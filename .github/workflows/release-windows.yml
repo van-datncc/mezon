@@ -16,8 +16,10 @@ jobs:
       - name: Zip portable
         run: |
           powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'version=$(npm pkg get version | xargs)'"
-          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'echo $version'"
-
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'echo version=$version'"
+      - name: Zip portable 2
+        run: |
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'version=$(npm pkg get version | xargs) && echo version=$version' "
       # - name: Install package
       #   run: |
       #     yarn
