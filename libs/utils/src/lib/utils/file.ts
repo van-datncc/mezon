@@ -103,5 +103,13 @@ export function getDisplayMention(array: MentionDataProps[]) {
 	return mentionStrings.join(' ');
 }
 export function filterMentionsWithAtSign(array: MentionDataProps[]) {
-	return array.filter((item: MentionDataProps) => item?.display?.startsWith('@'));
+	const seenIds = new Set<string>();
+
+	return array.filter((item: MentionDataProps) => {
+		if (item?.display?.startsWith('@') && !seenIds.has(item?.id as string)) {
+			seenIds.add(item?.id as string);
+			return true;
+		}
+		return false;
+	});
 }

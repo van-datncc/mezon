@@ -10,6 +10,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	RolesClanEntity,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -47,6 +48,7 @@ import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -67,7 +69,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -181,7 +183,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
-
+	const [mentionOnFile, setMentionOnFile] = useState<IMentionOnMessage[]>([]);
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const seenIds = new Set();
@@ -305,11 +307,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
 				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
 			}
-
+			const newMentionList = [...mentionList, ...mentionOnFile];
+			// const newStringDisplay = getDisplayMention(request.content ?? '');
+			const newMentionConverted = convertMentionOnfile(rolesClan, request.content, newMentionList as MentionItem[]);
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					mentionOnFile.length > 0 ? newMentionConverted : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -342,7 +346,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionList,
+						mentionOnFile.length > 0 ? newMentionConverted : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -371,6 +375,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
+			setMentionOnFile([]);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -429,6 +434,28 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		return [];
 	}, [props.mode, commonChannelDms]);
 
+	const convertMentionOnfile = (roles: RolesClanEntity[], contentString: string, ment: MentionItem[]): IMentionOnMessage[] => {
+		const roleIds = new Set(roles.map((role) => role.id));
+		const mentions: IMentionOnMessage[] = [];
+
+		ment.forEach((mention) => {
+			const { id, display } = mention;
+			const startIndex = contentString.indexOf(display);
+			if (startIndex !== -1) {
+				const s = startIndex;
+				const e = s + display.length;
+				const isRole = roleIds.has(id);
+				if (isRole) {
+					mentions.push({ role_id: id, s, e });
+				} else {
+					mentions.push({ user_id: id, s, e });
+				}
+			}
+		});
+
+		return mentions;
+	};
+
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
@@ -445,11 +472,21 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		const onlyMention = filterMentionsWithAtSign(mentions);
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
+			const displayString = getDisplayMention(onlyMention);
+
 			props.handleConvertToFile(newPlainTextValue);
 
 			if (onlyMention.length > 0) {
-				const displayString = getDisplayMention(onlyMention);
-				setRequestInput({ ...request, valueTextInput: formatMentionsToString(onlyMention), content: displayString }, props.isThread);
+				const mentionConverted = convertMentionOnfile(rolesClan, displayString, onlyMention as MentionItem[]);
+				setMentionOnFile(mentionConverted);
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: formatMentionsToString(onlyMention),
+						content: displayString
+					},
+					props.isThread
+				);
 			} else {
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 			}
