@@ -4,6 +4,7 @@ import {
 	useEscapeKeyClose,
 	useFormatDate,
 	useMemberCustomStatus,
+	useMemberStatus,
 	useOnClickOutside,
 	useSendInviteMessage,
 	useSettingFooter,
@@ -82,14 +83,13 @@ const ModalUserProfile = ({
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
 	const userById = useUserById(userID);
+	const userStatus = useMemberStatus(userID || '');
 
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 	const displayCustomStatus = userID === currentUserId ? currentUserCustomStatus : userCustomStatus;
-
-	const activity = activityByUserId?.activity_name + ' - ' + activityByUserId?.activity_description;
 
 	const [content, setContent] = useState<string>('');
 
@@ -179,13 +179,13 @@ const ModalUserProfile = ({
 	const iconMap: Partial<Record<ActivitiesType, JSX.Element>> = {
 		[ActivitiesType.VISUAL_STUDIO_CODE]: <Icons.VisualStudioCode defaultSize="w-6 h-6" />,
 		[ActivitiesType.SPOTIFY]: <Icons.Spotify defaultSize="w-6 h-6" />,
-		[ActivitiesType.LOL]: <Icons.RiotGame defaultSize="w-6 h-6" />
+		[ActivitiesType.LOL]: <Icons.LoLGame defaultSize="w-6 h-6" />
 	};
 
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
 		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
-		[ActivitiesName.LOL]: 'Riot Client'
+		[ActivitiesName.LOL]: 'League of Legends'
 	};
 
 	return (
@@ -215,6 +215,7 @@ const ModalUserProfile = ({
 				positionType={positionType}
 				isFooterProfile={isFooterProfile}
 				activityByUserId={activityByUserId}
+				userStatus={userStatus}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -232,7 +233,7 @@ const ModalUserProfile = ({
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 
-					{activityByUserId && (
+					{!isFooterProfile && userStatus?.status && activityByUserId && (
 						<div className="flex flex-col">
 							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 p-2"></div>
 							<div className="font-bold tracking-wider text-xs pt-2">{ETileDetail.Actitity}</div>

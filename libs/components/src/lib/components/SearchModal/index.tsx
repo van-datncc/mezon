@@ -253,7 +253,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: SearchItemProps) => {
-			if (channel.id && (channel.type === ChannelType.CHANNEL_TYPE_TEXT || channel.type === ChannelType.CHANNEL_TYPE_STREAMING)) {
+			if (
+				channel.id &&
+				(channel.type === ChannelType.CHANNEL_TYPE_TEXT ||
+					channel.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+					channel.type === ChannelType.CHANNEL_TYPE_THREAD)
+			) {
 				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
 				const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
 

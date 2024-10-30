@@ -1,4 +1,3 @@
-import { useMemberStatus } from '@mezon/core';
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ActivitiesName, ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
@@ -19,6 +18,7 @@ type AvatarProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
 	activityByUserId?: ApiUserActivity;
+	userStatus?: { status?: boolean; isMobile?: boolean };
 };
 
 const AvatarProfile = ({
@@ -30,9 +30,9 @@ const AvatarProfile = ({
 	userID,
 	positionType,
 	isFooterProfile,
-	activityByUserId
+	activityByUserId,
+	userStatus
 }: AvatarProfileProps) => {
-	const userStatus = useMemberStatus(userID || '');
 	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
 
 	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
@@ -52,7 +52,7 @@ const AvatarProfile = ({
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
 		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
-		[ActivitiesName.LOL]: 'Riot Client'
+		[ActivitiesName.LOL]: 'League of Legends'
 	};
 
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];
@@ -81,7 +81,7 @@ const AvatarProfile = ({
 				</div>
 			</div>
 
-			{(customStatus || activityByUserId) && (
+			{(customStatus || (userStatus?.status && activityByUserId)) && (
 				<div className="flex flex-col gap-[12px] mt-[30px] relative w-full h-[85px]">
 					<div className="dark:bg-bgPrimary bg-white w-[12px] h-[12px] rounded-full shadow-md"></div>
 					<div className="relative flex-1">
