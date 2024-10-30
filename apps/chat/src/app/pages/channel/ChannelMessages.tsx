@@ -316,7 +316,6 @@ function ChannelMessages({
 									}}
 								>
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={rowVirtualizer.measureElement}>
-										<span>{virtualRow.index}</span>
 										<MemorizedChannelMessage
 											index={virtualRow.index}
 											avatarDM={avatarDM}
