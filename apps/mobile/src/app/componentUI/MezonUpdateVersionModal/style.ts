@@ -10,28 +10,28 @@ export const style = () =>
 			flex: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
-			backgroundColor: 'rgba(0, 0, 0, 0.5)',
+			backgroundColor: 'rgba(0, 0, 0, 0.5)'
 		},
 		modalContainer: {
 			width: 300,
 			padding: 20,
 			backgroundColor: 'white',
 			borderRadius: 10,
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		title: {
 			fontSize: 18,
 			fontWeight: 'bold',
-			marginBottom: 10,
+			marginBottom: 10
 		},
 		message: {
 			fontSize: 16,
 			marginBottom: 20,
-			textAlign: 'center',
+			textAlign: 'center'
 		},
 		buttonContainer: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			width: '100%',
-		},
+			width: '100%'
+		}
 	});
