@@ -446,8 +446,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
-		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
-			const onlyMention = filterMentionsWithAtSign(mentions);
+		const onlyMention = filterMentionsWithAtSign(mentions);
+		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newPlainTextValue);
 			if (onlyMention.length > 0) {
 				const displayString = getDisplayMention(onlyMention);
