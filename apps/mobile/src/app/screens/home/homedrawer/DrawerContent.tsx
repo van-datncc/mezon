@@ -1,8 +1,9 @@
 import { useCategory } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/store-mobile';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { Swing } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import ChannelList from './ChannelList';
@@ -44,7 +45,22 @@ const DrawerContent = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const isTabletLandscape = useTabletLandscape();
+	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
 
+	useEffect(() => {
+		const timer = setTimeout(async () => {
+			setIsReadyForUse(true);
+		}, 2000);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, []);
+	if (!isReadyForUse)
+		return (
+			<View style={[styles.containerDrawerEmpty, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
+				<Swing color={themeValue.text} />
+			</View>
+		);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<ServerList />

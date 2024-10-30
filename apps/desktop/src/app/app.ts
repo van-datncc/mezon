@@ -1,14 +1,22 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import { windowManager } from 'node-window-manager';
 import { join } from 'path';
 import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
-import { TRIGGER_SHORTCUT } from './events/constants';
+
+import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 
 const isQuitting = false;
+
+export enum EActivities {
+	CODE = 'Code',
+	SPOTIFY = 'Spotify',
+	LOL = 'LeagueClientUx'
+}
 
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
@@ -44,6 +52,7 @@ export default class App {
 			App.setupMenu();
 			App.setupBadge();
 			tray.init(isQuitting);
+			App.setupWindowManager();
 		}
 	}
 
@@ -214,6 +223,75 @@ export default class App {
 		return initBadge(App.application, App.mainWindow);
 	}
 
+	private static setupWindowManager() {
+		const windowInfoArray = [];
+		let defaultApp = null;
+		const usageThreshold = 30 * 60 * 1000;
+		let hasSentDefaultApp = false;
+		let activityTimeout = null;
+		let isFirstRun = true;
+
+		const updateWindowInfoArray = () => {
+			windowInfoArray.length = 0;
+			windowManager.getWindows().forEach((window) => {
+				if (window.isVisible()) {
+					const fullPath = window.path.split('\\').pop();
+					const appName = fullPath.replace(/\.exe$/, '');
+					const windowTitle = window.getTitle();
+
+					if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName as EActivities)) {
+						const startTime = new Date().toISOString();
+						windowInfoArray.push({ appName, windowTitle, startTime });
+					}
+				}
+			});
+		};
+
+		updateWindowInfoArray();
+
+		if (windowInfoArray.length > 0) {
+			defaultApp = windowInfoArray[0];
+		}
+
+		windowManager.on('window-activated', (window) => {
+			const fullPath = window.path.split('\\').pop();
+			const appName = fullPath.replace(/\.exe$/, '');
+			const windowTitle = window.getTitle();
+			const startTime = new Date().toISOString();
+
+			if (defaultApp) {
+				if (isFirstRun) {
+					App.mainWindow.webContents.send(ACTIVE_WINDOW, { ...defaultApp, startTime });
+					hasSentDefaultApp = true;
+					isFirstRun = false;
+				}
+			} else if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && isFirstRun) {
+				defaultApp = { appName, windowTitle, startTime };
+				App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
+				hasSentDefaultApp = true;
+				isFirstRun = false;
+			}
+
+			if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && !isFirstRun) {
+				if (activityTimeout) {
+					clearTimeout(activityTimeout);
+				}
+
+				activityTimeout = setTimeout(() => {
+					const newWindowTitle = window.getTitle();
+					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
+						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
+						hasSentDefaultApp = false;
+					}
+
+					if (defaultApp && !hasSentDefaultApp) {
+						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
+						hasSentDefaultApp = true;
+					}
+				}, usageThreshold);
+			}
+		});
+	}
 	private static setupMenu() {
 		const isMac = process.platform === 'darwin';
 

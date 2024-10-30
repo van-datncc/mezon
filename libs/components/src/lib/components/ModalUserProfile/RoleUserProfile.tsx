@@ -86,7 +86,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className="flex flex-col">
-			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
+			{/* {userRolesClan.length > 0 && <div className="font-bold tracking-wider text-sm pt-2">ROLES</div>} */}
 			<div className="mt-2 flex flex-wrap gap-2">
 				{userRolesClan.slice(0, 6).map((role, index) => (
 					<RoleClanItem

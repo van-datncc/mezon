@@ -108,7 +108,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [message?.sender_id, userId]);
 	const mode = useMemo(() => {
 		if (modeResponsive === ModeResponsive.MODE_CLAN) {
-			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			}
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				return ChannelStreamMode.STREAM_MODE_THREAD;
+			}
 		}
 
 		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -116,7 +121,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		}
 
 		return ChannelStreamMode.STREAM_MODE_GROUP;
-	}, [modeResponsive, currentDm?.type]);
+	}, [modeResponsive, currentDm?.type, currentChannel?.type]);
 
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
@@ -301,7 +306,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [dispatch, dmGroupChatList?.length, message]);
 
 	const handlePinMessage = async () => {
-		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+		dispatch(pinMessageActions.setChannelPinMessage({ clan_id: currentClanId ?? '', channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
 				clanId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
@@ -402,7 +407,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
 			return isOwnerGroupDM;
 		}
-		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL || activeMode === ChannelStreamMode.STREAM_MODE_THREAD) {
 			return canDeleteMessage;
 		}
 	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM]);

@@ -25,6 +25,15 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	isBacktick,
 	typeOfBacktick
 }) => {
+	const contentRemovedBacktick = (contentArg: string) => {
+		if (typeOfBacktick === EBacktickType.SINGLE) {
+			return contentArg?.split('`')[1] || '';
+		} else if (typeOfBacktick === EBacktickType.TRIPLE) {
+			return contentArg?.split('```')[1] || contentArg?.split('`')[1];
+		}
+		return contentArg;
+	};
+
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
@@ -66,12 +75,17 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
-			{isBacktick && typeOfBacktick === EBacktickType.SINGLE ? (
-				<SingleBacktick content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
-			) : isBacktick && typeOfBacktick === EBacktickType.TRIPLE && !posInReply ? (
-				<TripleBackticks content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
-			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply ? (
-				<SingleBacktick content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
+			{!isLink && isBacktick && typeOfBacktick === EBacktickType.SINGLE ? (
+				<SingleBacktick
+					contentBacktick={contentRemovedBacktick(content as string)}
+					isInPinMsg={isInPinMsg}
+					isLightMode={isLightMode}
+					posInNotification={posInNotification}
+				/>
+			) : isBacktick && typeOfBacktick === EBacktickType.TRIPLE && !posInReply && !isLink ? (
+				<TripleBackticks contentBacktick={contentRemovedBacktick(content as string)} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply && !isLink ? (
+				<SingleBacktick contentBacktick={contentRemovedBacktick(content as string)} isLightMode={isLightMode} />
 			) : null}
 		</div>
 	);
@@ -79,26 +93,37 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 export default memo(MarkdownContent);
 
 type BacktickOpt = {
-	content?: any;
+	contentBacktick?: any;
 	isLightMode?: boolean;
 	isInPinMsg?: boolean;
 	isJumMessageEnabled?: boolean;
 	posInNotification?: boolean;
 };
 
-const SingleBacktick: React.FC<BacktickOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
+const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, isInPinMsg, posInNotification }) => {
+	const posInPinOrNotification = isInPinMsg || posInNotification;
 	return (
-		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
+		<span
+			className={
+				!posInPinOrNotification
+					? `${isLightMode ? 'prose-backtick single-markdown-light-mode ' : 'prose-backtick single-markdown'}`
+					: 'w-full'
+			}
+			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
+		>
 			<code
-				className={`${isInPinMsg && isLightMode ? 'whitespace-pre-wrap block break-words pin-msg-modeLight' : isInPinMsg && !isLightMode ? 'whitespace-pre-wrap block break-words pin-msg' : null}`}
+				className={`${
+					posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
+				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
+				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'nowrap' }}
 			>
-				{content}
+				{contentBacktick.trim()}
 			</code>
 		</span>
 	);
 };
 
-const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinMsg }) => {
+const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, isInPinMsg }) => {
 	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
@@ -109,19 +134,15 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinM
 		return () => clearTimeout(timer);
 	}, [copied]);
 
-	const splitContent = content?.split('```').filter(Boolean);
-
 	return (
-		<div className={`relative prose ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
-			<pre className={`pre p-2 ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
-				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
-					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
+		<div className={`relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
+				<CopyToClipboard text={`\`\`\`${contentBacktick?.trim()}\`\`\``} onCopy={() => setCopied(true)}>
+					<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 					</button>
 				</CopyToClipboard>
-				{splitContent?.map((block: string) => (
-					<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{block.trim()}</code>
-				))}
+				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick?.trim()}</code>
 			</pre>
 		</div>
 	);

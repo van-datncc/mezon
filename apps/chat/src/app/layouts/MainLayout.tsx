@@ -1,5 +1,5 @@
-import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAnyUnreadChannel, selectBadgeCountAllClan } from '@mezon/store';
+import { ChatContext, ChatContextProvider, useFriends } from '@mezon/core';
+import { gifsStickerEmojiActions, reactionActions, selectAnyUnreadChannel, selectBadgeCountAllClan } from '@mezon/store';
 
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
@@ -69,9 +69,8 @@ const GlobalEventListener = () => {
 
 const MainLayout = () => {
 	const dispatch = useDispatch();
-	const { setSubPanelActive } = useGifsStickersEmoji();
 	const handleClickingOutside = () => {
-		setSubPanelActive(SubPanelName.NONE);
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		dispatch(reactionActions.setUserReactionPanelState(false));
 	};
 	return (

@@ -495,9 +495,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						<svg data-5iu="true" data-qa="bold" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
-								fill-rule="evenodd"
+								fillRule="evenodd"
 								d="M4 2.75A.75.75 0 0 1 4.75 2h6.343a3.91 3.91 0 0 1 3.88 3.449A2 2 0 0 1 15 5.84l.001.067a3.9 3.9 0 0 1-1.551 3.118A4.627 4.627 0 0 1 11.875 18H4.75a.75.75 0 0 1-.75-.75V9.5a.8.8 0 0 1 .032-.218A.8.8 0 0 1 4 9.065zm2.5 5.565h3.593a2.157 2.157 0 1 0 0-4.315H6.5zm4.25 1.935H6.5v5.5h4.25a2.75 2.75 0 1 0 0-5.5"
-								clip-rule="evenodd"
+								clipRule="evenodd"
 							></path>
 						</svg>
 					</button>
@@ -513,9 +513,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						<svg data-5iu="true" data-qa="italic" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
-								fill-rule="evenodd"
+								fillRule="evenodd"
 								d="M7 2.75A.75.75 0 0 1 7.75 2h7.5a.75.75 0 0 1 0 1.5H12.3l-2.6 13h2.55a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5H7.7l2.6-13H7.75A.75.75 0 0 1 7 2.75"
-								clip-rule="evenodd"
+								clipRule="evenodd"
 							></path>
 						</svg>
 					</button>
@@ -531,9 +531,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						<svg data-5iu="true" data-qa="strikethrough" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
-								fill-rule="evenodd"
+								fillRule="evenodd"
 								d="M11.721 3.84c-.91-.334-2.028-.36-3.035-.114-1.51.407-2.379 1.861-2.164 3.15C6.718 8.051 7.939 9.5 11.5 9.5l.027.001h5.723a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5h3.66c-.76-.649-1.216-1.468-1.368-2.377-.347-2.084 1.033-4.253 3.265-4.848l.007-.002.007-.002c1.252-.307 2.68-.292 3.915.16 1.252.457 2.337 1.381 2.738 2.874a.75.75 0 0 1-1.448.39c-.25-.925-.91-1.528-1.805-1.856m2.968 9.114a.75.75 0 1 0-1.378.59c.273.64.186 1.205-.13 1.674-.333.492-.958.925-1.82 1.137-.989.243-1.991.165-3.029-.124-.93-.26-1.613-.935-1.858-1.845a.75.75 0 0 0-1.448.39c.388 1.441 1.483 2.503 2.903 2.9 1.213.338 2.486.456 3.79.135 1.14-.28 2.12-.889 2.704-1.753.6-.888.743-1.992.266-3.104"
-								clip-rule="evenodd"
+								clipRule="evenodd"
 							></path>
 						</svg>
 					</button>
@@ -547,9 +547,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						<svg data-5iu="true" data-qa="code" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
-								fill-rule="evenodd"
+								fillRule="evenodd"
 								d="M12.058 3.212c.396.12.62.54.5.936L8.87 16.29a.75.75 0 1 1-1.435-.436l3.686-12.143a.75.75 0 0 1 .936-.5M5.472 6.24a.75.75 0 0 1 .005 1.06l-2.67 2.693 2.67 2.691a.75.75 0 1 1-1.065 1.057l-3.194-3.22a.75.75 0 0 1 0-1.056l3.194-3.22a.75.75 0 0 1 1.06-.005m9.044 1.06a.75.75 0 1 1 1.065-1.056l3.194 3.221a.75.75 0 0 1 0 1.057l-3.194 3.219a.75.75 0 0 1-1.065-1.057l2.67-2.69z"
-								clip-rule="evenodd"
+								clipRule="evenodd"
 							></path>
 						</svg>
 					</button>
@@ -568,9 +568,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						<svg data-5iu="true" data-qa="link" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
-								fill-rule="evenodd"
+								fillRule="evenodd"
 								d="M12.306 3.756a2.75 2.75 0 0 1 3.889 0l.05.05a2.75 2.75 0 0 1 0 3.889l-3.18 3.18a2.75 2.75 0 0 1-3.98-.095l-.03-.034a.75.75 0 0 0-1.11 1.009l.03.034a4.25 4.25 0 0 0 6.15.146l3.18-3.18a4.25 4.25 0 0 0 0-6.01l-.05-.05a4.25 4.25 0 0 0-6.01 0L9.47 4.47a.75.75 0 1 0 1.06 1.06zm-4.611 12.49a2.75 2.75 0 0 1-3.89 0l-.05-.051a2.75 2.75 0 0 1 0-3.89l3.18-3.179a2.75 2.75 0 0 1 3.98.095l.03.034a.75.75 0 1 0 1.11-1.01l-.03-.033a4.25 4.25 0 0 0-6.15-.146l-3.18 3.18a4.25 4.25 0 0 0 0 6.01l.05.05a4.25 4.25 0 0 0 6.01 0l1.775-1.775a.75.75 0 0 0-1.06-1.06z"
-								clip-rule="evenodd"
+								clipRule="evenodd"
 							></path>
 						</svg>
 					</button>
@@ -591,7 +591,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 				{`
 				.ql-editor.ql-blank::before {
 					color: ${placeholderColor};
-					opacity: 1; 
+					opacity: 1;
 				}
 
 				.ql-snow .ql-editor code {
@@ -603,11 +603,11 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					}
 					.ql-toolbar {
 						display: none;
-					} 
+					}
 					.ql-tooltip {
 						left: 0 !important;
 					}
-					
+
         `}
 			</style>
 		</div>

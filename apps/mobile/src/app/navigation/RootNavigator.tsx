@@ -76,12 +76,13 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timer: string | number | NodeJS.Timeout;
 		if (isLoggedIn) {
+			mainLoader();
 			timer = setTimeout(async () => {
 				InteractionManager.runAfterInteractions(() => {
 					initAppLoading();
 				});
 				// timeout 2000s to check app open from FCM or nomarly
-			}, 3000);
+			}, 2000);
 		}
 		return () => {
 			clearTimeout(timer);
@@ -112,7 +113,6 @@ const NavigationMain = () => {
 
 	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-		await mainLoader();
 		await mainLoaderTimeout({ isFromFCM: isFromFCM?.toString() === 'true' });
 	};
 

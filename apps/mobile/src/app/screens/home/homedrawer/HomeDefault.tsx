@@ -1,5 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
+import { useResetCountChannelBadge } from '@mezon/core';
+import { ActionEmitEvent, ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -8,20 +9,22 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	gifsStickerEmojiActions,
 	selectAllClans,
 	selectAnyUnreadChannels,
 	selectChannelById,
 	selectCurrentChannel,
 	selectFetchChannelStatus,
+	selectPreviousChannels,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
+import { ChannelStatusEnum, SubPanelName, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
 import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -40,9 +43,15 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
+	const resetCountChannelBadge = useResetCountChannelBadge();
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
+		if (channelId) {
+			DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
+		}
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
@@ -55,7 +64,12 @@ function useChannelSeen(channelId: string) {
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [channelId, currentChannel?.clan_id, currentChannel?.count_mess_unread, currentChannel?.id, dispatch, resetBadgeCount, statusFetchChannel]);
+	}, [currentChannel?.id, statusFetchChannel]);
+	const previousChannelId = useSelector(selectPreviousChannels)[1];
+	const previousChannel = useSelector(selectChannelById(previousChannelId));
+	useEffect(() => {
+		resetCountChannelBadge(previousChannel);
+	}, [previousChannelId]);
 }
 
 const HomeDefault = React.memo((props: any) => {

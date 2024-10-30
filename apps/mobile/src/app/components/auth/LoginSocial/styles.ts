@@ -1,4 +1,5 @@
-import { Attributes, Metrics, brandColors } from '@mezon/mobile-ui';
+import { IS_TABLET } from '@mezon/mobile-components';
+import { Attributes, Metrics, brandColors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -7,16 +8,16 @@ export const style = (colors: Attributes) =>
 			backgroundColor: 'white',
 			paddingVertical: Metrics.size.l,
 			marginHorizontal: Metrics.size.xl,
-			borderRadius: 4,
+			borderRadius: size.s_4,
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
 		// Will fix later
 		appleButton: {
 			backgroundColor: 'black',
-			paddingVertical: 15,
-			marginHorizontal: 20,
-			borderRadius: 4,
+			paddingVertical: size.s_15,
+			marginHorizontal: size.s_20,
+			borderRadius: size.s_4,
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
@@ -28,14 +29,9 @@ export const style = (colors: Attributes) =>
 			width: '100%',
 			gap: Metrics.size.m
 		},
-
-		signinButtonLogo: {
-			height: 18,
-			width: 18
-		},
 		socialSigninButtonText: {
 			color: brandColors.google,
-			fontSize: 16,
-			lineHeight: 13 * 1.4
+			fontSize: size.s_16,
+			lineHeight: IS_TABLET ? size.s_22 : size.s_18
 		}
 	});

@@ -855,3 +855,33 @@ export type CanvasUpdate = {
 	id: string;
 	title: string;
 };
+
+export type IActivity = {
+	activity_description?: string;
+	activity_name?: string;
+	activity_type?: number;
+	application_id?: string;
+	end_time?: string;
+	start_time?: string;
+	status?: number;
+	user_id?: string;
+	id: string;
+};
+
+export interface ActivitiesInfo {
+	appName: string;
+	windowTitle: string;
+	startTime: string;
+}
+
+export enum ActivitiesType {
+	VISUAL_STUDIO_CODE = 1,
+	SPOTIFY = 2,
+	LOL = 3
+}
+
+export enum ActivitiesName {
+	CODE = 'Code',
+	SPOTIFY = 'Spotify',
+	LOL = 'LeagueClientUx'
+}

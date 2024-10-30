@@ -3,21 +3,20 @@ import {
 	ChannelsEntity,
 	appActions,
 	categoriesActions,
-	channelsActions,
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
 	selectStatusStream,
-	selectThreadNotJoin,
-	threadsActions,
+	selectThreadById,
 	useAppDispatch,
 	useAppSelector,
 	videoStreamActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
@@ -31,7 +30,6 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const dispatch = useAppDispatch();
 	const tagId = channelHastagId?.slice(2, -1);
 	const isClanView = useSelector(selectClanView);
-	const [openModal, setOpenModal] = useState(false);
 	const { toChannelPage, navigate } = useAppNavigation();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
@@ -39,30 +37,8 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const clanById = useSelector(selectCurrentClan);
 
 	let channel = useTagById(tagId);
-	const thread = useAppSelector((state) => selectThreadNotJoin(state, tagId));
-	if (thread) channel = thread;
-	const [loading, setLoading] = useState(!channel);
-
-	useEffect(() => {
-		const fetchThreads = async () => {
-			if (!(isClanView && clanById?.id && !channel && !thread)) return;
-			setLoading(true);
-			const threads = await dispatch(
-				threadsActions.fetchThread({
-					channelId: '0',
-					clanId: clanById?.id,
-					threadId: tagId
-				})
-			).unwrap();
-
-			if (threads?.length) {
-				dispatch(channelsActions.addThreadUserNotJoin(threads[0] as ChannelsEntity));
-				dispatch(channelsActions.upsertOne(threads[0] as ChannelsEntity));
-			}
-			setLoading(false);
-		};
-		fetchThreads();
-	}, []);
+	const thread = useAppSelector((state) => selectThreadById(state, tagId));
+	if (thread) channel = thread as ChannelsEntity;
 
 	const handleClick = useCallback(() => {
 		if (!channel) return;
@@ -96,9 +72,11 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		}
 	};
 
-	return loading ? (
-		<span></span>
-	) : channel ? (
+	const [openUnknown, closeUnknown] = useModal(() => {
+		return <ModalUnknowChannel onClose={closeUnknown} />;
+	}, []);
+
+	return channel ? (
 		(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
 			(channelHastagId && !isClanView)) &&
@@ -133,15 +111,12 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			</div>
 		) : null
 	) : (
-		<>
-			<span
-				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
-				onClick={() => setOpenModal(true)}
-			>
-				# unknown
-			</span>
-			{openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)} />}
-		</>
+		<span
+			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
+			onClick={openUnknown}
+		>
+			# Unknown
+		</span>
 	);
 };
 

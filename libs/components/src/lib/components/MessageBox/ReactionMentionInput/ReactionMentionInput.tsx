@@ -400,26 +400,26 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
-			return channels.map((item) => {
-				return {
+			return channels
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.category_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, channels]);
 
 	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
-			return commonChannelDms.map((item) => {
-				return {
+			return commonChannelDms
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.clan_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, commonChannelDms]);
@@ -633,7 +633,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
 				customSuggestionsContainer={(children: React.ReactNode) => {
-					return <CustomModalMentions children={children} titleModalMention={titleModalMention} />;
+					return <CustomModalMentions isThreadBox={props.isThread} children={children} titleModalMention={titleModalMention} />;
 				}}
 			>
 				<Mention
@@ -672,16 +672,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						return `#${display}`;
 					}}
 					style={mentionStyle}
-					renderSuggestion={(suggestion) => (
-						<SuggestItem
-							valueHightLight={valueHighlight}
-							display={suggestion?.display}
-							symbol="#"
-							subText={(suggestion as ChannelsMentionProps).subText}
-							channelId={suggestion.id}
-							emojiId=""
-						/>
-					)}
+					renderSuggestion={(suggestion) =>
+						suggestion?.id && suggestion?.display ? (
+							<SuggestItem
+								valueHightLight={valueHighlight}
+								display={suggestion.display}
+								symbol="#"
+								subText={(suggestion as ChannelsMentionProps).subText}
+								channelId={suggestion.id}
+								emojiId=""
+							/>
+						) : null
+					}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention

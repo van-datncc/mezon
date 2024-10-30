@@ -176,6 +176,7 @@ const DirectMessage = () => {
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
+									key={directId}
 									clanId="0"
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
@@ -289,7 +290,15 @@ const DirectMessage = () => {
 
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	return (
+		<SearchMessageChannelRender
+			searchMessages={messageSearchByChannelId}
+			currentPage={currentPage}
+			totalResult={totalResult}
+			channelId={currentChannelId || ''}
+		/>
+	);
 };
 
 export default memo(DirectMessage);

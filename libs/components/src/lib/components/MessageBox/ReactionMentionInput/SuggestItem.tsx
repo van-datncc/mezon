@@ -1,4 +1,11 @@
-import { ChannelsEntity, selectAllChannels, selectAllHashtagDm, selectChannelById, selectNumberMemberVoiceChannel, selectTheme } from '@mezon/store';
+import {
+	ChannelsEntity,
+	selectAllChannelsByUser,
+	selectAllHashtagDm,
+	selectChannelById,
+	selectNumberMemberVoiceChannel,
+	selectTheme
+} from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType, HashtagDm } from 'mezon-js';
@@ -37,7 +44,11 @@ const SuggestItem = ({
 	isHightLight = true,
 	channel
 }: SuggestItemProps) => {
-	const allChannels = useSelector(selectAllChannels);
+	const allChannels = useSelector(selectAllChannelsByUser);
+	const getChannel = allChannels.find((channel) => {
+		return channel.channel_id === channelId;
+	});
+
 	const { directId } = useParams();
 	const commonChannels = useSelector(selectAllHashtagDm);
 	const theme = useSelector(selectTheme);
@@ -52,9 +63,9 @@ const SuggestItem = ({
 	const channelIcon = useMemo(() => {
 		if (!specificChannel) return null;
 
-		const { channel_private, type, parrent_id } = specificChannel;
+		const { channel_private, type } = specificChannel;
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id === '0') {
+		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}
@@ -63,7 +74,7 @@ const SuggestItem = ({
 			}
 		}
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id !== '0') {
+		if (type === ChannelType.CHANNEL_TYPE_THREAD) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.ThreadIcon defaultSize="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />;
 			}
@@ -133,10 +144,10 @@ const SuggestItem = ({
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] one-line ${subTextStyle}`}>
-				{channel?.parrent_id === '0' ? (
-					<>{HighlightMatchBold(subText ?? '', valueHightLight ?? '')}</>
+				{getChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
+					<RenderChannelLabelForThread channel_id={getChannel?.parrent_id as string} />
 				) : (
-					<RenderChannelLabelForThread channel_id={channel?.parrent_id as string} />
+					<>{HighlightMatchBold(subText ?? '', valueHightLight ?? '')}</>
 				)}
 			</span>
 		</div>

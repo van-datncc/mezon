@@ -4,14 +4,17 @@ import {
 	useEscapeKeyClose,
 	useFormatDate,
 	useMemberCustomStatus,
+	useMemberStatus,
 	useOnClickOutside,
 	useSendInviteMessage,
 	useSettingFooter,
 	useUserById
 } from '@mezon/core';
 import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
-import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
+import { Icons } from '@mezon/ui';
+import { ActivitiesName, ActivitiesType, ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { ApiUserActivity } from 'mezon-js/api.gen';
 import { RefObject, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -44,6 +47,7 @@ type ModalUserProfileProps = {
 	userStatusProfile?: string;
 	onClose: () => void;
 	rootRef?: RefObject<HTMLElement>;
+	activityByUserId?: ApiUserActivity;
 };
 
 export type OpenModalProps = {
@@ -53,7 +57,8 @@ export type OpenModalProps = {
 
 enum ETileDetail {
 	AboutMe = 'About me',
-	MemberSince = 'Member Since'
+	MemberSince = 'Member Since',
+	Actitity = 'Activity'
 }
 
 const ModalUserProfile = ({
@@ -70,13 +75,15 @@ const ModalUserProfile = ({
 	positionType,
 	isDM,
 	onClose,
-	rootRef
+	rootRef,
+	activityByUserId
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
 	const userById = useUserById(userID);
+	const userStatus = useMemberStatus(userID || '');
 
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
@@ -168,6 +175,19 @@ const ModalUserProfile = ({
 		}
 		return message?.references?.[0].message_sender_username;
 	}, [userById, userID]);
+
+	const iconMap: Partial<Record<ActivitiesType, JSX.Element>> = {
+		[ActivitiesType.VISUAL_STUDIO_CODE]: <Icons.VisualStudioCode defaultSize="w-6 h-6" />,
+		[ActivitiesType.SPOTIFY]: <Icons.Spotify defaultSize="w-6 h-6" />,
+		[ActivitiesType.LOL]: <Icons.LoLGame defaultSize="w-6 h-6" />
+	};
+
+	const activityNames: { [key: string]: string } = {
+		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
+		[ActivitiesName.LOL]: 'League of Legends'
+	};
+
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
@@ -194,6 +214,8 @@ const ModalUserProfile = ({
 				userID={userID}
 				positionType={positionType}
 				isFooterProfile={isFooterProfile}
+				activityByUserId={activityByUserId}
+				userStatus={userStatus}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -210,6 +232,23 @@ const ModalUserProfile = ({
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
+
+					{!isFooterProfile && userStatus?.status && activityByUserId && (
+						<div className="flex flex-col">
+							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 p-2"></div>
+							<div className="font-bold tracking-wider text-xs pt-2">{ETileDetail.Actitity}</div>
+							<div className="flex gap-2 items-center">
+								<div className="">{iconMap[activityByUserId?.activity_type as ActivitiesType]}</div>
+								<div className="flex flex-col">
+									<div className='className="font-normal tracking-wider text-xs one-line'>
+										{activityNames[activityByUserId?.activity_name as string]}
+									</div>
+									<div className="font-normal tracking-wider text-xs one-line">{activityByUserId?.activity_description}</div>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{isFooterProfile ? (
 						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} />
 					) : (

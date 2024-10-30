@@ -1,5 +1,6 @@
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { TrashIcon } from '@mezon/mobile-components';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { EmojiDataOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -136,18 +137,16 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 		);
 	};
 	return (
-		<Block flex={1}>
+		<BottomSheetScrollView stickyHeaderIndices={[0]}>
+			{!!allReactionDataOnOneMessage?.length && <View style={styles.contentHeader}>{getTabHeader()}</View>}
 			{allReactionDataOnOneMessage?.length ? (
-				<View>
-					<View style={styles.contentHeader}>{getTabHeader()}</View>
-					<View>{getContent()}</View>
-				</View>
+				<View>{getContent()}</View>
 			) : (
 				<View style={styles.noActionsWrapper}>
 					<Text style={styles.noActionTitle}>{t('reactions.noActionTitle')}</Text>
 					<Text style={styles.noActionContent}>{t('reactions.noActionDescription')}</Text>
 				</View>
 			)}
-		</Block>
+		</BottomSheetScrollView>
 	);
 });

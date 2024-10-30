@@ -1,7 +1,7 @@
-import { useMemberStatus } from '@mezon/core';
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
+import { ActivitiesName, ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
+import { ApiUserActivity } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -17,10 +17,22 @@ type AvatarProfileProps = {
 	positionType?: string;
 	userID?: string;
 	isFooterProfile?: boolean;
+	activityByUserId?: ApiUserActivity;
+	userStatus?: { status?: boolean; isMobile?: boolean };
 };
 
-const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvatar, userID, positionType, isFooterProfile }: AvatarProfileProps) => {
-	const userStatus = useMemberStatus(userID || '');
+const AvatarProfile = ({
+	customStatus,
+	avatar,
+	username,
+	isAnonymous,
+	styleAvatar,
+	userID,
+	positionType,
+	isFooterProfile,
+	activityByUserId,
+	userStatus
+}: AvatarProfileProps) => {
 	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
 
 	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
@@ -36,6 +48,14 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 	const handleClearCustomStatus = () => {
 		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: '' }));
 	};
+
+	const activityNames: { [key: string]: string } = {
+		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
+		[ActivitiesName.LOL]: 'League of Legends'
+	};
+
+	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];
 
 	return (
 		<div className=" text-black flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
@@ -61,7 +81,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 				</div>
 			</div>
 
-			{customStatus && (
+			{(customStatus || (userStatus?.status && activityByUserId)) && (
 				<div className="flex flex-col gap-[12px] mt-[30px] relative w-full h-[85px]">
 					<div className="dark:bg-bgPrimary bg-white w-[12px] h-[12px] rounded-full shadow-md"></div>
 					<div className="relative flex-1">
@@ -69,7 +89,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 						<div className="absolute w-fit max-w-full shadow-lg rounded-[12px] group">
 							<div className="relative dark:bg-bgPrimary bg-white px-[16px] py-[12px] w-fit max-w-full rounded-[12px] flex items-center justify-center">
 								<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-words overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
-									{customStatus}
+									{activityStatus}
 								</span>
 								{isFooterProfile && (
 									<div className="absolute -top-4 right-1 hidden group-hover:flex gap-[1px] dark:text-[#d1d4d6] text-[#303236] rounded-full bg-white dark:bg-bgPrimary border dark:border-[#1e1e1e] p-[2px] shadow-md">

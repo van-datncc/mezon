@@ -1,9 +1,9 @@
 import { useChatMessages } from '@mezon/core';
-import { Icons, IUserStatus } from '@mezon/mobile-components';
+import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { directActions, directMetaActions, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
-import { TIME_OFFSET } from '@mezon/utils';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { MessagesEntity, directActions, directMetaActions, gifsStickerEmojiActions, useAppDispatch } from '@mezon/store-mobile';
+import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
+import React, { useEffect, useRef } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { UserStatus } from '../../../components/UserStatus';
 
@@ -24,21 +24,22 @@ function useChannelSeen(channelId: string) {
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
-	const updateChannelSeenState = useCallback(
-		(channelId: string, lastMessage: MessagesEntity) => {
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directActions.setActiveDirect({ directId: channelId }));
-		},
-		[dispatch]
-	);
+	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
+		const timestamp = Date.now() / 1000;
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+		dispatch(directActions.setActiveDirect({ directId: channelId }));
+	};
+
+	useEffect(() => {
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [channelId]);
 
 	useEffect(() => {
 		if (lastMessage) {
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [channelId, lastMessage, updateChannelSeenState]);
+	}, []);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -48,7 +49,7 @@ function useChannelSeen(channelId: string) {
 			mounted.current = channelId;
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [dispatch, channelId, lastMessage, updateChannelSeenState]);
+	}, [dispatch, channelId, lastMessage]);
 }
 
 const HeaderDirectMessage: React.FC<HeaderProps> = ({

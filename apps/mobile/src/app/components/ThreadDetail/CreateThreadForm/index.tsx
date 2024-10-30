@@ -19,6 +19,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectOpenThreadMessageState,
+	selectThreadCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
@@ -54,10 +55,11 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 
 	const formikRef = useRef(null);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const { valueThread, threadCurrentChannel } = useThreads();
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { valueThread } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
+		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -90,7 +92,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				channel_private: value.isPrivate,
 				parrent_id: (channelThreads ? channelThreads?.id : currentChannelId) || '',
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT
+				type: ChannelType.CHANNEL_TYPE_THREAD
 			};
 			try {
 				const newThreadResponse = await dispatch(createNewChannel(body));
@@ -122,7 +124,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
 						// sleep for waiting server check exist after insert
-						await sleep(10);
+						await sleep(100);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
@@ -170,7 +172,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME);
 		const channelId = thread?.channel_id;
-		const clanId = thread?.clan_id;
+		const clanId = thread?.clan_id || currentClanId;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));

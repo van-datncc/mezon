@@ -2,6 +2,7 @@ import { useChannelMembersActions } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	notificationSettingActions,
+	selectActivityByUserId,
 	selectAllAccount,
 	selectCurrentClan,
 	selectCurrentClanId,
@@ -9,6 +10,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	ActivitiesName,
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
 	MemberProfileType,
@@ -103,6 +105,15 @@ export function MemberProfile({
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
+
+	const activityNames: { [key: string]: string } = {
+		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
+		[ActivitiesName.LOL]: 'League of Legends'
+	};
+
+	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
@@ -220,10 +231,11 @@ export function MemberProfile({
 					avatar={avatar}
 					name={name}
 					isDM={isDM}
+					activityByUserId={activityByUserId}
 				/>
 			</div>
 		);
-	}, [positionShortUser]);
+	}, [positionShortUser, activityByUserId]);
 
 	const [openPanelMember, closePanelMember] = useModal(() => {
 		if (isHiddenAvatarPanel) return;
@@ -366,12 +378,12 @@ export function MemberProfile({
 									</button>
 								)}
 							</div>
-							{customStatus && (isMemberChannel || isMemberDMGroup) && (
+							{(customStatus || activityByUserId) && (isMemberChannel || isMemberDMGroup) && (
 								<p
 									className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] "
 									title={customStatus}
 								>
-									{customStatus}
+									{status?.status ? activityStatus : customStatus}
 								</p>
 							)}
 						</div>

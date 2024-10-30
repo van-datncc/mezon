@@ -9,13 +9,14 @@ import {
 	directActions,
 	directMetaActions,
 	getStoreAsync,
+	gifsStickerEmojiActions,
 	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { TIME_OFFSET } from '@mezon/utils';
+import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -32,21 +33,22 @@ function useChannelSeen(channelId: string) {
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
-	const updateChannelSeenState = useCallback(
-		(channelId: string, lastMessage: MessagesEntity) => {
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directActions.setActiveDirect({ directId: channelId }));
-		},
-		[dispatch]
-	);
+	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
+		const timestamp = Date.now() / 1000;
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+		dispatch(directActions.setActiveDirect({ directId: channelId }));
+	};
+
+	useEffect(() => {
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [channelId]);
 
 	useEffect(() => {
 		if (lastMessage) {
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [channelId, lastMessage, updateChannelSeenState]);
+	}, []);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -56,7 +58,7 @@ function useChannelSeen(channelId: string) {
 			mounted.current = channelId;
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [dispatch, channelId, lastMessage, updateChannelSeenState]);
+	}, [dispatch, channelId, lastMessage]);
 }
 
 export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {

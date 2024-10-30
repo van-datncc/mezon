@@ -81,8 +81,8 @@ const ContentInstall = memo((props: ContentInstallProps) => {
 				<Icons.AddServe className="text-contentTertiary ml-4" />
 				<div className="flex justify-between items-center flex-1">
 					<div>
-						<h4 className="text-base font-medium">Add to Server</h4>
-						<p className="dark:text-contentTertiary text-colorTextLightMode text-xs">Customise your server by adding this app</p>
+						<h4 className="text-base font-medium">Add to clan</h4>
+						<p className="dark:text-contentTertiary text-colorTextLightMode text-xs">Customise your clan by adding this app</p>
 					</div>
 					<Icons.ArrowRight defaultSize="size-6 mr-2 dark:text-contentTertiary text-contentTertiary" />
 				</div>

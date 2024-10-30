@@ -99,6 +99,36 @@ export const logOut = createAsyncThunk('auth/logOut', async (_, thunkAPI) => {
 	restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories']);
 });
 
+export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+	const QRlogin = await mezon?.createQRLogin();
+
+	if (!QRlogin) {
+		return thunkAPI.rejectWithValue('Invalid session');
+	}
+	return QRlogin;
+});
+
+export const checkLoginRequest = createAsyncThunk('auth/checkLoginRequest', async ({ loginId }: { loginId: string }, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+
+	const session = await mezon?.checkLoginRequest({ login_id: loginId });
+	if (session) {
+		return normalizeSession(session);
+	}
+	return null;
+});
+
+export const confirmLoginRequest = createAsyncThunk('auth/confirmLoginRequest', async ({ loginId }: { loginId: string }, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+
+	const session = await mezon?.confirmLoginRequest({ login_id: loginId });
+	if (session) {
+		return normalizeSession(session);
+	}
+	return null;
+});
+
 export const authSlice = createSlice({
 	name: AUTH_FEATURE_KEY,
 	initialState: initialAuthState,
@@ -157,7 +187,6 @@ export const authSlice = createSlice({
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-				console.log(action.error.message);
 			});
 
 		builder
@@ -175,6 +204,29 @@ export const authSlice = createSlice({
 				state.session = null;
 				state.isLogin = false;
 			});
+
+		builder
+			.addCase(checkLoginRequest.fulfilled, (state: AuthState, action) => {
+				if (action.payload !== null) {
+					state.session = action.payload;
+					state.isLogin = true;
+				}
+			})
+			.addCase(checkLoginRequest.rejected, (state: AuthState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+		builder
+			.addCase(confirmLoginRequest.pending, (state: AuthState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(confirmLoginRequest.fulfilled, (state: AuthState, action) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(confirmLoginRequest.rejected, (state: AuthState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	}
 });
 
@@ -189,6 +241,9 @@ export const authActions = {
 	authenticateApple,
 	authenticateEmail,
 	refreshSession,
+	createQRLogin,
+	checkLoginRequest,
+	confirmLoginRequest,
 	logOut
 };
 
