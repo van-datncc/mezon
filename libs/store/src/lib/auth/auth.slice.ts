@@ -247,6 +247,7 @@ export const authActions = {
 	refreshSession,
 	createQRLogin,
 	checkLoginRequest,
+	confirmLoginRequest,
 	logOut
 };
 
