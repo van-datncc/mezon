@@ -400,26 +400,26 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
-			return channels.map((item) => {
-				return {
+			return channels
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.category_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, channels]);
 
 	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
-			return commonChannelDms.map((item) => {
-				return {
+			return commonChannelDms
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.clan_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, commonChannelDms]);
