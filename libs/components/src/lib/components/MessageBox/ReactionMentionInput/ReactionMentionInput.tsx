@@ -272,6 +272,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				mk: markdownList,
 				vk: voiceLinkRoomList
 			};
+			const uniqueMentions = [...mentionOnFile, ...mentionList].filter(
+				(mention, index, self) =>
+					index ===
+					self.findIndex((m) => m.s === mention.s && m.e === mention.e && m.user_id === mention.user_id && m.role_id === mention.role_id)
+			);
+
 			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
@@ -309,7 +315,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionOnFile.length > 0 ? mentionOnFile : mentionList,
+					uniqueMentions,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -342,7 +348,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionOnFile.length > 0 ? mentionOnFile : mentionList,
+						uniqueMentions,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
