@@ -112,7 +112,7 @@ const ChannelMessages = React.memo(
 		}, [dispatch, idMessageToJump, isMessageExist, messages]);
 
 		const scrollChannelMessageToIndex = (index: number) => {
-			if (flatListRef.current) {
+			if (flatListRef.current && index > 0 && messages?.length - 1 >= index) {
 				flatListRef?.current?.scrollToIndex?.({ animated: true, index: index });
 			}
 		};
