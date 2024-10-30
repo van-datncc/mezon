@@ -44,7 +44,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile, userId } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '' } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', recentEmoji } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -57,6 +57,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
 
+	const combinedEmojis = useMemo(() => [...recentEmoji, ...emojiFakeData]?.slice(0, 5), [recentEmoji]);
 	const { sendMessage } = useChatSending({
 		mode,
 		channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
@@ -508,12 +509,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 		onClose();
 	};
-
 	const renderMessageItemActions = () => {
 		return (
 			<View style={styles.messageActionsWrapper}>
 				<View style={styles.reactWrapper}>
-					{emojiFakeData.map((item, index) => {
+					{combinedEmojis?.map((item, index) => {
 						return (
 							<Pressable
 								key={index}
