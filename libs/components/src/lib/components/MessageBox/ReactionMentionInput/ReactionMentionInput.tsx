@@ -57,7 +57,10 @@ import {
 	blankReferenceObj,
 	checkIsThread,
 	filterEmptyArrays,
+	filterMentionsWithAtSign,
 	focusToElement,
+	formatMentionsToString,
+	getDisplayMention,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -575,18 +578,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			);
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
-
-	function formatMentionsToString(array: MentionDataProps[]) {
-		const mentionStrings = array.map((item) => `@[${item?.display?.replace('@', '')}](${item.id})`);
-		return mentionStrings.join(' ');
-	}
-	function getDisplayMention(array: MentionDataProps[]) {
-		const mentionStrings = array.map((item) => `${item?.display}`);
-		return mentionStrings.join(' ');
-	}
-	function filterMentionsWithAtSign(array: MentionDataProps[]) {
-		return array.filter((item: MentionDataProps) => item?.display?.startsWith('@'));
-	}
 
 	return (
 		<div className="relative">

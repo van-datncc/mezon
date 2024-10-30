@@ -1,3 +1,5 @@
+import { MentionDataProps } from '../types';
+
 function createFileMetadata<T>(file: File): T {
 	return {
 		filename: file.name,
@@ -90,4 +92,16 @@ export function isMediaTypeNotSupported(mediaType?: string) {
 	]);
 
 	return unsupportedMediaTypes.has(mediaType);
+}
+
+export function formatMentionsToString(array: MentionDataProps[]) {
+	const mentionStrings = array.map((item) => `@[${item?.display?.replace('@', '')}](${item.id})`);
+	return mentionStrings.join(' ');
+}
+export function getDisplayMention(array: MentionDataProps[]) {
+	const mentionStrings = array.map((item) => `${item?.display}`);
+	return mentionStrings.join(' ');
+}
+export function filterMentionsWithAtSign(array: MentionDataProps[]) {
+	return array.filter((item: MentionDataProps) => item?.display?.startsWith('@'));
 }
