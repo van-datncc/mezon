@@ -47,6 +47,7 @@ import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -56,15 +57,19 @@ import {
 	ThreadValue,
 	blankReferenceObj,
 	checkIsThread,
+	convertMentionOnfile,
 	filterEmptyArrays,
+	filterMentionsWithAtSign,
 	focusToElement,
+	formatMentionsToString,
+	getDisplayMention,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -151,10 +156,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
-	const currentDmOrChannelId = useMemo(
-		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
-	);
+	const currentDmOrChannelId =
+		props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
+			? currentChannel?.channel_id
+			: currentDmId;
+
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -167,6 +173,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		membersOfParent as ChannelMembersEntity[],
 		dataReferences?.message_sender_id || ''
 	);
+
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
 	const userProfile = useSelector(selectAllAccount);
@@ -176,7 +183,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
-
+	const [mentionOnFile, setMentionOnFile] = useState<IMentionOnMessage[]>([]);
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const seenIds = new Set();
@@ -304,7 +311,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -337,7 +344,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionList,
+						mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -366,6 +373,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
+			setMentionOnFile([]);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -438,9 +446,24 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
-		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(newValue);
-			setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+		const onlyMention = filterMentionsWithAtSign(mentions);
+		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS) {
+			props.handleConvertToFile(newPlainTextValue);
+			if (onlyMention.length > 0) {
+				const displayString = getDisplayMention(onlyMention);
+				const mentionConverted = convertMentionOnfile(rolesClan, displayString, onlyMention as MentionItem[]);
+				setMentionOnFile(mentionConverted);
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: formatMentionsToString(onlyMention),
+						content: displayString
+					},
+					props.isThread
+				);
+			} else {
+				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+			}
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
