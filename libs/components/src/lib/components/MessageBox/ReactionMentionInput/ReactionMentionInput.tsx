@@ -10,7 +10,6 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
-	RolesClanEntity,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -58,6 +57,7 @@ import {
 	ThreadValue,
 	blankReferenceObj,
 	checkIsThread,
+	convertMentionOnfile,
 	filterEmptyArrays,
 	filterMentionsWithAtSign,
 	focusToElement,
@@ -307,13 +307,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
 				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
 			}
-			const newMentionList = [...mentionList, ...mentionOnFile];
-			// const newStringDisplay = getDisplayMention(request.content ?? '');
-			const newMentionConverted = convertMentionOnfile(rolesClan, request.content, newMentionList as MentionItem[]);
+
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionOnFile.length > 0 ? newMentionConverted : mentionList,
+					mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -346,7 +344,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionOnFile.length > 0 ? newMentionConverted : mentionList,
+						mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -434,28 +432,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		return [];
 	}, [props.mode, commonChannelDms]);
 
-	const convertMentionOnfile = (roles: RolesClanEntity[], contentString: string, ment: MentionItem[]): IMentionOnMessage[] => {
-		const roleIds = new Set(roles.map((role) => role.id));
-		const mentions: IMentionOnMessage[] = [];
-
-		ment.forEach((mention) => {
-			const { id, display } = mention;
-			const startIndex = contentString.indexOf(display);
-			if (startIndex !== -1) {
-				const s = startIndex;
-				const e = s + display.length;
-				const isRole = roleIds.has(id);
-				if (isRole) {
-					mentions.push({ role_id: id, s, e });
-				} else {
-					mentions.push({ user_id: id, s, e });
-				}
-			}
-		});
-
-		return mentions;
-	};
-
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
@@ -469,14 +445,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
-		const onlyMention = filterMentionsWithAtSign(mentions);
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
-			const displayString = getDisplayMention(onlyMention);
-
+			const onlyMention = filterMentionsWithAtSign(mentions);
 			props.handleConvertToFile(newPlainTextValue);
-
 			if (onlyMention.length > 0) {
+				const displayString = getDisplayMention(onlyMention);
 				const mentionConverted = convertMentionOnfile(rolesClan, displayString, onlyMention as MentionItem[]);
 				setMentionOnFile(mentionConverted);
 				setRequestInput(

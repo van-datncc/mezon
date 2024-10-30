@@ -1,4 +1,5 @@
-import { MentionDataProps } from '../types';
+import { MentionItem } from 'react-mentions';
+import { IMentionOnMessage, IRolesClan, MentionDataProps } from '../types';
 
 function createFileMetadata<T>(file: File): T {
 	return {
@@ -113,3 +114,25 @@ export function filterMentionsWithAtSign(array: MentionDataProps[]) {
 		return false;
 	});
 }
+
+export const convertMentionOnfile = (roles: IRolesClan[], contentString: string, ment: MentionItem[]): IMentionOnMessage[] => {
+	const roleIds = new Set(roles.map((role) => role.id));
+	const mentions: IMentionOnMessage[] = [];
+
+	ment.forEach((mention) => {
+		const { id, display } = mention;
+		const startIndex = contentString.indexOf(display);
+		if (startIndex !== -1) {
+			const s = startIndex;
+			const e = s + display.length;
+			const isRole = roleIds.has(id);
+			if (isRole) {
+				mentions.push({ role_id: id, s, e });
+			} else {
+				mentions.push({ user_id: id, s, e });
+			}
+		}
+	});
+
+	return mentions;
+};
