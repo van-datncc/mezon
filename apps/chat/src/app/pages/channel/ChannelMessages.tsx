@@ -78,6 +78,7 @@ function ChannelMessages({
 	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId as string));
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const dispatch = useAppDispatch();
+
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb?: IBeforeRenderCb) => {
 			if (isFetching) {
@@ -116,42 +117,16 @@ function ChannelMessages({
 		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
 	}, []);
 
-	const cacheLastChannelId = useRef<string | null>(null);
-	useLayoutEffect(() => {
-		if (chatRef.current && messages?.length && lastMessage?.channel_id && cacheLastChannelId.current !== lastMessage?.channel_id) {
-			chatRef.current.scrollTop = chatRef.current.scrollHeight;
-		}
-	});
-
-	const lastMsgTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	useEffect(() => {
-		if (messages.length && lastMessage && cacheLastChannelId.current !== lastMessage?.channel_id) {
-			if (lastMsgTimeoutRef.current) {
-				clearTimeout(lastMsgTimeoutRef.current);
-				lastMsgTimeoutRef.current = null;
-			}
-			lastMsgTimeoutRef.current = setTimeout(() => {
-				cacheLastChannelId.current = lastMessage?.channel_id as string;
-			}, 100);
-		}
-
-		return () => {
-			if (lastMsgTimeoutRef.current) {
-				clearTimeout(lastMsgTimeoutRef.current);
-				lastMsgTimeoutRef.current = null;
-			}
-		};
-	}, [messages, lastMessage]);
-
 	const scrollTimeoutId = useRef<NodeJS.Timeout | null>(null);
-	const cachedMessageLength = useRef<number>(0);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 	const rowVirtualizer = useVirtualizer({
 		count: messages.length,
+		overscan: 5,
 		getScrollElement: () => chatRef.current,
 		estimateSize: () => 50,
-		overscan: 5,
+		getItemKey: (index) => {
+			return messages[index];
+		},
 		onChange: (instance) => {
 			scrollTimeoutId.current && clearTimeout(scrollTimeoutId.current);
 			scrollTimeoutId.current = setTimeout(() => {
@@ -159,7 +134,6 @@ function ChannelMessages({
 					case 'backward':
 						if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
 							currentScrollDirection.current = ELoadMoreDirection.top;
-							cachedMessageLength.current = messages.length;
 							loadMoreMessage(ELoadMoreDirection.top);
 							return;
 						}
@@ -175,7 +149,6 @@ function ChannelMessages({
 								Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
 							if (isAtBottom) {
 								currentScrollDirection.current = ELoadMoreDirection.bottom;
-								cachedMessageLength.current = messages.length;
 								loadMoreMessage(ELoadMoreDirection.bottom);
 							}
 						}
@@ -185,31 +158,39 @@ function ChannelMessages({
 		}
 	});
 
-	useEffect(() => {
-		if (isFetching || currentScrollDirection.current === null) {
-			return;
-		}
-
-		// 200 is the cache's size
-		if (messages.length === 200) {
-			rowVirtualizer.scrollToIndex(currentScrollDirection.current === ELoadMoreDirection.bottom ? 150 : 50, { align: 'end' });
-			currentScrollDirection.current = null;
-		}
-		if (cachedMessageLength.current > 0 && messages.length > cachedMessageLength.current) {
-			const index = messages.length - cachedMessageLength.current;
-			rowVirtualizer.scrollToIndex(index, { align: 'center' });
-			currentScrollDirection.current = null;
-			cachedMessageLength.current = messages.length;
-		}
-	}, [messages, rowVirtualizer, isFetching]);
-
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
 			const index = messages.length - 1;
-
 			index >= 0 && rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
 			rs(true);
 		});
+	}, [messages.length, rowVirtualizer]);
+
+	// maintain scroll position
+	const firsRowCached = useRef<string>('');
+	const lastRowCached = useRef<string>('');
+	useEffect(() => {
+		const firstMessageId = messages[0];
+		const lastMessageId = messages[messages.length - 1];
+		if (firsRowCached.current !== firstMessageId) {
+			firsRowCached.current &&
+				currentScrollDirection.current === ELoadMoreDirection.top &&
+				rowVirtualizer.scrollToIndex(
+					messages.findIndex((messageId) => messageId === firsRowCached.current),
+					{ align: 'start' }
+				);
+			firsRowCached.current = messages[0];
+		}
+		if (lastRowCached.current !== lastMessageId) {
+			lastRowCached.current &&
+				currentScrollDirection.current === ELoadMoreDirection.bottom &&
+				rowVirtualizer.scrollToIndex(
+					messages.findIndex((messageId) => messageId === lastRowCached.current),
+					{ align: 'end' }
+				);
+			lastRowCached.current = messages[messages.length - 1];
+		}
+		currentScrollDirection.current = null;
 	}, [messages, rowVirtualizer]);
 
 	useEffect(() => {
@@ -264,17 +245,60 @@ function ChannelMessages({
 
 	// Handle scroll to bottom when user on the bottom and received new message
 	useEffect(() => {
-		if (rowVirtualizer.isScrolling) {
-			return;
-		}
-
 		if (isViewOlderMessage) {
 			return;
 		}
-		if (userId === lastMessage?.sender_id) {
+
+		if (userId === lastMessage?.sender_id && lastMessage?.isSending) {
+			scrollToLastMessage();
 			return;
 		}
-	}, [lastMessage, userId, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset, rowVirtualizer.isScrolling]);
+
+		const virtualItems = rowVirtualizer?.getVirtualItems() ?? [];
+		const lastVirtualItems = virtualItems?.[virtualItems?.length - 1];
+		if (lastVirtualItems?.key === lastMessage?.id) {
+			const isNearAtBottom = getChatScrollBottomOffset() <= 100;
+			if (isNearAtBottom) {
+				scrollToLastMessage();
+			}
+		}
+	}, [
+		userId,
+		lastMessage?.id,
+		lastMessage?.sender_id,
+		lastMessage?.isSending,
+		isViewOlderMessage,
+		rowVirtualizer,
+		scrollToLastMessage,
+		getChatScrollBottomOffset
+	]);
+
+	const cacheLastChannelId = useRef<string | null>(null);
+	useLayoutEffect(() => {
+		if (chatRef.current && messages?.length && lastMessage?.channel_id && cacheLastChannelId.current !== lastMessage?.channel_id) {
+			chatRef.current.scrollTop = chatRef.current.scrollHeight;
+		}
+	});
+
+	const lastMsgTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	useEffect(() => {
+		if (messages.length && lastMessage && cacheLastChannelId.current !== lastMessage?.channel_id) {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+			lastMsgTimeoutRef.current = setTimeout(() => {
+				cacheLastChannelId.current = lastMessage?.channel_id as string;
+			}, 100);
+		}
+
+		return () => {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+		};
+	}, [messages, lastMessage]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
@@ -291,6 +315,7 @@ function ChannelMessages({
 						}
 					])}
 				>
+					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
 					<div
 						style={{
 							height: `${rowVirtualizer.getTotalSize()}px`,
