@@ -15,7 +15,7 @@ const isQuitting = false;
 export enum EActivities {
 	CODE = 'Code',
 	SPOTIFY = 'Spotify',
-	LOL = 'Riot Client'
+	LOL = 'LeagueClientUx'
 }
 
 export default class App {
@@ -278,8 +278,9 @@ export default class App {
 				}
 
 				activityTimeout = setTimeout(() => {
-					if (!defaultApp || defaultApp.appName !== appName) {
-						defaultApp = { appName, windowTitle, startTime };
+					const newWindowTitle = window.getTitle();
+					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
+						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
 						hasSentDefaultApp = false;
 					}
 

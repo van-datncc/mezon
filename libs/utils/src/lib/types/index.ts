@@ -883,5 +883,5 @@ export enum ActivitiesType {
 export enum ActivitiesName {
 	CODE = 'Code',
 	SPOTIFY = 'Spotify',
-	LOL = 'Riot Client'
+	LOL = 'LeagueClientUx'
 }

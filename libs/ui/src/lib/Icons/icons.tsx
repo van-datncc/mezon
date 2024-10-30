@@ -5574,21 +5574,31 @@ export function MicrosoftWinPortable(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const RiotGame: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const LoLGame: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			id="Layer_1"
-			data-name="Layer 1"
-			viewBox="0 0 32 32"
+			width="30"
+			height="32"
+			viewBox="0 0 30 32"
+			fill="none"
 			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
 		>
-			<circle cx="16" cy="16" r="16" fill="#f1f5f1"></circle>
-			<polygon
-				points="16.42 8 6.75 12.47 9.16 21.64 11 21.41 10.49 15.65 11.1 15.38 12.13 21.27 15.27 20.89 14.71 14.53 15.3 14.27 16.45 20.75 19.62 20.36 19.01 13.38 19.61 13.12 20.86 20.2 24 19.82 24 9.89 16.42 8"
-				fill="#050505"
-			></polygon>
-			<polygon points="16.65 21.9 16.81 22.8 24 24 24 21 16.66 21.9 16.65 21.9" fill="#050505"></polygon>
+			<g>
+				<path
+					d="M1.80644 9.75049C0.655032 11.8373 0 14.2271 0 16.7683C0 19.3095 0.655032 21.7015 1.80644 23.7883V9.75049Z"
+					fill="#C28F2C"
+				></path>{' '}
+				<path
+					d="M15 2.02222C13.7829 2.02222 12.602 2.16921 11.4688 2.43647V4.75718C12.5907 4.44093 13.7738 4.26721 15 4.26721C22.0218 4.26721 27.7153 9.84627 27.7153 16.7305C27.7153 19.8307 26.5571 22.6659 24.6464 24.8463L24.2838 26.118L23.4814 28.9331C27.4184 26.2761 30.0023 21.8195 30.0023 16.7705C30 8.62355 23.2843 2.02222 15 2.02222Z"
+					fill="#C28F2C"
+				></path>{' '}
+				<path
+					d="M11.4688 24.4209H22.9737H23.2253C25.1723 22.4209 26.3713 19.7126 26.3713 16.7305C26.3713 10.5746 21.2806 5.58569 15 5.58569C13.767 5.58569 12.5816 5.78168 11.4688 6.1358V24.4209Z"
+					fill="#C28F2C"
+				></path>{' '}
+				<path d="M10.1088 0H1.55029L3.16634 3.29844V28.7038L1.55029 32H21.1922L22.9737 25.7572H10.1088V0Z" fill="#C28F2C"></path>
+			</g>
 		</svg>
 	);
 };
