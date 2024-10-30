@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
 	},
 	backHeader: {
 		position: 'absolute',
-		top: size.s_10,
+		top: size.s_30,
 		width: size.s_50,
 		height: size.s_50,
 		alignItems: 'center',
@@ -108,8 +108,13 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_14,
 		marginBottom: size.s_30
 	},
+	subTitleSuccess: {
+		color: '#c8c8c8',
+		fontSize: size.s_14,
+		marginBottom: size.s_30
+	},
 	button: {
-		backgroundColor: '#2c0afa',
+		backgroundColor: '#3920cd',
 		padding: size.s_10,
 		borderRadius: size.s_6,
 		width: '90%',
@@ -117,11 +122,15 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		marginVertical: size.s_4
 	},
+	buttonBorder: {
+		borderWidth: 2,
+		borderColor: '#ededed'
+	},
 	buttonText: {
 		color: '#ededed',
 		fontSize: size.s_14,
 		fontWeight: '600',
-		paddingBottom: size.s_6
+		paddingVertical: size.s_2
 	},
 	iconLogin: {
 		width: size.s_50 * 2,
