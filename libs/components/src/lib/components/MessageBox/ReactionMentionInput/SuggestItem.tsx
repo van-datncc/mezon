@@ -63,9 +63,9 @@ const SuggestItem = ({
 	const channelIcon = useMemo(() => {
 		if (!specificChannel) return null;
 
-		const { channel_private, type, parrent_id } = specificChannel;
+		const { channel_private, type } = specificChannel;
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id === '0') {
+		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}
