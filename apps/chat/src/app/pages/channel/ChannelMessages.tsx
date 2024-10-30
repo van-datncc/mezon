@@ -38,9 +38,20 @@ type ChannelMessagesProps = {
 	avatarDM?: string;
 	mode: number;
 	userName?: string;
+	userIdsFromThreadBox?: string[];
+	isThreadBox?: boolean;
 };
 
-function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, mode }: ChannelMessagesProps) {
+function ChannelMessages({
+	clanId,
+	channelId,
+	channelLabel,
+	avatarDM,
+	userName,
+	mode,
+	userIdsFromThreadBox,
+	isThreadBox = false
+}: ChannelMessagesProps) {
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const idMessageNotified = useSelector(selectMessageNotified);
@@ -53,7 +64,8 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const { userId } = useAuth();
-	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
+	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
+	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 	const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
@@ -221,7 +233,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	}, [lastMessage, userId, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	return (
-		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
+		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<AnchorScroll ref={chatRef} anchorId={channelId}>
 				<div
 					style={{

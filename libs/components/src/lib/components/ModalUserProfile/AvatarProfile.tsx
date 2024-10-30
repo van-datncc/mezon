@@ -1,7 +1,7 @@
 import { useMemberStatus } from '@mezon/core';
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelMembersEntity, EActivities, IUserAccount, MemberProfileType } from '@mezon/utils';
+import { ActivitiesName, ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
 import { ApiUserActivity } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -50,8 +50,9 @@ const AvatarProfile = ({
 	};
 
 	const activityNames: { [key: string]: string } = {
-		[EActivities.CODE]: 'Visual Studio Code',
-		[EActivities.SPOTIFY]: 'Listening to Spotify'
+		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
+		[ActivitiesName.LOL]: 'Riot Client'
 	};
 
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];

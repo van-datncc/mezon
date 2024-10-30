@@ -12,6 +12,7 @@ import {
 } from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -78,6 +79,9 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			action_delete: boolean,
 			is_public: boolean
 		) => {
+			if (channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				mode = ChannelStreamMode.STREAM_MODE_THREAD;
+			}
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
 					emojiId: emoji_id ?? '',
