@@ -128,8 +128,11 @@ function ChannelMessages({
 			return messages[index];
 		},
 		onChange: (instance) => {
+			chatRef.current?.classList.add('disable-hover');
 			scrollTimeoutId.current && clearTimeout(scrollTimeoutId.current);
 			scrollTimeoutId.current = setTimeout(() => {
+				chatRef?.current?.classList.remove('disable-hover');
+
 				switch (instance.scrollDirection) {
 					case 'backward':
 						if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
@@ -219,7 +222,7 @@ function ChannelMessages({
 			timerRef.current = window.setTimeout(() => {
 				dispatch(pinMessageActions.setJumpPinMessageId(null));
 			}, 1000);
-		} else if (idMessageToJump && isMessageExist && jumpPinMessageId === null) {
+		} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
 			handleScrollToIndex(idMessageToJump);
 			timerRef.current = window.setTimeout(() => {
 				dispatch(messagesActions.setIdMessageToJump(null));

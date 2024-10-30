@@ -338,7 +338,7 @@ export const loadMoreMessage = createAsyncThunk(
 					return;
 				}
 
-				return thunkAPI.dispatch(
+				return await thunkAPI.dispatch(
 					fetchMessages({
 						clanId: clanId,
 						channelId: channelId,
@@ -538,7 +538,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			username: username || '',
 			avatar: avatar,
 			isSending: true,
-			references: [],
+			references: references?.filter((item) => item) || [],
 			isMe: true,
 			hide_editted: true
 		};

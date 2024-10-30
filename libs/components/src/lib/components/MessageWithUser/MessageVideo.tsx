@@ -29,6 +29,9 @@ function MessageVideo({ attachmentData }: MessageImage) {
 			e.currentTarget.pause();
 		}
 	};
+
+	const height = Number(attachmentData?.height) > Number(attachmentData?.width) ? 350 : 275;
+
 	return (
 		<div className="relative overflow-hidden w-full h-full max-w-fit rounded-lg">
 			<video
@@ -37,8 +40,8 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				autoPlay={false}
 				className={`object-contain`}
 				style={{
-					width: 350 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)),
-					height: 350
+					width: height * ((attachmentData?.width || 1) / (attachmentData?.height || 1)),
+					height
 				}}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
