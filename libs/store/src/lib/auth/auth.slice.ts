@@ -196,11 +196,7 @@ export const authSlice = createSlice({
 			});
 
 		builder
-			.addCase(checkLoginRequest.pending, (state: AuthState) => {
-				state.loadingStatus = 'loading';
-			})
 			.addCase(checkLoginRequest.fulfilled, (state: AuthState, action) => {
-				state.loadingStatus = 'loaded';
 				if (action.payload !== null) {
 					state.session = action.payload;
 					state.isLogin = true;
