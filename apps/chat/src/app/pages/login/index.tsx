@@ -18,8 +18,8 @@ function Login() {
 	useEffect(() => {
 		const fetchQRCode = async () => {
 			const qRInfo = await qRCode();
-			await setLoginId(qRInfo.login_id as string);
-			await setCreateSecond(Number(qRInfo.create_time_second));
+			await setLoginId(qRInfo?.login_id as string);
+			await setCreateSecond(Number(qRInfo?.create_time_second));
 		};
 
 		fetchQRCode();
