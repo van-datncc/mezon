@@ -10,7 +10,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, memo, useCallback, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
@@ -104,7 +104,7 @@ function MessageWithUser({
 	const checkJumpPinMessage = jumpPinMessageId === message.id;
 
 	const containerClass = classNames('relative', 'message-container', {
-		// 'is-sending': message.isSending,
+		'is-sending': message.isSending,
 		'is-error': message.isError,
 		'bg-[#383B47]': isHighlight
 	});
@@ -262,14 +262,12 @@ function MessageWithUser({
 												{!isEditing && (
 													<MessageContent
 														message={message}
-														isCombine={isCombine}
-														// isSending={message.isSending}
+														isSending={message.isSending}
 														isError={message.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
 													/>
 												)}
-
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 											</div>
 										</div>
@@ -324,26 +322,6 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }
 			setIsHover(false);
 		}, 100);
 	};
-
-	useEffect(() => {
-		const handleScroll = () => {
-			isScrolling.current = true;
-			if (hoverTimeout.current) {
-				clearTimeout(hoverTimeout.current);
-			}
-			setIsHover(false);
-			setTimeout(() => {
-				isScrolling.current = false;
-			}, 100);
-		};
-
-		window.addEventListener('scroll', handleScroll, true);
-
-		return () => {
-			window.removeEventListener('scroll', handleScroll, true);
-		};
-	}, []);
-
 	return (
 		<div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 			{children}

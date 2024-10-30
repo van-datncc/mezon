@@ -45,8 +45,8 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine }: ChannelMes
 	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
 
 	return (
-		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? 'top-6' : '-top-8'}  right-6 w-fit`}>
-			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
+		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? 'top-0' : '-top-1/2'}  right-6 w-fit`}>
+			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>
 					{items
 						.filter((item) => {

@@ -371,7 +371,9 @@ input:-webkit-autofill:active {
 	}
 
 	&.is-sending {
-		opacity: 0.6;
+		.textChat {
+			opacity: 0.6;
+		}
 	}
 
 	&.is-error {
@@ -933,4 +935,8 @@ input:-webkit-autofill:active {
 
 .fade-in {
 	animation: fadeIn 1.5s ease-in;
+}
+
+.disable-hover * {
+	pointer-events: none;
 }
