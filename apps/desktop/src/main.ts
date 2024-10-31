@@ -56,7 +56,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 	const window = App.BrowserWindow.getFocusedWindow();
 	dialog
 		.showMessageBox(window, {
-			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+			icon: 'apps/desktop/src/assets/new-desktop-logo.ico',
 			type: 'info',
 			buttons: ['Download', 'Cancel'],
 			title: 'Updates available',
@@ -71,7 +71,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 
 autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
-		icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+		icon: 'apps/desktop/src/assets/new-desktop-logo.ico',
 		title: 'No update',
 		body: `The current version (${info.version}) is the latest.`
 	}).show();
