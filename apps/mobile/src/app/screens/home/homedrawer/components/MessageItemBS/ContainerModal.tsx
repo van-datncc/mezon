@@ -59,7 +59,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 	const { sendMessage } = useChatSending({
 		mode,
-		channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
+		channelOrDirect:
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup
 	});
 
 	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
@@ -496,7 +497,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (message?.clan_id ?? currentClanId),
+			mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM ? '' : (message?.clan_id ?? currentClanId),
 			message.channel_id ?? '',
 			messageId ?? '',
 			emoji_id,

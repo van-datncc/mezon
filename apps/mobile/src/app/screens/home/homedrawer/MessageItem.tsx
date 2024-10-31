@@ -148,7 +148,7 @@ const MessageItem = React.memo(
 		}, [mode]);
 
 		const messageAvatar = useMemo(() => {
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
 				return message?.clan_avatar || message?.avatar;
 			}
 			return message?.avatar;
@@ -476,13 +476,13 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				<NewMessageRedLine
-					channelId={props?.channelId}
-					messageId={props?.messageId}
-					isEdited={message?.hide_editted}
-					isSending={message?.isSending}
-					isMe={message.sender_id === userProfile?.user?.id}
-				/>
+				{/*<NewMessageRedLine*/}
+				{/*	channelId={props?.channelId}*/}
+				{/*	messageId={props?.messageId}*/}
+				{/*	isEdited={message?.hide_editted}*/}
+				{/*	isSending={message?.isSending}*/}
+				{/*	isMe={message.sender_id === userProfile?.user?.id}*/}
+				{/*/>*/}
 			</Animated.View>
 		);
 	},

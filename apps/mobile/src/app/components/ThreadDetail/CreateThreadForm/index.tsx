@@ -22,7 +22,7 @@ import {
 	selectThreadCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
+import { IChannel, IMessageSendPayload, ThreadValue, checkIsThread } from '@mezon/utils';
 import { Formik } from 'formik';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -226,7 +226,11 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 										messageId={valueThread?.id}
 										message={valueThread}
 										showUserInformation
-										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+										mode={
+											checkIsThread(currentChannel)
+												? ChannelStreamMode.STREAM_MODE_THREAD
+												: ChannelStreamMode.STREAM_MODE_CHANNEL
+										}
 										channelId={currentChannel?.channel_id}
 										isNumberOfLine={true}
 										preventAction
@@ -236,7 +240,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 							<ChatBox
 								messageAction={EMessageActionType.CreateThread}
 								channelId={currentChannel?.channel_id}
-								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+								mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 								hiddenIcon={{
 									threadIcon: true
 								}}

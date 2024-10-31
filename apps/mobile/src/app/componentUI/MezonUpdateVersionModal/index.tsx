@@ -1,6 +1,7 @@
 import { Metrics, size } from '@mezon/mobile-ui';
 import React from 'react';
 import { ImageBackground, Modal, ModalBaseProps, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Chase } from 'react-native-animated-spinkit';
 import codePush from 'react-native-code-push';
 import FastImage from 'react-native-fast-image';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -18,24 +19,34 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 	const { visible, onClose } = props;
 	const [percent, setPercent] = React.useState(0);
+	const [isLoading, setIsLoading] = React.useState(false);
 
 	const handleUpdate = () => {
-		codePush.sync(
-			{
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
-				updateDialog: false,
-				installMode: codePush.InstallMode.IMMEDIATE
-			},
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			() => {},
-			codePushDownloadProgress
-		);
+		try {
+			setIsLoading(true);
+			codePush.sync(
+				{
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					updateDialog: false,
+					installMode: codePush.InstallMode.IMMEDIATE
+				},
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				() => {},
+				codePushDownloadProgress
+			);
+		} catch (err) {
+			setIsLoading(false);
+		}
 	};
 
 	const codePushDownloadProgress = (progress: { receivedBytes: any; totalBytes: any }) => {
 		const { receivedBytes, totalBytes } = progress;
 		const percent = (receivedBytes / totalBytes) * 100;
+
+		if (Math.round(percent) === 100) {
+			setIsLoading(false);
+		}
 		setPercent(percent);
 	};
 	return (
@@ -48,6 +59,7 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 					<View style={styles.buttonContainer}>
 						<TouchableOpacity onPress={handleUpdate} style={styles.button} disabled={!!percent}>
 							<Text style={styles.buttonText}>{percent ? `${Math.round(percent)}%` : 'Update'}</Text>
+							{isLoading && <Chase size={size.s_18} color={'#ededed'} />}
 						</TouchableOpacity>
 						{!percent && (
 							<TouchableOpacity onPress={onClose} style={styles.buttonSecond}>
@@ -87,7 +99,8 @@ const styles = StyleSheet.create({
 	message: {
 		fontSize: size.s_16,
 		marginBottom: size.s_30,
-		textAlign: 'center'
+		textAlign: 'center',
+		color: '#ededed'
 	},
 	buttonContainer: {
 		flexDirection: 'row',
@@ -102,6 +115,8 @@ const styles = StyleSheet.create({
 		padding: size.s_10,
 		borderRadius: size.s_6,
 		flex: 1,
+		flexDirection: 'row',
+		gap: size.s_6,
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginVertical: size.s_4
