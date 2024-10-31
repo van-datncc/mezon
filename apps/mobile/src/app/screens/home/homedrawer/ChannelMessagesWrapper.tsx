@@ -14,6 +14,7 @@ import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
+import ChannelMessageListener from "./ChannelMessageListener";
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -136,6 +137,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, 
 				isPublic={isPublic}
 			/>
 
+			<ChannelMessageListener onMessageAction={onMessageAction} />
 			<View>
 				{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 
