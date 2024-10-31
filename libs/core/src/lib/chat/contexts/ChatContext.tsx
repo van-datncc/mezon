@@ -782,9 +782,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
 	const messageCoffee = useAppSelector((state) => selectMessageByMessageId(state, channelId, messageIdCoffee));
-	const channelCoffee = useAppSelector(selectChannelById(channelIdCoffee));
+	const channelCoffee = useAppSelector((state) => selectChannelById(state, channelIdCoffee ?? '')) || {};
 	const directCoffee = useAppSelector((state) => selectDirectById(state, channelIdCoffee));
-	const parentChannelCoffee = useAppSelector(selectChannelById(channelCoffee?.parrent_id ?? ''));
+
+	const parentChannelCoffee = useAppSelector((state) => selectChannelById(state, channelCoffee?.parrent_id ?? '')) || {};
+
 	const isClanView = useSelector(selectClanView);
 
 	useEffect(() => {

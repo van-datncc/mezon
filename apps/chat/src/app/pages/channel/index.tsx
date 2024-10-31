@@ -21,7 +21,8 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
@@ -34,7 +35,8 @@ import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const currentChannel = useSelector(selectChannelById(channelId));
+	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
+
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
@@ -58,7 +60,8 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [currentChannel?.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
 	const previousChannelId = useSelector(selectPreviousChannels)[1];
-	const previousChannel = useSelector(selectChannelById(previousChannelId));
+	const previousChannel = useAppSelector((state) => selectChannelById(state, previousChannelId)) || {};
+
 	useEffect(() => {
 		resetCountChannelBadge(previousChannel);
 	}, [previousChannelId]);
@@ -76,7 +79,8 @@ function ChannelSeenListener({ channelId }: { channelId: string }) {
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
-	const currentChannel = useSelector(selectChannelById(channelId));
+	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId ?? '')) || {};
+
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const mode =
@@ -133,7 +137,7 @@ type ChannelMainContentProps = {
 
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const dispatch = useAppDispatch();
-	const currentChannel = useSelector(selectChannelById(channelId));
+	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));

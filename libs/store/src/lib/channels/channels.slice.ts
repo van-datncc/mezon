@@ -791,7 +791,6 @@ export const selectChannelById = createSelector(
 		return channel || channelFromUserChannel || null;
 	}
 );
-export const selectChannelById3 = createSelector([selectChannelsEntities, (state, id) => id], (channelsEntities, id) => channelsEntities[id] || null);
 
 export const selectCurrentChannel = createSelector(
 	selectChannelsEntities,

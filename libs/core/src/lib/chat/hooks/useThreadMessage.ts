@@ -26,7 +26,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	mode = ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const currentClanId = useSelector(selectCurrentClanId);
-	const thread = useSelector(selectChannelById(channelId));
+	const thread = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef } = useMezon();
