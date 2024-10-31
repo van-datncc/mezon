@@ -144,22 +144,7 @@ function StreamingRoom({
 					{!isFullScreen && isAnimationComplete && (
 						<Block style={[styles.menuFooter]}>
 							<Block borderRadius={size.s_40} backgroundColor={themeValue.secondary}>
-								<TouchableOpacity style={styles.lineBtn}>
-									<Block
-										width={size.s_50}
-										height={size.s_6}
-										borderRadius={size.s_4}
-										backgroundColor={themeValue.badgeHighlight}
-									></Block>
-								</TouchableOpacity>
-								<Block
-									gap={size.s_10}
-									flexDirection="row"
-									alignItems="center"
-									justifyContent="space-between"
-									paddingHorizontal={size.s_14}
-									paddingBottom={size.s_14}
-								>
+								<Block gap={size.s_40} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
 									<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
 										<Icons.ChatIcon />
 									</TouchableOpacity>

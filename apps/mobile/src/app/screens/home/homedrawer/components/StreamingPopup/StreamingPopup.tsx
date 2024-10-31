@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 export const StreamingPopup = () => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const pan = useRef(new Animated.ValueXY()).current;
+	const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 	const [isFullScreen, setIsFullScreen] = useState(true);
 	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
@@ -26,12 +26,15 @@ export const StreamingPopup = () => {
 			showSKlListener.remove();
 		};
 	}, []);
-
 	const panResponder = useRef(
 		PanResponder.create({
 			onMoveShouldSetPanResponder: () => true,
-			onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false }),
-			onPanResponderRelease: () => {}
+			onPanResponderMove: (event, gestureState) => {
+				Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false })(event, gestureState);
+			},
+			onPanResponderRelease: () => {
+				pan.extractOffset();
+			}
 		})
 	).current;
 
@@ -45,35 +48,40 @@ export const StreamingPopup = () => {
 		}
 	}, []);
 
-	const handleResizeStreamRoom = useCallback((isFullScreen: boolean) => {
-		if (isFullScreen) {
-			Animated.spring(pan, {
-				toValue: { x: 0, y: 0 },
-				useNativeDriver: false
-			}).start(() => {
+	const handleResizeStreamRoom = useCallback(
+		(isFullScreen: boolean) => {
+			if (isFullScreen) {
+				pan.setOffset({ x: 0, y: 0 });
+
+				Animated.parallel([
+					Animated.spring(pan, {
+						toValue: { x: 0, y: 0 },
+						useNativeDriver: false
+					}),
+					Animated.timing(windowSize, {
+						toValue: { x: width, y: height },
+						duration: 100,
+						useNativeDriver: false
+					})
+				]).start(() => {
+					setIsAnimationComplete(true);
+				});
+				dispatch(appActions.setHiddenBottomTabMobile(true));
+			} else {
 				Animated.timing(windowSize, {
-					toValue: { x: width, y: height },
+					toValue: { x: 100, y: 100 },
 					duration: 100,
 					useNativeDriver: false
 				}).start(() => {
-					setIsAnimationComplete(true);
+					setIsAnimationComplete(false);
 				});
-			});
-			dispatch(appActions.setHiddenBottomTabMobile(true));
-		} else {
-			Animated.timing(windowSize, {
-				toValue: { x: 100, y: 100 },
-				duration: 100,
-				useNativeDriver: false
-			}).start(() => {
-				setIsAnimationComplete(false);
-			});
-			isOpenDrawer && dispatch(appActions.setHiddenBottomTabMobile(false));
-		}
-		setIsFullScreen(isFullScreen);
-		Keyboard.dismiss();
-	}, []);
-
+				dispatch(appActions.setHiddenBottomTabMobile(!isOpenDrawer));
+			}
+			setIsFullScreen(isFullScreen);
+			Keyboard.dismiss();
+		},
+		[isOpenDrawer]
+	);
 	return (
 		<Animated.View
 			style={[
