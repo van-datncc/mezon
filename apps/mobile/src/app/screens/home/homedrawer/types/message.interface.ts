@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { MessagesEntity } from '@mezon/store-mobile';
-import { EmojiDataOptionals, EmojiStorage, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
@@ -18,7 +18,6 @@ export interface IReplyBottomSheet {
 	senderDisplayName?: string;
 	isPublic?: boolean;
 	channelId?: string;
-	recentEmoji?: EmojiStorage[];
 }
 
 export interface IMessageActionPayload {
