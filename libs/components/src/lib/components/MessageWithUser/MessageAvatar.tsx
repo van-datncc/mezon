@@ -30,8 +30,6 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 		message?.clan_avatar
 	);
 
-	const modeAccepted = ChannelStreamMode.STREAM_MODE_THREAD || ChannelStreamMode.STREAM_MODE_CHANNEL;
-
 	return (
 		<AvatarImage
 			onContextMenu={(e) => {
@@ -41,7 +39,11 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			alt={message.username ?? ''}
 			userName={message.username}
 			data-popover-target="popover-content"
-			src={(mode === modeAccepted ? clanAvatar || pendingClanAvatar || pendingUserAvatar : pendingUserAvatar) || message?.avatar}
+			src={
+				(mode === ChannelStreamMode.STREAM_MODE_THREAD || ChannelStreamMode.STREAM_MODE_CHANNEL
+					? clanAvatar || pendingClanAvatar || pendingUserAvatar
+					: pendingUserAvatar) || message?.avatar
+			}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"
 			isAnonymous={message.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}
