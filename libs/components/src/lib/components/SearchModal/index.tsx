@@ -267,7 +267,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					if (thread) {
 						thread = { ...thread, active: 1 };
 					}
-					dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
+					await dispatch(channelsActions.add(thread as ChannelsEntity));
 				}
 				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
 				const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
