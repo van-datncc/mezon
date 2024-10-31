@@ -23,6 +23,8 @@ export type UseThreadMessage = {
 };
 
 export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
+	mode = ChannelStreamMode.STREAM_MODE_THREAD;
+
 	const currentClanId = useSelector(selectCurrentClanId);
 	const thread = useSelector(selectChannelById(channelId));
 	const dispatch = useAppDispatch();
@@ -59,7 +61,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			await socket.writeChatMessage(
 				currentClanId,
 				thread.channel_id as string,
-				mode,
+				ChannelStreamMode.STREAM_MODE_THREAD,
 				false,
 				{ t: content.t },
 				mentions,
@@ -86,8 +88,8 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			dispatch(
 				messagesActions.sendTypingUser({
 					clanId: currentClanId || '',
-					channelId,
-					mode,
+					channelId: channelId,
+					mode: ChannelStreamMode.STREAM_MODE_THREAD,
 					isPublic: false
 				})
 			);
@@ -106,7 +108,14 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(currentClanId, channelId, mode, thread ? !thread.channel_private : false, messageId, editMessage);
+			await socket.updateChatMessage(
+				currentClanId,
+				channelId,
+				ChannelStreamMode.STREAM_MODE_THREAD,
+				thread ? !thread.channel_private : false,
+				messageId,
+				editMessage
+			);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, thread]
 	);
