@@ -15,7 +15,8 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
@@ -29,7 +30,6 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const dispatch = useAppDispatch();
 	const tagId = channelHastagId?.slice(2, -1);
 	const isClanView = useSelector(selectClanView);
-	const [openModal, setOpenModal] = useState(false);
 	const { toChannelPage, navigate } = useAppNavigation();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
@@ -72,6 +72,10 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		}
 	};
 
+	const [openUnknown, closeUnknown] = useModal(() => {
+		return <ModalUnknowChannel onClose={closeUnknown} />;
+	}, []);
+
 	return channel ? (
 		(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
@@ -107,15 +111,12 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			</div>
 		) : null
 	) : (
-		<>
-			<span
-				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
-				onClick={() => setOpenModal(true)}
-			>
-				# unknown
-			</span>
-			{openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)} />}
-		</>
+		<span
+			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
+			onClick={openUnknown}
+		>
+			# Unknown
+		</span>
 	);
 };
 

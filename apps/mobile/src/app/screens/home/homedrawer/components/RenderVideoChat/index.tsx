@@ -26,7 +26,7 @@ export const RenderVideoChat = React.memo(
 						timeout = setTimeout(() => {
 							videoRef?.current?.setVolumeAsync(1);
 							videoRef?.current?.pauseAsync();
-						}, 500);
+						}, 1000);
 						return;
 					}
 				})

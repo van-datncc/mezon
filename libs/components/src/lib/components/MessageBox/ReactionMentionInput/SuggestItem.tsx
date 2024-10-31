@@ -1,4 +1,11 @@
-import { ChannelsEntity, selectAllChannels, selectAllHashtagDm, selectChannelById, selectNumberMemberVoiceChannel, selectTheme } from '@mezon/store';
+import {
+	ChannelsEntity,
+	selectAllChannelsByUser,
+	selectAllHashtagDm,
+	selectChannelById,
+	selectNumberMemberVoiceChannel,
+	selectTheme
+} from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType, HashtagDm } from 'mezon-js';
@@ -37,7 +44,7 @@ const SuggestItem = ({
 	isHightLight = true,
 	channel
 }: SuggestItemProps) => {
-	const allChannels = useSelector(selectAllChannels);
+	const allChannels = useSelector(selectAllChannelsByUser);
 	const getChannel = allChannels.find((channel) => {
 		return channel.channel_id === channelId;
 	});
@@ -56,9 +63,9 @@ const SuggestItem = ({
 	const channelIcon = useMemo(() => {
 		if (!specificChannel) return null;
 
-		const { channel_private, type, parrent_id } = specificChannel;
+		const { channel_private, type } = specificChannel;
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id === '0') {
+		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}

@@ -6,16 +6,18 @@ import {
 	checkDuplicateThread,
 	createNewChannel,
 	messagesActions,
+	selectAllChannelMembers,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectThreadCurrentChannel,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
@@ -28,10 +30,18 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+
+	const membersOfParent = useAppSelector((state) =>
+		threadCurrentChannel?.parrent_id ? selectAllChannelMembers(state, threadCurrentChannel?.parrent_id as string) : null
+	);
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
+
+	const mapToMemberIds = useMemo(() => {
+		return membersOfParent?.map((item) => item.id);
+	}, [membersOfParent]);
 
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
@@ -113,6 +123,8 @@ const ThreadBox = () => {
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
+							isThreadBox={true}
+							userIdsFromThreadBox={mapToMemberIds}
 							key={threadCurrentChannel.channel_id}
 							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
@@ -127,7 +139,10 @@ const ThreadBox = () => {
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
-					listMentions={UserMentionList({ channelID: threadCurrentChannel?.channel_id as string })}
+					listMentions={UserMentionList({
+						channelID: currentChannel?.channel_id as string,
+						channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
+					})}
 					isThread
 				/>
 			</div>

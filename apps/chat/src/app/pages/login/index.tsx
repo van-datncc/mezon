@@ -2,7 +2,7 @@ import { GoogleButtonLogin, LoginForm, QRSection, TitleSection } from '@mezon/co
 import { useAppNavigation, useAuth } from '@mezon/core';
 import { selectIsLogin } from '@mezon/store';
 import { useGoogleOneTapLogin } from '@react-oauth/google';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
 import { ILoginLoaderData } from '../../loaders/loginLoader';
@@ -11,14 +11,46 @@ function Login() {
 	const { navigate } = useAppNavigation();
 	const isLogin = useSelector(selectIsLogin);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
-	const { loginByGoogle } = useAuth();
+	const { loginByGoogle, qRCode, checkLoginRequest } = useAuth();
+	const [loginId, setLoginId] = useState<string | null>(null);
+	const [createSecond, setCreateSecond] = useState<number | null>(null);
+	const [hidden, setHidden] = useState<boolean>(false);
+	useEffect(() => {
+		const fetchQRCode = async () => {
+			const qRInfo = await qRCode();
+			await setLoginId(qRInfo?.login_id as string);
+			await setCreateSecond(Number(qRInfo?.create_time_second));
+		};
+
+		fetchQRCode();
+	}, [qRCode]);
+
+	useEffect(() => {
+		const intervalId = setInterval(async () => {
+			if (loginId && createSecond !== null) {
+				const currentTime = Math.floor(Date.now() / 1000);
+				const timeElapsed = currentTime - createSecond;
+
+				if (timeElapsed >= 60) {
+					setHidden(true);
+					clearInterval(intervalId);
+				} else {
+					const currentSession = await checkLoginRequest(loginId);
+					if (currentSession !== null && currentSession !== undefined) {
+						clearInterval(intervalId);
+					}
+				}
+			}
+		}, 2000);
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [loginId]);
 
 	useGoogleOneTapLogin({
 		onSuccess: async (credentialResponse) => {
 			await loginByGoogle(credentialResponse.credential as string);
-		},
-		onError: () => {
-			console.log('Login Failed');
 		},
 		auto_select: true,
 		cancel_on_tap_outside: false,
@@ -45,7 +77,7 @@ function Login() {
 						<GoogleButtonLogin />
 						<LoginForm />
 					</div>
-					<QRSection />
+					<QRSection loginId={loginId || ''} isExpired={hidden} />
 				</div>
 			</div>
 		</div>

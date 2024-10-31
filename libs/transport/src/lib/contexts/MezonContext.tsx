@@ -1,6 +1,7 @@
 import { DeviceUUID } from 'device-uuid';
 import { Client, DefaultSocket, Session, Socket } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
+import { ApiConfirmLoginRequest, ApiLoginIDResponse } from 'mezon-js/dist/api.gen';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
 
@@ -30,6 +31,9 @@ export type MezonContextValue = {
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
 	authenticateGoogle: (token: string) => Promise<Session>;
+	createQRLogin: () => Promise<ApiLoginIDResponse>;
+	checkLoginRequest: (LoginRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
+	confirmLoginRequest: (ConfirmRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
@@ -80,6 +84,33 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		},
 		[createSocket, isFromMobile]
 	);
+
+	const createQRLogin = useCallback(async () => {
+		if (!clientRef.current) {
+			throw new Error('Mezon client not initialized');
+		}
+		const QRlogin = await clientRef.current.createQRLogin({});
+		return QRlogin;
+	}, []);
+
+	const checkLoginRequest = useCallback(async (LoginRequest: ApiConfirmLoginRequest) => {
+		if (!clientRef.current) {
+			throw new Error('Mezon client not initialized');
+		}
+		const session = await clientRef.current.checkLoginRequest(LoginRequest);
+		return session;
+	}, []);
+
+	const confirmLoginRequest = useCallback(async (confirmRequest: ApiConfirmLoginRequest) => {
+		if (!clientRef.current) {
+			throw new Error('Mezon client not initialized');
+		}
+		if (!sessionRef.current) {
+			throw new Error('Mezon session not initialized');
+		}
+		const session = await clientRef.current.confirmLogin(sessionRef.current, confirmRequest);
+		return session;
+	}, []);
 
 	const authenticateGoogle = useCallback(
 		async (token: string) => {
@@ -277,6 +308,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef,
 			socketRef,
 			createClient,
+			createQRLogin,
+			checkLoginRequest,
+			confirmLoginRequest,
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,
@@ -291,6 +325,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef,
 			socketRef,
 			createClient,
+			createQRLogin,
+			checkLoginRequest,
+			confirmLoginRequest,
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,

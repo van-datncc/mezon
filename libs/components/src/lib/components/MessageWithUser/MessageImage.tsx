@@ -79,17 +79,22 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		};
 	}, [imageLoaded]);
 
+	const height = attachmentData?.height ? (attachmentData.height > 275 ? 275 : attachmentData?.height) : 150;
+
 	return (
 		<div
 			className="my-1 max-w-md"
-			style={{ width: attachmentData?.width ? 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)) : 'auto', height: 150 }}
+			style={{
+				width: attachmentData?.width ? height * ((attachmentData?.width || 1) / (attachmentData?.height || 1)) : 'auto',
+				height: height
+			}}
 		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
 			{showLoader && !imageLoaded && (
 				<div
 					role="status"
 					className="image-loading max-w-md rounded shadow animate-pulse"
-					style={{ width: 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)), height: 150 }}
+					style={{ width: height * ((attachmentData?.width || 1) / (attachmentData?.height || 1)), height: height }}
 				>
 					<div className="flex items-center justify-center bg-gray-300 rounded " style={{ height: '100%' }}>
 						<svg
@@ -110,7 +115,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
 						onContextMenu={handleContextMenu}
-						className={`max-w-md flex h-[150px] object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						className={`max-w-md flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						style={{ height }}
 						src={attachmentData.url}
 						alt={'message'}
 						onClick={() => handleClick(attachmentData.url || '')}

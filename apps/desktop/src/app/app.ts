@@ -14,7 +14,8 @@ const isQuitting = false;
 
 export enum EActivities {
 	CODE = 'Code',
-	SPOTIFY = 'Spotify'
+	SPOTIFY = 'Spotify',
+	LOL = 'LeagueClientUx'
 }
 
 export default class App {
@@ -225,9 +226,10 @@ export default class App {
 	private static setupWindowManager() {
 		const windowInfoArray = [];
 		let defaultApp = null;
-		const appUsageTime = new Map();
 		const usageThreshold = 30 * 60 * 1000;
 		let hasSentDefaultApp = false;
+		let activityTimeout = null;
+		let isFirstRun = true;
 
 		const updateWindowInfoArray = () => {
 			windowInfoArray.length = 0;
@@ -237,12 +239,9 @@ export default class App {
 					const appName = fullPath.replace(/\.exe$/, '');
 					const windowTitle = window.getTitle();
 
-					if (appName === EActivities.SPOTIFY || appName === EActivities.CODE) {
-						windowInfoArray.push({ appName, windowTitle });
-
-						if (!appUsageTime.has(appName)) {
-							appUsageTime.set(appName, Date.now());
-						}
+					if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName as EActivities)) {
+						const startTime = new Date().toISOString();
+						windowInfoArray.push({ appName, windowTitle, startTime });
 					}
 				}
 			});
@@ -258,34 +257,41 @@ export default class App {
 			const fullPath = window.path.split('\\').pop();
 			const appName = fullPath.replace(/\.exe$/, '');
 			const windowTitle = window.getTitle();
+			const startTime = new Date().toISOString();
 
-			if (appName === EActivities.SPOTIFY || appName === EActivities.CODE) {
-				const exists = windowInfoArray.some((info) => info.appName === appName && info.windowTitle === windowTitle);
-				if (!exists) {
-					windowInfoArray.push({ appName, windowTitle });
-					appUsageTime.set(appName, Date.now());
+			if (defaultApp) {
+				if (isFirstRun) {
+					App.mainWindow.webContents.send(ACTIVE_WINDOW, { ...defaultApp, startTime });
+					hasSentDefaultApp = true;
+					isFirstRun = false;
 				}
-
-				const currentTime = Date.now();
-				if (appUsageTime.has(appName)) {
-					const startTime = appUsageTime.get(appName);
-
-					if (currentTime - startTime > usageThreshold) {
-						if (!defaultApp || defaultApp.appName !== appName) {
-							defaultApp = { appName, windowTitle };
-							hasSentDefaultApp = false;
-						}
-					}
-				}
-			}
-
-			if (defaultApp && !hasSentDefaultApp) {
+			} else if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && isFirstRun) {
+				defaultApp = { appName, windowTitle, startTime };
 				App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
 				hasSentDefaultApp = true;
+				isFirstRun = false;
+			}
+
+			if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && !isFirstRun) {
+				if (activityTimeout) {
+					clearTimeout(activityTimeout);
+				}
+
+				activityTimeout = setTimeout(() => {
+					const newWindowTitle = window.getTitle();
+					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
+						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
+						hasSentDefaultApp = false;
+					}
+
+					if (defaultApp && !hasSentDefaultApp) {
+						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
+						hasSentDefaultApp = true;
+					}
+				}, usageThreshold);
 			}
 		});
 	}
-
 	private static setupMenu() {
 		const isMac = process.platform === 'darwin';
 

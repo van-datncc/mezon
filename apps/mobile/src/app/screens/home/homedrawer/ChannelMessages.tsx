@@ -105,14 +105,14 @@ const ChannelMessages = React.memo(
 			if (idMessageToJump && isMessageExist) {
 				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump);
 				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
-					flatListRef?.current?.scrollToIndex?.({ animated: true, index: indexToJump });
+					flatListRef?.current?.scrollToIndex?.({ animated: true, index: indexToJump - 2 >= 0 ? indexToJump - 2 : indexToJump });
 					DeviceEventEmitter.emit(ActionEmitEvent.MESSAGE_ID_TO_JUMP, idMessageToJump);
 				}
 			}
 		}, [dispatch, idMessageToJump, isMessageExist, messages]);
 
 		const scrollChannelMessageToIndex = (index: number) => {
-			if (flatListRef.current) {
+			if (flatListRef.current && index > 0 && messages?.length - 1 >= index) {
 				flatListRef?.current?.scrollToIndex?.({ animated: true, index: index });
 			}
 		};

@@ -40,6 +40,7 @@
 		"react-native-awesome-gallery": "^0.4.2",
 		"react-native-bootsplash": "^6.1.1",
 		"react-native-bouncy-checkbox": "^4.0.1",
+		"react-native-code-push": "^9.0.0",
 		"react-native-controlled-mentions": "^3.0.0-alpha.4",
 		"react-native-date-picker": "^5.0.4",
 		"react-native-device-info": "^11.1.0",
