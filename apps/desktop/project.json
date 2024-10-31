@@ -22,7 +22,7 @@
       ],
       "mac": {
         "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-        "icon": "apps/desktop/src/assets/new-desktop-logo.png",
+        "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "E9Y2J54ZH3.app.mezon.ai",
         "category": "public.app-category.productivity",
         "target": {
@@ -46,7 +46,7 @@
         "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
       },
       "win": {
-        "icon": "apps/desktop/src/assets/new-desktop-logo.ico",
+        "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
         "target": [
           "nsis"
         ],
@@ -75,7 +75,7 @@
         "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
       },
       "linux": {
-        "icon": "apps/desktop/src/assets/new-desktop-logo.icns",
+        "icon": "apps/desktop/src/assets/linux-icon.icns",
         "category": "Utility",
         "target": "deb",
         "mimeTypes": [
@@ -159,7 +159,7 @@
         "prepackageOnly": true,
         "mac": {
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-          "icon": "apps/desktop/src/assets/new-desktop-logo.png",
+          "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
           "target": {
@@ -183,7 +183,7 @@
           "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
         },
         "win": {
-          "icon": "apps/desktop/src/assets/new-desktop-logo.ico",
+          "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis"
           ],
@@ -212,7 +212,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
-          "icon": "apps/desktop/src/assets/new-desktop-logo.icns",
+          "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
@@ -241,7 +241,7 @@
         "outputPath": "dist/executables",
         "mac": {
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-          "icon": "apps/desktop/src/assets/new-desktop-logo.png",
+          "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
           "target": {
@@ -265,7 +265,7 @@
           "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
         },
         "win": {
-          "icon": "apps/desktop/src/assets/new-desktop-logo.ico",
+          "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis"
           ],
@@ -293,7 +293,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
-          "icon": "apps/desktop/src/assets/new-desktop-logo.icns",
+          "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
