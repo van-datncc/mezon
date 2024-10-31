@@ -134,6 +134,7 @@ export const ChatMessageInput = memo(
 			const handleTypingMessage = useCallback(async () => {
 				switch (mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:
+					case ChannelStreamMode.STREAM_MODE_THREAD:
 						await handleTypingDebounced();
 						break;
 					case ChannelStreamMode.STREAM_MODE_DM:

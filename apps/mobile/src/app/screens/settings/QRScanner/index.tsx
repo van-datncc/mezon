@@ -55,13 +55,13 @@ export const QRScanner = () => {
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-expect-error
-				if (res?.action?.requestStatus === 'fulfilled') {
-					setIsSuccess(true);
-				} else {
+				if (res?.action?.action?.requestStatus === 'rejected' || !res) {
 					Toast.show({
 						type: 'error',
 						text1: 'An error occurred, please try again'
 					});
+				} else {
+					setIsSuccess(true);
 				}
 			}
 		} catch (err) {
