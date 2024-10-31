@@ -39,25 +39,8 @@ const mezon: CreateMezonClientOptions = {
 };
 
 const App = () => {
-	const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			checkForUpdate();
-		}, 2000);
-		return () => clearTimeout(timer);
-	}, []);
-
-	const checkForUpdate = async () => {
-		const update = await codePush.checkForUpdate(process.env.NX_CODE_PUSH_KEY_MOBILE as string);
-		if (VersionInfo.appVersion === update?.appVersion) {
-			setIsShowUpdateModal(true);
-		}
-	};
-
 	return (
 		<SafeAreaProvider>
-			<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />
 			<I18nextProvider i18n={i18n}>
 				<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
 					<RootNavigation />

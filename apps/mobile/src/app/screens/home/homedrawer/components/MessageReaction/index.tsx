@@ -40,7 +40,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.clan_id ?? '') : '',
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? (currentChannel?.clan_id ?? '') : '',
 			message?.channel_id ?? '',
 			messageId ?? '',
 			emoji_id,
@@ -58,7 +58,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.clan_id ?? '') : '',
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? (currentChannel?.clan_id ?? '') : '',
 			message?.channel_id ?? '',
 			message.id ?? '',
 			emojiId,
