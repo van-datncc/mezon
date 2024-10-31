@@ -118,6 +118,7 @@ function ChannelMessages({
 	}, []);
 
 	const scrollTimeoutId = useRef<NodeJS.Timeout | null>(null);
+	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 	const rowVirtualizer = useVirtualizer({
 		count: messages.length,
@@ -130,14 +131,16 @@ function ChannelMessages({
 		onChange: (instance) => {
 			chatRef.current?.classList.add('disable-hover');
 			scrollTimeoutId.current && clearTimeout(scrollTimeoutId.current);
-			scrollTimeoutId.current = setTimeout(() => {
+			scrollTimeoutId.current = setTimeout(async () => {
 				chatRef?.current?.classList.remove('disable-hover');
 
 				switch (instance.scrollDirection) {
 					case 'backward':
 						if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
 							currentScrollDirection.current = ELoadMoreDirection.top;
-							loadMoreMessage(ELoadMoreDirection.top);
+							isLoadMore.current = true;
+							await loadMoreMessage(ELoadMoreDirection.top);
+							isLoadMore.current = false;
 							return;
 						}
 
@@ -152,7 +155,9 @@ function ChannelMessages({
 								Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
 							if (isAtBottom) {
 								currentScrollDirection.current = ELoadMoreDirection.bottom;
-								loadMoreMessage(ELoadMoreDirection.bottom);
+								isLoadMore.current = true;
+								await loadMoreMessage(ELoadMoreDirection.bottom);
+								isLoadMore.current = false;
 							}
 						}
 						break;
@@ -163,16 +168,16 @@ function ChannelMessages({
 
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
-			const index = messages.length - 1;
-			index >= 0 && rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
+			chatRef.current && (chatRef.current.scrollTop = chatRef.current.scrollHeight);
 			rs(true);
 		});
-	}, [messages.length, rowVirtualizer]);
+	}, []);
 
 	// maintain scroll position
 	const firsRowCached = useRef<string>('');
 	const lastRowCached = useRef<string>('');
 	useEffect(() => {
+		if (!isLoadMore.current) return;
 		const firstMessageId = messages[0];
 		const lastMessageId = messages[messages.length - 1];
 		if (firsRowCached.current !== firstMessageId) {
@@ -183,6 +188,9 @@ function ChannelMessages({
 					{ align: 'start' }
 				);
 			firsRowCached.current = messages[0];
+			lastRowCached.current = messages[messages.length - 1];
+			currentScrollDirection.current = null;
+			return;
 		}
 		if (lastRowCached.current !== lastMessageId) {
 			lastRowCached.current &&
@@ -197,7 +205,7 @@ function ChannelMessages({
 	}, [messages, rowVirtualizer]);
 
 	useEffect(() => {
-		if (dataReferences && getChatScrollBottomOffset() <= 61) {
+		if (dataReferences?.message_ref_id && getChatScrollBottomOffset() <= 100) {
 			scrollToLastMessage();
 		}
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
@@ -252,61 +260,28 @@ function ChannelMessages({
 			return;
 		}
 
-		if (userId === lastMessage?.sender_id && lastMessage?.isSending) {
+		const isNearAtBottom = getChatScrollBottomOffset() <= 100;
+
+		if (userId === lastMessage?.sender_id || isNearAtBottom) {
 			scrollToLastMessage();
 			return;
 		}
+	}, [userId, messages.length, isViewOlderMessage, rowVirtualizer, scrollToLastMessage, getChatScrollBottomOffset]);
 
-		const virtualItems = rowVirtualizer?.getVirtualItems() ?? [];
-		const lastVirtualItems = virtualItems?.[virtualItems?.length - 1];
-		if (lastVirtualItems?.key === lastMessage?.id) {
-			const isNearAtBottom = getChatScrollBottomOffset() <= 100;
-			if (isNearAtBottom) {
-				scrollToLastMessage();
-			}
-		}
-	}, [
-		userId,
-		lastMessage?.id,
-		lastMessage?.sender_id,
-		lastMessage?.isSending,
-		isViewOlderMessage,
-		rowVirtualizer,
-		scrollToLastMessage,
-		getChatScrollBottomOffset
-	]);
-
-	const cacheLastChannelId = useRef<string | null>(null);
+	const userActiveScroll = useRef<boolean>(false);
 	useLayoutEffect(() => {
-		if (chatRef.current && messages?.length && lastMessage?.channel_id && cacheLastChannelId.current !== lastMessage?.channel_id) {
+		if (chatRef.current && messages?.length && lastMessage?.channel_id && !userActiveScroll.current) {
 			chatRef.current.scrollTop = chatRef.current.scrollHeight;
 		}
 	});
-
-	const lastMsgTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-	useEffect(() => {
-		if (messages.length && lastMessage && cacheLastChannelId.current !== lastMessage?.channel_id) {
-			if (lastMsgTimeoutRef.current) {
-				clearTimeout(lastMsgTimeoutRef.current);
-				lastMsgTimeoutRef.current = null;
-			}
-			lastMsgTimeoutRef.current = setTimeout(() => {
-				cacheLastChannelId.current = lastMessage?.channel_id as string;
-			}, 100);
-		}
-
-		return () => {
-			if (lastMsgTimeoutRef.current) {
-				clearTimeout(lastMsgTimeoutRef.current);
-				lastMsgTimeoutRef.current = null;
-			}
-		};
-	}, [messages, lastMessage]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
+					onWheelCapture={() => {
+						userActiveScroll.current = true;
+					}}
 					ref={chatRef}
 					id="scrollLoading"
 					className={classNames([
@@ -328,6 +303,7 @@ function ChannelMessages({
 					>
 						{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 							const messageId = messages[virtualRow.index];
+							const islastIndex = messages.length - 1 === virtualRow.index;
 							const checkMessageTargetToMoved = idMessageToJump === messageId && messageId !== lastMessageId;
 							const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
 
@@ -360,11 +336,11 @@ function ChannelMessages({
 											messageReplyHighlight={messageReplyHighlight}
 										/>
 									</div>
+									{islastIndex && <div className="h-[20px] w-[1px] pointer-events-none"></div>}
 								</div>
 							);
 						})}
 					</div>
-					<div className="h-[20px] w-[1px] pointer-events-none"></div>
 				</div>
 			</div>
 		</MessageContextMenuProvider>
