@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
 import { useDragAndDrop, usePermissionChecker, useResetCountChannelBadge, useSearchMessages, useWindowFocusState } from '@mezon/core';
 import {
@@ -62,8 +63,11 @@ function useChannelSeen(channelId: string) {
 		resetCountChannelBadge(previousChannel);
 	}, [previousChannelId]);
 	useEffect(() => {
-		dispatch(channelsActions.upsertOne(currentChannel as ChannelsEntity));
-	}, []);
+		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			const channelWithActive = { ...currentChannel, active: 1 };
+			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
+		}
+	}, [currentChannel.channel_id]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {

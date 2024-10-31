@@ -1,6 +1,5 @@
 import { useAppNavigation, useAuth, useDirect } from '@mezon/core';
 import {
-	ChannelsEntity,
 	DirectEntity,
 	appActions,
 	categoriesActions,
@@ -83,7 +82,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					return {
 						id: itemGr?.channel_id ?? '',
 						name: itemGr?.channel_label ?? '',
-						avatarUser: 'assets/images/avatar-group.png' ?? '',
+						avatarUser: 'assets/images/avatar-group.png',
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
@@ -260,15 +259,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					channel.type === ChannelType.CHANNEL_TYPE_STREAMING ||
 					channel.type === ChannelType.CHANNEL_TYPE_THREAD)
 			) {
-				if (channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
-					let thread = listChannels.find((item) => {
-						return item.id === channel.id;
-					});
-					if (thread) {
-						thread = { ...thread, active: 1 };
-					}
-					await dispatch(channelsActions.add(thread as ChannelsEntity));
-				}
 				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
 				const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
 

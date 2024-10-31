@@ -170,7 +170,7 @@ export const joinChannel = createAsyncThunk(
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
-			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			const channel = selectChannelById(getChannelsRootState(thunkAPI), channelId);
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
 			const isPublic = channel ? (checkIsThread(channel as ChannelsEntity) ? false : !channel.channel_private) : false;
@@ -778,19 +778,21 @@ export const selectModeResponsive = createSelector(getChannelsState, (state) => 
 
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
-export const selectChannelUserByChannelId = (channelId: string) =>
-	createSelector(selectAllChannelsByUser, (channels) => channels.find((ch) => ch.channel_id === channelId) || null);
+export const selectChannelUserByChannelId = createSelector(
+	[selectAllChannelsByUser, (state, channelId: string) => channelId],
+	(channels, channelId) => channels.find((ch) => ch.channel_id === channelId) || null
+);
 
-export const selectChannelById = (id: string) =>
-	createSelector(selectChannelsEntities, selectAllChannelsByUser, (channelsEntities, userChannels) => {
+export const selectChannelById = createSelector(
+	[selectChannelsEntities, selectAllChannelsByUser, (state, id: string) => id],
+	(channelsEntities, userChannels, id) => {
 		const channel = channelsEntities[id];
-		let channelFromUserChannel = userChannels.find((ch) => ch.channel_id === id);
-		if (channelFromUserChannel) {
-			channelFromUserChannel = { ...channelFromUserChannel, active: 1 };
-			channelsActions.upsertOne(channelFromUserChannel as ChannelsEntity);
-		}
+		const channelFromUserChannel = userChannels.find((ch) => ch.channel_id === id);
 		return channel || channelFromUserChannel || null;
-	});
+	}
+);
+export const selectChannelById3 = createSelector([selectChannelsEntities, (state, id) => id], (channelsEntities, id) => channelsEntities[id] || null);
+
 export const selectCurrentChannel = createSelector(
 	selectChannelsEntities,
 	selectCurrentChannelId,
@@ -798,12 +800,7 @@ export const selectCurrentChannel = createSelector(
 	(clansEntities, clanId, userChannels) => {
 		if (!clanId) return null;
 		const currentChannel = clansEntities[clanId];
-		let channelFromUserChannel = userChannels.find((ch) => ch.channel_id === clanId);
-
-		if (channelFromUserChannel) {
-			channelFromUserChannel = { ...channelFromUserChannel, active: 1 };
-			channelsActions.upsertOne(channelFromUserChannel as ChannelsEntity);
-		}
+		const channelFromUserChannel = userChannels.find((ch) => ch.channel_id === clanId);
 		return currentChannel || channelFromUserChannel || null;
 	}
 );
