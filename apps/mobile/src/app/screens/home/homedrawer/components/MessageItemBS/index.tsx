@@ -1,5 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../componentUI';
@@ -14,13 +15,16 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const styles = style(themeValue);
 	const { type, onClose, isOnlyEmojiPicker = false } = props;
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
+	const [isShowBottomSheet, setSetShowBottomSheet] = useState(false);
 
 	const setVisibleBottomSheet = (isShow: boolean) => {
 		if (bottomSheetRef) {
 			if (isShow) {
 				bottomSheetRef.current?.present();
+				setSetShowBottomSheet(true);
 			} else {
 				bottomSheetRef.current?.close();
+				setSetShowBottomSheet(false);
 			}
 		}
 	};
@@ -48,6 +52,22 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		}
 		return ['50%'];
 	}, [isShowEmojiPicker, isOnlyEmojiPicker, type]);
+	const [recentEmoji, setRecentEmoji] = useState([]);
+
+	useEffect(() => {
+		if (isShowBottomSheet) {
+			AsyncStorage.getItem('recentEmojis').then((emojis) => {
+				const parsedEmojis = JSON.parse(emojis) || [];
+				const recentEmojis = parsedEmojis
+					?.map((item) => ({
+						shortname: item?.emoji,
+						id: item?.emojiId
+					}))
+					.reverse();
+				setRecentEmoji(recentEmojis);
+			});
+		}
+	}, [isShowBottomSheet]);
 
 	return (
 		<MezonBottomSheet
@@ -67,7 +87,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				);
 			}}
 		>
-			<ContainerModal {...props} />
+			<ContainerModal {...props} recentEmoji={recentEmoji || []} />
 		</MezonBottomSheet>
 	);
 });

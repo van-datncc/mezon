@@ -31,7 +31,7 @@ import {
 } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { NotificationType } from 'mezon-js';
+import { ChannelType, NotificationType } from 'mezon-js';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -52,8 +52,9 @@ type PanelChannel = {
 };
 
 const typeChannel = {
-	text: 1,
-	voice: 4
+	text: ChannelType.CHANNEL_TYPE_TEXT,
+	thread: ChannelType.CHANNEL_TYPE_THREAD,
+	voice: ChannelType.CHANNEL_TYPE_VOICE
 };
 export const notiLabels: Record<number, string> = {
 	[NotificationType.ALL_MESSAGE]: 'All',
@@ -419,7 +420,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 						) : (
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
-						{channel.type === typeChannel.text && (
+						{(channel.type === typeChannel.text || channel.type === typeChannel.thread) && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}
@@ -457,7 +458,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								))}
 							</Dropdown>
 						)}
-						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />}
+						{currentChannel?.creator_id !== currentUserId && (
+							<ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />
+						)}
 					</GroupPanels>
 
 					{canManageThread && (
