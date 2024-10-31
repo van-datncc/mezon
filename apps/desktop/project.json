@@ -203,7 +203,7 @@
           "include": "scripts/installer.nsh",
           "packElevateHelper": false,
           "runAfterFinish": true,
-          "createDesktopShortcut": false,
+          "createDesktopShortcut": "always",
           "deleteAppDataOnUninstall": false
         },
         "msi": {
@@ -285,7 +285,7 @@
           "uninstallDisplayName": "${productName}",
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
-          "createDesktopShortcut": false,
+          "createDesktopShortcut": "always",
           "deleteAppDataOnUninstall": false
         },
         "msi": {
