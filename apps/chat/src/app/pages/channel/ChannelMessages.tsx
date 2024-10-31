@@ -24,7 +24,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode } from '@mezon/utils';
+import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
@@ -86,6 +86,7 @@ function ChannelMessages({
 			}
 
 			if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
+				dispatch(messagesActions.setViewingOlder({ channelId, status: false }));
 				return;
 			}
 
@@ -99,6 +100,7 @@ function ChannelMessages({
 
 			if (direction === ELoadMoreDirection.bottom) {
 				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
+				dispatch(messagesActions.setViewingOlder({ channelId, status: true }));
 				return true;
 			}
 
@@ -117,7 +119,8 @@ function ChannelMessages({
 		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
 	}, []);
 
-	const scrollTimeoutId = useRef<NodeJS.Timeout | null>(null);
+	const scrollHeight = useRef<number>(0);
+	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 	const rowVirtualizer = useVirtualizer({
@@ -128,46 +131,46 @@ function ChannelMessages({
 		getItemKey: (index) => {
 			return messages[index];
 		},
-		onChange: (instance) => {
-			chatRef.current?.classList.add('disable-hover');
-			scrollTimeoutId.current && clearTimeout(scrollTimeoutId.current);
-			scrollTimeoutId.current = setTimeout(async () => {
-				chatRef?.current?.classList.remove('disable-hover');
+		onChange: async (instance) => {
+			toggleDisableHover(chatRef.current, scrollTimeoutId2);
+			if (isLoadMore.current) return;
+			switch (instance.scrollDirection) {
+				case 'backward':
+					if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
+						scrollHeight.current = chatRef.current?.scrollHeight || 0;
+						currentScrollDirection.current = ELoadMoreDirection.top;
+						isLoadMore.current = true;
+						firsRowCached.current = messages[0];
+						await loadMoreMessage(ELoadMoreDirection.top);
+						isLoadMore.current = false;
+						return;
+					}
 
-				switch (instance.scrollDirection) {
-					case 'backward':
-						if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
-							currentScrollDirection.current = ELoadMoreDirection.top;
-							isLoadMore.current = true;
-							await loadMoreMessage(ELoadMoreDirection.top);
-							isLoadMore.current = false;
+					break;
+				case 'forward':
+					{
+						const scrollElement = instance.scrollElement;
+						if (!scrollElement) {
 							return;
 						}
-
-						break;
-					case 'forward':
-						{
-							const scrollElement = instance.scrollElement;
-							if (!scrollElement) {
-								return;
-							}
-							const isAtBottom =
-								Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
-							if (isAtBottom) {
-								currentScrollDirection.current = ELoadMoreDirection.bottom;
-								isLoadMore.current = true;
-								await loadMoreMessage(ELoadMoreDirection.bottom);
-								isLoadMore.current = false;
-							}
+						const isAtBottom =
+							Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
+						if (isAtBottom) {
+							currentScrollDirection.current = ELoadMoreDirection.bottom;
+							isLoadMore.current = true;
+							lastRowCached.current = messages[messages.length - 1];
+							await loadMoreMessage(ELoadMoreDirection.bottom);
+							isLoadMore.current = false;
 						}
-						break;
-				}
-			}, 100);
+					}
+					break;
+			}
 		}
 	});
 
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
+			if (isLoadMore.current) return rs(true);
 			chatRef.current && (chatRef.current.scrollTop = chatRef.current.scrollHeight);
 			rs(true);
 		});
@@ -177,16 +180,13 @@ function ChannelMessages({
 	const firsRowCached = useRef<string>('');
 	const lastRowCached = useRef<string>('');
 	useEffect(() => {
-		if (!isLoadMore.current) return;
+		if (!isLoadMore.current || !chatRef.current) return;
 		const firstMessageId = messages[0];
 		const lastMessageId = messages[messages.length - 1];
 		if (firsRowCached.current !== firstMessageId) {
-			firsRowCached.current &&
-				currentScrollDirection.current === ELoadMoreDirection.top &&
-				rowVirtualizer.scrollToIndex(
-					messages.findIndex((messageId) => messageId === firsRowCached.current),
-					{ align: 'start' }
-				);
+			if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
+				chatRef.current.scrollTop = chatRef.current.scrollHeight - scrollHeight.current;
+			}
 			firsRowCached.current = messages[0];
 			lastRowCached.current = messages[messages.length - 1];
 			currentScrollDirection.current = null;
@@ -226,6 +226,7 @@ function ChannelMessages({
 		}
 
 		if (jumpPinMessageId && isPinMessageExist) {
+			userActiveScroll.current = true;
 			handleScrollToIndex(jumpPinMessageId);
 			timerRef.current = window.setTimeout(() => {
 				dispatch(pinMessageActions.setJumpPinMessageId(null));
@@ -280,6 +281,12 @@ function ChannelMessages({
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
 					onWheelCapture={() => {
+						userActiveScroll.current = true;
+					}}
+					onTouchStart={() => {
+						userActiveScroll.current = true;
+					}}
+					onMouseDown={() => {
 						userActiveScroll.current = true;
 					}}
 					ref={chatRef}
