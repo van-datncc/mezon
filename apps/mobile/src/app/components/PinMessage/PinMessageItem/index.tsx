@@ -10,7 +10,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -58,8 +58,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 				params: { directMessageId: pinMessageItem?.channel_id }
 			});
 		} else {
-			navigation.navigate(APP_SCREEN.HOME);
-			navigation.dispatch(DrawerActions.closeDrawer());
+			navigation.goBack();
 		}
 	};
 
