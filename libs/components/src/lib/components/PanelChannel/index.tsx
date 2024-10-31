@@ -458,7 +458,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								))}
 							</Dropdown>
 						)}
-						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />}
+						{currentChannel?.creator_id !== currentUserId && (
+							<ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />
+						)}
 					</GroupPanels>
 
 					{canManageThread && (
