@@ -16,7 +16,6 @@ import { useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AnchorScroll } from '../../AnchorScroll/AnchorScroll';
-import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
 	listChannel: ApiChannelSettingItem[];
@@ -25,7 +24,6 @@ type ListChannelSettingProp = {
 };
 
 const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSettingProp) => {
-	const [channelSettingId, setChannelSettingId] = useState('');
 	const parentRef = useRef(null);
 	const dispatch = useAppDispatch();
 
@@ -65,15 +63,6 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 				})
 			);
 		}
-	};
-
-	const [openModalChannelSetting, closeModalChannelSetting] = useModal(() => {
-		return <ChannelSettingInforItem onClose={closeModalChannelSetting} channelId={channelSettingId} />;
-	}, [channelSettingId]);
-
-	const handleChooseChannelSetting = (id: string) => {
-		setChannelSettingId(id);
-		openModalChannelSetting();
 	};
 
 	return (
@@ -183,12 +172,12 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 					label={channelParrent?.channel_label as string}
 					privateChannel={channelParrent?.channel_private as number}
 					isThread={channelParrent?.parent_id !== '0'}
-					key={channelParrent.id}
+					key={channelParrent?.id}
 					userIds={channelParrent?.user_ids || []}
-					channelId={channelParrent.id as string}
+					channelId={channelParrent?.id as string}
 					isVoice={isVoiceChannel}
-					messageCount={channelParrent.message_count || 0}
-					lastMessage={channelParrent.last_sent_message}
+					messageCount={channelParrent?.message_count || 0}
+					lastMessage={channelParrent?.last_sent_message}
 				/>
 				{!isVoiceChannel && (
 					<div
@@ -204,14 +193,14 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 					{threadsList?.length > 0 ? (
 						threadsList?.map((thread) => (
 							<ItemInfor
-								creatorId={thread.creator_id as string}
+								creatorId={thread?.creator_id as string}
 								label={thread?.channel_label as string}
-								privateChannel={thread.channel_private as number}
+								privateChannel={thread?.channel_private as number}
 								isThread={thread?.parent_id !== '0'}
-								key={`${thread.id}_thread`}
+								key={`${thread?.id}_thread`}
 								userIds={thread?.user_ids || []}
-								channelId={thread.id as string}
-								messageCount={thread.message_count || 0}
+								channelId={thread?.id as string}
+								messageCount={thread?.message_count || 0}
 								lastMessage={channelParrent.last_sent_message}
 							/>
 						))
