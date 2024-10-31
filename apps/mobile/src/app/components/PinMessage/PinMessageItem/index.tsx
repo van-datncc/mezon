@@ -36,7 +36,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 	const currentChannel = useContext(threadDetailContext);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const navigation = useNavigation<any>();
-	const isDMThread = useMemo(() => {
+	const isDmOrGroup = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
 
@@ -52,7 +52,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 				})
 			);
 		}
-		if (isDMThread) {
+		if (isDmOrGroup) {
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
 				params: { directMessageId: pinMessageItem?.channel_id }
