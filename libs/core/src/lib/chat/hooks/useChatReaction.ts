@@ -4,9 +4,10 @@ import {
 	channelUsersActions,
 	reactionActions,
 	selectAllChannelMembers,
-	selectChannelById,
 	selectClanView,
-	selectCurrentChannelId,
+	selectCurrentChannel,
+	selectDirectById,
+	selectDmGroupCurrentId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -15,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
@@ -24,11 +26,47 @@ interface ChatReactionProps {
 }
 
 export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
+	const location = useLocation();
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const isClanView = useSelector(selectClanView);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const channel = useAppSelector((state) => selectChannelById(state, currentChannelId ?? '')) || {};
+
+	const directId = useSelector(selectDmGroupCurrentId);
+	const direct = useAppSelector((state) => selectDirectById(state, directId));
+	const channel = useSelector(selectCurrentChannel);
+	const isChannelViewPage = location.pathname.includes('/chat/clans/') && location.pathname.includes('/channels/');
+	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
+
+	const currentActive = useMemo(() => {
+		let clanIdActive = '';
+		let modeActive = 0;
+		let channelIdActive = '';
+
+		if (isDirectViewPage && direct?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			clanIdActive = '0';
+			modeActive = ChannelStreamMode.STREAM_MODE_GROUP;
+			channelIdActive = directId || '';
+		} else if (isDirectViewPage && direct?.type === ChannelType.CHANNEL_TYPE_DM) {
+			clanIdActive = '0';
+			modeActive = ChannelStreamMode.STREAM_MODE_DM;
+			channelIdActive = directId || '';
+		} else if (isChannelViewPage && channel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			clanIdActive = channel?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
+			channelIdActive = channel?.id || '';
+		} else if (isChannelViewPage && channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			clanIdActive = channel?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_THREAD;
+			channelIdActive = channel?.id || '';
+		}
+
+		return {
+			clanIdActive,
+			modeActive,
+			channelIdActive
+		};
+	}, [isDirectViewPage, isChannelViewPage, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id]);
+
 	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
 	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
@@ -68,9 +106,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
-			mode: number,
-			clanId: string,
-			channelId: string,
 			messageId: string,
 			emoji_id: string,
 			emoji: string,
@@ -79,9 +114,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			action_delete: boolean,
 			is_public: boolean
 		) => {
-			if (channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
-				mode = ChannelStreamMode.STREAM_MODE_THREAD;
-			}
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
 					emojiId: emoji_id ?? '',
@@ -94,7 +126,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			}
 			addMemberToThread(userId || '');
 			const payload = transformPayloadWriteSocket({
-				clanId,
+				clanId: currentActive.clanIdActive,
 				isPublicChannel: is_public,
 				isClanView: isClanView as boolean
 			});
@@ -102,9 +134,9 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
-					clanId: payload.clan_id,
-					channelId,
-					mode,
+					clanId: currentActive.clanIdActive,
+					channelId: currentActive.channelIdActive,
+					mode: currentActive.modeActive,
 					messageId,
 					emoji_id,
 					emoji,
