@@ -334,7 +334,7 @@ const reducer = {
 	listusersbyuserid: persistedListUsersByUserReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: messagesReducer,
+	messages: persistedMessageReducer,
 	categories: persistedCatReducer,
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
