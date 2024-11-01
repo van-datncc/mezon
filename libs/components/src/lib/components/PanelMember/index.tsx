@@ -250,21 +250,22 @@ const PanelMember = ({
 		}
 	};
 
-	const RemoveMemberFromPrivateThread = async (userId: string) => {
-		if (userId !== userProfile?.user?.id) {
-			const body: removeChannelUsersPayload = {
-				channelId: currentChannel?.channel_id as string,
-				userId: userId,
-				channelType: currentChannel?.type,
-				clanId: currentClan?.clan_id as string
-			};
-			await dispatch(channelUsersActions.removeChannelUsers(body));
-		}
-	};
+	const RemoveMemberFromPrivateThread = useCallback(
+		async (userId: string) => {
+			if (userId !== userProfile?.user?.id) {
+				const body: removeChannelUsersPayload = {
+					channelId: currentChannel?.channel_id as string,
+					userId: userId,
+					channelType: currentChannel?.type,
+					clanId: currentClan?.clan_id as string
+				};
+				await dispatch(channelUsersActions.removeChannelUsers(body));
+			}
+		},
+		[currentChannel?.channel_id, currentChannel?.type, currentClan?.clan_id, userProfile?.user?.id]
+	);
 
-	const isPrivateThread = useMemo(() => {
-		return currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel.channel_private;
-	}, [currentChannel?.channel_private, currentChannel?.type]);
+	const isPrivateThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel.channel_private;
 
 	return (
 		<div
