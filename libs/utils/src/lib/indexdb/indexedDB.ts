@@ -36,9 +36,7 @@ export async function clearLogsIfNewDay() {
 		const lastLogDate = new Date(lastLog.timestamp).toDateString();
 		const currentDate = new Date().toDateString();
 		if (lastLogDate !== currentDate) {
-			for (const log of logs) {
-				await tx.store.delete(log.id);
-			}
+			tx.store.clear();
 		}
 	}
 
