@@ -514,16 +514,19 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	useEffect(() => {
-		AsyncStorage.getItem('recentEmojis').then((emojis) => {
-			const parsedEmojis = JSON.parse(emojis) || [];
-			const recentEmojis = parsedEmojis
-				?.map((item) => ({
-					shortname: item?.emoji,
-					id: item?.emojiId
-				}))
-				.reverse();
-			setRecentEmoji([...recentEmojis, ...emojiFakeData]?.slice(0, 5));
-		});
+		if (type === EMessageBSToShow?.MessageAction) {
+			AsyncStorage.getItem('recentEmojis').then((emojis) => {
+				const parsedEmojis = JSON.parse(emojis || '{}') || [];
+				const recentEmojis = parsedEmojis
+					?.slice(0, 5)
+					?.map((item) => ({
+						shortname: item?.emoji,
+						id: item?.emojiId
+					}))
+					.reverse();
+				setRecentEmoji([...recentEmojis, ...emojiFakeData]?.slice(0, 5));
+			});
+		}
 	}, [type]);
 
 	const renderMessageItemActions = () => {
