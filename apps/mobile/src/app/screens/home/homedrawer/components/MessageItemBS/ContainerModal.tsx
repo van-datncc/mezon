@@ -527,7 +527,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				const uniqueEmojis = [...recentEmojis, ...emojiFakeData]?.filter((emoji, index, self) => {
 					return index === self?.findIndex((e) => e?.id === emoji?.id);
 				});
-				setRecentEmoji(uniqueEmojis.slice(0, 5));
+				setRecentEmoji(uniqueEmojis?.slice(0, 5));
 			});
 		}
 	}, [type]);
