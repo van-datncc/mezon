@@ -88,7 +88,8 @@ export const ChatMessageSending = memo(
 
 		const { editSendMessage, sendMessage } = useChatSending({
 			mode,
-			channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
+			channelOrDirect:
+				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup
 		});
 
 		const attachmentDataRef = useMemo(() => {

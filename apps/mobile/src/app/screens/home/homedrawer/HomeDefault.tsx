@@ -18,7 +18,7 @@ import {
 	selectPreviousChannels,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, SubPanelName, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
+import { ChannelStatusEnum, SubPanelName, TIME_OFFSET, checkIsThread, isPublicChannel } from '@mezon/utils';
 import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -204,11 +204,11 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
 						isPublic={isPublicChannel(currentChannel)}
-						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					<ChatBox
 						channelId={currentChannel?.channel_id}
-						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />

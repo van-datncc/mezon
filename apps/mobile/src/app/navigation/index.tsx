@@ -1,14 +1,12 @@
 import i18n from '@mezon/translations';
 import { CreateMezonClientOptions, MezonContextProvider } from '@mezon/transport';
 import * as Sentry from '@sentry/react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import codePush from 'react-native-code-push';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import 'react-native-svg';
-import VersionInfo from 'react-native-version-info';
-import MezonUpdateVersionModal from '../componentUI/MezonUpdateVersionModal';
 import RootNavigation from './RootNavigator';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
@@ -39,25 +37,8 @@ const mezon: CreateMezonClientOptions = {
 };
 
 const App = () => {
-	const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			checkForUpdate();
-		}, 2000);
-		return () => clearTimeout(timer);
-	}, []);
-
-	const checkForUpdate = async () => {
-		const update = await codePush.checkForUpdate(process.env.NX_CODE_PUSH_KEY_MOBILE as string);
-		if (VersionInfo.appVersion === update?.appVersion) {
-			setIsShowUpdateModal(true);
-		}
-	};
-
 	return (
 		<SafeAreaProvider>
-			<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />
 			<I18nextProvider i18n={i18n}>
 				<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
 					<RootNavigation />

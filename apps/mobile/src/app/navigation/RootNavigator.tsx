@@ -45,7 +45,10 @@ import notifee from '@notifee/react-native';
 import { ChannelType } from 'mezon-js';
 import { AppState, DeviceEventEmitter, InteractionManager, StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
+import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
+import VersionInfo from 'react-native-version-info';
+import MezonUpdateVersionModal from '../componentUI/MezonUpdateVersionModal';
 import NetInfoComp from '../components/NetworkInfo';
 import { toastConfig } from '../configs/toastConfig';
 import RootStack from './RootStack';
@@ -58,6 +61,14 @@ const NavigationMain = () => {
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
 	const { handleReconnect } = useContext(ChatContext);
+	const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			checkForUpdate();
+		}, 2000);
+		return () => clearTimeout(timer);
+	}, []);
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
@@ -141,13 +152,6 @@ const NavigationMain = () => {
 						channelType: ChannelType.CHANNEL_TYPE_VOICE
 					})
 				)
-				// store.dispatch(
-				// 	usersStreamActions.fetchStreamChannelMembers({
-				// 		clanId: currentClanId ?? '',
-				// 		channelId: '',
-				// 		channelType: ChannelType.CHANNEL_TYPE_STREAMING
-				// 	})
-				// )
 			];
 			await Promise.all(promise);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -261,9 +265,17 @@ const NavigationMain = () => {
 		[currentClanId]
 	);
 
+	const checkForUpdate = async () => {
+		// const update = await codePush.checkForUpdate(process.env.NX_CODE_PUSH_KEY_MOBILE as string);
+		const update = await codePush.checkForUpdate('JT3Y22ATCAz3K-IadwV5RGntE6PT5hO0FuaudV');
+		if (VersionInfo.appVersion === update?.appVersion) {
+			setIsShowUpdateModal(true);
+		}
+	};
 	return (
 		<NavigationContainer>
 			<NetInfoComp />
+			{isReadyForUse && <MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />}
 			{isReadyForUse && <RootStack />}
 		</NavigationContainer>
 	);
