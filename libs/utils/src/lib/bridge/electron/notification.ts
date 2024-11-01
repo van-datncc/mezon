@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { addLog, LogType } from '../../indexdb';
 import { electronBridge } from './electron';
 
 export interface IMessageExtras {
@@ -71,22 +72,37 @@ export class MezonNotificationService {
 		};
 
 		ws.onmessage = (data: MessageEvent<string>) => {
-			if (data.data === 'ping') {
-				this.handlePong();
-				this.startPingMonitoring(token);
-			} else {
-				const msg = JSON.parse(data.data) as NotificationData;
-				const { title, message, image } = msg ?? {};
-				const { link } = msg?.extras ?? {};
-				if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
-					return;
-				}
-				electronBridge.pushNotification(title, {
-					body: message,
-					icon: image ?? '',
-					data: {
-						link: link ?? ''
+			try {
+				if (data.data === 'ping') {
+					this.handlePong();
+					this.startPingMonitoring(token);
+				} else {
+					const msg = JSON.parse(data.data) as NotificationData;
+					const { title, message, image } = msg ?? {};
+					const { link } = msg?.extras ?? {};
+					if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
+						return;
 					}
+					electronBridge.pushNotification(title, {
+						body: message,
+						icon: image ?? '',
+						data: {
+							link: link ?? ''
+						}
+					});
+					addLog({
+						message,
+						eventType: LogType.PushNotification,
+						level: 'info',
+						timestamp: new Date()
+					});
+				}
+			} catch (err) {
+				addLog({
+					message: JSON.stringify(err),
+					eventType: LogType.PushNotification,
+					level: 'error',
+					timestamp: new Date()
 				});
 			}
 		};
