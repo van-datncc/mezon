@@ -21,6 +21,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji } from '@mezon/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -45,11 +46,12 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile, userId } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', recentEmoji } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '' } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
+	const [recentEmoji, setRecentEmoji] = useState([]);
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -57,7 +59,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
 
-	const combinedEmojis = useMemo(() => [...recentEmoji, ...emojiFakeData]?.slice(0, 5), [recentEmoji]);
 	const { sendMessage } = useChatSending({
 		mode,
 		channelOrDirect:
@@ -512,11 +513,31 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 		onClose();
 	};
+
+	useEffect(() => {
+		if (type === EMessageBSToShow?.MessageAction) {
+			AsyncStorage.getItem('recentEmojis').then((emojis) => {
+				const parsedEmojis = emojis ? JSON.parse(emojis || '{}') : [];
+				const recentEmojis = parsedEmojis
+					?.slice(0, 5)
+					?.map((item) => ({
+						shortname: item?.emoji,
+						id: item?.emojiId
+					}))
+					.reverse();
+				const uniqueEmojis = [...recentEmojis, ...emojiFakeData]?.filter((emoji, index, self) => {
+					return index === self?.findIndex((e) => e?.id === emoji?.id);
+				});
+				setRecentEmoji(uniqueEmojis?.slice(0, 5));
+			});
+		}
+	}, [type]);
+
 	const renderMessageItemActions = () => {
 		return (
 			<View style={styles.messageActionsWrapper}>
 				<View style={styles.reactWrapper}>
-					{combinedEmojis?.map((item, index) => {
+					{recentEmoji?.map((item, index) => {
 						return (
 							<Pressable
 								key={index}
@@ -632,7 +653,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				setVisibleBottomSheet(false);
 				setContent(<View />);
 		}
-	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
+	}, [type, isShowEmojiPicker, isOnlyEmojiPicker, recentEmoji]);
 
 	return <View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>{content}</View>;
 });
