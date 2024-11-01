@@ -606,9 +606,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 	const onSelectEmoji = useCallback(
 		async (emoji_id: string, emoij: string) => {
-			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoji_id, emoij, userProfile?.user?.id);
+			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userProfile?.user?.id);
 		},
-		[handleReact, message.id, mode, userProfile?.user?.id]
+		[handleReact, message?.id, mode, userProfile?.user?.id]
 	);
 
 	const renderEmojiSelector = () => {
