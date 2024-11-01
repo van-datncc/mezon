@@ -15,8 +15,10 @@ import {
 	EStateFriend,
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
+	channelUsersActions,
 	directMetaActions,
 	notificationSettingActions,
+	removeChannelUsersPayload,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrent,
@@ -76,6 +78,7 @@ const PanelMember = ({
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const currentClan = useSelector(selectCurrentClan);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 	const { removeMemberChannel } = useChannelMembersActions();
 	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
@@ -247,6 +250,22 @@ const PanelMember = ({
 		}
 	};
 
+	const RemoveMemberFromPrivateThread = async (userId: string) => {
+		if (userId !== userProfile?.user?.id) {
+			const body: removeChannelUsersPayload = {
+				channelId: currentChannel?.channel_id as string,
+				userId: userId,
+				channelType: currentChannel?.type,
+				clanId: currentClan?.clan_id as string
+			};
+			await dispatch(channelUsersActions.removeChannelUsers(body));
+		}
+	};
+
+	const isPrivateThread = useMemo(() => {
+		return currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel.channel_private;
+	}, [currentChannel?.channel_private, currentChannel?.type]);
+
 	return (
 		<div
 			ref={panelRef}
@@ -417,6 +436,13 @@ const PanelMember = ({
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
 							<ItemPanelMember onClick={handleRemoveMember} children={`Kick ${member?.user?.username}`} danger />
 							<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
+							{isPrivateThread && (
+								<ItemPanelMember
+									onClick={() => RemoveMemberFromPrivateThread(member?.user?.id as string)}
+									children={`Remove ${member?.user?.username} from this thread`}
+									danger
+								/>
+							)}
 						</GroupPanelMember>
 					)}
 					{isSelf && !isMemberDMGroup && (
