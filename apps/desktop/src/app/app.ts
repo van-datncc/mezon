@@ -82,7 +82,7 @@ export default class App {
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js')
 			},
-			icon: join(__dirname, 'assets', 'linux-icon.png')
+			icon: join(__dirname, 'assets', 'desktop-taskbar-256x256.ico')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenuBarVisibility(false);
