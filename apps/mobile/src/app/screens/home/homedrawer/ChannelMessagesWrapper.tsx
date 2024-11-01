@@ -7,6 +7,7 @@ import { ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, View } from 'react-native';
 import { ImageListModal } from '../../../components/ImageListModal';
+import ChannelMessageListener from './ChannelMessageListener';
 import ChannelMessages from './ChannelMessages';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
@@ -14,7 +15,6 @@ import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import ChannelMessageListener from "./ChannelMessageListener";
 
 type ChannelMessagesProps = {
 	channelId: string;
