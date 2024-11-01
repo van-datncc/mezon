@@ -20,6 +20,7 @@ export async function initDB() {
 }
 
 export async function addLog(log: LogEntry) {
+	return; // pending
 	const db = await initDB();
 	const tx = db.transaction(STORE_NAME, 'readwrite');
 	await tx.store.add(log);
