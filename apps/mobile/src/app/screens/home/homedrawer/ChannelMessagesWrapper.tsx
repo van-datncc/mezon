@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, View } from 'react-native';
 import { ImageListModal } from '../../../components/ImageListModal';
 import ChannelMessageListener from './ChannelMessageListener';
+import ChannelMessageReactionListener from './ChannelMessageReactionListener';
 import ChannelMessages from './ChannelMessages';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
@@ -138,6 +139,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, 
 			/>
 
 			<ChannelMessageListener onMessageAction={onMessageAction} />
+			<ChannelMessageReactionListener />
 			<View>
 				{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 
