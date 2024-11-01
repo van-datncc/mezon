@@ -59,8 +59,10 @@ import { useMezon } from '@mezon/transport';
 import {
 	EMOJI_GIVE_COFFEE,
 	ETypeLinkMedia,
+	LogType,
 	ModeResponsive,
 	NotificationCode,
+	addLog,
 	isPublicChannel,
 	sleep,
 	transformPayloadWriteSocket
@@ -1014,6 +1016,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
+				const id = Date.now().toString();
+				addLog({
+					message: id + ':' + socketType,
+					eventType: LogType.DisconnectSocket,
+					timestamp: new Date(),
+					level: 'info'
+				});
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -1022,19 +1031,32 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 					if (!socket) {
 						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-						return;
+						throw Error('socket not init');
 					}
 
 					if (window && navigator) {
+						addLog({
+							message: id + ':reconnect success',
+							eventType: LogType.ReconnectSocket,
+							timestamp: new Date(),
+							level: 'info'
+						});
 						if (navigator.onLine) {
-							dispatch(appActions.refreshApp());
+							dispatch(appActions.refreshApp({ id }));
 						} else {
 							dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+							throw Error('socket navigator online error');
 						}
 					}
 
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
+					addLog({
+						message: id + ':' + JSON.stringify(error),
+						eventType: LogType.ReconnectSocket,
+						timestamp: new Date(),
+						level: 'error'
+					});
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					Sentry.captureException(error);
 				}
