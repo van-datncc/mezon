@@ -16,10 +16,9 @@ import {
 	selectCurrentClanId
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
-import { DeviceEventEmitter, Linking, Platform, UIManager, View } from 'react-native';
+import { DeviceEventEmitter, Linking, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../utils/helpers';
