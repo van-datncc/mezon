@@ -16,7 +16,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
@@ -26,7 +25,6 @@ interface ChatReactionProps {
 }
 
 export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
-	const location = useLocation();
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const isClanView = useSelector(selectClanView);
@@ -34,27 +32,25 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
-	const isChannelViewPage = location.pathname.includes('/chat/clans/') && location.pathname.includes('/channels/');
-	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
 		let modeActive = 0;
 		let channelIdActive = '';
 
-		if (isDirectViewPage && direct?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+		if (!isClanView && direct?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			clanIdActive = '0';
 			modeActive = ChannelStreamMode.STREAM_MODE_GROUP;
 			channelIdActive = directId || '';
-		} else if (isDirectViewPage && direct?.type === ChannelType.CHANNEL_TYPE_DM) {
+		} else if (!isClanView && direct?.type === ChannelType.CHANNEL_TYPE_DM) {
 			clanIdActive = '0';
 			modeActive = ChannelStreamMode.STREAM_MODE_DM;
 			channelIdActive = directId || '';
-		} else if (isChannelViewPage && channel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
 			channelIdActive = channel?.id || '';
-		} else if (isChannelViewPage && channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_THREAD;
 			channelIdActive = channel?.id || '';
@@ -65,7 +61,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			modeActive,
 			channelIdActive
 		};
-	}, [isDirectViewPage, isChannelViewPage, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id]);
+	}, [isClanView, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id]);
 
 	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
