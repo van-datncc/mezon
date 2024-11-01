@@ -24,6 +24,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { canvasReducer } from './canvas/canvas.slice';
@@ -285,14 +286,6 @@ const persistedStreamReducer = persistReducer(
 	videoStreamReducer
 );
 
-const persistPoliciesReducer = persistReducer(
-	{
-		key: 'policiesReducer',
-		storage
-	},
-	policiesReducer
-);
-
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -309,12 +302,12 @@ const reducer = {
 	listusersbyuserid: persistedListUsersByUserReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: persistedMessageReducer,
+	messages: messagesReducer,
 	categories: persistedCatReducer,
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
 	usersClan: usersClanReducer,
-	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
+	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
@@ -339,6 +332,7 @@ const reducer = {
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
+	activitiesapi: activitiesAPIReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
