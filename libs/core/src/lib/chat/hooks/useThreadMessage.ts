@@ -63,7 +63,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				thread.channel_id as string,
 				ChannelStreamMode.STREAM_MODE_THREAD,
 				false,
-				{ t: content.t },
+				content,
 				mentions,
 				attachments,
 				references
