@@ -293,9 +293,33 @@ const persistPoliciesReducer = persistReducer(
 	policiesReducer
 );
 
+const persistOverriddenPoliciesReducer = persistReducer(
+	{
+		key: 'overriddenPoliciesReducer',
+		storage
+	},
+	overriddenPoliciesReducer
+);
+
+const persistuUersClanReducer = persistReducer(
+	{
+		key: 'usersClanReducer',
+		storage
+	},
+	usersClanReducer
+);
+
+const persistAccountReducer = persistReducer(
+	{
+		key: 'accountReducer',
+		storage
+	},
+	accountReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
-	account: accountReducer,
+	account: persistAccountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
@@ -313,7 +337,7 @@ const reducer = {
 	categories: persistedCatReducer,
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
-	usersClan: usersClanReducer,
+	usersClan: persistuUersClanReducer,
 	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
@@ -321,7 +345,7 @@ const reducer = {
 	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
-	[OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
+	[OVERRIDDEN_POLICIES_FEATURE_KEY]: persistOverriddenPoliciesReducer,
 	notificationsetting: notificationSettingReducer,
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: persistedDefaultNotiClanReducer,
