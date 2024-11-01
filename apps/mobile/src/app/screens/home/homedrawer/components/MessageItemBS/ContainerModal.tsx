@@ -516,7 +516,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	useEffect(() => {
 		if (type === EMessageBSToShow?.MessageAction) {
 			AsyncStorage.getItem('recentEmojis').then((emojis) => {
-				const parsedEmojis = JSON.parse(emojis || '{}') || [];
+				const parsedEmojis = emojis ? JSON.parse(emojis || '{}') : [];
 				const recentEmojis = parsedEmojis
 					?.slice(0, 5)
 					?.map((item) => ({
@@ -524,7 +524,10 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 						id: item?.emojiId
 					}))
 					.reverse();
-				setRecentEmoji([...recentEmojis, ...emojiFakeData]?.slice(0, 5));
+				const uniqueEmojis = [...recentEmojis, ...emojiFakeData]?.filter((emoji, index, self) => {
+					return index === self?.findIndex((e) => e?.id === emoji?.id);
+				});
+				setRecentEmoji(uniqueEmojis.slice(0, 5));
 			});
 		}
 	}, [type]);
