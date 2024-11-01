@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, ReplyIcon, ReplyMessageDeleted, validLinkInviteRegex } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, MessagesEntity, messagesActions, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';

@@ -1,10 +1,10 @@
 import { Metrics, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { appActions, selectStatusStream } from '@mezon/store-mobile';
+import { appActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { Keyboard, Platform, StatusBar, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import LeftDrawerContent from './homedrawer/DrawerContent';
@@ -18,7 +18,6 @@ const HomeScreen = React.memo((props: any) => {
 	const dispatch = useDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation();
-	const streamPlay = useSelector(selectStatusStream);
 	const { themeValue, themeBasic } = useTheme();
 
 	useEffect(() => {
@@ -55,7 +54,7 @@ const HomeScreen = React.memo((props: any) => {
 
 	return (
 		<View style={{ flex: 1, position: 'relative' }}>
-			{streamPlay && <StreamingPopup />}
+			<StreamingPopup />
 			<Drawer.Navigator
 				screenOptions={{
 					drawerPosition: 'left',

@@ -33,6 +33,7 @@ import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
+import DrawerListener from './DrawerListener';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
@@ -94,12 +95,6 @@ const HomeDefault = React.memo((props: any) => {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
-
-	const isOpenDrawer = useDrawerStatus() === 'open';
-
-	useEffect(() => {
-		DeviceEventEmitter.emit(ActionEmitEvent.OPEN_CLOSE_DRAWER, { isOpenDrawer: isOpenDrawer });
-	}, [isOpenDrawer]);
 
 	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
@@ -191,6 +186,7 @@ const HomeDefault = React.memo((props: any) => {
 					save(STORAGE_AGREED_POLICY, 'true');
 				}}
 			/>
+			<DrawerListener />
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}
 				navigation={props.navigation}

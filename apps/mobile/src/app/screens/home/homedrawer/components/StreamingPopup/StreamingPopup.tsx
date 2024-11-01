@@ -1,9 +1,10 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { useAppDispatch } from '@mezon/store';
+import { selectStatusStream, useAppDispatch } from '@mezon/store';
 import { appActions } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
 import StreamingRoom from '../StreamingRoom';
 import { style } from './styles';
 const { width, height } = Dimensions.get('window');
@@ -13,6 +14,8 @@ export const StreamingPopup = () => {
 	const styles = style(themeValue);
 	const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 	const [isFullScreen, setIsFullScreen] = useState(true);
+	const streamPlay = useSelector(selectStatusStream);
+
 	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const dispatch = useAppDispatch();
@@ -82,6 +85,7 @@ export const StreamingPopup = () => {
 		},
 		[isOpenDrawer]
 	);
+	if (!streamPlay) return null;
 	return (
 		<Animated.View
 			style={[
