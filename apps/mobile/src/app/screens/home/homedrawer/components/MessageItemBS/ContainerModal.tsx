@@ -255,6 +255,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionSaveImage = async () => {
+		onClose();
 		const media = message?.attachments;
 		bottomSheetRef?.current?.dismiss();
 		dispatch(appActions.setLoadingMainMobile(true));
