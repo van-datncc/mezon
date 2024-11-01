@@ -294,15 +294,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(statusPresence: StatusPresenceEvent) => {
 			if (statusPresence.joins.length > 0) {
 				const onlineStatus = statusPresence.joins.map((join) => {
-					return { userId: join.user_id, online: true, isMobile: false };
+					return { userId: join.user_id, online: true, isMobile: join.is_mobile };
 				});
 				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
+				dispatch(directActions.updateStatusByUserId(onlineStatus));
+				dispatch(friendsActions.setManyStatusUser(onlineStatus));
 			}
 			if (statusPresence.leaves.length > 0) {
 				const offlineStatus = statusPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, online: false, isMobile: false };
 				});
 				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
+				dispatch(directActions.updateStatusByUserId(offlineStatus));
+				dispatch(friendsActions.setManyStatusUser(offlineStatus));
 			}
 		},
 		[dispatch]
