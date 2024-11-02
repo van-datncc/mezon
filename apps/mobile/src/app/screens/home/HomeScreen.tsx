@@ -58,7 +58,7 @@ const HomeScreen = React.memo((props: any) => {
 			<Drawer.Navigator
 				screenOptions={{
 					drawerPosition: 'left',
-					drawerType: 'front',
+					drawerType: 'back',
 					freezeOnBlur: true,
 					swipeEdgeWidth: Metrics.screenWidth,
 					swipeMinDistance: 5,
@@ -82,7 +82,7 @@ const HomeScreen = React.memo((props: any) => {
 					name={APP_SCREEN.HOME_DEFAULT}
 					component={HomeDefault}
 					options={{
-						drawerType: 'front',
+						drawerType: 'back',
 						swipeEdgeWidth: Metrics.screenWidth,
 						keyboardDismissMode: 'none',
 						swipeMinDistance: 5,

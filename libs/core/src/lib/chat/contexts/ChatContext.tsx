@@ -59,8 +59,10 @@ import { useMezon } from '@mezon/transport';
 import {
 	EMOJI_GIVE_COFFEE,
 	ETypeLinkMedia,
+	LogType,
 	ModeResponsive,
 	NotificationCode,
+	addLog,
 	isPublicChannel,
 	sleep,
 	transformPayloadWriteSocket
@@ -294,15 +296,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(statusPresence: StatusPresenceEvent) => {
 			if (statusPresence.joins.length > 0) {
 				const onlineStatus = statusPresence.joins.map((join) => {
-					return { userId: join.user_id, online: true, isMobile: false };
+					return { userId: join.user_id, online: true, isMobile: join.is_mobile };
 				});
 				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
+				dispatch(directActions.updateStatusByUserId(onlineStatus));
+				dispatch(friendsActions.setManyStatusUser(onlineStatus));
 			}
 			if (statusPresence.leaves.length > 0) {
 				const offlineStatus = statusPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, online: false, isMobile: false };
 				});
 				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
+				dispatch(directActions.updateStatusByUserId(offlineStatus));
+				dispatch(friendsActions.setManyStatusUser(offlineStatus));
 			}
 		},
 		[dispatch]
@@ -782,9 +788,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
 	const messageCoffee = useAppSelector((state) => selectMessageByMessageId(state, channelId, messageIdCoffee));
-	const channelCoffee = useAppSelector(selectChannelById(channelIdCoffee));
+	const channelCoffee = useAppSelector((state) => selectChannelById(state, channelIdCoffee ?? '')) || {};
 	const directCoffee = useAppSelector((state) => selectDirectById(state, channelIdCoffee));
-	const parentChannelCoffee = useAppSelector(selectChannelById(channelCoffee?.parrent_id ?? ''));
+
+	const parentChannelCoffee = useAppSelector((state) => selectChannelById(state, channelCoffee?.parrent_id ?? '')) || {};
+
 	const isClanView = useSelector(selectClanView);
 
 	useEffect(() => {
@@ -1008,6 +1016,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
+				const id = Date.now().toString();
+				addLog({
+					message: id + ':' + socketType,
+					eventType: LogType.DisconnectSocket,
+					timestamp: new Date(),
+					level: 'info'
+				});
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -1016,19 +1031,32 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 					if (!socket) {
 						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-						return;
+						throw Error('socket not init');
 					}
 
 					if (window && navigator) {
+						addLog({
+							message: id + ':reconnect success',
+							eventType: LogType.ReconnectSocket,
+							timestamp: new Date(),
+							level: 'info'
+						});
 						if (navigator.onLine) {
-							dispatch(appActions.refreshApp());
+							dispatch(appActions.refreshApp({ id }));
 						} else {
 							dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+							throw Error('socket navigator online error');
 						}
 					}
 
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
+					addLog({
+						message: id + ':' + JSON.stringify(error),
+						eventType: LogType.ReconnectSocket,
+						timestamp: new Date(),
+						level: 'error'
+					});
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					Sentry.captureException(error);
 				}
