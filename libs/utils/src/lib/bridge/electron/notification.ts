@@ -1,5 +1,4 @@
 import isElectron from 'is-electron';
-import { addLog, LogType } from '../../indexdb';
 import { electronBridge } from './electron';
 
 export interface IMessageExtras {
@@ -90,20 +89,10 @@ export class MezonNotificationService {
 							link: link ?? ''
 						}
 					});
-					addLog({
-						message,
-						eventType: LogType.PushNotification,
-						level: 'info',
-						timestamp: new Date()
-					});
 				}
 			} catch (err) {
-				addLog({
-					message: JSON.stringify(err),
-					eventType: LogType.PushNotification,
-					level: 'error',
-					timestamp: new Date()
-				});
+				// eslint-disable-next-line no-console
+				console.log(err);
 			}
 		};
 
