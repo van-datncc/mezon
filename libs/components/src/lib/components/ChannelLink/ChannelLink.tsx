@@ -155,7 +155,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
 		const notMuteAndUnread = !channel?.is_mute && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
-		const notMuteAndHasCountNoti = !channel?.is_mute && (numberNotification ?? 0) > 0 && notVoiceOrAppOrStreamChannel && !isActive;
+		const notMuteAndHasCountNoti = !channel?.is_mute && numberNotification && numberNotification > 0 && notVoiceOrAppOrStreamChannel && !isActive;
 		const showWhiteDot = (notMuteAndUnread && !isActive) || (notMuteAndHasCountNoti && !isActive);
 		const hightLightTextChannel = activeChannelChannelText || notMuteAndUnread || notMuteAndHasCountNoti;
 		const highLightVoiceChannel = isActive && !notVoiceOrAppOrStreamChannel;

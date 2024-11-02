@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import { useDragAndDrop, useMarkAsRead, usePermissionChecker, useSearchMessages, useWindowFocusState } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useResetCountChannelBadge, useSearchMessages, useWindowFocusState } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMetaActions,
@@ -40,8 +40,7 @@ function useChannelSeen(channelId: string) {
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
-
-	const { handleMarkAsReadPreviousChannel } = useMarkAsRead();
+	const resetCountChannelBadge = useResetCountChannelBadge();
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -64,7 +63,7 @@ function useChannelSeen(channelId: string) {
 	const previousChannel = useAppSelector((state) => selectChannelById(state, previousChannelId)) || {};
 
 	useEffect(() => {
-		handleMarkAsReadPreviousChannel(previousChannel);
+		resetCountChannelBadge(previousChannel);
 	}, [previousChannelId]);
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
