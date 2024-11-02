@@ -94,6 +94,7 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
+
 export const uniqueUsers = (
 	mentions: IMentionOnMessage[],
 	userChannels: ChannelMembersEntity[] | null,
