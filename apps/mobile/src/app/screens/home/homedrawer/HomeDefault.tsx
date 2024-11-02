@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useResetCountChannelBadge } from '@mezon/core';
+import { useMarkAsRead } from '@mezon/core';
 import { ActionEmitEvent, ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -45,7 +45,7 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
-	const resetCountChannelBadge = useResetCountChannelBadge();
+	const { handleMarkAsReadPreviousChannel } = useMarkAsRead();
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -70,7 +70,7 @@ function useChannelSeen(channelId: string) {
 	const previousChannelId = useSelector(selectPreviousChannels)[1];
 	const previousChannel = useAppSelector((state) => selectChannelById(state, previousChannelId));
 	useEffect(() => {
-		resetCountChannelBadge(previousChannel);
+		handleMarkAsReadPreviousChannel(previousChannel);
 	}, [previousChannelId]);
 }
 
