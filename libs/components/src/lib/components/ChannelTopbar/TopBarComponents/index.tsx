@@ -110,9 +110,9 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				className={`mr-2 text-base font-semibold mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '} ${isActive ? 'dark:text-white text-colorTextLightMode cursor-default' : 'dark:text-textSecondary text-colorTextLightMode cursor-pointer'} ${isChannelVoice && 'text-white'}`}
 				onClick={handleRedirect}
 			>
-				{channelParent ? channelParent?.channel_label : channel?.channel_label}
+				{channelParent?.channel_label ? channelParent?.channel_label : channel?.channel_label}
 			</p>
-			{channelParent && channel && !isShowCanvas && (
+			{channelParent?.channel_label && channel && !isShowCanvas && (
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
 					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
