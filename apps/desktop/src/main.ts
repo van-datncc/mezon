@@ -72,7 +72,7 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		window.removeAllListeners('close');
 		window.close();
 	});
-	autoUpdater.quitAndInstall();
+	autoUpdater.quitAndInstall(true, true);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
