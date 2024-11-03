@@ -11,6 +11,7 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
+import isElectron from 'is-electron';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
@@ -39,6 +40,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
+import { getPlatform } from './index';
 export * from './file';
 export * from './mergeRefs';
 export * from './transform';
@@ -885,3 +887,5 @@ export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => 
 export const checkIsThread = (channel?: IChannel) => {
 	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
 };
+
+export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();
