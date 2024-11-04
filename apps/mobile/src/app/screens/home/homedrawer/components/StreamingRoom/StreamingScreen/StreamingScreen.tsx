@@ -76,6 +76,7 @@ export function StreamingScreen({
 							source={{
 								uri: channelStream?.streaming_url
 							}}
+							mixWithOthers={'mix'}
 							resizeMode={isFullScreen ? 'cover' : 'contain'}
 							style={isFullScreen ? styles.fullScreenVideo : styles.video}
 							onLoadStart={handleVideoLoadStart}
