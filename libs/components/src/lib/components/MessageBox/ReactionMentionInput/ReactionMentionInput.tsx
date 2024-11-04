@@ -275,13 +275,14 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (payload.t.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
 				props.handleConvertToFile(payload.t ?? '');
 				const onlyMention = filterMentionsWithAtSign(request.mentionRaw);
-				const displayString = getDisplayMention(onlyMention);
+				const displayPlaintext = getDisplayMention(onlyMention);
+				const displayMarkup = formatMentionsToString(onlyMention);
 
 				setRequestInput(
 					{
 						...request,
-						valueTextInput: formatMentionsToString(onlyMention),
-						content: displayString
+						valueTextInput: displayMarkup,
+						content: displayPlaintext
 					},
 					props.isThread
 				);
