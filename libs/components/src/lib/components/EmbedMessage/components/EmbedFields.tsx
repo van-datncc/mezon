@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 interface Field {
 	name: string;
 	value: string;
@@ -9,19 +11,21 @@ interface EmbedFieldsProps {
 }
 
 export function EmbedFields({ fields }: EmbedFieldsProps) {
-	const groupedFields = fields.reduce((acc, field) => {
-		if (!field.inline) {
-			acc.push([field]);
-		} else {
-			const lastRow = acc[acc.length - 1];
-			if (lastRow && lastRow[0].inline && lastRow.length < 3) {
-				lastRow.push(field);
-			} else {
+	const groupedFields = useMemo(() => {
+		return fields.reduce<Field[][]>((acc, field) => {
+			if (!field.inline) {
 				acc.push([field]);
+			} else {
+				const lastRow = acc[acc.length - 1];
+				if (lastRow && lastRow[0].inline && lastRow.length < 3) {
+					lastRow.push(field);
+				} else {
+					acc.push([field]);
+				}
 			}
-		}
-		return acc;
-	}, [] as Field[][]);
+			return acc;
+		}, []);
+	}, [fields]);
 
 	return (
 		<div className="mt-2 grid gap-2">
