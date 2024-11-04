@@ -77,7 +77,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 
 	const handleRouteData = useCallback(async (thread?: IChannel) => {
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-			bottomSheetChannelStreamingRef.current.present();
+			bottomSheetChannelStreamingRef.current?.present();
 			return;
 		}
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
