@@ -12050,17 +12050,17 @@ metro@0.80.12, metro@^0.80.3:
     ws "^7.5.10"
     yargs "^17.6.2"
 
-mezon-js-protobuf@^1.6.9:
-  version "1.6.10"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.6.10.tgz#dafc110fb6ee40da53b2a02191f0e416b0cca182"
-  integrity sha512-T0IZDFzk2PRWg5v8qcNktnyg+tM7RRRvt2p1Xlty/oQgJPQFrqMx8PZ1LvQXUpLGj/olGgyQuvbJPcyddLOJgw==
+mezon-js-protobuf@^1.6.12:
+  version "1.6.12"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.6.12.tgz#6ba73a346de1b6112313ca7b60a972e006d55bec"
+  integrity sha512-Y+EKQGy2XO1iT4NfzzKb+qxRju318LqcuT8Phs2po6c8We0kE5ED1uBif3VcgCW9/UzN/zXCihGtd0BfXNi0ew==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@^2.9.51:
-  version "2.9.51"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.51.tgz#60118036e4e0d3401422fc3951ad6401826e3f4a"
-  integrity sha512-surutqtIGd1lQ942I2XP8RcMZlshDaVJ5yNE3mWjlT721ZM5v9sd4h7u3WyS7Zl/uATTmci+io9apWn7nZ2lgQ==
+mezon-js@^2.9.56:
+  version "2.9.56"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.56.tgz#dbfffefd8a594e0a76cee1563ec5da85d3b8bf3d"
+  integrity sha512-IkAh5YAM4sUy04d+fZTWMgaQRwQ3T/jPlZViP5DlkKbt0yzRjYeZPokCjCoF0ZsaTLmAvFTinQLMLcypu9JdaQ==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"
@@ -14078,6 +14078,11 @@ pure-rand@^6.0.0:
   resolved "https://registry.yarnpkg.com/pure-rand/-/pure-rand-6.1.0.tgz#d173cf23258231976ccbdb05247c9787957604f2"
   integrity sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==
 
+qr.js@0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/qr.js/-/qr.js-0.0.0.tgz#cace86386f59a0db8050fa90d9b6b0e88a1e364f"
+  integrity sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==
+
 qrcode-terminal@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/qrcode-terminal/-/qrcode-terminal-0.12.0.tgz#bb5b699ef7f9f0505092a3748be4464fe71b5819"
@@ -14380,6 +14385,14 @@ react-onclickoutside@^6.13.0:
   version "6.13.1"
   resolved "https://registry.yarnpkg.com/react-onclickoutside/-/react-onclickoutside-6.13.1.tgz#1f5e0241c08784b6e65745d91aca0d700c548a89"
   integrity sha512-LdrrxK/Yh9zbBQdFbMTXPp3dTSN9B+9YJQucdDu3JNKRrbdU+H+/TVONJoWtOwy4II8Sqf1y/DTI6w/vGPYW0w==
+
+react-qr-code@^2.0.15:
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/react-qr-code/-/react-qr-code-2.0.15.tgz#fbfc12952c504bcd64275647e9d1ea63251742ce"
+  integrity sha512-MkZcjEXqVKqXEIMVE0mbcGgDpkfSdd8zhuzXEl9QzYeNcw8Hq2oVIzDLWuZN2PQBwM5PWjc2S31K8Q1UbcFMfw==
+  dependencies:
+    prop-types "^15.8.1"
+    qr.js "0.0.0"
 
 react-redux@9.1.0:
   version "9.1.0"

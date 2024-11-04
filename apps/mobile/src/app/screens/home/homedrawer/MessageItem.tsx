@@ -351,7 +351,7 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							<Block opacity={message.isError || message.isSending || message?.isErrorRetry ? 0.6 : 1}>
+							<Block opacity={message.isError || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink ? (
 									<RenderMessageInvite content={contentMessage} />
 								) : (

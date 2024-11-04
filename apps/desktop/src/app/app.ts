@@ -77,7 +77,12 @@ export default class App {
 			width: width,
 			height: height,
 			show: false,
+			frame: false,
+			titleBarOverlay: process.platform == 'linux' || process.platform == 'darwin' ? true : false,
+			titleBarStyle: process.platform == 'linux' || process.platform == 'darwin' ? 'hidden' : 'default',
+			trafficLightPosition: process.platform == 'linux' || process.platform == 'darwin' ? { x: 15, y: 10 } : undefined,
 			webPreferences: {
+				nodeIntegration: false,
 				contextIsolation: true,
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js')
