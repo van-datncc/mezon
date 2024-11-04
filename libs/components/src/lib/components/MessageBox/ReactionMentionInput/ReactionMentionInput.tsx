@@ -62,6 +62,7 @@ import {
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
+	getExtraPart,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -796,15 +797,3 @@ const useEnterPressTracker = () => {
 
 	return { trackEnterPress };
 };
-
-function getExtraPart(stringA: string, stringB: string): string {
-	if (stringB.startsWith(stringA)) {
-		return stringB.slice(stringA.length);
-	}
-
-	if (stringB.endsWith(stringA)) {
-		return stringB.slice(0, stringB.length - stringA.length);
-	}
-
-	return '';
-}
