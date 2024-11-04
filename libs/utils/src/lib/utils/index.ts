@@ -23,8 +23,8 @@ import {
 	ChannelMembersEntity,
 	EBacktickType,
 	EMimeTypes,
-	EmojiDataOptionals,
 	ETokenMessage,
+	EmojiDataOptionals,
 	IChannel,
 	IEmojiOnMessage,
 	IExtendedMessage,
@@ -888,3 +888,5 @@ export const checkIsThread = (channel?: IChannel) => {
 };
 
 export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();
+export const isMacDesktop = getPlatform() === Platform.MACOS && isElectron();
+export const isLinuxDesktop = getPlatform() === Platform.LINUX && isElectron();

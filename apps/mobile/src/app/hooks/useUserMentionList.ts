@@ -1,6 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useChannelMembers } from '@mezon/core';
 import { ChannelMembersEntity, selectAllRolesClan, selectChannelById, selectRolesByChannelId } from '@mezon/store';
+import { useAppSelector } from '@mezon/store-mobile';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
