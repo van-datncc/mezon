@@ -57,7 +57,6 @@ import {
 	ThreadValue,
 	blankReferenceObj,
 	checkIsThread,
-	convertMentionOnfile,
 	filterEmptyArrays,
 	filterMentionsWithAtSign,
 	focusToElement,
@@ -69,7 +68,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -273,10 +272,27 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				mk: markdownList,
 				vk: voiceLinkRoomList
 			};
+			if (payload.t.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
+				props.handleConvertToFile(payload.t ?? '');
+				const onlyMention = filterMentionsWithAtSign(request.mentionRaw);
+				const displayString = getDisplayMention(onlyMention);
+
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: formatMentionsToString(onlyMention),
+						content: displayString
+					},
+					props.isThread
+				);
+
+				return;
+			}
 
 			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
+
 			if (
 				request?.valueTextInput &&
 				typeof request?.valueTextInput === 'string' &&
@@ -432,6 +448,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		return [];
 	}, [props.mode, commonChannelDms]);
 
+	const [pastedContent, setPastedContent] = useState<string>('');
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
@@ -446,18 +463,17 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
-		const onlyMention = filterMentionsWithAtSign(mentions);
-		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(newPlainTextValue);
-			if (onlyMention.length > 0) {
-				const displayString = getDisplayMention(onlyMention);
-				const mentionConverted = convertMentionOnfile(rolesClan, displayString, onlyMention as MentionItem[]);
-				setMentionOnFile(mentionConverted);
+		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
+			const extraPartMarkup = getExtraPart(pastedContent, newValue);
+			const extraPartPlainText = getExtraPart(pastedContent, newPlainTextValue);
+			props.handleConvertToFile(pastedContent);
+
+			if (extraPartPlainText.length > 0) {
 				setRequestInput(
 					{
 						...request,
-						valueTextInput: formatMentionsToString(onlyMention),
-						content: displayString
+						valueTextInput: extraPartMarkup,
+						content: extraPartPlainText
 					},
 					props.isThread
 				);
@@ -625,7 +641,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
 			)}
 			<MentionsInput
-				onPaste={props.handlePaste}
+				onPaste={(event) => {
+					event.preventDefault();
+					const pastedText = event.clipboardData.getData('text');
+					setPastedContent(pastedText);
+				}}
+				onPasteCapture={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
@@ -735,6 +756,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					hasPermissionEdit={props.hasPermissionEdit || true}
 				/>
 			)}
+			{request?.content.length > MIN_THRESHOLD_CHARS && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content.length}</div>
+			)}
 		</div>
 	);
 });
@@ -771,3 +795,15 @@ const useEnterPressTracker = () => {
 
 	return { trackEnterPress };
 };
+
+function getExtraPart(stringA: string, stringB: string): string {
+	if (stringB.startsWith(stringA)) {
+		return stringB.slice(stringA.length);
+	}
+
+	if (stringB.endsWith(stringA)) {
+		return stringB.slice(0, stringB.length - stringA.length);
+	}
+
+	return '';
+}
