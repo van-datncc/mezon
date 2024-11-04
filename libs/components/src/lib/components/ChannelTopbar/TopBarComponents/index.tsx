@@ -115,7 +115,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			{channelParent?.channel_label && channel && !isShowCanvas && (
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
-					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
+					{channelParent?.channel_label && channel.channel_private === ChannelStatusEnum.isPrivate ? (
 						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode min-w-6" />
 					) : (
 						<Icons.ThreadIcon defaultSize="w-6 h-6 min-w-6" />
