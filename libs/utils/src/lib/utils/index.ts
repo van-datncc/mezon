@@ -1,5 +1,5 @@
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
-import { getPlatform, Platform } from '@mezon/utils';
+import { Platform, getPlatform } from '@mezon/utils';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -555,15 +555,14 @@ export const processText = (inputString: string) => {
 
 	const singleBacktick = '`';
 	const tripleBacktick = '```';
-	const httpPrefix = 'http';
 	const googleMeetPrefix = 'https://meet.google.com/';
 
 	let i = 0;
 	while (i < inputString?.length) {
-		if (inputString.startsWith(httpPrefix, i)) {
+		if (inputString.startsWith('http://', i) || inputString.startsWith('https://', i)) {
 			// Link processing
 			const startindex = i;
-			i += httpPrefix.length;
+			i += inputString.startsWith('https://', i) ? 'https://'.length : 'http://'.length;
 			while (i < inputString?.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
 				i++;
 			}
