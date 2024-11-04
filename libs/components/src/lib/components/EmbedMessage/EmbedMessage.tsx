@@ -30,7 +30,7 @@ export default function EmbedMessage({ color, title, url, author, description, f
 				{author && <EmbedAuthor {...author} />}
 				{title && <EmbedTitle title={title} url={url} />}
 				{description && <EmbedDescription description={description} />}
-				<EmbedFields fields={fields} />
+				{fields && <EmbedFields fields={fields} />}
 				{image && <EmbedImage url={image.url} />}
 				{(footer || timestamp) && <EmbedFooter {...footer} timestamp={timestamp} />}
 			</div>
