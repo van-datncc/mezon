@@ -62,6 +62,7 @@ import {
 	LogType,
 	ModeResponsive,
 	NotificationCode,
+	TIME_OFFSET,
 	addLog,
 	isPublicChannel,
 	sleep,
@@ -84,6 +85,7 @@ import {
 	EventEmoji,
 	EventUserPermissionChannel,
 	LastPinMessageEvent,
+	LastSeenMessageEvent,
 	MessageTypingEvent,
 	Notification,
 	RoleEvent,
@@ -376,6 +378,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[currentChannel?.channel_id, dispatch]
 	);
+
+	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
+		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
+		dispatch(channelsActions.updateChannelBadgeCount({ channelId: lastSeenMess.channel_id, count: 0, isReset: true }));
+	}, []);
 
 	const onuserchannelremoved = useCallback(
 		(user: UserChannelRemovedEvent) => {
@@ -943,6 +952,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpinmessage = onpinmessage;
 
+			socket.onlastseenupdated = onlastseenupdated;
+
 			socket.onuserchannelremoved = onuserchannelremoved;
 
 			socket.onuserclanremoved = onuserclanremoved;
@@ -999,6 +1010,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			onlastseenupdated,
 			onuserchannelremoved,
 			onuserclanremoved,
 			onclandeleted,
@@ -1101,6 +1113,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onlastseenupdated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstatuspresence = () => {};
@@ -1139,6 +1153,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		onlastseenupdated,
 		onuserchannelremoved,
 		onuserclanremoved,
 		onclandeleted,

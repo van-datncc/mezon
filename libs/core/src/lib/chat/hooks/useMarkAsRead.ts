@@ -50,7 +50,8 @@ export function useMarkAsRead() {
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
 					channelId: channel?.channel_id ?? '',
-					count: (channel?.count_mess_unread ?? 0) * -1
+					count: 0,
+					isReset: true
 				})
 			);
 		},
@@ -218,7 +219,8 @@ export function useResetCountChannelBadge() {
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
 					channelId: channel?.channel_id ?? '',
-					count: (channel?.count_mess_unread ?? 0) * -1
+					count: 0,
+					isReset: true
 				})
 			);
 		},
