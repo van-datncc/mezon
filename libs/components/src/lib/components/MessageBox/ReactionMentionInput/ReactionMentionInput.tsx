@@ -47,7 +47,6 @@ import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
-	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -55,6 +54,7 @@ import {
 	TITLE_MENTION_HERE,
 	ThreadStatus,
 	ThreadValue,
+	addMention,
 	blankReferenceObj,
 	checkIsThread,
 	filterEmptyArrays,
@@ -183,7 +183,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
-	const [mentionOnFile, setMentionOnFile] = useState<IMentionOnMessage[]>([]);
+	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
+	const [displayMarkup, setDisplayMarkup] = useState<string>('');
+
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const seenIds = new Set();
@@ -273,12 +275,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				mk: markdownList,
 				vk: voiceLinkRoomList
 			};
-			if (payload.t.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
-				props.handleConvertToFile(payload.t ?? '');
-				const onlyMention = filterMentionsWithAtSign(request.mentionRaw);
-				const displayPlaintext = getDisplayMention(onlyMention);
-				const displayMarkup = formatMentionsToString(onlyMention);
+			const addMentionToPayload = addMention(payload, mentionList);
+			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
+			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 
+			if (payloadJson.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
+				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
 						...request,
@@ -329,7 +331,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionOnFile.length > 0 ? mentionOnFile : mentionList,
+					mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -362,7 +364,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionOnFile.length > 0 ? mentionOnFile : mentionList,
+						mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -391,7 +393,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
-			setMentionOnFile([]);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -465,6 +466,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
+		const onlyMention = filterMentionsWithAtSign(mentions);
+		const convertToMarkUpString = formatMentionsToString(onlyMention);
+		const convertToPlainTextString = getDisplayMention(onlyMention);
+		setDisplayPlaintext(convertToPlainTextString);
+		setDisplayMarkup(convertToMarkUpString);
 		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
 			const extraPartMarkup = getExtraPart(pastedContent, newValue);
 			const extraPartPlainText = getExtraPart(pastedContent, newPlainTextValue);
