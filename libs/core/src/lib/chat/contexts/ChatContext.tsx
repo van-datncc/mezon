@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
 	AttachmentEntity,
+	appActions,
 	attachmentActions,
 	channelMembers,
 	channelMembersActions,
@@ -1061,6 +1062,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 						throw Error('socket not init');
 					}
+					dispatch(appActions.refreshApp({ id }));
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					// eslint-disable-next-line no-console
