@@ -40,7 +40,13 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 				);
 				break;
 			case EMessageActionType.PinMessage:
-				dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+				dispatch(
+					pinMessageActions.setChannelPinMessage({
+						clan_id: message?.clan_id ?? '0',
+						channel_id: message?.channel_id,
+						message_id: message?.id
+					})
+				);
 				break;
 			default:
 				break;

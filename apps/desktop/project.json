@@ -65,6 +65,7 @@
         "packElevateHelper": false,
         "runAfterFinish": true,
         "createDesktopShortcut": "always",
+        "createStartMenuShortcut": true,
         "deleteAppDataOnUninstall": false
       },
       "msi": {
@@ -201,7 +202,8 @@
           "include": "scripts/installer.nsh",
           "packElevateHelper": false,
           "runAfterFinish": true,
-          "createDesktopShortcut": false,
+          "createDesktopShortcut": "always",
+          "createStartMenuShortcut": true,
           "deleteAppDataOnUninstall": false
         },
         "msi": {
@@ -282,7 +284,8 @@
           "uninstallDisplayName": "${productName}",
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
-          "createDesktopShortcut": false,
+          "createDesktopShortcut": "always",
+          "createStartMenuShortcut": true,
           "deleteAppDataOnUninstall": false
         },
         "msi": {

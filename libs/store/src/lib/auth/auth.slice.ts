@@ -119,6 +119,16 @@ export const checkLoginRequest = createAsyncThunk('auth/checkLoginRequest', asyn
 	return null;
 });
 
+export const confirmLoginRequest = createAsyncThunk('auth/confirmLoginRequest', async ({ loginId }: { loginId: string }, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+
+	const session = await mezon?.confirmLoginRequest({ login_id: loginId });
+	if (session) {
+		return normalizeSession(session);
+	}
+	return null;
+});
+
 export const authSlice = createSlice({
 	name: AUTH_FEATURE_KEY,
 	initialState: initialAuthState,
@@ -196,17 +206,24 @@ export const authSlice = createSlice({
 			});
 
 		builder
-			.addCase(checkLoginRequest.pending, (state: AuthState) => {
-				state.loadingStatus = 'loading';
-			})
 			.addCase(checkLoginRequest.fulfilled, (state: AuthState, action) => {
-				state.loadingStatus = 'loaded';
 				if (action.payload !== null) {
 					state.session = action.payload;
 					state.isLogin = true;
 				}
 			})
 			.addCase(checkLoginRequest.rejected, (state: AuthState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+		builder
+			.addCase(confirmLoginRequest.pending, (state: AuthState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(confirmLoginRequest.fulfilled, (state: AuthState, action) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(confirmLoginRequest.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -226,6 +243,7 @@ export const authActions = {
 	refreshSession,
 	createQRLogin,
 	checkLoginRequest,
+	confirmLoginRequest,
 	logOut
 };
 

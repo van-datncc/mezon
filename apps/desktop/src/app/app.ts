@@ -15,7 +15,7 @@ const isQuitting = false;
 export enum EActivities {
 	CODE = 'Code',
 	SPOTIFY = 'Spotify',
-	LOL = 'Riot Client'
+	LOL = 'LeagueClientUx'
 }
 
 export default class App {
@@ -77,12 +77,17 @@ export default class App {
 			width: width,
 			height: height,
 			show: false,
+			frame: false,
+			titleBarOverlay: process.platform == 'linux' || process.platform == 'darwin' ? true : false,
+			titleBarStyle: process.platform == 'linux' || process.platform == 'darwin' ? 'hidden' : 'default',
+			trafficLightPosition: process.platform == 'linux' || process.platform == 'darwin' ? { x: 15, y: 10 } : undefined,
 			webPreferences: {
+				nodeIntegration: false,
 				contextIsolation: true,
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js')
 			},
-			icon: join(__dirname, 'assets', 'linux-icon.png')
+			icon: join(__dirname, 'assets', 'desktop-taskbar-256x256.ico')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenuBarVisibility(false);

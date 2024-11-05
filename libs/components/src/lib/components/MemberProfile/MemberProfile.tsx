@@ -110,7 +110,7 @@ export function MemberProfile({
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
 		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
-		[ActivitiesName.LOL]: 'Riot Client'
+		[ActivitiesName.LOL]: 'League of Legends'
 	};
 
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];
@@ -383,7 +383,7 @@ export function MemberProfile({
 									className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] "
 									title={customStatus}
 								>
-									{activityStatus}
+									{status?.status ? activityStatus : customStatus}
 								</p>
 							)}
 						</div>

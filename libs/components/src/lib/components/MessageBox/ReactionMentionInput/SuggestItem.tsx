@@ -4,7 +4,8 @@ import {
 	selectAllHashtagDm,
 	selectChannelById,
 	selectNumberMemberVoiceChannel,
-	selectTheme
+	selectTheme,
+	useAppSelector
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
@@ -63,9 +64,9 @@ const SuggestItem = ({
 	const channelIcon = useMemo(() => {
 		if (!specificChannel) return null;
 
-		const { channel_private, type, parrent_id } = specificChannel;
+		const { channel_private, type } = specificChannel;
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id === '0') {
+		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}
@@ -154,7 +155,8 @@ const SuggestItem = ({
 	);
 };
 const RenderChannelLabelForThread = ({ channel_id }: { channel_id: string }) => {
-	const channelParent = useSelector(selectChannelById(channel_id));
+	const channelParent = useAppSelector((state) => selectChannelById(state, channel_id ?? '')) || {};
+
 	return <>{channelParent?.channel_label || null}</>;
 };
 

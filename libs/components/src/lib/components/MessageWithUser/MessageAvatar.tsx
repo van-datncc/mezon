@@ -40,8 +40,9 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			userName={message.username}
 			data-popover-target="popover-content"
 			src={
-				(mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanAvatar || pendingClanAvatar || pendingUserAvatar : pendingUserAvatar) ||
-				message?.avatar
+				(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+					? clanAvatar || pendingClanAvatar || pendingUserAvatar
+					: pendingUserAvatar) || message?.avatar
 			}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"

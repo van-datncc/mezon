@@ -63,6 +63,15 @@ export function useAuth() {
 		[dispatch]
 	);
 
+	const confirmLoginRequest = useCallback(
+		async (loginId: string) => {
+			const action = await dispatch(authActions.confirmLoginRequest({ loginId: loginId || '' }));
+			const session = action.payload as Session;
+			return session;
+		},
+		[dispatch]
+	);
+
 	return useMemo(
 		() => ({
 			userProfile,
@@ -72,7 +81,8 @@ export function useAuth() {
 			qRCode,
 			checkLoginRequest,
 			loginByApple,
-			fetchUserProfile
+			fetchUserProfile,
+			confirmLoginRequest
 		}),
 		[userProfile, userId, loginEmail, loginByGoogle, qRCode, loginByApple, fetchUserProfile]
 	);

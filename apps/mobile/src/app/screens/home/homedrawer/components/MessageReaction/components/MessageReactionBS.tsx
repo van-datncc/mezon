@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
 import Backdrop from '../../../../../../componentUI/MezonBottomSheet/backdrop';
 import { IDetailReactionBottomSheet } from '../../../types';
@@ -22,16 +22,14 @@ export const MessageReactionBS = memo((props: IDetailReactionBottomSheet) => {
 			backdropComponent={Backdrop}
 			backgroundStyle={{ backgroundColor: themeValue.primary }}
 		>
-			<Block flex={1}>
-				<MessageReactionContent
-					allReactionDataOnOneMessage={allReactionDataOnOneMessage}
-					emojiSelectedId={emojiSelectedId}
-					userId={userId}
-					removeEmoji={removeEmoji}
-					onShowUserInformation={onShowUserInformation}
-					channelId={channelId}
-				/>
-			</Block>
+			<MessageReactionContent
+				allReactionDataOnOneMessage={allReactionDataOnOneMessage}
+				emojiSelectedId={emojiSelectedId}
+				userId={userId}
+				removeEmoji={removeEmoji}
+				onShowUserInformation={onShowUserInformation}
+				channelId={channelId}
+			/>
 		</BottomSheetModal>
 	);
 });

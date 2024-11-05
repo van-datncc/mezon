@@ -38,6 +38,7 @@ module.exports = {
 	bgDarkAccent: 'color-mix( in oklab, hsl(227 calc(1 * 6.5%) 27.3% / 1) 100%, black 0.01% )',
 	bgMentionReply: 'color-mix( in oklab, hsl(40 calc(1 * 86.4%) 56.9% / 1) 100%, black 0.01% )',
 	bgMessageReplyHighline: 'color-mix( in oklab, hsl(235 calc(1 * 86.1%) 77.5% / 0.08) 100%, hsl(0 0% 0% / 0.08) 0.01% )',
+	bgDarkPopover: 'oklab(0.296332 -0.000731647 -0.00768477)',
 
 	/* background light*/
 	bgLightPrimary: '#FFFFFF',

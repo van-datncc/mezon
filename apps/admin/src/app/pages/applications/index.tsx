@@ -192,8 +192,13 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 						<div
 							onClick={() => goToAppDetailPage(value.id as string)}
 							key={index}
-							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px] applicationItemSmallSort' : 'w-[206px] applicationItemLargeSort'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
+							className={`relative p-[10px] rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl ${isSmallSizeSort ? 'w-[128px] applicationItemSmallSort' : 'w-[206px] applicationItemLargeSort'} ${value.is_shadow ? 'dark:bg-[#474a51] dark:hover:bg-[#393a40] bg-[#c6ccd2] hover:bg-[#adaeaf]' : 'dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8]'}`}
 						>
+							{value.is_shadow && (
+								<div className="w-fit p-[6px] rounded-full dark:bg-bgLightPrimary bg-bgPrimary top-1 left-1 absolute">
+									<Icons.ShadowBotIcon className="w-6 dark:text-textPrimaryLight text-textPrimary" />
+								</div>
+							)}
 							{value.applogo ? (
 								<img src={value.applogo} alt="" className="aspect-square object-cover rounded-md w-full" />
 							) : (

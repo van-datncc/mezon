@@ -80,7 +80,8 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
-			user_ids: listGroupDM
+			user_ids: listGroupDM,
+			clan_id: '0'
 		};
 		if (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			handleAddMemberToGroupChat(bodyCreateDmGroup);

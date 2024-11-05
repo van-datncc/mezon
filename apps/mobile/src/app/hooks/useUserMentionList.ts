@@ -1,6 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useChannelMembers } from '@mezon/core';
 import { ChannelMembersEntity, selectAllRolesClan, selectChannelById, selectRolesByChannelId } from '@mezon/store';
+import { useAppSelector } from '@mezon/store-mobile';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
@@ -14,8 +15,8 @@ interface UserMentionListProps {
 
 function UseMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
 	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
-	const channel = useSelector(selectChannelById(channelID));
-	const channelparrent = useSelector(selectChannelById(channel?.parrent_id || ''));
+	const channel = useAppSelector((state) => selectChannelById(state, channelID || ''));
+	const channelparrent = useAppSelector((state) => selectChannelById(state, channel?.parrent_id || ''));
 	const rolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const rolesToUse = useMemo(() => {
@@ -65,7 +66,7 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 				isRoleUser: true
 			})) ?? [];
 
-		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL || channelMode === ChannelStreamMode.STREAM_MODE_THREAD) {
 			return [...sortedMentionList, ...roleMentions, hardcodedUser];
 		} else {
 			return [...sortedMentionList];

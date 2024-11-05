@@ -105,17 +105,20 @@ const ChannelMessages = React.memo(
 			if (idMessageToJump && isMessageExist) {
 				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump);
 				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
-					flatListRef?.current?.scrollToIndex?.({ animated: true, index: indexToJump });
+					flatListRef?.current?.scrollToIndex?.({ animated: true, index: indexToJump - 2 >= 0 ? indexToJump - 2 : indexToJump });
 					DeviceEventEmitter.emit(ActionEmitEvent.MESSAGE_ID_TO_JUMP, idMessageToJump);
 				}
 			}
 		}, [dispatch, idMessageToJump, isMessageExist, messages]);
 
-		const scrollChannelMessageToIndex = (index: number) => {
-			if (flatListRef.current) {
-				flatListRef?.current?.scrollToIndex?.({ animated: true, index: index });
-			}
-		};
+		const scrollChannelMessageToIndex = useCallback(
+			(index: number) => {
+				if (flatListRef.current && index > 0 && messages?.length - 1 >= index) {
+					flatListRef?.current?.scrollToIndex?.({ animated: true, index: index });
+				}
+			},
+			[messages?.length]
+		);
 
 		const isHaveJumpToPresent = useMemo(() => {
 			return (isViewingOldMessage || hasMoreBottom || messages?.length >= LIMIT_MESSAGE * 3) && !!messages?.length;
@@ -160,7 +163,7 @@ const ChannelMessages = React.memo(
 
 				return true;
 			},
-			[hasMoreBottom, isFetching, hasMoreTop, dispatch, clanId, channelId]
+			[isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, scrollChannelMessageToIndex]
 		);
 
 		const renderItem = useCallback(

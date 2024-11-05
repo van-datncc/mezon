@@ -1,7 +1,6 @@
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
-import { useCallback } from 'react';
 
 type ChannelJumpProps = {
 	clanId: string;
@@ -11,12 +10,11 @@ type ChannelJumpProps = {
 
 export function ChannelJumpToPresent({ clanId, channelId, className }: ChannelJumpProps) {
 	const dispatch = useAppDispatch();
-
-	const handleJumpToPresent = useCallback(() => {
+	const handleJumpToPresent = () => {
 		// Jump to present
-		dispatch(messagesActions.fetchMessages({ clanId, channelId, isFetchingLatestMessages: true, noCache: true }));
+		dispatch(messagesActions.fetchMessages({ clanId, channelId, isFetchingLatestMessages: true, noCache: true, isClearMessage: true }));
 		dispatch(messagesActions.setIdMessageToJump(null));
-	}, [clanId, channelId, dispatch]);
+	};
 
 	return (
 		<div

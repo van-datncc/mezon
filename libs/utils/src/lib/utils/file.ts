@@ -1,3 +1,6 @@
+import { MentionItem } from 'react-mentions';
+import { IMentionOnMessage, IRolesClan, MentionDataProps } from '../types';
+
 function createFileMetadata<T>(file: File): T {
 	return {
 		filename: file.name,
@@ -90,4 +93,58 @@ export function isMediaTypeNotSupported(mediaType?: string) {
 	]);
 
 	return unsupportedMediaTypes.has(mediaType);
+}
+
+export function formatMentionsToString(array: MentionDataProps[]) {
+	const mentionStrings = array.map((item) => `@[${item?.display?.replace('@', '')}](${item.id})`);
+	return mentionStrings.join(' ');
+}
+export function getDisplayMention(array: MentionDataProps[]) {
+	const mentionStrings = array.map((item) => `${item?.display}`);
+	return mentionStrings.join(' ');
+}
+export function filterMentionsWithAtSign(array: MentionDataProps[]) {
+	const seenIds = new Set<string>();
+
+	return array.filter((item: MentionDataProps) => {
+		if (item?.display?.startsWith('@') && !seenIds.has(item?.id as string)) {
+			seenIds.add(item?.id as string);
+			return true;
+		}
+		return false;
+	});
+}
+
+export const convertMentionOnfile = (roles: IRolesClan[], contentString: string, ment: MentionItem[]): IMentionOnMessage[] => {
+	const roleIds = new Set(roles.map((role) => role.id));
+	const mentions: IMentionOnMessage[] = [];
+
+	ment.forEach((mention) => {
+		const { id, display } = mention;
+		const startIndex = contentString.indexOf(display);
+		if (startIndex !== -1) {
+			const s = startIndex;
+			const e = s + display.length;
+			const isRole = roleIds.has(id);
+			if (isRole) {
+				mentions.push({ role_id: id, s, e });
+			} else {
+				mentions.push({ user_id: id, s, e });
+			}
+		}
+	});
+
+	return mentions;
+};
+
+export function getExtraPart(stringA: string, stringB: string): string {
+	if (stringB.startsWith(stringA)) {
+		return stringB.slice(stringA.length);
+	}
+
+	if (stringB.endsWith(stringA)) {
+		return stringB.slice(0, stringB.length - stringA.length);
+	}
+
+	return '';
 }

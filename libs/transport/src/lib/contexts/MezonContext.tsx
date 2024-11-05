@@ -33,6 +33,7 @@ export type MezonContextValue = {
 	authenticateGoogle: (token: string) => Promise<Session>;
 	createQRLogin: () => Promise<ApiLoginIDResponse>;
 	checkLoginRequest: (LoginRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
+	confirmLoginRequest: (ConfirmRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
@@ -97,6 +98,17 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			throw new Error('Mezon client not initialized');
 		}
 		const session = await clientRef.current.checkLoginRequest(LoginRequest);
+		return session;
+	}, []);
+
+	const confirmLoginRequest = useCallback(async (confirmRequest: ApiConfirmLoginRequest) => {
+		if (!clientRef.current) {
+			throw new Error('Mezon client not initialized');
+		}
+		if (!sessionRef.current) {
+			throw new Error('Mezon session not initialized');
+		}
+		const session = await clientRef.current.confirmLogin(sessionRef.current, confirmRequest);
 		return session;
 	}, []);
 
@@ -298,6 +310,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createClient,
 			createQRLogin,
 			checkLoginRequest,
+			confirmLoginRequest,
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,
@@ -314,6 +327,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createClient,
 			createQRLogin,
 			checkLoginRequest,
+			confirmLoginRequest,
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,

@@ -54,10 +54,15 @@ import {
 	TITLE_MENTION_HERE,
 	ThreadStatus,
 	ThreadValue,
+	addMention,
 	blankReferenceObj,
 	checkIsThread,
 	filterEmptyArrays,
+	filterMentionsWithAtSign,
 	focusToElement,
+	formatMentionsToString,
+	getDisplayMention,
+	getExtraPart,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -151,10 +156,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
-	const currentDmOrChannelId = useMemo(
-		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
-	);
+	const currentDmOrChannelId =
+		props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
+			? currentChannel?.channel_id
+			: currentDmId;
+
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -167,6 +173,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		membersOfParent as ChannelMembersEntity[],
 		dataReferences?.message_sender_id || ''
 	);
+
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
 	const userProfile = useSelector(selectAllAccount);
@@ -176,6 +183,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
+	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
+	const [displayMarkup, setDisplayMarkup] = useState<string>('');
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -266,10 +275,28 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				mk: markdownList,
 				vk: voiceLinkRoomList
 			};
+			const addMentionToPayload = addMention(payload, mentionList);
+			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
+			const payloadJson = JSON.stringify(removeEmptyOnPayload);
+
+			if (payloadJson.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
+				props.handleConvertToFile(payload.t ?? '');
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: displayMarkup,
+						content: displayPlaintext
+					},
+					props.isThread
+				);
+
+				return;
+			}
 
 			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
+
 			if (
 				request?.valueTextInput &&
 				typeof request?.valueTextInput === 'string' &&
@@ -325,7 +352,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			} else {
 				if (openThreadMessageState) {
 					props.onSend(
-						{ t: valueThread?.content.t || '', contentThread: request?.content },
+						{ t: valueThread?.content.t || '' },
 						valueThread?.mentions,
 						valueThread?.attachments,
 						valueThread?.references,
@@ -400,30 +427,31 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
-			return channels.map((item) => {
-				return {
+			return channels
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.category_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, channels]);
 
 	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
-			return commonChannelDms.map((item) => {
-				return {
+			return commonChannelDms
+				.map((item) => ({
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.clan_name ?? ''
-				};
-			}) as ChannelsMentionProps[];
+				}))
+				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 		}
 		return [];
 	}, [props.mode, commonChannelDms]);
 
+	const [pastedContent, setPastedContent] = useState<string>('');
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
@@ -438,9 +466,28 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
-		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(newValue);
-			setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+		const onlyMention = filterMentionsWithAtSign(mentions);
+		const convertToMarkUpString = formatMentionsToString(onlyMention);
+		const convertToPlainTextString = getDisplayMention(onlyMention);
+		setDisplayPlaintext(convertToPlainTextString);
+		setDisplayMarkup(convertToMarkUpString);
+		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
+			const extraPartMarkup = getExtraPart(pastedContent, newValue);
+			const extraPartPlainText = getExtraPart(pastedContent, newPlainTextValue);
+			props.handleConvertToFile(pastedContent);
+
+			if (extraPartPlainText.length > 0) {
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: extraPartMarkup,
+						content: extraPartPlainText
+					},
+					props.isThread
+				);
+			} else {
+				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+			}
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -478,7 +525,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId: props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannelId as string) : (currentDmId as string),
+					channelId:
+						props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
+							? (currentChannelId as string)
+							: (currentDmId as string),
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
@@ -599,7 +649,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
 			)}
 			<MentionsInput
-				onPaste={props.handlePaste}
+				onPaste={(event) => {
+					event.preventDefault();
+					const pastedText = event.clipboardData.getData('text');
+					setPastedContent(pastedText);
+				}}
+				onPasteCapture={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
@@ -708,6 +763,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					currentClanId={props.currentClanId}
 					hasPermissionEdit={props.hasPermissionEdit || true}
 				/>
+			)}
+			{request?.content.length > MIN_THRESHOLD_CHARS && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content.length}</div>
 			)}
 		</div>
 	);

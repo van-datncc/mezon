@@ -11,7 +11,8 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	selectTitle,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton, ThreadNameProps } from '@mezon/utils';
@@ -30,11 +31,14 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_VOICE;
-	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT;
+	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT || type === ChannelType.CHANNEL_TYPE_THREAD;
 	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isAppChannel = type === ChannelType.CHANNEL_TYPE_APP;
-	const channelParent = useSelector(selectChannelById(channel?.parrent_id ? (channel.parrent_id as string) : ''));
-	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
+
+	const channelParent =
+		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
+
+	const isPrivate = channelParent?.id ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
 	const theme = useSelector(selectTheme);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -54,7 +58,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const dispatch = useAppDispatch();
 
 	const handleRedirect = () => {
-		if (channelParent) {
+		if (channelParent?.id) {
 			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
 		}
 		if (isShowCanvas) {
@@ -106,12 +110,12 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				className={`mr-2 text-base font-semibold mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '} ${isActive ? 'dark:text-white text-colorTextLightMode cursor-default' : 'dark:text-textSecondary text-colorTextLightMode cursor-pointer'} ${isChannelVoice && 'text-white'}`}
 				onClick={handleRedirect}
 			>
-				{channelParent ? channelParent?.channel_label : channel?.channel_label}
+				{channelParent?.channel_label ? channelParent?.channel_label : channel?.channel_label}
 			</p>
-			{channelParent && channel && !isShowCanvas && (
+			{channelParent?.channel_label && channel && !isShowCanvas && (
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
-					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
+					{channelParent?.channel_label && channel.channel_private === ChannelStatusEnum.isPrivate ? (
 						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode min-w-6" />
 					) : (
 						<Icons.ThreadIcon defaultSize="w-6 h-6 min-w-6" />

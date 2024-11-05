@@ -12,7 +12,7 @@ import { EOverridePermissionType, ERequestStatus } from '../../types/channelPerm
 import { IMemberItemProps } from '../../types/channelPermission.type';
 
 export const MemberItem = memo(
-	({ member, channelId, isCheckbox = false, isChecked = false, onSelectMemberChange, isAdvancedSetting = false, onPress }: IMemberItemProps) => {
+	({ member, channel, isCheckbox = false, isChecked = false, onSelectMemberChange, isAdvancedSetting = false, onPress }: IMemberItemProps) => {
 		const { userId } = useAuth();
 		const [checkClanOwner] = useCheckOwnerForUser();
 		const isClanOwner = checkClanOwner(member?.user?.id);
@@ -26,8 +26,10 @@ export const MemberItem = memo(
 
 		const deleteMember = async () => {
 			const body = {
-				channelId,
-				userId: member?.user?.id
+				channelId: channel.id,
+				userId: member?.user?.id,
+				channelType: channel.type,
+				clanId: channel.clan_id
 			};
 			const response = await dispatch(channelUsersActions.removeChannelUsers(body));
 			const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;

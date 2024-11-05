@@ -48,6 +48,7 @@ export const style = (colors: Attributes) =>
 			padding: size.s_10,
 			borderBottomWidth: 2,
 			borderBottomColor: colors.border,
+			backgroundColor: colors.primary,
 			height: size.s_60
 		},
 		tabHeaderItem: {

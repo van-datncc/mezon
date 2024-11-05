@@ -15,7 +15,7 @@ jobs:
 
       - name: Install package
         run: |
-          yarn
+           yarn
 
       - name: Change prod environment
         run: |
@@ -44,8 +44,16 @@ jobs:
           NX_CHAT_SENTRY_DNS: ${{ secrets.NX_CHAT_SENTRY_DNS_PROD }}
           NX_CHAT_APP_ANNONYMOUS_USER_ID: ${{ secrets.NX_CHAT_APP_ANNONYMOUS_USER_ID_PROD }}
           NX_CHAT_APP_NOTIFICATION_WS_URL: ${{ secrets.NX_CHAT_APP_NOTIFICATION_WS_URL_PROD }}
-          
+
+      - name: Zip portable
+        run: |
+           $version = (Get-Content -Path package.json | ConvertFrom-Json).version
+           echo "$version"
+           cd ./dist/executables/
+           zip mezon-$version-win-portable-x64.zip  mezon-*-win-x64.exe
+
       - name: Push to MinIO
         run: |
           powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/latest.yml mezon/mezon/release/latest.yml'"
           powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-x64.exe mezon/mezon/release/'"
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-portable-x64.zip mezon/mezon/release/'"

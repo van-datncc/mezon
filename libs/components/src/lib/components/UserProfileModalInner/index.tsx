@@ -1,4 +1,13 @@
-import { useAppNavigation, useDirect, useEscapeKeyClose, useMemberCustomStatus, useOnClickOutside, useSettingFooter, useUserById } from '@mezon/core';
+import {
+	useAppNavigation,
+	useDirect,
+	useEscapeKeyClose,
+	useMemberCustomStatus,
+	useMemberStatus,
+	useOnClickOutside,
+	useSettingFooter,
+	useUserById
+} from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	notificationActions,
@@ -56,6 +65,7 @@ const UserProfileModalInner = ({ userId, directId, notify, onClose, isDM, user }
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
 	const displayAvatar = userById?.clan_avatar || userById?.user?.avatar_url;
 	const displayUsername = userById?.clan_nick || userById?.user?.display_name || userById?.user?.username;
+	const userStatus = useMemberStatus(userId || '');
 
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
@@ -154,6 +164,7 @@ const UserProfileModalInner = ({ userId, directId, notify, onClose, isDM, user }
 							userToDisplay={userById}
 							customStatus={userCustomStatus}
 							userID={userId}
+							userStatus={userStatus}
 							styleAvatar="w-[120px] h-[120px] rounded-full"
 						/>
 						{isSelf ? (

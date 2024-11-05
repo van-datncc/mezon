@@ -3,6 +3,7 @@ import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAp
 import {
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
+	TypeMessage,
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_CLAN_SIDE_BAR,
 	convertDateString,
@@ -10,7 +11,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
@@ -96,7 +97,7 @@ function MessageWithUser({
 		return includesUser || includesRole;
 	})();
 
-	const checkMessageHasReply = !!message.references?.length;
+	const checkMessageHasReply = !!message.references?.length && message.code == TypeMessage.Chat;
 
 	const checkMessageIncludeMention = hasIncludeMention;
 
@@ -104,7 +105,7 @@ function MessageWithUser({
 	const checkJumpPinMessage = jumpPinMessageId === message.id;
 
 	const containerClass = classNames('relative', 'message-container', {
-		// 'is-sending': message.isSending,
+		'is-sending': message.isSending,
 		'is-error': message.isError,
 		'bg-[#383B47]': isHighlight
 	});
@@ -136,35 +137,41 @@ function MessageWithUser({
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
-	const handleOpenShortUser = useCallback((e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
-		if (checkAnonymous) {
-			return;
-		}
-		if (modalState.current.profileItem) {
-			return;
-		}
-		shortUserId.current = userId;
-		const heightPanel =
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
-				? HEIGHT_PANEL_PROFILE
-				: HEIGHT_PANEL_PROFILE_DM;
-		if (window.innerHeight - e.clientY > heightPanel) {
-			positionShortUser.current = {
-				top: e.clientY,
-				left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-			};
-		} else {
-			positionShortUser.current = {
-				top: window.innerHeight - heightPanel,
-				left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-			};
-		}
-		openProfileItem();
-		modalState.current.profileItem = true;
-	}, []);
+	const handleOpenShortUser = useCallback(
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
+			if (checkAnonymous) {
+				return;
+			}
+			if (modalState.current.profileItem) {
+				return;
+			}
+			shortUserId.current = userId;
+			const heightPanel =
+				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+					? HEIGHT_PANEL_PROFILE
+					: HEIGHT_PANEL_PROFILE_DM;
+			if (window.innerHeight - e.clientY > heightPanel) {
+				positionShortUser.current = {
+					top: e.clientY,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				};
+			} else {
+				positionShortUser.current = {
+					top: window.innerHeight - heightPanel,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				};
+			}
+			openProfileItem();
+			modalState.current.profileItem = true;
+		},
+		[checkAnonymous, mode]
+	);
 
-	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
-	const avatar = (() => {
+	const isDM = useMemo(() => {
+		return mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
+	}, [mode]);
+
+	const avatar = useMemo(() => {
 		if (isDM && shortUserId.current === message.sender_id) {
 			return message?.avatar;
 		}
@@ -176,7 +183,7 @@ function MessageWithUser({
 		if (shortUserId.current === message.sender_id) {
 			return message?.clan_avatar || message?.avatar;
 		}
-	})();
+	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.references, message.sender_id]);
 
 	const messageHour = convertTimeHour(message?.create_time || ('' as string));
 
@@ -207,17 +214,19 @@ function MessageWithUser({
 				/>
 			</div>
 		);
-	}, [message]);
+	}, [message, avatar]);
+
+	const isMessageSystem = message.code == TypeMessage.Welcome || message.code == TypeMessage.CreateThread || message.code == TypeMessage.CreatePin;
 
 	return (
 		<>
 			{showDivider && <MessageDateDivider message={message} />}
 			{!shouldNotRender && (
-				<HoverStateWrapper popup={popup}>
+				<HoverStateWrapper isSearchMessage={isSearchMessage} popup={popup}>
 					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
 						<div className="relative rounded-sm overflow-visible">
-							<div className={childDivClass}></div>
-							<div className={parentDivClass}>
+							<div className={!isMessageSystem ? childDivClass : ''}></div>
+							<div className={!isMessageSystem ? parentDivClass : ''}>
 								{checkMessageHasReply && (
 									<MessageReply
 										message={message}
@@ -262,14 +271,12 @@ function MessageWithUser({
 												{!isEditing && (
 													<MessageContent
 														message={message}
-														isCombine={isCombine}
-														// isSending={message.isSending}
+														isSending={message.isSending}
 														isError={message.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
 													/>
 												)}
-
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 											</div>
 										</div>
@@ -299,8 +306,9 @@ function MessageDateDivider({ message }: { message: MessagesEntity }) {
 interface HoverStateWrapperProps {
 	children: ReactNode;
 	popup?: () => ReactNode;
+	isSearchMessage?: boolean;
 }
-const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }) => {
+const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage }) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 	const isScrolling = useRef(false);
@@ -324,28 +332,8 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }
 			setIsHover(false);
 		}, 100);
 	};
-
-	useEffect(() => {
-		const handleScroll = () => {
-			isScrolling.current = true;
-			if (hoverTimeout.current) {
-				clearTimeout(hoverTimeout.current);
-			}
-			setIsHover(false);
-			setTimeout(() => {
-				isScrolling.current = false;
-			}, 100);
-		};
-
-		window.addEventListener('scroll', handleScroll, true);
-
-		return () => {
-			window.removeEventListener('scroll', handleScroll, true);
-		};
-	}, []);
-
 	return (
-		<div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+		<div className={isSearchMessage ? 'w-full' : ''} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 			{children}
 			{isHover && popup && popup()}
 		</div>

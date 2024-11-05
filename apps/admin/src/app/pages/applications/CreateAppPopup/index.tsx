@@ -1,5 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { createApplication, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ApiAddAppRequest } from 'mezon-js/api.gen';
 import { FormEvent, useState } from 'react';
 
@@ -9,7 +10,8 @@ interface ICreateAppPopup {
 
 const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const [inputValue, setInputValue] = useState('');
-	const [isChecked, setIsChecked] = useState(false);
+	const [isCheckedForPolicy, setIsChecked] = useState(false);
+	const [isShadowBot, setIsShadowBot] = useState(false);
 	const [notification, setNotification] = useState<React.JSX.Element | null>(null);
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
@@ -22,7 +24,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 					A name is required to create your new application.
 				</div>
 			);
-		} else if (inputValue && !isChecked) {
+		} else if (inputValue && !isCheckedForPolicy) {
 			return setNotification(
 				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
 					The <span className="font-semibold hover:underline">Terms of Service</span> must be accepted.
@@ -33,15 +35,20 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			const createRequest: ApiAddAppRequest = {
 				appname: inputValue,
 				creator_id: userProfile?.user?.id,
-				role: 0
+				role: 0,
+				is_shadow: isShadowBot
 			};
 			await dispatch(createApplication({ request: createRequest }));
 			togglePopup();
 		}
 	};
 
-	const handleToggleCheckBox = () => {
-		setIsChecked(!isChecked);
+	const handleTogglePolicyCheckBox = () => {
+		setIsChecked(!isCheckedForPolicy);
+	};
+
+	const handleCheckForShadow = () => {
+		setIsShadowBot(!isShadowBot);
 	};
 
 	const handleInputOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,11 +71,18 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						/>
 					</div>
 					<div className="flex gap-2">
-						<input checked={isChecked} onChange={handleToggleCheckBox} type="checkbox" className="w-6" />
+						<input checked={isCheckedForPolicy} onChange={handleTogglePolicyCheckBox} type="checkbox" className="w-6" />
 						<div className="flex-1">
 							By clicking Create, you agree to the Mezon{' '}
 							<span className="text-blue-500 hover:underline">Developer Terms of Service</span> and{' '}
 							<span className="text-blue-500 hover:underline">Developer Policy</span>
+						</div>
+					</div>
+					<div className="flex gap-2">
+						<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
+						<div className="flex-1 flex gap-1">
+							<div>Shadow Bot </div>
+							<Icons.ShadowBotIcon className="w-6" />
 						</div>
 					</div>
 				</div>

@@ -38,6 +38,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CodePushDeploymentKey</key>
+	<string>y1WdSlfsC6OKqVt1lUNBZkOKrblqHckK8M4O19</string>
 	<key>GIDClientID</key>
 	<string>648946579638-funno2n4iiib3idaa0pqt2js4u1nal26.apps.googleusercontent.com</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -51,6 +53,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Mezon app needs access to the camera to take and send pictures in messages</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to enhance your experience by showing nearby content and providing location-specific features when you're using the app. Your privacy is important to us, and we only access your location while you’re actively using the app.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

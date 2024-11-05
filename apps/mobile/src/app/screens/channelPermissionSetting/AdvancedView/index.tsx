@@ -20,7 +20,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const allUserInChannel = useSelector(selectAllUserChannel);
 
 	const listOfRoleAndMemberInChannel = useMemo(() => {
-		if (!listOfChannelRole?.length || !allUserInChannel?.length) {
+		if ((!listOfChannelRole?.length && !allUserInChannel?.length) || !!channel?.channel_private) {
 			return [];
 		}
 		return [
@@ -67,14 +67,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 			}
 			switch (type) {
 				case EOverridePermissionType.Member:
-					return (
-						<MemberItem
-							member={member}
-							channelId={channel?.channel_id}
-							isAdvancedSetting={true}
-							onPress={navigateToPermissionOverridesDetail}
-						/>
-					);
+					return <MemberItem member={member} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />;
 				case EOverridePermissionType.Role:
 					return <RoleItem role={role} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />;
 				default:

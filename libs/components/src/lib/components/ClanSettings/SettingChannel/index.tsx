@@ -16,20 +16,17 @@ import { useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AnchorScroll } from '../../AnchorScroll/AnchorScroll';
-import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
 	listChannel: ApiChannelSettingItem[];
 	clanId: string;
 	countChannel?: number;
+	searchFilter?: string;
 };
 
-const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSettingProp) => {
-	const [channelSettingId, setChannelSettingId] = useState('');
+const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }: ListChannelSettingProp) => {
 	const parentRef = useRef(null);
 	const dispatch = useAppDispatch();
-
-	// const selectClanId = useSelector(selectCurrentClanId);
 
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize, setPageSize] = useState(10);
@@ -67,15 +64,6 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 		}
 	};
 
-	const [openModalChannelSetting, closeModalChannelSetting] = useModal(() => {
-		return <ChannelSettingInforItem onClose={closeModalChannelSetting} channelId={channelSettingId} />;
-	}, [channelSettingId]);
-
-	const handleChooseChannelSetting = (id: string) => {
-		setChannelSettingId(id);
-		openModalChannelSetting();
-	};
-
 	return (
 		<div className="h-full w-full flex flex-col gap-1 flex-1">
 			<div className="w-full flex pl-12 pr-12 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
@@ -93,6 +81,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 						clanId={clanId}
 						currentPage={currentPage}
 						pageSize={pageSize}
+						searchFilter={searchFilter}
 					/>
 				))}
 				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mt-0">
@@ -145,9 +134,10 @@ interface IRenderChannelAndThread {
 	clanId: string;
 	currentPage: number;
 	pageSize: number;
+	searchFilter?: string;
 }
 
-const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize }: IRenderChannelAndThread) => {
+const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize, searchFilter }: IRenderChannelAndThread) => {
 	const dispatch = useAppDispatch();
 	const threadsList = useSelector(selectThreadsListByParentId(channelParrent.id as string));
 
@@ -179,18 +169,18 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 		<div className="flex flex-col">
 			<div className="relative" onClick={handleFetchThreads}>
 				<ItemInfor
-					creatorId={channelParrent?.creator_id as string}
+					creatorId={channelParrent.creator_id as string}
 					label={channelParrent?.channel_label as string}
 					privateChannel={channelParrent?.channel_private as number}
 					isThread={channelParrent?.parent_id !== '0'}
-					key={channelParrent.id}
+					key={channelParrent?.id}
 					userIds={channelParrent?.user_ids || []}
-					channelId={channelParrent.id as string}
+					channelId={channelParrent?.id as string}
 					isVoice={isVoiceChannel}
-					messageCount={channelParrent.message_count || 0}
-					lastMessage={channelParrent.last_sent_message}
+					messageCount={channelParrent?.message_count || 0}
+					lastMessage={channelParrent?.last_sent_message}
 				/>
-				{!isVoiceChannel && (
+				{!isVoiceChannel && !searchFilter && (
 					<div
 						onClick={toggleThreadsList}
 						className={`absolute top-4 right-2 cursor-pointer transition duration-100 ease-in-out ${showThreadsList ? '' : '-rotate-90'}`}
@@ -199,19 +189,19 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 					</div>
 				)}
 			</div>
-			{showThreadsList && (
+			{showThreadsList && !searchFilter && (
 				<div className="flex flex-col pl-8">
 					{threadsList?.length > 0 ? (
 						threadsList?.map((thread) => (
 							<ItemInfor
-								creatorId={thread.creator_id as string}
+								creatorId={thread?.creator_id as string}
 								label={thread?.channel_label as string}
-								privateChannel={thread.channel_private as number}
+								privateChannel={thread?.channel_private as number}
 								isThread={thread?.parent_id !== '0'}
-								key={`${thread.id}_thread`}
+								key={`${thread?.id}_thread`}
 								userIds={thread?.user_ids || []}
-								channelId={thread.id as string}
-								messageCount={thread.message_count || 0}
+								channelId={thread?.id as string}
+								messageCount={thread?.message_count || 0}
 								lastMessage={channelParrent.last_sent_message}
 							/>
 						))

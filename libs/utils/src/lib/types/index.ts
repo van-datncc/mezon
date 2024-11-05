@@ -193,6 +193,7 @@ export type IMessage = ChannelMessage & {
 	isFirst?: boolean;
 	hide_editted?: boolean;
 	isErrorRetry?: boolean;
+	code?: number;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -205,14 +206,31 @@ export type IMessageWithUser = IMessage & {
 	user: IUser | null;
 };
 
+export interface IEmbedProps {
+	color?: string;
+	title?: string;
+	url?: string;
+	author?: {
+		name: string;
+		icon_url?: string;
+		url?: string;
+	};
+	description?: string;
+	thumbnail?: { url: string };
+	fields?: Array<{ name: string; value: string; inline?: boolean }>;
+	image?: { url: string };
+	timestamp?: string;
+	footer?: { text: string; icon_url?: string };
+}
+
 export interface IMessageSendPayload {
 	t?: string;
-	contentThread?: string;
 	hg?: IHashtagOnMessage[];
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
+	embed?: IEmbedProps;
 }
 
 export type IUser = {
@@ -400,6 +418,7 @@ export type IEmoji = {
 
 export type IChannelUser = ChannelDescription & {
 	id: string;
+	active?: number;
 };
 
 export type IUsers = ApiUser & {
@@ -883,5 +902,16 @@ export enum ActivitiesType {
 export enum ActivitiesName {
 	CODE = 'Code',
 	SPOTIFY = 'Spotify',
-	LOL = 'Riot Client'
+	LOL = 'LeagueClientUx'
+}
+
+export enum TypeMessage {
+	Chat = 0,
+	ChatUpdate = 1,
+	ChatRemove = 2,
+	Typing = 3,
+	Indicator = 4,
+	Welcome = 5,
+	CreateThread = 6,
+	CreatePin = 7
 }

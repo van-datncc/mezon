@@ -4,69 +4,44 @@ import {
 	channelSettingActions,
 	selectAllChannelSuggestion,
 	selectCurrentClanId,
+	selectListChannelBySearch,
 	selectNumberChannelCount,
-	selectNumberThreadCount,
 	useAppDispatch
 } from '@mezon/store';
-import { ChannelStatusEnum } from '@mezon/utils';
-import { ApiChannelSettingItem } from 'mezon-js/api.gen';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ChannelSetting = () => {
-	const [privateFilter, setPrivateFilter] = useState(false);
-	const [threadFilter, setThreadFilter] = useState(false);
-
 	const [searchFilter, setSearchFilter] = useState('');
 	const listChannel = useSelector(selectAllChannelSuggestion);
+	const listChannelSearch = useSelector(selectListChannelBySearch);
 	const countChannel = useSelector(selectNumberChannelCount);
-	const countThread = useSelector(selectNumberThreadCount);
-
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 
-	const handleFilterPrivateChannel = (e: ChangeEvent<HTMLInputElement>) => {
-		setPrivateFilter(e.target.checked);
-	};
-	const handleFilterThread = (e: ChangeEvent<HTMLInputElement>) => {
-		setThreadFilter(e.target.checked);
-	};
 	const handleSearchByNameChannel = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchFilter(e.target.value);
+		debouncedSearchChannel(e.target.value);
 	};
 
-	const filterChannel = (channel: ApiChannelSettingItem) => {
-		if (privateFilter && channel.channel_private !== ChannelStatusEnum.isPrivate) {
-			return false;
-		}
-		if (threadFilter && channel.parent_id === '0') {
-			return false;
-		}
-		if (!channel.channel_label?.includes(searchFilter)) {
-			return false;
-		}
-		return true;
-	};
+	const debouncedSearchChannel = useDebouncedCallback(async (value: string) => {
+		await dispatch(
+			channelSettingActions.fetchChannelSettingInClan({
+				clanId: selectClanId as string,
+				parentId: '',
+				typeFetch: ETypeFetchChannelSetting.SEARCH_CHANNEL,
+				keyword: value
+			})
+		);
+	}, 300);
 
-	// const listChannelSetting = useMemo(() => {
-	// 	const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
-	// 	listChannel.forEach((channel) => {
-	// 		if (!filterChannel(channel)) {
-	// 			return;
-	// 		}
-	// 		if (listChannelRecord[channel.parent_id as string]) {
-	// 			listChannelRecord[channel.parent_id as string].push(channel);
-	// 			return;
-	// 		}
-	// 		if (channel.parent_id === '0') {
-	// 			listChannelRecord[channel.id as string] = [];
-	// 		} else {
-	// 			listChannelRecord[channel.parent_id as string] = [channel];
-	// 		}
-	// 	});
-
-	// 	return listChannelRecord;
-	// }, [privateFilter, searchFilter, listChannel.length, threadFilter, currentPage, pageSize]);
+	const listChannelBySearch = useMemo(() => {
+		if (searchFilter) {
+			return listChannelSearch;
+		}
+		return listChannel;
+	}, [listChannelSearch, listChannel]);
 
 	useEffect(() => {
 		async function fetchListChannel() {
@@ -86,39 +61,20 @@ const ChannelSetting = () => {
 			<div className="p-2 flex items-center justify-between text-textLightTheme dark:text-textDarkTheme">
 				<div className="flex items-center gap-2">
 					<input
-						type="checkbox"
-						id="private_filter"
-						defaultChecked={privateFilter}
-						onChange={handleFilterPrivateChannel}
-						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
-					/>
-					<label htmlFor="private_filter">
-						Only Private <span className="font-semibold italic">({countChannel})</span>
-					</label>
-				</div>
-				<div className="flex items-center gap-2">
-					<input
-						type="checkbox"
-						id="thread_filter"
-						defaultChecked={threadFilter}
-						onChange={handleFilterThread}
-						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
-					/>
-					<label htmlFor="thread_filter">
-						Only Thread <span className="font-semibold italic">({countThread})</span>
-					</label>
-				</div>
-				<div className="flex items-center gap-2">
-					<input
 						type="text"
 						value={searchFilter}
 						placeholder="Search"
 						onChange={handleSearchByNameChannel}
-						className=" max-w-60 h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex outline-none focus:outline-none"
+						className="w-full h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex outline-none focus:outline-none"
 					/>
 				</div>
 			</div>
-			<ListChannelSetting listChannel={listChannel} clanId={selectClanId as string} countChannel={countChannel} />
+			<ListChannelSetting
+				listChannel={listChannelBySearch}
+				clanId={selectClanId as string}
+				countChannel={countChannel}
+				searchFilter={searchFilter}
+			/>
 		</div>
 	);
 };

@@ -142,7 +142,12 @@ export default memo(MentionUser);
 
 const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose, rootRef }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
-		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
+		selectChannelMemberByUserIds(
+			state,
+			channelId ?? '',
+			userID,
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? '' : '1'
+		)
 	)[0];
 	const currentChannel = useSelector(selectCurrentChannel);
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };

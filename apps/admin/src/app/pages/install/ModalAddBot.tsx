@@ -138,8 +138,8 @@ export const SelectClan = memo((props: SelectClanProps) => {
 	return (
 		<div className="space-y-3 px-4">
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-contentTertiary my-4" />
-			<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Add to server:</p>
-			{selectClan.isEmpty && <p className="text-colorDanger text-xs text-left">Please select a server.</p>}
+			<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Add to clan:</p>
+			{selectClan.isEmpty && <p className="text-colorDanger text-xs text-left">Please select a clan.</p>}
 			<select
 				name="clan"
 				defaultValue=""
@@ -154,7 +154,7 @@ export const SelectClan = memo((props: SelectClanProps) => {
 				}}
 			>
 				<option value="" disabled hidden>
-					Select a serve
+					Select a clan
 				</option>
 				{clans.map((clan) => (
 					<option key={clan.clan_id} value={JSON.stringify({ id: clan.clan_id, name: clan.clan_name })}>
@@ -163,7 +163,7 @@ export const SelectClan = memo((props: SelectClanProps) => {
 				))}
 			</select>
 			<p className="text-xs text-contentTertiary text-left">
-				This requires you to have <strong>Manage Server</strong> permission in the server.
+				This requires you to have <strong>Manage Clan</strong> permission in the clan.
 			</p>
 		</div>
 	);
