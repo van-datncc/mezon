@@ -1,8 +1,19 @@
-import { SearchMessageEntity, searchMessagesActions, selectChannelById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { useJumpToMessage } from '@mezon/core';
+import {
+	ChannelsEntity,
+	messagesActions,
+	SearchMessageEntity,
+	searchMessagesActions,
+	selectChannelById,
+	selectTheme,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { IMessageWithUser, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { Pagination } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import MessageWithUser from '../../MessageWithUser';
 import EmptySearch from './EmptySearch';
 
@@ -53,6 +64,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 		}
 	}, [currentPage]);
 
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
 			<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
@@ -74,35 +86,27 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 				{groupedMessages.length > 0 ? (
 					<div
 						ref={messageContainerRef}
-						className="flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden"
+						className={`flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 					>
 						<div className="flex flex-col flex-1 gap-[20px]">
-							{groupedMessages.map((group, groupIndex) => (
-								<div key={groupIndex} className="flex flex-col">
-									<h3 className="mb-[8px] dark:text-white text-black font-medium text-ellipsis whitespace-nowrap overflow-hidden">
-										# {group.label}
-									</h3>
-									<div className="flex flex-col gap-[8px]">
-										{group.messages.map((searchMessage) => (
-											<div
-												key={searchMessage.message_id}
-												className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full "
-											>
-												<MessageWithUser
-													allowDisplayShortProfile={false}
-													message={searchMessage as IMessageWithUser}
-													mode={
-														searchChannel?.type === ChannelType.CHANNEL_TYPE_THREAD
-															? ChannelStreamMode.STREAM_MODE_THREAD
-															: ChannelStreamMode.STREAM_MODE_CHANNEL
-													}
-													isSearchMessage={true}
+							{groupedMessages.map((group, groupIndex) => {
+								return (
+									<div key={groupIndex} className="flex flex-col">
+										<h3 className="mb-[8px] dark:text-white text-black font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+											# {group.label}
+										</h3>
+										<div key={groupIndex} className="flex flex-col gap-[8px]">
+											{group.messages.map((searchMessage) => (
+												<SearchedItem
+													key={searchMessage.message_id}
+													searchChannel={searchChannel}
+													searchMessage={searchMessage}
 												/>
-											</div>
-										))}
+											))}
+										</div>
 									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 						{totalResult > 25 && (
 							<div className="mt-4 h-10">
@@ -139,6 +143,47 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 				)}
 			</div>
 		</>
+	);
+};
+
+interface ISearchedItemProps {
+	searchMessage: SearchMessageEntity;
+	searchChannel: ChannelsEntity;
+}
+
+const SearchedItem = ({ searchMessage, searchChannel }: ISearchedItemProps) => {
+	const dispatch = useAppDispatch();
+
+	const { directToMessageById } = useJumpToMessage({
+		channelId: searchChannel.channel_id as string,
+		messageID: searchMessage.message_id as string,
+		clanId: searchMessage.clan_id as string
+	});
+
+	const handleClickJump = () => {
+		dispatch(messagesActions.setIdMessageToJump(searchMessage.message_id));
+		directToMessageById();
+	};
+
+	return (
+		<div className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full relative group">
+			<button
+				onClick={handleClickJump}
+				className="absolute py-1 px-2 text-textLightTheme dark:text-textDarkTheme dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+			>
+				Jump
+			</button>
+			<MessageWithUser
+				allowDisplayShortProfile={false}
+				message={searchMessage as IMessageWithUser}
+				mode={
+					searchChannel?.type === ChannelType.CHANNEL_TYPE_THREAD
+						? ChannelStreamMode.STREAM_MODE_THREAD
+						: ChannelStreamMode.STREAM_MODE_CHANNEL
+				}
+				isSearchMessage={true}
+			/>
+		</div>
 	);
 };
 
