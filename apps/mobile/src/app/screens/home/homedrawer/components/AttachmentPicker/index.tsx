@@ -119,8 +119,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					const { latitude, longitude } = position.coords;
 					resolve({ latitude, longitude });
 				},
-				(error) => reject(error),
-				{ enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+				(error) => reject(error)
 			);
 		});
 	};
@@ -138,6 +137,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			console.error('Location permission denied');
 		}
 	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.wrapperHeader}>

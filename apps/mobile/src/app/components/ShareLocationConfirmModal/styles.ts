@@ -32,7 +32,7 @@ export const style = (colors: Attributes) =>
 		},
 		textContent: {
 			color: colors.text,
-			fontSize: size.label,
+			fontSize: size.s_14,
 			fontWeight: '400'
 		},
 		modalFooter: {
