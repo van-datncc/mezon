@@ -157,7 +157,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.SEND_MESSAGE, ({ content }) => {
 			const { isPrivate, nameValueThread } = formikRef.current.values;
 			const valueForm = { isPrivate: isPrivate ? 1 : 0, nameValueThread: nameValueThread ?? valueThread?.content?.t };
-			const contentMessage = openThreadMessageState ? { t: valueThread?.content?.t, contentThread: content?.t } : { t: content?.t };
+			const contentMessage = openThreadMessageState ? { t: valueThread?.content?.t } : { t: content?.t };
 
 			if (validInput(nameValueThread)) {
 				handleSendMessageThread(contentMessage, [], [], [], valueForm);
