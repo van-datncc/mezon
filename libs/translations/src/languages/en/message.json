@@ -13,7 +13,7 @@
         "report": "Report",
         "forward": "Forward Message",
         "forwardAllMessages": "Forward All Messages",
-        "polls": "Polls",
+        "location": "Location",
         "files": "Files",
         "saveImage": "Save Media",
         "copyMediaLink": "Copy Media Link",
@@ -80,5 +80,11 @@
     },
     "newMessages": "NEW MESSAGES",
     "noSendMessagePermission": "You don't have permission to send message",
-    "messageInputPlaceHolder": "Write your thoughts here"
+    "messageInputPlaceHolder": "Write your thoughts here",
+    "shareLocationModal": {
+      "sendThisLocation": "Send this location to",
+      "send": "Send",
+      "cancel": "Cancel",
+      "coordinate": "Coordinate"
+    }
 }
