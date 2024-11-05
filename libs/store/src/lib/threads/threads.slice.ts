@@ -323,7 +323,8 @@ export const selectIsShowCreateThread = createSelector([getThreadsState, (_, cha
 export const selectActiveThreads = (keywordSearch: string) =>
 	createSelector([selectAllThreads], (threads) => {
 		const result = threads.filter(
-			(thread) => thread.active === ThreadStatus.activePublic && thread.channel_label?.toLocaleLowerCase().includes(keywordSearch)
+			(thread) =>
+				thread.active === ThreadStatus.activePublic && thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
 		);
 		const sortByLsentMess = sortChannelsByLastActivity(result as any);
 		return sortByLsentMess;
@@ -338,7 +339,7 @@ export const selectJoinedThreadsWithinLast30Days = (keywordSearch: string) =>
 				thread.active === ThreadStatus.joined &&
 				thread.last_sent_message?.timestamp_seconds &&
 				currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds &&
-				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch)
+				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
 			) {
 				accumulator.push(thread);
 			}
@@ -356,7 +357,7 @@ export const selectThreadsOlderThan30Days = (keywordSearch: string) =>
 			if (
 				thread.last_sent_message?.timestamp_seconds &&
 				currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds &&
-				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch)
+				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
 			) {
 				accumulator.push(thread);
 			}

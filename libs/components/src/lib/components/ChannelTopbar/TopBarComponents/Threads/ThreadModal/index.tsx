@@ -48,9 +48,9 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const [keywordSearch, setKeywordSearch] = useState('');
 
-	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch.toLocaleLowerCase()));
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch.toLocaleLowerCase()));
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch.toLocaleLowerCase()));
+	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch));
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch));
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch));
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
