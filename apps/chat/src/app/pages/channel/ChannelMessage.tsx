@@ -15,7 +15,10 @@ import {
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
+import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
+import OnBoardWelcome from 'libs/components/src/lib/components/ChatWelcome/OnBoardWelcome';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -112,15 +115,14 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		markMessageAsSeen(message);
 	}, [messageId]);
 
-	const nextMessage = useMemo(() => {
-		return nextMessageId;
-	}, [nextMessageId]);
-
 	return (
 		<>
-			{message.isFirst && (
-				<ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} nextMessageId={nextMessage} />
+			{message.code === TypeMessage.Indicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
+				<div className="pb-10">
+					<OnBoardWelcome nextMessageId={nextMessageId} />
+				</div>
 			)}
+			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 			{!message.isFirst && (
 				<div ref={messageRef} className={`fullBoxText relative group ${!isCombine || mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>

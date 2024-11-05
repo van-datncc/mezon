@@ -14,17 +14,15 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import OnBoardWelcome from './OnBoardWelcome';
 
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
 	userName?: string;
 	mode: number;
-	nextMessageId?: string;
 };
 
-function ChatWelCome({ name, userName, avatarDM, mode, nextMessageId }: ChatWelComeProp) {
+function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const { directId } = useAppParams();
 	const directChannel = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -40,7 +38,6 @@ function ChatWelCome({ name, userName, avatarDM, mode, nextMessageId }: ChatWelC
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	return (
 		<div className="flex flex-col gap-3">
-			<OnBoardWelcome nextMessageId={nextMessageId} />
 			<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
 				{
 					<>
