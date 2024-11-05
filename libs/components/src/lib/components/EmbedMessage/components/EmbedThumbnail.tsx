@@ -4,26 +4,8 @@ interface ThumbnailProps {
 
 export function EmbedThumbnail({ url }: ThumbnailProps) {
 	return (
-		<div
-			style={{
-				position: 'absolute',
-				top: '12px',
-				right: '16px',
-				width: '80px',
-				height: '80px',
-				borderRadius: '4px',
-				overflow: 'hidden'
-			}}
-		>
-			<img
-				src={url}
-				alt="Thumbnail"
-				style={{
-					width: '100%',
-					height: '100%',
-					objectFit: 'cover'
-				}}
-			/>
+		<div className="absolute top-3 right-4 w-20 h-20 rounded overflow-hidden">
+			<img src={url} alt="Thumbnail" className="w-full h-full object-cover" />
 		</div>
 	);
 }
