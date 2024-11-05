@@ -1,28 +1,32 @@
-import { Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, TextInput, View } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { style } from './styles';
 
-function SearchDmList({ onChangeText }: { onChangeText: (value: string) => void }) {
+function SearchDmList() {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const searchInputRef = useRef(null);
 	const [searchText, setSearchText] = useState<string>('');
 	const { t } = useTranslation(['dmMessage']);
 
+	const handleSearchDM = (value) => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_SEARCH_DM, { searchText: value });
+	};
+
 	const clearTextInput = () => {
 		if (searchInputRef?.current) {
 			searchInputRef.current.clear();
 			setSearchText('');
-			onChangeText('');
+			handleSearchDM('');
 		}
 	};
 	const typingSearchDebounce = useThrottledCallback((text) => {
-		onChangeText(text);
 		setSearchText(text);
+		handleSearchDM(text);
 	}, 500);
 
 	return (

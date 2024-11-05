@@ -1,7 +1,7 @@
-import { ActionEmitEvent, convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
-import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById, useAppDispatch } from '@mezon/store-mobile';
+import { useAppDispatch, useAppSelector } from '@mezon/store';
+import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -12,20 +12,20 @@ import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
-import { style } from './styles';
 import { TypingDmItem } from './TypingDMItem';
+import { style } from './styles';
 
 export const DmListItem = React.memo((props: { id: string; navigation: any; onLongPress; onPress? }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
-	const [searchText, setSearchText] = useState<string>('');
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
+	const [hiddenFlag, setHiddenFlag] = useState(false);
 
 	const redirectToMessageDetail = async () => {
 		await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -46,7 +46,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
 		const usernameList = directMessage?.channel_label?.split?.(',') || [];
-
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
 			username: username
@@ -100,68 +99,67 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	useEffect(() => {
 		const searchDMListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SEARCH_DM, ({ searchText }) => {
-			setSearchText(searchText);
+			if (searchText && !normalizeString(directMessage?.channel_label || directMessage?.usernames)?.includes(normalizeString(searchText))) {
+				setHiddenFlag(true);
+			} else {
+				setHiddenFlag(false);
+			}
 		});
+
 		return () => {
 			searchDMListener.remove();
 		};
-	}, []);
+	}, [directMessage?.channel_label, directMessage?.usernames]);
 
-	const renderItemDM = () => {
-		if (searchText && !normalizeString(directMessage?.channel_label || directMessage?.usernames)?.includes(normalizeString(searchText)))
-			return null;
-		return (
-			<TouchableOpacity
-				style={[
-					styles.messageItem,
-					currentDmGroupId === directMessage?.id && {
-						backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
-						borderColor: themeValue.borderHighlight,
-						borderWidth: 1
-					}
-				]}
-				onPress={redirectToMessageDetail}
-				onLongPress={() => onLongPress(directMessage)}
-			>
-				{isTypeDMGroup ? (
-					<View style={styles.groupAvatar}>
-						<Icons.GroupIcon />
-					</View>
-				) : (
-					<View style={styles.avatarWrapper}>
-						{directMessage?.channel_avatar?.[0] ? (
-							<FastImage source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
-						) : (
-							<View style={styles.wrapperTextAvatar}>
-								<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
-							</View>
-						)}
-						<TypingDmItem directMessage={directMessage} />
-					</View>
-				)}
+	if (hiddenFlag) return null;
 
-				<View style={{ flex: 1 }}>
-					<View style={styles.messageContent}>
-						<Text
-							numberOfLines={1}
-							style={[styles.defaultText, styles.channelLabel, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}
-						>
-							{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
-						</Text>
-						{lastMessageTime ? (
-							<Text
-								style={[styles.defaultText, styles.dateTime, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}
-							>
-								{lastMessageTime}
-							</Text>
-						) : null}
-					</View>
-
-					{getLastMessageContent(directMessage?.last_sent_message?.content)}
+	return (
+		<TouchableOpacity
+			style={[
+				styles.messageItem,
+				currentDmGroupId === directMessage?.id && {
+					backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
+					borderColor: themeValue.borderHighlight,
+					borderWidth: 1
+				}
+			]}
+			onPress={redirectToMessageDetail}
+			onLongPress={() => onLongPress(directMessage)}
+		>
+			{isTypeDMGroup ? (
+				<View style={styles.groupAvatar}>
+					<Icons.GroupIcon />
 				</View>
-			</TouchableOpacity>
-		);
-	};
+			) : (
+				<View style={styles.avatarWrapper}>
+					{directMessage?.channel_avatar?.[0] ? (
+						<FastImage source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
+					) : (
+						<View style={styles.wrapperTextAvatar}>
+							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
+						</View>
+					)}
+					<TypingDmItem directMessage={directMessage} />
+				</View>
+			)}
 
-	return renderItemDM();
+			<View style={{ flex: 1 }}>
+				<View style={styles.messageContent}>
+					<Text
+						numberOfLines={1}
+						style={[styles.defaultText, styles.channelLabel, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}
+					>
+						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
+					</Text>
+					{lastMessageTime ? (
+						<Text style={[styles.defaultText, styles.dateTime, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}>
+							{lastMessageTime}
+						</Text>
+					) : null}
+				</View>
+
+				{getLastMessageContent(directMessage?.last_sent_message?.content)}
+			</View>
+		</TouchableOpacity>
+	);
 });

@@ -1,11 +1,11 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlistOrder } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppState, DeviceEventEmitter, Pressable, Text, View } from 'react-native';
+import { AppState, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -57,10 +57,6 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		setDirectMessageSelected(directMessage);
 	}, []);
 
-	const handleSearchDM = useCallback((value) => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_SEARCH_DM, { searchText: value });
-	}, []);
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
@@ -70,7 +66,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
-			<SearchDmList onChangeText={handleSearchDM} />
+			<SearchDmList />
 			{clansLoadingStatus === 'loaded' && !clans?.length && !dmGroupChatList?.length ? (
 				<UserEmptyMessage
 					onPress={() => {
