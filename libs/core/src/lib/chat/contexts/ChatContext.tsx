@@ -1062,16 +1062,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 						throw Error('socket not init');
 					}
-
-					if (window && navigator) {
-						if (navigator.onLine) {
-							dispatch(appActions.refreshApp({ id }));
-						} else {
-							dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-							throw Error('socket navigator online error');
-						}
-					}
-
+					dispatch(appActions.refreshApp({ id }));
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					// eslint-disable-next-line no-console
@@ -1105,7 +1096,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = (message: ChannelMessage) => {
+				addLog({
+					data: message,
+					eventType: LogType.NewMessageCleanUp,
+					timestamp: new Date(),
+					level: 'error'
+				});
+			};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function

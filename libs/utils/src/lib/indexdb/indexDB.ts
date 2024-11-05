@@ -76,7 +76,8 @@ export enum LogType {
 	PushNotification = 'push_notification',
 	DisconnectSocket = 'disconnect_socket',
 	ReconnectSocket = 'reconnect_socket',
-	NewMessage = 'new_message'
+	NewMessage = 'new_message',
+	NewMessageCleanUp = 'new_message_cleanup'
 }
 
 clearLogsIfNewDay();

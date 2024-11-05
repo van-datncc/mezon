@@ -334,6 +334,7 @@ function ChannelMessages({
 											key={messageId}
 											messageId={messageId}
 											previousMessageId={messages[virtualRow.index - 1]}
+											nextMessageId={messages[virtualRow.index + 1]}
 											channelId={channelId}
 											isHighlight={messageId === idMessageNotified}
 											mode={mode}

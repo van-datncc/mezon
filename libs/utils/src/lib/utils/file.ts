@@ -136,3 +136,15 @@ export const convertMentionOnfile = (roles: IRolesClan[], contentString: string,
 
 	return mentions;
 };
+
+export function getExtraPart(stringA: string, stringB: string): string {
+	if (stringB.startsWith(stringA)) {
+		return stringB.slice(stringA.length);
+	}
+
+	if (stringB.endsWith(stringA)) {
+		return stringB.slice(0, stringB.length - stringA.length);
+	}
+
+	return '';
+}

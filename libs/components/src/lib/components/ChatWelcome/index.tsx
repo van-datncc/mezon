@@ -37,33 +37,35 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	return (
-		<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
-			{
-				<>
-					{isChannel &&
-						(isChannelThread ? (
-							<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
-						) : (
-							<WelComeChannel
-								name={name}
+		<div className="flex flex-col gap-3">
+			<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
+				{
+					<>
+						{isChannel &&
+							(isChannelThread ? (
+								<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
+							) : (
+								<WelComeChannel
+									name={name}
+									classNameSubtext={classNameSubtext}
+									showName={showName}
+									channelPrivate={Boolean(selectedChannel?.channel_private)}
+									isChatStream={isChatStream}
+								/>
+							))}
+						{(isDm || isDmGroup) && (
+							<WelComeDm
+								name={name || `${selectedChannel?.creator_name}'s Groups`}
+								userName={userName}
+								avatar={avatarDM}
 								classNameSubtext={classNameSubtext}
 								showName={showName}
-								channelPrivate={Boolean(selectedChannel?.channel_private)}
-								isChatStream={isChatStream}
+								isDmGroup={isDmGroup}
 							/>
-						))}
-					{(isDm || isDmGroup) && (
-						<WelComeDm
-							name={name || `${selectedChannel?.creator_name}'s Groups`}
-							userName={userName}
-							avatar={avatarDM}
-							classNameSubtext={classNameSubtext}
-							showName={showName}
-							isDmGroup={isDmGroup}
-						/>
-					)}
-				</>
-			}
+						)}
+					</>
+				}
+			</div>
 		</div>
 	);
 }
