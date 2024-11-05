@@ -80,7 +80,11 @@ export const activitiesSlice = createSlice({
 			.addCase(createActivity.fulfilled, (state: ActivityState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
 				// acitvitiesActions.add(action.payload);
-				activityAdapter.upsertOne(state, action.payload);
+				if (action.payload?.activity_name) {
+					activityAdapter.upsertOne(state, action.payload);
+				} else {
+					activityAdapter.removeOne(state, action.payload?.id);
+				}
 			})
 			.addCase(createActivity.rejected, (state: ActivityState, action) => {
 				state.loadingStatus = 'error';

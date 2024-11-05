@@ -25,7 +25,7 @@ import {
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ListGroupSearchModal } from './ListGroupSeacrhModal';
 
@@ -36,11 +36,18 @@ export type SearchModalProps = {
 
 function SearchModal({ open, onClose }: SearchModalProps) {
 	const dispatch = useAppDispatch();
-	const allClanUsersEntities = useSelector(selectEntitesUserClans);
-	const dmGroupChatList = useSelector(selectAllDirectMessages);
-	const listChannels = useSelector(selectAllChannelsByUser);
-	const allUsesInAllClansEntities = useSelector(selectAllUsesInAllClansEntities);
-	const previousChannels = useSelector(selectPreviousChannels);
+	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
+	const dmGroupChatListRef = useRef(useSelector(selectAllDirectMessages));
+	const listChannelsRef = useRef(useSelector(selectAllChannelsByUser));
+	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
+	const previousChannelsRef = useRef(useSelector(selectPreviousChannels));
+
+	const allClanUsersEntities = allClanUsersEntitiesRef.current;
+	const dmGroupChatList = dmGroupChatListRef.current;
+	const listChannels = listChannelsRef.current;
+	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
+	const previousChannels = previousChannelsRef.current;
+
 	const { userProfile } = useAuth();
 	const accountId = userProfile?.user?.id ?? '';
 
@@ -185,7 +192,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const listRecent = useMemo(() => {
 		const previous: SearchItemProps[] = [];
-
 		if (totalListSortedWithoutPreviousList.length > 0) {
 			for (let i = totalListSortedWithoutPreviousList.length - 1; i >= 0; i--) {
 				if (previousChannels.includes(totalListSortedWithoutPreviousList[i]?.channelId || totalListSortedWithoutPreviousList[i]?.id || '')) {

@@ -1,7 +1,7 @@
 import { ToastController } from '@mezon/components';
 import { fcmActions, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
-import { isWindowsDesktop, notificationService } from '@mezon/utils';
+import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -111,7 +111,7 @@ const AppLayout = () => {
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">
-				{isWindowsDesktop && <TitleBar />}
+				{(isWindowsDesktop || isLinuxDesktop) && <TitleBar />}
 				<ToastController />
 				<Outlet />
 			</div>

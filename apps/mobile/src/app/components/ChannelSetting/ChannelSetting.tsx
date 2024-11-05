@@ -1,9 +1,10 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { BellIcon, CheckIcon, Icons, isEqual, LinkIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectAllChannels, selectChannelById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { DrawerActions } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -11,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../componentUI';
 import MezonSlider, { IMezonSliderData } from '../../componentUI/MezonSlider';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
+import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 
@@ -27,6 +29,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const { channelId } = route.params;
 	const { t } = useTranslation(['channelSetting', 'channelCreator']);
 	const { t: t1 } = useTranslation(['screenStack']);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const dispatch = useAppDispatch();
 	const channel = useAppSelector((state) => selectChannelById(state, channelId || ''));
 	const isChannel = useMemo(() => channel?.parrent_id === '0', [channel?.parrent_id]);
@@ -135,6 +138,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 								channelId
 							}
 						});
+					}
+				},
+				{
+					title: t('fields.privateChannelInvite.addMember'),
+					expandable: true,
+					icon: <Icons.BravePermission color={themeValue.text} />,
+					isShow: isChannel && !!channel.channel_private,
+					onPress: () => {
+						bottomSheetRef?.current?.present();
 					}
 				}
 			] satisfies IMezonMenuItemProps[],
@@ -381,6 +393,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					channelName: channel?.channel_label
 				})}
 			/>
+			<AddMemberOrRoleBS bottomSheetRef={bottomSheetRef} channel={channel} />
 		</ScrollView>
 	);
 }

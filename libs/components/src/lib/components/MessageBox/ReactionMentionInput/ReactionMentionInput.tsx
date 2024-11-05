@@ -352,7 +352,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			} else {
 				if (openThreadMessageState) {
 					props.onSend(
-						{ t: valueThread?.content.t || '', contentThread: request?.content },
+						{ t: valueThread?.content.t || '' },
 						valueThread?.mentions,
 						valueThread?.attachments,
 						valueThread?.references,
