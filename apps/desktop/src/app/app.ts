@@ -1,13 +1,13 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import { windowManager } from 'node-window-manager';
+//import { windowManager } from 'node-window-manager';
 import { join } from 'path';
 import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 
-import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
+import { TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 
 const isQuitting = false;
@@ -52,7 +52,7 @@ export default class App {
 			App.setupMenu();
 			App.setupBadge();
 			tray.init(isQuitting);
-			App.setupWindowManager();
+			//App.setupWindowManager();
 		}
 	}
 
@@ -228,6 +228,7 @@ export default class App {
 		return initBadge(App.application, App.mainWindow);
 	}
 
+	/*
 	private static setupWindowManager() {
 		if (process.platform === 'darwin') {
 			const permissionGranted = windowManager.requestAccessibility();
@@ -314,6 +315,7 @@ export default class App {
 			}
 		});
 	}
+  */
 
 	private static setupMenu() {
 		const isMac = process.platform === 'darwin';
