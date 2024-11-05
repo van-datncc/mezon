@@ -14,15 +14,17 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
+import OnBoardWelcome from './OnBoardWelcome';
 
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
 	userName?: string;
 	mode: number;
+	nextMessageId?: string;
 };
 
-function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
+function ChatWelCome({ name, userName, avatarDM, mode, nextMessageId }: ChatWelComeProp) {
 	const { directId } = useAppParams();
 	const directChannel = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -37,33 +39,36 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	return (
-		<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
-			{
-				<>
-					{isChannel &&
-						(isChannelThread ? (
-							<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
-						) : (
-							<WelComeChannel
-								name={name}
+		<div className="flex flex-col gap-3">
+			<OnBoardWelcome nextMessageId={nextMessageId} />
+			<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
+				{
+					<>
+						{isChannel &&
+							(isChannelThread ? (
+								<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
+							) : (
+								<WelComeChannel
+									name={name}
+									classNameSubtext={classNameSubtext}
+									showName={showName}
+									channelPrivate={Boolean(selectedChannel?.channel_private)}
+									isChatStream={isChatStream}
+								/>
+							))}
+						{(isDm || isDmGroup) && (
+							<WelComeDm
+								name={name || `${selectedChannel?.creator_name}'s Groups`}
+								userName={userName}
+								avatar={avatarDM}
 								classNameSubtext={classNameSubtext}
 								showName={showName}
-								channelPrivate={Boolean(selectedChannel?.channel_private)}
-								isChatStream={isChatStream}
+								isDmGroup={isDmGroup}
 							/>
-						))}
-					{(isDm || isDmGroup) && (
-						<WelComeDm
-							name={name || `${selectedChannel?.creator_name}'s Groups`}
-							userName={userName}
-							avatar={avatarDM}
-							classNameSubtext={classNameSubtext}
-							showName={showName}
-							isDmGroup={isDmGroup}
-						/>
-					)}
-				</>
-			}
+						)}
+					</>
+				}
+			</div>
 		</div>
 	);
 }

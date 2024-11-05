@@ -35,6 +35,7 @@ import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
+import DrawerListener from './DrawerListener';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
@@ -188,6 +189,7 @@ const HomeDefault = React.memo((props: any) => {
 					save(STORAGE_AGREED_POLICY, 'true');
 				}}
 			/>
+			<DrawerListener />
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}
 				navigation={props.navigation}

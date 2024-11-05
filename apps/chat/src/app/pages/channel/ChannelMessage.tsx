@@ -23,6 +23,7 @@ export type MessageProps = {
 	channelId: string;
 	messageId: string;
 	previousMessageId: string;
+	nextMessageId?: string;
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
@@ -54,6 +55,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	userName,
 	isLastSeen,
 	previousMessageId,
+	nextMessageId,
 	checkMessageTargetToMoved,
 	messageReplyHighlight
 }: Readonly<MessageProps>) => {
@@ -110,9 +112,15 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		markMessageAsSeen(message);
 	}, [messageId]);
 
+	const nextMessage = useMemo(() => {
+		return nextMessageId;
+	}, [nextMessageId]);
+
 	return (
 		<>
-			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
+			{message.isFirst && (
+				<ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} nextMessageId={nextMessage} />
+			)}
 
 			{!message.isFirst && (
 				<div ref={messageRef} className={`fullBoxText relative group ${!isCombine || mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>

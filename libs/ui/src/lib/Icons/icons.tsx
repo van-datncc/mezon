@@ -184,14 +184,14 @@ export function Check(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function Tick(props: React.HTMLAttributes<SVGElement>) {
+export function Tick({ fill = '#155EEF' }: { fill?: string }) {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M17.7071 4.29289C18.0976 4.68342 18.0976 5.31658 17.7071 5.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L2.29289 9.70711C1.90237 9.31658 1.90237 8.68342 2.29289 8.29289C2.68342 7.90237 3.31658 7.90237 3.70711 8.29289L8 12.5858L16.2929 4.29289C16.6834 3.90237 17.3166 3.90237 17.7071 4.29289Z"
-				fill="#155EEF"
+				fill={fill}
 			/>
 		</svg>
 	);
@@ -5665,6 +5665,24 @@ export function ShadowBotIcon(props: React.HTMLAttributes<SVGElement>) {
 					></path>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+
+export function WindowMinimize(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
+			<path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+	);
+}
+export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 448 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
+			<path
+				d="M384 80c8.8 0 16 7.2 16 16l0 320c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16L48 96c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"
+				fill="currentColor"
+			/>
 		</svg>
 	);
 }
