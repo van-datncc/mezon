@@ -1,5 +1,5 @@
 import { ChannelMembersEntity, selectTheme } from '@mezon/store';
-import { MemberProfileType } from '@mezon/utils';
+import { MemberProfileType, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ type ListMemberProps = {
 };
 
 const heightTopBar = 60;
-const titleBarHeight = 21;
+const titleBarHeight = isWindowsDesktop ? 21 : 0;
 
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, offlineCount, onlineCount } = props;
