@@ -108,8 +108,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	})();
 
 	const popup = useCallback(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} />;
-	}, [message, handleContextMenu, isCombine]);
+		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} mode={mode} />;
+	}, [message, handleContextMenu, isCombine, mode]);
 
 	useEffect(() => {
 		markMessageAsSeen(message);
