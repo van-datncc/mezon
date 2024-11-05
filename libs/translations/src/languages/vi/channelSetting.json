@@ -20,6 +20,9 @@
             "permission": "Quyền hạn channel",
             "description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với channel này."
         },
+        "privateChannelInvite": {
+            "addMember": "Thêm thành viên"
+        },
         "channelNotifications": {
             "title": "",
             "notification": "Cài đặt thông báo",

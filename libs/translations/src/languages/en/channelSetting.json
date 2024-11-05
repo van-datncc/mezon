@@ -20,6 +20,9 @@
             "permission": "Channel Permission",
             "description": "Change privacy settings and customize how members can interact with this channel."
         },
+        "privateChannelInvite": {
+            "addMember": "Add Member"
+        },
         "channelNotifications": {
             "title": "",
             "notification": "Notification Settings",
