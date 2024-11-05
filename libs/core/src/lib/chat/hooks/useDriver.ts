@@ -23,7 +23,7 @@ export const useDriver = () => {
 				element: ref,
 				popover: {
 					side: side ?? 'top',
-					description: description ?? 'Enter to send message !!'
+					description: description
 				}
 			});
 		},

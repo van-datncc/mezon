@@ -21,8 +21,7 @@ function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 	const { openHighLight, closeHighLight } = useDriver();
 
 	const handleSendMessage = () => {
-		setRequestInput({ content: 'Enter to send first Message', mentionRaw: [], valueTextInput: 'Enter to send first Message' });
-		openHighLight(EElementHightLight.MAIN_INPUT);
+		openHighLight(EElementHightLight.MAIN_INPUT, undefined, 'Write content and press Enter to send message!');
 	};
 
 	const handleCreateChannel = () => {
