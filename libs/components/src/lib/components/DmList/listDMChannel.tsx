@@ -11,7 +11,7 @@ type ListDMChannelProps = {
 };
 
 const heightAroundComponent = 230;
-
+const titleBarHeight = 21;
 const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -21,10 +21,10 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const streamPlay = useSelector(selectStatusStream);
 
-	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
+	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
 
 	useEffect(() => {
-		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
+		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
 		updateHeight();
 		window.addEventListener('resize', updateHeight);
 		return () => window.removeEventListener('resize', updateHeight);

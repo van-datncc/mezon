@@ -1,6 +1,6 @@
 import { useAppNavigation, useAppParams } from '@mezon/core';
 import { selectCategoriesIds, selectDefaultChannelIdByClanId } from '@mezon/store';
-import { isWindowsDesktop } from '@mezon/utils';
+import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
@@ -19,10 +19,10 @@ export default function ChannelIndex() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-bgLightModeSecond h-[100%] overflow-hidden">
-			<div className="flex h-heightWithoutTopBar flex-row ">
+			<div className={`flex ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} flex-row `}>
 				<div className="flex flex-col flex-1 w-full h-full">
 					<div
-						className={`overflow-y-auto bg-transparent max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${isWindowsDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}
+						className={`overflow-y-auto bg-transparent max-w-widthMessageViewChat overflow-x-hidden ${isWindowsDesktop || isLinuxDesktop ? ' max-h-heightTitleBarMessageViewChat h-heightTitleBarMessageViewChat' : ' max-h-heightMessageViewChat h-heightMessageViewChat'}`}
 					>
 						<ChannelMessages.Skeleton />
 					</div>
