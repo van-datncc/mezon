@@ -1,15 +1,15 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useGifsStickersEmoji } from '@mezon/core';
 import {
-  selectCloseMenu,
-  selectCurrentChannel,
-  selectIsShowCreateThread,
-  selectPositionEmojiButtonSmile,
-  selectReactionTopState,
-  selectStatusMenu
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectIsShowCreateThread,
+	selectPositionEmojiButtonSmile,
+	selectReactionTopState,
+	selectStatusMenu
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -48,7 +48,7 @@ const ChannelLayout = () => {
 			) : (
 				<>
 					<div
-						className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'} ${isChannelStream ? 'justify-center items-center mx-4' : ''}`}
+						className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`} ${isChannelStream ? 'justify-center items-center mx-4' : ''}`}
 					>
 						<Outlet />
 					</div>

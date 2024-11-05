@@ -98,7 +98,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			const clanFooterEle = document.getElementById('clan-footer');
 			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
 			const outsideHeight = totalHeight;
-			setHeight(window.innerHeight - outsideHeight);
+			const titleBarHeight = 21;
+			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
 		};
 		calculateHeight();
 		window.addEventListener('resize', calculateHeight);

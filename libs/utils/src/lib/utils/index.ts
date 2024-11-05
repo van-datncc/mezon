@@ -1,5 +1,4 @@
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
-import { Platform, getPlatform } from '@mezon/utils';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -19,6 +18,7 @@ import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
+import { Platform, getPlatform } from '../hooks/platform';
 import {
 	ChannelMembersEntity,
 	EBacktickType,

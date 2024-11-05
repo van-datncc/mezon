@@ -12,15 +12,16 @@ type ListMemberProps = {
 };
 
 const heightTopBar = 60;
+const titleBarHeight = 21;
 
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, offlineCount, onlineCount } = props;
-	const [height, setHeight] = useState(window.innerHeight - heightTopBar);
+	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
 
 	const appearanceTheme = useSelector(selectTheme);
 
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight - heightTopBar);
+		const handleResize = () => setHeight(window.innerHeight - heightTopBar - titleBarHeight);
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
