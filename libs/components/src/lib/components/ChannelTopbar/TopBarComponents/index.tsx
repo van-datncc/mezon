@@ -31,14 +31,14 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_VOICE;
-	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT;
+	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT || type === ChannelType.CHANNEL_TYPE_THREAD;
 	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isAppChannel = type === ChannelType.CHANNEL_TYPE_APP;
 
 	const channelParent =
 		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
 
-	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
+	const isPrivate = channelParent?.id ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
 	const theme = useSelector(selectTheme);
 	const currentClanId = useSelector(selectCurrentClanId);
