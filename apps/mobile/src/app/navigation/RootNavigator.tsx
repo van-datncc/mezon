@@ -2,6 +2,7 @@
 import {
 	MezonStoreProvider,
 	accountActions,
+	acitvitiesActions,
 	appActions,
 	authActions,
 	clansActions,
@@ -239,6 +240,7 @@ const NavigationMain = () => {
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
 				promises.push(store.dispatch(clansActions.fetchClans()));
+				promises.push(store.dispatch(acitvitiesActions.listActivities()));
 				if (!isFromFCM) {
 					if (clanId) {
 						save(STORAGE_CLAN_ID, clanId);
