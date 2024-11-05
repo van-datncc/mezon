@@ -9,6 +9,7 @@ import {
 	channelsActions,
 	channelsSlice,
 	channelsStreamActions,
+	clanMembersMetaActions,
 	clansActions,
 	clansSlice,
 	directActions,
@@ -317,7 +318,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const onlineStatus = statusPresence.joins.map((join) => {
 					return { userId: join.user_id, online: true, isMobile: join.is_mobile };
 				});
-				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
+				dispatch(clanMembersMetaActions.setManyStatusUser(onlineStatus));
 				dispatch(directActions.updateStatusByUserId(onlineStatus));
 				dispatch(friendsActions.setManyStatusUser(onlineStatus));
 			}
@@ -325,7 +326,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const offlineStatus = statusPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, online: false, isMobile: false };
 				});
-				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
+				dispatch(clanMembersMetaActions.setManyStatusUser(offlineStatus));
 				dispatch(directActions.updateStatusByUserId(offlineStatus));
 				dispatch(friendsActions.setManyStatusUser(offlineStatus));
 			}
