@@ -1,11 +1,10 @@
-import { useMessageValue } from '@mezon/core';
+import { EElementHightLight, useDriver, useMessageValue } from '@mezon/core';
 import { channelsActions, selectAllChannels, selectMembersClanCount, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import { ReactNode, useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 export type OnBoardWelcomeProps = {
 	nextMessageId?: string;
@@ -13,29 +12,17 @@ export type OnBoardWelcomeProps = {
 
 function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 	const numberMemberClan = useAppSelector(selectMembersClanCount);
-	const numberChannel = useAppSelector(selectAllChannels);
+	const numberChannel = useSelector(selectAllChannels);
 
 	const { setRequestInput } = useMessageValue();
 	const dispatch = useDispatch();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
 
-	const driverObj = driver();
+	const { openHighLight, closeHighLight } = useDriver();
 
 	const handleSendMessage = () => {
-		if (!nextMessageId) {
-			setRequestInput({ content: 'Enter to send first Message', mentionRaw: [], valueTextInput: 'Enter to send first Message' });
-			const inputReact = document.getElementById('editorReactMention');
-			if (inputReact) {
-				driverObj.highlight({
-					element: inputReact,
-					popover: {
-						side: 'top',
-						description: 'Enter to send message !!'
-					}
-				});
-				inputReact?.focus();
-			}
-		}
+		setRequestInput({ content: 'Enter to send first Message', mentionRaw: [], valueTextInput: 'Enter to send first Message' });
+		openHighLight(EElementHightLight.MAIN_INPUT);
 	};
 
 	const handleCreateChannel = () => {
@@ -47,12 +34,12 @@ function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 
 	useEffect(() => {
 		if (nextMessageId) {
-			driverObj.destroy();
+			closeHighLight();
 		}
 	}, [nextMessageId]);
 
 	return (
-		<div className="w-full px-4 mb-0  flex-1 flex flex-col items-center gap-2">
+		<div className="w-full p-4 mb-0  flex-1 flex flex-col items-center gap-2">
 			<Onboarditem icon={<Icons.AddPerson />} title="Invite your friends" tick={numberMemberClan > 1} onClick={openInviteClanModal} />
 			<Onboarditem icon={<Icons.Sent />} title="Send your first message" tick={!!nextMessageId} onClick={handleSendMessage} />
 			<Onboarditem icon={<Icons.Download />} title="Download the Mezon App" tick={true} onClick={handleSendMessage} />
@@ -63,7 +50,7 @@ function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 
 const Onboarditem = ({ icon, title, tick, onClick }: { icon: ReactNode; title: string; tick: boolean; onClick: () => void }) => {
 	const handleOnClickItem = () => {
-		if (tick) {
+		if (!tick) {
 			onClick();
 		}
 	};
