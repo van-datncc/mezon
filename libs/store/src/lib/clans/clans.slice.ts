@@ -13,6 +13,7 @@ import { defaultNotificationCategoryActions } from '../notificationSetting/notif
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { RootState } from '../store';
 import { channelsStreamActions } from '../stream/channelsStream.slice';
 import { usersStreamActions } from '../stream/usersStream.slice';
 import { voiceActions } from '../voice/voice.slice';
@@ -210,6 +211,25 @@ export const updateClan = createAsyncThunk(
 	}
 );
 
+export const updateBageClanWS = createAsyncThunk('clans/updateBageClanWS', async ({ channel_id }: { channel_id: string }, thunkAPI) => {
+	const state = thunkAPI.getState() as RootState;
+
+	if (!state) {
+		throw Error('refresh app error: state does not init');
+	}
+
+	const channel = state.channels?.entities[channel_id];
+
+	try {
+		const numberNotification = channel?.count_mess_unread ? channel?.count_mess_unread : 0;
+		if (numberNotification && numberNotification > 0) {
+			await thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
+	} catch (error) {
+		console.error(error);
+	}
+});
+
 type UpdateLinkUser = {
 	user_name: string;
 	avatar_url: string;
@@ -379,7 +399,8 @@ export const clansActions = {
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
-	joinClan
+	joinClan,
+	updateBageClanWS
 };
 
 /*
