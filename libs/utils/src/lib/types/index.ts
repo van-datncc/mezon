@@ -225,7 +225,6 @@ export interface IEmbedProps {
 
 export interface IMessageSendPayload {
 	t?: string;
-	contentThread?: string;
 	hg?: IHashtagOnMessage[];
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];

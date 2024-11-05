@@ -122,7 +122,7 @@ const ThreadBox = () => {
 			<div>
 				{threadCurrentChannel && (
 					<div
-						className={`overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread ${isWindowsDesktop ? 'h-heightTitleBarMessageViewChatThread' : 'h-heightMessageViewChatThread'}"`}
+						className={`overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden  ${isWindowsDesktop ? 'h-heightTitleBarMessageViewChatThread' : 'h-heightMessageViewChatThread max-h-heightMessageViewChatThread'}"`}
 					>
 						<ChannelMessages
 							isThreadBox={true}
