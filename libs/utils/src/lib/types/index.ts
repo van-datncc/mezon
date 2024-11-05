@@ -206,6 +206,23 @@ export type IMessageWithUser = IMessage & {
 	user: IUser | null;
 };
 
+export interface IEmbedProps {
+	color?: string;
+	title?: string;
+	url?: string;
+	author?: {
+		name: string;
+		icon_url?: string;
+		url?: string;
+	};
+	description?: string;
+	thumbnail?: { url: string };
+	fields?: Array<{ name: string; value: string; inline?: boolean }>;
+	image?: { url: string };
+	timestamp?: string;
+	footer?: { text: string; icon_url?: string };
+}
+
 export interface IMessageSendPayload {
 	t?: string;
 	contentThread?: string;
@@ -214,6 +231,7 @@ export interface IMessageSendPayload {
 	lk?: ILinkOnMessage[];
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
+	embed?: IEmbedProps;
 }
 
 export type IUser = {
