@@ -3,7 +3,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useRef } from 'react';
 import { View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
 import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
 import PanelKeyboard from '../../home/homedrawer/PanelKeyboard';
@@ -63,10 +62,6 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 				directMessageId={directMessageId || ''}
 				currentChannelId={directMessageId}
 				currentClanId={currentClanId}
-			/>
-			<ShareLocationConfirmModal
-				channelId={directMessageId}
-				mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 			/>
 		</View>
 	);

@@ -1,89 +1,83 @@
 {
-  "actions": {
-    "editMessage": "Chỉnh sửa tin nhắn",
-    "reply": "Trả lời",
-    "createThread": "Tạo Chủ Đề",
-    "copyText": "Sao Chép Văn Bản",
-    "deleteMessage": "Xóa tin nhắn",
+    "actions": {
+        "editMessage": "Chỉnh sửa tin nhắn",
+        "reply": "Trả lời",
+        "createThread": "Tạo Chủ Đề",
+        "copyText": "Sao Chép Văn Bản",
+        "deleteMessage": "Xóa tin nhắn",
+        "pinMessage": "Ghim tin nhắn",
+        "markUnRead": "Đánh dấu chưa đọc",
+        "mention": "Đề cập",
+        "copyMessageLink": "Sao chép đường dẫn tin nhắn",
+        "report": "Báo cáo",
+        "forward": "Chuyển tiếp",
+        "forwardAllMessages": "Chuyển tiếp tất cả",
+        "polls": "Polls",
+        "files": "Files",
+        "saveImage": "Lưu media",
+        "copyMediaLink": "Sao chép đường dẫn media",
+        "giveACoffee": "Give A Coffee",
+        "resend": "Gửi lại"
+    },
+    "chatBox": {
+        "replyingTo": "Đang phản hổi",
+        "editingMessage": "Đang chỉnh sửa tin nhắn"
+    },
+    "toast": {
+        "copyText": "Đã sao chép nội dung tin nhắn",
+        "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi trong giây lát",
+        "pinMessage": "Tin nhắn đã được ghim"
+    },
+    "directMessage": {
+        "you": "Bạn"
+    },
+    "edited": "(đã chỉnh sửa)",
+    "newMessage": {
+        "to": "Đến",
+        "newGroup": "Nhóm Mới",
+        "addFriend": "Thêm bạn",
+        "create": "Tạo",
+        "add": "Thêm",
+        "createGroupWith": "Tạo nhóm mới với"
+    },
+    "reactions": {
+        "noActionTitle": "Không có biểu cảm gì cả",
+        "noActionDescription": "Thật là một thế giới lạnh lùng và vô cảm",
+        "removeActions": "Xoá Biểu Cảm"
+    },
+    "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
+    "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
+    "reportMessage": {
+        "reportSummary": "Tóm tắt báo cáo",
+        "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",
+        "reportCategory": "Danh mục báo cáo",
+        "title": "Báo cáo tin nhắn",
+        "subTitle": "Vui lòng chọn tùy chọn mô tả tốt nhất vấn đề.",
+        "selectedMessage": "Tin nhắn đã chọn",
+        "submitDescription": "Bằng cách gửi báo cáo này, bạn xác nhận rằng nó là chính xác và được thực hiện với thiện chí. Vui lòng tuân theo Nguyên tắc Cộng đồng của chúng tôi và không gửi báo cáo sai hoặc trùng lặp.",
+        "submitReport": "Gửi Báo Cáo",
+        "cancel": "Hủy",
+        "reportSubmitted": "Đã gửi báo cáo"
+    },
+    "tapToSeeAttachment": "Nhấn để xem tệp đính kèm",
+    "findThePerfectReaction": "Tìm kiếm biểu cảm phù hợp nhất",
+    "findThePerfectSticker": "Tìm kiếm nhãn dán phù hợp nhất",
     "pinMessage": "Ghim tin nhắn",
-    "markUnRead": "Đánh dấu chưa đọc",
-    "mention": "Đề cập",
-    "copyMessageLink": "Sao chép đường dẫn tin nhắn",
-    "report": "Báo cáo",
-    "forward": "Chuyển tiếp",
-    "forwardAllMessages": "Chuyển tiếp tất cả",
-    "location": "Địa chỉ",
-    "files": "Files",
-    "saveImage": "Lưu media",
-    "copyMediaLink": "Sao chép đường dẫn media",
-    "giveACoffee": "Give A Coffee",
-    "resend": "Gửi lại"
-  },
-  "chatBox": {
-    "replyingTo": "Đang phản hổi",
-    "editingMessage": "Đang chỉnh sửa tin nhắn"
-  },
-  "toast": {
-    "copyText": "Đã sao chép nội dung tin nhắn",
-    "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi trong giây lát",
-    "pinMessage": "Tin nhắn đã được ghim"
-  },
-  "directMessage": {
-    "you": "Bạn"
-  },
-  "edited": "(đã chỉnh sửa)",
-  "newMessage": {
-    "to": "Đến",
-    "newGroup": "Nhóm Mới",
-    "addFriend": "Thêm bạn",
-    "create": "Tạo",
-    "add": "Thêm",
-    "createGroupWith": "Tạo nhóm mới với"
-  },
-  "reactions": {
-    "noActionTitle": "Không có biểu cảm gì cả",
-    "noActionDescription": "Thật là một thế giới lạnh lùng và vô cảm",
-    "removeActions": "Xoá Biểu Cảm"
-  },
-  "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
-  "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
-  "reportMessage": {
-    "reportSummary": "Tóm tắt báo cáo",
-    "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",
-    "reportCategory": "Danh mục báo cáo",
-    "title": "Báo cáo tin nhắn",
-    "subTitle": "Vui lòng chọn tùy chọn mô tả tốt nhất vấn đề.",
-    "selectedMessage": "Tin nhắn đã chọn",
-    "submitDescription": "Bằng cách gửi báo cáo này, bạn xác nhận rằng nó là chính xác và được thực hiện với thiện chí. Vui lòng tuân theo Nguyên tắc Cộng đồng của chúng tôi và không gửi báo cáo sai hoặc trùng lặp.",
-    "submitReport": "Gửi Báo Cáo",
-    "cancel": "Hủy",
-    "reportSubmitted": "Đã gửi báo cáo"
-  },
-  "tapToSeeAttachment": "Nhấn để xem tệp đính kèm",
-  "findThePerfectReaction": "Tìm kiếm biểu cảm phù hợp nhất",
-  "findThePerfectSticker": "Tìm kiếm nhãn dán phù hợp nhất",
-  "pinMessage": "Ghim tin nhắn",
-  "unpinMessage": "Bỏ ghim tin nhắn",
-  "confirmPinMessage": "Bạn có chắc muốn ghim tin nhắn này không?",
-  "confirmUnPinMessage": "Bạn có chắc muốn xoá tin nhắn được ghim này không?",
-  "pinSuccess": "ghim tin nhắn thành công",
-  "unpinSuccess": "bỏ ghim tin nhắn thành công",
-  "Yes": "Có",
-  "No": "Không",
-  "unableSendMessage": "Không thể gửi tin nhắn. Vui lòng thử lại.",
-  "manage": {
-    "edit": "Chỉnh sửa",
-    "roles": "Vài trò",
-    "editRoles": "Chỉnh sửa vai trò",
-    "cancel": "Đóng"
-  },
-  "newMessages": "Các tin nhắn mới",
-  "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
-  "messageInputPlaceHolder": "Viết suy nghĩ của bạn ở đây",
-  "shareLocationModal": {
-    "sendThisLocation": "Gửi vị trí này đến",
-    "send": "Gửi",
-    "cancel": "Hủy",
-    "coordinate": "Tọa độ"
-  }
+    "unpinMessage": "Bỏ ghim tin nhắn",
+    "confirmPinMessage": "Bạn có chắc muốn ghim tin nhắn này không?",
+    "confirmUnPinMessage": "Bạn có chắc muốn xoá tin nhắn được ghim này không?",
+    "pinSuccess": "ghim tin nhắn thành công",
+    "unpinSuccess": "bỏ ghim tin nhắn thành công",
+     "Yes": "Có",
+    "No": "Không",
+    "unableSendMessage": "Không thể gửi tin nhắn. Vui lòng thử lại.",
+    "manage": {
+        "edit": "Chỉnh sửa",
+        "roles": "Vài trò",
+        "editRoles": "Chỉnh sửa vai trò",
+        "cancel": "Đóng"
+    },
+    "newMessages": "Các tin nhắn mới",
+    "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
+    "messageInputPlaceHolder": "Viết suy nghĩ của bạn ở đây"
 }

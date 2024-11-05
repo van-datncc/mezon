@@ -5,6 +5,7 @@ import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
 import style from './ChannelItem.styles';
 
 type ChannelItemProps = {
