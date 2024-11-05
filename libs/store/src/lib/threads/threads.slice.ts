@@ -320,42 +320,53 @@ export const selectIsShowCreateThread = createSelector([getThreadsState, (_, cha
 });
 // new update
 
-export const selectActiveThreads = createSelector([selectAllThreads], (threads) => {
-	const result = threads.filter((thread) => thread.active === ThreadStatus.activePublic);
-	const sortByLsentMess = sortChannelsByLastActivity(result as any);
-	return sortByLsentMess;
-});
+export const selectActiveThreads = (keywordSearch: string) =>
+	createSelector([selectAllThreads], (threads) => {
+		const result = threads.filter(
+			(thread) =>
+				thread.active === ThreadStatus.activePublic && thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
+		);
+		const sortByLsentMess = sortChannelsByLastActivity(result as any);
+		return sortByLsentMess;
+	});
 
-export const selectJoinedThreadsWithinLast30Days = createSelector([selectAllThreads], (threads) => {
-	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
-	const currentTime = Math.floor(Date.now() / 1000);
-	const result = threads.reduce((accumulator, thread) => {
-		if (
-			thread.active === ThreadStatus.joined &&
-			thread.last_sent_message?.timestamp_seconds &&
-			currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds
-		) {
-			accumulator.push(thread);
-		}
-		return accumulator;
-	}, [] as ThreadsEntity[]);
-	const sortByLsentMess = sortChannelsByLastActivity(result as any);
-	return sortByLsentMess;
-});
+export const selectJoinedThreadsWithinLast30Days = (keywordSearch: string) =>
+	createSelector([selectAllThreads], (threads) => {
+		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+		const currentTime = Math.floor(Date.now() / 1000);
+		const result = threads.reduce((accumulator, thread) => {
+			if (
+				thread.active === ThreadStatus.joined &&
+				thread.last_sent_message?.timestamp_seconds &&
+				currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds &&
+				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
+			) {
+				accumulator.push(thread);
+			}
+			return accumulator;
+		}, [] as ThreadsEntity[]);
+		const sortByLsentMess = sortChannelsByLastActivity(result as any);
+		return sortByLsentMess;
+	});
 
-export const selectThreadsOlderThan30Days = createSelector([selectAllThreads], (threads) => {
-	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
-	const currentTime = Math.floor(Date.now() / 1000);
-	const result = threads.reduce((accumulator, thread) => {
-		if (thread.last_sent_message?.timestamp_seconds && currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds) {
-			accumulator.push(thread);
-		}
-		return accumulator;
-	}, [] as ThreadsEntity[]);
-	const sortByLsentMess = sortChannelsByLastActivity(result as any);
+export const selectThreadsOlderThan30Days = (keywordSearch: string) =>
+	createSelector([selectAllThreads], (threads) => {
+		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+		const currentTime = Math.floor(Date.now() / 1000);
+		const result = threads.reduce((accumulator, thread) => {
+			if (
+				thread.last_sent_message?.timestamp_seconds &&
+				currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds &&
+				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
+			) {
+				accumulator.push(thread);
+			}
+			return accumulator;
+		}, [] as ThreadsEntity[]);
+		const sortByLsentMess = sortChannelsByLastActivity(result as any);
 
-	return sortByLsentMess;
-});
+		return sortByLsentMess;
+	});
 
 export const selectShowEmptyStatus = () =>
 	createSelector(selectAllThreads, (threads) => {

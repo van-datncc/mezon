@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/ui';
 
-const SearchThread = () => {
+const SearchThread = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<React.SetStateAction<string>> }) => {
 	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		console.log('event', event.target.value);
+		setKeywordSearch(event.target.value);
 	};
 
 	return (

@@ -15,7 +15,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { RefObject, useCallback, useRef } from 'react';
+import { RefObject, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -46,9 +46,11 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
-	const getActiveThreads = useSelector(selectActiveThreads);
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
+	const [keywordSearch, setKeywordSearch] = useState('');
+
+	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch));
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch));
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch));
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
@@ -86,7 +88,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<Icons.ThreadIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
-					<SearchThread />
+					<SearchThread setKeywordSearch={setKeywordSearch} />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button
