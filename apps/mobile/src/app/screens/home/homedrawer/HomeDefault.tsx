@@ -29,6 +29,7 @@ import { BackHandler, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpa
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
+import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -209,6 +210,10 @@ const HomeDefault = React.memo((props: any) => {
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+					<ShareLocationConfirmModal
+						channelId={currentChannel?.channel_id}
+						mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
 				</View>
 			)}
 
