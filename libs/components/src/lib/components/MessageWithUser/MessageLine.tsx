@@ -5,6 +5,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
+import EmbedMessage from '../EmbedMessage/EmbedMessage';
 
 type MessageLineProps = {
 	mode?: number;
@@ -101,7 +102,7 @@ const RenderContent = memo(
 		isEditted,
 		isInPinMsg
 	}: RenderContentProps) => {
-		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
+		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], embed } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
 		const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 		const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
@@ -280,6 +281,10 @@ const RenderContent = memo(
 
 			return formattedContent;
 		}, [elements, t, mode]);
+
+		if (embed) {
+			return <EmbedMessage {...embed} />;
+		}
 
 		return (
 			<div
