@@ -1,8 +1,8 @@
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
-import { StatusUserArgs } from '../channelmembers/channel.members';
 import { ensureSession, getMezonCtx } from '../helpers';
+import { clanMembersMetaActions, extracMeta, selectClanMembersMetaEntities } from './clan.members.meta';
 export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 
 /*
@@ -31,10 +31,9 @@ type UsersClanPayload = {
 export const fetchUsersClan = createAsyncThunk('UsersClan/fetchUsersClan', async ({ clanId }: UsersClanPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listClanUsers(mezon.session, clanId);
-	if (!response.clan_users) {
-		return [];
-	}
-	return response.clan_users.map(mapUsersClanToEntity);
+	const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
+	thunkAPI.dispatch(usersClanActions.setAll(users));
+	thunkAPI.dispatch(clanMembersMetaActions.updateBulkMetadata(users.map((item) => extracMeta(item))));
 });
 
 export const initialUsersClanState: UsersClanState = UsersClanAdapter.getInitialState({
@@ -46,10 +45,13 @@ export const UsersClanSlice = createSlice({
 	name: USERS_CLANS_FEATURE_KEY,
 	initialState: initialUsersClanState,
 	reducers: {
+		setAll: UsersClanAdapter.setAll,
 		add: UsersClanAdapter.addOne,
 		upsertMany: UsersClanAdapter.upsertMany,
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
+			console.log('UPDATE');
+
 			const { userId, clanNick, clanAvt } = action.payload;
 			UsersClanAdapter.updateOne(state, {
 				id: userId,
@@ -58,32 +60,6 @@ export const UsersClanSlice = createSlice({
 					clan_avatar: clanAvt
 				}
 			});
-		},
-		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
-			const allMemberChannels = UsersClanAdapter.getSelectors().selectAll(state);
-			UsersClanAdapter.updateMany(
-				state,
-				allMemberChannels.map((member) => {
-					const memberUpdate = action.payload.find((memberUpdate) => memberUpdate.userId === member.user?.id);
-					if (member.user?.id === memberUpdate?.userId) {
-						return {
-							id: member.id,
-							changes: {
-								...member,
-								user: {
-									...member.user,
-									online: memberUpdate?.online,
-									is_mobile: memberUpdate?.isMobile
-								}
-							}
-						};
-					}
-					return {
-						id: member.id,
-						changes: { ...member }
-					};
-				})
-			);
 		},
 		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
@@ -101,6 +77,8 @@ export const UsersClanSlice = createSlice({
 			});
 		},
 		addRoleIdUser: (state, action) => {
+			console.log('UPDATE');
+
 			const { userId, id } = action.payload;
 			const existingMember = state.entities[userId];
 
@@ -111,6 +89,8 @@ export const UsersClanSlice = createSlice({
 			}
 		},
 		removeRoleIdUser: (state, action) => {
+			console.log('UPDATE');
+
 			const { userId, id } = action.payload;
 			const existingMember = state.entities[userId];
 
@@ -126,11 +106,9 @@ export const UsersClanSlice = createSlice({
 			.addCase(fetchUsersClan.pending, (state: UsersClanState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchUsersClan.fulfilled, (state: UsersClanState, action: PayloadAction<IUsersClan[]>) => {
-				UsersClanAdapter.setAll(state, action.payload);
+			.addCase(fetchUsersClan.fulfilled, (state: UsersClanState) => {
 				state.loadingStatus = 'loaded';
 			})
-
 			.addCase(fetchUsersClan.rejected, (state: UsersClanState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -153,6 +131,9 @@ export const selectAllUserClans = createSelector(getUsersClanState, selectAll);
 export const selectEntitesUserClans = createSelector(getUsersClanState, selectEntities);
 
 // with DM group use selector: selectMembeGroupByUserId
+/**
+ * @deprecated will be removed to use selectMemberClanByUserId2
+ */
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 
 export const selectMemberClanByUserId2 = createSelector(
@@ -165,10 +146,39 @@ export const selectMemberClanByGoogleId = (googleId: string) =>
 		return members.find((member) => member.user?.google_id === googleId);
 	});
 
-export const selectMembersClanOnlineCount = createSelector(selectAllUserClans, (members) => {
-	return members.filter((member) => member?.user?.online).length;
-});
-
 export const selectMembersClanCount = createSelector(getUsersClanState, (state) => {
 	return state.ids.length;
+});
+
+const getName = (user: UsersClanEntity) =>
+	user.clan_nick?.toLowerCase() || user.user?.display_name?.toLowerCase() || user.user?.username?.toLowerCase() || '';
+
+export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, selectClanMembersMetaEntities, (members, metas) => {
+	if (!metas || !members) {
+		return {
+			online: [],
+			offline: []
+		};
+	}
+	const users = members.map((item) => ({
+		...item,
+		user: {
+			...item.user,
+			online: !!metas[item.id]?.online,
+			is_mobile: !!metas[item.id]?.isMobile
+		}
+	})) as UsersClanEntity[];
+
+	users.sort((a, b) => {
+		if (a.user?.online === b.user?.online) {
+			return getName(a).localeCompare(getName(b));
+		}
+		return a.user?.online ? -1 : 1;
+	});
+	const firstOfflineIndex = users.findIndex((user) => !user.user?.online);
+
+	return {
+		online: users.slice(0, firstOfflineIndex).map((item) => item.id),
+		offline: users.slice(firstOfflineIndex).map((item) => item.id)
+	};
 });

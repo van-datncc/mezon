@@ -11,8 +11,8 @@ export function findParentByClass(element: HTMLElement, className: string): HTML
 
 export function toggleDisableHover(element: HTMLDivElement | null, timeoutId: React.MutableRefObject<NodeJS.Timeout | null>) {
 	if (!element) return;
-	element.classList.add('disable-hover');
 	timeoutId.current && clearTimeout(timeoutId.current);
+	element.classList.add('disable-hover');
 	timeoutId.current = setTimeout(() => {
 		element.classList.remove('disable-hover');
 	}, 150);

@@ -1,6 +1,6 @@
 import { CircleIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { ClansEntity, selectMembersClanCount, selectMembersClanOnlineCount } from '@mezon/store-mobile';
+import { ClansEntity, selectClanMemberWithStatusIds, selectMembersClanCount } from '@mezon/store-mobile';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,7 @@ interface ClanMenuInfoProps {
 export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
 	const { t } = useTranslation(['clanMenu']);
 	const styles = style(useTheme().themeValue);
-	const onlineMembers = useSelector(selectMembersClanOnlineCount);
+	const onlineMembers = useSelector(selectClanMemberWithStatusIds)?.online?.length || 0;
 	const members = useSelector(selectMembersClanCount);
 
 	return (

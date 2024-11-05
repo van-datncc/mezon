@@ -1,21 +1,47 @@
-import { ChannelMembersEntity, selectTheme } from '@mezon/store';
+import { selectClanMemberMetaUserId, selectClanMemberWithStatusIds, selectMemberClanByUserId2, selectTheme, useAppSelector } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
-
-type ListMemberProps = {
-	lisMembers: ({ offlineSeparate: boolean } | { onlineSeparate: boolean } | ChannelMembersEntity)[];
-	offlineCount?: number;
-	onlineCount?: number;
-};
 
 const heightTopBar = 60;
 const titleBarHeight = 21;
 
-const ListMember = (props: ListMemberProps) => {
-	const { lisMembers, offlineCount, onlineCount } = props;
+type MemberItemProps = {
+	id: string;
+};
+const MemoizedMemberItem = memo((props: MemberItemProps) => {
+	const { id } = props;
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
+	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
+
+	return (
+		<MemberItem
+			user={user}
+			name={user?.clan_nick || user?.user?.display_name || user?.user?.username}
+			positionType={MemberProfileType.MEMBER_LIST}
+			isDM={false}
+			listProfile={true}
+			isOffline={!userMeta?.online}
+			isMobile={userMeta?.isMobile}
+		/>
+	);
+});
+
+const ListMember = () => {
+	const members = useSelector(selectClanMemberWithStatusIds);
+	const lisMembers = useMemo(() => {
+		return [
+			{ onlineSeparate: true },
+			...members.online,
+			{
+				offlineSeparate: true
+			},
+			...members.offline
+		];
+	}, [members]);
+
 	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
 
 	const appearanceTheme = useSelector(selectTheme);
@@ -64,24 +90,16 @@ const ListMember = (props: ListMemberProps) => {
 							}}
 						>
 							<div className="flex items-center px-4 h-full">
-								{'onlineSeparate' in user ? (
+								{typeof user === 'object' && 'onlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Member - {onlineCount}
+										Member - {members.online.length}
 									</p>
-								) : 'offlineSeparate' in user ? (
+								) : typeof user === 'object' && 'offlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Offline - {offlineCount}
+										Offline - {members.offline.length}
 									</p>
 								) : (
-									<MemberItem
-										name={user.clan_nick || user?.user?.display_name || user?.user?.username}
-										user={user}
-										key={user?.user?.id}
-										listProfile={true}
-										isOffline={!user?.user?.online}
-										positionType={MemberProfileType.MEMBER_LIST}
-										isDM={false}
-									/>
+									<MemoizedMemberItem id={user} />
 								)}
 							</div>
 						</div>
