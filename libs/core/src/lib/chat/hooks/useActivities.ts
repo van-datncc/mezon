@@ -13,11 +13,11 @@ export function useActivities() {
 	const setUserActivity = useCallback(
 		(info: ActivitiesInfo) => {
 			const body = {
-				activity_description: info.windowTitle,
-				activity_name: info.appName,
-				activity_type: testToActivityTypeMap[info.appName as ActivitiesName],
+				activity_description: info?.windowTitle,
+				activity_name: info?.appName,
+				activity_type: testToActivityTypeMap[info?.appName as ActivitiesName],
 				application_id: '0',
-				start_time: info.startTime,
+				start_time: info?.startTime,
 				status: 1
 			};
 			dispatch(acitvitiesActions.createActivity(body));
