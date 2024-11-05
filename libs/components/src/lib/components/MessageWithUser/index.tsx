@@ -225,8 +225,8 @@ function MessageWithUser({
 				<HoverStateWrapper isSearchMessage={isSearchMessage} popup={popup}>
 					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
 						<div className="relative rounded-sm overflow-visible">
-							<div className={!isMessageSystem ? childDivClass : ''}></div>
-							<div className={!isMessageSystem ? parentDivClass : ''}>
+							<div className={!isMessageSystem ? childDivClass : 'absolute w-0.5 h-full left-0'}></div>
+							<div className={!isMessageSystem ? parentDivClass : 'flex h-15 flex-col w-auto px-3 pt-[2px]'}>
 								{checkMessageHasReply && (
 									<MessageReply
 										message={message}
