@@ -9,6 +9,7 @@ export type MemberItemProps = {
 	user: ChannelMembersEntity;
 	listProfile?: boolean;
 	isOffline?: boolean;
+	isMobile?: boolean;
 	positionType?: MemberProfileType;
 	dataMemberCreate?: DataMemberCreate;
 	directMessageId?: string;
@@ -16,7 +17,7 @@ export type MemberItemProps = {
 	isDM: boolean;
 };
 
-function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM }: MemberItemProps) {
+function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM, isMobile }: MemberItemProps) {
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '', isDM);
 	const { userProfile } = useAuth();
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
@@ -32,7 +33,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
 			name={name || ''}
 			userNameAva={user?.user?.username}
-			status={{ status: isMe ? true : user.user?.online, isMobile: user.user?.is_mobile }}
+			status={{ status: isMe ? true : !isOffline, isMobile }}
 			customStatus={displayCustomStatus}
 			isHideStatus={true}
 			isHideIconStatus={false}

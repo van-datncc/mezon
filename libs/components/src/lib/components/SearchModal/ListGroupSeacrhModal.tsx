@@ -1,5 +1,5 @@
 import { selectTheme } from '@mezon/store';
-import { SearchItemProps } from '@mezon/utils';
+import { SearchItemProps, toggleDisableHover } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ListGroupSearchModalContext } from './ListGroupSearchModalContext';
@@ -86,8 +86,11 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		[allItems, handleItemClick]
 	);
 
+	const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+
 	useEffect(() => {
 		const handler = (event: KeyboardEvent) => {
+			toggleDisableHover(boxRef.current, timeoutIdRef);
 			travelItemByKeyBoard(event);
 			usingKeyboard.current = true;
 		};
