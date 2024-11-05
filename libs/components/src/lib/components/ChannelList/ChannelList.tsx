@@ -14,7 +14,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ICategoryChannel, isWindowsDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, ICategoryChannel, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -98,7 +98,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			const clanFooterEle = document.getElementById('clan-footer');
 			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
 			const outsideHeight = totalHeight;
-			const titleBarHeight = isWindowsDesktop ? 21 : 0;
+			const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
 		};
 		calculateHeight();
@@ -227,8 +227,8 @@ const FavoriteChannelsSection = ({
 			<div className="w-[94%] mx-auto">
 				{channelFavorites
 					? channelFavorites.map((id, index) => (
-							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-						))
+						<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+					))
 					: ''}
 			</div>
 		) : null}

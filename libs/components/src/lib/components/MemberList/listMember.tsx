@@ -1,12 +1,12 @@
-import { MemberProfileType, isWindowsDesktop } from '@mezon/utils';
 import { selectClanMemberMetaUserId, selectClanMemberWithStatusIds, selectMemberClanByUserId2, selectTheme, useAppSelector } from '@mezon/store';
+import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
 const heightTopBar = 60;
-const titleBarHeight = isWindowsDesktop ? 21 : 0;
+const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
 
 type MemberItemProps = {
 	id: string;
