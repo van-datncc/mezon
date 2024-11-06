@@ -25,7 +25,7 @@ import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, DeviceEventEmitter, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -91,9 +91,9 @@ const HomeDefault = React.memo((props: any) => {
 	const prevChannelIdRef = useRef<string>();
 
 	useChannelSeen(currentChannel?.channel_id || '');
-	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
-			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
 		}
 	}, []);
 
@@ -102,7 +102,7 @@ const HomeDefault = React.memo((props: any) => {
 	const onOpenDrawer = useCallback(() => {
 		requestAnimationFrame(async () => {
 			navigation.dispatch(DrawerActions.openDrawer());
-			onShowKeyboardBottomSheet(false, 0, 'text');
+			onShowKeyboardBottomSheet(false, 'text');
 			Keyboard.dismiss();
 		});
 	}, [navigation, onShowKeyboardBottomSheet]);
@@ -197,7 +197,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 			/>
 			{currentChannel && isFocusChannelView && !isChannelApp && (
-				<View style={styles.channelView}>
+				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
@@ -214,7 +214,7 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel?.channel_id}
 						mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
-				</View>
+				</KeyboardAvoidingView>
 			)}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>

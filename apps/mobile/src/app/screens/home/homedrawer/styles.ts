@@ -73,7 +73,8 @@ export const style = (colors: Attributes) =>
 		},
 		homeDefault: {
 			backgroundColor: colors.primary,
-			flex: 1
+			flex: 1,
+			zIndex: 10000
 		},
 		wrapperChannelMessage: {
 			flex: 1,
@@ -731,5 +732,9 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'center',
 			alignItems: 'center'
+		},
+		wall: {
+			height: '100%',
+			width: size.s_4
 		}
 	});
