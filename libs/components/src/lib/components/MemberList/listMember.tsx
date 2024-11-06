@@ -1,4 +1,12 @@
-import { selectClanMemberMetaUserId, selectClanMemberWithStatusIds, selectMemberClanByUserId2, selectTheme, useAppSelector } from '@mezon/store';
+import {
+	selectAllChannelMembers,
+	selectClanMemberMetaUserId,
+	selectClanMemberWithStatusIds,
+	selectCurrentChannelId,
+	selectMemberClanByUserId2,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
 import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -6,7 +14,7 @@ import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
 const heightTopBar = 60;
-const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
+const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 
 type MemberItemProps = {
 	id: string;
@@ -30,17 +38,39 @@ const MemoizedMemberItem = memo((props: MemberItemProps) => {
 });
 
 const ListMember = () => {
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId));
 	const members = useSelector(selectClanMemberWithStatusIds);
 	const lisMembers = useMemo(() => {
-		return [
-			{ onlineSeparate: true },
-			...members.online,
-			{
-				offlineSeparate: true
-			},
-			...members.offline
-		];
-	}, [members]);
+		if (!userChannels || !members) {
+			return {
+				users: [
+					{ onlineSeparate: true },
+					{
+						offlineSeparate: true
+					}
+				],
+				onlineCount: 0,
+				offlineCount: 0
+			};
+		}
+
+		const users = new Map(userChannels.map((item) => [item.id, true]));
+		const onlines = members.online.filter((m) => users.has(m));
+		const offlines = members.offline.filter((m) => users.has(m));
+		return {
+			users: [
+				{ onlineSeparate: true },
+				...onlines,
+				{
+					offlineSeparate: true
+				},
+				...offlines
+			],
+			onlineCount: onlines.length,
+			offlineCount: offlines.length
+		};
+	}, [members, userChannels]);
 
 	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
 
@@ -54,7 +84,7 @@ const ListMember = () => {
 
 	const parentRef = useRef(null);
 	const rowVirtualizer = useVirtualizer({
-		count: lisMembers.length,
+		count: lisMembers.users.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 48,
 		overscan: 5
@@ -76,7 +106,7 @@ const ListMember = () => {
 				}}
 			>
 				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-					const user = lisMembers[virtualRow.index];
+					const user = lisMembers.users[virtualRow.index];
 					return (
 						<div
 							key={virtualRow.index}
@@ -92,11 +122,11 @@ const ListMember = () => {
 							<div className="flex items-center px-4 h-full">
 								{typeof user === 'object' && 'onlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Member - {members.online.length}
+										Member - {lisMembers.onlineCount}
 									</p>
 								) : typeof user === 'object' && 'offlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Offline - {members.offline.length}
+										Offline - {lisMembers.offlineCount}
 									</p>
 								) : (
 									<MemoizedMemberItem id={user} />

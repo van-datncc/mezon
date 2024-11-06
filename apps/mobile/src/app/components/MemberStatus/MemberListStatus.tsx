@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectClanMemberWithStatusIds } from '@mezon/store-mobile';
+import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, selectCurrentChannelId, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
@@ -29,8 +29,23 @@ export const MemberListStatus = React.memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const members = useSelector(selectClanMemberWithStatusIds);
-	const onlineMembers = members.online;
-	const offlineMembers = members.offline;
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId));
+	const lisMembers = useMemo(() => {
+		if (!userChannels || !members) {
+			return {
+				onlineMembers: [],
+				offlineMembers: []
+			};
+		}
+		const users = new Map(userChannels.map((item) => [item.id, true]));
+		return {
+			onlineMembers: members.online.filter((m) => users.has(m)),
+			offlineMembers: members.offline.filter((m) => users.has(m))
+		};
+	}, [members, userChannels]);
+
+	const { onlineMembers, offlineMembers } = lisMembers;
 
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
