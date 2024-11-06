@@ -901,7 +901,6 @@ export enum ActivitiesType {
 
 export enum ActivitiesName {
 	CODE = 'Code',
-	VISUAL_STUDIO_CODE = 'Visual Studio Code',
 	SPOTIFY = 'Spotify',
 	LOL = 'LeagueClientUx'
 }
