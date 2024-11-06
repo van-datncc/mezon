@@ -49,6 +49,7 @@ const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'))
 const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 const ChannelSettingMain = loadable(() => import('../pages/setting/channelSetting'));
+const GuideMain = loadable(() => import('../pages/guide'));
 // Components
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
@@ -183,6 +184,10 @@ export const Routes = memo(() => {
 																			]
 																		}
 																	]
+																},
+																{
+																	path: 'guide',
+																	element: <GuideMain />
 																}
 															]
 														}
