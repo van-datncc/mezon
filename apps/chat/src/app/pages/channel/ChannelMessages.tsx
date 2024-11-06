@@ -77,6 +77,7 @@ function ChannelMessages({
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId as string));
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
+	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	const loadMoreMessage = useCallback(
@@ -128,6 +129,7 @@ function ChannelMessages({
 		getScrollElement: () => chatRef.current,
 		estimateSize: () => 50,
 		onChange: async (instance) => {
+			if (!userActiveScroll.current) return;
 			toggleDisableHover(chatRef.current, scrollTimeoutId2);
 			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
 			switch (instance.scrollDirection) {
@@ -175,21 +177,16 @@ function ChannelMessages({
 	const firsRowCached = useRef<string>('');
 	const lastRowCached = useRef<string>('');
 	useLayoutEffect(() => {
-		if (!isLoadMore.current || !chatRef.current) return;
+		if (!isLoadMore.current || !chatRef.current || !userActiveScroll.current) return;
 		const firstMessageId = messages[0];
 		const lastMessageId = messages[messages.length - 1];
 		if (firsRowCached.current !== firstMessageId) {
 			if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
 				const messageId = firsRowCached.current;
-				chatRef.current.style.overflowY = 'hidden';
 				rowVirtualizer.scrollToIndex(
 					messages.findIndex((item) => item === messageId),
 					{ align: 'start' }
 				);
-				setTimeout(() => {
-					if (!chatRef.current) return;
-					chatRef.current.style.overflowY = 'auto';
-				}, 50);
 			}
 			firsRowCached.current = messages[1];
 			lastRowCached.current = messages[messages.length - 1];
@@ -273,12 +270,20 @@ function ChannelMessages({
 		}
 	}, [userId, messages.length, isViewOlderMessage, rowVirtualizer, scrollToLastMessage, getChatScrollBottomOffset]);
 
-	const userActiveScroll = useRef<boolean>(false);
 	useLayoutEffect(() => {
 		if (chatRef.current && messages?.length && lastMessage?.channel_id && !userActiveScroll.current) {
 			chatRef.current.scrollTop = chatRef.current.scrollHeight;
 		}
 	});
+
+	useEffect(() => {
+		if (!userActiveScroll.current || !chatRef.current) return;
+		chatRef.current.style.overflowY = 'hidden';
+		setTimeout(() => {
+			if (!chatRef.current) return;
+			chatRef.current.style.overflowY = 'auto';
+		}, 50);
+	}, [messages]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
