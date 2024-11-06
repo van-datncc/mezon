@@ -233,7 +233,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					ref={flashListRef}
 					scrollEventThrottle={16}
 					removeClippedSubviews={false}
-					decelerationRate={'fast'}
+					nestedScrollEnabled={true}
 					bounces={false}
 				>
 					<ChannelListBackground onPress={handlePress} />

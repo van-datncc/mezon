@@ -1,27 +1,13 @@
 import { useAuth } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	changeClan,
-	getUpdateOrAddClanChannelCache,
-	Icons,
-	jumpToChannel,
-	load,
-	remove,
-	save,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_PREVIOUS_CHANNEL
-} from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
-import { selectCurrentClanId } from '@mezon/store-mobile';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, SafeAreaView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../componentUI';
-import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { IModeKeyboardPicker } from '../BottomKeyboardPicker';
 import { InviteToChannel } from '../InviteToChannel';
 import { ChatBoxStreamComponent } from './ChatBoxStream';
@@ -40,44 +26,43 @@ function StreamingRoom({
 	const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const navigation = useNavigation<any>();
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetChatRef = useRef(null);
 	const panelKeyboardRef = useRef(null);
 	const { t } = useTranslation(['streamingRoom']);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 
-	const handleLeaveChannel = async () => {
+	const handleLeaveChannel = useCallback(async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
 		const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
 		dispatch(usersStreamActions.remove(idStreamByMe || ''));
-	};
+	}, [currentStreamInfo, dispatch, streamChannelMember, userProfile?.user?.id]);
 
 	const handleEndCall = useCallback(() => {
 		requestAnimationFrame(async () => {
-			handleLeaveChannel();
-			const previousChannel = load(STORAGE_PREVIOUS_CHANNEL) || [];
-			navigation.navigate(APP_SCREEN.HOME);
-			navigation.dispatch(DrawerActions.openDrawer());
-			const { channel_id, clan_id } = previousChannel || {};
-			if (currentClanId !== clan_id) {
-				changeClan(clan_id);
-			}
-			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-				isFetchMemberChannelDM: true
-			});
-			const dataSave = getUpdateOrAddClanChannelCache(clan_id, channel_id);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			jumpToChannel(channel_id, clan_id);
-			remove(STORAGE_PREVIOUS_CHANNEL);
+			await handleLeaveChannel();
+			// todo: check this code
+			// const previousChannel = load(STORAGE_PREVIOUS_CHANNEL) || [];
+			// const { channel_id, clan_id } = previousChannel || {};
+			// if (currentClanId !== clan_id) {
+			// 	await changeClan(clan_id);
+			// }
+			// DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+			// 	isFetchMemberChannelDM: true
+			// });
+			// if (channel_id && clan_id) {
+			// 	const dataSave = getUpdateOrAddClanChannelCache(clan_id, channel_id);
+			// 	save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			// 	await jumpToChannel(channel_id, clan_id);
+			// 	await remove(STORAGE_PREVIOUS_CHANNEL);
+			// }
 		});
-	}, []);
+	}, [handleLeaveChannel]);
 
 	const handleAddPeopleToVoice = () => {
 		bottomSheetInviteRef.current.present();
@@ -163,7 +148,7 @@ function StreamingRoom({
 					footer={<FooterChatBoxStream onShowKeyboardBottomSheet={onShowKeyboardBottomSheet} />}
 					title={t('chat')}
 					titleSize={'md'}
-					snapPoints={['100%']}
+					snapPoints={['90%']}
 					ref={bottomSheetChatRef}
 				>
 					<ChatBoxStreamComponent ref={panelKeyboardRef} />
