@@ -8,9 +8,10 @@ import WebhookItemModal from './WebhookItemModal';
 interface IWebhooksProps {
 	allWebhooks?: ApiWebhook[] | undefined;
 	currentChannel?: IChannel;
+	isClanSetting?: boolean;
 }
 
-const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
+const Webhooks = ({ allWebhooks, currentChannel, isClanSetting }: IWebhooksProps) => {
 	const dispatch = useAppDispatch();
 	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight'];
 	const getRandomWebhookName = (): string => {
@@ -35,7 +36,9 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 			webhook_name: getRandomWebhookName(),
 			avatar: getRandomAvatar()
 		};
-		dispatch(generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string, clanId: clanId }));
+		dispatch(
+			generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string, clanId: clanId, isClanSetting: isClanSetting })
+		);
 	};
 
 	return (
@@ -55,7 +58,9 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 						New Webhook
 					</div>
 					{allWebhooks &&
-						allWebhooks.map((webhook) => <WebhookItemModal currentChannel={currentChannel} webhookItem={webhook} key={webhook.id} />)}
+						allWebhooks.map((webhook) => (
+							<WebhookItemModal isClanSetting={isClanSetting} currentChannel={currentChannel} webhookItem={webhook} key={webhook.id} />
+						))}
 				</>
 			) : (
 				<div className="flex items-center flex-col gap-4">
