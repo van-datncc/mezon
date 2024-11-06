@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
 const heightTopBar = 60;
-const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
+const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
 
 type MemberItemProps = {
 	id: string;
