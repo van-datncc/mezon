@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useRef } from 'react';
-import { View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
 import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
@@ -31,14 +31,14 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 		[handleBack]
 	);
 
-	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
-			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
 		}
 	}, []);
 
 	return (
-		<View style={styles.content}>
+		<KeyboardAvoidingView style={styles.content} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
 			<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
 				<View style={{ flex: 1 }}>
 					<ChannelMessagesWrapper
@@ -68,6 +68,6 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 				channelId={directMessageId}
 				mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 			/>
-		</View>
+		</KeyboardAvoidingView>
 	);
 });

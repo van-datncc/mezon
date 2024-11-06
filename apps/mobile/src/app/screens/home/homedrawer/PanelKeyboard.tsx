@@ -2,7 +2,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
 import { IModeKeyboardPicker } from './components';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker from './components/BottomKeyboardPicker';
@@ -15,24 +15,58 @@ interface IProps {
 }
 const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const { themeValue, theme } = useTheme();
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const timer = useRef<NodeJS.Timeout | null>(null);
-	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
-		if (isShow) {
-			if (type === 'attachment') {
-				Keyboard.dismiss();
+	const animatedHeight = useRef(new Animated.Value(0)).current;
+
+	const onShowKeyboardBottomSheet = useCallback(
+		(isShow: boolean, type?: IModeKeyboardPicker) => {
+			if (isShow) {
+				setHeightKeyboardShow(keyboardHeight);
+				Animated.timing(animatedHeight, {
+					toValue: keyboardHeight,
+					duration: 200,
+					useNativeDriver: false
+				}).start();
+				if (type === 'attachment') {
+					Keyboard.dismiss();
+				}
+				timer.current = setTimeout(() => {
+					setTypeKeyboardBottomSheet(type);
+				}, 100);
+			} else {
+				setHeightKeyboardShow(0);
+				Animated.timing(animatedHeight, {
+					toValue: 0,
+					duration: 200,
+					useNativeDriver: false
+				}).start();
+				setTypeKeyboardBottomSheet('text');
+				bottomPickerRef.current?.forceClose();
 			}
-			timer.current = setTimeout(() => {
-				setTypeKeyboardBottomSheet(type);
-			}, 100);
-		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef.current?.forceClose();
-		}
-	}, []);
+		},
+		[animatedHeight, keyboardHeight]
+	);
+
+	const keyboardWillShow = useCallback(
+		(event) => {
+			if (keyboardHeight !== event.endCoordinates.height) {
+				setKeyboardHeight(event.endCoordinates.height <= 300 ? 300 : event.endCoordinates.height);
+			}
+		},
+		[keyboardHeight]
+	);
+
+	useEffect(() => {
+		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
+
+		return () => {
+			keyboardListener.remove();
+		};
+	}, [keyboardWillShow]);
 
 	useImperativeHandle(ref, () => ({
 		onShowKeyboardBottomSheet
@@ -45,15 +79,15 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	}, []);
 
 	const onClose = useCallback(() => {
-		onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+		onShowKeyboardBottomSheet(false, 'text');
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-	}, [heightKeyboardShow, onShowKeyboardBottomSheet]);
+	}, [onShowKeyboardBottomSheet]);
 
 	return (
 		<>
-			<View
+			<Animated.View
 				style={{
-					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? animatedHeight : 0,
 					backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.primary
 				}}
 			/>

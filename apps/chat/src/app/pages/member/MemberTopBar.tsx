@@ -3,11 +3,16 @@ import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
 
 const MemberTopBar = () => {
-	const { searchQuery, setSearchQuery } = useMemberContext();
+	const { searchQuery, setSearchQuery, isSort, setIsSort } = useMemberContext();
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
 	};
+
+	const toggleSortOrder = () => {
+		setIsSort(!isSort);
+	};
+
 	return (
 		<div className="flex flex-row justify-between items-center py-2 px-4 border-b-[1px] dark:border-borderDivider border-buttonLightTertiary">
 			<h2 className="text-base font-semibold">Recent Members</h2>
@@ -29,7 +34,10 @@ const MemberTopBar = () => {
 					</div>
 				</div>
 				<div>
-					<Button className="h-8 rounded focus:ring-transparent bg-bgModifierHoverLight dark:bg-buttonSecondary hover:!bg-buttonSecondaryHover items-center dark:text-textDarkTheme text-textLightTheme">
+					<Button
+						className="h-8 rounded focus:ring-transparent bg-bgModifierHoverLight dark:bg-buttonSecondary hover:!bg-buttonSecondaryHover items-center dark:text-textDarkTheme text-textLightTheme"
+						onClick={toggleSortOrder}
+					>
 						<Icons.ConvertAccount className="rotate-90 mr-1 dark:text-textDarkTheme text-textLightTheme" />
 						<span>Sort</span>
 					</Button>
