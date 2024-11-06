@@ -43,7 +43,7 @@ import {
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
 import { ChannelType } from 'mezon-js';
-import { AppState, DeviceEventEmitter, InteractionManager, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, InteractionManager, Platform, StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
