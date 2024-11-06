@@ -109,6 +109,7 @@ export function MemberProfile({
 
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.VISUAL_STUDIO_CODE]: 'Visual Studio Code',
 		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
 		[ActivitiesName.LOL]: 'League of Legends'
 	};
