@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
+import { ChatBoxStreamComponent } from '../../../screens/home/homedrawer/components/StreamingRoom/ChatBoxStream';
 import { DirectMessageDetailScreen } from '../../../screens/messages/DirectMessageDetail';
 import { NewGroupScreen } from '../../../screens/messages/NewGroup';
 import { NewMessageScreen } from '../../../screens/messages/NewMessage';
@@ -54,6 +55,14 @@ export const MessagesStacks = ({}: any) => {
 				component={NewGroupScreen}
 				options={{
 					headerShown: false
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MESSAGES.CHAT_STREAMING}
+				component={ChatBoxStreamComponent}
+				options={{
+					title: t('headerTitle.chat')
 				}}
 			/>
 		</Stack.Navigator>
