@@ -187,7 +187,11 @@ export const Routes = memo(() => {
 																},
 																{
 																	path: 'guide',
-																	element: <GuideMain />
+																	element: (
+																		<MemberProvider>
+																			<GuideMain />
+																		</MemberProvider>
+																	)
 																}
 															]
 														}

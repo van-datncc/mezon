@@ -1,5 +1,5 @@
 import { selectAllUserClans } from '@mezon/store';
-import { getNameForPrioritize, IUsersClan, normalizeString } from '@mezon/utils';
+import { getNameForPrioritize, IUsersClan, normalizeString, UsersClanEntity } from '@mezon/utils';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -7,6 +7,7 @@ interface MemberContextType {
 	searchQuery: string;
 	setSearchQuery: (query: string) => void;
 	filteredMembers: IUsersClan[];
+	clanOwner: UsersClanEntity;
 }
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined);
@@ -46,5 +47,9 @@ export const MemberProvider = ({ children }: { children: React.ReactNode }) => {
 		});
 	}, [usersWithPrioritizeName, searchQuery]);
 
-	return <MemberContext.Provider value={{ searchQuery, setSearchQuery, filteredMembers }}>{children}</MemberContext.Provider>;
+	const clanOwner = useMemo(() => {
+		return usersClan[usersClan.length - 1];
+	}, [usersClan.length]);
+
+	return <MemberContext.Provider value={{ searchQuery, setSearchQuery, filteredMembers, clanOwner }}>{children}</MemberContext.Provider>;
 };
