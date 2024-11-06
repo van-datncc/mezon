@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import { ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
 
 export const ActivityIcon = ({ width, height, color = 'white', ...props }: SvgProps) => (
@@ -1798,3 +1799,67 @@ export const FavoriteFilledIcon = ({ width = 30, height = 30, color = 'white', .
 		/>
 	</Svg>
 );
+
+export const Forum = ({ defaultFill = '#AEAEAE', defaultSize = 20 }) => {
+	return (
+		<View style={{ width: defaultSize, height: defaultSize }}>
+			<Svg viewBox="0 0 20 20" fill="none" width={defaultSize} height={defaultSize}>
+				<Defs>
+					<ClipPath id="clip0_2541_3331">
+						<Rect width="20" height="20" fill="white" y="0.5" />
+					</ClipPath>
+				</Defs>
+				<G clipPath="url(#clip0_2541_3331)">
+					<G>
+						<Path
+							d="M13.0153 5.32968C11.8863 3.02422 9.52441 1.5 6.87514 1.5C3.08433 1.5 0.000301025 4.56653 0.000301025 8.33578C0.000301025 9.36013 0.220218 10.3419 0.65427 11.2573L0.0116679 14.4707C-0.070127 14.8798 0.290724 15.2414 0.699855 15.1604L3.95286 14.5173C4.39086 14.725 4.84398 14.883 5.30955 14.9919C4.26594 10.049 8.01257 5.40928 13.0153 5.32968Z"
+							fill={defaultFill}
+						/>
+						<Path
+							d="M19.3459 16.2572C19.4581 16.0205 19.5557 15.7792 19.6393 15.534H19.6178C21.0806 11.2405 18.0044 6.72796 13.463 6.50824C9.55543 6.32817 6.30875 9.45614 6.30875 13.3357C6.30875 17.1017 9.36965 20.1659 13.1345 20.1713C14.1557 20.17 15.1345 19.9501 16.0472 19.5172C19.6099 20.2215 19.3321 20.1714 19.4139 20.1714C19.7842 20.1714 20.0608 19.8321 19.9885 19.4706L19.3459 16.2572Z"
+							fill={defaultFill}
+						/>
+					</G>
+				</G>
+			</Svg>
+		</View>
+	);
+};
+
+export const Announcement = ({ defaultFill = '#AEAEAE', defaultSize = 20 }) => {
+	return (
+		<View style={{ width: defaultSize, height: defaultSize }}>
+			<Svg viewBox="0 0 20 20" fill="none" width={defaultSize} height={defaultSize}>
+				<Defs>
+					<ClipPath id="clip0_2541_1180">
+						<Rect width="20" height="20" fill="white" />
+					</ClipPath>
+				</Defs>
+				<G clipPath="url(#clip0_2541_1180)">
+					<G>
+						<Path
+							d="M8 12.5H3.5C1.567 12.5 0 10.933 0 8.99998C0 7.06698 1.567 5.49998 3.5 5.49998H8L12.3243 1.53606C12.9657 0.948107 14 1.40311 14 2.27321V15.7267C14 16.5968 12.9657 17.0518 12.3243 16.4639L8 12.5Z"
+							fill={defaultFill}
+						/>
+						<Path
+							d="M16 8.99998C16 8.44769 16.4477 7.99998 17 7.99998H19C19.5523 7.99998 20 8.44769 20 8.99998C20 9.55226 19.5523 9.99998 19 9.99998H17C16.4477 9.99998 16 9.55226 16 8.99998Z"
+							fill={defaultFill}
+						/>
+						<Path
+							d="M19.6 4.79998C20.0418 4.46861 20.1314 3.84181 19.8 3.39998C19.4686 2.95815 18.8418 2.86861 18.4 3.19998L16.4 4.69998C15.9582 5.03135 15.8686 5.65815 16.2 6.09998C16.5314 6.54181 17.1582 6.63135 17.6 6.29998L19.6 4.79998Z"
+							fill={defaultFill}
+						/>
+						<Path
+							d="M16.2 11.9C15.8686 12.3418 15.9582 12.9686 16.4 13.3L18.4 14.8C18.8418 15.1313 19.4686 15.0418 19.8 14.6C20.1314 14.1582 20.0418 13.5313 19.6 13.2L17.6 11.7C17.1582 11.3686 16.5314 11.4581 16.2 11.9Z"
+							fill={defaultFill}
+						/>
+						<Path
+							d="M7 14H4L5.67566 19.027C5.86935 19.608 6.41315 20 7.02566 20C7.99695 20 8.68281 19.0484 8.37566 18.127L7 14Z"
+							fill={defaultFill}
+						/>
+					</G>
+				</G>
+			</Svg>
+		</View>
+	);
+};
