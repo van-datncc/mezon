@@ -1,9 +1,8 @@
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, debounce, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, TextInput, View } from 'react-native';
-import { useThrottledCallback } from 'use-debounce';
 import { style } from './styles';
 
 function SearchDmList() {
@@ -24,10 +23,11 @@ function SearchDmList() {
 			handleSearchDM('');
 		}
 	};
-	const typingSearchDebounce = useThrottledCallback((text) => {
+
+	const typingSearchDebounce = debounce((text) => {
 		setSearchText(text);
 		handleSearchDM(text);
-	}, 500);
+	}, 400);
 
 	return (
 		<View style={styles.searchMessage}>
