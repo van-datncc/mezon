@@ -47,6 +47,7 @@ import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -57,19 +58,19 @@ import {
 	addMention,
 	blankReferenceObj,
 	checkIsThread,
+	convertMentionOnfile,
 	filterEmptyArrays,
 	filterMentionsWithAtSign,
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
-	getExtraPart,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -185,6 +186,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [titleModalMention, setTitleModalMention] = useState('');
 	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
+	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
+
+	const [isPasteMessage, setIsPasteMessage] = useState<boolean>(false);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -280,6 +284,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 
 			if (payloadJson.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
+				setIsPasteMessage(true);
 				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
@@ -331,7 +336,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					isPasteMessage ? mentionUpdated : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -364,7 +369,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionList,
+						isPasteMessage ? mentionUpdated : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -393,6 +398,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
+			setMentionUpdated([]);
+			setDisplayPlaintext('');
+			setDisplayPlaintext('');
+			setIsPasteMessage(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -452,7 +461,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [props.mode, commonChannelDms]);
 
 	const [pastedContent, setPastedContent] = useState<string>('');
-	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+	const onChangeMentionInput: OnChangeHandlerFunc = async (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
@@ -469,25 +478,54 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		const onlyMention = filterMentionsWithAtSign(mentions);
 		const convertToMarkUpString = formatMentionsToString(onlyMention);
 		const convertToPlainTextString = getDisplayMention(onlyMention);
+		const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);
 		setDisplayPlaintext(convertToPlainTextString);
 		setDisplayMarkup(convertToMarkUpString);
-		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
-			const extraPartMarkup = getExtraPart(pastedContent, newValue);
-			const extraPartPlainText = getExtraPart(pastedContent, newPlainTextValue);
-			props.handleConvertToFile(pastedContent);
+		setMentionUpdated(mentionUpdated);
+		if (!isPasteMessage) {
+			setDisplayPlaintext(convertToPlainTextString);
+			setDisplayMarkup(convertToMarkUpString);
+			setMentionUpdated(mentionUpdated);
+		} else {
+			// const onlyMention2 = filterMentionsWithAtSign(mentions);
+			// const convertToMarkUpString2 = formatMentionsToString(onlyMention2);
+			// const convertToPlainTextString2 = getDisplayMention(onlyMention2);
+			// // const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);
 
-			if (extraPartPlainText.length > 0) {
-				setRequestInput(
-					{
-						...request,
-						valueTextInput: extraPartMarkup,
-						content: extraPartPlainText
-					},
-					props.isThread
-				);
-			} else {
-				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
-			}
+			// const mentionUpdated2 = convertMentionOnfile(rolesClan, convertToPlainTextString2, onlyMention2 as MentionItem[]);
+			// setDisplayPlaintext(convertToPlainTextString2);
+			// setDisplayMarkup(convertToMarkUpString2);
+			// setMentionUpdated(mentionUpdated2);
+			console.log('newValue :', newValue);
+			console.log('newPlainTextValue :', newPlainTextValue);
+			console.log('mentions :', mentions);
+			setDisplayPlaintext(newPlainTextValue);
+			setDisplayMarkup(newValue);
+			setMentionUpdated(mentionList);
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: newValue,
+					content: newPlainTextValue,
+					mentionRaw: mentions
+				},
+				props.isThread
+			);
+		}
+
+		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
+			const startIndex = pastedContent.length;
+			const extraPartPlainText = newPlainTextValue.substring(0, newPlainTextValue.length - startIndex);
+			const extraPartMarkup = newValue.substring(0, newValue.length - startIndex);
+			props.handleConvertToFile(pastedContent);
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: extraPartMarkup,
+					content: extraPartPlainText
+				},
+				props.isThread
+			);
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
