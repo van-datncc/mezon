@@ -80,7 +80,7 @@ export default class App {
 			frame: false,
 			titleBarOverlay: process.platform == 'darwin' ? true : false,
 			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
-			trafficLightPosition: process.platform == 'darwin' ? { x: 15, y: 10 } : undefined,
+			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,

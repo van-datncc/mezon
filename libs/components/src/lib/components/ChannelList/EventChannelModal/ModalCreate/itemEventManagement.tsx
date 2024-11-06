@@ -172,7 +172,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							{isReviewEvent ? reviewDescription : event?.description}
 						</div>
 					</div>
-					{logoRight && <img src={logoRight} alt="logoRight" className="w-[60%] max-h-[100px] object-cover rounded flex-grow basis-2/5" />}
+					{logoRight && (
+						<img src={logoRight} alt="logoRight" className="w-[60%] max-h-[100px] object-contain rounded flex-grow basis-2/5" />
+					)}
 				</div>
 			</div>
 			<div
