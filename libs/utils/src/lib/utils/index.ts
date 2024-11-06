@@ -1,5 +1,4 @@
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
-import { getPlatform, Platform } from '@mezon/utils';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -19,12 +18,13 @@ import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
+import { Platform, getPlatform } from '../hooks/platform';
 import {
 	ChannelMembersEntity,
 	EBacktickType,
 	EMimeTypes,
-	EmojiDataOptionals,
 	ETokenMessage,
+	EmojiDataOptionals,
 	IChannel,
 	IEmojiOnMessage,
 	IExtendedMessage,
@@ -555,15 +555,14 @@ export const processText = (inputString: string) => {
 
 	const singleBacktick = '`';
 	const tripleBacktick = '```';
-	const httpPrefix = 'http';
 	const googleMeetPrefix = 'https://meet.google.com/';
 
 	let i = 0;
 	while (i < inputString?.length) {
-		if (inputString.startsWith(httpPrefix, i)) {
+		if (inputString.startsWith('http://', i) || inputString.startsWith('https://', i)) {
 			// Link processing
 			const startindex = i;
-			i += httpPrefix.length;
+			i += inputString.startsWith('https://', i) ? 'https://'.length : 'http://'.length;
 			while (i < inputString?.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
 				i++;
 			}
@@ -889,3 +888,5 @@ export const checkIsThread = (channel?: IChannel) => {
 };
 
 export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();
+export const isMacDesktop = getPlatform() === Platform.MACOS && isElectron();
+export const isLinuxDesktop = getPlatform() === Platform.LINUX && isElectron();

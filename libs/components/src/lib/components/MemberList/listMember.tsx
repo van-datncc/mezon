@@ -1,33 +1,90 @@
-import { ChannelMembersEntity, selectTheme } from '@mezon/store';
-import { MemberProfileType } from '@mezon/utils';
+import {
+	selectAllChannelMembers,
+	selectClanMemberMetaUserId,
+	selectClanMemberWithStatusIds,
+	selectCurrentChannelId,
+	selectMemberClanByUserId2,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
+import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
-type ListMemberProps = {
-	lisMembers: ({ offlineSeparate: boolean } | { onlineSeparate: boolean } | ChannelMembersEntity)[];
-	offlineCount?: number;
-	onlineCount?: number;
-};
-
 const heightTopBar = 60;
+const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 
-const ListMember = (props: ListMemberProps) => {
-	const { lisMembers, offlineCount, onlineCount } = props;
-	const [height, setHeight] = useState(window.innerHeight - heightTopBar);
+type MemberItemProps = {
+	id: string;
+};
+const MemoizedMemberItem = memo((props: MemberItemProps) => {
+	const { id } = props;
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
+	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
+
+	return (
+		<MemberItem
+			user={user}
+			name={user?.clan_nick || user?.user?.display_name || user?.user?.username}
+			positionType={MemberProfileType.MEMBER_LIST}
+			isDM={false}
+			listProfile={true}
+			isOffline={!userMeta?.online}
+			isMobile={userMeta?.isMobile}
+		/>
+	);
+});
+
+const ListMember = () => {
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId));
+	const members = useSelector(selectClanMemberWithStatusIds);
+	const lisMembers = useMemo(() => {
+		if (!userChannels || !members) {
+			return {
+				users: [
+					{ onlineSeparate: true },
+					{
+						offlineSeparate: true
+					}
+				],
+				onlineCount: 0,
+				offlineCount: 0
+			};
+		}
+
+		const users = new Map(userChannels.map((item) => [item.id, true]));
+		const onlines = members.online.filter((m) => users.has(m));
+		const offlines = members.offline.filter((m) => users.has(m));
+		return {
+			users: [
+				{ onlineSeparate: true },
+				...onlines,
+				{
+					offlineSeparate: true
+				},
+				...offlines
+			],
+			onlineCount: onlines.length,
+			offlineCount: offlines.length
+		};
+	}, [members, userChannels]);
+
+	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
 
 	const appearanceTheme = useSelector(selectTheme);
 
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight - heightTopBar);
+		const handleResize = () => setHeight(window.innerHeight - heightTopBar - titleBarHeight);
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
 	const parentRef = useRef(null);
 	const rowVirtualizer = useVirtualizer({
-		count: lisMembers.length,
+		count: lisMembers.users.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 48,
 		overscan: 5
@@ -49,7 +106,7 @@ const ListMember = (props: ListMemberProps) => {
 				}}
 			>
 				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-					const user = lisMembers[virtualRow.index];
+					const user = lisMembers.users[virtualRow.index];
 					return (
 						<div
 							key={virtualRow.index}
@@ -63,24 +120,16 @@ const ListMember = (props: ListMemberProps) => {
 							}}
 						>
 							<div className="flex items-center px-4 h-full">
-								{'onlineSeparate' in user ? (
+								{typeof user === 'object' && 'onlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Member - {onlineCount}
+										Member - {lisMembers.onlineCount}
 									</p>
-								) : 'offlineSeparate' in user ? (
+								) : typeof user === 'object' && 'offlineSeparate' in user ? (
 									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Offline - {offlineCount}
+										Offline - {lisMembers.offlineCount}
 									</p>
 								) : (
-									<MemberItem
-										name={user.clan_nick || user?.user?.display_name || user?.user?.username}
-										user={user}
-										key={user?.user?.id}
-										listProfile={true}
-										isOffline={!user?.user?.online}
-										positionType={MemberProfileType.MEMBER_LIST}
-										isDM={false}
-									/>
+									<MemoizedMemberItem id={user} />
 								)}
 							</div>
 						</div>

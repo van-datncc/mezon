@@ -105,6 +105,9 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		window.close();
 	});
 	autoUpdater.quitAndInstall(true, true);
+	setTimeout(() => {
+		App.application.quit();
+	}, 10000);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
@@ -126,4 +129,3 @@ Main.initialize();
 // bootstrap app
 Main.bootstrapApp();
 Main.bootstrapAppEvents();
-

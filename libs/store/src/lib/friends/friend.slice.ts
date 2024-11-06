@@ -4,7 +4,6 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { Friend } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { StatusUserArgs } from '../channelmembers/channel.members';
-import { usersClanActions } from '../clanMembers/clan.members';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -70,11 +69,7 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 	if (!response.friends) {
 		return [];
 	}
-	const onlineStatus = response.friends.map((friend) => {
-		return { userId: friend.user?.id ?? '', online: friend.user?.online ?? false, isMobile: friend.user?.is_mobile ?? false };
-	});
 	const listFriends = response.friends.map(mapFriendToEntity);
-	thunkAPI.dispatch(usersClanActions.setManyStatusUser(onlineStatus));
 	return listFriends;
 });
 
@@ -153,30 +148,13 @@ export const friendsSlice = createSlice({
 			state.statusSentMobile = action.payload;
 		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
-			const allFriends = friendsAdapter.getSelectors().selectAll(state);
-			friendsAdapter.updateMany(
-				state,
-				allFriends.map((member) => {
-					const memberUpdate = action.payload.find((memberUpdate) => memberUpdate.userId === member.user?.id);
-					if (member.user?.id === memberUpdate?.userId) {
-						return {
-							id: member.id,
-							changes: {
-								...member,
-								user: {
-									...member.user,
-									online: memberUpdate?.online,
-									is_mobile: memberUpdate?.isMobile
-								}
-							}
-						};
-					}
-					return {
-						id: member.id,
-						changes: { ...member }
-					};
-				})
-			);
+			action.payload.forEach((statusUser) => {
+				const friend = state.entities[statusUser.userId];
+				if (friend?.user && statusUser) {
+					friend.user.online = statusUser.online;
+					friend.user.is_mobile = statusUser.isMobile;
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {

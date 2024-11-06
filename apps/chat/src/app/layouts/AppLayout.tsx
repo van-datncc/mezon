@@ -1,7 +1,7 @@
 import { ToastController } from '@mezon/components';
 import { fcmActions, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
-import { isWindowsDesktop, notificationService } from '@mezon/utils';
+import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,9 @@ const TitleBar = () => {
 	const handleMinimize = () => {
 		window.electron.send('TITLE_BAR_ACTION', 'MINIMIZE_WINDOW');
 	};
+	useEffect(() => {
+		document.body.classList.add('overflow-hidden');
+	}, []);
 
 	const handleMaximize = () => {
 		window.electron.send('TITLE_BAR_ACTION', 'MAXIMIZE_WINDOW');
@@ -27,8 +30,7 @@ const TitleBar = () => {
 	};
 
 	return (
-		<header id="titlebar" className={`dark:bg-bgTertiary bg-bgLightTertiary`}
-			onDoubleClick={handleDoubleClick}>
+		<header id="titlebar" className={`dark:bg-bgTertiary bg-bgLightTertiary`} onDoubleClick={handleDoubleClick}>
 			<div id="drag-region">
 				<div className="dark:text-white text-colorTextLightMode ml-3 text-[15.15px] leading-[26.58px] font-semibold text-[#FFFFFF]">
 					Mezon
@@ -109,7 +111,7 @@ const AppLayout = () => {
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">
-				{isWindowsDesktop && <TitleBar />}
+				{(isWindowsDesktop || isLinuxDesktop) && <TitleBar />}
 				<ToastController />
 				<Outlet />
 			</div>

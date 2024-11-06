@@ -21,6 +21,7 @@ const heightMessageViewChatDM = `calc(100vh - ${topBarHeight})`;
 const heightMessageViewChatThread = `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`;
 const heightWithoutTopBar = `calc(100vh - ${topBarHeight})`;
 const heightWithoutTopBarMobile = `calc(100vh)`;
+const messageViewChatDM = `calc(100vh - 60px)`;
 
 const plugin = require('tailwindcss/plugin');
 
@@ -93,11 +94,11 @@ module.exports = {
         "9/10": "90%",
         heightTitleBar: `calc(100vh - ${titleBarHeight})`,
         heightTitleBarMessageViewChat: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
-        heightTitleBarMessageViewChatMobile: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
-        heightTitleBarMessageViewChatDM: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
-        heightTitleBarMessageViewChatThread: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
-        heightTitleBarWithoutTopBar: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
-        heightTitleBarWithoutTopBarMobile: `calc(${heightMessageViewChat} - ${titleBarHeight})`
+        heightTitleBarMessageViewChatMobile: `calc(${heightMessageViewChatMobile} - ${titleBarHeight})`,
+        heightTitleBarMessageViewChatDM: `calc(${heightMessageViewChatDM} - ${titleBarHeight})`,
+        heightTitleBarMessageViewChatThread: `calc(${heightMessageViewChatThread} - ${titleBarHeight})`,
+        heightTitleBarWithoutTopBar: `calc(${heightWithoutTopBar} - ${titleBarHeight})`,
+        heightTitleBarWithoutTopBarMobile: `calc(${heightWithoutTopBarMobile} - ${titleBarHeight})`
       },
 
       maxWidth: {
@@ -112,7 +113,8 @@ module.exports = {
         '4/5': '80%',
         '9/10': "90%",
         heightInBox: `calc(100vh - 168px)`,
-        messageViewChatDM: `calc(100vh - 60px)`,
+        messageViewChatDM: messageViewChatDM,
+        titleBarMessageViewChatDM: `calc(${messageViewChatDM} - ${titleBarHeight})`,
         listMemberRole: `calc(100vh - 225px)`,
         "50vh": "50vh"
       },

@@ -78,7 +78,9 @@ export default class App {
 			height: height,
 			show: false,
 			frame: false,
-			titleBarOverlay: process.platform === 'darwin',
+			titleBarOverlay: process.platform == 'darwin' ? true : false,
+			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
+			trafficLightPosition: process.platform == 'darwin' ? { x: 15, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
@@ -228,6 +230,14 @@ export default class App {
 
 	/*
 	private static setupWindowManager() {
+		if (process.platform === 'darwin') {
+			const permissionGranted = windowManager.requestAccessibility();
+			if (!permissionGranted) {
+				console.warn('Accessibility permission is required for this application to work correctly on macOS.');
+				return;
+			}
+		}
+
 		const windowInfoArray = [];
 		let defaultApp = null;
 		const usageThreshold = 30 * 60 * 1000;
@@ -239,8 +249,9 @@ export default class App {
 			windowInfoArray.length = 0;
 			windowManager.getWindows().forEach((window) => {
 				if (window.isVisible()) {
-					const fullPath = window.path.split('\\').pop();
-					const appName = fullPath.replace(/\.exe$/, '');
+					const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
+					const fullPath = window.path.split(pathDelimiter).pop();
+					const appName = fullPath.replace(/\.(exe|app)$/, '');
 					const windowTitle = window.getTitle();
 
 					if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName as EActivities)) {
@@ -258,12 +269,13 @@ export default class App {
 		}
 
 		windowManager.on('window-activated', (window) => {
-			const fullPath = window.path.split('\\').pop();
-			const appName = fullPath.replace(/\.exe$/, '');
+			const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
+			const fullPath = window.path.split(pathDelimiter).pop();
+			const appName = fullPath.replace(/\.(exe|app)$/, '');
 			const windowTitle = window.getTitle();
 			const startTime = new Date().toISOString();
 
-			if (defaultApp) {
+			if (defaultApp && defaultApp?.appName) {
 				if (isFirstRun) {
 					App.mainWindow.webContents.send(ACTIVE_WINDOW, { ...defaultApp, startTime });
 					hasSentDefaultApp = true;
@@ -278,13 +290,20 @@ export default class App {
 
 			if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && !isFirstRun) {
 				if (activityTimeout) {
-					clearTimeout(activityTimeout);
+					clearInterval(activityTimeout);
 				}
 
-				activityTimeout = setTimeout(() => {
+				activityTimeout = setInterval(() => {
 					const newWindowTitle = window.getTitle();
 					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
 						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
+						hasSentDefaultApp = false;
+					}
+
+					if (!newWindowTitle) {
+						isFirstRun = true;
+						defaultApp = {};
+						clearInterval(activityTimeout);
 						hasSentDefaultApp = false;
 					}
 
@@ -295,7 +314,8 @@ export default class App {
 				}, usageThreshold);
 			}
 		});
-	}*/
+	}
+  */
 
 	private static setupMenu() {
 		const isMac = process.platform === 'darwin';
@@ -345,15 +365,15 @@ export default class App {
 					{ role: 'paste' },
 					...(isMac
 						? ([
-							{ role: 'pasteAndMatchStyle' },
-							{ role: 'delete' },
-							{ role: 'selectAll' },
-							{ type: 'separator' },
-							{
-								label: 'Speech',
-								submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
-							}
-						] as MenuItemConstructorOptions[])
+								{ role: 'pasteAndMatchStyle' },
+								{ role: 'delete' },
+								{ role: 'selectAll' },
+								{ type: 'separator' },
+								{
+									label: 'Speech',
+									submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+								}
+							] as MenuItemConstructorOptions[])
 						: ([{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }] as MenuItemConstructorOptions[]))
 				]
 			},

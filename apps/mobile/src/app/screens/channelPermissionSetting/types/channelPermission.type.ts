@@ -1,11 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ChannelMembersEntity, ChannelsEntity, PermissionUserEntity, RolesClanEntity, UsersClanEntity } from '@mezon/store-mobile';
+import { IChannel } from '@mezon/utils';
 import { RefObject } from 'react';
 import { EAdvancedPermissionSetting, EOverridePermissionType, EPermissionStatus } from './channelPermission.enum';
 
 export interface IMemberItemProps {
 	member: ChannelMembersEntity | UsersClanEntity;
-	channelId?: string;
+	channel?: IChannel;
 	isCheckbox?: boolean;
 	isChecked?: boolean;
 	isAdvancedSetting?: boolean;

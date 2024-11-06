@@ -4,7 +4,7 @@ import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
-	selectAllChannelMembers,
+	selectAllUserChannel,
 	selectAllUserClans,
 	selectEveryoneRole,
 	selectRolesByChannelId,
@@ -39,7 +39,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel?.channel_id as string));
+	const listOfChannelMember = useAppSelector(selectAllUserChannel);
 
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));
@@ -50,7 +50,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			return listOfChannelMember;
 		}
 		return [clanOwner];
-	}, [listOfChannelMember, channel?.channel_private, clanOwner]);
+	}, [channel?.channel_private, clanOwner, listOfChannelMember]);
 
 	const availableRoleList = useMemo(() => {
 		if (channel?.channel_private) {
@@ -116,7 +116,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			}
 			switch (type) {
 				case EOverridePermissionType.Member:
-					return <MemberItem member={item} channelId={channel?.channel_id} />;
+					return <MemberItem member={item} channel={channel} />;
 				case EOverridePermissionType.Role:
 					return <RoleItem role={item} channel={channel} />;
 				default:

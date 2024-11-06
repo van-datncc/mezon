@@ -15,7 +15,10 @@ import {
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
+import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
+import OnBoardWelcome from 'libs/components/src/lib/components/ChatWelcome/OnBoardWelcome';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -23,6 +26,7 @@ export type MessageProps = {
 	channelId: string;
 	messageId: string;
 	previousMessageId: string;
+	nextMessageId?: string;
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
@@ -54,6 +58,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	userName,
 	isLastSeen,
 	previousMessageId,
+	nextMessageId,
 	checkMessageTargetToMoved,
 	messageReplyHighlight
 }: Readonly<MessageProps>) => {
@@ -103,8 +108,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	})();
 
 	const popup = useCallback(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} />;
-	}, [message, handleContextMenu, isCombine]);
+		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} mode={mode} />;
+	}, [message, handleContextMenu, isCombine, mode]);
 
 	useEffect(() => {
 		markMessageAsSeen(message);
@@ -112,6 +117,11 @@ export const ChannelMessage: ChannelMessageComponent = ({
 
 	return (
 		<>
+			{message.code === TypeMessage.Indicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
+				<div className="pb-10">
+					<OnBoardWelcome nextMessageId={nextMessageId} />
+				</div>
+			)}
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 			{!message.isFirst && (

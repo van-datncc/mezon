@@ -1,8 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity } from '@mezon/store-mobile';
+import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, selectCurrentChannelId, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
@@ -11,11 +10,12 @@ import React, { useCallback, useContext, useMemo, useRef, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../screens/home/homedrawer/components/InviteToChannel';
 import { threadDetailContext } from '../ThreadDetail/MenuThreadDetail';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
-import { MemberItem } from './MemberItem';
+import { MemoizedMemberItem } from './MemberItem';
 import style from './style';
 
 enum EActionButton {
@@ -28,7 +28,25 @@ export const MemberListStatus = React.memo(() => {
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannel?.id });
+	const members = useSelector(selectClanMemberWithStatusIds);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId));
+	const lisMembers = useMemo(() => {
+		if (!userChannels || !members) {
+			return {
+				onlineMembers: [],
+				offlineMembers: []
+			};
+		}
+		const users = new Map(userChannels.map((item) => [item.id, true]));
+		return {
+			onlineMembers: members.online.filter((m) => users.has(m)),
+			offlineMembers: members.offline.filter((m) => users.has(m))
+		};
+	}, [members, userChannels]);
+
+	const { onlineMembers, offlineMembers } = lisMembers;
+
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -56,17 +74,8 @@ export const MemberListStatus = React.memo(() => {
 		setSelectedUser(user);
 	}, []);
 
-	const renderMemberItem = ({ item, index }) => {
-		return (
-			<MemberItem
-				onPress={handleUserPress}
-				user={item}
-				key={`memberItem[${item?.user?.id}][${index}]`}
-				isOffline={!item?.user?.online}
-				currentChannel={currentChannel}
-				isDMThread={isDMThread}
-			/>
-		);
+	const renderMemberItem = ({ item }) => {
+		return <MemoizedMemberItem onPress={handleUserPress} id={item} currentChannel={currentChannel} isDMThread={isDMThread} />;
 	};
 
 	return (
@@ -113,7 +122,7 @@ export const MemberListStatus = React.memo(() => {
 						<View style={styles.box}>
 							<FlashList
 								data={onlineMembers}
-								keyExtractor={(user, index) => `channelOnlineMember[${user?.id}][${index}]`}
+								keyExtractor={(user, index) => `channelOnlineMember[${user}][${index}]`}
 								renderItem={renderMemberItem}
 								estimatedItemSize={size.s_80}
 								nestedScrollEnabled
@@ -127,7 +136,7 @@ export const MemberListStatus = React.memo(() => {
 						<View style={styles.box}>
 							<FlashList
 								data={offlineMembers}
-								keyExtractor={(user, index) => `channelOfflineMember[${user?.id}][${index}]`}
+								keyExtractor={(user, index) => `channelOfflineMember[${user}][${index}]`}
 								renderItem={renderMemberItem}
 								estimatedItemSize={size.s_80}
 								nestedScrollEnabled
