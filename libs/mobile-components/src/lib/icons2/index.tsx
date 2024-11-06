@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
+import { Circle, ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
 
 export const ActivityIcon = ({ width, height, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
@@ -1800,6 +1800,47 @@ export const FavoriteFilledIcon = ({ width = 30, height = 30, color = 'white', .
 	</Svg>
 );
 
+export const VisualStudioCode = ({ defaultFill = '#AEAEAE', defaultSize = 24 }) => {
+	return (
+		<Svg width={defaultSize} height={defaultSize} viewBox="0 0 24 24" fill="none">
+			<Path
+				fill="#1677C7"
+				d="M2.419 13.939l3.434-2.589L12 17l3-1.456V4.456L12 3 5.853 8.65 2.418 6.062 1 6.889 4.385 10 1 13.111l1.419.828zM12 6.717v6.566L7.644 10 12 6.717z"
+			/>
+			<Path fill="#1677C7" d="M18 19.484 0 17.939v.561L18 24l6-2.5v-19L18 0z" />
+		</Svg>
+	);
+};
+
+export const Spotify = ({ defaultFill = '#AEAEAE', defaultSize = 40 }) => {
+	return (
+		<Svg width={defaultSize} height={defaultSize} viewBox="0 0 40 40" fill="none">
+			<Circle cx="20" cy="20" r="16" fill="#1ed35a" />
+			<Path
+				d="M31 18.5c-.2 0-.4 0-.7-.1-3.3-1.6-6.8-2.5-10.5-2.8-3.2-.2-6.4.1-9.5.9-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8 3.4-.9 7-1.3 10.5-1 4 .3 7.9 1.3 11.5 3.1.7.4 1.1 1.3.7 2C32.1 18.2 31.6 18.5 31 18.5zM28.9 23c-.2 0-.4 0-.5-.1-2.6-1.4-5.5-2.3-8.5-2.6-2.8-.3-5.8 0-8.5.9-.6.2-1.2-.2-1.4-.7-.2-.6.2-1.2.7-1.4 3-.9 6.2-1.2 9.3-.9 3.3.3 6.5 1.3 9.3 2.8.5.3.7 1 .4 1.5-.3.4-.7.6-1.1.6zM26.7 27.5c-.2 0-.3 0-.4-.1-1.1-.8-2.4-1.4-3.7-1.9-4.3-1.5-8.4-.8-11 0-.4.1-.9-.1-1-.5-.1-.4.1-.9.5-1 2.9-.9 7.3-1.7 12.1 0 1.4.5 2.8 1.2 4 2 .4.2.5.7.2 1.1-.2.2-.4.4-.7.4z"
+				fill="#AEAEAE"
+			/>
+		</Svg>
+	);
+};
+export const LoLGame = ({ defaultFill = '#AEAEAE', defaultSize = 30 }) => {
+	return (
+		<Svg width={defaultSize} height={defaultSize * (32 / 30)} viewBox="0 0 30 32" fill="none">
+			<G>
+				<Path d="M1.80644 9.75049C0.655032 11.8373 0 14.2271 0 16.7683C0 19.3095 0.655032 21.7015 1.80644 23.7883V9.75049Z" fill="#C28F2C" />
+				<Path
+					d="M15 2.02222C13.7829 2.02222 12.602 2.16921 11.4688 2.43647V4.75718C12.5907 4.44093 13.7738 4.26721 15 4.26721C22.0218 4.26721 27.7153 9.84627 27.7153 16.7305C27.7153 19.8307 26.5571 22.6659 24.6464 24.8463L24.2838 26.118L23.4814 28.9331C27.4184 26.2761 30.0023 21.8195 30.0023 16.7705C30 8.62355 23.2843 2.02222 15 2.02222Z"
+					fill="#C28F2C"
+				/>
+				<Path
+					d="M11.4688 24.4209H22.9737H23.2253C25.1723 22.4209 26.3713 19.7126 26.3713 16.7305C26.3713 10.5746 21.2806 5.58569 15 5.58569C13.767 5.58569 12.5816 5.78168 11.4688 6.1358V24.4209Z"
+					fill="#C28F2C"
+				/>
+				<Path d="M10.1088 0H1.55029L3.16634 3.29844V28.7038L1.55029 32H21.1922L22.9737 25.7572H10.1088V0Z" fill="#C28F2C" />
+			</G>
+		</Svg>
+	);
+};
 export const Forum = ({ defaultFill = '#AEAEAE', defaultSize = 20 }) => {
 	return (
 		<View style={{ width: defaultSize, height: defaultSize }}>

@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectStreamChannelByChannelId } from '@mezon/store-mobile';
 import { default as React, memo, useRef, useState } from 'react';

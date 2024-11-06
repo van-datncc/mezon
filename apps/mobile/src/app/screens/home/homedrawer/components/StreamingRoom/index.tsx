@@ -1,23 +1,10 @@
 import { useAuth } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	changeClan,
-	getUpdateOrAddClanChannelCache,
-	Icons,
-	jumpToChannel,
-	load,
-	remove,
-	save,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_PREVIOUS_CHANNEL
-} from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
-import { selectCurrentClanId } from '@mezon/store-mobile';
-import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, SafeAreaView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../componentUI';
