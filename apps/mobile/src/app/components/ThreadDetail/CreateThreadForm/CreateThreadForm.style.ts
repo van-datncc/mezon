@@ -10,8 +10,8 @@ export const style = (colors: Attributes) =>
 			position: 'relative'
 		},
 		createChannelContent: {
-			position: 'absolute',
-			bottom: 0,
+			flex: 1,
+			backgroundColor: colors.primary,
 			width: '100%'
 		},
 		createChannelIcon: {
