@@ -222,11 +222,11 @@ function MessageWithUser({
 		<>
 			{showDivider && <MessageDateDivider message={message} />}
 			{!shouldNotRender && (
-				<HoverStateWrapper popup={popup}>
+				<HoverStateWrapper isSearchMessage={isSearchMessage} popup={popup}>
 					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
 						<div className="relative rounded-sm overflow-visible">
-							<div className={!isMessageSystem ? childDivClass : ''}></div>
-							<div className={!isMessageSystem ? parentDivClass : ''}>
+							<div className={!isMessageSystem ? childDivClass : 'absolute w-0.5 h-full left-0'}></div>
+							<div className={!isMessageSystem ? parentDivClass : 'flex h-15 flex-col w-auto px-3 pt-[2px]'}>
 								{checkMessageHasReply && (
 									<MessageReply
 										message={message}
@@ -306,8 +306,9 @@ function MessageDateDivider({ message }: { message: MessagesEntity }) {
 interface HoverStateWrapperProps {
 	children: ReactNode;
 	popup?: () => ReactNode;
+	isSearchMessage?: boolean;
 }
-const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }) => {
+const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage }) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 	const isScrolling = useRef(false);
@@ -332,7 +333,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }
 		}, 100);
 	};
 	return (
-		<div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+		<div className={isSearchMessage ? 'w-full' : ''} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 			{children}
 			{isHover && popup && popup()}
 		</div>

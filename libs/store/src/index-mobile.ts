@@ -16,6 +16,7 @@ export * from './lib/channels/channels.slice';
 export * from './lib/channels/hashtagDm.slice';
 export * from './lib/channels/listUsers.slice';
 export * from './lib/clanMembers/clan.members';
+export * from './lib/clanMembers/clan.members.meta';
 export * from './lib/clanProfile/clanProfile.slice';
 export * from './lib/clans/clanSettingChannel.slice';
 export * from './lib/clans/clans.slice';

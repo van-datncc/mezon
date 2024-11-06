@@ -1,5 +1,6 @@
 import { useAppParams, useMenu } from '@mezon/core';
 import { channelsActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,7 +12,7 @@ type ListDMChannelProps = {
 };
 
 const heightAroundComponent = 230;
-
+const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
 const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -21,10 +22,10 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const streamPlay = useSelector(selectStatusStream);
 
-	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
+	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
 
 	useEffect(() => {
-		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
+		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
 		updateHeight();
 		window.addEventListener('resize', updateHeight);
 		return () => window.removeEventListener('resize', updateHeight);
@@ -90,7 +91,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 								isActive={isActive}
 								navigateToFriends={() => navigate(`/chat/direct/friends`)}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								joinToChatAndNavigate={isActive ? () => {} : joinToChatAndNavigate}
+								joinToChatAndNavigate={isActive ? () => { } : joinToChatAndNavigate}
 							/>
 						</div>
 					);

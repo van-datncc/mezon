@@ -377,11 +377,6 @@ export const selectMemberIdsByChannelId = createSelector(
 	}
 );
 
-export const selectMemberOnlineStatusById = createSelector(
-	[getUsersClanState, (state, userId: string) => userId],
-	(getUsersClanState, userId) => getUsersClanState.entities[userId]?.user?.online || false
-);
-
 export const selectMemberCustomStatusById = createSelector(
 	[
 		getUsersClanState,

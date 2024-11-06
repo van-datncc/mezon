@@ -35,12 +35,14 @@ export async function clearLogsIfNewDay() {
 		const db = await initDB();
 		const tx = db.transaction(STORE_NAME, 'readwrite');
 		const key = (await tx.store.getAllKeys())?.[0];
-		const log = await tx.store.get(key);
-		if (log) {
-			const logDate = new Date(log.timestamp).toDateString();
-			const currentDate = new Date().toDateString();
-			if (logDate !== currentDate) {
-				tx.store.clear();
+		if (key) {
+			const log = await tx.store.get(key);
+			if (log) {
+				const logDate = new Date(log.timestamp).toDateString();
+				const currentDate = new Date().toDateString();
+				if (logDate !== currentDate) {
+					tx.store.clear();
+				}
 			}
 		}
 
@@ -76,7 +78,8 @@ export enum LogType {
 	PushNotification = 'push_notification',
 	DisconnectSocket = 'disconnect_socket',
 	ReconnectSocket = 'reconnect_socket',
-	NewMessage = 'new_message'
+	NewMessage = 'new_message',
+	NewMessageCleanUp = 'new_message_cleanup'
 }
 
 clearLogsIfNewDay();
