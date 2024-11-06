@@ -5,12 +5,13 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		modalContainer: {
 			backgroundColor: colors.secondaryLight,
-			padding: size.s_10,
+			paddingVertical: size.s_10,
+			paddingHorizontal: size.s_14,
 			borderRadius: size.s_16
 		},
 		headerText: {
 			color: colors.white,
-			fontSize: size.label,
+			fontSize: size.s_18,
 			fontWeight: '500'
 		},
 		modalHeader: {
