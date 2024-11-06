@@ -10,13 +10,21 @@ interface IDeleteWebhookPopupProps {
 	closeShowPopup: () => void;
 	webhookItem: ApiWebhook;
 	currentChannel?: IChannel;
+	isClanSetting?: boolean;
 }
 
-const DeleteWebhookPopup = ({ toggleShowPopup, webhookItem, currentChannel, closeShowPopup }: IDeleteWebhookPopupProps) => {
+const DeleteWebhookPopup = ({ toggleShowPopup, webhookItem, currentChannel, closeShowPopup, isClanSetting }: IDeleteWebhookPopupProps) => {
 	const dispatch = useAppDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const handleDeleteWebhook = (webhook: ApiWebhook) => {
-		dispatch(deleteWebhookById({ webhook: webhook, channelId: currentChannel?.channel_id as string, clanId: currentClan?.clan_id as string }));
+		dispatch(
+			deleteWebhookById({
+				webhook: webhook,
+				channelId: currentChannel?.channel_id as string,
+				clanId: currentClan?.clan_id as string,
+				isClanSetting: isClanSetting
+			})
+		);
 	};
 
 	const isChildModal = useSelector(hasGrandchildModal);
