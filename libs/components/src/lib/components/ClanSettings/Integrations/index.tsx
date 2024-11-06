@@ -8,9 +8,10 @@ import Webhooks from './Webhooks';
 
 interface IIntegrationsProps {
 	currentChannel?: IChannel;
+	isClanSetting?: boolean;
 }
 
-const Integrations = ({ currentChannel }: IIntegrationsProps) => {
+const Integrations = ({ currentChannel, isClanSetting }: IIntegrationsProps) => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
 	const allWebhooks = useSelector(selectAllWebhooks);
 	return (
@@ -33,7 +34,7 @@ const Integrations = ({ currentChannel }: IIntegrationsProps) => {
 			</h2>
 
 			{isOpenWebhooks ? (
-				<Webhooks allWebhooks={allWebhooks} currentChannel={currentChannel} />
+				<Webhooks isClanSetting={isClanSetting} allWebhooks={allWebhooks} currentChannel={currentChannel} />
 			) : (
 				<MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />
 			)}

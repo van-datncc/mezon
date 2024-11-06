@@ -33,7 +33,16 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		[listChannelSearch]
 	);
 	const listTextChannel = useMemo(
-		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
+		() =>
+			listChannelSearch?.filter((channel) =>
+				[
+					ChannelType.CHANNEL_TYPE_TEXT,
+					ChannelType.CHANNEL_TYPE_THREAD,
+					ChannelType.CHANNEL_TYPE_APP,
+					ChannelType.CHANNEL_TYPE_ANNOUNCEMENT,
+					ChannelType.CHANNEL_TYPE_FORUM
+				].includes(channel?.type)
+			),
 		[listChannelSearch]
 	);
 	const listStreamingChannel = useMemo(

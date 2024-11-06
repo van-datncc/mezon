@@ -1,19 +1,19 @@
-import { convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
-import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById, useAppDispatch } from '@mezon/store-mobile';
-import { IExtendedMessage } from '@mezon/utils';
+import { useAppDispatch, useAppSelector } from '@mezon/store';
+import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
+import { IExtendedMessage, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
+import { TypingDmItem } from './TypingDMItem';
 import { style } from './styles';
-import { TypingDmItem } from './TypingDmItem';
 
 export const DmListItem = React.memo((props: { id: string; navigation: any; onLongPress; onPress? }) => {
 	const { themeValue } = useTheme();
@@ -25,6 +25,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const isTabletLandscape = useTabletLandscape();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
+	const [hiddenFlag, setHiddenFlag] = useState(false);
 
 	const redirectToMessageDetail = async () => {
 		await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -45,7 +46,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
 		const usernameList = directMessage?.channel_label?.split?.(',') || [];
-
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
 			username: username
@@ -96,6 +96,22 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 		}
 		return null;
 	}, [directMessage]);
+
+	useEffect(() => {
+		const searchDMListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SEARCH_DM, ({ searchText }) => {
+			if (searchText && !normalizeString(directMessage?.channel_label || directMessage?.usernames)?.includes(normalizeString(searchText))) {
+				setHiddenFlag(true);
+			} else {
+				setHiddenFlag(false);
+			}
+		});
+
+		return () => {
+			searchDMListener.remove();
+		};
+	}, [directMessage?.channel_label, directMessage?.usernames]);
+
+	if (hiddenFlag) return null;
 
 	return (
 		<TouchableOpacity

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { ActionEmitEvent, ReplyIcon, ReplyMessageDeleted, validLinkInviteRegex } from '@mezon/mobile-components';
+import { ActionEmitEvent, ReplyIcon, ReplyMessageDeleted, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
@@ -16,12 +16,12 @@ import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import RenderMessageBlock from './RenderMessageBlock';
 import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
-import RenderMessageInvite from './components/RenderMessageInvite';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -65,6 +65,10 @@ const MessageItem = React.memo(
 
 		const isInviteLink = useMemo(() => {
 			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
+		}, [contentMessage, lk]);
+
+		const isGoogleMapsLink = useMemo(() => {
+			return Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
 		}, [contentMessage, lk]);
 		const userProfile = useSelector(selectAllAccount);
 		const timeoutRef = useRef<NodeJS.Timeout>(null);
@@ -352,8 +356,8 @@ const MessageItem = React.memo(
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
 							<Block opacity={message.isError || message?.isErrorRetry ? 0.6 : 1}>
-								{isInviteLink ? (
-									<RenderMessageInvite content={contentMessage} />
+								{isInviteLink || isGoogleMapsLink ? (
+									<RenderMessageBlock message={message} isGoogleMapsLink={isGoogleMapsLink} isInviteLink={isInviteLink} />
 								) : (
 									<RenderTextMarkdownContent
 										content={{
