@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, usePathMatch } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannels } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -45,9 +45,6 @@ function ChannelList() {
 }
 
 const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity | null }) => {
-	const memberPath = `/chat/clans/${currentClan?.id}/member-safety`;
-	const channelSettingPath = `/chat/clans/${currentClan?.id}/channel-setting`;
-	const { isMemberPath, isSettingPath } = usePathMatch({ isMemberPath: memberPath, isSettingPath: channelSettingPath });
 	return (
 		<>
 			{currentClan?.banner && (
@@ -56,7 +53,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 				</div>
 			)}
 			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
-				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
+				<Events />
 			</div>
 		</>
 	);
@@ -98,7 +95,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			const clanFooterEle = document.getElementById('clan-footer');
 			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
 			const outsideHeight = totalHeight;
-			const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
+			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
 		};
 		calculateHeight();
@@ -227,8 +224,8 @@ const FavoriteChannelsSection = ({
 			<div className="w-[94%] mx-auto">
 				{channelFavorites
 					? channelFavorites.map((id, index) => (
-						<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-					))
+							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+						))
 					: ''}
 			</div>
 		) : null}

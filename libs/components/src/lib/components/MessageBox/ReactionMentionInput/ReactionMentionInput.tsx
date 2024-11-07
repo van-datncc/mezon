@@ -677,15 +677,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				onPaste={(event) => {
 					event.preventDefault();
 					let pastedText = event.clipboardData.getData('text');
-
-					while (pastedText.includes('\r\n')) {
-						pastedText = pastedText.replace('\r\n', '\n');
-					}
-
-					while (pastedText.includes('\r')) {
-						pastedText = pastedText.replace('\r', '\n');
-					}
-
+					pastedText = pastedText.replace(/\r\n|\r/g, '\n');
 					setPastedContent(pastedText);
 				}}
 				onPasteCapture={props.handlePaste}
