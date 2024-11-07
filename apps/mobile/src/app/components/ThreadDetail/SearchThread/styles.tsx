@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 		},
 		searchInput: {
 			color: colors.text,
-			fontSize: size.small,
+			fontSize: size.medium,
+			height: size.s_50,
 			flex: 1
 		}
 	});
