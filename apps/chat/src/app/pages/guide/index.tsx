@@ -1,19 +1,34 @@
 import { GuideBody } from '@mezon/components';
 import { useMemberContext } from '@mezon/core';
+import { selectCurrentClan } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
 function GuideMain() {
 	const { clanOwner } = useMemberContext();
+	const currentClan = useSelector(selectCurrentClan);
 
 	return (
 		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll  scrollbar-hide flex flex-col items-center">
 			<div className="flex flex-col w-[104%]">
-				<div className="h-36 w-full rounded-lg object-cover bg-slate-700" />
+				<div
+					className={`h-36 w-full object-cover ${currentClan?.banner ? '' : 'bg-bgModalDark'} rounded-xl flex items-center justify-center`}
+				>
+					{currentClan?.banner ? <img src={currentClan.banner} className="w-full h-full object-cover  rounded-xl" /> : null}
+				</div>
 			</div>
-			<div className="flex flex-col w-full h-28 relative justify-end">
-				<div className="absolute -top-10 h-24 w-24 rounded-3xl object-cover shadow-sm bg-slate-500" />
-				<div className=" flex gap-3 items-center">
+			<div className="flex flex-col w-full relative justify-end pt-2">
+				<div
+					className={`absolute -top-12 h-28 w-28 rounded-3xl object-cover shadow-sm ${currentClan?.logo ? '' : 'bg-zinc-950'} flex items-center justify-center`}
+				>
+					{currentClan?.logo ? (
+						<img src={currentClan.logo} className="w-full h-full object-cover  rounded-3xl" />
+					) : (
+						<p className="text-white text-4xl font-bold">{currentClan?.clan_name?.charAt(0)}</p>
+					)}
+				</div>
+				<div className=" flex gap-3 items-end h-28">
 					<div className="text-[32px] font-bold leading-8">
-						{clanOwner.clan_nick ?? clanOwner.user?.display_name ?? clanOwner.user?.username}'s clan
+						{currentClan?.clan_name ?? `${clanOwner.user?.display_name ?? clanOwner.user?.username}'s`} clan
 					</div>
 					<div className="relative h-6 w-6">
 						<svg className="absolute" role="img" width="24" height="24" viewBox="0 0 16 15.2">
