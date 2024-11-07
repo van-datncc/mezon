@@ -1,4 +1,4 @@
-import { addBotChat, clansActions, selectAllAccount, selectClanByUserId, useAppDispatch } from '@mezon/store';
+import { addBotChat, clansActions, selectAllAccount, selectAllClans, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -130,7 +130,7 @@ type SelectClanProps = {
 export const SelectClan = memo((props: SelectClanProps) => {
 	const { userId, selectClan, setSelectClan } = props;
 	const dispatch = useAppDispatch();
-	const clans = useSelector(selectClanByUserId(userId || ''));
+	const clans = useSelector(selectAllClans);
 	useEffect(() => {
 		dispatch(clansActions.fetchClans());
 	}, []);
