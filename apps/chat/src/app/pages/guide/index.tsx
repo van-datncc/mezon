@@ -1,3 +1,4 @@
+import { GuideBody } from '@mezon/components';
 import { useMemberContext } from '@mezon/core';
 
 function GuideMain() {
@@ -42,7 +43,9 @@ function GuideMain() {
 					</div>
 				</div>
 			</div>
-			<div className="pt-8"></div>
+			<div className="pt-8 w-full">
+				<GuideBody />
+			</div>
 		</div>
 	);
 }
