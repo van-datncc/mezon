@@ -1,6 +1,7 @@
 import { referencesActions, selectGeolocation } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import ShareLocation from './ShareLocation';
@@ -27,9 +28,10 @@ const ShareLocationConfirmModal = ({ mode, channelId }: { mode: ChannelStreamMod
 			animationIn={'bounceIn'}
 			animationOut={'bounceOut'}
 			hasBackdrop={true}
-			coverScreen={true}
 			avoidKeyboard={false}
 			backdropColor={'rgba(0,0,0, 0.7)'}
+			coverScreen={false}
+			deviceHeight={Dimensions.get('screen').height}
 		>
 			<ShareLocation oncancel={handelCancelModal} mode={mode} channelId={channelId} geoLocation={geoLocation} />
 		</Modal>
