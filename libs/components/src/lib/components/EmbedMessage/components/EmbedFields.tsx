@@ -33,9 +33,9 @@ export function EmbedFields({ fields }: EmbedFieldsProps) {
 				<div key={index} className={`grid gap-4 ${row.length === 1 ? 'grid-cols-1' : row.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
 					{row.map((field, index) => (
 						<div key={index} className={`${field.inline ? `col-span-${3 / row.length}` : 'col-span-3'}`}>
-							<div className="text-gray-300 font-semibold text-sm">{field.name}</div>
+							<div className="font-semibold text-sm">{field.name}</div>
 
-							<div className="text-gray-300 text-sm">{field.value}</div>
+							<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
 						</div>
 					))}
 				</div>
