@@ -11,7 +11,8 @@
         "newGroup": "New Group",
         "addMembers": "Add Members",
         "share": "Share",
-        "appearance": "Appearance"
+        "appearance": "Appearance",
+        "chat": "Chat"
     },
     "headerRight": {
         "addFriends": "Add Friends"
