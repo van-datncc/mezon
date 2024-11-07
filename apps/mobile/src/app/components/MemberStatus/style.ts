@@ -12,7 +12,7 @@ export const style = (colors: Attributes) =>
 		text: {
 			backgroundColor: colors.secondary,
 			color: colors.text,
-			marginTop: size.s_10,
+			marginTop: size.s_10
 		},
 
 		box: {

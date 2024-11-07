@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, selectCurrentChannelId, useAppSelector } from '@mezon/store-mobile';
+import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';

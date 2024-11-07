@@ -1,13 +1,12 @@
 import { Metrics, size } from '@mezon/mobile-ui';
 import React from 'react';
-import { Dimensions, ImageBackground, ModalBaseProps, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ModalBaseProps, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Chase } from 'react-native-animated-spinkit';
 import codePush from 'react-native-code-push';
 import FastImage from 'react-native-fast-image';
 import Modal from 'react-native-modal';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import BG_LOGIN from '../../screens/settings/QRScanner/bgLoginQR.png';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import BG from './bgUpdateApp.png';
