@@ -9,12 +9,13 @@ import {
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
+	RootState,
 	selectCurrentClanId
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -25,6 +26,7 @@ import NotificationItem from './NotificationItem';
 import NotificationItemOption from './NotificationItemOption';
 import NotificationOption from './NotificationOption';
 import { style } from './Notifications.styles';
+import SkeletonNotification from './SkeletonNotification';
 import { EActionDataNotify, ENotifyBsToShow } from './types';
 
 const Notifications = () => {
@@ -33,6 +35,8 @@ const Notifications = () => {
 	const { notification, deleteNotify } = useNotification();
 	const [notify, setNotify] = useState<INotification>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
+	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
 
 	const { t } = useTranslation(['notification']);
 	const navigation = useNavigation();
@@ -197,8 +201,9 @@ const Notifications = () => {
 					</View>
 				</Pressable>
 			</View>
-
-			{notificationsFilter?.length > 0 ? (
+			{isLoading && !notificationsFilter?.length ? (
+				<SkeletonNotification numberSkeleton={8} />
+			) : notificationsFilter?.length ? (
 				<FlashList
 					data={notificationsFilter}
 					renderItem={({ item }) => {
@@ -213,6 +218,7 @@ const Notifications = () => {
 			) : (
 				<EmptyNotification />
 			)}
+
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize="md">
 				<NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabs} />
 			</MezonBottomSheet>
