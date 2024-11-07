@@ -27,8 +27,7 @@ export const MemberListStatus = React.memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const members = useSelector(selectClanMemberWithStatusIds);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId));
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.channel_id));
 	const lisMembers = useMemo(() => {
 		if (!userChannels || !members) {
 			return {
@@ -38,8 +37,8 @@ export const MemberListStatus = React.memo(() => {
 		}
 		const users = new Map(userChannels.map((item) => [item.id, true]));
 		return {
-			onlineMembers: members.online.filter((m) => users.has(m)),
-			offlineMembers: members.offline.filter((m) => users.has(m))
+			onlineMembers: members?.online?.filter((m) => users.has(m)),
+			offlineMembers: members?.offline?.filter((m) => users.has(m))
 		};
 	}, [members, userChannels]);
 
