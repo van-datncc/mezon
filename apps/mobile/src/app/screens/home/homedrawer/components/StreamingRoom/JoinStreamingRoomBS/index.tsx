@@ -3,7 +3,6 @@ import {
 	ActionEmitEvent,
 	Icons,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_PREVIOUS_CHANNEL,
 	changeClan,
 	getUpdateOrAddClanChannelCache,
 	jumpToChannel,
@@ -11,7 +10,7 @@ import {
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, selectClanById, useAppDispatch, videoStreamActions } from '@mezon/store';
-import { selectCurrentChannel, selectCurrentClanId, selectCurrentStreamInfo, selectStatusStream } from '@mezon/store-mobile';
+import { selectCurrentClanId, selectCurrentStreamInfo, selectStatusStream } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -31,13 +30,12 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 	const { dismiss } = useBottomSheetModal();
 	const { t } = useTranslation(['streamingRoom']);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
 	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
 
-	const handleJoinVoice = async () => {
+	const handleJoinVoice = () => {
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(appActions.setHiddenBottomTabMobile(true));
@@ -52,21 +50,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 						})
 					);
 				}
-
-				save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
-				const clanId = channel?.clan_id;
-				const channelId = channel?.channel_id;
-
-				if (currentClanId !== clanId) {
-					changeClan(clanId);
-				}
-				DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-					isFetchMemberChannelDM: true
-				});
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				await jumpToChannel(channelId, clanId);
-				dismiss();
+				joinChannel();
 			}
 		});
 	};
@@ -78,21 +62,24 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
 			});
-			save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
-			const clanId = channel?.clan_id;
-			const channelId = channel?.channel_id;
-
-			if (currentClanId !== clanId) {
-				changeClan(clanId);
-			}
-			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-				isFetchMemberChannelDM: true
-			});
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			await jumpToChannel(channelId, clanId);
-			dismiss();
+			joinChannel();
 		}
+	};
+
+	const joinChannel = async () => {
+		const clanId = channel?.clan_id;
+		const channelId = channel?.channel_id;
+
+		if (currentClanId !== clanId) {
+			changeClan(clanId);
+		}
+		DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+			isFetchMemberChannelDM: true
+		});
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+		await jumpToChannel(channelId, clanId);
+		dismiss();
 	};
 
 	return (
