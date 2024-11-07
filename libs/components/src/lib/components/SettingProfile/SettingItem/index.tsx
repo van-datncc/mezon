@@ -111,6 +111,18 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Advanced
 				</button>
+				<hr className="border-t border-solid border-borderDefault mt-4" />
+				<button className="pt-2 dark:text-[#84ADFF] text-black mt-4 font-bold text-sm tracking-wider">COMMUNITY</button>
+				<br />
+				<button
+					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'On Boarding' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					onClick={() => {
+						handleButtonClick('On Boarding');
+						onItemClick && onItemClick('On Boarding');
+					}}
+				>
+					On Boarding
+				</button>
 				<br />
 				<button
 					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium ${selectedButton === 'Log Out' ? 'bg-[#232E3B]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] `}

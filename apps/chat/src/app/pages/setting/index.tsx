@@ -1,4 +1,4 @@
-import { ExitSetting, SettingAccount, SettingAppearance, SettingItem, SettingRightProfile } from '@mezon/components';
+import { ExitSetting, SettingAccount, SettingAppearance, SettingItem, SettingOnBoarding, SettingRightProfile } from '@mezon/components';
 import { useEscapeKeyClose, useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -47,6 +47,7 @@ const Setting = ({ isDM }: settingProps) => {
 						)}
 						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} isDM={isDM} />}
 						{currentSetting === EUserSettings.APPEARANCE && <SettingAppearance menuIsOpen={menuIsOpen} />}
+						{currentSetting === EUserSettings.ON_BOARDING && <SettingOnBoarding menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={closeSetting} />
 
 						{menuIsOpen ? (

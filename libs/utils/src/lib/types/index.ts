@@ -803,6 +803,7 @@ export enum EUserSettings {
 	LANGUAGE = 'Language',
 	STREAMER_MODE = 'Streamer Mode',
 	ADVANCED = 'Advanced',
+	ON_BOARDING = 'On Boarding',
 	LOG_OUT = 'Log Out'
 }
 
