@@ -187,8 +187,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
 	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
-
-	const [isPasteMessage, setIsPasteMessage] = useState<boolean>(false);
+	const [isPasteMulti, setIsPasteMulti] = useState<boolean>(false);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -284,7 +283,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 
 			if (payloadJson.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
-				setIsPasteMessage(true);
+				setIsPasteMulti(true);
 				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
@@ -336,7 +335,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					isPasteMessage ? mentionUpdated : mentionList,
+					isPasteMulti ? mentionUpdated : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -369,7 +368,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						isPasteMessage ? mentionUpdated : mentionList,
+						isPasteMulti ? mentionUpdated : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -401,7 +400,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setMentionUpdated([]);
 			setDisplayPlaintext('');
 			setDisplayPlaintext('');
-			setIsPasteMessage(false);
+			setIsPasteMulti(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -482,23 +481,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		setDisplayPlaintext(convertToPlainTextString);
 		setDisplayMarkup(convertToMarkUpString);
 		setMentionUpdated(mentionUpdated);
-		if (!isPasteMessage) {
+		if (!isPasteMulti) {
 			setDisplayPlaintext(convertToPlainTextString);
 			setDisplayMarkup(convertToMarkUpString);
 			setMentionUpdated(mentionUpdated);
 		} else {
-			// const onlyMention2 = filterMentionsWithAtSign(mentions);
-			// const convertToMarkUpString2 = formatMentionsToString(onlyMention2);
-			// const convertToPlainTextString2 = getDisplayMention(onlyMention2);
-			// // const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);
-
-			// const mentionUpdated2 = convertMentionOnfile(rolesClan, convertToPlainTextString2, onlyMention2 as MentionItem[]);
-			// setDisplayPlaintext(convertToPlainTextString2);
-			// setDisplayMarkup(convertToMarkUpString2);
-			// setMentionUpdated(mentionUpdated2);
-			console.log('newValue :', newValue);
-			console.log('newPlainTextValue :', newPlainTextValue);
-			console.log('mentions :', mentions);
 			setDisplayPlaintext(newPlainTextValue);
 			setDisplayMarkup(newValue);
 			setMentionUpdated(mentionList);
@@ -506,11 +493,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				{
 					...request,
 					valueTextInput: newValue,
-					content: newPlainTextValue,
-					mentionRaw: mentions
+					content: newPlainTextValue
 				},
 				props.isThread
 			);
+			setIsPasteMulti(false);
 		}
 
 		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
@@ -689,7 +676,16 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			<MentionsInput
 				onPaste={(event) => {
 					event.preventDefault();
-					const pastedText = event.clipboardData.getData('text');
+					let pastedText = event.clipboardData.getData('text');
+
+					while (pastedText.includes('\r\n')) {
+						pastedText = pastedText.replace('\r\n', '\n');
+					}
+
+					while (pastedText.includes('\r')) {
+						pastedText = pastedText.replace('\r', '\n');
+					}
+
 					setPastedContent(pastedText);
 				}}
 				onPasteCapture={props.handlePaste}
