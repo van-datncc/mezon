@@ -7,7 +7,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useAppSelector } from '@mezon/store-mobile';
 
 interface UserMentionListProps {
 	channelID: string;
