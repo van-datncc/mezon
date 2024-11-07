@@ -29,7 +29,7 @@ interface IChatMessageInputProps {
 	handleKeyboardBottomSheetMode: (mode: IModeKeyboardPicker) => void;
 	setModeKeyBoardBottomSheet: Dispatch<SetStateAction<IModeKeyboardPicker>>;
 	setIsShowAttachControl: Dispatch<SetStateAction<boolean>>;
-	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
+	onShowKeyboardBottomSheet?: (isShow: boolean, type?: string) => void;
 	keyboardHeight?: number;
 	mentionsOnMessage?: MutableRefObject<IMentionOnMessage[]>;
 	hashtagsOnMessage?: MutableRefObject<IHashtagOnMessage[]>;
@@ -58,7 +58,6 @@ export const ChatMessageInput = memo(
 				setModeKeyBoardBottomSheet,
 				setIsShowAttachControl,
 				onShowKeyboardBottomSheet,
-				keyboardHeight,
 				mentionsOnMessage,
 				hashtagsOnMessage,
 				emojisOnMessage,
@@ -121,13 +120,13 @@ export const ChatMessageInput = memo(
 			const handleInputFocus = () => {
 				setModeKeyBoardBottomSheet('text');
 				ref && ref.current && ref.current?.focus();
-				onShowKeyboardBottomSheet(false, keyboardHeight);
+				onShowKeyboardBottomSheet(false);
 			};
 
 			const handleInputBlur = () => {
 				setIsShowAttachControl(false);
 				if (modeKeyBoardBottomSheet === 'text') {
-					onShowKeyboardBottomSheet(false, 0);
+					onShowKeyboardBottomSheet(false);
 				}
 			};
 

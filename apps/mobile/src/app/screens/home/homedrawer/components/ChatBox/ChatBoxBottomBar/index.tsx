@@ -27,7 +27,7 @@ import { IFile } from 'apps/mobile/src/app/componentUI';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native';
+import { DeviceEventEmitter, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -73,7 +73,7 @@ interface IChatInputProps {
 	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
 	messageAction?: EMessageActionType;
 	onDeleteMessageActionNeedToResolve?: () => void;
-	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
+	onShowKeyboardBottomSheet?: (isShow: boolean, type?: string) => void;
 }
 
 export const ChatBoxBottomBar = memo(
@@ -98,8 +98,6 @@ export const ChatBoxBottomBar = memo(
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
-		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList({ channelID: channelId || '', channelMode: mode });
 		const [textChange, setTextChange] = useState<string>('');
@@ -192,13 +190,13 @@ export const ChatBoxBottomBar = memo(
 			(mode: IModeKeyboardPicker) => {
 				setModeKeyBoardBottomSheet(mode);
 				if (mode === 'emoji' || mode === 'attachment') {
-					onShowKeyboardBottomSheet(true, keyboardHeight, mode);
+					onShowKeyboardBottomSheet(true, mode);
 				} else {
 					inputRef && inputRef.current && inputRef.current.focus();
-					onShowKeyboardBottomSheet(false, 0);
+					onShowKeyboardBottomSheet(false);
 				}
 			},
-			[keyboardHeight, onShowKeyboardBottomSheet]
+			[onShowKeyboardBottomSheet]
 		);
 		const handleTextInputChange = async (text: string) => {
 			setTextChange(text);
@@ -262,13 +260,6 @@ export const ChatBoxBottomBar = memo(
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
 			cursorPositionRef.current = selection.start;
 		};
-
-		function keyboardWillShow(event) {
-			if (keyboardHeight !== event.endCoordinates.height) {
-				setIsShowEmojiNativeIOS(event.endCoordinates.height >= 380 && Platform.OS === 'ios');
-				setKeyboardHeight(event.endCoordinates.height <= 300 ? 300 : event.endCoordinates.height);
-			}
-		}
 
 		const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
 			const { type, targetMessage } = messageAction;
@@ -434,7 +425,6 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		useEffect(() => {
-			const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
 				handleClearText();
 			});
@@ -442,14 +432,13 @@ export const ChatBoxBottomBar = memo(
 				handleEventAfterEmojiPicked(emoji.shortName);
 			});
 			return () => {
-				keyboardListener.remove();
 				clearTextInputListener.remove();
 				addEmojiPickedListener.remove();
 			};
 		}, [handleEventAfterEmojiPicked]);
 
 		return (
-			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
+			<Block paddingHorizontal={size.s_6}>
 				{triggers?.mention?.keyword !== undefined && (
 					<Suggestions
 						{...triggers.mention}
@@ -495,7 +484,6 @@ export const ChatBoxBottomBar = memo(
 						setIsShowAttachControl={setIsShowAttachControl}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 						setModeKeyBoardBottomSheet={setModeKeyBoardBottomSheet}
-						keyboardHeight={keyboardHeight}
 						mentionsOnMessage={mentionsOnMessage}
 						hashtagsOnMessage={hashtagsOnMessage}
 						emojisOnMessage={emojiList}

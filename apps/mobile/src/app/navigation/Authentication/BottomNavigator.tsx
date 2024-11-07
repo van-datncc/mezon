@@ -4,7 +4,7 @@ import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigationState } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -35,7 +35,7 @@ const BottomNavigator = () => {
 	useEffect(() => {
 		Animated.timing(tabBarTranslateY, {
 			toValue: hiddenBottomTab ? 80 : 0,
-			duration: 200,
+			duration: 150,
 			useNativeDriver: true
 		}).start();
 	}, [hiddenBottomTab, isTabletLandscape, tabBarTranslateY]);
@@ -46,11 +46,13 @@ const BottomNavigator = () => {
 				screenOptions={{
 					tabBarHideOnKeyboard: true,
 					tabBarStyle: {
-						height: isTabletLandscape ? size.s_60 : hiddenBottomTab ? 0 : size.s_80,
+						position: 'absolute',
+						zIndex: hiddenBottomTab ? -1 : 100,
+						height: isTabletLandscape ? size.s_60 : size.s_80,
 						paddingHorizontal: isTabletLandscape ? '20%' : 0,
 						transform: [{ translateY: tabBarTranslateY }],
-						paddingBottom: isTabletLandscape ? size.s_10 : hiddenBottomTab ? 0 : size.s_20,
-						borderTopWidth: isTabletLandscape ? 1 : hiddenBottomTab ? 0 : 1,
+						paddingBottom: isTabletLandscape ? size.s_10 : size.s_20,
+						borderTopWidth: 1,
 						elevation: 0,
 						backgroundColor: themeValue.secondary,
 						borderTopColor: themeValue.border
@@ -66,7 +68,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Clans',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} width={size.s_22} height={size.s_22} />)
+						tabBarIcon: ({ color }) => <HomeTab color={color} width={size.s_22} height={size.s_22} />
 					}}
 				/>
 				<TabStack.Screen
@@ -75,7 +77,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Messages',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <MessageTab color={color} width={size.s_22} height={size.s_22} />)
+						tabBarIcon: ({ color }) => <MessageTab color={color} width={size.s_22} height={size.s_22} />
 					}}
 				/>
 				<TabStack.Screen
@@ -84,7 +86,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Notifications',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <NotiTab color={color} width={size.s_22} height={size.s_22} />)
+						tabBarIcon: ({ color }) => <NotiTab color={color} width={size.s_22} height={size.s_22} />
 					}}
 				/>
 				<TabStack.Screen
@@ -93,7 +95,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Profile',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <ProfileTab color={color} width={size.s_22} height={size.s_22} />)
+						tabBarIcon: ({ color }) => <ProfileTab color={color} width={size.s_22} height={size.s_22} />
 					}}
 				/>
 			</TabStack.Navigator>

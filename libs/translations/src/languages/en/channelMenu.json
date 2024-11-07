@@ -21,7 +21,8 @@
         },
         "thread": {
           "title": "",
-          "threads": "Threads"
+          "threads": "Threads",
+          "searchThreads": "Search Thread"
         },
         "organizationMenu": {
             "title": "",

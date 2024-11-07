@@ -1,5 +1,5 @@
 import { selectAllUserClans } from '@mezon/store';
-import { getNameForPrioritize, IUsersClan, normalizeString } from '@mezon/utils';
+import { getNameForPrioritize, IUsersClan, normalizeString, UsersClanEntity } from '@mezon/utils';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -7,6 +7,9 @@ interface MemberContextType {
 	searchQuery: string;
 	setSearchQuery: (query: string) => void;
 	filteredMembers: IUsersClan[];
+	isSort: boolean;
+	setIsSort: (isSort: boolean) => void;
+	clanOwner: UsersClanEntity;
 }
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined);
@@ -21,6 +24,7 @@ export const useMemberContext = () => {
 
 export const MemberProvider = ({ children }: { children: React.ReactNode }) => {
 	const [searchQuery, setSearchQuery] = useState('');
+	const [isSort, setIsSort] = useState(false);
 	const usersClan = useSelector(selectAllUserClans);
 	const usersWithPrioritizeName = usersClan.map((member: IUsersClan) => ({
 		...member,
@@ -30,7 +34,7 @@ export const MemberProvider = ({ children }: { children: React.ReactNode }) => {
 	const filteredMembers = useMemo(() => {
 		const searchLowerCase = normalizeString(searchQuery).toLowerCase();
 
-		const filtered = usersWithPrioritizeName.filter((member) => {
+		let filtered = usersWithPrioritizeName.filter((member) => {
 			const prioritizeNameMatch = normalizeString(member.prioritizeName ?? '')
 				?.toLowerCase()
 				.includes(searchLowerCase);
@@ -39,12 +43,20 @@ export const MemberProvider = ({ children }: { children: React.ReactNode }) => {
 			return prioritizeNameMatch || usernameMatch;
 		});
 
-		return filtered.sort((a, b) => {
-			const nameA = a.prioritizeName?.toLowerCase() || '';
-			const nameB = b.prioritizeName?.toLowerCase() || '';
-			return nameA.localeCompare(nameB);
-		});
+		if (isSort) {
+			filtered = filtered.slice().reverse();
+		}
+
+		return filtered;
 	}, [usersWithPrioritizeName, searchQuery]);
 
-	return <MemberContext.Provider value={{ searchQuery, setSearchQuery, filteredMembers }}>{children}</MemberContext.Provider>;
+	const clanOwner = useMemo(() => {
+		return usersClan[usersClan.length - 1];
+	}, [usersClan.length]);
+
+	return (
+		<MemberContext.Provider value={{ searchQuery, setSearchQuery, filteredMembers, isSort, setIsSort, clanOwner }}>
+			{children}
+		</MemberContext.Provider>
+	);
 };

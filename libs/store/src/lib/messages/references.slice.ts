@@ -27,6 +27,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	idMessageMention: string;
 	attachmentAfterUpload: Record<string, PreSendAttachment>;
+	geoLocation?: { latitude: number; longitude: number };
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -44,7 +45,8 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
 	idMessageMention: '',
-	attachmentAfterUpload: {}
+	attachmentAfterUpload: {},
+	geoLocation: undefined
 });
 
 export const referencesSlice = createSlice({
@@ -121,6 +123,9 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageEdit(state, action) {
 			state.idMessageRefEdit = action.payload;
+		},
+		setGeolocation(state, action) {
+			state.geoLocation = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -170,3 +175,5 @@ export const selectAttachmentAfterUpload = createSelector(getReferencesState, (s
 
 export const selectAttachmentByChannelId = (channelId: string) =>
 	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) => attachmentAfterUpload[channelId] || null);
+
+export const selectGeolocation = createSelector(getReferencesState, (state: ReferencesState) => state.geoLocation);

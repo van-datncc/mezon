@@ -14,6 +14,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
@@ -278,6 +279,7 @@ function MessageWithUser({
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												{message.content?.embed && <EmbedMessage {...message.content.embed} />}
 											</div>
 										</div>
 									</div>

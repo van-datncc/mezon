@@ -32,7 +32,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
-const SCROLL_THRESHOLD = 100; // 500px
+const SCROLL_THRESHOLD = 500; // 500px
 
 type ChannelMessagesProps = {
 	clanId: string;
@@ -77,6 +77,7 @@ function ChannelMessages({
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId as string));
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
+	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	const loadMoreMessage = useCallback(
@@ -119,7 +120,6 @@ function ChannelMessages({
 		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
 	}, []);
 
-	const scrollHeight = useRef<number>(0);
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
@@ -128,19 +128,16 @@ function ChannelMessages({
 		overscan: 5,
 		getScrollElement: () => chatRef.current,
 		estimateSize: () => 50,
-		getItemKey: (index) => {
-			return messages[index];
-		},
 		onChange: async (instance) => {
+			if (!userActiveScroll.current) return;
 			toggleDisableHover(chatRef.current, scrollTimeoutId2);
-			if (isLoadMore.current) return;
+			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
 			switch (instance.scrollDirection) {
 				case 'backward':
-					if (Number(instance?.scrollOffset) < SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
-						scrollHeight.current = chatRef.current?.scrollHeight || 0;
+					if (chatRef.current.scrollTop <= SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
 						currentScrollDirection.current = ELoadMoreDirection.top;
 						isLoadMore.current = true;
-						firsRowCached.current = messages[0];
+						firsRowCached.current = messages[1];
 						await loadMoreMessage(ELoadMoreDirection.top);
 						isLoadMore.current = false;
 						return;
@@ -179,15 +176,19 @@ function ChannelMessages({
 	// maintain scroll position
 	const firsRowCached = useRef<string>('');
 	const lastRowCached = useRef<string>('');
-	useEffect(() => {
-		if (!isLoadMore.current || !chatRef.current) return;
+	useLayoutEffect(() => {
+		if (!isLoadMore.current || !chatRef.current || !userActiveScroll.current) return;
 		const firstMessageId = messages[0];
 		const lastMessageId = messages[messages.length - 1];
 		if (firsRowCached.current !== firstMessageId) {
 			if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
-				chatRef.current.scrollTop = chatRef.current.scrollHeight - scrollHeight.current;
+				const messageId = firsRowCached.current;
+				rowVirtualizer.scrollToIndex(
+					messages.findIndex((item) => item === messageId),
+					{ align: 'start' }
+				);
 			}
-			firsRowCached.current = messages[0];
+			firsRowCached.current = messages[1];
 			lastRowCached.current = messages[messages.length - 1];
 			currentScrollDirection.current = null;
 			return;
@@ -269,12 +270,20 @@ function ChannelMessages({
 		}
 	}, [userId, messages.length, isViewOlderMessage, rowVirtualizer, scrollToLastMessage, getChatScrollBottomOffset]);
 
-	const userActiveScroll = useRef<boolean>(false);
 	useLayoutEffect(() => {
 		if (chatRef.current && messages?.length && lastMessage?.channel_id && !userActiveScroll.current) {
 			chatRef.current.scrollTop = chatRef.current.scrollHeight;
 		}
 	});
+
+	useEffect(() => {
+		if (!userActiveScroll.current || !chatRef.current) return;
+		chatRef.current.style.overflowY = 'hidden';
+		setTimeout(() => {
+			if (!chatRef.current) return;
+			chatRef.current.style.overflowY = 'auto';
+		}, 50);
+	}, [messages]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>

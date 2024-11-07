@@ -47,6 +47,10 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
+		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			const channelWithActive = { ...currentChannel, active: 1 };
+			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
+		}
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
@@ -57,13 +61,6 @@ function useChannelSeen(channelId: string) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
 	}, [currentChannel?.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
-
-	useEffect(() => {
-		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
-			const channelWithActive = { ...currentChannel, active: 1 };
-			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
-		}
-	}, [currentChannel.channel_id]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {

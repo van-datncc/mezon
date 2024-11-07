@@ -10,7 +10,8 @@
         "newMessage": "Tin Nhắn Mới",
         "newGroup": "Nhóm Mới",
         "addMembers": "Thêm thành viên",
-        "appearance": "Giao diện"
+        "appearance": "Giao diện",
+        "chat": "nhắn tin"
     },
     "headerRight": {
         "addFriends": "Thêm bạn bè"

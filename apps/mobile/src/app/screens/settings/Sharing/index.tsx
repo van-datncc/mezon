@@ -100,9 +100,9 @@ export const Sharing = ({ data, onClose }) => {
 
 	const getFullFileName = useCallback(
 		(fileName: string) => {
-			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName, true);
+			return createUploadFilePath(session, currentClan?.id, currentChannelId, fileName, true);
 		},
-		[currentChannelId, currentClan.id, session]
+		[currentChannelId, currentClan?.id, session]
 	);
 
 	useEffect(() => {
@@ -300,12 +300,12 @@ export const Sharing = ({ data, onClose }) => {
 	const handleFiles = async (files: any) => {
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
-		if (!files || !client || !session || !currentClan.id) {
+		if (!files || !client || !session) {
 			throw new Error('Client or files are not initialized');
 		}
 
 		const promises = Array.from(files).map((file: any) => {
-			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
+			return handleUploadFileMobile(client, session, currentClan?.id, currentChannelId, file.name, file);
 		});
 
 		const response = await Promise.all(promises);
