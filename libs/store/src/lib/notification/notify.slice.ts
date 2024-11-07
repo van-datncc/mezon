@@ -100,6 +100,9 @@ export const notificationSlice = createSlice({
 
 		setIsShowInbox(state, action: PayloadAction<boolean>) {
 			state.isShowInbox = action.payload;
+		},
+		refreshStatus(state) {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 
