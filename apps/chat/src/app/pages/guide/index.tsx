@@ -1,8 +1,6 @@
 import { useMemberContext } from '@mezon/core';
 
 function GuideMain() {
-	// const clanOwner = useSelector(selectAllUserClanProfile)
-	// console.log('clanOwner: ', clanOwner);
 	const { clanOwner } = useMemberContext();
 
 	return (
