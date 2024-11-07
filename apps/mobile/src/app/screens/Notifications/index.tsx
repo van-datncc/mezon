@@ -205,6 +205,7 @@ const Notifications = () => {
 				<SkeletonNotification numberSkeleton={8} />
 			) : notificationsFilter?.length ? (
 				<FlashList
+					showsVerticalScrollIndicator={false}
 					data={notificationsFilter}
 					renderItem={({ item }) => {
 						return <NotificationItem notify={item} onLongPressNotify={openBottomSheet} onPressNotify={handleOnPressNotify} />;
