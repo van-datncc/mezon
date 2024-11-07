@@ -49,6 +49,7 @@ export const fetchWebhooks = createAsyncThunk(
 			const response = await fetchWebhooksCached(mezon, channelId, clanId);
 			return response.webhooks;
 		} catch (error) {
+			console.error(error);
 			return thunkAPI.rejectWithValue({ error });
 		}
 	}
@@ -71,6 +72,7 @@ export const generateWebhook = createAsyncThunk(
 				thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
+			console.error(error);
 			return thunkAPI.rejectWithValue({ error });
 		}
 	}
@@ -92,6 +94,7 @@ export const deleteWebhookById = createAsyncThunk(
 			}
 			thunkAPI.rejectWithValue({});
 		} catch (err) {
+			console.error(err);
 			return thunkAPI.rejectWithValue(err);
 		}
 	}
@@ -114,6 +117,7 @@ export const updateWebhookBySpecificId = createAsyncThunk(
 				}
 			}
 		} catch (err) {
+			console.error(err);
 			return thunkAPI.rejectWithValue(err);
 		}
 	}
