@@ -1,15 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
-import { baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, selectCurrentChannelId, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { FlashList } from '@shopify/flash-list';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Pressable, SectionList, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../screens/home/homedrawer/components/InviteToChannel';
@@ -79,7 +77,7 @@ export const MemberListStatus = React.memo(() => {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
+		<View style={styles.container}>
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
 				<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={styles.actionItem}>
 					<View style={[styles.actionIconWrapper]}>
@@ -115,38 +113,30 @@ export const MemberListStatus = React.memo(() => {
 				</Pressable>
 			) : null}
 
-			<View>
-				{onlineMembers?.length > 0 && (
-					<View>
-						<Text style={styles.text}>Member - {onlineMembers?.length || '0'}</Text>
-						<View style={styles.box}>
-							<FlashList
-								data={onlineMembers}
-								keyExtractor={(user, index) => `channelOnlineMember[${user}][${index}]`}
-								renderItem={renderMemberItem}
-								estimatedItemSize={size.s_80}
-								nestedScrollEnabled
-							/>
-						</View>
-					</View>
-				)}
-				{offlineMembers?.length > 0 && (
-					<View style={{ marginTop: 20 }}>
-						<Text style={styles.text}>Offline - {offlineMembers?.length}</Text>
-						<View style={styles.box}>
-							<FlashList
-								data={offlineMembers}
-								keyExtractor={(user, index) => `channelOfflineMember[${user}][${index}]`}
-								renderItem={renderMemberItem}
-								estimatedItemSize={size.s_80}
-								nestedScrollEnabled
-							/>
-						</View>
-					</View>
-				)}
-			</View>
+			{onlineMembers?.length > 0 || offlineMembers?.length > 0 ? (
+				<SectionList
+					sections={[
+						{ title: 'Member', data: onlineMembers },
+						{ title: 'Offline', data: offlineMembers }
+					]}
+					keyExtractor={(_, index) => `channelMember[${index}]`}
+					renderItem={renderMemberItem}
+					renderSectionHeader={({ section: { title } }) => (
+						<Text style={styles.text}>
+							{title} - {title === 'Member' ? onlineMembers?.length : offlineMembers?.length}
+						</Text>
+					)}
+					nestedScrollEnabled
+					removeClippedSubviews={true}
+					showsVerticalScrollIndicator={false}
+					stickySectionHeadersEnabled={false}
+					initialNumToRender={10}
+					maxToRenderPerBatch={10}
+					windowSize={5}
+				/>
+			) : null}
 			<UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={onClose} />
 			<InviteToChannel isUnknownChannel={false} ref={bottomSheetRef} isDMThread={isDMThread} />
-		</ScrollView>
+		</View>
 	);
 });
