@@ -5672,7 +5672,7 @@ export function ShadowBotIcon(props: React.HTMLAttributes<SVGElement>) {
 export function WindowMinimize(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
-			<path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 		</svg>
 	);
 }
@@ -5686,3 +5686,34 @@ export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+export const Guide: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fillRule="evenodd"
+			strokeLinejoin="round"
+			strokeMiterlimit="2"
+			clipRule="evenodd"
+			viewBox="0 0 32 32"
+			fill={defaultFill}
+			id="direction-board"
+			className={`${defaultSize}`}
+		>
+			<g transform="translate(-52 -156)">
+				<path
+					d="M72.125,117.091C72.125,116.657 71.769,116.241 71.136,115.934C70.504,115.627 69.645,115.455 68.75,115.455C68.26,115.455 67.74,115.455 67.25,115.455C66.355,115.455 65.496,115.627 64.864,115.934C64.231,116.241 63.875,116.657 63.875,117.091C63.875,120.012 63.875,127.988 63.875,130.909C63.875,131.343 64.231,131.759 64.864,132.066C65.496,132.373 66.355,132.545 67.25,132.545C67.74,132.545 68.26,132.545 68.75,132.545C69.645,132.545 70.504,132.373 71.136,132.066C71.769,131.759 72.125,131.343 72.125,130.909C72.125,127.988 72.125,120.012 72.125,117.091Z"
+					transform="matrix(0 .66667 -1.375 0 238.5 139.667)"
+				></path>
+				<path d="M67.25,157L67.25,183C67.25,183.414 67.586,183.75 68,183.75C68.414,183.75 68.75,183.414 68.75,183L68.75,157C68.75,156.586 68.414,156.25 68,156.25C67.586,156.25 67.25,156.586 67.25,157Z"></path>
+				<path
+					d="M81.386,162.036C81.612,161.923 81.75,161.72 81.75,161.5C81.75,161.28 81.612,161.077 81.386,160.964L76.386,158.464C76.269,158.406 76.136,158.375 76,158.375L68,158.375C67.586,158.375 67.25,158.655 67.25,159L67.25,164C67.25,164.345 67.586,164.625 68,164.625L76,164.625C76.136,164.625 76.269,164.594 76.386,164.536L81.386,162.036Z"
+					transform="matrix(1 0 0 1.2 0 -30.8)"
+				></path>
+				<path
+					d="M81.386,160.964C81.612,161.077 81.75,161.28 81.75,161.5C81.75,161.72 81.612,161.923 81.386,162.036L76.386,164.536C76.269,164.594 76.136,164.625 76,164.625L68,164.625C67.586,164.625 67.25,164.345 67.25,164L67.25,159C67.25,158.655 67.586,158.375 68,158.375L76,158.375C76.136,158.375 76.269,158.406 76.386,158.464L81.386,160.964Z"
+					transform="matrix(-1 0 0 1.2 136 -20.8)"
+				></path>
+			</g>
+		</svg>
+	);
+};

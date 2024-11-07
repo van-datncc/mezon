@@ -12,13 +12,14 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../navigation/ScreenTypes';
 import EmptyThread from './EmptyThread';
 import GroupThread from './GroupThread';
+import { SearchThreadsBar } from './SearchThread';
 import ThreadAddButton from './ThreadAddButton';
 import ThreadItem from './ThreadItem';
 import { style } from './styles';
@@ -29,6 +30,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const styles = style(themeValue);
 	const { channelThreads } = route.params || {};
 	const { t } = useTranslation(['createThread']);
+	const [searchText, setSearchText] = useState<string>('');
 	const { setValueThread } = useThreads();
 	const dispatch = useAppDispatch();
 	navigation.setOptions({
@@ -55,9 +57,9 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	}, [currentChannel, dispatch, isThread]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
-	const getActiveThreads = useSelector(selectActiveThreads(''));
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(''));
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(''));
+	const getActiveThreads = useSelector(selectActiveThreads(searchText));
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(searchText));
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(searchText));
 
 	const handleNavigateCreateForm = useCallback(() => {
 		dispatch(threadsActions.setOpenThreadMessageState(false));
@@ -70,9 +72,14 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		});
 	}, []);
 
+	const debouncedSetSearchText = useCallback((value) => {
+		setSearchText(value);
+	}, []);
+
 	return (
 		// TODO: MezonMenu??
 		<View style={styles.createChannelContainer}>
+			<SearchThreadsBar onTextChanged={debouncedSetSearchText} />
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
 				{getJoinedThreadsWithinLast30Days?.length > 0 && (
 					<GroupThread
