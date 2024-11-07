@@ -460,7 +460,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [props.mode, commonChannelDms]);
 
 	const [pastedContent, setPastedContent] = useState<string>('');
-	const onChangeMentionInput: OnChangeHandlerFunc = async (event, newValue, newPlainTextValue, mentions) => {
+	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
