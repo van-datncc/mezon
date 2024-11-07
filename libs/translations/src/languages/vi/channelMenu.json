@@ -21,7 +21,8 @@
       },
       "thread": {
         "title": "",
-        "threads": "Chuỗi"
+        "threads": "Chuỗi",
+        "searchThreads": "Tìm kiếm threads"
       },
       "organizationMenu": {
           "title": "",

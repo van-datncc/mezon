@@ -348,10 +348,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				isTabVisible === false
 			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				const isFriendPageView = path.includes('/chat/direct/friends');
+				const isNotCurrentDirect =
+					isFriendPageView ||
+					isClanView ||
+					!currentDirectId ||
+					(currentDirectId && !RegExp(currentDirectId).test((notification as any).channel_id)) ||
+					(isElectron() && isFocusDesktop === false) ||
+					isTabVisible === false;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
-					dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
+					if (isNotCurrentDirect) {
+						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
+					}
 				}
 			}
 
@@ -385,6 +395,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
 		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
 		dispatch(channelsActions.updateChannelBadgeCount({ channelId: lastSeenMess.channel_id, count: 0, isReset: true }));
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
 	}, []);
 
 	const onuserchannelremoved = useCallback(

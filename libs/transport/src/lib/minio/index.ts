@@ -63,6 +63,37 @@ function getFileType(mimeType: string): string {
 	return mimeTypeMap[mimeType] || mimeType;
 }
 
+async function getFileContentFromBlob(blobUrl: string) {
+	try {
+		const response = await fetch(blobUrl);
+		if (!response.ok) {
+			throw new Error(`Network response was not ok: ${response.statusText}`);
+		}
+		const blob = await response.blob();
+		const text = await blob.text();
+		return text;
+	} catch (error) {
+		return null;
+	}
+}
+
+async function isEnvFileContent(blobUrl: string): Promise<boolean> {
+	const fileContent = await getFileContentFromBlob(blobUrl);
+
+	if (!fileContent) {
+		return false;
+	}
+
+	const lines = fileContent.split('\n');
+	for (let line of lines) {
+		line = line.trim();
+		if (line.includes('=') && !line.startsWith('#')) {
+			return true;
+		}
+	}
+	return false;
+}
+
 export async function handleUploadFile(
 	client: Client,
 	session: Session,
@@ -82,8 +113,20 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			const shortFileType = getFileType(fileType);
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			let updatedFilename = filename;
 
-			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, false, index);
+			if (fileType === 'application/octet-stream') {
+				const hasExtension = filename.includes('.');
+
+				if (!hasExtension) {
+					const isEnv = await isEnvFileContent(file.url ?? '');
+					if (isEnv) {
+						updatedFilename = `${filename}.env`;
+					}
+				}
+			}
+			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, updatedFilename, false, index);
 			const buf = await file?.arrayBuffer();
 
 			resolve(
@@ -115,14 +158,13 @@ export async function handleUploadFileMobile(
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
-					console.log('Failed to read file data.');
+					console.error('Failed to read file data.');
 					return;
 				}
 				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
 				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename, file?.width, file?.height));
 			}
 		} catch (error) {
-			console.log('handleUploadFileMobile Error: ', error);
 			reject(new Error(`${error}`));
 		}
 	});
