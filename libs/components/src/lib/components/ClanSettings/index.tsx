@@ -46,7 +46,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.ROLES:
 				return <ServerSettingMainRoles />;
 			case ItemSetting.INTEGRATIONS:
-				return <Integrations currentChannel={currentChannel} />;
+				return <Integrations isClanSetting currentChannel={currentChannel} />;
 			case ItemSetting.EMOJI:
 				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:

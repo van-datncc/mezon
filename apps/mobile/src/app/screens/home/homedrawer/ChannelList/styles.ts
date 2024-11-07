@@ -70,7 +70,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 			borderRadius: size.s_20,
 			paddingHorizontal: size.s_6,
 			padding: size.s_4,
-			bottom: 10,
+			bottom: size.s_100,
 			left: '30%'
 		}
 	});

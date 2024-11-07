@@ -23,6 +23,7 @@ import DeleteWebhookPopup from './DeleteWebhookPopup';
 interface IWebhookItemModalProps {
 	webhookItem: ApiWebhook;
 	currentChannel?: IChannel;
+	isClanSetting?: boolean;
 }
 
 const convertDate = (isoDateString: string): string => {
@@ -35,7 +36,7 @@ const convertDate = (isoDateString: string): string => {
 	return date.toLocaleDateString('en-GB', options);
 };
 
-const WebhookItemModal = ({ webhookItem, currentChannel }: IWebhookItemModalProps) => {
+const WebhookItemModal = ({ webhookItem, currentChannel, isClanSetting }: IWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberClanByUserId(webhookItem.creator_id as string));
 	return (
@@ -60,7 +61,7 @@ const WebhookItemModal = ({ webhookItem, currentChannel }: IWebhookItemModalProp
 					</div>
 				</div>
 			</div>
-			{isExpand && <ExpendedWebhookModal currentChannel={currentChannel} webhookItem={webhookItem} />}
+			{isExpand && <ExpendedWebhookModal isClanSetting={isClanSetting} currentChannel={currentChannel} webhookItem={webhookItem} />}
 		</div>
 	);
 };
@@ -68,6 +69,7 @@ const WebhookItemModal = ({ webhookItem, currentChannel }: IWebhookItemModalProp
 interface IExpendedWebhookModal {
 	webhookItem: ApiWebhook;
 	currentChannel?: IChannel;
+	isClanSetting?: boolean;
 }
 
 interface IDataForUpdate {
@@ -76,7 +78,7 @@ interface IDataForUpdate {
 	webhookAvatarUrl: string | undefined;
 }
 
-const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookModal) => {
+const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IExpendedWebhookModal) => {
 	const dispatch = useAppDispatch();
 	const [isShowPopup, setIsShowPopup] = useState(false);
 	const toggleShowPopup = () => {
@@ -150,7 +152,13 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 			webhook_name: dataForUpdate.webhookNameInput
 		};
 		await dispatch(
-			updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '', clanId: clanId })
+			updateWebhookBySpecificId({
+				request: request,
+				webhookId: webhookItem.id,
+				channelId: currentChannel?.channel_id || '',
+				clanId: clanId,
+				isClanSetting: isClanSetting
+			})
 		);
 		setHasChange(false);
 	};
@@ -174,7 +182,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 					<div className="w-3/12 dark:text-[#b5bac1] text-textLightTheme">
 						<input onChange={handleChooseFile} ref={avatarRef} type="file" hidden />
 						<div className="relative w-fit">
-							<div className="absolute right-0 top-0 p-[5px] bg-[#ffffff] rounded-full z-50 shadow-xl border">
+							<div className="absolute right-0 top-0 p-[5px] bg-[#ffffff] rounded-full z-10 shadow-xl border">
 								<Icons.SelectFileIcon />
 							</div>
 							<img
@@ -258,6 +266,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 					webhookItem={webhookItem}
 					toggleShowPopup={toggleShowPopup}
 					closeShowPopup={handleCloseDeletePopup}
+					isClanSetting={isClanSetting}
 				/>
 			)}
 		</>

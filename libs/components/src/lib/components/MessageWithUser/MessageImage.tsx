@@ -79,24 +79,35 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		};
 	}, [imageLoaded]);
 
-	const height = attachmentData?.height ? (attachmentData.height > 275 ? 275 : attachmentData?.height) : 150;
+	let width = attachmentData.width || 150;
+	let height = attachmentData.height || 150;
 
+	if (attachmentData.width && attachmentData.height) {
+		const aspectRatio = attachmentData.width / attachmentData.height;
+
+		if (height >= 275) {
+			height = 275;
+			width = height * aspectRatio;
+		}
+
+		if (width >= 550) {
+			width = 550;
+			height = width / aspectRatio;
+		}
+	}
 	return (
 		<div
-			className="my-1 max-w-md"
+			className="my-1"
 			style={{
-				width: attachmentData?.width ? height * ((attachmentData?.width || 1) / (attachmentData?.height || 1)) : 'auto',
-				height: height
+				width: '100%',
+				maxWidth: `${width}px`,
+				height
 			}}
 		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
 			{showLoader && !imageLoaded && (
-				<div
-					role="status"
-					className="image-loading max-w-md rounded shadow animate-pulse"
-					style={{ width: height * ((attachmentData?.width || 1) / (attachmentData?.height || 1)), height: height }}
-				>
-					<div className="flex items-center justify-center bg-gray-300 rounded " style={{ height: '100%' }}>
+				<div role="status" className="image-loading rounded shadow animate-pulse" style={{ width: '100%', height }}>
+					<div className="flex items-center justify-center bg-gray-300 rounded h-full w-full" style={{ width }}>
 						<svg
 							className="w-10 h-10 text-gray-200"
 							aria-hidden="true"
@@ -115,8 +126,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
 						onContextMenu={handleContextMenu}
-						className={`max-w-md flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
-						style={{ height }}
+						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						style={{ width: '100%', height }}
 						src={attachmentData.url}
 						alt={'message'}
 						onClick={() => handleClick(attachmentData.url || '')}

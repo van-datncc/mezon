@@ -1,9 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectStreamChannelByChannelId } from '@mezon/store-mobile';
 import { default as React, memo, useRef, useState } from 'react';
-import { StatusBar, TouchableOpacity, View } from 'react-native';
-import Orientation from 'react-native-orientation-locker';
+import { View } from 'react-native';
+// import Orientation from 'react-native-orientation-locker';
 import Video from 'react-native-video';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
@@ -29,17 +28,17 @@ export function StreamingScreen({
 	const [error, setError] = useState(false);
 	const { t } = useTranslation(['streamingRoom']);
 
-	const handleFullScreen = () => {
-		setIsFullScreen(!isFullScreen);
-		onFullScreenVideo?.();
-		if (!isFullScreen) {
-			StatusBar.setHidden(true);
-			Orientation.lockToLandscapeLeft();
-		} else {
-			StatusBar.setHidden(false);
-			Orientation.lockToPortrait();
-		}
-	};
+	// const handleFullScreen = () => {
+	// 	setIsFullScreen(!isFullScreen);
+	// 	onFullScreenVideo?.();
+	// 	if (!isFullScreen) {
+	// 		StatusBar.setHidden(true);
+	// 		Orientation.lockToLandscapeLeft();
+	// 	} else {
+	// 		StatusBar.setHidden(false);
+	// 		Orientation.lockToPortrait();
+	// 	}
+	// };
 
 	const handleVideoLoadStart = () => {
 		setLoading(true);
@@ -76,6 +75,7 @@ export function StreamingScreen({
 							source={{
 								uri: channelStream?.streaming_url
 							}}
+							mixWithOthers={'mix'}
 							resizeMode={isFullScreen ? 'cover' : 'contain'}
 							style={isFullScreen ? styles.fullScreenVideo : styles.video}
 							onLoadStart={handleVideoLoadStart}
@@ -90,11 +90,11 @@ export function StreamingScreen({
 				</Block>
 			)}
 
-			{(isAnimationComplete || isFullScreen) && !error && channelStream?.streaming_url && (
-				<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>
-					<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />
-				</TouchableOpacity>
-			)}
+			{/*{(isAnimationComplete || isFullScreen) && !error && channelStream?.streaming_url && Platform.OS !== 'ios' && (*/}
+			{/*	<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>*/}
+			{/*		<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />*/}
+			{/*	</TouchableOpacity>*/}
+			{/*)}*/}
 		</View>
 	);
 }

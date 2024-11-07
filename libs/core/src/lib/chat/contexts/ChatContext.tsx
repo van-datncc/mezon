@@ -84,13 +84,13 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
-	EventUserPermissionChannel,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	MessageTypingEvent,
 	Notification,
+	PermissionChangedEvent,
+	PermissionSet,
 	RoleEvent,
-	SetPermissionChannelEvent,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -348,10 +348,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				isTabVisible === false
 			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				const isFriendPageView = path.includes('/chat/direct/friends');
+				const isNotCurrentDirect =
+					isFriendPageView ||
+					isClanView ||
+					!currentDirectId ||
+					(currentDirectId && !RegExp(currentDirectId).test((notification as any).channel_id)) ||
+					(isElectron() && isFocusDesktop === false) ||
+					isTabVisible === false;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
-					dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
+					if (isNotCurrentDirect) {
+						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
+					}
 				}
 			}
 
@@ -385,6 +395,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
 		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
 		dispatch(channelsActions.updateChannelBadgeCount({ channelId: lastSeenMess.channel_id, count: 0, isReset: true }));
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
 	}, []);
 
 	const onuserchannelremoved = useCallback(
@@ -772,8 +783,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const onsetpermissionchannel = useCallback(
-		(setPermission: SetPermissionChannelEvent) => {
+	const onpermissionset = useCallback(
+		(setPermission: PermissionSet) => {
 			if (userId !== setPermission.caller) {
 				const permissionRoleChannels: ApiPermissionUpdate[] = setPermission.permission_updates
 					.filter((permission: ApiPermissionUpdate) => permission.type !== 0)
@@ -794,8 +805,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const onuserpermissionchannel = useCallback(
-		(userPermission: EventUserPermissionChannel) => {
+	const onpermissionchanged = useCallback(
+		(userPermission: PermissionChangedEvent) => {
 			if (userId === userPermission.user_id && channelId === userPermission.channel_id) {
 				dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId || '', channelId, noCache: true }));
 			}
@@ -985,9 +996,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
-			socket.onsetpermissionchannel = onsetpermissionchannel;
+			socket.onpermissionset = onpermissionset;
 
-			socket.onuserpermissionchannel = onuserpermissionchannel;
+			socket.onpermissionchanged = onpermissionchanged;
 
 			socket.oneventcreated = oneventcreated;
 
@@ -1004,8 +1015,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelmessage,
 			onchannelpresence,
 			onchannelupdated,
-			onsetpermissionchannel,
-			onuserpermissionchannel,
+			onpermissionset,
+			onpermissionchanged,
 			onerror,
 			onmessagereaction,
 			onmessagetyping,
@@ -1177,8 +1188,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelcreated,
 		onchanneldeleted,
 		onchannelupdated,
-		onsetpermissionchannel,
-		onuserpermissionchannel,
+		onpermissionset,
+		onpermissionchanged,
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,

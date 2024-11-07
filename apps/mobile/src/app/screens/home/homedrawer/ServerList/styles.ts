@@ -41,6 +41,6 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			backgroundColor: colors.secondary
 		},
-		contentScroll: { alignItems: 'center', paddingBottom: size.s_20 },
+		contentScroll: { alignItems: 'center', paddingBottom: size.s_100 },
 		separatorLine: { width: '60%', marginTop: size.s_10, alignSelf: 'center' }
 	});
