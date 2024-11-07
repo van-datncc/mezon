@@ -11,8 +11,8 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { checkIsThread, normalizeString } from '@mezon/utils';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { checkIsThread } from '@mezon/utils';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -57,9 +57,9 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	}, [currentChannel, dispatch, isThread]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
-	const getActiveThreads = useSelector(selectActiveThreads(''));
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(''));
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(''));
+	const getActiveThreads = useSelector(selectActiveThreads(searchText));
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(searchText));
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(searchText));
 
 	const handleNavigateCreateForm = useCallback(() => {
 		dispatch(threadsActions.setOpenThreadMessageState(false));
@@ -72,27 +72,6 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		});
 	}, []);
 
-	const ActiveThreadFilter = useMemo(() => {
-		if (!getActiveThreads?.length) {
-			return [];
-		}
-		return getActiveThreads?.filter((thread) => normalizeString(thread.channel_label).includes(normalizeString(searchText)));
-	}, [getActiveThreads, searchText]);
-
-	const JoinedThreadFilter = useMemo(() => {
-		if (!getJoinedThreadsWithinLast30Days?.length) {
-			return [];
-		}
-		return getJoinedThreadsWithinLast30Days?.filter((thread) => normalizeString(thread.channel_label).includes(normalizeString(searchText)));
-	}, [getJoinedThreadsWithinLast30Days, searchText]);
-
-	const OlderThreadFilter = useMemo(() => {
-		if (!getThreadsOlderThan30Days?.length) {
-			return [];
-		}
-		return getThreadsOlderThan30Days?.filter((thread) => normalizeString(thread.channel_label).includes(normalizeString(searchText)));
-	}, [getThreadsOlderThan30Days, searchText]);
-
 	const debouncedSetSearchText = useCallback((value) => {
 		setSearchText(value);
 	}, []);
@@ -102,21 +81,23 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		<View style={styles.createChannelContainer}>
 			<SearchThreadsBar onTextChanged={debouncedSetSearchText} />
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
-				{JoinedThreadFilter?.length > 0 && (
+				{getJoinedThreadsWithinLast30Days?.length > 0 && (
 					<GroupThread
 						title={
-							JoinedThreadFilter?.length > 1
-								? `${JoinedThreadFilter?.length} ${t('joinedThreads')}`
-								: `${JoinedThreadFilter?.length} ${t('joinedThread')}`
+							getJoinedThreadsWithinLast30Days?.length > 1
+								? `${getJoinedThreadsWithinLast30Days?.length} ${t('joinedThreads')}`
+								: `${getJoinedThreadsWithinLast30Days?.length} ${t('joinedThread')}`
 						}
 					>
-						{JoinedThreadFilter?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-joined-threads`} />)}
+						{getJoinedThreadsWithinLast30Days?.map((thread: ThreadsEntity) => (
+							<ThreadItem thread={thread} key={`${thread.id}-joined-threads`} />
+						))}
 					</GroupThread>
 				)}
-				{ActiveThreadFilter?.length > 0 && (
+				{getActiveThreads?.length > 0 && (
 					<GroupThread
 						title={
-							ActiveThreadFilter?.length > 1
+							getActiveThreads?.length > 1
 								? `${getActiveThreads?.length} ${t('otherActiveThreads')}`
 								: `${getActiveThreads?.length} ${t('otherActiveThread')}`
 						}
@@ -124,15 +105,15 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 						{getActiveThreads?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-other-active-threads`} />)}
 					</GroupThread>
 				)}
-				{OlderThreadFilter?.length > 0 && (
+				{getThreadsOlderThan30Days?.length > 0 && (
 					<GroupThread
 						title={
-							OlderThreadFilter?.length > 1
-								? `${OlderThreadFilter?.length} ${t('olderThreads')}`
-								: `${OlderThreadFilter?.length} ${t('olderThread')}`
+							getThreadsOlderThan30Days?.length > 1
+								? `${getThreadsOlderThan30Days?.length} ${t('olderThreads')}`
+								: `${getThreadsOlderThan30Days?.length} ${t('olderThread')}`
 						}
 					>
-						{OlderThreadFilter?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-older-threads`} />)}
+						{getThreadsOlderThan30Days?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-older-threads`} />)}
 					</GroupThread>
 				)}
 			</ScrollView>
