@@ -10,10 +10,11 @@ import {
 	messagesActions,
 	notificationActions,
 	RootState,
-	selectCurrentClanId
+	selectCurrentClanId,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,7 @@ const Notifications = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
 	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
+	const dispatch = useAppDispatch();
 
 	const { t } = useTranslation(['notification']);
 	const navigation = useNavigation();
@@ -47,11 +49,16 @@ const Notifications = () => {
 	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
-	useEffect(() => {
-		if (currentClanId && currentClanId !== '0') {
-			initLoader();
-		}
-	}, [currentClanId]);
+	useFocusEffect(
+		React.useCallback(() => {
+			if (currentClanId && currentClanId !== '0') {
+				initLoader();
+			}
+			return () => {
+				dispatch(notificationActions.refreshStatus());
+			};
+		}, [currentClanId])
+	);
 
 	useEffect(() => {
 		handleFilterNotify(EActionDataNotify.All);
@@ -59,7 +66,7 @@ const Notifications = () => {
 
 	const initLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
+		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId, noCache: true }));
 	};
 
 	const handleFilterNotify = (tabNotify) => {
@@ -201,7 +208,7 @@ const Notifications = () => {
 					</View>
 				</Pressable>
 			</View>
-			{isLoading && !notificationsFilter?.length ? (
+			{isLoading ? (
 				<SkeletonNotification numberSkeleton={8} />
 			) : notificationsFilter?.length ? (
 				<FlashList
