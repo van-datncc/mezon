@@ -73,7 +73,6 @@ import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, use
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
-import { useThrottledCallback } from 'use-debounce';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
@@ -523,7 +522,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setIsPasteMulti(false);
 		}
 
-		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
+		if (
+			props.handleConvertToFile !== undefined &&
+			newPlainTextValue?.length > MIN_THRESHOLD_CHARS &&
+			pastedContent?.length > MIN_THRESHOLD_CHARS
+		) {
 			props.handleConvertToFile(pastedContent);
 			setRequestInput(
 				{
@@ -705,7 +708,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
-				onChange={useThrottledCallback(onChangeMentionInput, 100)}
+				onChange={onChangeMentionInput}
 				style={{
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
@@ -810,8 +813,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					hasPermissionEdit={props.hasPermissionEdit || true}
 				/>
 			)}
-			{request?.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content.length}</div>
+			{request?.content?.length > MIN_THRESHOLD_CHARS && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content?.length}</div>
 			)}
 		</div>
 	);
