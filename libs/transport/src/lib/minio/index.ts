@@ -158,6 +158,7 @@ export async function handleUploadFileMobile(
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
+					console.error('Failed to read file data.');
 					return;
 				}
 				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
