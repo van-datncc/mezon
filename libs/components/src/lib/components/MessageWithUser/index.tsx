@@ -279,7 +279,7 @@ function MessageWithUser({
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
-												{message.content.embed && <EmbedMessage {...message.content.embed} />}
+												{message.content?.embed && <EmbedMessage {...message.content.embed} />}
 											</div>
 										</div>
 									</div>
