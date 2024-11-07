@@ -8,18 +8,10 @@ function GuideMain() {
 	return (
 		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll  scrollbar-hide flex flex-col items-center">
 			<div className="flex flex-col w-[104%]">
-				<img
-					src={
-						'https://img.freepik.com/free-photo/aerial-beautiful-shot-seashore-with-hills-background-sunset_181624-24143.jpg?t=st=1730887460~exp=1730891060~hmac=46f2b7932027d0aef23054c85c9e8c6049c9572a8f5ce937eac0cc50227d39bf&w=996'
-					}
-					className="h-36 w-full rounded-lg object-cover"
-				/>
+				<div className="h-36 w-full rounded-lg object-cover bg-slate-700" />
 			</div>
 			<div className="flex flex-col w-full h-28 relative justify-end">
-				<img
-					src={'https://img.freepik.com/free-photo/vibrant-colors-flow-abstract-wave-pattern-generated-by-ai_188544-9781.jpg'}
-					className="absolute -top-10 h-24 w-24 rounded-3xl object-cover shadow-sm"
-				/>
+				<div className="absolute -top-10 h-24 w-24 rounded-3xl object-cover shadow-sm bg-slate-500" />
 				<div className=" flex gap-3 items-center">
 					<div className="text-[32px] font-bold leading-8">
 						{clanOwner.clan_nick ?? clanOwner.user?.display_name ?? clanOwner.user?.username}'s clan
