@@ -8,14 +8,14 @@ export const style = (colors: Attributes) =>
 			width: WIDTH,
 			height: HEIGHT,
 			backgroundColor: colors.secondary,
-			padding: Metrics.size.m
+			paddingVertical: size.s_10
 		},
 
 		notificationsHeader: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-			paddingVertical: Metrics.size.m
+			padding: Metrics.size.m
 		},
 
 		notificationHeaderTitle: {

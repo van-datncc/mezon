@@ -1,4 +1,4 @@
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
@@ -8,7 +8,7 @@ export default function SkeletonNotification({ numberSkeleton }: { numberSkeleto
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	return (
-		<Block flex={1}>
+		<Block paddingHorizontal={Metrics.size.m} flex={1}>
 			{Array.from({ length: numberSkeleton }).map((_, index) => (
 				<Block key={`ChannelListSkeleton_${index}`} flexDirection="row" justifyContent="space-between" gap={size.s_20}>
 					<ShimmerPlaceHolder
