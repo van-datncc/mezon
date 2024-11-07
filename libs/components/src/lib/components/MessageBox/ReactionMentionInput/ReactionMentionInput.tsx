@@ -73,6 +73,7 @@ import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, use
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
+import { useThrottledCallback } from 'use-debounce';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
@@ -704,7 +705,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
-				onChange={onChangeMentionInput}
+				onChange={useThrottledCallback(onChangeMentionInput, 100)}
 				style={{
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
