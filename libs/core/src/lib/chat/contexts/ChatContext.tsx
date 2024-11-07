@@ -84,13 +84,13 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
-	EventUserPermissionChannel,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	MessageTypingEvent,
 	Notification,
+	PermissionChangedEvent,
+	PermissionSet,
 	RoleEvent,
-	SetPermissionChannelEvent,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -772,8 +772,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const onsetpermissionchannel = useCallback(
-		(setPermission: SetPermissionChannelEvent) => {
+	const onpermissionset = useCallback(
+		(setPermission: PermissionSet) => {
 			if (userId !== setPermission.caller) {
 				const permissionRoleChannels: ApiPermissionUpdate[] = setPermission.permission_updates
 					.filter((permission: ApiPermissionUpdate) => permission.type !== 0)
@@ -794,8 +794,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const onuserpermissionchannel = useCallback(
-		(userPermission: EventUserPermissionChannel) => {
+	const onpermissionchanged = useCallback(
+		(userPermission: PermissionChangedEvent) => {
 			if (userId === userPermission.user_id && channelId === userPermission.channel_id) {
 				dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId || '', channelId, noCache: true }));
 			}
@@ -985,9 +985,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
-			socket.onsetpermissionchannel = onsetpermissionchannel;
+			socket.onpermissionset = onpermissionset;
 
-			socket.onuserpermissionchannel = onuserpermissionchannel;
+			socket.onpermissionchanged = onpermissionchanged;
 
 			socket.oneventcreated = oneventcreated;
 
@@ -1004,8 +1004,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelmessage,
 			onchannelpresence,
 			onchannelupdated,
-			onsetpermissionchannel,
-			onuserpermissionchannel,
+			onpermissionset,
+			onpermissionchanged,
 			onerror,
 			onmessagereaction,
 			onmessagetyping,
@@ -1177,8 +1177,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelcreated,
 		onchanneldeleted,
 		onchannelupdated,
-		onsetpermissionchannel,
-		onuserpermissionchannel,
+		onpermissionset,
+		onpermissionchanged,
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,

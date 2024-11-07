@@ -19,7 +19,7 @@ interface IChatBoxProps {
 		threadIcon: boolean;
 	};
 	directMessageId?: string;
-	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
+	onShowKeyboardBottomSheet?: (isShow: boolean, type?: string) => void;
 }
 export const ChatBox = memo((props: IChatBoxProps) => {
 	const { themeValue } = useTheme();

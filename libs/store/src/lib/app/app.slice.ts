@@ -1,6 +1,7 @@
 import { addLog, LoadingStatus, LogType } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
+import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
@@ -88,9 +89,12 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 
 	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
 
+	thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 	thunkAPI.dispatch(clansActions.fetchClans());
 	if (isClanView && currentClanId) {
 		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
+		thunkAPI.dispatch(clansActions.joinClan({ clanId: currentClanId }));
 	}
 
 	try {

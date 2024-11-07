@@ -49,7 +49,6 @@ export const fetchWebhooks = createAsyncThunk(
 			const response = await fetchWebhooksCached(mezon, channelId, clanId);
 			return response.webhooks;
 		} catch (error) {
-			console.log(error);
 			return thunkAPI.rejectWithValue({ error });
 		}
 	}
@@ -57,18 +56,21 @@ export const fetchWebhooks = createAsyncThunk(
 
 export const generateWebhook = createAsyncThunk(
 	'integration/createWebhook',
-	async (data: { request: ApiWebhookCreateRequest; channelId: string; clanId: string }, thunkAPI) => {
+	async (data: { request: ApiWebhookCreateRequest; channelId: string; clanId: string; isClanSetting?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.generateWebhookLink(mezon.session, data.request);
 			if (response) {
-				thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				if (data.isClanSetting) {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: '0', clanId: data.clanId, noCache: true }));
+				} else {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				}
 				toast.success(`Generated ${response.hook_name} successfully !`);
 			} else {
 				thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
-			console.log(error);
 			return thunkAPI.rejectWithValue({ error });
 		}
 	}
@@ -76,17 +78,20 @@ export const generateWebhook = createAsyncThunk(
 
 export const deleteWebhookById = createAsyncThunk(
 	'integration/deleteWebhook',
-	async (data: { webhook: ApiWebhook; clanId: string; channelId: string }, thunkAPI) => {
+	async (data: { webhook: ApiWebhook; clanId: string; channelId: string; isClanSetting?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string);
 			if (response) {
-				thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				if (data.isClanSetting) {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: '0', clanId: data.clanId, noCache: true }));
+				} else {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				}
 				return data.webhook;
 			}
 			thunkAPI.rejectWithValue({});
 		} catch (err) {
-			console.log(err);
 			return thunkAPI.rejectWithValue(err);
 		}
 	}
@@ -94,15 +99,21 @@ export const deleteWebhookById = createAsyncThunk(
 
 export const updateWebhookBySpecificId = createAsyncThunk(
 	'integration/editWebhook',
-	async (data: { request: MezonUpdateWebhookByIdBody; webhookId: string | undefined; channelId: string; clanId: string }, thunkAPI) => {
+	async (
+		data: { request: MezonUpdateWebhookByIdBody; webhookId: string | undefined; channelId: string; clanId: string; isClanSetting?: boolean },
+		thunkAPI
+	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateWebhookById(mezon.session, data.webhookId as string, data.request);
 			if (response) {
-				thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, noCache: true, clanId: data.clanId }));
+				if (data.isClanSetting) {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: '0', clanId: data.clanId, noCache: true }));
+				} else {
+					thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				}
 			}
 		} catch (err) {
-			console.log(err);
 			return thunkAPI.rejectWithValue(err);
 		}
 	}
