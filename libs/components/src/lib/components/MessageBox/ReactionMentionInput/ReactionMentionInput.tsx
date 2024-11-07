@@ -460,11 +460,33 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [props.mode, commonChannelDms]);
 
 	const [pastedContent, setPastedContent] = useState<string>('');
+	const prevValueRef = useRef('');
+	const prevPlainTextRef = useRef('');
+
+	useEffect(() => {
+		prevValueRef.current = request?.valueTextInput;
+	}, [request?.valueTextInput]);
+
+	useEffect(() => {
+		prevPlainTextRef.current = request?.content;
+	}, [request?.content]);
+
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const previousValue = prevValueRef.current;
+		const previousPlainText = prevPlainTextRef.current;
+
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
-		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
+		setRequestInput(
+			{
+				...request,
+				valueTextInput: newValue,
+				content: newPlainTextValue,
+				mentionRaw: mentions
+			},
+			props.isThread
+		);
 		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
@@ -501,18 +523,16 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 
 		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
-			const startIndex = pastedContent.length;
-			const extraPartPlainText = newPlainTextValue.substring(0, newPlainTextValue.length - startIndex);
-			const extraPartMarkup = newValue.substring(0, newValue.length - startIndex);
 			props.handleConvertToFile(pastedContent);
 			setRequestInput(
 				{
 					...request,
-					valueTextInput: extraPartMarkup,
-					content: extraPartPlainText
+					valueTextInput: previousValue,
+					content: previousPlainText
 				},
 				props.isThread
 			);
+			setPastedContent('');
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -676,8 +696,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			<MentionsInput
 				onPaste={(event) => {
 					event.preventDefault();
-					let pastedText = event.clipboardData.getData('text');
-					pastedText = pastedText.replace(/\r\n|\r/g, '\n');
+					const pastedText = event.clipboardData.getData('text');
 					setPastedContent(pastedText);
 				}}
 				onPasteCapture={props.handlePaste}
