@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
 import { ExitSetting } from '../SettingProfile';
+import AuditLog from './AuditLog';
 import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
@@ -55,6 +56,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
+			case ItemSetting.AUDIT_LOG:
+				return <AuditLog />;
 		}
 	};
 	const dispatch = useAppDispatch();

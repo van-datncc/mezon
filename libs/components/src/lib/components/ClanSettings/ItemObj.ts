@@ -17,7 +17,8 @@ export const ItemSetting = {
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
 	APP_DIRECTORY: 'app-directory',
-	CATEGORY_ORDER: 'category-order'
+	CATEGORY_ORDER: 'category-order',
+	AUDIT_LOG: 'audit-log'
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -34,6 +35,8 @@ export const listItemSettingApp: ItemObjProps[] = [
 	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' }
 ];
 
+export const listItemSettingModeration: ItemObjProps[] = [{ id: ItemSetting.AUDIT_LOG, name: 'Audit Log' }];
+
 export const sideBarListItem: ListSideBarProps[] = [
 	{
 		title: '',
@@ -42,6 +45,10 @@ export const sideBarListItem: ListSideBarProps[] = [
 	{
 		title: 'Apps',
 		listItem: listItemSettingApp
+	},
+	{
+		title: 'Moderation',
+		listItem: listItemSettingModeration
 	}
 ];
 
