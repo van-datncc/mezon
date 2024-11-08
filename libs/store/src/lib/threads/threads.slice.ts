@@ -214,6 +214,9 @@ export const threadsSlice = createSlice({
 					}
 				});
 			}
+		},
+		refreshStatus: (state) => {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
