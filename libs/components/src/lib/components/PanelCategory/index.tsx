@@ -34,10 +34,10 @@ interface IPanelCategoryProps {
 	category?: ICategoryChannel;
 	onDeleteCategory?: () => void;
 	setIsShowPanelChannel: () => void;
-	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
+	openEditCategory: () => void;
 }
 
-const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDeleteCategory, setIsShowPanelChannel, setOpenSetting }) => {
+const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDeleteCategory, setIsShowPanelChannel, openEditCategory }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
 	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
@@ -56,11 +56,6 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 			setPositionTop(true);
 		}
 	}, [coords.distanceToBottom]);
-
-	const handleOpenSetting = () => {
-		setOpenSetting(true);
-		setIsShowPanelChannel();
-	};
 
 	const handleChangeSettingType = (notificationType: number) => {
 		const payload: SetDefaultNotificationPayload = {
@@ -225,7 +220,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 
 			<UserRestrictionZone policy={canManageCategory}>
 				<GroupPanels>
-					<ItemPanel children={'Edit Category'} onClick={handleOpenSetting} />
+					<ItemPanel children={'Edit Category'} onClick={openEditCategory} />
 					<ItemPanel children={'Delete Category'} onClick={handleDeleteCategory} danger />
 				</GroupPanels>
 			</UserRestrictionZone>

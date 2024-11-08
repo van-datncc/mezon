@@ -1,4 +1,4 @@
-import { useAppParams, useGifsStickersEmoji } from '@mezon/core';
+import { useGifsStickersEmoji } from '@mezon/core';
 import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -19,7 +19,6 @@ export type GifStickerEmojiPopupOptions = {
 };
 
 export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: GifStickerEmojiPopupOptions) => {
-	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setValueInputSearch } = useGifsStickersEmoji();
@@ -28,14 +27,17 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 	const currentChannel = useSelector(selectCurrentChannel);
 
 	useEffect(() => {
-		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
+		if (channelOrDirect?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			setMod(ChannelStreamMode.STREAM_MODE_GROUP);
-		} else if (Number(type) === ChannelType.CHANNEL_TYPE_DM) {
+		} else if (channelOrDirect?.type === ChannelType.CHANNEL_TYPE_DM) {
 			setMod(ChannelStreamMode.STREAM_MODE_DM);
-		} else {
+		} else if (channelOrDirect?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			setMod(ChannelStreamMode.STREAM_MODE_THREAD);
+		} else if (channelOrDirect?.type === ChannelType.CHANNEL_TYPE_TEXT) {
 			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL);
 		}
-	}, [type]);
+	}, [channelOrDirect?.type]);
+
 	const handleTabClick = (tab: SubPanelName) => {
 		setValueInputSearch('');
 		setSubPanelActive(tab);
