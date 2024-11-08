@@ -1,4 +1,4 @@
-import { useAuth, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -8,6 +8,7 @@ import {
 	messagesActions,
 	reactionActions,
 	referencesActions,
+	selectChannelById,
 	selectCurrentChannel,
 	selectDefaultCanvasByChannelId,
 	selectTheme,
@@ -16,7 +17,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
+import {
+	EMOJI_GIVE_COFFEE,
+	IMessageWithUser,
+	SubPanelName,
+	findParentByClass,
+	isPublicChannel,
+	useMenuBuilder,
+	useMenuBuilderPlugin
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -116,10 +125,11 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const appearanceTheme = useSelector(selectTheme);
-
+	const { reactionMessageDispatch } = useChatReaction();
+	const channel = useAppSelector((state) => selectChannelById(state, message.channel_id ?? '')) || {};
 	const handleItemClick = useCallback(async () => {
 		try {
-			dispatch(
+			await dispatch(
 				giveCoffeeActions.updateGiveCoffee({
 					channel_id: message.channel_id,
 					clan_id: message.clan_id,
@@ -128,6 +138,17 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 					sender_id: userId,
 					token_count: 1
 				})
+			).unwrap();
+
+			await reactionMessageDispatch(
+				'',
+				message.id ?? '',
+				EMOJI_GIVE_COFFEE.emoji_id,
+				EMOJI_GIVE_COFFEE.emoji,
+				1,
+				message?.sender_id ?? '',
+				false,
+				isPublicChannel(channel)
 			);
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
