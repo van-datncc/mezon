@@ -60,11 +60,9 @@ import { useMezon } from '@mezon/transport';
 import {
 	EMOJI_GIVE_COFFEE,
 	ETypeLinkMedia,
-	LogType,
 	ModeResponsive,
 	NotificationCode,
 	TIME_OFFSET,
-	addLog,
 	isPublicChannel,
 	sleep,
 	transformPayloadWriteSocket
@@ -228,12 +226,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			try {
-				addLog({
-					data: message,
-					eventType: LogType.NewMessage,
-					timestamp: new Date(),
-					level: 'info'
-				});
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = mapMessageChannelToEntity(message);
@@ -293,12 +285,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
 				console.error(error);
-				addLog({
-					data: message,
-					error: error,
-					eventType: LogType.NewMessage,
-					timestamp: new Date(),
-					level: 'error'
+				Sentry.captureException({
+					eventType: 'NEW_MESSAGE',
+					error
 				});
 			}
 		},
@@ -1058,12 +1047,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
 				const id = Date.now().toString();
-				addLog({
-					message: id + ':' + socketType,
-					eventType: LogType.DisconnectSocket,
-					timestamp: new Date(),
-					level: 'info'
-				});
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -1078,15 +1061,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					// eslint-disable-next-line no-console
-					addLog({
-						message: id + ':' + socketType,
-						error,
-						eventType: LogType.ReconnectSocket,
-						timestamp: new Date(),
-						level: 'error'
-					});
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					Sentry.captureException(error);
+					Sentry.captureException({
+						eventType: 'SOCKET_RECONNECT',
+						error
+					});
 				}
 			}, 5000);
 		},
@@ -1108,14 +1087,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = (message: ChannelMessage) => {
-				addLog({
-					data: message,
-					eventType: LogType.NewMessageCleanUp,
-					timestamp: new Date(),
-					level: 'error'
-				});
-			};
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function

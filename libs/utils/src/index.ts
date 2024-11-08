@@ -5,6 +5,5 @@ export * from './lib/contextmenu';
 export * from './lib/dom';
 export * from './lib/errors';
 export * from './lib/hooks';
-export * from './lib/indexdb';
 export * from './lib/types';
 export * from './lib/utils';

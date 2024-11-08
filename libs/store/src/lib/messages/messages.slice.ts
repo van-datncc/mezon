@@ -203,19 +203,6 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		if (Date.now() - response.time > 1000) {
-			const state = getMessagesState(getMessagesRootState(thunkAPI));
-			//@ts-expect-error This error is expected because the type information for this line is missing.
-			const lastSeenMessageId = selectMessageIdsByChannelId(state, channelId)?.at(-1);
-
-			if (lastSeenMessageId) {
-				thunkAPI.dispatch(
-					messagesActions.setChannelLastMessage({
-						channelId,
-						messageId: lastSeenMessageId
-					})
-				);
-			}
-
 			return {
 				messages: []
 			};
@@ -777,13 +764,6 @@ export const messagesSlice = createSlice({
 				}
 				default:
 					break;
-			}
-
-			if (isCurrentChannel || isMe) {
-				state.unreadMessagesEntries = {
-					...state.unreadMessagesEntries,
-					[action.payload.channel_id]: action.payload.id
-				};
 			}
 		},
 		setManyLastMessages: (state, action: PayloadAction<ApiChannelMessageHeaderWithChannel[]>) => {
