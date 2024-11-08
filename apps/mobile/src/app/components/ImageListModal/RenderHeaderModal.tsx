@@ -3,7 +3,7 @@ import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonClanAvatar } from '../../componentUI';
 import { useImage } from '../../hooks/useImage';
@@ -43,6 +43,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 	return (
 		<Block
 			position="absolute"
+			paddingVertical={Platform.OS === 'ios' ? size.s_28 : size.s_14}
 			left={0}
 			zIndex={1}
 			justifyContent="space-between"
