@@ -150,7 +150,7 @@ const OwnerGreeting = () => {
 	const { clanOwner } = useMemberContext();
 	return (
 		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-[#d5ddec] to-[#bbbfc9]">
-			<div className="p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-[#3d3f3d] to-[#1a1d1e] rounded-md">
+			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-[#3d3f3d] to-[#1a1d1e] rounded-md">
 				<div className="flex  gap-3">
 					<div className="w-12 relative">
 						<img
