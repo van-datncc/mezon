@@ -99,8 +99,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		<div
 			className="my-1"
 			style={{
-				height,
-				maxWidth: width || 150
+				height
 			}}
 		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
