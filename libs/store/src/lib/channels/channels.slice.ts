@@ -401,6 +401,23 @@ export const fetchChannels = createAsyncThunk(
 
 		const state = thunkAPI.getState() as RootState;
 
+		const currentChannelId = state.channels?.currentChannelId;
+
+		if (currentChannelId && !response?.channeldesc?.some((item) => item.channel_id === currentChannelId)) {
+			const data = await thunkAPI
+				.dispatch(
+					threadsActions.fetchThread({
+						channelId: '0',
+						clanId,
+						threadId: currentChannelId
+					})
+				)
+				.unwrap();
+			if (data?.length > 0) {
+				response.channeldesc.push({ ...data[0], active: 1 } as ChannelsEntity);
+			}
+		}
+
 		// Add threads that the user has not joined to the response
 
 		const unjoinedThreads = state.channels.threadsNotJoinedByUser;
