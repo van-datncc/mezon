@@ -45,6 +45,9 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 	);
 	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
 	const { avatarImg, username } = useMessageSender(user);
+	const [openThreadSetting, closeThreadSetting] = useModal(() => {
+		return <SettingChannel onClose={closeThreadSetting} channel={{ ...channelThread, type: ChannelType.CHANNEL_TYPE_THREAD }} />;
+	}, [channelThread?.id]);
 
 	const getRandomElements = (array: ChannelMembersEntity[], count: number) => {
 		const result = [];
@@ -156,6 +159,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 					coords={coords}
 					panelRef={panelRef}
 					setIsShowPanelChannel={setIsShowPanelChannel}
+					openThreadSetting={openThreadSetting}
 				/>
 			)}
 		</div>
@@ -166,16 +170,15 @@ const PannelThreadItem = ({
 	channelThread,
 	coords,
 	setIsShowPanelChannel,
-	panelRef
+	panelRef,
+	openThreadSetting
 }: {
 	panelRef: React.MutableRefObject<HTMLDivElement | null>;
 	channelThread: IChannel;
 	coords: Coords;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+	openThreadSetting: () => void;
 }) => {
-	const [openSettingThread, closeSettingThread] = useModal(() => {
-		return <SettingChannel onClose={closeSettingThread} channel={channelThread} />;
-	}, [channelThread?.id]);
 	const { handleConfirmDeleteChannel } = useChannels();
 	const handleDeleteChannel = () => {
 		handleConfirmDeleteChannel(channelThread?.channel_id as string, channelThread?.clan_id as string);
@@ -198,7 +201,7 @@ const PannelThreadItem = ({
 				onDeleteChannel={openConfirmDelete}
 				channel={channelThread as IChannel}
 				coords={coords}
-				openSetting={openSettingThread}
+				openSetting={openThreadSetting}
 				setIsShowPanelChannel={setIsShowPanelChannel}
 				rootRef={panelRef}
 			/>
