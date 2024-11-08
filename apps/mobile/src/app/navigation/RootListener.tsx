@@ -4,6 +4,7 @@ import {
 	acitvitiesActions,
 	appActions,
 	authActions,
+	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
@@ -73,6 +74,12 @@ const RootListener = () => {
 					isFetchingLatestMessages: true,
 					isClearMessage: true,
 					clanId: currentClanId
+				})
+			);
+			store.dispatch(
+				channelsActions.fetchChannels({
+					clanId: currentClanId,
+					noCache: true
 				})
 			);
 		}

@@ -48,6 +48,8 @@
     },
     "messageDeleteReply": "Original message was deleted",
     "forwardMessagesSuccessfully": "Forward messages successfully!",
+    "forwardTo": "Forward to",
+    "search": "Search",
     "reportMessage": {
         "reportSummary": "Report summary",
         "reviewYourReportBeforeSubmitting": "Review your report before submitting.",
