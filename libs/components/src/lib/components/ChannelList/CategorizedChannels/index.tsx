@@ -105,16 +105,25 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const dispatch = useAppDispatch();
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
 
+	const handleOpenEditCategory = () => {
+		openCategoryEdit();
+		closeRightClickModal();
+	};
+
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
 		return (
 			<PanelCategory
 				coords={coords}
 				setIsShowPanelChannel={closeRightClickModal}
 				onDeleteCategory={openDeleteCategoryModal}
-				setOpenSetting={setIsShowCategorySetting}
+				openEditCategory={handleOpenEditCategory}
 				category={category}
 			/>
 		);
+	}, [coords, category]);
+
+	const [openCategoryEdit, closeCategoryEdit] = useModal(() => {
+		return <CategorySetting onClose={closeCategoryEdit} category={category} />;
 	}, [coords, category]);
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

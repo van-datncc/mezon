@@ -1,4 +1,4 @@
-import { useClans, usePermissionChecker } from '@mezon/core';
+import { useClans, usePathMatch, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
 	eventManagementActions,
@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EventModal from '../EventChannelModal';
 
-export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boolean; isSettingPath: boolean }) => {
+export const Events = memo(() => {
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
@@ -42,6 +42,12 @@ export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boo
 
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const channelSettingPath = `/chat/clans/${currentClanId}/channel-setting`;
+	const serverGuidePath = `/chat/clans/${currentClanId}/guide`;
+	const { isMemberPath, isSettingPath, isGuidePath } = usePathMatch({
+		isMemberPath: memberPath,
+		isSettingPath: channelSettingPath,
+		isGuidePath: serverGuidePath
+	});
 
 	const [openEventModal, closeEventModal] = useModal(() => {
 		return (
@@ -57,6 +63,21 @@ export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boo
 	return (
 		<>
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
+
+			<Link
+				to={serverGuidePath}
+				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+			>
+				<div className="grow w-5 flex-row items-center gap-2 flex">
+					<div className="w-5 h-5 relative flex flex-row items-center">
+						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+							<Icons.Guide defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+						</div>
+					</div>
+					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Server Guide</div>
+				</div>
+			</Link>
+
 			<div
 				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
 				onClick={openModal}

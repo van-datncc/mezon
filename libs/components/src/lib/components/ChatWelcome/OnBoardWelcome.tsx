@@ -1,4 +1,4 @@
-import { EElementHightLight, useDriver, useMessageValue } from '@mezon/core';
+import { EElementHightLight, useDriver } from '@mezon/core';
 import { channelsActions, selectAllChannels, selectMembersClanCount, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import 'driver.js/dist/driver.css';
@@ -10,11 +10,10 @@ export type OnBoardWelcomeProps = {
 	nextMessageId?: string;
 };
 
-function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
+export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 	const numberMemberClan = useAppSelector(selectMembersClanCount);
 	const numberChannel = useSelector(selectAllChannels);
 
-	const { setRequestInput } = useMessageValue();
 	const dispatch = useDispatch();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
 
@@ -70,5 +69,3 @@ const Onboarditem = ({ icon, title, tick, onClick }: { icon: ReactNode; title: s
 		</div>
 	);
 };
-
-export default OnBoardWelcome;

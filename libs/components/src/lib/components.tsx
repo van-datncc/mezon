@@ -4,6 +4,7 @@ export { default as ChannelTopbar } from './components/ChannelTopbar';
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
 export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
 export { default as ChatWelcome } from './components/ChatWelcome';
+export * from './components/ChatWelcome/OnBoardWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
 export { default as ModalCreateClan } from './components/CreateClanModal';
 export { default as DeleteClanModal } from './components/DeleteClanModal';
@@ -85,3 +86,4 @@ export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
 
 export { default as Canvas } from './components/Canvas';
+export { default as GuideBody } from './components/Guide/GuideBody';

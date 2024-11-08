@@ -2,7 +2,7 @@
 import { selectChannelMemberByUserIds, selectCurrentChannel, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { RefObject, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { RefObject, memo, useCallback, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
@@ -29,7 +29,7 @@ type UserProfilePopupProps = {
 	mode?: number;
 	positionShortUser: { top: number; left: number } | null;
 	isDm?: boolean;
-	rootRef: RefObject<HTMLElement>;
+	rootRef?: RefObject<HTMLElement>;
 	onClose: () => void;
 };
 
@@ -58,8 +58,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
 
-	const mentionRef = useRef<HTMLSpanElement>(null);
-
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
 	const channelId = isDM ? currentDirectId : currentChannelId;
@@ -67,6 +65,19 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
+
+	const [openProfileItem, closeProfileItem] = useModal(() => {
+		return (
+			<UserProfilePopup
+				userID={tagUserId ?? ''}
+				channelId={channelId ?? ''}
+				mode={mode}
+				isDm={isDM}
+				positionShortUser={positionShortUser}
+				onClose={closeProfileItem}
+			/>
+		);
+	}, [positionShortUser]);
 
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -88,26 +99,8 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		[tagRoleId]
 	);
 
-	const handleClickOutside = useCallback(() => {
-		closeProfileItem();
-	}, []);
-
-	const [openProfileItem, closeProfileItem] = useModal(() => {
-		return (
-			<UserProfilePopup
-				rootRef={mentionRef}
-				userID={tagUserId ?? ''}
-				channelId={channelId ?? ''}
-				mode={mode}
-				isDm={isDM}
-				positionShortUser={positionShortUser}
-				onClose={handleClickOutside}
-			/>
-		);
-	}, [positionShortUser]);
-
 	return (
-		<span ref={mentionRef}>
+		<span>
 			{displayToken?.type === MentionType.ROLE_EXIST && (
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`${displayToken.display}`}</span>
 			)}
@@ -173,7 +166,6 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 			}}
 		>
 			<ModalUserProfile
-				rootRef={rootRef}
 				onClose={onClose}
 				userID={userID}
 				classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
