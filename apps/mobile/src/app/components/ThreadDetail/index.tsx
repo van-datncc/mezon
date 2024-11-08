@@ -45,7 +45,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isThread = checkIsThread(currentChannel as ChannelsEntity);
 	const loadingStatus = useSelector((state: RootState) => state?.threads?.loadingStatus);
-	const isLoading = useMemo(() => ['loading'].includes(loadingStatus), [loadingStatus]);
+	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
 
 	useEffect(() => {
 		fetchThreads();
