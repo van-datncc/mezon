@@ -27,6 +27,7 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { auditLogReducer } from './auditLog/auditLog.slice';
 import { canvasReducer } from './canvas/canvas.slice';
 import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
@@ -334,6 +335,7 @@ const reducer = {
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
+	auditlog: auditLogReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

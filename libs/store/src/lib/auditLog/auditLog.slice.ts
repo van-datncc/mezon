@@ -1,13 +1,17 @@
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MezonapiListAuditLog } from 'mezon-js/api.gen';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { ApiAuditLog, MezonapiListAuditLog } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const AUDIT_LOG_FEATURE_KEY = 'auditlog';
 const FETCH_AUDIT_LOG_CACHED_TIME = 1000 * 60 * 3;
 
-export interface IAuditLogState {
+export interface AuditLogEntity extends ApiAuditLog {
+	id: string;
+}
+
+export interface IAuditLogState extends EntityState<AuditLogEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	auditLogData: MezonapiListAuditLog;
@@ -22,16 +26,9 @@ type getAuditLogListPayload = {
 	noCache?: boolean;
 };
 
-export const auditLogInitialState: IAuditLogState = {
-	loadingStatus: 'not loaded',
-	error: null,
-	auditLogData: {
-		logs: [],
-		page: undefined,
-		page_size: undefined,
-		total_count: undefined
-	}
-};
+export const auditLogAdapter = createEntityAdapter({
+	selectId: (auditLog: AuditLogEntity) => auditLog.id || ''
+});
 
 export const fetchAuditLogCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, actionLog: string, userId: string, clanId?: string, page?: number, page_size?: number) => {
@@ -66,15 +63,15 @@ export const auditLogList = createAsyncThunk(
 	}
 );
 
-// export const initialAuditLogState: IAuditLogState = auditLogAdapter.getInitialState({
-// 	loadingStatus: 'not loaded',
-// 	error: null,
-// 	auditLogData: {}
-// });
+export const initialAuditLogState: IAuditLogState = auditLogAdapter.getInitialState({
+	loadingStatus: 'not loaded',
+	error: null,
+	auditLogData: {}
+});
 
 export const auditLogSlice = createSlice({
 	name: AUDIT_LOG_FEATURE_KEY,
-	initialState: auditLogInitialState,
+	initialState: initialAuditLogState,
 	reducers: {
 		// ...
 	},
@@ -101,5 +98,9 @@ export const auditLogActions = {
 	auditLogList
 };
 
+const { selectAll, selectById, selectEntities } = auditLogAdapter.getSelectors();
 export const getAuditLogState = (rootState: { [AUDIT_LOG_FEATURE_KEY]: IAuditLogState }): IAuditLogState => rootState[AUDIT_LOG_FEATURE_KEY];
-export const selectAllAuditLog = createSelector(getAuditLogState, (state) => state.auditLogData || []);
+export const selectAllAuditLog = createSelector(getAuditLogState, selectAll);
+export const selectAllAuditLogData = createSelector(getAuditLogState, (state) => {
+	return state.auditLogData || [];
+});

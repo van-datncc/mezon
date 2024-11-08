@@ -4,8 +4,8 @@ import MainAuditLog from './AuditItem';
 const AuditLog = () => {
 	return (
 		<div className="mt-[60px]">
-			<div className="flex justify-between items-center mb-5">
-				<h2 className="text-xl font-semibold  dark:text-textDarkTheme text-textLightTheme flex">
+			<div className="flex justify-between items-center">
+				<h2 className="text-xl font-semibold dark:text-textDarkTheme text-textLightTheme flex">
 					<div>Audit Log</div>
 				</h2>
 				<div className="flex items-center gap-1">
