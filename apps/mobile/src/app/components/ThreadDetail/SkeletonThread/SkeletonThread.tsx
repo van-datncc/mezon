@@ -23,9 +23,6 @@ export default function SkeletonThread({ numberSkeleton }: { numberSkeleton: num
 				<Block key={`ChannelListSkeleton_${index}`} flexDirection="row" justifyContent="space-between" gap={size.s_20}>
 					<Block
 						flex={1}
-						backgroundColor={themeValue.secondaryLight}
-						borderBottomWidth={1}
-						borderBlockColor={themeValue.borderHighlight}
 						borderRadius={size.s_10}
 						flexDirection="row"
 						alignItems="center"
