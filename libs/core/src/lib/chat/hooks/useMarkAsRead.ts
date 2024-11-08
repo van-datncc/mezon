@@ -124,7 +124,7 @@ export function useMarkAsRead() {
 				allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
 					resetCountChannelBadge(channel);
 				});
-				dispatch(clansActions.updateClanBadgeCount({ clanId: currentClanId ?? '', count: 0, isReset: true }));
+				dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: 0, isReset: true }));
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadClan('error');
