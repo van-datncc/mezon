@@ -1,5 +1,5 @@
 import { useAuth, useChatReaction } from '@mezon/core';
-import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannel } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
@@ -14,7 +14,6 @@ type EmojiItemProps = {
 };
 
 function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
-	const dispatch = useDispatch();
 	const userId = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
 	const emojiHover = useRef<EmojiDataOptionals | null>(null);
@@ -23,7 +22,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentClanId = useSelector(selectCurrentClanId);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -179,7 +177,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 		}, [totalCount]);
 
 		return (
-			<div className="flex flex-row gap-1">
+			<div className="flex flex-row gap-1" style={{ height: 24 }}>
 				<div
 					ref={ref}
 					onMouseEnter={onMouse}

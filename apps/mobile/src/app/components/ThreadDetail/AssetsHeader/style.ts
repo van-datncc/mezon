@@ -37,5 +37,5 @@ export const style = (colors: Attributes) =>
 			width: '100%',
 			height: 2,
 			backgroundColor: 'black'
-		},
+		}
 	});

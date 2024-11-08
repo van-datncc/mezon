@@ -1,7 +1,7 @@
 import { selectTheme } from '@mezon/store';
 import { getSrcEmoji, SHOW_POSITION } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 import PlainText from './PlainText';
@@ -14,9 +14,7 @@ type EmojiMarkupOpt = {
 };
 
 export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, isOne }) => {
-	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`);
 	const appearanceTheme = useSelector(selectTheme);
-
 	const srcEmoji = useMemo(() => {
 		return getSrcEmoji(emojiId);
 	}, [emojiId]);
@@ -33,15 +31,14 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 			id={`emoji-${emojiSyntax}`}
 			src={srcEmoji}
 			alt={`[${emojiSyntax}](${emojiId})`}
-			className={className}
+			className={`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`}
 			onDragStart={(e) => e.preventDefault()}
 		/>
 	);
-
 	return (
 		<span onContextMenu={handleContextMenu} style={{ display: 'inline-block', height: onlyEmoji ? '50px' : 'auto' }}>
 			{srcEmoji ? (
-				<Tooltip style={appearanceTheme === 'light' ? 'light' : 'dark'} content={emojiSyntax}>
+				<Tooltip style={appearanceTheme === 'light' ? 'light' : 'dark'} content={<p style={{ width: 'max-content' }}>{emojiSyntax}</p>}>
 					{emojiElement}
 				</Tooltip>
 			) : (
