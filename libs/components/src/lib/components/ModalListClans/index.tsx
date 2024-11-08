@@ -30,15 +30,7 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 	});
 
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
-		return (
-			<PanelClan
-				coords={coords}
-				setIsShowPanelChannel={closeRightClickModal}
-				// onDeleteCategory={openDeleteCategoryModal}
-				// setOpenSetting={setIsShowCategorySetting}
-				clan={option}
-			/>
-		);
+		return <PanelClan coords={coords} setIsShowPanelClan={closeRightClickModal} clan={option} />;
 	}, [coords, option]);
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;

@@ -1,54 +1,34 @@
-import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
-import {
-	SetDefaultNotificationPayload,
-	defaultNotificationCategoryActions,
-	selectCurrentClan,
-	selectDefaultNotificationCategory,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
-import {
-	ACTIVE,
-	DEFAULT_ID,
-	ENotificationTypes,
-	EPermission,
-	FOR_15_MINUTES,
-	FOR_1_HOUR,
-	FOR_24_HOURS,
-	FOR_3_HOURS,
-	FOR_8_HOURS,
-	IClan,
-	MUTE
-} from '@mezon/utils';
-import { format } from 'date-fns';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
+import { defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
+import { EPermission, getNotificationLabel, IClan, serverSettingsMenuList } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
+import ModalInvite from '../ListMemberInvite/modalInvite';
 import { notificationTypesList } from '../PanelChannel';
 import GroupPanels from '../PanelChannel/GroupPanels';
 import ItemPanel from '../PanelChannel/ItemPanel';
 
-interface IPanelCategoryProps {
+interface IPanelCLanProps {
 	coords: Coords;
 	clan?: IClan;
 	onDeleteCategory?: () => void;
-	setIsShowPanelChannel?: () => void;
-	setOpenSetting?: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsShowPanelClan?: () => void;
 }
 
-const PanelClan: React.FC<IPanelCategoryProps> = ({ coords, clan, onDeleteCategory, setIsShowPanelChannel, setOpenSetting }) => {
+const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setIsShowPanelClan }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
+	const [canManageCLan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
 	const dispatch = useAppDispatch();
-	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
-	const currentClan = useAppSelector(selectCurrentClan);
-	const [muteUntil, setMuteUntil] = useState('');
-
-	const handleDeleteCategory = () => {
-		onDeleteCategory?.();
-	};
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteClanModal} setIsShowPanelClan={setIsShowPanelClan} open={true} clanId={clan?.clan_id} />
+	));
+	const [isOnClickOutsideActive, setIsOnClickOutsideActive] = useState(true);
 
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
@@ -56,91 +36,35 @@ const PanelClan: React.FC<IPanelCategoryProps> = ({ coords, clan, onDeleteCatego
 			setPositionTop(true);
 		}
 	}, [coords.distanceToBottom]);
-
-	// const handleOpenSetting = () => {
-	// 	setOpenSetting(true);
-	// 	// setIsShowPanelChannel();
-	// };
-
-	const handleChangeSettingType = (notificationType: number) => {
-		const payload: SetDefaultNotificationPayload = {
-			category_id: clan?.id,
-			notification_type: notificationType,
-			clan_id: currentClan?.clan_id || ''
-		};
-		dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
-	};
-
-	const handleScheduleMute = (duration: number) => {
-		if (duration !== Infinity) {
-			const now = new Date();
-			const muteTime = new Date(now.getTime() + duration);
-			const muteTimeISO = muteTime.toISOString();
-			const payload: SetDefaultNotificationPayload = {
-				category_id: clan?.id,
-				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
-				time_mute: muteTimeISO,
-				clan_id: currentClan?.clan_id || ''
-			};
-			dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
-		} else {
-			const payload: SetDefaultNotificationPayload = {
-				category_id: clan?.id,
-				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
-				clan_id: currentClan?.clan_id || '',
-				active: 0
-			};
-			dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
-		}
-	};
-
-	const handleMuteCategory = (active: number) => {
-		const payload: SetDefaultNotificationPayload = {
-			category_id: clan?.id,
-			notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
-			clan_id: currentClan?.clan_id || '',
-			active: active
-		};
-		dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
-	};
-
-	useEffect(() => {
-		if (defaultCategoryNotificationSetting?.active) {
-			setMuteUntil('');
-		} else if (defaultCategoryNotificationSetting?.time_mute) {
-			const muteTime = new Date(defaultCategoryNotificationSetting.time_mute);
-			const now = new Date();
-			if (muteTime > now) {
-				const timeDifference = muteTime.getTime() - now.getTime();
-				const formattedTimeDifference = format(muteTime, 'dd/MM, HH:mm');
-				setMuteUntil(`Muted until ${formattedTimeDifference}`);
-				setTimeout(() => {
-					const payload: SetDefaultNotificationPayload = {
-						category_id: clan?.id,
-						notification_type: defaultCategoryNotificationSetting?.notification_setting_type ?? NotificationType.ALL_MESSAGE,
-						clan_id: currentClan?.clan_id || '',
-						active: 1
-					};
-					dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
-				}, timeDifference);
-			}
-		}
-	}, [defaultCategoryNotificationSetting]);
-
 	const handClosePannel = useCallback(() => {
-		setIsShowPanelChannel?.();
+		setIsShowPanelClan?.();
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	useOnClickOutside(panelRef, handClosePannel);
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	useOnClickOutside(panelRef, isOnClickOutsideActive ? handClosePannel : () => {});
+	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
+	useEffect(() => {
+		if (statusMarkAsReadClan === 'success' || statusMarkAsReadClan === 'error') {
+			handClosePannel();
+		}
+	}, [statusMarkAsReadClan]);
 
-	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
-	// useEffect(() => {
-	// 	if (statusMarkAsReadCategory === 'success' || statusMarkAsReadCategory === 'error') {
-	// 		setIsShowPanelChannel();
-	// 	}
-	// }, [statusMarkAsReadCategory]);
+	const handleChangeSettingType = (notificationType: number) => {
+		dispatch(
+			defaultNotificationActions.setDefaultNotificationClan({
+				clan_id: clan?.clan_id,
+				notification_type: notificationType
+			})
+		);
+		handClosePannel();
+	};
 
+	const getLabel = getNotificationLabel(defaultNotificationClan?.notification_setting_type as NotificationType);
+	const handleInvitePeople = () => {
+		openInviteClanModal();
+		setIsOnClickOutsideActive(false);
+	};
 	return (
 		<div
 			ref={panelRef}
@@ -151,64 +75,29 @@ const PanelClan: React.FC<IPanelCategoryProps> = ({ coords, clan, onDeleteCatego
 		>
 			<GroupPanels>
 				<ItemPanel
-					// onClick={statusMarkAsReadCategory === 'pending' ? undefined : () => handleMarkAsReadCategory(clan as IClan)}
-					disabled={statusMarkAsReadCategory === 'pending'}
+					onClick={statusMarkAsReadClan === 'pending' ? undefined : () => handleMarkAsReadClan(clan?.id as string)}
+					disabled={statusMarkAsReadClan === 'pending'}
 				>
-					{statusMarkAsReadCategory === 'pending' ? 'Processing...' : 'Mark As Read'}
+					{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
 				</ItemPanel>
 			</GroupPanels>
+
 			<GroupPanels>
-				<ItemPanel children="Collapse Category" type={'checkbox'} />
-				<ItemPanel children="Collapse All Categories" />
+				<ItemPanel children="Invite People" info onClick={handleInvitePeople} />
 			</GroupPanels>
 			<GroupPanels>
-				{defaultCategoryNotificationSetting?.active === ACTIVE || defaultCategoryNotificationSetting?.id === DEFAULT_ID ? (
-					<Dropdown
-						trigger="hover"
-						dismissOnClick={false}
-						renderTrigger={() => (
-							<div>
-								<ItemPanel children={'Mute Category'} dropdown="change here" onClick={() => handleMuteCategory(MUTE)} />
-							</div>
-						)}
-						label=""
-						placement="right-start"
-						className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
-					>
-						<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
-						<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
-						<ItemPanel children="For 3 Hours" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
-						<ItemPanel children="For 8 Hours" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
-						<ItemPanel children="For 24 Hours" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
-						<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
-					</Dropdown>
-				) : (
-					<ItemPanel children={'Unmute Category'} onClick={() => handleMuteCategory(ACTIVE)} subText={muteUntil} />
-				)}
-
 				<Dropdown
 					trigger="hover"
 					dismissOnClick={false}
 					renderTrigger={() => (
 						<div>
-							<ItemPanel children="Notification Settings" dropdown="change here" />
+							<ItemPanel children="Notification Settings" subText={getLabel as string} dropdown="change here" />
 						</div>
 					)}
 					label=""
 					placement="right-start"
-					className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
 				>
-					<ItemPanel
-						children="Use Clan Default"
-						type="radio"
-						name="NotificationSetting"
-						defaultNotifi={true}
-						onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
-						checked={
-							defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT ||
-							defaultCategoryNotificationSetting?.notification_setting_type === undefined
-						}
-					/>
 					{notificationTypesList.map((notification) => (
 						<ItemPanel
 							children={notification.label}
@@ -217,18 +106,53 @@ const PanelClan: React.FC<IPanelCategoryProps> = ({ coords, clan, onDeleteCatego
 							name="NotificationSetting"
 							key={notification.value}
 							onClick={() => handleChangeSettingType(notification.value)}
-							checked={defaultCategoryNotificationSetting?.notification_setting_type === notification.value}
+							checked={defaultNotificationClan?.notification_setting_type === notification.value}
 						/>
 					))}
 				</Dropdown>
+				<ItemPanel children={'Hide Muted Channels'} type={'checkbox'} />
 			</GroupPanels>
-
-			{/* <UserRestrictionZone policy={canManageCategory}>
+			<GroupPanels>
+				<UserRestrictionZone policy={canManageCLan}>
+					<Dropdown
+						trigger="hover"
+						dismissOnClick={false}
+						renderTrigger={() => (
+							<div>
+								<ItemPanel children={'Serve Settings'} dropdown="change here" />
+							</div>
+						)}
+						label=""
+						placement="right-start"
+						className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+					>
+						{serverSettingsMenuList.map((menuItem) => (
+							<ItemPanel
+								children={menuItem.label}
+								notificationId={menuItem.value}
+								name="ServerSettingsMenu"
+								key={menuItem.value}
+								// onClick={() => handleMenuSelection(menuItem.value)}
+								// checked={selectedMenu === menuItem.value}
+							/>
+						))}
+					</Dropdown>
+				</UserRestrictionZone>
+				<ItemPanel children={'Privacy Settings'} />
+				<ItemPanel children={'Edit Server Profile'} />
+			</GroupPanels>
+			<UserRestrictionZone policy={canManageCLan}>
 				<GroupPanels>
-					<ItemPanel children={'Edit Category'} onClick={handleOpenSetting} />
-					<ItemPanel children={'Delete Category'} onClick={handleDeleteCategory} danger />
+					<ItemPanel children={'Create Channel'} />
+					<ItemPanel children={'Create Category'} />
+					<ItemPanel children={'Create Event'} />
 				</GroupPanels>
-			</UserRestrictionZone> */}
+			</UserRestrictionZone>
+			<UserRestrictionZone policy={!canManageCLan}>
+				<GroupPanels>
+					<ItemPanel children={'Leave Server'} danger />
+				</GroupPanels>
+			</UserRestrictionZone>
 		</div>
 	);
 };
