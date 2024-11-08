@@ -16,17 +16,17 @@ interface IPanelCLanProps {
 	coords: Coords;
 	clan?: IClan;
 	onDeleteCategory?: () => void;
-	setIsShowPanelClan?: () => void;
+	setShowClanListMenuContext?: () => void;
 }
 
-const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setIsShowPanelClan }) => {
+const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMenuContext }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
 	const [canManageCLan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
 	const dispatch = useAppDispatch();
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} setIsShowPanelClan={setIsShowPanelClan} open={true} clanId={clan?.clan_id} />
+		<ModalInvite onClose={closeInviteClanModal} setShowClanListMenuContext={setShowClanListMenuContext} open={true} clanId={clan?.clan_id} />
 	));
 	const [isOnClickOutsideActive, setIsOnClickOutsideActive] = useState(true);
 
@@ -37,7 +37,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setIsShowPanelClan
 		}
 	}, [coords.distanceToBottom]);
 	const handClosePannel = useCallback(() => {
-		setIsShowPanelClan?.();
+		setShowClanListMenuContext?.();
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
@@ -127,14 +127,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setIsShowPanelClan
 						className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 					>
 						{serverSettingsMenuList.map((menuItem) => (
-							<ItemPanel
-								children={menuItem.label}
-								notificationId={menuItem.value}
-								name="ServerSettingsMenu"
-								key={menuItem.value}
-								// onClick={() => handleMenuSelection(menuItem.value)}
-								// checked={selectedMenu === menuItem.value}
-							/>
+							<ItemPanel children={menuItem.label} notificationId={menuItem.value} name="ServerSettingsMenu" key={menuItem.value} />
 						))}
 					</Dropdown>
 				</UserRestrictionZone>

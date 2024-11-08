@@ -18,7 +18,7 @@ export type ModalParam = {
 	channelID?: string;
 	confirmButton?: () => void;
 	clanId?: string;
-	setIsShowPanelClan?: () => void;
+	setShowClanListMenuContext?: () => void;
 };
 
 const ModalInvite = (props: ModalParam) => {
@@ -29,7 +29,7 @@ const ModalInvite = (props: ModalParam) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
 	const firstChannel = useSelector(selectChannelFirst);
-	const { onClose, channelID, clanId, setIsShowPanelClan } = props;
+	const { onClose, channelID, clanId, setShowClanListMenuContext } = props;
 
 	const effectiveClanId = clanId && clanId !== '0' ? clanId : currentClanId;
 
@@ -103,7 +103,7 @@ const ModalInvite = (props: ModalParam) => {
 						onClick={() => {
 							handleCopyToClipboard(urlInvite);
 							onClose();
-							setIsShowPanelClan?.();
+							setShowClanListMenuContext?.();
 						}}
 					>
 						Copy
