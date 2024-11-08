@@ -79,7 +79,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		};
 	}, [imageLoaded]);
 
-	let width = attachmentData.width || 150;
+	let width = attachmentData.width || 0;
 	let height = attachmentData.height || 150;
 
 	if (attachmentData.width && attachmentData.height) {
@@ -99,15 +99,14 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		<div
 			className="my-1"
 			style={{
-				width: '100%',
-				maxWidth: `${width}px`,
-				height
+				height,
+				maxWidth: width || 150
 			}}
 		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
 			{showLoader && !imageLoaded && (
 				<div role="status" className="image-loading rounded shadow animate-pulse" style={{ width: '100%', height }}>
-					<div className="flex items-center justify-center bg-gray-300 rounded h-full w-full" style={{ width }}>
+					<div className="flex items-center justify-center bg-gray-300 rounded h-full w-full" style={{ width: width || 150 }}>
 						<svg
 							className="w-10 h-10 text-gray-200"
 							aria-hidden="true"

@@ -1,11 +1,4 @@
-import {
-	ChannelMessageOpt,
-	ChatWelcome,
-	MessageContextMenuProps,
-	MessageWithUser,
-	UnreadMessageBreak,
-	useMessageContextMenu
-} from '@mezon/components';
+import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectChannelDraftMessage,
@@ -17,7 +10,6 @@ import {
 } from '@mezon/store';
 import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
-import OnBoardWelcome from 'libs/components/src/lib/components/ChatWelcome/OnBoardWelcome';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -142,7 +134,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 				</div>
 			)}
 
-			{!isMyMessage && isLastSeen && <UnreadMessageBreak />}
+			{/* {!isMyMessage && isLastSeen && <UnreadMessageBreak />} */}
 		</>
 	);
 };
