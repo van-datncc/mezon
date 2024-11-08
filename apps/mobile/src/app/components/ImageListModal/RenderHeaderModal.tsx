@@ -43,7 +43,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 	return (
 		<Block
 			position="absolute"
-			paddingVertical={Platform.OS === 'ios' ? size.s_28 : size.s_14}
+			paddingTop={Platform.OS === 'ios' ? size.s_28 : size.s_14}
 			left={0}
 			zIndex={1}
 			justifyContent="space-between"
