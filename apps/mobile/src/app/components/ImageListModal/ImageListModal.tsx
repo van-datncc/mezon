@@ -122,7 +122,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 				}
 			}
 		},
-		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter]
+		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig?.showFooter]
 	);
 
 	const renderItem = ({ item, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
@@ -155,7 +155,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			clearTimeout(footerTimeoutRef.current);
 			setTimeoutHideFooter();
 		}
-	}, [visibleToolbarConfig.showFooter, currentImage.id, setTimeoutHideFooter]);
+	}, [visibleToolbarConfig?.showFooter, currentImage?.id, setTimeoutHideFooter]);
 
 	useEffect(() => {
 		return () => {
