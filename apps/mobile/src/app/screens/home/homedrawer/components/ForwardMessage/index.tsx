@@ -319,6 +319,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 							ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
 							keyExtractor={(item) => item?.channelId?.toString()}
 							renderItem={renderForwardObject}
+							estimatedItemSize={size.s_80}
 						/>
 					</Block>
 
