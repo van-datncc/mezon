@@ -104,7 +104,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
 			.map(mapChannelToForwardObject);
 
-		return [...listDMForward, ...listGroupForward, ...listTextChannel];
+		return [...listTextChannel, ...listGroupForward, ...listDMForward];
 	}, [dmGroupChatList, listChannels]);
 
 	const filteredForwardObjects = useMemo(() => {
