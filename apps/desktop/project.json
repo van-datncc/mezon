@@ -29,7 +29,10 @@
           "arch": "universal",
           "target": "default"
         },
-        "x64ArchFiles": "**/mezon-active-windows/*",
+        "x64ArchFiles": [
+          "**/nothing.o",
+          "**/windowmacos.o"
+        ],
         "publish": [
           {
             "provider": "generic",
@@ -168,7 +171,10 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "**/mezon-active-windows/*",
+          "x64ArchFiles": [
+            "**/nothing.o",
+            "**/windowmacos.o"
+          ],
           "publish": [
             {
               "provider": "generic",
@@ -252,7 +258,10 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "**/mezon-active-windows/*",
+          "x64ArchFiles": [
+            "**/nothing.o",
+            "**/windowmacos.o"
+          ],
           "publish": [
             {
               "provider": "generic",
