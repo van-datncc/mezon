@@ -263,7 +263,7 @@ export default class App {
 			defaultApp = windowInfoArray[0];
 		}
 
-		activeWindows.on('window-activated', (window) => {
+		activeWindows?.on('window-activated', (window) => {
 			const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
 			const fullPath = window.path.split(pathDelimiter).pop();
 			const appName = fullPath.replace(/\.(exe|app)$/, '');
