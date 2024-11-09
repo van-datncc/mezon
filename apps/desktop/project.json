@@ -29,7 +29,7 @@
           "arch": "universal",
           "target": "default"
         },
-        "x64ArchFiles": "**/*.o",
+        "x64ArchFiles": "**/mezon-active-windows/**",
         "publish": [
           {
             "provider": "generic",
@@ -168,7 +168,7 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "**/*.o)",
+          "x64ArchFiles": "**/mezon-active-windows/**",
           "publish": [
             {
               "provider": "generic",
@@ -252,7 +252,7 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "**/*.o",
+          "x64ArchFiles": "**/mezon-active-windows/**",
           "publish": [
             {
               "provider": "generic",
