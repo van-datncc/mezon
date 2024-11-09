@@ -29,10 +29,7 @@
           "arch": "universal",
           "target": "default"
         },
-        "x64ArchFiles": [
-          "**/nothing.o",
-          "**/windowmacos.o"
-        ],
+        "x64ArchFiles": "+(**/nothing.o|**/windowmacos.o)",
         "publish": [
           {
             "provider": "generic",
@@ -171,10 +168,7 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": [
-            "**/nothing.o",
-            "**/windowmacos.o"
-          ],
+          "x64ArchFiles": "+(**/nothing.o|**/windowmacos.o)",
           "publish": [
             {
               "provider": "generic",
@@ -258,10 +252,7 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": [
-            "**/nothing.o",
-            "**/windowmacos.o"
-          ],
+          "x64ArchFiles": "+(**/nothing.o|**/windowmacos.o)",
           "publish": [
             {
               "provider": "generic",
