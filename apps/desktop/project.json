@@ -29,7 +29,6 @@
           "arch": "universal",
           "target": "default"
         },
-        "x64ArchFiles": "*",
         "publish": [
           {
             "provider": "generic",
@@ -168,7 +167,6 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "*",
           "publish": [
             {
               "provider": "generic",
@@ -252,7 +250,6 @@
             "arch": "universal",
             "target": "default"
           },
-          "x64ArchFiles": "*",
           "publish": [
             {
               "provider": "generic",
