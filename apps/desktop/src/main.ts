@@ -115,10 +115,10 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 						window.removeAllListeners('close');
 						window.close();
 					});
-					autoUpdater.quitAndInstall();
-					setTimeout(() => {
-						App.application.quit();
-					}, 10000);
+
+					setImmediate(() => {
+						autoUpdater.quitAndInstall();
+					});
 				}
 			});
 	} else {
