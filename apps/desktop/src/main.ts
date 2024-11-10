@@ -99,7 +99,6 @@ autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 
 autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 	log.info(`The current version is ${app.getVersion()}. Install ${info.version} now.`);
-
 	const windows = App.BrowserWindow.getAllWindows();
 	if (process.platform === 'darwin') {
 		const window = App.BrowserWindow.getFocusedWindow();
