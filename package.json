@@ -1,6 +1,6 @@
 {
   "name": "mezon",
-  "version": "1.3.9",
+  "version": "1.3.12",
   "license": "MIT",
   "description": "Mezon application",
   "productName": "mezon",
@@ -28,10 +28,13 @@
     "install:desktop": "cd apps/desktop && yarn",
     "build:desktop:app": "nx run desktop:build",
     "build:desktop:renderer": "cross-env BUILD_TARGET='electron' nx build chat --prod --baseHref=./",
+    "build:macx64:renderer": "cross-env BUILD_TARGET='electron' nx build chat --x64 --prod --baseHref=./",
     "build:desktop": "yarn install:desktop && yarn build:desktop:app && yarn build:desktop:renderer",
+    "build:macx64": "yarn install:desktop && yarn build:desktop:app && yarn build:macx64:renderer",
     "package:desktop": "nx run desktop:package",
     "make:desktop": "nx run desktop:make",
     "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop",
+    "release:macx64": "yarn build:macx64 && yarn package:desktop && yarn make:desktop",
     "prepare": "husky"
   },
   "private": true,
