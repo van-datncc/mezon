@@ -27,7 +27,6 @@
         "category": "public.app-category.productivity",
         "target": {
           "arch": [
-            "x64",
             "arm64"
           ],
           "target": "default"
@@ -168,7 +167,6 @@
           "category": "public.app-category.productivity",
           "target": {
             "arch": [
-              "x64",
               "arm64"
             ],
             "target": "default"
@@ -254,7 +252,6 @@
           "category": "public.app-category.productivity",
           "target": {
             "arch": [
-              "x64",
               "arm64"
             ],
             "target": "default"
