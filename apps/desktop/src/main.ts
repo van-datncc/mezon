@@ -104,10 +104,15 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		window.removeAllListeners('close');
 		window.close();
 	});
-	autoUpdater.quitAndInstall(true, true);
-	setTimeout(() => {
-		App.application.quit();
-	}, 10000);
+
+	if (process.platform === 'darwin') {
+		autoUpdater.quitAndInstall();
+		setTimeout(() => {
+			App.application.quit();
+		}, 10000);
+	} else {
+		autoUpdater.quitAndInstall(true, true);
+	}
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
