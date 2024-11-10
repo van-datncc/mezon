@@ -33,9 +33,11 @@
     "build:desktop": "yarn install:desktop && yarn build:desktop:app && yarn build:desktop:renderer",
     "build:macx64": "yarn install:desktop && yarn build:macx64:app && yarn build:macx64:renderer",
     "package:desktop": "nx run desktop:package",
+    "package:macx64": "nx run desktop:package --x64",
     "make:desktop": "nx run desktop:make",
+    "make:macx64": "nx run desktop:make --x64",
     "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop",
-    "release:macx64": "yarn build:macx64 && yarn package:desktop && yarn make:desktop",
+    "release:macx64": "yarn build:macx64 && yarn package:macx64 && yarn make:macx64",
     "prepare": "husky"
   },
   "private": true,
