@@ -99,12 +99,8 @@ autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 
 autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 	log.info(`The current version is ${app.getVersion()}. Install ${info.version} now.`);
-	const windows = App.BrowserWindow.getAllWindows();
-	windows.forEach((window) => {
-		window.removeAllListeners('close');
-		window.close();
-	});
 
+	const windows = App.BrowserWindow.getAllWindows();
 	if (process.platform === 'darwin') {
 		const window = App.BrowserWindow.getFocusedWindow();
 		dialog
@@ -116,7 +112,6 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 			})
 			.then((result) => {
 				if (result.response === 0) {
-					const windows = App.BrowserWindow.getAllWindows();
 					windows.forEach((window) => {
 						window.removeAllListeners('close');
 						window.close();
@@ -128,6 +123,10 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 				}
 			});
 	} else {
+		windows.forEach((window) => {
+			window.removeAllListeners('close');
+			window.close();
+		});
 		autoUpdater.quitAndInstall(true, true);
 	}
 });
