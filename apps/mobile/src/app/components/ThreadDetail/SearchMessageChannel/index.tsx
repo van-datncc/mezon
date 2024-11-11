@@ -1,7 +1,7 @@
-import { debounce, EOpenSearchChannelFrom, IOption, IUerMention } from '@mezon/mobile-components';
+import { ETypeSearch, IOption, IUerMention } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, searchMessagesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { IChannel, SearchFilter, SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { IChannel, SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import SearchOptionPage from './SearchOptionPage';
 
 type RootStackParamList = {
 	SearchMessageChannel: {
-		openSearchChannelFrom: EOpenSearchChannelFrom;
+		typeSearch: ETypeSearch;
 		currentChannel: IChannel | DirectEntity;
 	};
 };
@@ -31,7 +31,7 @@ export const SearchMessageChannelContext = createContext(null);
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['searchMessageChannel']);
-	const { openSearchChannelFrom, currentChannel } = route?.params || {};
+	const { currentChannel, typeSearch } = route?.params || {};
 
 	const [userMention, setUserMention] = useState<IUerMention>();
 	const [isSearchMessagePage, setSearchMessagePage] = useState<boolean>(true);
@@ -41,15 +41,12 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const [optionFilter, setOptionFilter] = useState<IOption>();
 
 	const [searchText, setSearchText] = useState<string>('');
-	const handleSearchText = useCallback(
-		debounce((text) => {
-			if (!text.length) {
-				setSearchMessagePage(true);
-			}
-			setSearchText(text);
-		}, 200),
-		[]
-	);
+	const handleSearchText = useCallback((text) => {
+		if (!text.length) {
+			setSearchMessagePage(true);
+		}
+		setSearchText(text);
+	}, []);
 
 	const handleOptionFilter = useCallback(
 		(option) => {
@@ -70,10 +67,15 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	const handleSearchMessage = () => {
 		const filter: SearchFilter[] = [];
+
 		if (optionFilter && userMention) {
 			filter.push(
-				{ field_name: optionFilter.value, field_value: userMention?.display },
-				{ field_name: 'channel_id', field_value: currentChannel?.id }
+				{
+					field_name: optionFilter?.value,
+					field_value: optionFilter?.value === 'mention' ? `"user_id":"${userMention.id}"` : userMention?.display
+				},
+				{ field_name: 'channel_id', field_value: currentChannel?.id },
+				{ field_name: 'clan_id', field_value: currentClanId as string }
 			);
 		} else {
 			filter.push(
@@ -101,6 +103,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			setOptionFilter(null);
 		}
 	};
+
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
 			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
@@ -119,6 +122,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						userMention={userMention}
 						currentChannel={currentChannel}
 						searchText={searchText}
+						typeSearch={typeSearch}
 					/>
 				) : (
 					<SearchOptionPage

@@ -1,14 +1,15 @@
-import { ACTIVE_TAB, IUerMention } from '@mezon/mobile-components';
+import { ACTIVE_TAB, ETypeSearch, IUerMention } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	selectAllInfoChannels,
 	selectAllMessageSearch,
 	selectAllUsersByUser,
+	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage
 } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { ChannelsSearchTab } from '../../../ChannelsSearchTab';
@@ -22,15 +23,21 @@ interface ISearchMessagePageProps {
 	searchText: string;
 	userMention: IUerMention;
 	isSearchMessagePage: boolean;
+	typeSearch: ETypeSearch;
 }
 
-function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage }: ISearchMessagePageProps) {
+function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage, typeSearch }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
-	const messageSearchByChannelId = useSelector(selectAllMessageSearch);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id || ''));
+	const allMessageSearch = useSelector(selectAllMessageSearch);
+
+	const messagesSearch = useMemo(() => {
+		return typeSearch === ETypeSearch?.SearchAll ? allMessageSearch : messageSearchByChannelId;
+	}, [typeSearch, messageSearchByChannelId, allMessageSearch]);
 
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;
@@ -66,12 +73,12 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 			},
 			{
 				title: t('Messages'),
-				quantitySearch: totalResult,
-				display: !!userMention || !!totalResult,
+				quantitySearch: typeSearch === ETypeSearch?.SearchAll ? totalResult : messagesSearch?.length,
+				display: !!userMention || !!messagesSearch?.length,
 				index: ACTIVE_TAB.MESSAGES
 			}
 		].filter((tab) => tab?.display);
-	}, [channelsSearch?.length, membersSearch?.length, searchText, t, totalResult]);
+	}, [channelsSearch?.length, membersSearch?.length, searchText, t, messagesSearch?.length, userMention, totalResult]);
 
 	function handelHeaderTabChange(index: number) {
 		setActiveTab(index);
@@ -81,10 +88,10 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 		setActiveTab(TabList[0]?.index);
 	}, [TabList]);
 
-	const renderContent = () => {
+	const renderContent = useCallback(() => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} />;
+				return <MessagesSearchTab messageSearchByChannelId={messagesSearch} />;
 			case ACTIVE_TAB.MEMBER:
 				return <MembersSearchTab listMemberSearch={membersSearch} />;
 			case ACTIVE_TAB.CHANNEL:
@@ -92,7 +99,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 			default:
 				return <EmptySearchPage />;
 		}
-	};
+	}, [messagesSearch, membersSearch, channelsSearch, activeTab]);
 
 	return (
 		<Block height={'100%'} width={'100%'}>

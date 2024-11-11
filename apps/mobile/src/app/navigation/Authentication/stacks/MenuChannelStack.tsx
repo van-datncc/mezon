@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChangeCategory } from '../../../components/ChangeCategory';
 import { ChannelSetting } from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
+import SearchMessageDm from '../../../components/ThreadDetail/SearchMessageDm/SearchMessageDm';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
 import { APP_SCREEN } from '../../ScreenTypes';
@@ -53,6 +54,14 @@ export function MenuChannelStacks({}: any) {
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL}
 				component={SearchMessageChannel}
+				options={{
+					headerShown: false,
+					headerLeftLabelVisible: false
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM}
+				component={SearchMessageDm}
 				options={{
 					headerShown: false,
 					headerLeftLabelVisible: false

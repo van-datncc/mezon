@@ -25,7 +25,7 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 		if (messageSearchByChannelId?.length > 0) {
 			setMessages((prevMessages) => {
 				const existingMessages = new Set(prevMessages.map((msg) => msg?.id));
-				const newMessages = messageSearchByChannelId?.filter((msg) => !existingMessages.has(msg.id));
+				const newMessages = messageSearchByChannelId.filter((msg) => !existingMessages.has(msg.id));
 				if (newMessages.length > 0) {
 					return [...prevMessages, ...newMessages];
 				}
@@ -113,7 +113,8 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 						estimatedItemSize={100}
 						removeClippedSubviews={true}
 						onEndReached={loadMoreMessages}
-						onEndReachedThreshold={0.5}
+						contentContainerStyle={{ paddingBottom: size.s_100 }}
+						onEndReachedThreshold={0.2}
 						ListFooterComponent={isLoadingMore && <ViewLoadMore />}
 					/>
 				</Block>
