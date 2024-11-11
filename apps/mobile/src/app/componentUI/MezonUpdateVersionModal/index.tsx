@@ -1,12 +1,12 @@
 import { Metrics, size } from '@mezon/mobile-ui';
 import React from 'react';
-import { ImageBackground, Modal, ModalBaseProps, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ModalBaseProps, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Chase } from 'react-native-animated-spinkit';
 import codePush from 'react-native-code-push';
 import FastImage from 'react-native-fast-image';
+import Modal from 'react-native-modal';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import BG_LOGIN from '../../screens/settings/QRScanner/bgLoginQR.png';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import BG from './bgUpdateApp.png';
@@ -50,9 +50,9 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 		setPercent(percent);
 	};
 	return (
-		<Modal visible={visible} statusBarTranslucent={true} transparent>
+		<Modal coverScreen={false} deviceHeight={Dimensions.get('screen').height} isVisible={visible} statusBarTranslucent={true}>
 			<View style={styles.modalOverlay}>
-				<ImageBackground source={BG_LOGIN} style={styles.modalContainer} resizeMode={'cover'}>
+				<View style={styles.modalContainer}>
 					<FastImage source={BG} style={{ width: size.s_100, height: size.s_100 }} />
 					<Text style={styles.title}>Update Available</Text>
 					<Text style={styles.message}>A new update is available. Would you like to update now?</Text>
@@ -67,7 +67,7 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 							</TouchableOpacity>
 						)}
 					</View>
-				</ImageBackground>
+				</View>
 			</View>
 		</Modal>
 	);
@@ -87,7 +87,10 @@ const styles = StyleSheet.create({
 		borderRadius: size.s_10,
 		overflow: 'hidden',
 		alignItems: 'center',
-		justifyContent: 'center'
+		justifyContent: 'center',
+		backgroundColor: '#242427',
+		borderWidth: 1,
+		borderColor: '#4a4a4a'
 	},
 	title: {
 		color: '#ededed',
@@ -109,7 +112,7 @@ const styles = StyleSheet.create({
 		gap: size.s_10
 	},
 	button: {
-		backgroundColor: '#3314d3',
+		backgroundColor: '#5a62f4',
 		borderColor: '#d8d8d8',
 		borderWidth: 1,
 		padding: size.s_10,
@@ -123,7 +126,7 @@ const styles = StyleSheet.create({
 	},
 	buttonSecond: {
 		backgroundColor: '#d8d8d8',
-		borderColor: '#3920cd',
+		borderColor: '#5a62f4',
 		borderWidth: 1,
 		padding: size.s_10,
 		borderRadius: size.s_6,

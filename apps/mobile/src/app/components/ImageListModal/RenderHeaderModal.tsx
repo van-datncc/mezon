@@ -3,7 +3,7 @@ import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
-import { Platform, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonClanAvatar } from '../../componentUI';
 import { useImage } from '../../hooks/useImage';
@@ -13,9 +13,10 @@ interface IRenderFooterModalProps {
 	onClose?: () => void;
 	imageSelected?: AttachmentEntity;
 	onImageSaved?: () => void;
+	onLoading?: (isLoading: boolean) => void;
 }
 
-export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved }: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const uploader = useSelector(selectMemberClanByUserId(imageSelected?.uploader || ''));
@@ -24,6 +25,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 		if (!imageSelected?.url) {
 			return;
 		}
+		onLoading(true);
 		try {
 			const { url, filetype } = imageSelected;
 			const filetypeParts = filetype.split('/');
@@ -33,14 +35,15 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			}
 			onImageSaved();
 		} catch (error) {
-			console.log('download image error', error);
+			console.error(error);
 		}
+		onLoading(false);
 	};
 
 	return (
 		<Block
 			position="absolute"
-			top={Platform.OS === 'ios' ? size.s_28 : size.s_14}
+			paddingTop={size.s_30}
 			left={0}
 			zIndex={1}
 			justifyContent="space-between"

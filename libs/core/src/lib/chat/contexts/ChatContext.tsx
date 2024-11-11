@@ -35,16 +35,13 @@ import {
 	policiesActions,
 	reactionActions,
 	rolesClanActions,
-	selectChannelById,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
-	selectDirectById,
 	selectDmGroupCurrentId,
-	selectMessageByMessageId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -57,18 +54,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import {
-	EMOJI_GIVE_COFFEE,
-	ETypeLinkMedia,
-	LogType,
-	ModeResponsive,
-	NotificationCode,
-	TIME_OFFSET,
-	addLog,
-	isPublicChannel,
-	sleep,
-	transformPayloadWriteSocket
-} from '@mezon/utils';
+import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, sleep } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
@@ -100,6 +86,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
+	TokenSentEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -109,7 +96,7 @@ import {
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
@@ -228,12 +215,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			try {
-				addLog({
-					data: message,
-					eventType: LogType.NewMessage,
-					timestamp: new Date(),
-					level: 'info'
-				});
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = mapMessageChannelToEntity(message);
@@ -293,12 +274,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
 				console.error(error);
-				addLog({
-					data: message,
-					error: error,
-					eventType: LogType.NewMessage,
-					timestamp: new Date(),
-					level: 'error'
+				Sentry.captureException({
+					eventType: 'NEW_MESSAGE',
+					error
 				});
 			}
 		},
@@ -668,6 +646,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const ontokensent = useCallback(
+		(tokenEvent: TokenSentEvent) => {
+			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
+		},
+		[dispatch, userId]
+	);
+
 	const onerror = useCallback(
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -821,63 +806,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const [triggerDate, setTriggerDate] = useState<number>(Date.now());
-
-	const [messageIdCoffee, setMessageIdCoffee] = useState('');
-	const [channelIdCoffee, setChannelIdCoffee] = useState('');
-	const messageCoffee = useAppSelector((state) => selectMessageByMessageId(state, channelId, messageIdCoffee));
-	const channelCoffee = useAppSelector((state) => selectChannelById(state, channelIdCoffee ?? '')) || {};
-	const directCoffee = useAppSelector((state) => selectDirectById(state, channelIdCoffee));
-
-	const parentChannelCoffee = useAppSelector((state) => selectChannelById(state, channelCoffee?.parrent_id ?? '')) || {};
-
 	const isClanView = useSelector(selectClanView);
-
-	useEffect(() => {
-		const currentActive = channelCoffee ? channelCoffee : directCoffee;
-		if (messageCoffee !== undefined && !currentActive !== undefined && parentChannelCoffee !== undefined) {
-			const mode =
-				currentActive.type === ChannelType.CHANNEL_TYPE_TEXT
-					? ChannelStreamMode.STREAM_MODE_CHANNEL
-					: currentActive.type === ChannelType.CHANNEL_TYPE_GROUP
-						? ChannelStreamMode.STREAM_MODE_GROUP
-						: currentActive.type === ChannelType.CHANNEL_TYPE_DM
-							? ChannelStreamMode.STREAM_MODE_DM
-							: 0;
-			const payload = transformPayloadWriteSocket({
-				clanId: currentClanId as string,
-				isPublicChannel: isPublicChannel(currentActive),
-				isClanView: isClanView as boolean
-			});
-
-			dispatch(
-				reactionActions.writeMessageReaction({
-					id: '',
-					clanId: payload.clan_id as string,
-					channelId: messageCoffee.channel_id ?? '',
-					mode: mode ?? 0,
-					messageId: messageIdCoffee ?? '',
-					emoji_id: EMOJI_GIVE_COFFEE.emoji_id,
-					emoji: EMOJI_GIVE_COFFEE.emoji,
-					count: 1,
-					messageSenderId: messageCoffee?.sender_id ?? '',
-					actionDelete: false,
-					isPublic: payload.is_public
-				})
-			);
-		}
-	}, [triggerDate, dispatch]);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
-
-		if (coffeeEvent?.message_ref_id) {
-			setMessageIdCoffee(coffeeEvent.message_ref_id ?? '');
-			setChannelIdCoffee(coffeeEvent.channel_id ?? '');
-		}
-		if (userId === coffeeEvent.sender_id) {
-			setTriggerDate(Date.now());
-		}
 	}, []);
 
 	const onroleevent = useCallback((roleEvent: RoleEvent) => {
@@ -1007,6 +939,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oncoffeegiven = oncoffeegiven;
 
 			socket.onroleevent = onroleevent;
+
+			socket.ontokensent = ontokensent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1044,7 +978,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
-			onroleevent
+			onroleevent,
+			ontokensent
 		]
 	);
 
@@ -1058,12 +993,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
 				const id = Date.now().toString();
-				addLog({
-					message: id + ':' + socketType,
-					eventType: LogType.DisconnectSocket,
-					timestamp: new Date(),
-					level: 'info'
-				});
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -1078,15 +1007,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					// eslint-disable-next-line no-console
-					addLog({
-						message: id + ':' + socketType,
-						error,
-						eventType: LogType.ReconnectSocket,
-						timestamp: new Date(),
-						level: 'error'
-					});
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					Sentry.captureException(error);
+					Sentry.captureException({
+						eventType: 'SOCKET_RECONNECT',
+						error
+					});
 				}
 			}, 5000);
 		},
@@ -1108,14 +1033,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = (message: ChannelMessage) => {
-				addLog({
-					data: message,
-					eventType: LogType.NewMessageCleanUp,
-					timestamp: new Date(),
-					level: 'error'
-				});
-			};
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function

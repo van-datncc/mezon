@@ -420,13 +420,9 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [messageActionNeedToResolve]);
 
-		const handleClearText = () => {
-			setText('');
-		};
-
 		useEffect(() => {
 			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
-				handleClearText();
+				setText('');
 			});
 			const addEmojiPickedListener = DeviceEventEmitter.addListener(ActionEmitEvent.ADD_EMOJI_PICKED, (emoji) => {
 				handleEventAfterEmojiPicked(emoji.shortName);

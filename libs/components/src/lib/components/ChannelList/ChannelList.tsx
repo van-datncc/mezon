@@ -112,15 +112,20 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	useLayoutEffect(() => {
 		if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
+		if (!virtualizer.getVirtualItems().length) return;
+
 		const focusChannel = ctrlKFocusChannel;
 		const { id, parentId } = focusChannel as { id: string; parentId: string };
 		const categoryId = channels[id]?.category_id;
 		const index = data.findIndex((item) => item.id === categoryId);
+		if (index <= 0) return;
 
-		if (index === -1) return;
-
-		virtualizer.scrollToIndex(index, { align: 'center' });
-
+		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
+		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
+		const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
+		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
+			virtualizer.scrollToIndex(index, { align: 'center' });
+		}
 		if (id && parentId && parentId !== '0') {
 			if (channelRefs.current[parentId]?.channelRef) {
 				requestAnimationFrame(() => {

@@ -7,7 +7,7 @@ import {
 	MessagesEntity,
 	getIsFowardAll,
 	getSelectedMessage,
-	selectChannelThreads,
+	selectAllChannelsByUser,
 	selectCurrentChannelId,
 	selectDirectsOpenlist,
 	selectDmGroupCurrentId,
@@ -15,10 +15,11 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelThreads, IMessageWithUser, normalizeString } from '@mezon/utils';
+import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
@@ -47,7 +48,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
 
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
-	const listChannels = useSelector(selectChannelThreads);
+	const listChannels = useSelector(selectAllChannelsByUser);
 
 	const { sendForwardMessage } = useSendForwardMessage();
 	const { t } = useTranslation('message');
@@ -103,7 +104,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
 			.map(mapChannelToForwardObject);
 
-		return [...listDMForward, ...listGroupForward, ...listTextChannel];
+		return [...listTextChannel, ...listGroupForward, ...listDMForward];
 	}, [dmGroupChatList, listChannels]);
 
 	const filteredForwardObjects = useMemo(() => {
@@ -299,12 +300,12 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 							</TouchableOpacity>
 						</Block>
 						<Text h3 color={themeValue.white}>
-							{'Forward To'}
+							{t('forwardTo')}
 						</Text>
 					</Block>
 
 					<MezonInput
-						placeHolder={'Search'}
+						placeHolder={t('search')}
 						onTextChange={setSearchText}
 						value={searchText}
 						prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
@@ -312,12 +313,13 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 					/>
 
 					<Block flex={1}>
-						<FlatList
+						<FlashList
 							keyboardShouldPersistTaps="handled"
 							data={filteredForwardObjects}
 							ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
 							keyExtractor={(item) => item?.channelId?.toString()}
 							renderItem={renderForwardObject}
+							estimatedItemSize={size.s_60}
 						/>
 					</Block>
 
