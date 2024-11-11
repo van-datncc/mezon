@@ -1,5 +1,5 @@
 import { usePermissionChecker } from '@mezon/core';
-import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import { auditLogList, authActions, selectActionAuditLog, selectCurrentClan, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
@@ -19,10 +19,11 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [isClanOwner, hasClanPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
+	const actionFilter = useSelector(selectActionAuditLog);
 	const navigate = useNavigate();
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
-			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS].includes(item.id)) {
+			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS, ItemSetting.AUDIT_LOG].includes(item.id)) {
 				return hasClanPermission;
 			}
 			return true;
@@ -49,6 +50,18 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			navigate('/application-directory');
 			return;
 		}
+		if (settingItem.id === ItemSetting.AUDIT_LOG) {
+			if (currentClan?.clan_id) {
+				const body = {
+					actionLog: actionFilter ?? '',
+					userId: '',
+					clanId: currentClan?.clan_id ?? '',
+					page: 1,
+					pageSize: 10000
+				};
+				const response = dispatch(auditLogList(body));
+			}
+		}
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};
@@ -58,8 +71,11 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			<div className="w-[220px] py-[60px] pl-5 pr-[6px]">
 				<p className="text-[#84ADFF] pl-[10px] pb-[6px] font-bold text-sm tracking-wider uppercase truncate">{currentClan?.clan_name}</p>
 				{sideBarListItemWithPermissions.map((sidebarItem) => (
-					<div key={sidebarItem.title} className={'mt-[5px] border-b-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}>
-						{sidebarItem.title && (
+					<div
+						key={sidebarItem.title}
+						className={`${sidebarItem.listItem.length > 0 ? 'mt-[5px] border-b-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight' : ''}`}
+					>
+						{sidebarItem.title && sidebarItem.listItem.length > 0 && (
 							<p className="select-none font-semibold px-[10px] py-[4px] text-xs uppercase dark:text-textSecondary text-textSecondary">
 								{sidebarItem.title}
 							</p>

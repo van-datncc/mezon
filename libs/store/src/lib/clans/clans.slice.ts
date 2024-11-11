@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
-import { auditLogActions } from '../auditLog/auditLog.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
@@ -89,15 +88,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 				clanId: clanId ?? '',
 				channelId: '',
 				channelType: ChannelType.CHANNEL_TYPE_STREAMING
-			})
-		);
-		thunkAPI.dispatch(
-			auditLogActions.auditLogList({
-				actionLog: '',
-				userId: '',
-				clanId: clanId ?? '',
-				page: 1,
-				pageSize: 10000
 			})
 		);
 	}

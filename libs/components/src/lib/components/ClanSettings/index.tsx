@@ -39,6 +39,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel) || undefined;
+	const currentClanId = useSelector(selectCurrentClanId) as string;
 
 	const currentSettingPage = () => {
 		switch (currentSettingId) {
@@ -57,11 +58,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 			case ItemSetting.AUDIT_LOG:
-				return <AuditLog />;
+				return <AuditLog currentClanId={currentClanId} />;
 		}
 	};
 	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId) as string;
 	useEffect(() => {
 		if (canManageClan) {
 			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
