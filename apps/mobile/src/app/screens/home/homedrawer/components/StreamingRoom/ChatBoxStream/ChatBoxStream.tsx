@@ -33,11 +33,14 @@ const ChatBoxStream = () => {
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 				/>
 				<ChatBox
+					hiddenIcon={{
+						threadIcon: true
+					}}
 					channelId={currentChannel?.channel_id}
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 					onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 				/>
-				<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+				<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 			</KeyboardAvoidingView>
 		</Block>
 	);
