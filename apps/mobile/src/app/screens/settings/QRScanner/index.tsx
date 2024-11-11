@@ -9,6 +9,7 @@ import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { styles } from './styles';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -28,7 +29,19 @@ export const QRScanner = () => {
 	const codeScanner = useCodeScanner({
 		codeTypes: ['qr'],
 		onCodeScanned: (codes) => {
-			setValueCode(codes?.[0]?.value);
+			const valueObj = JSON.parse(codes?.[0]?.value || '{}');
+			// case send token
+			if (valueObj?.receiver_id) {
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.SEND_COFFEE,
+					params: {
+						formValue: codes?.[0]?.value
+					}
+				});
+				// 	case login
+			} else {
+				setValueCode(codes?.[0]?.value);
+			}
 		}
 	});
 
