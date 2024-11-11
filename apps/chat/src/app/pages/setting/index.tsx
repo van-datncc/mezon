@@ -47,7 +47,6 @@ const Setting = ({ isDM }: settingProps) => {
 						)}
 						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} isDM={isDM} />}
 						{currentSetting === EUserSettings.APPEARANCE && <SettingAppearance menuIsOpen={menuIsOpen} />}
-						{currentSetting === EUserSettings.ON_BOARDING && <SettingOnBoarding menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={closeSetting} />
 
 						{menuIsOpen ? (
