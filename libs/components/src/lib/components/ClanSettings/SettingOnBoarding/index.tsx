@@ -1,6 +1,8 @@
 import { channelSettingActions, selectEnableStatusOfOnBoarding, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import Questions from './Questions/Questions';
 
 const SettingOnBoarding = () => {
 	const dispatch = useAppDispatch();
@@ -10,8 +12,30 @@ const SettingOnBoarding = () => {
 
 	const isEnableOnBoarding = useSelector(selectEnableStatusOfOnBoarding);
 
+	const [currentPage, setCurrentPage] = useState('MainIndex');
+	const handleGoToPage = (page: string) => {
+		setCurrentPage(page);
+	};
+
 	return (
-		<div className="flex flex-col gap-6 flex-1 dark:text-channelTextLabel text-colorTextLightMode text-sm">
+		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm">
+			{currentPage === 'MainIndex' && (
+				<MainIndex handleGoToPage={handleGoToPage} isEnableOnBoarding={isEnableOnBoarding} toggleEnableStatus={toggleEnableStatus} />
+			)}
+			{currentPage === 'Questions' && <Questions />}
+		</div>
+	);
+};
+
+interface IMainIndexProps {
+	isEnableOnBoarding: boolean;
+	toggleEnableStatus: () => void;
+	handleGoToPage: (page: string) => void;
+}
+
+const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage }: IMainIndexProps) => {
+	return (
+		<div className="flex flex-col gap-6 flex-1">
 			<div className="flex flex-col gap-2">
 				<div className="text-[20px] text-white font-semibold">On Boarding</div>
 				<div className="font-medium">Give your members a simple starting experience with custom channels, roles and first steps.</div>
@@ -86,8 +110,11 @@ const SettingOnBoarding = () => {
 							<div className="text-[12px]">7 of 7 public channels are assignable through Questions and Default Channels.</div>
 						</div>
 					</div>
-					<div className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-bgModifierHover hover:bg-bgModifierHover cursor-pointer">
-						Edit
+					<div
+						onClick={() => handleGoToPage('Questions')}
+						className="px-3 py-2 flex gap-2 justify-center items-center rounded-sm bg-gray-600 hover:bg-gray-500 transition-colors cursor-pointer"
+					>
+						<div>Set up</div> <Icons.LongArrowRight className="w-3" />
 					</div>
 				</div>
 				<div className="mx-4 border-t border-bgModifierHover" />
