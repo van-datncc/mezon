@@ -6,7 +6,7 @@ import {
 	getStoreAsync,
 	MessagesEntity,
 	selectLastMessageIdByChannelId,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	selectMessageEntityById,
 	ThreadsEntity,
 	useAppSelector
@@ -15,7 +15,6 @@ import { convertTimeMessage, IChannelMember } from '@mezon/utils';
 import { DrawerActions, NavigationProp, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN, AppStackParamList } from '../../../navigation/ScreenTypes';
@@ -32,7 +31,9 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const message = useAppSelector(
 		(state) => selectMessageEntityById(state, thread?.channel_id as string, messageId || thread?.last_sent_message?.id) as MessagesEntity
 	);
-	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
+	const user = useAppSelector((state) =>
+		selectMemberClanByUserId2(state, (message?.user?.id || thread?.last_sent_message?.sender_id) as string)
+	) as IChannelMember;
 	const isTabletLandscape = useTabletLandscape();
 
 	const { username } = useMessageSender(user);
