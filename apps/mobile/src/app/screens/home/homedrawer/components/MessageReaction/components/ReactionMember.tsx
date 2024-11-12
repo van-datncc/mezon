@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import {selectAllChannelMembers, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { selectAllChannelMembers, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { style } from '../styles';

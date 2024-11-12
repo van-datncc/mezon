@@ -3,7 +3,7 @@ import { ActionEmitEvent, ReplyIcon, ReplyMessageDeleted, validLinkGoogleMapRege
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
@@ -364,7 +364,7 @@ const MessageItem = React.memo(
 											content={{
 												...(typeof message.content === 'object' ? message.content : {}),
 												mentions: message.mentions,
-												...(checkOneLinkImage ? {t: ''} : {})
+												...(checkOneLinkImage ? { t: '' } : {})
 											}}
 											isEdited={isEdited}
 											translate={t}
