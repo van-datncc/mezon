@@ -301,8 +301,14 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 	}
 );
 
-export const ChannelLink = memo(ChannelLinkComponent, (prev, curr) => prev.channel?.id === curr?.channel?.id && prev.isActive === curr.isActive);
-
+export const ChannelLink = memo(
+	ChannelLinkComponent,
+	(prev, curr) =>
+		prev.channel?.id === curr?.channel?.id &&
+		prev.isActive === curr.isActive &&
+		prev.numberNotification === curr.numberNotification &&
+		prev.isUnReadChannel === curr.isUnReadChannel
+);
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;
 	channelId: string;

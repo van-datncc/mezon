@@ -18,6 +18,7 @@ export const ItemSetting = {
 	NOTIFICATION_SOUND: 'notification-sound',
 	APP_DIRECTORY: 'app-directory',
 	CATEGORY_ORDER: 'category-order',
+	AUDIT_LOG: 'audit-log',
 	ON_BOARDING: 'on-boarding'
 };
 
@@ -35,6 +36,7 @@ export const listItemSettingApp: ItemObjProps[] = [
 	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' }
 ];
 
+export const listItemSettingModeration: ItemObjProps[] = [{ id: ItemSetting.AUDIT_LOG, name: 'Audit Log' }];
 export const communitySettingsList: ItemObjProps[] = [{ id: ItemSetting.ON_BOARDING, name: 'On Boarding' }];
 
 export const sideBarListItem: ListSideBarProps[] = [
@@ -45,6 +47,10 @@ export const sideBarListItem: ListSideBarProps[] = [
 	{
 		title: 'Apps',
 		listItem: listItemSettingApp
+	},
+	{
+		title: 'Moderation',
+		listItem: listItemSettingModeration
 	},
 	{
 		title: 'Community',

@@ -2,7 +2,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -44,7 +44,7 @@ const UserProfile = React.memo(
 		const styles = style(themeValue);
 		const { userProfile } = useAuth();
 		const { t } = useTranslation(['userProfile']);
-		const userById = useAppSelector(selectMemberClanByUserId(userId || user?.id));
+		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
 		const userStatus = useMemberStatus(userId || user?.id);
 		const rolesClan = useSelector(selectAllRolesClan);
 		const messageAvatar = useMemo(() => {
