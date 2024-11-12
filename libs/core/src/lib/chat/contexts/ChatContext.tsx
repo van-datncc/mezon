@@ -778,7 +778,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channelUpdated.app_url) {
 					dispatch(channelsActions.fetchAppChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 				}
-				if (channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD && channelUpdated.status === ThreadStatus.joined) {
+				if (
+					channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD &&
+					channelUpdated.status === ThreadStatus.joined &&
+					channelUpdated.creator_id !== userId
+				) {
 					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				}
