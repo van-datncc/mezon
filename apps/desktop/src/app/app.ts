@@ -55,7 +55,7 @@ export default class App {
 			tray.init(isQuitting);
 			App.setupWindowManager();
 			if (process.platform === 'win32') {
-				app.setAppUserModelId('mezon.desktop-notifications');
+				app.setAppUserModelId('Mezon Notifications');
 			}
 		}
 	}
