@@ -70,7 +70,7 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 		width: widthMedia
 	});
 
-	const isUploading = !image?.url?.includes('http');
+	const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 	const photoSize = useMemo(() => getPhotoSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
 
 	if (!image.url) {
@@ -132,7 +132,7 @@ const RenderImageHaveSize = React.memo(
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
-		const isUploading = !image?.url?.includes('http');
+		const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 		const photoSize = useMemo(() => getPhotoSizeWithSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
 
 		if (!image.url) {
