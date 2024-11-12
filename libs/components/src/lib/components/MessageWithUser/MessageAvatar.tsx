@@ -1,5 +1,5 @@
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -39,11 +39,14 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			alt={message.username ?? ''}
 			userName={message.username}
 			data-popover-target="popover-content"
-			src={
-				(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			src={createImgproxyUrl(
+				((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
 					? clanAvatar || pendingClanAvatar || pendingUserAvatar
-					: pendingUserAvatar) || message?.avatar
-			}
+					: pendingUserAvatar) ||
+					message?.avatar) ??
+					'',
+				{ width: 100, height: 100, resizeType: 'fit' }
+			)}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"
 			isAnonymous={message.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}

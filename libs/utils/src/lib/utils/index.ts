@@ -896,3 +896,18 @@ export const getNotificationLabel = (value: NotificationType) => {
 	const notificationType = notificationTypesList.find((type) => type.value === value);
 	return notificationType ? notificationType.label : null;
 };
+
+type ImgproxyOptions = {
+	width?: number;
+	height?: number;
+	resizeType?: string;
+};
+
+export const createImgproxyUrl = (sourceImageUrl?: string, options: ImgproxyOptions = {}) => {
+	if (!sourceImageUrl) return '';
+	const { width, height, resizeType } = options;
+	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;
+	const path = `/${processingOptions}/plain/${sourceImageUrl}@png`;
+
+	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
+};

@@ -16,7 +16,8 @@ import {
 	MemberProfileType,
 	MouseButton,
 	WIDTH_CHANNEL_LIST_BOX,
-	WIDTH_PANEL_PROFILE
+	WIDTH_PANEL_PROFILE,
+	createImgproxyUrl
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -304,7 +305,7 @@ export function MemberProfile({
 						userName={userNameAva ?? userName}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
 						classNameText="font-semibold"
-						src={avatar}
+						src={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
 						isAnonymous={isAnonymous}
 					/>
 					{isFooter && (
