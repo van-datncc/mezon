@@ -19,6 +19,3 @@
   end_uninstall:
 !macroend
 
-!macro customInstall
-  CreateShortCut "$APPDATA\Microsoft\Windows\Start Menu\Programs\mezon.lnk" "$INSTDIR\mezon.exe"
-!macroend

@@ -54,6 +54,9 @@ export default class App {
 			App.setupBadge();
 			tray.init(isQuitting);
 			App.setupWindowManager();
+			if (process.platform === 'win32') {
+				app.setAppUserModelId('Mezon Notifications');
+			}
 		}
 	}
 
@@ -209,8 +212,6 @@ export default class App {
 				})
 			);
 		}
-
-		App.application.setAppUserModelId('mezon.ai');
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
