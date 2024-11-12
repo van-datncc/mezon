@@ -94,6 +94,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		};
 		setFiltersSearch(filter);
 		if ((optionFilter && userMention) || isSearchMessagePage) {
+			dispatch(searchMessagesActions.setCurrentPage(1));
 			dispatch(searchMessagesActions.fetchListSearchMessage(payload));
 		}
 	};

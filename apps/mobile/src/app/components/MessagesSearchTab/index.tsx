@@ -1,40 +1,30 @@
-import { useSearchMessages } from '@mezon/core';
-import { GroupedMessages } from '@mezon/mobile-components';
+import { ETypeSearch, GroupedMessages } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, SearchMessageEntity } from '@mezon/store';
+import { MessagesEntity, selectAllMessageSearch, selectMessageSearchByChannelId } from '@mezon/store';
+import { ISearchMessage, searchMessagesActions, selectCurrentPage, useAppDispatch } from '@mezon/store-mobile';
 import { SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
 import { EmptySearchPage } from '../EmptySearchPage';
 import { SearchMessageChannelContext } from '../ThreadDetail/SearchMessageChannel';
 import style from './MessagesSearchTab.styles';
 
-const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSearchByChannelId: SearchMessageEntity[] }) => {
+const MessagesSearchTab = React.memo(({ typeSearch, currentChannelId }: { typeSearch: ETypeSearch; currentChannelId: string }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const filtersSearch = useContext(SearchMessageChannelContext);
-	const { totalResult, fetchSearchMessages } = useSearchMessages();
-	const [isLoadingMore, setIsLoadingMore] = useState(false);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [messages, setMessages] = useState([]);
+	const [isLoadingMore, setIsLoadingMore] = useState(true);
+	const [hasLoadMore, setHasLoadMore] = useState(true);
+	const dispatch = useAppDispatch();
+	const [pageSearch, setPageSearch] = useState(1);
+	const currentPage = useSelector(selectCurrentPage);
 
-	useEffect(() => {
-		if (messageSearchByChannelId?.length > 0) {
-			setMessages((prevMessages) => {
-				const existingMessages = new Set(prevMessages.map((msg) => msg?.id));
-				const newMessages = messageSearchByChannelId.filter((msg) => !existingMessages.has(msg.id));
-				if (newMessages.length > 0) {
-					return [...prevMessages, ...newMessages];
-				}
-				return prevMessages;
-			});
-		} else {
-			setMessages([]);
-		}
-	}, [messageSearchByChannelId]);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannelId));
+	const searchMessages = useSelector(selectAllMessageSearch);
 
 	const ViewLoadMore = () => {
 		return (
@@ -44,42 +34,55 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 		);
 	};
 
-	const searchMessages = useMemo(() => {
-		const groupedMessages: GroupedMessages = [];
-		let currentGroup: SearchMessageEntity[] = [];
-		let currentLabel: string | null | undefined = null;
-
-		messages?.forEach((message) => {
-			const label = message?.channel_label ?? '';
-			if (label !== currentLabel) {
-				if (currentGroup?.length > 0) {
-					groupedMessages.push({ label: currentLabel, messages: currentGroup });
-					currentGroup = [];
+	const searchMessagesData = useMemo(() => {
+		let groupedMessages: GroupedMessages = [];
+		if (typeSearch === ETypeSearch.SearchChannel) {
+			groupedMessages?.push({
+				label: messageSearchByChannelId[0]?.channel_label,
+				messages: messageSearchByChannelId
+			});
+		} else {
+			groupedMessages = searchMessages?.reduce((acc, message) => {
+				const label = message?.channel_label ?? '';
+				const channelId = message?.channel_id ?? '';
+				const existingGroup = acc?.find((group) => group?.label === label && group?.channel_id === channelId);
+				if (existingGroup) {
+					existingGroup.messages.push(message);
+				} else {
+					acc.push({
+						label,
+						channel_id: channelId,
+						messages: [message]
+					});
 				}
-				currentLabel = label;
-			}
-			currentGroup?.push(message);
-		});
-
-		if (currentGroup.length > 0) {
-			groupedMessages?.push({ label: currentLabel, messages: currentGroup });
+				return acc;
+			}, []);
 		}
-
 		return groupedMessages;
-	}, [messages, messageSearchByChannelId]);
+	}, [messageSearchByChannelId, searchMessages, typeSearch]);
 
 	const loadMoreMessages = async () => {
-		if (isLoadingMore || totalResult === messages?.length) return;
 		setIsLoadingMore(true);
+		setPageSearch((prevPage) => prevPage + 1);
+		if ((!isLoadingMore && !hasLoadMore) || pageSearch <= currentPage) {
+			setIsLoadingMore(false);
+			return;
+		}
+
 		const payload = {
 			filters: filtersSearch,
-			from: currentPage,
-			size: SIZE_PAGE_SEARCH
+			from: pageSearch,
+			size: SIZE_PAGE_SEARCH,
+			isMobile: true
 		};
 
 		try {
-			await fetchSearchMessages(payload);
-			setCurrentPage((prevPage) => prevPage + 1);
+			const searchMessageResponse = await dispatch(searchMessagesActions.fetchListSearchMessage(payload));
+			const searchMessage = (searchMessageResponse?.payload as { searchMessage: ISearchMessage[]; isMobile: boolean })?.searchMessage;
+			if (!searchMessage || searchMessage?.length === 0) {
+				setHasLoadMore(false);
+				return;
+			}
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -102,11 +105,11 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 
 	return (
 		<Block style={styles.container}>
-			{searchMessages?.length ? (
+			{searchMessagesData?.length ? (
 				<Block height={'100%'} width={'100%'} paddingBottom={size.s_100}>
 					<FlashList
 						showsVerticalScrollIndicator={false}
-						data={searchMessages}
+						data={searchMessagesData}
 						keyboardShouldPersistTaps={'handled'}
 						onScrollBeginDrag={Keyboard.dismiss}
 						renderItem={renderGroupItem}
@@ -114,7 +117,7 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 						removeClippedSubviews={true}
 						onEndReached={loadMoreMessages}
 						contentContainerStyle={{ paddingBottom: size.s_100 }}
-						onEndReachedThreshold={0.2}
+						onEndReachedThreshold={0.5}
 						ListFooterComponent={isLoadingMore && <ViewLoadMore />}
 					/>
 				</Block>
