@@ -75,32 +75,45 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		};
 	}, [props?.data?.id, isActive]);
 
-	const handleRouteData = useCallback(async (thread?: IChannel) => {
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-			bottomSheetChannelStreamingRef.current?.present();
-			return;
-		}
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
-				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
-				await Linking.openURL(urlVoice);
+	const handleRouteData = useCallback(
+		async (thread?: IChannel) => {
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				bottomSheetChannelStreamingRef.current?.present();
+				return;
 			}
-		} else {
-			if (!isTabletLandscape) {
-				navigation.dispatch(DrawerActions.closeDrawer());
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+				if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
+					const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
+					await Linking.openURL(urlVoice);
+				}
+			} else {
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
+				const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
+				const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				const store = await getStoreAsync();
+				timeoutRef.current = setTimeout(async () => {
+					requestAnimationFrame(async () => {
+						store.dispatch(
+							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+						);
+					});
+				}, 0);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
-			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			const store = await getStoreAsync();
-			timeoutRef.current = setTimeout(async () => {
-				requestAnimationFrame(async () => {
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-				});
-			}, 100);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-		}
-	}, []);
+		},
+		[
+			isTabletLandscape,
+			navigation,
+			props?.data?.channel_id,
+			props?.data?.clan_id,
+			props?.data?.meeting_code,
+			props?.data?.status,
+			props?.data?.type
+		]
+	);
 
 	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
 

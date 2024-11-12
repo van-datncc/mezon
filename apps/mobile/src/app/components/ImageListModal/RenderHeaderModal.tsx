@@ -1,10 +1,9 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
+import {AttachmentEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import { useSelector } from 'react-redux';
 import { MezonClanAvatar } from '../../componentUI';
 import { useImage } from '../../hooks/useImage';
 import { style } from './styles';
@@ -19,7 +18,7 @@ interface IRenderFooterModalProps {
 export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const uploader = useSelector(selectMemberClanByUserId(imageSelected?.uploader || ''));
+	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, imageSelected?.uploader || ''));
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const handleDownloadImage = async () => {
 		if (!imageSelected?.url) {

@@ -3,7 +3,7 @@ import { ActionEmitEvent, ReplyIcon, ReplyMessageDeleted, validLinkGoogleMapRege
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
@@ -359,23 +359,25 @@ const MessageItem = React.memo(
 								{isInviteLink || isGoogleMapsLink ? (
 									<RenderMessageBlock message={message} isGoogleMapsLink={isGoogleMapsLink} isInviteLink={isInviteLink} />
 								) : (
-									<RenderTextMarkdownContent
-										content={{
-											...(typeof message.content === 'object' ? message.content : {}),
-											mentions: message.mentions,
-											...(checkOneLinkImage ? { t: '' } : {})
-										}}
-										isEdited={isEdited}
-										translate={t}
-										onMention={onMention}
-										onChannelMention={onChannelMention}
-										isNumberOfLine={isNumberOfLine}
-										isMessageReply={false}
-										mode={mode}
-										currentChannelId={channelId}
-										isOnlyContainEmoji={isOnlyContainEmoji}
-										onLongPress={handleLongPressMessage}
-									/>
+									<Suspense fallback={<Text>Loading...</Text>}>
+										<RenderTextMarkdownContent
+											content={{
+												...(typeof message.content === 'object' ? message.content : {}),
+												mentions: message.mentions,
+												...(checkOneLinkImage ? {t: ''} : {})
+											}}
+											isEdited={isEdited}
+											translate={t}
+											onMention={onMention}
+											onChannelMention={onChannelMention}
+											isNumberOfLine={isNumberOfLine}
+											isMessageReply={false}
+											mode={mode}
+											currentChannelId={channelId}
+											isOnlyContainEmoji={isOnlyContainEmoji}
+											onLongPress={handleLongPressMessage}
+										/>
+									</Suspense>
 								)}
 								{!!message?.content?.embed && <EmbedMessage {...message.content.embed} />}
 							</Block>
