@@ -15,6 +15,7 @@ export interface OnboardingState extends EntityState<OnboardingEntity, string> {
 	onboardingMode: boolean;
 	missionDone: number;
 	missionSum: number;
+	guideLine: boolean;
 }
 
 export const onboardingAdapter = createEntityAdapter({ selectId: (thread: OnboardingEntity) => thread.id || '' });
@@ -22,8 +23,15 @@ export const onboardingAdapter = createEntityAdapter({ selectId: (thread: Onboar
 export const initialOnboardingState: OnboardingState = onboardingAdapter.getInitialState({
 	onboardingMode: false,
 	missionDone: 0,
-	missionSum: 3
+	missionSum: 3,
+	guideLine: false
 });
+
+export enum ETypeMission {
+	SEND_MESSAGE = 0,
+	VISIT = 1,
+	DOSOMETHING = 2
+}
 
 export const onboardingSlice = createSlice({
 	name: ONBOARDING_FEATURE_KEY,
@@ -42,6 +50,12 @@ export const onboardingSlice = createSlice({
 			if (state.missionDone < state.missionSum) {
 				state.missionDone = state.missionDone + 1;
 			}
+		},
+		openGuideLine: (state) => {
+			state.guideLine = true;
+		},
+		closeGuideLine: (state) => {
+			state.guideLine = false;
 		}
 	}
 });
