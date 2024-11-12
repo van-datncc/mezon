@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
 	backHeader: {
 		width: size.s_50,
 		height: size.s_50,
-		backgroundColor: 'rgba(0,0,0,0.5)',
+		backgroundColor: 'rgba(0,0,0,0.4)',
 		borderRadius: size.s_50,
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -142,13 +142,13 @@ export const styles = StyleSheet.create({
 		height: size.s_50 * 2
 	},
 	iconLibrary: {
-		backgroundColor: 'rgba(0,0,0,0.6)',
+		backgroundColor: 'rgba(0,0,0,0.4)',
 		borderRadius: size.s_10,
 		padding: size.s_10,
 		alignItems: 'center',
 		justifyContent: 'center',
 		position: 'absolute',
 		bottom: size.s_60,
-		left: size.s_30,
+		left: size.s_30
 	}
 });

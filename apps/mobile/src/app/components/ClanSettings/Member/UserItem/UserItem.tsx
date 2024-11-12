@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectMemberClanByUserId, useAppSelector, UsersClanEntity } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectMemberClanByUserId2, useAppSelector, UsersClanEntity } from '@mezon/store-mobile';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { MezonAvatar } from '../../../../componentUI';
@@ -14,7 +14,7 @@ interface IUserItem {
 export function UserItem({ userID, onMemberSelect }: IUserItem) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const user = useAppSelector(selectMemberClanByUserId(userID));
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userID));
 	const rolesClan = useAppSelector(selectAllRolesClan);
 
 	const clanUserRole = useMemo(() => {

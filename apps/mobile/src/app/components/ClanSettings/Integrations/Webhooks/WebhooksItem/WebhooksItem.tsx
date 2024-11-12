@@ -1,13 +1,12 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectMemberClanByUserId } from '@mezon/store-mobile';
+import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ApiWebhook } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text } from 'react-native';
-import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
@@ -26,7 +25,7 @@ export function WebhooksItem({ webhook }: { webhook: ApiWebhook }) {
 		};
 		return date.toLocaleDateString('en-GB', options);
 	};
-	const webhookOwner = useSelector(selectMemberClanByUserId(webhook.creator_id as string));
+	const webhookOwner = useAppSelector((state) => selectMemberClanByUserId2(state, webhook.creator_id as string));
 	const handleEditWebhooks = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT, {
 			webhook

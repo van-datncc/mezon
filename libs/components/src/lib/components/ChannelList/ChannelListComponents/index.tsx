@@ -3,13 +3,16 @@ import {
 	EventManagementOnGogoing,
 	eventManagementActions,
 	selectCurrentClanId,
+	selectMissionDone,
+	selectMissionSum,
 	selectNumberEvent,
+	selectOnboardingMode,
 	selectOngoingEvent,
 	selectShowNumEvent
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -23,7 +26,7 @@ export const Events = memo(() => {
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
-
+	const onboardingMode = useSelector(selectOnboardingMode);
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
 
 	const closeModal = () => {
@@ -62,6 +65,8 @@ export const Events = memo(() => {
 
 	return (
 		<>
+			{onboardingMode && <OnboardingGetStart />}
+
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
 			<Link
@@ -154,6 +159,38 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 			<div className="text-center py-1 bg-green-700 mt-2 rounded select-none" onClick={handleOpenDetail}>
 				<p className=" text-channelActiveLightColor dark:text-channelActiveColor  font-medium">Event detail</p>
 			</div>
+		</div>
+	);
+};
+
+const OnboardingGetStart = () => {
+	const missionDone = useSelector(selectMissionDone);
+	const missionSum = useSelector(selectMissionSum);
+
+	const completionPercentage = useMemo(() => {
+		return missionDone ? (missionDone / missionSum) * 100 - 100 : -97;
+	}, [missionDone, missionSum]);
+	return (
+		<div className="w-full h-12 flex flex-col gap-1 relative">
+			<div className="flex justify-between">
+				<p className="text-sm font-bold text-white">Get Started</p>
+				<div className="flex gap-[1px] items-center">
+					<p className="text-xs font-bold text-white">{missionDone}</p>
+					<p className="text-xs">of</p>
+					<p className="text-xs font-bold text-white">{missionSum}</p>
+					<Icons.ArrowRight defaultSize="w-3 h-3" />
+				</div>
+			</div>
+			<div className="flex bg-slate-700 relative rounded-2xl w-full h-2 overflow-hidden">
+				<div
+					className="absolute w-full h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl"
+					style={{
+						animation: 'transform 1s ease-out',
+						transform: `translateX(${completionPercentage}%)`
+					}}
+				></div>
+			</div>
+			<hr className="absolute bottom-1 left-0 h-[0.08px] w-full dark:border-borderDivider border-white" />
 		</div>
 	);
 };
