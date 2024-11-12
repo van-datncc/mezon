@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { onboardingActions, selectChannelFirst, selectCurrentClanId, selectOnboardingMode } from '@mezon/store';
+import { ETypeMission, onboardingActions, selectChannelFirst, selectCurrentClanId, selectOnboardingMode } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ReactNode, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,19 +14,19 @@ function GuideBody() {
 	const handleDoMission = (type: number) => {
 		if (onboadingMode) {
 			switch (type) {
-				case 0: {
+				case ETypeMission.SEND_MESSAGE: {
 					const link = toChannelPage(firstChannelId.channel_id as string, currentClanId as string);
 					navigate(link);
 					dispatch(onboardingActions.doneMission());
 					break;
 				}
-				case 1: {
+				case ETypeMission.VISIT: {
 					const memberPage = toMembersPage(currentClanId as string);
 					navigate(memberPage);
 					dispatch(onboardingActions.doneMission());
 					break;
 				}
-				case 2: {
+				case ETypeMission.DOSOMETHING: {
 					dispatch(onboardingActions.doneMission());
 					break;
 				}

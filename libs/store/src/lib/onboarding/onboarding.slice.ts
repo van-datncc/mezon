@@ -27,6 +27,12 @@ export const initialOnboardingState: OnboardingState = onboardingAdapter.getInit
 	guideLine: false
 });
 
+export enum ETypeMission {
+	SEND_MESSAGE = 0,
+	VISIT = 1,
+	DOSOMETHING = 2
+}
+
 export const onboardingSlice = createSlice({
 	name: ONBOARDING_FEATURE_KEY,
 	initialState: initialOnboardingState,
