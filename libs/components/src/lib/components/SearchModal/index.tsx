@@ -44,7 +44,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const allClanUsersEntities = allClanUsersEntitiesRef.current;
 	const dmGroupChatList = dmGroupChatListRef.current;
-	const listChannels = listChannelsRef.current;
+	// const listChannels = listChannelsRef.current;
+	const listChannels = fake;
 	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 	const previousChannels = previousChannelsRef.current;
 
@@ -80,7 +81,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
-						type: ChannelType.CHANNEL_TYPE_DM
+						type: ChannelType.CHANNEL_TYPE_DM,
+						count_messsage_unread: itemDM.count_mess_unread
 					};
 				})
 			: [];
@@ -93,7 +95,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
-						typeChat: TypeSearch.Dm_Type
+						typeChat: TypeSearch.Dm_Type,
+						count_messsage_unread: itemGr.count_mess_unread
 					};
 				})
 			: [];
@@ -118,7 +121,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
-				meeting_code: item.meeting_code
+				meeting_code: item.meeting_code,
+				count_messsage_unread: item?.count_mess_unread,
+				lastSeenTimeStamp: Number(item?.last_seen_message?.timestamp_seconds || 0)
 			};
 		});
 		return list;
@@ -341,3 +346,314 @@ const FooterNoteModal = memo(() => {
 		</div>
 	);
 });
+const fake = [
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '7218401280',
+		type: 1,
+		channel_label: 'channel test 12',
+		last_sent_message: {
+			id: '1840651252665421824',
+			timestamp_seconds: 1731407668,
+			sender_id: '4198400',
+			content: '{"t":"dfd"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 1,
+		meeting_code: ''
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6970937344',
+		type: 1,
+		channel_label: 'channel test 4',
+		last_sent_message: {
+			id: '1840651252644450304',
+			timestamp_seconds: 1731407649,
+			sender_id: '4198400',
+			content: '{"t":"sdf"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3,
+		meeting_code: ''
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '2134904832',
+		type: 1,
+		channel_label: 'channel1',
+		last_sent_message: {
+			id: '1840651252636061696',
+			timestamp_seconds: 1729152433
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6966743040',
+		type: 1,
+		channel_label: 'channel test 3',
+		last_sent_message: {
+			id: '1840651252652838912',
+			timestamp_seconds: 1731407653,
+			sender_id: '4198400',
+			content: '{"t":"sdf"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '19335745536',
+		type: 1,
+		channel_label: 'channel test',
+		last_sent_message: {
+			id: '1840651252644450304',
+			timestamp_seconds: 1731036881,
+			sender_id: '62918656',
+			content: '{"t":"sdf"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6991908864',
+		type: 1,
+		channel_label: 'channel test 9',
+		last_sent_message: {
+			id: '1840651252640256000',
+			timestamp_seconds: 1731054810,
+			sender_id: '4198400',
+			content: '{"t":"dfsfsdf"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '20287852544',
+		parrent_id: '0',
+		channel_id: '20304629760',
+		type: 1,
+		channel_label: 'general',
+		last_sent_message: {
+			id: '1840651252648644608',
+			timestamp_seconds: 1731407882,
+			sender_id: '4198400',
+			content: '{"t":"@Phong Nguyen Nam "}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[{"user_id":"11362373632","e":17}]',
+			reaction: '[]'
+		},
+		last_seen_message: {
+			id: '1840651252648644608',
+			timestamp_seconds: 1731408275
+		},
+		clan_name: 'd clan'
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '130027520',
+		type: 1,
+		channel_label: '13',
+		channel_private: 1,
+		last_sent_message: {
+			id: '1840651253839826944',
+			timestamp_seconds: 1730892621,
+			sender_id: '62918656',
+			content: '{"t":"@thai1 "}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[{"user_id":"4198400","e":6}]',
+			reaction: '[]'
+		},
+		last_seen_message: {
+			id: '1840651253839826944',
+			timestamp_seconds: 1731408041
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6962548736',
+		type: 1,
+		channel_label: 'channel test 223',
+		last_sent_message: {
+			id: '1840651252640256000',
+			timestamp_seconds: 1730976111
+		},
+		clan_name: 'thai112323'
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6996103168',
+		type: 1,
+		channel_label: 'channel test 10',
+		last_sent_message: {
+			id: '1840651252636061696',
+			timestamp_seconds: 1729677456
+		},
+		last_seen_message: {
+			id: '1840651252636061696',
+			timestamp_seconds: 1731408315
+		},
+		clan_name: 'thai112323'
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6987714560',
+		type: 1,
+		channel_label: 'channel test 8',
+		last_sent_message: {
+			id: '1840651252644450304',
+			timestamp_seconds: 1730709495,
+			sender_id: '92278784',
+			content: '{"t":"@thai1 "}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[{"user_id":"4198400","e":6}]'
+		},
+		clan_name: 'thai112323'
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6983520256',
+		type: 1,
+		channel_label: 'channel test 7',
+		last_sent_message: {
+			id: '1840651252648644608',
+			timestamp_seconds: 1731407672,
+			sender_id: '4198400',
+			content: '{"t":"sd"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '5591011328',
+		type: 1,
+		channel_label: 'channel test 1',
+		last_sent_message: {
+			id: '1840651252682199040',
+			timestamp_seconds: 1730875655,
+			sender_id: '62918656',
+			content: '{"t":"sdfsd"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		last_seen_message: {
+			id: '1840651252682199040',
+			timestamp_seconds: 1731408083
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '2814382080',
+		type: 1,
+		channel_label: 'channel 2',
+		last_sent_message: {
+			id: '1840651253852409856',
+			timestamp_seconds: 1731407739,
+			sender_id: '4198400',
+			content: '{"t":"@Phong Nguyen Nam "}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[{"user_id":"11362373632","e":17}]',
+			reaction: '[]'
+		},
+		last_seen_message: {
+			id: '1840651253852409856',
+			timestamp_seconds: 1731407788
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6975131648',
+		type: 1,
+		channel_label: 'channel test 5',
+		last_sent_message: {
+			id: '1840651252636061696',
+			timestamp_seconds: 1729676746
+		},
+		clan_name: 'thai112323',
+		count_mess_unread: 3
+	},
+	{
+		clan_id: '8392704',
+		parrent_id: '0',
+		channel_id: '6979325952',
+		type: 1,
+		channel_label: 'channel test 6',
+		last_sent_message: {
+			id: '1840651252636061696',
+			timestamp_seconds: 1729676752
+		},
+		clan_name: 'thai112323'
+	},
+	{
+		clan_id: '20287852544',
+		parrent_id: '0',
+		channel_id: '21562920960',
+		type: 1,
+		channel_label: 'test 1',
+		last_sent_message: {
+			id: '1840651252644450304',
+			timestamp_seconds: 1731407875,
+			sender_id: '4198400',
+			content: '{"t":"sdfsdf"}',
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		clan_name: 'd clan'
+	}
+];
