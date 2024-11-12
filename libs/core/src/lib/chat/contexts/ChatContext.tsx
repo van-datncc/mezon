@@ -290,28 +290,43 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const statusPresenceQueue = useRef<StatusPresenceEvent[]>([]);
+	const statusPresenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
 	const onstatuspresence = useCallback(
 		(statusPresence: StatusPresenceEvent) => {
-			if (statusPresence.joins.length > 0) {
-				const onlineStatus = statusPresence.joins.map((join) => {
-					return { userId: join.user_id, online: true, isMobile: join.is_mobile };
-				});
-				dispatch(clanMembersMetaActions.setManyStatusUser(onlineStatus));
-				dispatch(directActions.updateStatusByUserId(onlineStatus));
-				dispatch(friendsActions.setManyStatusUser(onlineStatus));
-			}
-			if (statusPresence.leaves.length > 0) {
-				const offlineStatus = statusPresence.leaves.map((leave) => {
-					return { userId: leave.user_id, online: false, isMobile: false };
-				});
-				dispatch(clanMembersMetaActions.setManyStatusUser(offlineStatus));
-				dispatch(directActions.updateStatusByUserId(offlineStatus));
-				dispatch(friendsActions.setManyStatusUser(offlineStatus));
+			statusPresenceQueue.current.push(statusPresence);
+			if (!statusPresenceTimerRef.current) {
+				statusPresenceTimerRef.current = setTimeout(() => {
+					const userStatusMap = new Map<string, { online: boolean; isMobile: boolean }>();
+
+					statusPresenceQueue.current.forEach((event) => {
+						event?.joins?.forEach((join) => {
+							userStatusMap.set(join.user_id, { online: true, isMobile: join.is_mobile });
+						});
+						event?.leaves?.forEach((leave) => {
+							userStatusMap.set(leave.user_id, { online: false, isMobile: false });
+						});
+					});
+
+					const combinedStatus = Array.from(userStatusMap.entries()).map(([userId, status]) => ({
+						userId,
+						online: status.online,
+						isMobile: status.isMobile
+					}));
+
+					if (combinedStatus.length) {
+						dispatch(clanMembersMetaActions.setManyStatusUser(combinedStatus));
+						dispatch(directActions.updateStatusByUserId(combinedStatus));
+						dispatch(friendsActions.setManyStatusUser(combinedStatus));
+					}
+					statusPresenceQueue.current = [];
+					statusPresenceTimerRef.current = null;
+				}, 10000);
 			}
 		},
 		[dispatch]
 	);
-
 	const onnotification = useCallback(
 		async (notification: Notification) => {
 			const path = isElectron() ? window.location.hash : window.location.pathname;
@@ -1033,45 +1048,47 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onlastseenupdated = () => {};
+			socket.onlastseenupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => {};
+			socket.onclandeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => {};
+			socket.onstickercreated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventemoji = () => {};
+			socket.oneventemoji = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerdeleted = () => {};
+			socket.onstickerdeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => {};
+			socket.onstickerupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => {};
+			socket.oncoffeegiven = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => {};
+			socket.onroleevent = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.ontokensent = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -1112,7 +1129,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oneventcreated,
 		setCallbackEventFn,
 		oncoffeegiven,
-		onroleevent
+		onroleevent,
+		ontokensent
 	]);
 
 	useEffect(() => {
@@ -1137,3 +1155,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+

@@ -5671,14 +5671,14 @@ export function ShadowBotIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function WindowMinimize(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
 			<path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 		</svg>
 	);
 }
 export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 448 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
+		<svg viewBox="0 0 448 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
 			<path
 				d="M384 80c8.8 0 16 7.2 16 16l0 320c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16L48 96c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"
 				fill="currentColor"
@@ -5731,6 +5731,37 @@ export const RuleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 		</svg>
 	);
 };
+
+export function SendMoney(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="M9.5 13.75C9.5 14.72 10.25 15.5 11.17 15.5H13.05C13.85 15.5 14.5 14.82 14.5 13.97C14.5 13.06 14.1 12.73 13.51 12.52L10.5 11.47C9.91 11.26 9.51001 10.94 9.51001 10.02C9.51001 9.17999 10.16 8.48999 10.96 8.48999H12.84C13.76 8.48999 14.51 9.26999 14.51 10.24"
+					stroke="#23b850"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>{' '}
+				<path d="M12 7.5V16.5" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
+				<path
+					d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2"
+					stroke="#23b850"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>{' '}
+				<path d="M22 6V2H18" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
+				<path d="M17 7L22 2" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
+			</g>
+		</svg>
+	);
+}
 
 export function HashIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
