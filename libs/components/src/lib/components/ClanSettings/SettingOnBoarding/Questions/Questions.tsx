@@ -64,10 +64,10 @@ const Questions = () => {
 					</div>
 					<div className="border-t border-[#4e5058]" />
 					<div className="flex flex-col gap-2 cursor-pointer">
-						<div className="text-[16px] text-white font-bold">Pre-join Questions</div>
+						<div className="text-[16px] text-white font-bold">Post-join Questions</div>
 						<div>
-							Members will be asked these questions before they join your server. Use them to assign channels and important roles.
-							Pre-join Questions will also be available on the Channels & Roles page.
+							Members will be asked these questions after they join your server, on the Channels & Roles page. Use them to assign roles
+							that members can pick later, like vanity roles.
 						</div>
 						<div className="rounded-xl text-[#949cf7] justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2">
 							<Icons.CirclePlusFill className="w-5" />
