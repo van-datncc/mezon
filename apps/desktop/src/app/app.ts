@@ -54,6 +54,7 @@ export default class App {
 			App.setupBadge();
 			tray.init(isQuitting);
 			App.setupWindowManager();
+			app.setAppUserModelId('Mezon Notifications');
 		}
 	}
 
@@ -209,8 +210,6 @@ export default class App {
 				})
 			);
 		}
-
-		App.application.setAppUserModelId('mezon.ai');
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
