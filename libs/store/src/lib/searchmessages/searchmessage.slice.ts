@@ -95,7 +95,7 @@ export const searchMessageSlice = createSlice({
 				fetchListSearchMessage.fulfilled,
 				(
 					state: SearchMessageState,
-					action: PayloadAction<{ searchMessage: ISearchMessage[]; isMobile: boolean }, string, { arg: { filters: SearchFilter[] } }>
+					action: PayloadAction<{ searchMessage: ISearchMessage[]; isMobile?: boolean }, string, { arg: { filters: SearchFilter[] } }>
 				) => {
 					const channelId = action.meta.arg.filters[1].field_value;
 					if (action?.payload?.isMobile) {
