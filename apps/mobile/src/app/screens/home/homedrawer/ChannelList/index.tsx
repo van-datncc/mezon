@@ -124,7 +124,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			if (position && isScrollChannelActive) {
 				flashListRef?.current?.scrollTo({
 					x: 0,
-					y: position - size.s_150,
+					y: position - size.s_100 * 2,
 					animated: true
 				});
 			}

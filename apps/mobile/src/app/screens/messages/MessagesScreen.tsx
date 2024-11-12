@@ -76,6 +76,9 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			) : (
 				<FlashList
 					data={dmGroupChatList}
+					contentContainerStyle={{
+						paddingBottom: size.s_100
+					}}
 					showsVerticalScrollIndicator={false}
 					keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
 					estimatedItemSize={size.s_60}
