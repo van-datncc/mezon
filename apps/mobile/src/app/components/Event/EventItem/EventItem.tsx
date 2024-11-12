@@ -1,11 +1,10 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
+import {EventManagementEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
 import { EEventStatus } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useSelector } from 'react-redux';
 import MezonButton from '../../../componentUI/MezonButton2';
 import { EventLocation } from '../EventLocation';
 import { EventTime } from '../EventTime';
@@ -21,7 +20,7 @@ interface IEventItemProps {
 export function EventItem({ event, onPress, showActions = true, start }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
+	const userCreate = useAppSelector((state) => selectMemberClanByUserId2(state, event?.creator_id || ''));
 
 	const eventStatus = useMemo(() => {
 		if (event?.status) {

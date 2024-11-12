@@ -180,7 +180,6 @@ export const QRScanner = () => {
 						justifyContent={'space-between'}
 						top={size.s_40}
 						flex={1}
-						backgroundColor={'red'}
 						paddingHorizontal={size.s_10}
 						width={'100%'}
 					>
