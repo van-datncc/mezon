@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import {AttachmentEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { AttachmentEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';

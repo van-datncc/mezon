@@ -1,8 +1,8 @@
 import { useClanRestriction } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {deleteSticker, selectMemberClanByUserId2, updateSticker, useAppDispatch} from '@mezon/store';
-import {selectCurrentUserId, useAppSelector} from '@mezon/store-mobile';
+import { deleteSticker, selectMemberClanByUserId2, updateSticker, useAppDispatch } from '@mezon/store';
+import { selectCurrentUserId, useAppSelector } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { memo, useCallback, useMemo, useState } from 'react';

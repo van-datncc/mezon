@@ -60,7 +60,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 				})
 			: [];
 	}, [isDMGroup, currenChannel?.user_id]);
-	
+
 	const creatorUser = useAppSelector((state) => selectMemberClanByUserId2(state, currenChannel?.creator_id));
 	const checkAddFriend = useAppSelector(selectFriendStatus(currenChannel?.user_id?.[0]));
 

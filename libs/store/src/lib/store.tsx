@@ -27,6 +27,8 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { auditLogReducer } from './auditLog/auditLog.slice';
+import { auditLogFilterReducer } from './auditLog/auditLogFilter.slice';
 import { canvasReducer } from './canvas/canvas.slice';
 import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
@@ -47,6 +49,7 @@ import { notifiReactMessageReducer } from './notificationSetting/notificationRea
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboarding.slice';
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
@@ -334,6 +337,8 @@ const reducer = {
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
+	auditlog: auditLogReducer,
+	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
@@ -347,7 +352,8 @@ const reducer = {
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
-	clanMembersMeta: clanMembersMetaReducer
+	clanMembersMeta: clanMembersMetaReducer,
+	[ONBOARDING_FEATURE_KEY]: onboardingReducer
 };
 
 let storeInstance = configureStore({

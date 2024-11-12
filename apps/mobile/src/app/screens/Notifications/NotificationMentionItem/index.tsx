@@ -1,6 +1,6 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {selectChannelById, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { selectChannelById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';

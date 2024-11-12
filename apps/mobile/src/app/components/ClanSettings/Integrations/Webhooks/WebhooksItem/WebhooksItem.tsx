@@ -1,7 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import {selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ApiWebhook } from 'mezon-js/api.gen';
 import React from 'react';

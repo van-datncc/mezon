@@ -1,6 +1,6 @@
 import { useMemberStatus } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
-import {EventManagementEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { EventManagementEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { Text, View } from 'react-native';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './styles';

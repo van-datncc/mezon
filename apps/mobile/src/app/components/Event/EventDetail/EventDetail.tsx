@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {EventManagementEntity, selectClanById, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { EventManagementEntity, selectClanById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { useRef } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
