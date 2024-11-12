@@ -1,4 +1,4 @@
-import { ExitSetting, SettingAccount, SettingAppearance, SettingItem, SettingRightProfile } from '@mezon/components';
+import { ExitSetting, SettingAccount, SettingAppearance, SettingItem, SettingOnBoarding, SettingRightProfile } from '@mezon/components';
 import { useEscapeKeyClose, useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
 import { Icons } from '@mezon/ui';
