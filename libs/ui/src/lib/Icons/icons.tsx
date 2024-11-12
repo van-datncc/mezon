@@ -5732,6 +5732,29 @@ export const RuleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
+export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+		>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm5.7-13.3a1 1 0 0 0-1.4-1.4L10 14.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l7-7Z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+};
+
 export function SendMoney(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
