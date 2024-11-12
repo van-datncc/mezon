@@ -14,6 +14,7 @@ import NotificationSoundSetting from './NotificationSoundSetting';
 import CategoryOrderSetting from './OrderCategorySetting';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
+import SettingOnBoarding from './SettingOnBoarding';
 import SettingSidebar from './SettingSidebar';
 import SettingSticker from './SettingSticker';
 
@@ -59,6 +60,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <CategoryOrderSetting />;
 			case ItemSetting.AUDIT_LOG:
 				return <AuditLog currentClanId={currentClanId} />;
+			case ItemSetting.ON_BOARDING:
+				return <SettingOnBoarding />;
 		}
 	};
 	const dispatch = useAppDispatch();
