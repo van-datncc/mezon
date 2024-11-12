@@ -54,7 +54,9 @@ export default class App {
 			App.setupBadge();
 			tray.init(isQuitting);
 			App.setupWindowManager();
-			app.setAppUserModelId('Mezon Notifications');
+			if (process.platform === 'win32') {
+				app.setAppUserModelId('Mezon Notifications');
+			}
 		}
 	}
 
