@@ -1,8 +1,7 @@
-import { auditLogFilterActions, auditLogList } from '@mezon/store';
+import { auditLogActions, auditLogFilterActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ActionLog, IUserAuditLog } from '@mezon/utils';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 interface Action {
 	name: string;
@@ -62,7 +61,7 @@ const iconMap: { [key in ActionLog]: string } = {
 };
 
 const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchActionAuditLogProps) => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedAction, setSelectedAction] = useState<string>(actionFilter || ActionLog.ALL_ACTION_AUDIT);
 
@@ -82,7 +81,7 @@ const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, cl
 				page: 1,
 				pageSize: 10000
 			};
-			dispatch(auditLogList(body) as any);
+			dispatch(auditLogActions.auditLogList(body));
 		}
 		closeModal();
 	};

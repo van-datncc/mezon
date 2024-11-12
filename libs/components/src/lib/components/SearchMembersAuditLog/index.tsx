@@ -1,8 +1,8 @@
-import { auditLogFilterActions, auditLogList, selectAllUserClans, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { auditLogFilterActions, auditLogList, selectAllUserClans, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IUserAuditLog, UsersClanEntity, getAvatarForPrioritize } from '@mezon/utils';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 type AvatarUserProps = {
@@ -40,17 +40,17 @@ type SearchMemberAuditLogProps = {
 };
 
 const SearchMemberAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchMemberAuditLogProps) => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedUser, setSelectedUser] = useState<string>(userFilter?.userId || '');
 	const usersClan = useSelector(selectAllUserClans);
 
 	const users: Users[] = [
 		{ name: 'All Users', icon: <Icons.MemberList isWhite={true} />, userId: '' },
-		...usersClan.map((item: any) => ({
-			name: item?.user?.display_name,
+		...usersClan.map((item: UsersClanEntity) => ({
+			name: item?.user?.display_name || '',
 			icon: <AvatarUser user={item} />,
-			userId: item?.user?.id
+			userId: item?.user?.id || ''
 		}))
 	];
 
@@ -71,7 +71,7 @@ const SearchMemberAuditLogModal = ({ currentClanId, actionFilter, userFilter, cl
 				page: 1,
 				pageSize: 10000
 			};
-			const response = dispatch(auditLogList(body) as any);
+			const response = dispatch(auditLogList(body));
 		}
 		closeModal();
 	};

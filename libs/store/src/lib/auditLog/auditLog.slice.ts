@@ -72,15 +72,13 @@ export const initialAuditLogState: IAuditLogState = auditLogAdapter.getInitialSt
 export const auditLogSlice = createSlice({
 	name: AUDIT_LOG_FEATURE_KEY,
 	initialState: initialAuditLogState,
-	reducers: {
-		// ...
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
 			.addCase(auditLogList.pending, (state: IAuditLogState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(auditLogList.fulfilled, (state: IAuditLogState, action: PayloadAction<any>) => {
+			.addCase(auditLogList.fulfilled, (state: IAuditLogState, action: PayloadAction<MezonapiListAuditLog>) => {
 				state.loadingStatus = 'loaded';
 				state.auditLogData = action.payload;
 			})
