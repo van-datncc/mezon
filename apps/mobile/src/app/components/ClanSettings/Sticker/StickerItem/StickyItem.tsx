@@ -1,8 +1,8 @@
 import { useClanRestriction } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { deleteSticker, updateSticker, useAppDispatch } from '@mezon/store';
-import { selectCurrentUserId, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
+import {deleteSticker, selectMemberClanByUserId2, updateSticker, useAppDispatch} from '@mezon/store';
+import {selectCurrentUserId, useAppSelector} from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -34,7 +34,7 @@ const CloseAction = memo(() => {
 export function StickerSettingItem({ data, clanID }: IStickerItem) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const user = useAppSelector(selectMemberClanByUserId(data.creator_id));
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, data.creator_id));
 	const [stickerName, setStickerName] = useState<string>(data.shortname);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation(['clanStickerSetting']);

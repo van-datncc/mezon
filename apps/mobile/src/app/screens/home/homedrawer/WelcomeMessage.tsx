@@ -10,7 +10,7 @@ import {
 	selectChannelById,
 	selectDmGroupCurrent,
 	selectFriendStatus,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
@@ -60,8 +60,8 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 				})
 			: [];
 	}, [isDMGroup, currenChannel?.user_id]);
-
-	const creatorUser = useAppSelector(selectMemberClanByUserId(currenChannel?.creator_id));
+	
+	const creatorUser = useAppSelector((state) => selectMemberClanByUserId2(state, currenChannel?.creator_id));
 	const checkAddFriend = useAppSelector(selectFriendStatus(currenChannel?.user_id?.[0]));
 
 	const handleAddFriend = async () => {

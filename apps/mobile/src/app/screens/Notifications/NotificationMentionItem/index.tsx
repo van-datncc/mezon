@@ -1,10 +1,9 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
+import {selectChannelById, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import MessageNotification from '../MessageNotification';
@@ -57,7 +56,7 @@ function parseObject(obj: any) {
 const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPressNotify }: NotifyProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const user = useSelector(selectMemberClanByUserId(notify?.sender_id || ''));
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, notify?.sender_id || ''));
 	const { avatarImg } = useMessageSender(user as any);
 	const channelInfo = useAppSelector((state) => selectChannelById(state, notify?.content?.channel_id || ''));
 	const data = parseObject(notify?.content);
