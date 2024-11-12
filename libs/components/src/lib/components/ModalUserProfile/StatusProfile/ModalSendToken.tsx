@@ -117,7 +117,7 @@ const ModalSendToken = ({
 		count: filteredUsers?.length,
 		getScrollElement: () => dropdownRef.current,
 		estimateSize: () => 48,
-		overscan: 3
+		overscan: 5
 	});
 
 	return (
