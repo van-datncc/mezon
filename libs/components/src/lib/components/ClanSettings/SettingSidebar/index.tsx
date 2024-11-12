@@ -1,5 +1,5 @@
 import { usePermissionChecker } from '@mezon/core';
-import { auditLogList, authActions, selectActionAuditLog, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import { auditLogList, authActions, selectActionAuditLog, selectCurrentClan, selectUserAuditLog, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
@@ -19,7 +19,8 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [isClanOwner, hasClanPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
-	const actionFilter = useSelector(selectActionAuditLog);
+	const auditLogFilterAction = useSelector(selectActionAuditLog);
+	const auditLogFilterUser = useSelector(selectUserAuditLog);
 	const navigate = useNavigate();
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
@@ -53,8 +54,8 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 		if (settingItem.id === ItemSetting.AUDIT_LOG) {
 			if (currentClan?.clan_id) {
 				const body = {
-					actionLog: actionFilter ?? '',
-					userId: '',
+					actionLog: auditLogFilterAction ?? '',
+					userId: auditLogFilterUser?.userId ?? '',
 					clanId: currentClan?.clan_id ?? '',
 					page: 1,
 					pageSize: 10000

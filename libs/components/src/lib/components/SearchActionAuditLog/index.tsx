@@ -1,6 +1,6 @@
 import { auditLogFilterActions, auditLogList } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ActionLog } from '@mezon/utils';
+import { ActionLog, IUserAuditLog } from '@mezon/utils';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -12,6 +12,7 @@ interface Action {
 type SearchActionAuditLogProps = {
 	currentClanId: string;
 	actionFilter: string;
+	userFilter?: IUserAuditLog | null;
 	closeModal: () => void;
 };
 
@@ -60,7 +61,7 @@ const iconMap: { [key in ActionLog]: string } = {
 	[ActionLog.DELETE_CATEGORY_ACTION_AUDIT]: '-'
 };
 
-const SearchActionAuditLogModal = ({ currentClanId, actionFilter, closeModal }: SearchActionAuditLogProps) => {
+const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchActionAuditLogProps) => {
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedAction, setSelectedAction] = useState<string>(actionFilter || ActionLog.ALL_ACTION_AUDIT);
@@ -76,7 +77,7 @@ const SearchActionAuditLogModal = ({ currentClanId, actionFilter, closeModal }: 
 		if (currentClanId) {
 			const body = {
 				actionLog: action?.name === ActionLog.ALL_ACTION_AUDIT ? '' : action?.name,
-				userId: '',
+				userId: userFilter?.userId ?? '',
 				clanId: currentClanId ?? '',
 				page: 1,
 				pageSize: 10000
