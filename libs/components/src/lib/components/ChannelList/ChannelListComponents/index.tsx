@@ -12,7 +12,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -166,6 +166,10 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 const OnboardingGetStart = () => {
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
+
+	const completionPercentage = useMemo(() => {
+		return missionDone ? (missionDone / missionSum) * 100 - 100 : -97;
+	}, [missionDone, missionSum]);
 	return (
 		<div className="w-full h-12 flex flex-col gap-1 relative">
 			<div className="flex justify-between">
@@ -182,7 +186,7 @@ const OnboardingGetStart = () => {
 					className="absolute w-full h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl"
 					style={{
 						animation: 'transform 1s ease-out',
-						transform: `translateX(${missionDone ? (missionDone / missionSum) * 100 - 100 : -97}%)`
+						transform: `translateX(${completionPercentage}%)`
 					}}
 				></div>
 			</div>

@@ -12,8 +12,8 @@ function GuideBody() {
 	const dispatch = useDispatch();
 	const handleDoMission = () => {
 		if (onboadingMode) {
-			// const link = toChannelPage(firstChannelId.channel_id as string,currentClanId as string);
-			// navigate(link);
+			const link = toChannelPage(firstChannelId.channel_id as string, currentClanId as string);
+			navigate(link);
 			dispatch(onboardingActions.doneMission());
 		}
 	};
