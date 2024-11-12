@@ -1,5 +1,6 @@
 import { LoadingStatus, SearchFilter } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiSearchMessageDocument } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const SEARCH_MESSAGES_FEATURE_KEY = 'searchMessages';
@@ -17,7 +18,7 @@ export const mapSearchMessageToEntity = (searchMessage: ApiSearchMessageDocument
 	return {
 		...searchMessage,
 		avatar: searchMessage.avatar_url,
-		id: searchMessage.message_id || '',
+		id: searchMessage.message_id || Snowflake.generate(),
 		content: searchMessage.content ? JSON.parse(searchMessage.content) : null
 	};
 };
@@ -35,16 +36,22 @@ export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
 
 export const fetchListSearchMessage = createAsyncThunk(
 	'searchMessage/fetchListSearchMessage',
-	async ({ filters, from, size, sorts }: any, thunkAPI) => {
+	async ({ filters, from, size, sorts, isMobile = false }: any, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
+
 		if (!response.messages) {
-			thunkAPI.dispatch(searchMessagesActions.setTotalResults(0));
-			return [];
+			thunkAPI.dispatch(searchMessagesActions.setTotalResults(isMobile ? response.total || 0 : 0));
+			return { searchMessage: [], isMobile };
 		}
+
 		const searchMessage = response.messages.map(mapSearchMessageToEntity);
 		thunkAPI.dispatch(searchMessagesActions.setTotalResults(response.total ?? 0));
-		return searchMessage;
+
+		return {
+			searchMessage,
+			isMobile
+		};
 	}
 );
 
@@ -86,13 +93,20 @@ export const searchMessageSlice = createSlice({
 			})
 			.addCase(
 				fetchListSearchMessage.fulfilled,
-				(state: SearchMessageState, action: PayloadAction<ISearchMessage[], string, { arg: { filters: SearchFilter[] } }>) => {
+				(
+					state: SearchMessageState,
+					action: PayloadAction<{ searchMessage: ISearchMessage[]; isMobile: boolean }, string, { arg: { filters: SearchFilter[] } }>
+				) => {
 					const channelId = action.meta.arg.filters[1].field_value;
-					const ids = Object.values(state.entities)
-						.filter((message) => message.channel_id === channelId)
-						.map((message) => message.id);
-					SearchMessageAdapter.removeMany(state, ids);
-					SearchMessageAdapter.setAll(state, action.payload);
+					if (action?.payload?.isMobile) {
+						SearchMessageAdapter.addMany(state, action?.payload?.searchMessage);
+					} else {
+						const ids = Object.values(state.entities)
+							.filter((message) => message.channel_id === channelId)
+							.map((message) => message.id);
+						SearchMessageAdapter.removeMany(state, ids);
+						SearchMessageAdapter.setAll(state, action?.payload?.searchMessage);
+					}
 					state.loadingStatus = 'loaded';
 				}
 			)
