@@ -61,11 +61,11 @@ export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: 
 		const response = await mezon.socketRef.current?.sendToken(tokenEvent.receiver_id, tokenEvent.amount);
 
 		if (response) {
-			thunkAPI.dispatch(toastActions.addToast({ message: 'Token sent successfully', type: 'success', id: 'ACTION_SEND_TOKEN_SUCCESS' }));
+			thunkAPI.dispatch(toastActions.addToast({ message: 'Token sent successfully', type: 'success' }));
 			thunkAPI.dispatch(giveCoffeeActions.updateTokenUser({ tokenEvent }));
 			return response;
 		} else {
-			thunkAPI.dispatch(toastActions.addToast({ message: 'An error occurred, please try again', type: 'error', id: 'ACTION_SEND_TOKEN_FAILD' }));
+			thunkAPI.dispatch(toastActions.addToast({ message: 'An error occurred, please try again', type: 'error' }));
 		}
 	} catch (error: any) {
 		const errmsg = await error.json();
