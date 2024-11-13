@@ -352,6 +352,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+
 					if (isNotCurrentDirect) {
 						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
 					}

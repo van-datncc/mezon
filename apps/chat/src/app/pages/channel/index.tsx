@@ -7,6 +7,7 @@ import {
 	channelsActions,
 	clansActions,
 	gifsStickerEmojiActions,
+	listChannelsByUserActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
@@ -44,6 +45,7 @@ function useChannelSeen(channelId: string) {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+		dispatch(listChannelsByUserActions.updateCount({ channelId: channelId }));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
