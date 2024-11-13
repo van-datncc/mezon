@@ -37,10 +37,6 @@ function GuideBody() {
 		}
 	};
 
-	const openOnboardingMode = () => {
-		dispatch(onboardingActions.openOnboardingMode());
-	};
-
 	const listMission = useMemo(() => {
 		if (!firstChannelId) {
 			return [];
@@ -78,12 +74,7 @@ function GuideBody() {
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-xl font-bold">
-							Missions{' '}
-							<span className="cursor-pointer ml-4 text-primary hover:underline text-sm font-normal" onClick={openOnboardingMode}>
-								preview
-							</span>
-						</p>
+						<p className="text-xl font-bold">Missions </p>
 						{listMission.map((mission, index) => (
 							<GuideItemLayout
 								key={mission.title}
