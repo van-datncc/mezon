@@ -59,9 +59,9 @@ export function ClanEmojiSetting({ navigation }: MenuClanScreenProps<ClanSetting
 		});
 
 		if (response.didCancel) {
-			console.log('User cancelled camera');
+			console.warn('User cancelled camera');
 		} else if (response.errorCode) {
-			console.log('Camera Error: ', response.errorMessage);
+			console.error('Camera Error: ', response.errorMessage);
 		} else {
 			const file = response?.assets[0];
 			return file;

@@ -70,7 +70,6 @@ export const FriendsTablet = React.memo(({ navigation }: { navigation: any }) =>
 		(friend: FriendsEntity, action: EFriendItemAction) => {
 			switch (action) {
 				case EFriendItemAction.Call:
-					console.log('handle phone call', friend);
 					Toast.show({ type: 'info', text1: 'Updating...' });
 					break;
 				case EFriendItemAction.MessageDetail:
