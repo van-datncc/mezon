@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -20,9 +21,9 @@ export const addChannelUsers = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'channelUsers/addChannelUsers');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -56,9 +57,9 @@ export const removeChannelUsers = createAsyncThunk(
 				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'channelUsers/removeChannelUsers');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -94,9 +95,9 @@ export const addChannelRoles = createAsyncThunk(
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(bodyFetchUsers));
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan(bodyFetchRoles));
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'channelUsers/addChannelRoles');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -132,9 +133,9 @@ export const removeChannelRole = createAsyncThunk(
 			};
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan(bodyFetchRoles));
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'channelUsers/removeChannelRole');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IChannelsStream, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -43,9 +44,9 @@ export const listStreamChannels = createAsyncThunk('stream/listStreamChannels', 
 		});
 		thunkAPI.dispatch(channelsStreamActions.addMany(channels));
 		return response.streaming_channels;
-	} catch (error: any) {
-		const errstream = await error.json();
-		return thunkAPI.rejectWithValue(errstream.message);
+	} catch (error) {
+		captureSentryError(error, 'stream/listStreamChannels');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

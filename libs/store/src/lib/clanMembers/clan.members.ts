@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
@@ -29,11 +30,16 @@ type UsersClanPayload = {
 	clanId: string;
 };
 export const fetchUsersClan = createAsyncThunk('UsersClan/fetchUsersClan', async ({ clanId }: UsersClanPayload, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listClanUsers(mezon.session, clanId);
-	const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
-	thunkAPI.dispatch(usersClanActions.setAll(users));
-	thunkAPI.dispatch(clanMembersMetaActions.updateBulkMetadata(users.map((item) => extracMeta(item))));
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listClanUsers(mezon.session, clanId);
+		const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
+		thunkAPI.dispatch(usersClanActions.setAll(users));
+		thunkAPI.dispatch(clanMembersMetaActions.updateBulkMetadata(users.map((item) => extracMeta(item))));
+	} catch (error) {
+		captureSentryError(error, 'UsersClan/fetchUsersClan');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const initialUsersClanState: UsersClanState = UsersClanAdapter.getInitialState({

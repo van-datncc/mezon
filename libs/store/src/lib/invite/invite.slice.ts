@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IInvite, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiInviteUserRes, ApiLinkInviteUser } from 'mezon-js/api.gen';
@@ -42,9 +43,9 @@ export const createLinkInviteUser = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response as ApiLinkInviteUser;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'invite/createLinkInviteUser');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -61,9 +62,9 @@ export const inviteUser = createAsyncThunk('invite/inviteUser', async ({ inviteI
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response as ApiInviteUserRes;
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'invite/inviteUser');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -76,9 +77,9 @@ export const getLinkInvite = createAsyncThunk('invite/getLinkInvite', async ({ i
 		}
 
 		return mapInviteToEntity(response, inviteId);
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'invite/getLinkInvite');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IPinMessage, LoadingStatus, TypeMessage } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageMention, ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -48,22 +48,27 @@ export const mapChannelPinMessagesToEntity = (pinMessageRes: ApiPinMessageReques
 export const fetchChannelPinMessages = createAsyncThunk(
 	'pinmessage/fetchChannelPinMessages',
 	async ({ channelId, noCache }: fetchChannelPinMessagesPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		if (noCache) {
-			fetchChannelPinMessagesCached.clear(mezon, channelId);
-		}
-		const response = await fetchChannelPinMessagesCached(mezon, channelId);
-		if (!response) {
-			return [];
-		}
+			if (noCache) {
+				fetchChannelPinMessagesCached.clear(mezon, channelId);
+			}
+			const response = await fetchChannelPinMessagesCached(mezon, channelId);
+			if (!response) {
+				return [];
+			}
 
-		if (!response.pin_messages_list) {
-			return '';
-		}
+			if (!response.pin_messages_list) {
+				return '';
+			}
 
-		const pinMessages = response.pin_messages_list.map((pinMessageRes) => mapChannelPinMessagesToEntity(pinMessageRes));
-		return pinMessages;
+			const pinMessages = response.pin_messages_list.map((pinMessageRes) => mapChannelPinMessagesToEntity(pinMessageRes));
+			return pinMessages;
+		} catch (error) {
+			captureSentryError(error, 'pinmessage/fetchChannelPinMessages');
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 type SetChannelPinMessagesPayload = {
@@ -74,56 +79,66 @@ type SetChannelPinMessagesPayload = {
 export const setChannelPinMessage = createAsyncThunk(
 	'pinmessage/setChannelPinMessage',
 	async ({ clan_id, channel_id, message_id }: SetChannelPinMessagesPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			clan_id: clan_id,
-			channel_id: channel_id,
-			message_id: message_id
-		};
-		const response = await mezon.client.createPinMessage(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				clan_id: clan_id,
+				channel_id: channel_id,
+				message_id: message_id
+			};
+			const response = await mezon.client.createPinMessage(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+
+			const content = JSON.parse(response.content ?? '');
+			const originalMentions = JSON.parse(response.mention ?? '') as ApiMessageMention[];
+			const mentions = originalMentions.map((item) => ({
+				user_id: item.user_id,
+				e: item.e
+			}));
+			const reference = JSON.parse(response.referece ?? '');
+
+			const messageSystem: ChannelMessage = {
+				id: response.id ?? '',
+				channel_id: channel_id,
+				channel_label: '',
+				code: TypeMessage.CreatePin,
+				content: content ?? '',
+				create_time: response.timestamp_seconds ? new Date(response.timestamp_seconds * 1000).toISOString() : '',
+				mentions: mentions ?? [],
+				references: reference ?? [],
+				sender_id: '0',
+				username: 'System'
+			};
+			const mess = mapMessageChannelToEntity(messageSystem);
+			mess.isMe = true;
+			mess.hide_editted = true;
+			thunkAPI.dispatch(messagesActions.addNewMessage(mess));
+			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'pinmessage/setChannelPinMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const content = JSON.parse(response.content ?? '');
-		const originalMentions = JSON.parse(response.mention ?? '') as ApiMessageMention[];
-		const mentions = originalMentions.map((item) => ({
-			user_id: item.user_id,
-			e: item.e
-		}));
-		const reference = JSON.parse(response.referece ?? '');
-
-		const messageSystem: ChannelMessage = {
-			id: response.id ?? '',
-			channel_id: channel_id,
-			channel_label: '',
-			code: TypeMessage.CreatePin,
-			content: content ?? '',
-			create_time: response.timestamp_seconds ? new Date(response.timestamp_seconds * 1000).toISOString() : '',
-			mentions: mentions ?? [],
-			references: reference ?? [],
-			sender_id: '0',
-			username: 'System'
-		};
-		const mess = mapMessageChannelToEntity(messageSystem);
-		mess.isMe = true;
-		mess.hide_editted = true;
-		thunkAPI.dispatch(messagesActions.addNewMessage(mess));
-		thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
-		return response;
 	}
 );
 
 export const deleteChannelPinMessage = createAsyncThunk(
 	'pinmessage/deleteChannelPinMessage',
 	async ({ channel_id, message_id }: SetChannelPinMessagesPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deletePinMessage(mezon.session, message_id);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deletePinMessage(mezon.session, message_id);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'pinmessage/deleteChannelPinMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
-		return response;
 	}
 );
 
@@ -142,9 +157,9 @@ export const joinPinMessage = createAsyncThunk(
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, mode, isPublic, messageId, now, 1);
-		} catch (e) {
-			Sentry.captureException(e);
-			console.error('Error updating last seen message', e);
+		} catch (error) {
+			captureSentryError(error, 'pinmessage/joinPinMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -156,9 +171,9 @@ export const updateLastPin = createAsyncThunk(
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 0);
-		} catch (e) {
-			Sentry.captureException(e);
-			console.error('Error updating last seen message', e);
+		} catch (error) {
+			captureSentryError(error, 'pinmessage/updateLastPinMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

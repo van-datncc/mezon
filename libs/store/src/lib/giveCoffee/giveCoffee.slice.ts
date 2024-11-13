@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiGiveCoffeeEvent } from 'mezon-js/api.gen';
@@ -39,9 +40,9 @@ export const updateGiveCoffee = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'giveCoffee/updateGiveCoffee');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -71,9 +72,9 @@ export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: 
 		} else {
 			thunkAPI.dispatch(toastActions.addToast({ message: 'An error occurred, please try again', type: 'error' }));
 		}
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'token/sendToken');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
