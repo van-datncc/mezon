@@ -1,4 +1,5 @@
 import { useAuth } from '@mezon/core';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -43,6 +44,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 							alt={userProfile?.user?.username || ''}
 							userName={userProfile?.user?.username}
 							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
+							srcImgProxy={createImgproxyUrl(urlImg ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 							src={urlImg}
 							classNameText="!text-5xl"
 						/>
