@@ -49,7 +49,7 @@ const LoggedInView: React.FC<LoggedInViewProps> = ({ appearanceTheme, session })
 			window.location.href = `mezonapp://accounts?data=${jsonString}`;
 		},
 		onError: () => {
-			console.log('Login Failed');
+			console.error('Login Failed');
 		},
 		auto_select: true,
 		cancel_on_tap_outside: false,
