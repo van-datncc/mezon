@@ -40,6 +40,54 @@ const BottomNavigator = () => {
 		}).start();
 	}, [hiddenBottomTab, isTabletLandscape, tabBarTranslateY]);
 
+	const AnimatedIcon = ({ color, Icon, focused }) => {
+		const scaleValue = useRef(new Animated.Value(1)).current;
+		const opacityValue = useRef(new Animated.Value(1)).current;
+
+		useEffect(() => {
+			if (focused) {
+				// Scale up and bounce effect
+				Animated.sequence([
+					Animated.timing(scaleValue, {
+						toValue: 1.15,
+						duration: 100,
+						useNativeDriver: true
+					}),
+					Animated.spring(scaleValue, {
+						toValue: 1,
+						friction: 3,
+						tension: 40,
+						useNativeDriver: true
+					})
+				]).start();
+
+				// Fade effect
+				Animated.sequence([
+					Animated.timing(opacityValue, {
+						toValue: 0.7,
+						duration: 100,
+						useNativeDriver: true
+					}),
+					Animated.timing(opacityValue, {
+						toValue: 1,
+						duration: 200,
+						useNativeDriver: true
+					})
+				]).start();
+			}
+		}, [focused, scaleValue, opacityValue]);
+
+		return (
+			<Animated.View
+				style={{
+					transform: [{ scale: scaleValue }],
+					opacity: opacityValue
+				}}
+			>
+				<Icon color={color} width={size.s_22} height={size.s_22} />
+			</Animated.View>
+		);
+	};
 	return (
 		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: isHomeActive ? themeValue.primary : themeValue.secondary }}>
 			<TabStack.Navigator
@@ -68,7 +116,8 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Clans',
-						tabBarIcon: ({ color }) => <HomeTab color={color} width={size.s_22} height={size.s_22} />
+						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={HomeTab} color={color} focused={focused} />
 					}}
 				/>
 				<TabStack.Screen
@@ -77,7 +126,8 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Messages',
-						tabBarIcon: ({ color }) => <MessageTab color={color} width={size.s_22} height={size.s_22} />
+						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={MessageTab} color={color} focused={focused} />
 					}}
 				/>
 				<TabStack.Screen
@@ -86,7 +136,8 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Notifications',
-						tabBarIcon: ({ color }) => <NotiTab color={color} width={size.s_22} height={size.s_22} />
+						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={NotiTab} color={color} focused={focused} />
 					}}
 				/>
 				<TabStack.Screen
@@ -95,7 +146,8 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Profile',
-						tabBarIcon: ({ color }) => <ProfileTab color={color} width={size.s_22} height={size.s_22} />
+						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={ProfileTab} color={color} focused={focused} />
 					}}
 				/>
 			</TabStack.Navigator>

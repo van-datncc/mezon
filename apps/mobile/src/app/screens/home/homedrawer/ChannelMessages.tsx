@@ -89,9 +89,11 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 		});
 
 		const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
-			setIsReadyShowChannelMsg(false);
-			await sleep(time || 100);
-			setIsReadyShowChannelMsg(true);
+			if (time) {
+				setIsReadyShowChannelMsg(false);
+				await sleep(time);
+				setIsReadyShowChannelMsg(true);
+			}
 		});
 		return () => {
 			showSKlListener.remove();

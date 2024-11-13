@@ -7,6 +7,7 @@ import { style } from './style';
 import { useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import useBackHardWare from '../../../hooks/useBackHardWare';
 import { ActionRow } from '../ActionRow';
 import { AssetsViewer } from '../AssetViewer';
 import { ThreadHeader } from '../ThreadHeader';
@@ -25,6 +26,7 @@ export default function MenuThreadDetail(props: { route: any }) {
 		}
 		return currentChannel;
 	}, [directMessage, currentChannel]);
+	useBackHardWare();
 
 	return (
 		<threadDetailContext.Provider value={channel}>
