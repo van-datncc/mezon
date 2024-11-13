@@ -3,12 +3,11 @@ import { STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { channelMembersActions, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
-import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -62,21 +61,6 @@ const HomeDefault = React.memo((props: any) => {
 			bottomSheetRef.current?.present();
 		}, 200);
 	};
-	const drawerStatus = useDrawerStatus();
-
-	useEffect(() => {
-		const backAction = () => {
-			if (drawerStatus === 'closed') {
-				navigation.dispatch(DrawerActions.openDrawer());
-				return true;
-			}
-			return false;
-		};
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-		return () => {
-			backHandler.remove();
-		};
-	}, [drawerStatus, navigation]);
 
 	const fetchMemberChannel = useCallback(async () => {
 		if (!currentChannel) {
@@ -137,7 +121,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 			/>
 			{currentChannel && isFocusChannelView && !isChannelApp && (
-				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 54 : 0}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
