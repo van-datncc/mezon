@@ -1,6 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 
+import { captureSentryError } from '@mezon/logger';
 import { ApiChannelSettingItem } from 'mezon-js/dist/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -95,7 +96,8 @@ export const fetchChannelSettingInClan = createAsyncThunk(
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'channelSetting/fetchClanChannelSetting');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

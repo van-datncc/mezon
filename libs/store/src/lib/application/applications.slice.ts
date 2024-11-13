@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -57,9 +58,9 @@ export const fetchApplications = createAsyncThunk('adminApplication/fetchApplica
 		}
 		const response = await fetchApplicationsCached(mezon);
 		return response;
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/fetchApplications');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -69,8 +70,9 @@ export const getApplicationDetail = createAsyncThunk('adminApplication/getApplic
 		const response = await mezon.client.getApp(mezon.session, appId);
 		thunkAPI.dispatch(setCurrentAppId(appId));
 		return response;
-	} catch (err) {
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/getApplicationDetail');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -83,9 +85,9 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 		} else {
 			thunkAPI.rejectWithValue({});
 		}
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/createApplication');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -93,9 +95,9 @@ export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async 
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/addBotChat');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -108,9 +110,9 @@ export const editApplication = createAsyncThunk(
 			if (response) {
 				return data.request;
 			}
-		} catch (err) {
-			console.log(err);
-			return thunkAPI.rejectWithValue({ err });
+		} catch (error) {
+			captureSentryError(error, 'adminApplication/editApplication');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -120,9 +122,9 @@ export const deleteApplication = createAsyncThunk('adminApplication/deleteApplic
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteApp(mezon.session, appId);
 		return response;
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/deleteApplication');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

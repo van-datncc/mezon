@@ -1,12 +1,6 @@
-import { ACTIVE_TAB, IUerMention } from '@mezon/mobile-components';
+import { ACTIVE_TAB, ETypeSearch, IUerMention } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
-import {
-	DirectEntity,
-	selectAllInfoChannels,
-	selectAllMessageSearch,
-	selectAllUsersByUser,
-	selectTotalResultSearchMessage
-} from '@mezon/store-mobile';
+import { DirectEntity, selectAllInfoChannels, selectAllUsersByUser, selectTotalResultSearchMessage } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,15 +16,15 @@ interface ISearchMessagePageProps {
 	searchText: string;
 	userMention: IUerMention;
 	isSearchMessagePage: boolean;
+	typeSearch: ETypeSearch;
 }
 
-function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage }: ISearchMessagePageProps) {
+function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage, typeSearch }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
-	const messageSearchByChannelId = useSelector(selectAllMessageSearch);
 
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;
@@ -71,7 +65,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 				index: ACTIVE_TAB.MESSAGES
 			}
 		].filter((tab) => tab?.display);
-	}, [channelsSearch?.length, membersSearch?.length, searchText, t, totalResult]);
+	}, [channelsSearch?.length, membersSearch?.length, searchText, t, userMention, totalResult]);
 
 	function handelHeaderTabChange(index: number) {
 		setActiveTab(index);
@@ -84,7 +78,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	const renderContent = () => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} />;
+				return <MessagesSearchTab typeSearch={typeSearch} currentChannelId={currentChannel?.channel_id} />;
 			case ACTIVE_TAB.MEMBER:
 				return <MembersSearchTab listMemberSearch={membersSearch} />;
 			case ACTIVE_TAB.CHANNEL:

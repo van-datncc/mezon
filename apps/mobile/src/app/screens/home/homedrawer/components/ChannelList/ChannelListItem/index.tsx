@@ -1,5 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save
+} from '@mezon/mobile-components';
 import {
 	channelsActions,
 	getStoreAsync,
@@ -92,15 +99,18 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				}
 				const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 				const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				const isCached = channelsCache?.includes(channelId);
 				const store = await getStoreAsync();
 				timeoutRef.current = setTimeout(async () => {
 					requestAnimationFrame(async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(
 							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
 						);
 					});
 				}, 0);
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
 		},

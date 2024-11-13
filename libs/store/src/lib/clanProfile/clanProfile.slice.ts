@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IClanProfile, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanProfileRequest } from 'mezon-js';
 import { ApiClanProfile } from 'mezon-js/api.gen';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -52,8 +52,8 @@ export const checkDuplicateClanNickName = createAsyncThunk(
 
 			return false;
 		} catch (error) {
-			Sentry.captureException(error);
-			return thunkAPI.rejectWithValue(false);
+			captureSentryError(error, 'userClanProfile/duplicateClanNickName');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -67,18 +67,23 @@ type updateLinkUserClanProfile = {
 export const updateUserClanProfile = createAsyncThunk(
 	'userclanProfile/updateUserClanProfile',
 	async ({ clanId, username, avatarUrl }: updateLinkUserClanProfile, thunkAPI) => {
-		const mezon = ensureClient(getMezonCtx(thunkAPI));
-		const body: ApiUpdateClanProfileRequest = {
-			clan_id: clanId,
-			nick_name: username || '',
-			avatar: avatarUrl || ''
-		};
-		const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = ensureClient(getMezonCtx(thunkAPI));
+			const body: ApiUpdateClanProfileRequest = {
+				clan_id: clanId,
+				nick_name: username || '',
+				avatar: avatarUrl || ''
+			};
+			const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
+			return response as true;
+		} catch (error) {
+			captureSentryError(error, 'userClanProfile/updateUserClanProfile');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
-		return response as true;
 	}
 );
 

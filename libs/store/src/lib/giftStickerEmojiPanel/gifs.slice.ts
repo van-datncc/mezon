@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IGif, IGifCategory } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -56,6 +57,7 @@ export const fetchGifCategories = createAsyncThunk<GifCategoriesResponse>('gifs/
 		const data = await response.json();
 		return data;
 	} catch (error) {
+		captureSentryError(error, 'gifs/fetchStatus');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -73,6 +75,7 @@ export const fetchGifsDataSearch = createAsyncThunk<any, string>('gifs/fetchData
 		const data = await response.json();
 		return data;
 	} catch (error) {
+		captureSentryError(error, 'gifs/fetchDataSearch');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -89,6 +92,7 @@ export const fetchGifCategoryFeatured = createAsyncThunk<GifEntity[]>('gifs/fetc
 		const data = await response.json();
 		return data;
 	} catch (error) {
+		captureSentryError(error, 'gifs/fetchDataTrending');
 		return thunkAPI.rejectWithValue(error);
 	}
 });

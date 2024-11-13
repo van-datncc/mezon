@@ -28,7 +28,8 @@ export const ServersStacks = ({}: any) => {
 					}
 				}),
 				cardStyle: { backgroundColor: 'transparent' },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				animationEnabled: Platform.OS === 'ios'
 			}}
 			initialRouteName={APP_SCREEN.SERVERS.HOME}
 		>

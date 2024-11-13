@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import LeftDrawerContent from './homedrawer/DrawerContent';
-import HomeDefault from './homedrawer/HomeDefault';
+import HomeWrapper from './homedrawer/HomeWrapper';
 import { StreamingPopup } from './homedrawer/components/StreamingPopup';
 import { styles } from './styles';
 
@@ -46,7 +46,7 @@ const HomeScreen = React.memo((props: any) => {
 					<LeftDrawerContent />
 				</View>
 				<View style={styles.containerHomeDefault}>
-					<HomeDefault navigation={navigation} />
+					<HomeWrapper navigation={navigation} />
 				</View>
 			</View>
 		);
@@ -80,7 +80,7 @@ const HomeScreen = React.memo((props: any) => {
 			>
 				<Drawer.Screen
 					name={APP_SCREEN.HOME_DEFAULT}
-					component={HomeDefault}
+					component={HomeWrapper}
 					options={{
 						drawerType: 'back',
 						swipeEdgeWidth: Metrics.screenWidth,

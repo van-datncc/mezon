@@ -12,7 +12,7 @@ const RootStack = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 
 	return (
-		<Root.Navigator screenOptions={{ headerShown: false }}>
+		<Root.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
 			{isLoggedIn ? (
 				<Root.Group
 					screenOptions={{
