@@ -39,7 +39,8 @@ export function MenuChannelStacks({}: any) {
 				}),
 				cardStyle: {
 					backgroundColor: 'transparent'
-				}
+				},
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen
