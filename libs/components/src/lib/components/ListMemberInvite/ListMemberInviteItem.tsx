@@ -85,11 +85,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				alt={userName}
 				userName={userName}
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
-				srcImgProxy={
-					type === ChannelType.CHANNEL_TYPE_GROUP
-						? '/assets/images/avatar-group.png'
-						: createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })
-				}
+				srcImgProxy={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : createImgproxyUrl(avatar ?? '')}
 				src={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : avatar}
 			/>
 			<p style={{ marginRight: 'auto' }} className="px-[10px] flex-1 overflow-hidden text truncate">
@@ -127,7 +123,7 @@ const ItemInviteUser = (props: ItemInviteUserProps) => {
 				alt={userName}
 				userName={userName}
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
-				srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+				srcImgProxy={createImgproxyUrl(avatar ?? '')}
 				src={avatar}
 			/>
 			<p style={{ marginRight: 'auto' }} className="pl-[10px]">

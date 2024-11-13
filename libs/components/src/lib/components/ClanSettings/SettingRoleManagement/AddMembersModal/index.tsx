@@ -169,7 +169,7 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 						alt={userName}
 						userName={userName}
 						className="min-w-5 min-h-5 max-w-5 max-h-5"
-						srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+						srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>

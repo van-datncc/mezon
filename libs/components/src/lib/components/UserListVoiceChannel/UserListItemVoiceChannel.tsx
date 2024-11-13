@@ -23,7 +23,7 @@ function UserListItem({ user, channelID }: { user: IChannelMember; channelID: st
 							alt={userName || ''}
 							userName={userName}
 							className="min-w-8 min-h-8 max-w-8 max-h-8"
-							srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}
 						/>
 					) : (

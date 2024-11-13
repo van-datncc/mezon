@@ -159,7 +159,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								alt={userCreate?.user?.username || ''}
 								userName={userCreate?.user?.username}
 								className="min-w-6 min-h-6 max-w-6 max-h-6"
-								srcImgProxy={createImgproxyUrl(userCreate?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+								srcImgProxy={createImgproxyUrl(userCreate?.user?.avatar_url ?? '')}
 								src={userCreate?.user?.avatar_url}
 								classNameText="text-[9px] pt-[3px]"
 							/>

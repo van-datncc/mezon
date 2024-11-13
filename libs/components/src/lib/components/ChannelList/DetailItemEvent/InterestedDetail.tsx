@@ -13,11 +13,7 @@ const InterestedDetail = (props: InterestedDetailProps) => {
 	return (
 		<div className="p-4 space-y-1 dark:text-zinc-300 text-colorTextLightMode text-base font-semibold max-h-[250px] h-[250px] hide-scrollbar overflow-auto">
 			<div className="flex items-center gap-x-3 rounded dark:hover:bg-slate-600 hover:bg-bgLightModeButton p-2">
-				<img
-					src={createImgproxyUrl(userCreate?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })}
-					alt={userCreate?.user?.avatar_url}
-					className="size-7 rounded-full"
-				/>
+				<img src={createImgproxyUrl(userCreate?.user?.avatar_url ?? '')} alt={userCreate?.user?.avatar_url} className="size-7 rounded-full" />
 				<p>{userCreate?.user?.username}</p>
 			</div>
 		</div>

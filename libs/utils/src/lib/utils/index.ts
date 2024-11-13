@@ -903,7 +903,7 @@ type ImgproxyOptions = {
 	resizeType?: string;
 };
 
-export const createImgproxyUrl = (sourceImageUrl?: string, options: ImgproxyOptions = {}) => {
+export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
 	if (!sourceImageUrl) return '';
 	const { width, height, resizeType } = options;
 	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;

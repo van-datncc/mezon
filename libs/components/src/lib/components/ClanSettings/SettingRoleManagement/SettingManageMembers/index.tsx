@@ -117,7 +117,7 @@ const ItemMember = (props: ItemMemberProps) => {
 					alt={userName}
 					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 				/>
 				<span className="dark:text-white text-black font-medium one-line">{namePrioritize}</span>

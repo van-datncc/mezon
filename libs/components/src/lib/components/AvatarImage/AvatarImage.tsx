@@ -20,6 +20,10 @@ export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', i
 	if ((!src && !userName) || isAnonymous)
 		return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
 
+	if (srcImgProxy && src && isError) {
+		return <img loading="lazy" className={computedClassName} src={src} alt={alt} {...rest} />;
+	}
+
 	if (!src || isError) {
 		const avatarChar = userName?.charAt(0)?.toUpperCase() || '';
 
@@ -30,10 +34,6 @@ export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', i
 				{avatarChar}
 			</div>
 		);
-	}
-
-	if (srcImgProxy && src && isError) {
-		return <img loading="lazy" className={computedClassName} src={src} alt={alt} {...rest} />;
 	}
 
 	return <img loading="lazy" onError={handleError} className={computedClassName} src={srcImgProxy} alt={alt} {...rest} />;

@@ -109,7 +109,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 							alt={username}
 							userName={username}
 							className="min-w-9 min-h-9 max-w-9 max-h-9"
-							srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}
 						/>
 						<div className="flex flex-col">
