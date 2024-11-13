@@ -70,7 +70,7 @@
     "lodash.isequal": "^4.5.0",
     "match-sorter": "^6.3.3",
     "memoizee": "^0.4.15",
-    "mezon-active-windows": "0.1.18",
+    "mezon-active-windows": "0.1.25",
     "mezon-js": "^2.9.62",
     "mezon-js-protobuf": "^1.6.15",
     "minio": "^7.1.3",

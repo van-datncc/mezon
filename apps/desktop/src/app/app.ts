@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import { activeWindows } from 'mezon-active-windows';
+import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
