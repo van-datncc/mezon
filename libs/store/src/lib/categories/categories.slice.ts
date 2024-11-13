@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { ICategory, LoadingStatus, SortChannel, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -76,7 +76,8 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 			return thunkAPI.rejectWithValue([]);
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'categories/createCategories');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -92,8 +93,8 @@ export const checkDuplicateCategoryInClan = createAsyncThunk(
 			}
 			return;
 		} catch (error) {
-			Sentry.captureException(error);
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'categories/checkDuplicateCategoryInClan');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -110,7 +111,8 @@ export const deleteCategory = createAsyncThunk(
 				thunkAPI.dispatch(channelsActions.removeRememberChannel({ clanId }));
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'categories/deleteCategory');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -120,13 +122,14 @@ export const updateCategoriesOrder = createAsyncThunk(
 	async ({ clan_id, categories }: ApiUpdateCategoryOrderRequest, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateCategoryOrder(mezon.session, {
+			await mezon.client.updateCategoryOrder(mezon.session, {
 				clan_id: clan_id,
 				categories: categories
 			});
 			thunkAPI.dispatch(fetchCategories({ clanId: clan_id || '' }));
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'categories/updateCategoriesOrder');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -134,10 +137,11 @@ export const updateCategoriesOrder = createAsyncThunk(
 export const deleteCategoriesOrder = createAsyncThunk('categories/deleteCategoriesOrder', async (clanId: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteCategoryOrder(mezon.session, clanId);
+		await mezon.client.deleteCategoryOrder(mezon.session, clanId);
 		thunkAPI.dispatch(fetchCategories({ clanId: clanId }));
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'categories/deleteCategoriesOrder');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -147,7 +151,8 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 		await mezon.client.updateCategory(mezon.session, clanId, request);
 		thunkAPI.dispatch(fetchCategories({ clanId }));
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'categories/updateCategory');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

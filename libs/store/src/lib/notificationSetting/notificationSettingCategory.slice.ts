@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
@@ -40,26 +41,31 @@ export const fetchDefaultNotificationCategoryCached = memoizeAndTrack(
 export const getDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/getDefaultNotificationCategory',
 	async ({ categoryId, noCache }: fetchNotificationCategorySettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchDefaultNotificationCategoryCached.clear(mezon, categoryId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchDefaultNotificationCategoryCached.clear(mezon, categoryId);
+			}
+			const response = await fetchDefaultNotificationCategoryCached(mezon, categoryId);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+
+			const apiNotificationSetting = response
+				? {
+						id: response.id,
+						notification_setting_type: response.notification_setting_type,
+						active: response.active,
+						time_mute: response.time_mute
+					}
+				: {};
+
+			return apiNotificationSetting;
+		} catch (error) {
+			captureSentryError(error, 'defaultnotificationcategory/getDefaultNotificationCategory');
+			return thunkAPI.rejectWithValue(error);
 		}
-		const response = await fetchDefaultNotificationCategoryCached(mezon, categoryId);
-
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
-
-		const apiNotificationSetting = response
-			? {
-					id: response.id,
-					notification_setting_type: response.notification_setting_type,
-					active: response.active,
-					time_mute: response.time_mute
-				}
-			: {};
-
-		return apiNotificationSetting;
 	}
 );
 
@@ -74,23 +80,28 @@ export type SetDefaultNotificationPayload = {
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
 	async ({ category_id, notification_type, time_mute, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			channel_category_id: category_id,
-			notification_type: notification_type,
-			time_mute: time_mute,
-			clan_id: clan_id
-		};
-		const response = await mezon.client.setNotificationCategory(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				channel_category_id: category_id,
+				notification_type: notification_type,
+				time_mute: time_mute,
+				clan_id: clan_id
+			};
+			const response = await mezon.client.setNotificationCategory(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			if (time_mute) {
+				thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id || '', noCache: true }));
+			}
+			thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+			thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'defaultnotificationcategory/setDefaultNotificationCategory');
+			return thunkAPI.rejectWithValue(error);
 		}
-		if (time_mute) {
-			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id || '', noCache: true }));
-		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
-		return response;
 	}
 );
 
@@ -102,33 +113,43 @@ type DeleteDefaultNotificationPayload = {
 export const deleteDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/deleteDefaultNotificationCategory',
 	async ({ category_id, clan_id }: DeleteDefaultNotificationPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteNotificationCategory(mezon.session, category_id || '');
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteNotificationCategory(mezon.session, category_id || '');
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+			thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'defaultnotificationcategory/deleteDefaultNotificationCategory');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
-		return response;
 	}
 );
 
 export const setMuteCategory = createAsyncThunk(
 	'defaultnotificationcategory/setMuteCategory',
 	async ({ category_id, notification_type, active, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.setMuteNotificationCategory(mezon.session, {
-			active: active,
-			notification_type: notification_type,
-			id: category_id
-		});
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.setMuteNotificationCategory(mezon.session, {
+				active: active,
+				notification_type: notification_type,
+				id: category_id
+			});
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id || '', noCache: true }));
+			thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+			thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'defaultnotificationcategory/setMuteCategory');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id || '', noCache: true }));
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
-		return response;
 	}
 );
 
@@ -194,16 +215,21 @@ export const fetchChannelCategorySettingCached = memoizeAndTrack(
 export const fetchChannelCategorySetting = createAsyncThunk(
 	'channelCategorySetting/fetchChannelCategorySetting',
 	async ({ clanId, noCache }: fetchChannelCategorySettingPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchChannelCategorySettingCached.clear(mezon, clanId);
-		}
-		const response = await fetchChannelCategorySettingCached(mezon, clanId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchChannelCategorySettingCached.clear(mezon, clanId);
+			}
+			const response = await fetchChannelCategorySettingCached(mezon, clanId);
 
-		if (!response?.notification_channel_category_settings_list) {
-			return [];
+			if (!response?.notification_channel_category_settings_list) {
+				return [];
+			}
+			return response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
+		} catch (error) {
+			captureSentryError(error, 'channelCategorySetting/fetchChannelCategorySetting');
+			return thunkAPI.rejectWithValue(error);
 		}
-		return response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
 	}
 );
 

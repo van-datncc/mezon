@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { HashtagDm } from 'mezon-js';
@@ -36,18 +37,23 @@ export const fetchHashtagDmCached = memoizeAndTrack(
 );
 
 export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, noCache }: fetchHashtagDmArgs, thunkAPI) => {
-	const mezon = await ensureClient(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchHashtagDmCached.clear(mezon, userIds);
+	try {
+		const mezon = await ensureClient(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchHashtagDmCached.clear(mezon, userIds);
+		}
+		const response = await fetchHashtagDmCached(mezon, userIds);
+		if (!response?.hashtag_dm) {
+			return [];
+		}
+		return response.hashtag_dm.map((dm: HashtagDm) => ({
+			...dm,
+			id: dm.channel_id
+		}));
+	} catch (error) {
+		captureSentryError(error, 'channels/fetchHashtagDm');
+		return thunkAPI.rejectWithValue(error);
 	}
-	const response = await fetchHashtagDmCached(mezon, userIds);
-	if (!response?.hashtag_dm) {
-		return [];
-	}
-	return response.hashtag_dm.map((dm: HashtagDm) => ({
-		...dm,
-		id: dm.channel_id
-	}));
 });
 
 export const initialHashtagDmState: HashtagDmState = HashtagDmAdapter.getInitialState({

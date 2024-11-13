@@ -105,7 +105,7 @@ const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 
 	const emojiRecentData = useMemo(() => {
 		return localStorage.getItem('recentEmojis');
-	}, [localStorage.getItem('recentEmojis')]);
+	}, []);
 
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);

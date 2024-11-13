@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, IUserStream, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
@@ -31,28 +32,33 @@ type fetchStreamChannelMembersPayload = {
 export const fetchStreamChannelMembers = createAsyncThunk(
 	'stream/fetchStreamChannelMembers',
 	async ({ clanId, channelId, channelType }: fetchStreamChannelMembersPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.listStreamingChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
-		if (!response.streaming_channel_users) {
-			return [];
+			const response = await mezon.client.listStreamingChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
+			if (!response.streaming_channel_users) {
+				return [];
+			}
+
+			const members = response.streaming_channel_users.map((channelRes) => {
+				return {
+					user_id: channelRes.user_id || '',
+					clan_id: clanId,
+					streaming_channel_id: channelRes.channel_id || '',
+					clan_name: '',
+					participant: channelRes.participant || '',
+					streaming_channel_label: '',
+					id: channelRes.id || ''
+				};
+			});
+
+			thunkAPI.dispatch(usersStreamActions.addMany(members));
+			const streams = response.streaming_channel_users;
+			return streams;
+		} catch (error) {
+			captureSentryError(error, 'stream/fetchStreamChannelMembers');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const members = response.streaming_channel_users.map((channelRes) => {
-			return {
-				user_id: channelRes.user_id || '',
-				clan_id: clanId,
-				streaming_channel_id: channelRes.channel_id || '',
-				clan_name: '',
-				participant: channelRes.participant || '',
-				streaming_channel_label: '',
-				id: channelRes.id || ''
-			};
-		});
-
-		thunkAPI.dispatch(usersStreamActions.addMany(members));
-		const streams = response.streaming_channel_users;
-		return streams;
 	}
 );
 
