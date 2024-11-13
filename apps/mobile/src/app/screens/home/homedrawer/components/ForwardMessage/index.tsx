@@ -212,6 +212,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	};
 
 	const onSelectChange = useCallback((value: boolean, item: IForwardIObject) => {
+		if (!item || !item?.channelId) return;
 		if (value) {
 			selectedForwardObjectsRef.current = [...selectedForwardObjectsRef.current, item];
 		} else {
@@ -252,7 +253,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 							keyboardShouldPersistTaps="handled"
 							data={filteredForwardObjects}
 							ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
-							keyExtractor={(item, index) => `${item?.channelId?.toString()}_${index}_'forward'`}
+							keyExtractor={(item) => item?.channelId?.toString()}
 							renderItem={renderForwardObject}
 							estimatedItemSize={size.s_60}
 						/>
