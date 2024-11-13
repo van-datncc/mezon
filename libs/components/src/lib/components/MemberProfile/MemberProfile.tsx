@@ -305,7 +305,8 @@ export function MemberProfile({
 						userName={userNameAva ?? userName}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
 						classNameText="font-semibold"
-						src={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+						srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+						src={avatar}
 						isAnonymous={isAnonymous}
 					/>
 					{isFooter && (

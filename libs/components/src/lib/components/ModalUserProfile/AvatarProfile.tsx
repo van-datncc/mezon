@@ -65,7 +65,8 @@ const AvatarProfile = ({
 					alt={username || ''}
 					userName={username}
 					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}
-					src={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+					srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+					src={avatar}
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"
 				/>

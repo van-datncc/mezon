@@ -6,9 +6,10 @@ export type AvatarImageProp = {
 	alt: string;
 	isAnonymous?: boolean;
 	classNameText?: string;
+	srcImgProxy?: string;
 } & DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
+export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
 
 	const computedClassName = twMerge('size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className);
@@ -31,5 +32,9 @@ export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, c
 		);
 	}
 
-	return <img loading="lazy" onError={handleError} className={computedClassName} src={src} alt={alt} {...rest} />;
+	if (srcImgProxy && src && isError) {
+		return <img loading="lazy" className={computedClassName} src={src} alt={alt} {...rest} />;
+	}
+
+	return <img loading="lazy" onError={handleError} className={computedClassName} src={srcImgProxy} alt={alt} {...rest} />;
 };

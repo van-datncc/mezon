@@ -1,6 +1,6 @@
 import { auditLogFilterActions, auditLogList, selectAllUserClans, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IUserAuditLog, UsersClanEntity, getAvatarForPrioritize } from '@mezon/utils';
+import { IUserAuditLog, UsersClanEntity, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -17,7 +17,13 @@ const AvatarUser = ({ user }: AvatarUserProps) => {
 		<div className="w-6 h-6 rounded-full">
 			<div className="w-6 h-6">
 				{userClan ? (
-					<AvatarImage alt={userName || ''} userName={userName} className="min-w-6 min-h-6 max-w-6 max-h-6" src={avatar} />
+					<AvatarImage
+						alt={userName || ''}
+						userName={userName}
+						className="min-w-6 min-h-6 max-w-6 max-h-6"
+						srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+						src={avatar}
+					/>
 				) : (
 					<Icons.AvatarUser />
 				)}

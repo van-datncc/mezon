@@ -39,7 +39,7 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			alt={message.username ?? ''}
 			userName={message.username}
 			data-popover-target="popover-content"
-			src={createImgproxyUrl(
+			srcImgProxy={createImgproxyUrl(
 				((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
 					? clanAvatar || pendingClanAvatar || pendingUserAvatar
 					: pendingUserAvatar) ||
@@ -47,6 +47,11 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 					'',
 				{ width: 100, height: 100, resizeType: 'fit' }
 			)}
+			src={
+				(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+					? clanAvatar || pendingClanAvatar || pendingUserAvatar
+					: pendingUserAvatar) || message?.avatar
+			}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"
 			isAnonymous={message.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}
