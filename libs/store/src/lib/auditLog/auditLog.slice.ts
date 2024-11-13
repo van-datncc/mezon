@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ApiAuditLog, MezonapiListAuditLog } from 'mezon-js/api.gen';
@@ -56,9 +57,9 @@ export const auditLogList = createAsyncThunk(
 			}
 			const response = await fetchAuditLogCached(mezon, actionLog, userId, clanId, page, pageSize);
 			return response;
-		} catch (error: any) {
-			const errstream = await error.json();
-			return thunkAPI.rejectWithValue(errstream.message);
+		} catch (error) {
+			captureSentryError(error, 'attachment/fetchChannelAttachments');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
@@ -63,33 +63,38 @@ export type ChangeCurrentClanArgs = {
 export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 	'clans/changeCurrentClan',
 	async ({ clanId, noCache = false }: ChangeCurrentClanArgs, thunkAPI) => {
-		thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
-		thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
-		thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
-		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
-		thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
-		thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
-		thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
-		thunkAPI.dispatch(policiesActions.fetchPermission());
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
-		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
-		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
-		thunkAPI.dispatch(channelsActions.setStatusChannelFetch());
-		thunkAPI.dispatch(
-			voiceActions.fetchVoiceChannelMembers({
-				clanId: clanId ?? '',
-				channelId: '',
-				channelType: ChannelType.CHANNEL_TYPE_VOICE
-			})
-		);
-		thunkAPI.dispatch(channelsStreamActions.listStreamChannels({ clanId }));
-		thunkAPI.dispatch(
-			usersStreamActions.fetchStreamChannelMembers({
-				clanId: clanId ?? '',
-				channelId: '',
-				channelType: ChannelType.CHANNEL_TYPE_STREAMING
-			})
-		);
+		try {
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+			thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
+			thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
+			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
+			thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
+			thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
+			thunkAPI.dispatch(policiesActions.fetchPermission());
+			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
+			thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
+			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
+			thunkAPI.dispatch(channelsActions.setStatusChannelFetch());
+			thunkAPI.dispatch(
+				voiceActions.fetchVoiceChannelMembers({
+					clanId: clanId ?? '',
+					channelId: '',
+					channelType: ChannelType.CHANNEL_TYPE_VOICE
+				})
+			);
+			thunkAPI.dispatch(channelsStreamActions.listStreamChannels({ clanId }));
+			thunkAPI.dispatch(
+				usersStreamActions.fetchStreamChannelMembers({
+					clanId: clanId ?? '',
+					channelId: '',
+					channelType: ChannelType.CHANNEL_TYPE_STREAMING
+				})
+			);
+		} catch (error) {
+			captureSentryError(error, 'clans/changeCurrentClan');
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 
@@ -104,9 +109,9 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		const meta = clans.map((clan) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
 		return clans;
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'clans/fetchClans');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -129,9 +134,9 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 			return thunkAPI.rejectWithValue([]);
 		}
 		return mapClanToEntity(response);
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'clans/createClans');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -145,8 +150,8 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 		}
 		return;
 	} catch (error) {
-		Sentry.captureException(error);
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'clans/duplicateNameClan');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -158,7 +163,8 @@ export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: Cha
 			thunkAPI.dispatch(fetchClans());
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'clans/deleteClans');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -176,9 +182,9 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		}
 		thunkAPI.dispatch(fetchClans());
 		return response;
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'clans/removeClanUsers');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -204,9 +210,9 @@ export const updateClan = createAsyncThunk(
 
 			thunkAPI.dispatch(fetchClans());
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'clans/updateClans');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -226,7 +232,8 @@ export const updateBageClanWS = createAsyncThunk('clans/updateBageClanWS', async
 			await thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
 	} catch (error) {
-		console.error(error);
+		captureSentryError(error, 'clans/updateBageClanWS');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -260,9 +267,9 @@ export const updateUser = createAsyncThunk(
 				thunkAPI.dispatch(accountActions.getUserProfile({ noCache: true }));
 			}
 			return response as true;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'clans/updateUser');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -274,7 +281,7 @@ export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.socketRef.current?.joinClanChat(clanId);
 	} catch (error) {
-		Sentry.captureException(error);
+		captureSentryError(error, 'clans/joinClan');
 		return thunkAPI.rejectWithValue(error);
 	}
 });

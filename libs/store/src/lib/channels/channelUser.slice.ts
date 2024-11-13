@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelDescription } from 'mezon-js';
@@ -45,17 +46,22 @@ export const fetchListChannelsByUserCached = memoizeAndTrack(
 export const fetchListChannelsByUser = createAsyncThunk(
 	'channelsByUser/fetchListChannelsByUser',
 	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchListChannelsByUserCached.clear(mezon);
-		}
-		const response = await fetchListChannelsByUserCached(mezon);
-		if (!response?.channeldesc) {
-			return [];
-		}
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchListChannelsByUserCached.clear(mezon);
+			}
+			const response = await fetchListChannelsByUserCached(mezon);
+			if (!response?.channeldesc) {
+				return [];
+			}
 
-		const channels = response.channeldesc.map(mapChannelsByUserToEntity);
-		return channels;
+			const channels = response.channeldesc.map(mapChannelsByUserToEntity);
+			return channels;
+		} catch (error) {
+			captureSentryError(error, 'channelsByUser/fetchListChannelsByUser');
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 

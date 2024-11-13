@@ -27,7 +27,8 @@ export const NotificationStacks = ({}: any) => {
 					}
 				}),
 				cardStyle: { backgroundColor: themeValue.secondary },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				animationEnabled: Platform.OS === 'ios'
 			}}
 			initialRouteName={APP_SCREEN.NOTIFICATION.HOME}
 		>

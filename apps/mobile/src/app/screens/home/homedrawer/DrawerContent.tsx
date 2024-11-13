@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import { Swing } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
+import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
 import ServerList from './ServerList';
 import UserEmptyClan from './UserEmptyClan';
@@ -64,6 +65,7 @@ const DrawerContent = React.memo(() => {
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<ServerList />
+			<BackNativeListener />
 			<ChannelListWrapper />
 			{isTabletLandscape && <View style={styles.wall}></View>}
 		</View>

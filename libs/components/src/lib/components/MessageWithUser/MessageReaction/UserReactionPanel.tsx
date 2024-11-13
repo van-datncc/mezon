@@ -1,7 +1,15 @@
 import { useAuth, useChatReaction, useUserById } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
+import {
+	EmojiDataOptionals,
+	IMessageWithUser,
+	SenderInfoOptionals,
+	calculateTotalCount,
+	createImgproxyUrl,
+	getSrcEmoji,
+	isPublicChannel
+} from '@mezon/utils';
 import { Fragment, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
@@ -98,7 +106,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({ emojiId, emojiName, count }) 
 	return (
 		<div>
 			<div className="flex flex-row items-center m-2 dark:text-white text-black">
-				<img src={getSrcEmoji(emojiId ?? '')} className="w-5 h-5 min-h-5 min-w-5" />
+				<img src={getSrcEmoji(emojiId ?? '')} className="w-5 h-5 min-h-5 min-w-5" alt="" />
 				<p className="text-sm ml-2">{count}</p>
 				<p className="text-sm ml-2">{emojiName}</p>
 			</div>
@@ -146,6 +154,11 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 					className="w-8 h-8"
 					alt="user avatar"
 					userName={user?.clan_nick || user?.user?.display_name || user?.user?.username}
+					srcImgProxy={createImgproxyUrl((user?.clan_avatar || user?.user?.avatar_url) ?? '', {
+						width: 300,
+						height: 300,
+						resizeType: 'fit'
+					})}
 					src={user?.clan_avatar || user?.user?.avatar_url}
 				/>
 			</div>

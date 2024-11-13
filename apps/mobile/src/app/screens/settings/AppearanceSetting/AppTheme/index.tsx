@@ -1,4 +1,4 @@
-import { ThemeMode, ThemeModeAuto, ThemeModeBase, themeColors, useTheme } from '@mezon/mobile-ui';
+import { ThemeMode, ThemeModeBase, themeColors, useTheme } from '@mezon/mobile-ui';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Appearance, View } from 'react-native';

@@ -1,6 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 
+import { captureSentryError } from '@mezon/logger';
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
@@ -60,7 +61,8 @@ export const fetchStickerByUserId = createAsyncThunk(
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'settingClanSticker/fetchClanSticker');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -76,7 +78,8 @@ export const createSticker = createAsyncThunk(
 				return thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue({ error });
+			captureSentryError(error, 'settingClanSticker/createSticker');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -89,7 +92,8 @@ export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker'
 			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({ error });
+		captureSentryError(error, 'settingClanSticker/updateSticker');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -110,7 +114,8 @@ export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker'
 			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({ error });
+		captureSentryError(error, 'settingClanSticker/deleteSticker');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

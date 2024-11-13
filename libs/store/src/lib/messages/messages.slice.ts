@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -25,7 +26,6 @@ import {
 	createSlice,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -190,93 +190,98 @@ export const fetchMessages = createAsyncThunk(
 			viewingOlder
 		}: fetchMessageChannelPayload,
 		thunkAPI
-	): Promise<FetchMessagesPayloadAction> => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
-		}
-		const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
-		if (!response.messages) {
-			return {
-				messages: []
-			};
-		}
-
-		if (Date.now() - response.time > 1000) {
-			return {
-				messages: []
-			};
-		}
-
-		const firstMessage = response.messages[response.messages.length - 1];
-		if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
-			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
-		}
-
-		let lastSentMessage = response.last_sent_message;
-
-		// no message id and direction is before timestamp means load latest messages
-		// then the last sent message will be the last message of response
-		if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
-			lastSentMessage = response.messages[response.messages.length - 1];
-		}
-
-		if (lastSentMessage && lastSentMessage.id) {
-			thunkAPI.dispatch(
-				messagesActions.setLastMessage({
-					...lastSentMessage,
-					channel_id: channelId
-				})
-			);
-		}
-		thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
-
-		const messages = response.messages.map((item) => {
-			return mapMessageChannelToEntity(item, response.last_seen_message?.id);
-		});
-
-		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-
-		const lastLoadMessage = messages[messages.length - 1];
-		const hasMore = lastLoadMessage?.isFirst === false ? false : true;
-
-		if (messages.length > 0) {
-			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
-		}
-
-		if (response.last_seen_message?.id) {
-			thunkAPI.dispatch(
-				messagesActions.setChannelLastMessage({
-					channelId,
-					messageId: response.last_seen_message?.id
-				})
-			);
-			const lastMessage = messages.find((message) => message.id === response.last_seen_message?.id);
-
-			if (lastMessage) {
-				seenMessagePool.updateKnownSeenMessage({
-					clanId: lastMessage.clan_id || '',
-					channelId: lastMessage.channel_id || '',
-					channelLabel: lastMessage.channel_label,
-					messageId: lastMessage.id,
-					messageCreatedAt: lastMessage.create_time_seconds ? +lastMessage.create_time_seconds : 0,
-					messageSeenAt: 0,
-					mode: lastMessage.mode as number
-				});
+	) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
 			}
-		}
+			const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
+			if (!response.messages) {
+				return {
+					messages: []
+				};
+			}
 
-		if (isFetchingLatestMessages) {
-			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
-			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
-		}
+			if (Date.now() - response.time > 1000) {
+				return {
+					messages: []
+				};
+			}
 
-		return {
-			messages,
-			isFetchingLatestMessages,
-			isClearMessage,
-			viewingOlder
-		};
+			const firstMessage = response.messages[response.messages.length - 1];
+			if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
+				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
+			}
+
+			let lastSentMessage = response.last_sent_message;
+
+			// no message id and direction is before timestamp means load latest messages
+			// then the last sent message will be the last message of response
+			if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
+				lastSentMessage = response.messages[response.messages.length - 1];
+			}
+
+			if (lastSentMessage && lastSentMessage.id) {
+				thunkAPI.dispatch(
+					messagesActions.setLastMessage({
+						...lastSentMessage,
+						channel_id: channelId
+					})
+				);
+			}
+			thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
+
+			const messages = response.messages.map((item) => {
+				return mapMessageChannelToEntity(item, response.last_seen_message?.id);
+			});
+
+			thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
+
+			const lastLoadMessage = messages[messages.length - 1];
+			const hasMore = lastLoadMessage?.isFirst === false ? false : true;
+
+			if (messages.length > 0) {
+				thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
+			}
+
+			if (response.last_seen_message?.id) {
+				thunkAPI.dispatch(
+					messagesActions.setChannelLastMessage({
+						channelId,
+						messageId: response.last_seen_message?.id
+					})
+				);
+				const lastMessage = messages.find((message) => message.id === response.last_seen_message?.id);
+
+				if (lastMessage) {
+					seenMessagePool.updateKnownSeenMessage({
+						clanId: lastMessage.clan_id || '',
+						channelId: lastMessage.channel_id || '',
+						channelLabel: lastMessage.channel_label,
+						messageId: lastMessage.id,
+						messageCreatedAt: lastMessage.create_time_seconds ? +lastMessage.create_time_seconds : 0,
+						messageSeenAt: 0,
+						mode: lastMessage.mode as number
+					});
+				}
+			}
+
+			if (isFetchingLatestMessages) {
+				thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
+				thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
+			}
+
+			return {
+				messages,
+				isFetchingLatestMessages,
+				isClearMessage,
+				viewingOlder
+			};
+		} catch (error) {
+			captureSentryError(error, 'messages/fetchMessages');
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 
@@ -338,8 +343,8 @@ export const loadMoreMessage = createAsyncThunk(
 				);
 			}
 		} catch (e) {
-			console.error(e);
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(e, 'messages/loadMoreMessage');
+			return thunkAPI.rejectWithValue(e);
 		}
 	}
 );
@@ -382,8 +387,8 @@ export const jumpToMessage = createAsyncThunk(
 			}
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
 		} catch (e) {
-			console.error(e);
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(e, 'messages/jumpToMessage');
+			return thunkAPI.rejectWithValue(e);
 		}
 	}
 );
@@ -403,8 +408,8 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, now);
 		} catch (e) {
-			Sentry.captureException(e);
-			console.error('Error updating last seen message', e);
+			captureSentryError(e, 'messages/updateLastSeenMessage');
+			return thunkAPI.rejectWithValue(e);
 		}
 	},
 	{
@@ -556,8 +561,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 	try {
 		await fakeItUntilYouMakeIt();
 	} catch (error) {
-		console.error('Error sending message', error);
 		thunkAPI.dispatch(messagesActions.markAsError({ messageId: id, channelId }));
+		captureSentryError(error, 'messages/sendMessage');
 		return thunkAPI.rejectWithValue('Error sending message');
 	}
 });

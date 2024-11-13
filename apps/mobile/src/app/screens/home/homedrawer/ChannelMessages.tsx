@@ -16,7 +16,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { Direction_Mode, LIMIT_MESSAGE } from '@mezon/utils';
+import { Direction_Mode, LIMIT_MESSAGE, sleep } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, LayoutAnimation, Platform, TouchableOpacity, UIManager, View } from 'react-native';
@@ -54,6 +54,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
+	const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(true);
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean>(false);
@@ -86,8 +87,17 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
 			setIsShowSkeleton(isShow);
 		});
+
+		const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
+			if (time) {
+				setIsReadyShowChannelMsg(false);
+				await sleep(time);
+				setIsReadyShowChannelMsg(true);
+			}
+		});
 		return () => {
 			showSKlListener.remove();
+			onSwitchChannel.remove();
 		};
 	}, []);
 
@@ -226,19 +236,23 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 				<MessageItemSkeleton skeletonNumber={15} />
 			)}
 
-			<ChannelMessageList
-				flatListRef={flatListRef}
-				messages={messages}
-				handleScroll={async ({ nativeEvent }) => {
-					if (nativeEvent.contentOffset.y <= 0) {
-						await onLoadMore(ELoadMoreDirection.bottom);
-					}
-				}}
-				renderItem={renderItem}
-				onLoadMore={onLoadMore}
-				isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
-				isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
-			/>
+			{isReadyShowChannelMsg ? (
+				<ChannelMessageList
+					flatListRef={flatListRef}
+					messages={messages}
+					handleScroll={async ({ nativeEvent }) => {
+						if (nativeEvent.contentOffset.y <= 0) {
+							await onLoadMore(ELoadMoreDirection.bottom);
+						}
+					}}
+					renderItem={renderItem}
+					onLoadMore={onLoadMore}
+					isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
+					isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
+				/>
+			) : (
+				<MessageItemSkeleton skeletonNumber={15} />
+			)}
 			<Block height={size.s_8} />
 			{isHaveJumpToPresent && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={handleJumpToPresent} activeOpacity={0.8}>

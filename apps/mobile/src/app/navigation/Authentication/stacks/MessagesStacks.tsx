@@ -38,7 +38,8 @@ export const MessagesStacks = ({}: any) => {
 						left: size.s_6
 					}
 				}),
-				headerLeftLabelVisible: false
+				headerLeftLabelVisible: false,
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen

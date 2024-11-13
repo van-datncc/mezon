@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
@@ -63,41 +64,46 @@ export const initialAppState: AppState = {
 };
 
 export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id: string }, thunkAPI) => {
-	const state = thunkAPI.getState() as RootState;
+	try {
+		const state = thunkAPI.getState() as RootState;
 
-	if (!state) {
-		throw Error('refresh app error: state does not init');
+		if (!state) {
+			throw Error('refresh app error: state does not init');
+		}
+
+		clearAllMemoizedFunctions();
+
+		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
+		const currentChannelId = state.channels?.currentChannelId;
+		const currentDirectId = state.direct?.currentDirectMessageId;
+		const currentClanId = state.clans?.currentClanId;
+		const path = isElectron() ? window.location.hash : window.location.pathname;
+
+		let channelId = null;
+		let clanId = null;
+		if (currentChannelId && RegExp(currentChannelId).test(path)) {
+			clanId = currentClanId;
+			channelId = currentChannelId;
+		} else if (currentDirectId && RegExp(currentDirectId).test(path)) {
+			clanId = '0';
+			channelId = currentDirectId;
+		}
+
+		channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
+
+		thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
+		thunkAPI.dispatch(clansActions.fetchClans());
+		if (isClanView && currentClanId) {
+			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
+			thunkAPI.dispatch(clansActions.joinClan({ clanId: currentClanId }));
+		}
+
+		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+	} catch (error) {
+		captureSentryError(error, 'app/refreshApp');
+		return thunkAPI.rejectWithValue(error);
 	}
-
-	clearAllMemoizedFunctions();
-
-	const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
-	const currentChannelId = state.channels?.currentChannelId;
-	const currentDirectId = state.direct?.currentDirectMessageId;
-	const currentClanId = state.clans?.currentClanId;
-	const path = isElectron() ? window.location.hash : window.location.pathname;
-
-	let channelId = null;
-	let clanId = null;
-	if (currentChannelId && RegExp(currentChannelId).test(path)) {
-		clanId = currentClanId;
-		channelId = currentChannelId;
-	} else if (currentDirectId && RegExp(currentDirectId).test(path)) {
-		clanId = '0';
-		channelId = currentDirectId;
-	}
-
-	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
-
-	thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
-	thunkAPI.dispatch(clansActions.fetchClans());
-	if (isClanView && currentClanId) {
-		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
-		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
-		thunkAPI.dispatch(clansActions.joinClan({ clanId: currentClanId }));
-	}
-
-	thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 });
 
 export const appSlice = createSlice({
