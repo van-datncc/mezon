@@ -1,5 +1,6 @@
 import { selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Label, Modal } from 'flowbite-react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
@@ -173,6 +174,11 @@ const ModalSendToken = ({
 																<AvatarImage
 																	alt={user.username || ''}
 																	userName={user.username}
+																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
+																		width: 100,
+																		height: 100,
+																		resizeType: 'fit'
+																	})}
 																	src={user.avatar_url}
 																	className="size-4 mr-2"
 																	classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"

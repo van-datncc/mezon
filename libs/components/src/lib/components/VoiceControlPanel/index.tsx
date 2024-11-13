@@ -23,22 +23,22 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
-	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
+	const currentVoiceChannel = useSelector((state) => selectChannelById(state, currentVoiceChannelId));
 
 	const startScreenShare = useCallback(() => {
-		console.log('not implemented');
+		console.error('not implemented');
 	}, []);
 
 	const stopScreenShare = useCallback(() => {
-		console.log('not implemented');
+		console.error('not implemented');
 	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
-		console.log('not implemented');
+		console.error('not implemented');
 	}, []);
 
 	const openCamera = useCallback(() => {
-		console.log('not implemented');
+		console.error('not implemented');
 	}, []);
 
 	const { toChannelPage } = useAppNavigation();

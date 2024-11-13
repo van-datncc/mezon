@@ -1,7 +1,7 @@
 import { useEventManagement, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EEventStatus, EPermission, OptionEvent } from '@mezon/utils';
+import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -159,6 +159,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								alt={userCreate?.user?.username || ''}
 								userName={userCreate?.user?.username}
 								className="min-w-6 min-h-6 max-w-6 max-h-6"
+								srcImgProxy={createImgproxyUrl(userCreate?.user?.avatar_url ?? '')}
 								src={userCreate?.user?.avatar_url}
 								classNameText="text-[9px] pt-[3px]"
 							/>
