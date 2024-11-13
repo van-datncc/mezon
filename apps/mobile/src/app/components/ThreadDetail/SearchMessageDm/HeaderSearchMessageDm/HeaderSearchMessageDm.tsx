@@ -23,13 +23,13 @@ export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: 
 		}
 	};
 
+	const onGoBack = () => {
+		navigation.goBack();
+	};
+
 	return (
 		<Block paddingHorizontal={size.s_10} paddingVertical={size.s_20} flexDirection="row" alignItems="center" gap={size.s_20}>
-			<TouchableOpacity
-				onPress={() => {
-					navigation.goBack();
-				}}
-			>
+			<TouchableOpacity onPress={onGoBack}>
 				<ArrowLeftIcon width={20} height={20} color={themeValue.text} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
