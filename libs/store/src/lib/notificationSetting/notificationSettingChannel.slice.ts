@@ -86,7 +86,8 @@ export const setNotificationSetting = createAsyncThunk(
 		const body = {
 			channel_category_id: channel_id,
 			notification_type: notification_type,
-			time_mute: time_mute
+			time_mute: time_mute,
+			clan_id: clan_id
 		};
 		const response = await mezon.client.setNotificationChannel(mezon.session, body);
 		if (!response) {
