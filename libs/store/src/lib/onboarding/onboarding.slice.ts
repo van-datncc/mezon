@@ -16,6 +16,7 @@ export interface OnboardingState extends EntityState<OnboardingEntity, string> {
 	missionDone: number;
 	missionSum: number;
 	guideFinished: boolean;
+	listMission: { title: string; description: string }[];
 }
 
 export const onboardingAdapter = createEntityAdapter({ selectId: (thread: OnboardingEntity) => thread.id || '' });
@@ -24,7 +25,21 @@ export const initialOnboardingState: OnboardingState = onboardingAdapter.getInit
 	onboardingMode: false,
 	missionDone: 0,
 	missionSum: 3,
-	guideFinished: false
+	guideFinished: false,
+	listMission: [
+		{
+			title: `Sends message in #general`,
+			description: `Sends message in #general`
+		},
+		{
+			title: "Visit clan's members list ",
+			description: `Open clan's members list`
+		},
+		{
+			title: 'Visit events clans ',
+			description: `Open events clan`
+		}
+	]
 });
 
 export enum ETypeMission {
@@ -71,3 +86,4 @@ export const selectMissionDone = createSelector(getOnboardingState, (state) => s
 
 export const selectMissionSum = createSelector(getOnboardingState, (state) => state.missionSum);
 export const selectFinishGuide = createSelector(getOnboardingState, (state) => state.guideFinished);
+export const selectListMission = createSelector(getOnboardingState, (state) => state.listMission);
