@@ -21,7 +21,6 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 	const avatarPickerRef = useRef<IMezonImagePickerHandler>();
 
 	const handleOnload = async (url: string) => {
-		console.log(url);
 		onLoad && onLoad(url);
 	};
 

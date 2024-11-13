@@ -1,7 +1,6 @@
-export enum EOpenSearchChannelFrom {
-	ChannelList,
-	HeaderDefault,
-	ActionMenu
+export enum ETypeSearch {
+	SearchChannel,
+	SearchAll
 }
 
 export interface IRoleMention {

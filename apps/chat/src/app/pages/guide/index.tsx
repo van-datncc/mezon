@@ -1,7 +1,7 @@
-import { GuideBody } from '@mezon/components';
 import { useMemberContext } from '@mezon/core';
 import { selectCurrentClan } from '@mezon/store';
 import { useSelector } from 'react-redux';
+import GuideBody from './GuideBody';
 
 function GuideMain() {
 	const { clanOwner } = useMemberContext();

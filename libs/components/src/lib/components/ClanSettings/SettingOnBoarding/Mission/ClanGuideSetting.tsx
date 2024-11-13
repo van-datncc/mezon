@@ -2,8 +2,8 @@ import { useMemberContext } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { ChangeEvent, ReactNode, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { GuideItemLayout } from './GuideBody';
-import ModalControlRule, { ControlInput } from './ModalControlRule';
+import GuideItemLayout from '../GuideItemLayout';
+import ModalControlRule, { ControlInput } from '../ModalControlRule';
 
 type TypeMission = {
 	id: number;
