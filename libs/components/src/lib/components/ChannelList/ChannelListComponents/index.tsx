@@ -1,15 +1,19 @@
-import { useClans, usePathMatch, usePermissionChecker } from '@mezon/core';
+import { useAppNavigation, useClans, usePathMatch, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
 	eventManagementActions,
+	onboardingActions,
 	selectCurrentClanId,
+	selectMissionDone,
+	selectMissionSum,
 	selectNumberEvent,
+	selectOnboardingMode,
 	selectOngoingEvent,
 	selectShowNumEvent
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { memo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -23,7 +27,7 @@ export const Events = memo(() => {
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
-
+	const onboardingMode = useSelector(selectOnboardingMode);
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
 
 	const closeModal = () => {
@@ -62,6 +66,8 @@ export const Events = memo(() => {
 
 	return (
 		<>
+			{onboardingMode && <OnboardingGetStart link={serverGuidePath} />}
+
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
 			<Link
@@ -154,6 +160,63 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 			<div className="text-center py-1 bg-green-700 mt-2 rounded select-none" onClick={handleOpenDetail}>
 				<p className=" text-channelActiveLightColor dark:text-channelActiveColor  font-medium">Event detail</p>
 			</div>
+		</div>
+	);
+};
+
+const OnboardingGetStart = ({ link }: { link: string }) => {
+	const missionDone = useSelector(selectMissionDone);
+	const missionSum = useSelector(selectMissionSum);
+
+	const completionPercentage = useMemo(() => {
+		return missionDone ? (missionDone / missionSum) * 100 - 100 : -97;
+	}, [missionDone, missionSum]);
+	const dispatch = useDispatch();
+	const { navigate } = useAppNavigation();
+	const handleNavigate = () => {
+		navigate(link);
+	};
+	const handleClosePreview = () => {
+		dispatch(onboardingActions.closeOnboardingMode());
+	};
+	const [openModalGetStarted, closeModalGetStarted] = useModal(() => {
+		return (
+			<div className="fixed z-50 top-0 left-0 w-screen  bg-black flex px-4 py-2 h-12 items-center justify-center ">
+				<div className="absolute cursor-pointer hover:bg-slate-950 left-6 px-2 flex gap-1 border-2 py-1 items-center justify-center  border-white rounded bg-transparent">
+					<Icons.LeftArrowIcon className="fill-white text-white" />
+					<p className="text-white text-xs font-medium" onClick={handleClosePreview}>
+						Close preview mode
+					</p>
+				</div>
+				<div className="text-base text-white font-semibold">You are viewing the server as a new member. You have no roles.</div>
+			</div>
+		);
+	});
+	useEffect(() => {
+		openModalGetStarted();
+	}, []);
+
+	return (
+		<div className="w-full h-12 flex flex-col gap-1 relative" onClick={handleNavigate}>
+			<div className="flex justify-between">
+				<p className="text-sm font-bold text-white">Get Started</p>
+				<div className="flex gap-[1px] items-center">
+					<p className="text-xs font-bold text-white">{missionDone}</p>
+					<p className="text-xs">of</p>
+					<p className="text-xs font-bold text-white">{missionSum}</p>
+					<Icons.ArrowRight defaultSize="w-3 h-3" />
+				</div>
+			</div>
+			<div className="flex bg-slate-700 relative rounded-2xl w-full h-1 overflow-hidden">
+				<div
+					className="absolute w-full h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl"
+					style={{
+						animation: 'transform 1s ease-out',
+						transform: `translateX(${completionPercentage}%)`
+					}}
+				></div>
+			</div>
+			<hr className="absolute bottom-1 left-0 h-[0.08px] w-full dark:border-borderDivider border-white" />
 		</div>
 	);
 };
