@@ -9,7 +9,7 @@ type GuideItemLayoutProps = {
 	title?: string;
 	description?: ReactNode;
 	height?: string;
-	gap?: string;
+	gap?: number;
 	onClick?: () => void;
 };
 
@@ -20,14 +20,17 @@ export const GuideItemLayout = ({
 	hightLightIcon = false,
 	action,
 	className,
-	background = 'bg-[#282a2e]',
+	background = 'bg-bgSecondaryHover',
 	height,
-	gap = 'gap-2',
+	gap = 8,
 	onClick
 }: GuideItemLayoutProps) => {
 	return (
 		<div
-			className={`p-4 ${gap} flex items-start rounded-lg hover:bg-slate-800  ${height ? height : 'h-full'} ${background} ${className}`}
+			className={`p-4 flex items-start rounded-lg hover:bg-slate-800  ${height ? height : 'h-full'} ${background} ${className}`}
+			style={{
+				gap: gap
+			}}
 			onClick={onClick}
 		>
 			{icon && (
