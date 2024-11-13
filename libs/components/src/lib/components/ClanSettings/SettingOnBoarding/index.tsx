@@ -12,7 +12,7 @@ enum EOnboardingStep {
 	MISSION,
 	MAIN
 }
-const SettingOnBoarding = () => {
+const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
 	const toggleEnableStatus = () => {
 		dispatch(channelSettingActions.toggleOnBoarding());
@@ -28,7 +28,12 @@ const SettingOnBoarding = () => {
 	return (
 		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm">
 			{currentPage === EOnboardingStep.MAIN && (
-				<MainIndex handleGoToPage={handleGoToPage} isEnableOnBoarding={isEnableOnBoarding} toggleEnableStatus={toggleEnableStatus} />
+				<MainIndex
+					handleGoToPage={handleGoToPage}
+					isEnableOnBoarding={isEnableOnBoarding}
+					toggleEnableStatus={toggleEnableStatus}
+					onCloseSetting={onClose}
+				/>
 			)}
 			{currentPage === EOnboardingStep.QUESTION && <Questions />}
 			{currentPage === EOnboardingStep.MISSION && (
@@ -44,12 +49,16 @@ interface IMainIndexProps {
 	isEnableOnBoarding: boolean;
 	toggleEnableStatus: () => void;
 	handleGoToPage: (page: EOnboardingStep) => void;
+	onCloseSetting?: () => void;
 }
 
-const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage }: IMainIndexProps) => {
+const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
 	const dispatch = useAppDispatch();
 	const openOnboardingMode = () => {
 		dispatch(onboardingActions.openOnboardingMode());
+		if (onCloseSetting) {
+			onCloseSetting();
+		}
 	};
 	return (
 		<div className="flex flex-col gap-6 flex-1">
