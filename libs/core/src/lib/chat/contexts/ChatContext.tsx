@@ -88,7 +88,6 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
-	TokenSentEvent,
 	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -98,7 +97,7 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
+import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -665,7 +664,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ontokensent = useCallback(
-		(tokenEvent: TokenSentEvent) => {
+		(tokenEvent: ApiTokenSentEvent) => {
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
 		},
 		[dispatch, userId]
