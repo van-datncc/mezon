@@ -1,4 +1,4 @@
-import { EOpenSearchChannelFrom, ICategoryChannelOption } from '@mezon/mobile-components';
+import { ETypeSearch, ICategoryChannelOption } from '@mezon/mobile-components';
 import { ChannelsEntity, DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
@@ -91,7 +91,8 @@ export const APP_SCREEN = {
 		SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
 		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
 		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
-		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES'
+		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
+		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM'
 	},
 
 	SETTINGS: {
@@ -151,7 +152,7 @@ export type MenuChannelStackParamList = {
 		channelId: string;
 	};
 	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
-		openSearchChannelFrom: EOpenSearchChannelFrom;
+		typeSearch: ETypeSearch;
 		currentChannel: IChannel | DirectEntity;
 	};
 	[APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION]: {
@@ -164,6 +165,9 @@ export type MenuChannelStackParamList = {
 		channelId: string;
 		id: string;
 		type?: number;
+	};
+	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM]: {
+		currentChannel: IChannel | DirectEntity;
 	};
 };
 

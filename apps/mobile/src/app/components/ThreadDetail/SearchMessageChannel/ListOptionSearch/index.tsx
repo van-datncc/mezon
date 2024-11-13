@@ -19,7 +19,7 @@ export const searchOptions = [
 	{
 		title: ITypeOptionSearch.MENTIONS,
 		content: 'user',
-		value: 'username',
+		value: 'mention',
 		icon: <Icons.AtIcon color={Colors.textGray} />
 	}
 	// { title: ITypeOptionSearch.HAS, content: 'link, embed or file', value: 'attachment', icon: <LinkIcon /> },
