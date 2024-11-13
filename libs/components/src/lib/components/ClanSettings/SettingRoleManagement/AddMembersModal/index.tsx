@@ -70,7 +70,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		if (selectedRoleId === 'New Role') {
 			dispatch(setAddMemberRoles(userIds));
 		} else {
-			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', userIds, [], [], []);
+			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', selectedRole?.color ?? '', userIds, [], [], []);
 		}
 	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 
