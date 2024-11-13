@@ -45,7 +45,6 @@ function useChannelSeen(channelId: string) {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-		dispatch(listChannelsByUserActions.updateCount({ channelId: channelId }));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
@@ -58,6 +57,7 @@ function useChannelSeen(channelId: string) {
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+			dispatch(listChannelsByUserActions.updateCount({ channelId: channelId }));
 		}
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));

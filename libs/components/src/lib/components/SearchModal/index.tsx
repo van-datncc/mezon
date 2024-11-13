@@ -221,16 +221,16 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const listItemWithoutRecent = useMemo(() => {
 		if (normalizeSearchText.startsWith('@')) {
-			return totalListMembersSorted.slice(0, 50);
+			return totalListMembersSorted;
 		}
 		if (normalizeSearchText.startsWith('#')) {
-			return channelSearchSorted.slice(0, 50);
+			return channelSearchSorted;
 		}
 
 		if (normalizeSearchText) {
-			return totalListsSorted.slice(0, 50);
+			return totalListsSorted;
 		}
-		return totalListSortedWithoutPreviousList.slice(0, 50);
+		return totalListSortedWithoutPreviousList;
 	}, [channelSearchSorted, normalizeSearchText, totalListMembersSorted, totalListSortedWithoutPreviousList, totalListsSorted]);
 
 	const handleSelectMem = useCallback(
