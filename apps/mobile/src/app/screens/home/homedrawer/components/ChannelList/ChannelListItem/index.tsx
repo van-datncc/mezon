@@ -96,6 +96,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				const store = await getStoreAsync();
 				timeoutRef.current = setTimeout(async () => {
 					requestAnimationFrame(async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL);
 						store.dispatch(
 							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
 						);

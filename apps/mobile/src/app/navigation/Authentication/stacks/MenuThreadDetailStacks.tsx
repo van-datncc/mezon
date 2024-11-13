@@ -35,7 +35,8 @@ export const MenuThreadDetailStacks = ({}: any) => {
 						left: size.s_6
 					}
 				}),
-				cardStyle: { backgroundColor: 'transparent' }
+				cardStyle: { backgroundColor: 'transparent' },
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen

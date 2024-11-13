@@ -1,4 +1,4 @@
-import { EOpenSearchChannelFrom, Icons, VerifyIcon } from '@mezon/mobile-components';
+import { ETypeSearch, Icons, VerifyIcon } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel, selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
@@ -29,7 +29,7 @@ const ChannelListHeader = ({ onPress, onOpenEvent, onOpenInvite }: IProps) => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
+				typeSearch: ETypeSearch.SearchAll,
 				currentChannel
 			}
 		});

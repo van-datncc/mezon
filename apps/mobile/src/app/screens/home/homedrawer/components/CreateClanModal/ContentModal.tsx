@@ -77,9 +77,9 @@ const CreateClanModal = memo(({ visible, setVisible }: ICreateClanProps) => {
 
 		ImagePicker.launchImageLibrary(options as CameraOptions, async (response) => {
 			if (response.didCancel) {
-				console.log('User cancelled camera');
+				console.warn('User cancelled camera');
 			} else if (response.errorCode) {
-				console.log('Camera Error: ', response.errorMessage);
+				console.error('Camera Error: ', response.errorMessage);
 			} else {
 				const file = response.assets[0];
 				const fileData = await RNFS.readFile(file.uri, 'base64');

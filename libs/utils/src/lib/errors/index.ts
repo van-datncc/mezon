@@ -18,7 +18,7 @@ export function trackError(rawError: unknown) {
 	} else {
 		Sentry.captureException(formalError);
 	}
-	console.log('formalError', formalError);
+	console.error('formalError', formalError);
 }
 
 export function trackActionError(action: PayloadAction<unknown, string, unknown>, raise = false) {

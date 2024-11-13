@@ -12,6 +12,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clansSlice,
+	defaultNotificationCategoryActions,
 	directActions,
 	directMetaActions,
 	directSlice,
@@ -29,6 +30,7 @@ import {
 	mapReactionToEntity,
 	messagesActions,
 	notificationActions,
+	notificationSettingActions,
 	overriddenPoliciesActions,
 	permissionRoleChannelActions,
 	pinMessageActions,
@@ -87,6 +89,7 @@ import {
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
 	TokenSentEvent,
+	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -822,6 +825,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId, channelId, clanId]
 	);
 
+	const onunmuteevent = useCallback(
+		(unmuteEvent: UnmuteEvent) => {
+			if (unmuteEvent.category_id !== '0') {
+				dispatch(
+					defaultNotificationCategoryActions.setMuteCategory({
+						category_id: unmuteEvent.category_id,
+						active: 1,
+						clan_id: unmuteEvent.clan_id
+					})
+				);
+			} else {
+				dispatch(
+					notificationSettingActions.setMuteNotificationSetting({
+						channel_id: unmuteEvent.channel_id,
+						active: 1,
+						clan_id: unmuteEvent.clan_id,
+						is_current_channel: unmuteEvent.channel_id === channelId
+					})
+				);
+			}
+		},
+		[channelId]
+	);
+
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
 			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
@@ -955,6 +982,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpermissionchanged = onpermissionchanged;
 
+			socket.onunmuteevent = onunmuteevent;
+
 			socket.oneventcreated = oneventcreated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
@@ -974,6 +1003,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelupdated,
 			onpermissionset,
 			onpermissionchanged,
+			onunmuteevent,
 			onerror,
 			onmessagereaction,
 			onmessagetyping,
@@ -1133,6 +1163,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelupdated,
 		onpermissionset,
 		onpermissionchanged,
+		onunmuteevent,
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,

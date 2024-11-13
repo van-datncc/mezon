@@ -87,4 +87,5 @@ export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
 
 export { default as Canvas } from './components/Canvas';
-export { default as GuideBody } from './components/Guide/GuideBody';
+export { default as GuideItemLayout } from './components/ClanSettings/SettingOnBoarding/GuideItemLayout';
+export * from './components/ClanSettings/SettingOnBoarding/ModalControlRule';

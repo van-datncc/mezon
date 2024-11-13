@@ -75,5 +75,5 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.primary,
 			width: size.s_36,
 			height: size.s_36
-		},
+		}
 	});

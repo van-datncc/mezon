@@ -82,7 +82,7 @@ class SeenMessagePool {
 				this.updateKnownSeenMessage(payload);
 				this.removeSeenMessage(payload.channelId);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 			}
 		}, ms);
 	}

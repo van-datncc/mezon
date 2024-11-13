@@ -1,4 +1,4 @@
-import { ENotificationActive, EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
+import { ENotificationActive, ETypeSearch, Icons } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
@@ -37,7 +37,7 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
+					typeSearch: ETypeSearch.SearchChannel,
 					currentChannel
 				}
 			});
