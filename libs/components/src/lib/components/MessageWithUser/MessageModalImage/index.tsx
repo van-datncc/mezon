@@ -13,7 +13,7 @@ import {
 	selectOpenModalAttachment
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { SHOW_POSITION, handleSaveImage } from '@mezon/utils';
+import { SHOW_POSITION, createImgproxyUrl, handleSaveImage } from '@mezon/utils';
 import { format } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -288,7 +288,11 @@ const SenderUser = () => {
 	return (
 		<div className="flex gap-2 overflow-hidden ">
 			<div className="w-10 aspect-square object-cover overflow-hidden">
-				<img src={user?.clan_avatar ?? user?.user?.avatar_url} alt="user-avatar" className="w-10 rounded-full aspect-square object-cover" />
+				<img
+					src={createImgproxyUrl(user?.clan_avatar ?? user?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+					alt="user-avatar"
+					className="w-10 rounded-full aspect-square object-cover"
+				/>
 			</div>
 			<div className="flex flex-col justify-between ">
 				<div className="text-[14px] font-semibold text-textDarkTheme truncate max-sm:w-12">

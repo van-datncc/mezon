@@ -1,9 +1,8 @@
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import { defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
-import { EPermission, getNotificationLabel, IClan, serverSettingsMenuList } from '@mezon/utils';
+import { EPermission, IClan, serverSettingsMenuList } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { NotificationType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
@@ -60,7 +59,11 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		handClosePannel();
 	};
 
-	const getLabel = getNotificationLabel(defaultNotificationClan?.notification_setting_type as NotificationType);
+	const notificationLabel = useMemo(() => {
+		const notificationType = notificationTypesList.find((type) => type.value === defaultNotificationClan?.notification_setting_type);
+		return notificationType ? notificationType.label : null;
+	}, [defaultNotificationClan?.notification_setting_type]);
+
 	const handleInvitePeople = () => {
 		openInviteClanModal();
 		setIsOnClickOutsideActive(false);
@@ -91,7 +94,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 					dismissOnClick={false}
 					renderTrigger={() => (
 						<div>
-							<ItemPanel children="Notification Settings" subText={getLabel as string} dropdown="change here" />
+							<ItemPanel children="Notification Settings" subText={notificationLabel as string} dropdown="change here" />
 						</div>
 					)}
 					label=""

@@ -78,7 +78,8 @@ export const setDefaultNotificationCategory = createAsyncThunk(
 		const body = {
 			channel_category_id: category_id,
 			notification_type: notification_type,
-			time_mute: time_mute
+			time_mute: time_mute,
+			clan_id: clan_id
 		};
 		const response = await mezon.client.setNotificationCategory(mezon.session, body);
 		if (!response) {

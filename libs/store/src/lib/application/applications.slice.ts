@@ -58,7 +58,7 @@ export const fetchApplications = createAsyncThunk('adminApplication/fetchApplica
 		const response = await fetchApplicationsCached(mezon);
 		return response;
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 		return thunkAPI.rejectWithValue({ err });
 	}
 });
@@ -84,7 +84,7 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 			thunkAPI.rejectWithValue({});
 		}
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 		return thunkAPI.rejectWithValue({ err });
 	}
 });
@@ -94,7 +94,7 @@ export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async 
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 		return thunkAPI.rejectWithValue({ err });
 	}
 });
@@ -109,7 +109,7 @@ export const editApplication = createAsyncThunk(
 				return data.request;
 			}
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 			return thunkAPI.rejectWithValue({ err });
 		}
 	}
@@ -121,7 +121,7 @@ export const deleteApplication = createAsyncThunk('adminApplication/deleteApplic
 		const response = await mezon.client.deleteApp(mezon.session, appId);
 		return response;
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 		return thunkAPI.rejectWithValue({ err });
 	}
 });

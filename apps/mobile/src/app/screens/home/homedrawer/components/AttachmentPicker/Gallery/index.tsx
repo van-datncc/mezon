@@ -124,7 +124,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
 		} catch (error) {
-			console.log('Error loading photos', error);
+			console.error('Error loading photos', error);
 		} finally {
 			setLoading(false);
 		}
@@ -202,7 +202,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 			onPickGallery(fileFormat);
 		} catch (err) {
-			console.log('Error: ', err);
+			console.error('Error: ', err);
 		}
 	};
 
@@ -214,9 +214,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 		ImagePicker.launchCamera(options as CameraOptions, async (response) => {
 			if (response.didCancel) {
-				console.log('User cancelled camera');
+				console.warn('User cancelled camera');
 			} else if (response.errorCode) {
-				console.log('Camera Error: ', response.errorMessage);
+				console.error('Camera Error: ', response.errorMessage);
 			} else {
 				const file = response.assets[0];
 
