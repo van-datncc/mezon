@@ -1,7 +1,8 @@
-import { Fonts, size, useTheme } from '@mezon/mobile-ui';
+import { Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
+import { CanvasScreen } from '../../../components/Canvas/CanvasBoard';
 import { ChangeCategory } from '../../../components/ChangeCategory';
 import { ChannelSetting } from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
@@ -77,6 +78,17 @@ export function MenuChannelStacks({}: any) {
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY} component={ChangeCategory} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.CANVAS}
+				component={CanvasScreen}
+				options={{
+					headerTitle: '',
+					headerStyle: {
+						backgroundColor: Colors.bgCharcoal
+					},
+					headerTintColor: Colors.white
+				}}
+			/>
 		</Stack.Navigator>
 	);
 }
