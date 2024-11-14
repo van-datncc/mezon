@@ -1,7 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
-import { createImgproxyUrl } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import IconDarkMode from '../../assets/icons/IconDarkMode.png';
@@ -65,11 +64,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 				</button>
 				<div onClick={handleAvatarClick}>
 					{userProfile?.user?.avatar_url ? (
-						<img
-							src={createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							className="w-[40px] h-[40px] rounded-full object-cover cursor-pointer"
-							alt=""
-						/>
+						<img src={userProfile?.user?.avatar_url} className="w-[40px] h-[40px] rounded-full object-cover cursor-pointer" alt="" />
 					) : (
 						<div className="w-[40px] h-[40px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px] cursor-pointer">
 							{(userProfile?.user?.username ?? '').charAt(0).toUpperCase()}

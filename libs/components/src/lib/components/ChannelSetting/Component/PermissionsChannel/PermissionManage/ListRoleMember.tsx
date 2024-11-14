@@ -9,7 +9,7 @@ import {
 	UsersClanEntity
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../../AvatarImage/AvatarImage';
@@ -194,13 +194,7 @@ const ItemUser = (props: ItemUserProps) => {
 	const avatarPrioritize = getAvatarForPrioritize(avatarClan, avatar);
 	return (
 		<div className="rounded px-3 py-2 font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton dark:hover:text-white hover:text-black flex items-center gap-x-2">
-			<AvatarImage
-				alt={userName}
-				userName={userName}
-				className="min-w-8 min-h-8 max-w-8 max-h-8"
-				srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
-				src={avatarPrioritize}
-			/>
+			<AvatarImage alt={userName} userName={userName} className="min-w-8 min-h-8 max-w-8 max-h-8" src={avatarPrioritize} />
 			<p className="font-medium">{namePrioritize}</p>
 		</div>
 	);

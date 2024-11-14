@@ -1,5 +1,5 @@
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -39,14 +39,6 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			alt={message.username ?? ''}
 			userName={message.username}
 			data-popover-target="popover-content"
-			srcImgProxy={createImgproxyUrl(
-				((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-					? clanAvatar || pendingClanAvatar || pendingUserAvatar
-					: pendingUserAvatar) ||
-					message?.avatar) ??
-					'',
-				{ width: 100, height: 100, resizeType: 'fit' }
-			)}
 			src={
 				(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
 					? clanAvatar || pendingClanAvatar || pendingUserAvatar

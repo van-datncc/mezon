@@ -1,5 +1,4 @@
 import { useAuth } from '@mezon/core';
-import { createImgproxyUrl } from '@mezon/utils';
 
 const TestThemeBlock = () => {
 	const { userProfile } = useAuth();
@@ -13,11 +12,7 @@ const TestThemeBlock = () => {
 			>
 				<div className="test-item flex px-5 mt-[-15px]">
 					<div className="test-left">
-						<img
-							className="aspect-square w-[45px] rounded-full object-cover"
-							src={createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							alt=""
-						/>
+						<img className="aspect-square w-[45px] rounded-full object-cover" src={userProfile?.user?.avatar_url} alt="" />
 					</div>
 					<div className="test-right ml-3">
 						<div className="test-right-top flex gap-3 items-center">
@@ -31,11 +26,7 @@ const TestThemeBlock = () => {
 				</div>
 				<div className="test-item flex px-5 mt-5">
 					<div className="test-left">
-						<img
-							className="aspect-square w-[45px] rounded-full object-cover"
-							src={createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							alt=""
-						/>
+						<img className="aspect-square w-[45px] rounded-full object-cover" src={userProfile?.user?.avatar_url} alt="" />
 					</div>
 					<div className="test-right ml-3">
 						<div className="test-right-top flex gap-3 items-center">
@@ -49,11 +40,7 @@ const TestThemeBlock = () => {
 				</div>
 				<div className="test-item flex px-5 mt-5">
 					<div className="test-left">
-						<img
-							className="aspect-square w-[45px] rounded-full object-cover"
-							src={createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							alt=""
-						/>
+						<img className="aspect-square w-[45px] rounded-full object-cover" src={userProfile?.user?.avatar_url} alt="" />
 					</div>
 					<div className="test-right ml-3">
 						<div className="test-right-top flex gap-3 items-center">

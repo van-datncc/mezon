@@ -9,7 +9,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelIsNotThread, createImgproxyUrl } from '@mezon/utils';
+import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -151,7 +151,6 @@ const WelComeDm = (props: WelComeDmProps) => {
 				alt={userName}
 				userName={userName}
 				className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
-				srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 				src={avatar}
 				classNameText="!text-4xl font-semibold"
 			/>
