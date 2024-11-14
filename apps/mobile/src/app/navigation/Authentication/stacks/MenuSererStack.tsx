@@ -227,7 +227,8 @@ export const MenuClanStacks = ({}: any) => {
 				name={APP_SCREEN.MENU_CLAN.WEBHOOKS}
 				component={Webhooks}
 				options={{
-					headerTitle: t('menuClanStack.webhooks')
+					headerTitle: t('menuClanStack.webhooks'),
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CLAN.AUDIT_LOG} component={AuditLogComponent} />
@@ -235,14 +236,16 @@ export const MenuClanStacks = ({}: any) => {
 				name={APP_SCREEN.MENU_CLAN.FILTER_BY_USER}
 				component={FilterUserAuditLog}
 				options={{
-					headerTitle: t('menuClanStack.filterByUser')
+					headerTitle: t('menuClanStack.filterByUser'),
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.FILTER_BY_ACTION}
 				component={FilterActionAuditLog}
 				options={{
-					headerTitle: t('menuClanStack.filterByAction')
+					headerTitle: t('menuClanStack.filterByAction'),
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT} component={WebhooksEdit} />
