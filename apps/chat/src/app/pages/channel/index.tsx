@@ -61,7 +61,7 @@ function useChannelSeen(channelId: string) {
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-			dispatch(listChannelsByUserActions.updateCount({ channelId: channelId }));
+			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));

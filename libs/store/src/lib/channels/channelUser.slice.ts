@@ -90,10 +90,11 @@ export const listChannelsByUserSlice = createSlice({
 				}
 			});
 		},
-		updateCount: (state, action: PayloadAction<{ channelId: string }>) => {
+		resetBadgeCount: (state, action: PayloadAction<{ channelId: string }>) => {
 			const payload = action.payload;
 			const existingChannel = listChannelsByUserAdapter.getSelectors().selectById(state, payload.channelId);
-			if (existingChannel) {
+
+			if (existingChannel && existingChannel.count_mess_unread !== undefined) {
 				listChannelsByUserAdapter.updateOne(state, {
 					id: payload.channelId,
 					changes: {
