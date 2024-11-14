@@ -1,4 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import { StyleProp, TextStyle, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Images from '../../../assets/Images';
@@ -26,7 +27,14 @@ export default function MezonClanAvatar({
 	const styles = style(themeValue);
 
 	if (image) {
-		return <FastImage source={{ uri: image }} style={styles.image} />;
+		return (
+			<FastImage
+				source={{
+					uri: createImgproxyUrl(image ?? '', { width: 100, height: 100, resizeType: 'fit' })
+				}}
+				style={styles.image}
+			/>
+		);
 	}
 	return (
 		<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>

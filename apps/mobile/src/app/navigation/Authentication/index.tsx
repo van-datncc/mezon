@@ -150,7 +150,8 @@ export const Authentication = () => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					gestureDirection: 'horizontal'
+					gestureDirection: 'horizontal',
+					animation: Platform.OS === 'android' ? 'none' : 'default'
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />

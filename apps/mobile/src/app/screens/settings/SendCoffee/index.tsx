@@ -17,6 +17,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const jsonObject: ApiTokenSentEvent = JSON.parse(formValue || '{}');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState('1');
+	const [note, setNote] = useState(jsonObject?.note || 'send token');
 	const userProfile = useSelector(selectAllAccount);
 
 	const tokenInWallet = useMemo(() => {
@@ -49,7 +50,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				sender_name: userProfile?.user?.username || '',
 				receiver_id: jsonObject?.receiver_id || '',
 				amount: Number(tokenCount || 1),
-				note: jsonObject.note || 'send token'
+				note: note || ''
 			};
 
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
@@ -105,15 +106,17 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 					</View>
 				</View>
 				<View>
-					<Text style={styles.title}>Description</Text>
+					<Text style={styles.title}>Note</Text>
 					<View style={styles.textField}>
 						<TextInput
-							style={[styles.textInput, { height: size.s_100 }]}
+							style={[styles.textInput, { height: size.s_100, paddingVertical: size.s_10, paddingTop: size.s_10 }]}
 							placeholderTextColor="#535353"
 							autoCapitalize="none"
+							value={note}
 							numberOfLines={5}
 							multiline={true}
 							textAlignVertical="top"
+							onChangeText={(text) => setNote(text)}
 						/>
 					</View>
 				</View>

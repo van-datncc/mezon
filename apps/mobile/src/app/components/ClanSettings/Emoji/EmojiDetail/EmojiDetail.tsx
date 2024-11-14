@@ -2,7 +2,7 @@ import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectCurrentUserId, selectMemberClanByUserId2, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { EPermission } from '@mezon/utils';
+import { EPermission, createImgproxyUrl } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { Ref, forwardRef, useMemo, useRef, useState } from 'react';
@@ -122,7 +122,12 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 							{dataAuthor?.user?.username}
 						</Text>
 						{dataAuthor?.user?.avatar_url ? (
-							<FastImage source={{ uri: dataAuthor?.user?.avatar_url }} style={styles.imgWrapper} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(dataAuthor?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={styles.imgWrapper}
+							/>
 						) : (
 							<Block
 								backgroundColor={themeValue.colorAvatarDefault}

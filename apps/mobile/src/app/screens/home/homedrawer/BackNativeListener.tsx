@@ -26,8 +26,7 @@ function BackNativeListener() {
 				navigation.dispatch(DrawerActions.openDrawer());
 				return true;
 			} else if (isHomeActive && !isHiddenTab) {
-				alert('Press back again to exit');
-				// BackHandler.exitApp();
+				BackHandler.exitApp();
 			} else {
 				// empty
 			}
