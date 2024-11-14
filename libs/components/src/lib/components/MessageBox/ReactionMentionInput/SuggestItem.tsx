@@ -8,7 +8,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
-import { SearchItemProps, createImgproxyUrl, getSrcEmoji } from '@mezon/utils';
+import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType, HashtagDm } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -127,7 +127,6 @@ const SuggestItem = ({
 					<AvatarImage
 						alt={subText || ''}
 						userName={subText}
-						srcImgProxy={createImgproxyUrl(avatarUrl ?? '')}
 						src={avatarUrl}
 						className="size-4"
 						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"

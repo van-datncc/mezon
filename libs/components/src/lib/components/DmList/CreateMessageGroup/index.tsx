@@ -1,7 +1,7 @@
 import { useAppNavigation, useEscapeKeyClose, useFriends, useOnClickOutside } from '@mezon/core';
 import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
-import { GROUP_CHAT_MAXIMUM_MEMBERS, createImgproxyUrl } from '@mezon/utils';
+import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
@@ -240,11 +240,6 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 										<AvatarImage
 											alt={''}
 											userName={friend.user?.username}
-											srcImgProxy={createImgproxyUrl(friend.user?.avatar_url ?? '', {
-												width: 100,
-												height: 100,
-												resizeType: 'fit'
-											})}
 											src={friend.user?.avatar_url}
 											className="size-8"
 											classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"

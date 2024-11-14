@@ -15,7 +15,7 @@ import {
 	videoStreamActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannelMember, IStreamInfo, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { IChannelMember, IStreamInfo, getAvatarForPrioritize } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import Hls from 'hls.js';
 import { ChannelType } from 'mezon-js';
@@ -335,13 +335,7 @@ function UserItem({ user }: { user: IChannelMember }) {
 		<div className="w-14 h-14 rounded-full">
 			<div className="w-14 h-14">
 				{member || userStream ? (
-					<AvatarImage
-						alt={userName || ''}
-						userName={userName}
-						className="min-w-14 min-h-14 max-w-14 max-h-14"
-						srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-						src={avatar}
-					/>
+					<AvatarImage alt={userName || ''} userName={userName} className="min-w-14 min-h-14 max-w-14 max-h-14" src={avatar} />
 				) : (
 					<Icons.AvatarUser />
 				)}

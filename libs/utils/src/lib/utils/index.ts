@@ -12,8 +12,7 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { notificationTypesList } from 'libs/components/src/lib/components/PanelChannel';
-import { Client, NotificationType, Session } from 'mezon-js';
+import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
@@ -891,23 +890,3 @@ export const checkIsThread = (channel?: IChannel) => {
 export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();
 export const isMacDesktop = getPlatform() === Platform.MACOS && isElectron();
 export const isLinuxDesktop = getPlatform() === Platform.LINUX && isElectron();
-
-export const getNotificationLabel = (value: NotificationType) => {
-	const notificationType = notificationTypesList.find((type) => type.value === value);
-	return notificationType ? notificationType.label : null;
-};
-
-type ImgproxyOptions = {
-	width?: number;
-	height?: number;
-	resizeType?: string;
-};
-
-export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
-	if (!sourceImageUrl) return '';
-	const { width, height, resizeType } = options;
-	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;
-	const path = `/${processingOptions}/plain/${sourceImageUrl}@png`;
-
-	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
-};

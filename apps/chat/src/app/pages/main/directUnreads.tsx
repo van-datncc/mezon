@@ -1,6 +1,5 @@
 import { AvatarImage, NavLinkComponent } from '@mezon/components';
 import { DMMetaEntity, directActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
-import { createImgproxyUrl } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { NavLink, useNavigate } from 'react-router-dom';
 
@@ -31,11 +30,6 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 						alt={direct.usernames || ''}
 						userName={direct.usernames}
 						className="min-w-12 min-h-12 max-w-12 max-h-12"
-						srcImgProxy={
-							direct.type === ChannelType.CHANNEL_TYPE_DM
-								? createImgproxyUrl(direct?.channel_avatar?.at(0) ?? '', { width: 300, height: 300, resizeType: 'fit' })
-								: 'assets/images/avatar-group.png'
-						}
 						src={direct.type === ChannelType.CHANNEL_TYPE_DM ? direct?.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 					/>
 					{directMessage?.count_mess_unread && (
