@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -64,9 +65,9 @@ export const updateReactionMessage = createAsyncThunk(
 	async ({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
 			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }));
-		} catch (e) {
-			console.error(e);
-			return thunkAPI.rejectWithValue([]);
+		} catch (error) {
+			captureSentryError(error, 'messages/updateReactionMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -134,9 +135,9 @@ export const writeMessageReaction = createAsyncThunk(
 					messageSenderId,
 					actionDelete
 				);
-			} catch (e) {
-				Sentry.captureException(e);
-				thunkAPI.rejectWithValue(e);
+			} catch (error) {
+				captureSentryError(error, 'messages/writeMessageReaction');
+				thunkAPI.rejectWithValue(error);
 			}
 		};
 
@@ -282,8 +283,6 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 			emojisRecentParse.push(emojiLastest);
 		}
 	}
-
-	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
 }
 
 function combineMessageReactions(state: ReactionState, combinedId: string): EmojiDataOptionals[] {

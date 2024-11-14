@@ -1,15 +1,18 @@
 import {
 	RolesClanEntity,
 	getIsShow,
+	getNewColorRole,
 	getNewNameRole,
 	getSelectedRoleId,
 	selectTheme,
 	setAddMemberRoles,
+	setColorRoleNew,
 	setNameRoleNew,
 	setSelectedPermissions,
 	setSelectedRoleId
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { DEFAULT_ROLE_COLOR } from '@mezon/utils';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,6 +30,7 @@ const SettingListRole = (props: closeEditRole) => {
 	const clickRole = useSelector(getSelectedRoleId);
 	const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
 	const nameRoleNew = useSelector(getNewNameRole);
+	const colorRoleNew = useSelector(getNewColorRole);
 
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
@@ -40,6 +44,7 @@ const SettingListRole = (props: closeEditRole) => {
 			const permissionIds = permissions.map((permission) => permission.id) || [];
 
 			dispatch(setNameRoleNew(activeRole?.title));
+			dispatch(setColorRoleNew(activeRole?.color));
 			dispatch(setAddMemberRoles(memberIDRoles));
 			dispatch(setSelectedPermissions(permissionIds));
 			setClickedRole(roleId);
@@ -78,10 +83,15 @@ const SettingListRole = (props: closeEditRole) => {
 			>
 				{activeRoles.map((role) => (
 					<div key={role.id}>
-						<ItemRole title={role.title || ''} onHandle={() => handleRoleClick(role.id)} isChoose={clickedRole === role.id} />
+						<ItemRole
+							title={role.title || ''}
+							color={role.color || ''}
+							onHandle={() => handleRoleClick(role.id)}
+							isChoose={clickedRole === role.id}
+						/>
 					</div>
 				))}
-				{isNewRole && <ItemRole ref={newRoleRef} title={nameRoleNew ?? 'New Role'} isChoose />}
+				{isNewRole && <ItemRole ref={newRoleRef} title={nameRoleNew ?? 'New Role'} color={colorRoleNew ?? ''} isChoose />}
 			</div>
 		</div>
 	);
@@ -91,11 +101,12 @@ export default SettingListRole;
 
 type ItemRoleProps = {
 	title: string;
+	color: string;
 	isChoose?: boolean;
 	onHandle?: () => void;
 };
 
-const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, isChoose, onHandle }, ref) => {
+const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, color, isChoose, onHandle }, ref) => {
 	return (
 		<div ref={ref} onClick={onHandle}>
 			<button
@@ -103,7 +114,7 @@ const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, isChoose, o
 					${isChoose ? 'dark:bg-[#4e5058] bg-bgLightModeButton' : ''}
 				`}
 			>
-				<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
+				<div className="size-3 rounded-full min-w-3" style={{ backgroundColor: color || DEFAULT_ROLE_COLOR }}></div>
 				<span className="one-line">{title}</span>
 			</button>
 		</div>

@@ -13,7 +13,7 @@ import {
 	usersClanActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -61,7 +61,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const addRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
-		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
+		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', activeRole?.color ?? '', userIDArray || [], [], [], []);
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: roleId,
@@ -74,7 +74,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const deleteRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
-		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
+		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', activeRole?.color ?? '', [], [], userIDArray || [], []);
 		await dispatch(
 			usersClanActions.removeRoleIdUser({
 				id: roleId,
@@ -185,7 +185,7 @@ const AddRolesComp = ({
 							className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
 							onClick={() => addRole(role.id)}
 						>
-							<div className="size-3 min-w-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
+							<div className="size-3 min-w-3 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
 							{role.title}
 						</div>
 					))
@@ -216,7 +216,11 @@ const RoleClanItem = ({
 	return (
 		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
-				<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
+				<button
+					className="p-0.5 rounded-full h-fit"
+					onClick={() => deleteRole(role.id)}
+					style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
+				>
 					<Tooltip
 						content="Remove role"
 						trigger="hover"
@@ -228,7 +232,7 @@ const RoleClanItem = ({
 					</Tooltip>
 				</button>
 			) : (
-				<div className="size-2 bg-white  rounded-full"></div>
+				<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
 			)}
 			<span className="text-xs font-medium">{role.title}</span>
 		</span>

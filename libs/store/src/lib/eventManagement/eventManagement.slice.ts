@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement, ApiUpdateEventRequest } from 'mezon-js/api.gen';
@@ -34,20 +35,25 @@ type fetchEventManagementPayload = {
 export const fetchEventManagement = createAsyncThunk(
 	'eventManagement/fetchEventManagement',
 	async ({ clanId, noCache }: fetchEventManagementPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		if (noCache) {
-			fetchEventManagementCached.clear(mezon, clanId);
+			if (noCache) {
+				fetchEventManagementCached.clear(mezon, clanId);
+			}
+
+			const response = await fetchEventManagementCached(mezon, clanId);
+
+			if (!response.events) {
+				return [];
+			}
+
+			const events = response.events.map((eventRes) => mapEventManagementToEntity(eventRes, clanId));
+			return events;
+		} catch (error) {
+			captureSentryError(error, 'eventManagement/fetchEventManagement');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const response = await fetchEventManagementCached(mezon, clanId);
-
-		if (!response.events) {
-			return [];
-		}
-
-		const events = response.events.map((eventRes) => mapEventManagementToEntity(eventRes, clanId));
-		return events;
 	}
 );
 
@@ -90,24 +96,29 @@ export type EventManagementOnGogoing = {
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementpayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			clan_id: clan_id,
-			channel_id: channel_id || '',
-			address: address || '',
-			title: title,
-			start_time: start_time,
-			end_time: end_time,
-			description: description || '',
-			logo: logo || ''
-		};
-		const response = await mezon.client.createEvent(mezon.session, body);
-		if (response) {
-			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true }));
-		} else {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				clan_id: clan_id,
+				channel_id: channel_id || '',
+				address: address || '',
+				title: title,
+				start_time: start_time,
+				end_time: end_time,
+				description: description || '',
+				logo: logo || ''
+			};
+			const response = await mezon.client.createEvent(mezon.session, body);
+			if (response) {
+				thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true }));
+			} else {
+				return thunkAPI.rejectWithValue([]);
+			}
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'CreatEventManagement/fetchCreateEventManagement');
+			return thunkAPI.rejectWithValue(error);
 		}
-		return response;
 	}
 );
 
@@ -138,7 +149,8 @@ export const updateEventManagement = createAsyncThunk(
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clan_id || '', noCache: true }));
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'updateEventManagement/updateEventManagement');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -153,7 +165,8 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'deleteEventManagement/fetchDeleteEventManagement');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

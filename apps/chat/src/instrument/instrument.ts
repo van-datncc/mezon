@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react';
 
 Sentry.init({
 	dsn: process.env.NX_CHAT_SENTRY_DSN,
-	integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+	integrations: [Sentry.browserTracingIntegration(), Sentry.captureConsoleIntegration({ levels: ['error'] })],
 	// Tracing
 	tracesSampleRate: 1.0, //  Capture 100% of the transactions
 	// Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled

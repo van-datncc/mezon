@@ -6,11 +6,13 @@ import {
 	selectAllAccount,
 	selectCurrentClan,
 	selectCurrentClanId,
+	selectRolesClanEntities,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	ActivitiesName,
+	DEFAULT_ROLE_COLOR,
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
 	MemberProfileType,
@@ -107,6 +109,34 @@ export function MemberProfile({
 	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
+	const rolesClanEntity = useSelector(selectRolesClanEntities);
+	const userRolesClan = useMemo(() => {
+		const activeRole: Record<string, string> = {};
+		let userRoleLength = 0;
+		let highestPermissionRole = null;
+		let maxLevelPermission = 0;
+
+		for (const key in rolesClanEntity) {
+			const role = rolesClanEntity[key];
+			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === user?.user?.id);
+
+			if (checkHasRole) {
+				activeRole[key] = key;
+				userRoleLength++;
+
+				if (role.max_level_permission !== undefined && role.max_level_permission > maxLevelPermission) {
+					maxLevelPermission = role.max_level_permission;
+					highestPermissionRole = role;
+				}
+			}
+		}
+
+		return {
+			usersRole: activeRole,
+			length: userRoleLength,
+			highestPermissionRoleColor: highestPermissionRole?.color || DEFAULT_ROLE_COLOR
+		};
+	}, [user?.user?.id, rolesClanEntity]);
 
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
@@ -359,7 +389,7 @@ export function MemberProfile({
 							<div className="flex flex-row items-center w-full overflow-x-hidden" style={{ minWidth: `${minWidthNameMain}px` }}>
 								<p
 									className={`text-base font-medium nameMemberProfile
-				  ${isListFriend ? ' inline-flex justify-start' : ''}
+				          ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
@@ -370,6 +400,7 @@ export function MemberProfile({
 								>
 									<span
 										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+										style={{ color: userRolesClan.highestPermissionRoleColor }}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>
