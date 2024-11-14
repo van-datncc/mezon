@@ -27,6 +27,8 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { auditLogReducer } from './auditLog/auditLog.slice';
+import { auditLogFilterReducer } from './auditLog/auditLogFilter.slice';
 import { canvasReducer } from './canvas/canvas.slice';
 import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
@@ -47,6 +49,7 @@ import { notifiReactMessageReducer } from './notificationSetting/notificationRea
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboarding.slice';
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
@@ -287,41 +290,9 @@ const persistedStreamReducer = persistReducer(
 	videoStreamReducer
 );
 
-const persistPoliciesReducer = persistReducer(
-	{
-		key: 'policiesReducer',
-		storage
-	},
-	policiesReducer
-);
-
-const persistOverriddenPoliciesReducer = persistReducer(
-	{
-		key: 'overriddenPoliciesReducer',
-		storage
-	},
-	overriddenPoliciesReducer
-);
-
-const persistuUersClanReducer = persistReducer(
-	{
-		key: 'usersClanReducer',
-		storage
-	},
-	usersClanReducer
-);
-
-const persistAccountReducer = persistReducer(
-	{
-		key: 'accountReducer',
-		storage
-	},
-	accountReducer
-);
-
 const reducer = {
 	app: persistedAppReducer,
-	account: persistAccountReducer,
+	account: accountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
@@ -335,19 +306,19 @@ const reducer = {
 	listusersbyuserid: persistedListUsersByUserReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: persistedMessageReducer,
+	messages: messagesReducer,
 	categories: persistedCatReducer,
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
-	usersClan: persistuUersClanReducer,
-	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
+	usersClan: usersClanReducer,
+	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
 	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
-	[OVERRIDDEN_POLICIES_FEATURE_KEY]: persistOverriddenPoliciesReducer,
+	[OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
 	notificationsetting: notificationSettingReducer,
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: persistedDefaultNotiClanReducer,
@@ -366,6 +337,8 @@ const reducer = {
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
+	auditlog: auditLogReducer,
+	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
@@ -379,7 +352,8 @@ const reducer = {
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
-	clanMembersMeta: clanMembersMetaReducer
+	clanMembersMeta: clanMembersMetaReducer,
+	[ONBOARDING_FEATURE_KEY]: onboardingReducer
 };
 
 let storeInstance = configureStore({

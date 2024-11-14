@@ -2,6 +2,7 @@ import accountSetting from './accountSetting.json';
 import activityApp from './activityApp.json';
 import appThemeSetting from './appThemeSetting.json';
 import appearanceSetting from './appearanceSetting.json';
+import auditLog from './auditLog.json';
 import categoryCreator from './categoryCreator.json';
 import categoryMenu from './categoryMenu.json';
 import categorySetting from './categorySetting.json';
@@ -86,5 +87,6 @@ export default {
 	linkMessageInvite,
 	streamingRoom,
 	clanIntegrationsSetting,
-	activityApp
+	activityApp,
+	auditLog
 };

@@ -2,6 +2,9 @@ import { Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
+import AuditLogComponent from '../../../components/AuditLogComponent';
+import FilterActionAuditLog from '../../../components/AuditLogComponent/FilteActionAuditLog/FilterActionAuditLog';
+import FilterUserAuditLog from '../../../components/AuditLogComponent/FilterUserAuditLog/FilterUserAuditLog';
 import { CategoryCreator } from '../../../components/Category';
 import { CategorySetting } from '../../../components/CategorySetting';
 import { ChannelCreator } from '../../../components/ChannelCreator';
@@ -225,6 +228,21 @@ export const MenuClanStacks = ({}: any) => {
 				component={Webhooks}
 				options={{
 					headerTitle: t('menuClanStack.webhooks')
+				}}
+			/>
+			<Stack.Screen name={APP_SCREEN.MENU_CLAN.AUDIT_LOG} component={AuditLogComponent} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.FILTER_BY_USER}
+				component={FilterUserAuditLog}
+				options={{
+					headerTitle: t('menuClanStack.filterByUser')
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.FILTER_BY_ACTION}
+				component={FilterActionAuditLog}
+				options={{
+					headerTitle: t('menuClanStack.filterByAction')
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT} component={WebhooksEdit} />
