@@ -11,7 +11,7 @@ import {
 	usersClanActions
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
-import { ChannelMembersEntity, DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
+import { ChannelMembersEntity, DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID, createImgproxyUrl } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -105,7 +105,13 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 			>
 				<div className="flex-3 p-1">
 					<div className="flex flex-row gap-2 items-center">
-						<AvatarImage alt={username} userName={username} className="min-w-9 min-h-9 max-w-9 max-h-9" src={avatar} />
+						<AvatarImage
+							alt={username}
+							userName={username}
+							className="min-w-9 min-h-9 max-w-9 max-h-9"
+							srcImgProxy={createImgproxyUrl(avatar ?? '')}
+							src={avatar}
+						/>
 						<div className="flex flex-col">
 							<p
 								className="text-base font-medium"

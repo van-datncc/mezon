@@ -1,6 +1,6 @@
 import { selectMemberClanByGoogleId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
-import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { IChannelMember, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { AvatarImage } from '../../components';
 
 function UserListItem({ user, channelID }: { user: IChannelMember; channelID: string }) {
@@ -19,7 +19,13 @@ function UserListItem({ user, channelID }: { user: IChannelMember; channelID: st
 			<div className="w-5 h-5 rounded-full scale-75">
 				<div className="w-8 h-8 mt-[-0.3rem]">
 					{member || userStream ? (
-						<AvatarImage alt={userName || ''} userName={userName} className="min-w-8 min-h-8 max-w-8 max-h-8" src={avatar} />
+						<AvatarImage
+							alt={userName || ''}
+							userName={userName}
+							className="min-w-8 min-h-8 max-w-8 max-h-8"
+							srcImgProxy={createImgproxyUrl(avatar ?? '')}
+							src={avatar}
+						/>
 					) : (
 						<Icons.AvatarUser />
 					)}

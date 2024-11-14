@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
 import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUserClans, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
-import { getAvatarForPrioritize, getNameForPrioritize, UsersClanEntity } from '@mezon/utils';
+import { createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -113,7 +113,13 @@ const ItemMember = (props: ItemMemberProps) => {
 	return (
 		<li key={id} className="flex justify-between items-center">
 			<div className="flex gap-x-2">
-				<AvatarImage alt={userName} userName={userName} className="min-w-6 min-h-6 max-w-6 max-h-6" src={avatarPrioritize} />
+				<AvatarImage
+					alt={userName}
+					userName={userName}
+					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
+					src={avatarPrioritize}
+				/>
 				<span className="dark:text-white text-black font-medium one-line">{namePrioritize}</span>
 				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{userName}</span>
 			</div>
