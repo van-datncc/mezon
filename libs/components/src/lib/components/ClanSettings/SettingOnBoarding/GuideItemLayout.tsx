@@ -11,6 +11,7 @@ type GuideItemLayoutProps = {
 	height?: string;
 	gap?: number;
 	onClick?: () => void;
+	noNeedHover?: boolean;
 };
 
 export const GuideItemLayout = ({
@@ -23,11 +24,12 @@ export const GuideItemLayout = ({
 	background = 'bg-bgSecondaryHover',
 	height,
 	gap = 8,
-	onClick
+	onClick,
+	noNeedHover
 }: GuideItemLayoutProps) => {
 	return (
 		<div
-			className={`p-4 flex items-start rounded-lg hover:bg-slate-800  ${height ? height : 'h-full'} ${background} ${className}`}
+			className={`p-4 flex items-start rounded-lg ${noNeedHover ? '' : 'hover:bg-slate-800'}  ${height ? height : 'h-full'} ${background} ${className}`}
 			style={{
 				gap: gap
 			}}

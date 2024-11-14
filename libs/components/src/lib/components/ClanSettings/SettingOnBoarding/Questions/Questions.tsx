@@ -1,9 +1,14 @@
 import { Icons } from '@mezon/ui';
 import { useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import ModalControlRule, { ControlInput } from '../../../Guide/ModalControlRule';
+import { EOnboardingStep } from '..';
+import ModalControlRule, { ControlInput } from '../ModalControlRule';
 
-const Questions = () => {
+interface IQuestionsProps {
+	handleGoToPage: (page: EOnboardingStep) => void;
+}
+
+const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 	const [showChannelNotAssigned, setShowChannelNotAssigned] = useState(false);
 
 	const toggleChannelNotAssigned = () => {
@@ -23,7 +28,7 @@ const Questions = () => {
 
 	return (
 		<div className="flex flex-col gap-8">
-			<div className="flex gap-3">
+			<div onClick={() => handleGoToPage(EOnboardingStep.MAIN)} className="flex gap-3 cursor-pointer">
 				<Icons.LongArrowRight className="rotate-180 w-3" />
 				<div className="font-semibold">BACK</div>
 			</div>
@@ -128,6 +133,17 @@ const QuestionItem = () => {
 		</ModalControlRule>
 	));
 
+	const [isExpanded, setIsExpanded] = useState(true);
+	const [question, setQuestion] = useState('');
+
+	const handleQuestionOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setQuestion(e.target.value);
+	};
+
+	const toggleExpand = () => {
+		setIsExpanded(!isExpanded);
+	};
+
 	return (
 		<div className="flex flex-col gap-6 bg-bgSecondary p-4 rounded-lg">
 			<div className="flex flex-col gap-2">
@@ -135,37 +151,49 @@ const QuestionItem = () => {
 					<div className="uppercase text-xs font-medium">Question 1</div>
 					<div className="flex gap-2 items-center">
 						<Icons.TrashIcon className="w-4" />
-						<Icons.ArrowRight defaultSize="-rotate-90 w-4" />
+						<div onClick={toggleExpand}>
+							<Icons.ArrowRight defaultSize={`${isExpanded ? 'rotate-90' : '-rotate-90'} w-4`} />
+						</div>
 					</div>
 				</div>
-				<input
-					className="text-[20px] bg-bgTertiary font-semibold outline-none focus:outline-blue-500 rounded-lg p-[10px]"
-					type="text"
-					placeholder="Enter a question..."
-				/>
+				{isExpanded ? (
+					<input
+						className="text-[20px] bg-bgTertiary font-semibold outline-none focus:outline-blue-500 rounded-lg p-[10px]"
+						type="text"
+						placeholder="Enter a question..."
+						value={question}
+						onChange={handleQuestionOnchange}
+					/>
+				) : (
+					<div className="text-white text-xl font-semibold">{question}</div>
+				)}
 			</div>
-			<div className="flex flex-col gap-2">
-				<div>Available answers - 0 of 50</div>
-				<div className="flex gap-[1%] gap-y-[1%]">
-					<div
-						onClick={openAnswerPopup}
-						className="w-[49.5%] rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
-					>
-						<Icons.CirclePlusFill className="w-5" />
-						<div>Add an Answer</div>
+			{isExpanded && (
+				<div className="flex flex-col gap-2">
+					<div>Available answers - 0 of 50</div>
+					<div className="flex gap-[1%] gap-y-[1%]">
+						<div
+							onClick={openAnswerPopup}
+							className="w-[49.5%] rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
+						>
+							<Icons.CirclePlusFill className="w-5" />
+							<div>Add an Answer</div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex gap-6">
-				<div className="flex items-center gap-2">
-					<input type="checkbox" name="multiple-answer" className="w-5 h-5" />
-					<label htmlFor="multiple-answer">Allow multiple answers</label>
+			)}
+			{isExpanded && (
+				<div className="flex gap-6">
+					<div className="flex items-center gap-2">
+						<input type="checkbox" name="multiple-answer" className="w-5 h-5" />
+						<label htmlFor="multiple-answer">Allow multiple answers</label>
+					</div>
+					<div className="flex items-center gap-2">
+						<input type="checkbox" name="required" className="w-5 h-5" />
+						<label htmlFor="required">Required</label>
+					</div>
 				</div>
-				<div className="flex items-center gap-2">
-					<input type="checkbox" name="required" className="w-5 h-5" />
-					<label htmlFor="required">Required</label>
-				</div>
-			</div>
+			)}
 		</div>
 	);
 };
