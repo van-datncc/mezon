@@ -49,7 +49,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 
 	const handleRemoveMember = async (userID: string) => {
 		const userIDArray = userID?.split(',');
-		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
+		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', activeRole?.color ?? '', [], [], userIDArray, []);
 	};
 	return (
 		<div>

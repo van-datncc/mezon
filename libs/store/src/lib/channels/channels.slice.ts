@@ -428,7 +428,7 @@ export const fetchChannels = createAsyncThunk(
 				const data = await thunkAPI
 					.dispatch(
 						threadsActions.fetchThread({
-							channelId: '1',
+							channelId: '0',
 							clanId,
 							threadId: currentChannelId
 						})
