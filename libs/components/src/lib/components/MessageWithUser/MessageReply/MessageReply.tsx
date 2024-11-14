@@ -1,7 +1,7 @@
 import { useShowName, useUserById } from '@mezon/core';
 import { messagesActions, selectClanView, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 
 import { useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
@@ -56,12 +56,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								srcImgProxy={createImgproxyUrl(
-									(!isClanView
-										? (message?.references?.[0]?.mesages_sender_avatar ?? '')
-										: messageSender?.clan_avatar || messageSender?.user?.avatar_url) ?? '',
-									{ width: 100, height: 100, resizeType: 'fit' }
-								)}
 								src={
 									!isClanView
 										? (message?.references?.[0]?.mesages_sender_avatar ?? '')

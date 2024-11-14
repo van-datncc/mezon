@@ -1,5 +1,4 @@
 import { AttachmentEntity, attachmentActions, useAppDispatch } from '@mezon/store';
-import { createImgproxyUrl } from '@mezon/utils';
 
 type ItemAttachmentProps = {
 	attachment: AttachmentEntity;
@@ -30,7 +29,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 				onClick={handleSelectImage}
 			>
 				<img
-					src={createImgproxyUrl(attachment.url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+					src={attachment.url}
 					alt={attachment.url}
 					className={`size-[88px] max-w-[88px] max-h-[88px] max-[480px]:size-16  mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
 					onDragStart={handleDrag}

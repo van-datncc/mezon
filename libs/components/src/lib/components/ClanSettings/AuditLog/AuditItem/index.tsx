@@ -1,6 +1,6 @@
 import { selectAllAuditLogData, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { convertTimeString, getAvatarForPrioritize } from '@mezon/utils';
 import { ApiAuditLog } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -49,13 +49,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 			<div className="w-10 h-10 rounded-full">
 				<div className="w-10 h-10">
 					{userAuditLogItem ? (
-						<AvatarImage
-							alt={userName || ''}
-							userName={userName}
-							className="min-w-10 min-h-10 max-w-10 max-h-10"
-							srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							src={avatar}
-						/>
+						<AvatarImage alt={userName || ''} userName={userName} className="min-w-10 min-h-10 max-w-10 max-h-10" src={avatar} />
 					) : (
 						<Icons.AvatarUser />
 					)}

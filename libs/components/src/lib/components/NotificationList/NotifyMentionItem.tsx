@@ -1,6 +1,6 @@
 import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
 import { messagesActions, notificationActions } from '@mezon/store';
-import { IMentionOnMessage, IMessageWithUser, INotification, addMention, createImgproxyUrl } from '@mezon/utils';
+import { IMentionOnMessage, IMessageWithUser, INotification, addMention } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -103,11 +103,6 @@ function MentionTabContent({ message }: IMentionTabContent) {
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
 					userName={message?.username}
-					srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : message.avatar) ?? '', {
-						width: 300,
-						height: 300,
-						resizeType: 'fit'
-					})}
 					src={priorityAvatar ? priorityAvatar : message.avatar}
 				/>
 
