@@ -5732,32 +5732,55 @@ export const RuleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
+export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+		>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm5.7-13.3a1 1 0 0 0-1.4-1.4L10 14.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l7-7Z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+};
+
 export function SendMoney(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
-			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+			<g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
-			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
 
 			<g id="SVGRepo_iconCarrier">
 				{' '}
 				<path
 					d="M9.5 13.75C9.5 14.72 10.25 15.5 11.17 15.5H13.05C13.85 15.5 14.5 14.82 14.5 13.97C14.5 13.06 14.1 12.73 13.51 12.52L10.5 11.47C9.91 11.26 9.51001 10.94 9.51001 10.02C9.51001 9.17999 10.16 8.48999 10.96 8.48999H12.84C13.76 8.48999 14.51 9.26999 14.51 10.24"
 					stroke="#23b850"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
 				/>{' '}
-				<path d="M12 7.5V16.5" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
+				<path d="M12 7.5V16.5" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
 				<path
 					d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2"
 					stroke="#23b850"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
 				/>{' '}
-				<path d="M22 6V2H18" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
-				<path d="M17 7L22 2" stroke="#23b850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />{' '}
+				<path d="M22 6V2H18" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path d="M17 7L22 2" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
 			</g>
 		</svg>
 	);
@@ -5812,6 +5835,33 @@ export function TargetIcon({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' })
 	c0.8,0,1.6,0.2,2.3,0.4L19,8.8V6c0-0.8,0.3-1.6,0.9-2.1l1-1C19.3,2.3,17.7,2,16,2C8.3,2,2,8.3,2,16s6.3,14,14,14s14-6.3,14-14
 	c0-1.7-0.3-3.3-0.9-4.9L28.1,12.1z"
 			/>
+		</svg>
+	);
+}
+
+export function LongArrowRight(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="" {...props}>
+			<path
+				fill="currentColor"
+				d="M20.7 12.7a1 1 0 0 0 0-1.4l-5-5a1 1 0 1 0-1.4 1.4l3.29 3.3H4a1 1 0 1 0 0 2h13.59l-3.3 3.3a1 1 0 0 0 1.42 1.4l5-5Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg className="plusIcon_df2e1e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
+			<circle cx="12" cy="12" r="10" fill="transparent" className=""></circle>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm0-17a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1Z"
+				clip-rule="evenodd"
+				className=""
+			></path>
 		</svg>
 	);
 }

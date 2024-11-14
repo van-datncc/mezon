@@ -1,7 +1,8 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { IEmbedProps } from '@mezon/utils';
 import { memo } from 'react';
-import { Text, View } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { EmbedAuthor } from './EmbedAuthor';
 import { EmbedFields } from './EmbedFields';
@@ -26,7 +27,19 @@ export const EmbedMessage = memo((embed: IEmbedProps) => {
 					</View>
 					{!!thumbnail && <FastImage source={{ uri: thumbnail?.url }} style={styles.thumbnail} />}
 				</View>
-				{!!image && <FastImage source={{ uri: image?.url }} style={styles.imageWrapper} resizeMode="cover" />}
+				{!!image && (
+					<TouchableOpacity
+						onPress={() => {
+							DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_IMAGE_DETAIL_MESSAGE_ITEM, {
+								...image,
+								uploader: '',
+								create_time: ''
+							});
+						}}
+					>
+						<FastImage source={{ uri: image?.url }} style={styles.imageWrapper} resizeMode="cover" />
+					</TouchableOpacity>
+				)}
 				{(!!timestamp || !!footer) && <EmbedFooter {...footer} timestamp={timestamp} />}
 			</View>
 		</View>

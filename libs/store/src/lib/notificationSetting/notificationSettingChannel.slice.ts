@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { INotificationSetting, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationUserChannel } from 'mezon-js/api.gen';
@@ -48,25 +49,30 @@ export const fetchNotificationSettingCached = memoizeAndTrack(
 export const getNotificationSetting = createAsyncThunk(
 	'notificationsetting/getNotificationSetting',
 	async ({ channelId, isCurrentChannel = true, noCache }: FetchNotificationSettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotificationSettingCached.clear(mezon, channelId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchNotificationSettingCached.clear(mezon, channelId);
+			}
+			const response = await fetchNotificationSettingCached(mezon, channelId);
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+			const apiNotificationUserChannel: ApiNotificationUserChannel = {
+				active: response.active,
+				id: response.id,
+				notification_setting_type: response.notification_setting_type,
+				time_mute: response.time_mute
+			};
+			const payload: GetNotificationSettingResponse = {
+				notificationSetting: apiNotificationUserChannel,
+				isCurrentChannel: isCurrentChannel
+			};
+			return payload;
+		} catch (error) {
+			captureSentryError(error, 'notificationsetting/getNotificationSetting');
+			return thunkAPI.rejectWithValue(error);
 		}
-		const response = await fetchNotificationSettingCached(mezon, channelId);
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
-		const apiNotificationUserChannel: ApiNotificationUserChannel = {
-			active: response.active,
-			id: response.id,
-			notification_setting_type: response.notification_setting_type,
-			time_mute: response.time_mute
-		};
-		const payload: GetNotificationSettingResponse = {
-			notificationSetting: apiNotificationUserChannel,
-			isCurrentChannel: isCurrentChannel
-		};
-		return payload;
 	}
 );
 
@@ -82,28 +88,34 @@ export type SetNotificationPayload = {
 export const setNotificationSetting = createAsyncThunk(
 	'notificationsetting/setNotificationSetting',
 	async ({ channel_id, notification_type, time_mute, clan_id, is_current_channel = true, is_direct = false }: SetNotificationPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			channel_category_id: channel_id,
-			notification_type: notification_type,
-			time_mute: time_mute
-		};
-		const response = await mezon.client.setNotificationChannel(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		if (time_mute) {
-			if (is_direct) {
-				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-			} else {
-				thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				channel_category_id: channel_id,
+				notification_type: notification_type,
+				time_mute: time_mute,
+				clan_id: clan_id
+			};
+			const response = await mezon.client.setNotificationChannel(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
 			}
+			if (time_mute) {
+				if (is_direct) {
+					thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				} else {
+					thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
+				}
+			}
+			if (!is_direct) {
+				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
+			}
+			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notificationsetting/setNotificationSetting');
+			return thunkAPI.rejectWithValue(error);
 		}
-		if (!is_direct) {
-			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
-		}
-		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
-		return response;
 	}
 );
 
@@ -118,24 +130,29 @@ export type SetMuteNotificationPayload = {
 export const setMuteNotificationSetting = createAsyncThunk(
 	'notificationsetting/setMuteNotificationSetting',
 	async ({ channel_id, notification_type, active, clan_id, is_current_channel = true }: SetMuteNotificationPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			id: channel_id,
-			notification_type: notification_type,
-			active: active
-		};
-		const response = await mezon.client.setMuteNotificationChannel(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				id: channel_id,
+				notification_type: notification_type,
+				active: active
+			};
+			const response = await mezon.client.setMuteNotificationChannel(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			if (clan_id !== '0' && clan_id !== '') {
+				thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
+				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+			} else {
+				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			}
+			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notificationsetting/setMuteNotificationSetting');
+			return thunkAPI.rejectWithValue(error);
 		}
-		if (clan_id !== '0' && clan_id !== '') {
-			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
-			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		} else {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-		}
-		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
-		return response;
 	}
 );
 
@@ -148,14 +165,19 @@ type DeleteNotiChannelSettingPayload = {
 export const deleteNotiChannelSetting = createAsyncThunk(
 	'notificationsetting/deleteNotiChannelSetting',
 	async ({ channel_id, clan_id, is_current_channel = true }: DeleteNotiChannelSettingPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteNotificationChannel(mezon.session, channel_id || '');
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteNotificationChannel(mezon.session, channel_id || '');
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
+			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notificationsetting/deleteNotiChannelSetting');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
-		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
-		return response;
 	}
 );
 

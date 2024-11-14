@@ -103,7 +103,7 @@ export const MemberListStatus = React.memo(() => {
 							<View style={styles.iconWrapper}>
 								<Icons.UserPlusIcon height={20} width={20} color={baseColor.white} />
 							</View>
-							<Text style={styles.text}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
+							<Text style={styles.textInvite}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
 						</View>
 						<View>
 							<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />

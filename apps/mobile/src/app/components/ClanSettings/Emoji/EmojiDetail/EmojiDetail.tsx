@@ -1,13 +1,7 @@
 import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	emojiSuggestionActions,
-	selectCurrentUserId,
-	selectMemberClanByUserId2,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store-mobile';
+import { emojiSuggestionActions, selectCurrentUserId, selectMemberClanByUserId2, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';

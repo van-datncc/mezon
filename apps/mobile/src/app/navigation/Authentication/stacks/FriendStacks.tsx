@@ -65,7 +65,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				}),
 				headerTintColor: themeValue.text,
 				headerLeftLabelVisible: false,
-				animationEnabled: false
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen

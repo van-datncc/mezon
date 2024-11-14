@@ -1,6 +1,7 @@
 import { useClanOwner, useUserPolicy } from '@mezon/core';
 import {
 	RolesClanEntity,
+	getNewColorRole,
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
@@ -31,6 +32,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	const [searchTerm, setSearchTerm] = useState('');
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const nameRole = useSelector(getNewNameRole);
+	const colorRole = useSelector(getNewColorRole);
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const permissionsRole = activeRole?.permission_list;
@@ -59,12 +61,12 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 		const isSamePermissions =
 			selectedPermissions.length === permissionIds.length && selectedPermissions.every((id) => permissionIds.includes(id));
 
-		if (nameRole !== activeRole?.title || !isSamePermissions) {
+		if (nameRole !== activeRole?.title || colorRole !== activeRole?.color || !isSamePermissions) {
 			dispatch(toggleIsShowTrue());
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
+	}, [nameRole, colorRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
@@ -107,7 +109,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 									bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
 									after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
 									${clickRole !== EVERYONE_ROLE_ID ? 'hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600' : ''}
-									focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed 
+									focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed
 									`}
 									disabled={hiddenPermissionAdmin(permission.slug) || !hasPermissionEdit || clickRole === EVERYONE_ROLE_ID}
 								/>

@@ -26,7 +26,8 @@ export const style = (colors: Attributes) =>
 			gap: 6
 		},
 		imageWrapper: {
-			height: size.s_100 * 1.4,
+			marginTop: size.s_6,
+			height: size.s_100 * 2,
 			width: '90%',
 			borderRadius: size.s_4,
 			marginBottom: size.s_10
@@ -42,6 +43,7 @@ export const style = (colors: Attributes) =>
 			fontWeight: 'bold'
 		},
 		description: {
-			color: colors.text
+			color: colors.text,
+			fontSize: size.s_13
 		}
 	});

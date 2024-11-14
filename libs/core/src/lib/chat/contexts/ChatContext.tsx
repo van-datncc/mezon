@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { captureSentryError } from '@mezon/logger';
 import {
 	AttachmentEntity,
 	appActions,
@@ -12,6 +13,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clansSlice,
+	defaultNotificationCategoryActions,
 	directActions,
 	directMetaActions,
 	directSlice,
@@ -29,6 +31,7 @@ import {
 	mapReactionToEntity,
 	messagesActions,
 	notificationActions,
+	notificationSettingActions,
 	overriddenPoliciesActions,
 	permissionRoleChannelActions,
 	pinMessageActions,
@@ -54,8 +57,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, sleep } from '@mezon/utils';
-import * as Sentry from '@sentry/browser';
+import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -86,7 +88,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
-	TokenSentEvent,
+	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -95,7 +97,7 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
+import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -220,7 +222,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const mess = mapMessageChannelToEntity(message);
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
-
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
 				if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
@@ -273,11 +274,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
-				console.error(error);
-				Sentry.captureException({
-					eventType: 'NEW_MESSAGE',
-					error
-				});
+				captureSentryError(message, 'onchannelmessage');
 			}
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
@@ -322,7 +319,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					statusPresenceQueue.current = [];
 					statusPresenceTimerRef.current = null;
-				}, 10000);
+				}, 5000);
 			}
 		},
 		[dispatch]
@@ -662,7 +659,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ontokensent = useCallback(
-		(tokenEvent: TokenSentEvent) => {
+		(tokenEvent: ApiTokenSentEvent) => {
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
 		},
 		[dispatch, userId]
@@ -778,6 +775,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channelUpdated.app_url) {
 					dispatch(channelsActions.fetchAppChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 				}
+				if (
+					channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD &&
+					channelUpdated.status === ThreadStatus.joined &&
+					channelUpdated.creator_id !== userId
+				) {
+					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				}
 			}
 		},
 		[dispatch, userId]
@@ -812,6 +817,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		},
 		[dispatch, userId, channelId, clanId]
+	);
+
+	const onunmuteevent = useCallback(
+		(unmuteEvent: UnmuteEvent) => {
+			if (unmuteEvent.category_id !== '0') {
+				dispatch(
+					defaultNotificationCategoryActions.setMuteCategory({
+						category_id: unmuteEvent.category_id,
+						active: 1,
+						clan_id: unmuteEvent.clan_id
+					})
+				);
+			} else {
+				dispatch(
+					notificationSettingActions.setMuteNotificationSetting({
+						channel_id: unmuteEvent.channel_id,
+						active: 1,
+						clan_id: unmuteEvent.clan_id,
+						is_current_channel: unmuteEvent.channel_id === channelId
+					})
+				);
+			}
+		},
+		[channelId]
 	);
 
 	const oneventcreated = useCallback(
@@ -947,6 +976,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpermissionchanged = onpermissionchanged;
 
+			socket.onunmuteevent = onunmuteevent;
+
 			socket.oneventcreated = oneventcreated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
@@ -966,6 +997,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelupdated,
 			onpermissionset,
 			onpermissionchanged,
+			onunmuteevent,
 			onerror,
 			onmessagereaction,
 			onmessagetyping,
@@ -1023,10 +1055,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				} catch (error) {
 					// eslint-disable-next-line no-console
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					Sentry.captureException({
-						eventType: 'SOCKET_RECONNECT',
-						error
-					});
+					captureSentryError(error, 'SOCKET_RECONNECT');
 				}
 			}, 5000);
 		},
@@ -1048,47 +1077,47 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onlastseenupdated = () => { };
+			socket.onlastseenupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => { };
+			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => { };
+			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => { };
+			socket.onclandeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => { };
+			socket.onuserchanneladded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => { };
+			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => { };
+			socket.onstickercreated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventemoji = () => { };
+			socket.oneventemoji = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerdeleted = () => { };
+			socket.onstickerdeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => { };
+			socket.onstickerupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => { };
+			socket.onclanprofileupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => { };
+			socket.oncoffeegiven = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => { };
+			socket.onroleevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ontokensent = () => { };
+			socket.ontokensent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1125,6 +1154,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelupdated,
 		onpermissionset,
 		onpermissionchanged,
+		onunmuteevent,
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,
@@ -1155,4 +1185,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

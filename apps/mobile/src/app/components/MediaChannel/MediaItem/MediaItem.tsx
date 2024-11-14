@@ -1,5 +1,5 @@
 import { Block } from '@mezon/mobile-ui';
-import {AttachmentEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { AttachmentEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -28,7 +28,7 @@ export const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 			{checkIsVideo ? (
 				<ExpoVideo
 					onError={(err) => {
-						console.log('load error', err);
+						console.error('load error', err);
 					}}
 					source={{
 						uri: data?.url

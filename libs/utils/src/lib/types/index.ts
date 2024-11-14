@@ -1018,3 +1018,57 @@ export const serverSettingsMenuList = [
 		value: ServerSettingsMenuValue.Invites
 	}
 ];
+
+export enum ActionLog {
+	ALL_ACTION_AUDIT = 'All Actions',
+	UPDATE_CLAN_ACTION_AUDIT = 'Update Clan',
+	CREATE_CHANNEL_ACTION_AUDIT = 'Create Channel',
+	UPDATE_CHANNEL_ACTION_AUDIT = 'Update Channel',
+	UPDATE_CHANNEL_PRIVATE_ACTION_AUDIT = 'Update Channel private',
+	DELETE_CHANNE_ACTION_AUDIT = 'Delete Channel',
+	CREATE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Create Channel Permission',
+	UPDATE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Update Channel Permission',
+	DELETE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Delete Channel Permission',
+	KICK_MEMBER_ACTION_AUDIT = 'Kick Member',
+	PRUNE_MEMBER_ACTION_AUDIT = 'Prune Member',
+	BAN_MEMBER_ACTION_AUDIT = 'Ban Member',
+	UNBAN_MEMBER_ACTION_AUDIT = 'Unban Member',
+	UPDATE_MEMBER_ACTION_AUDIT = 'Update Member',
+	UPDATE_ROLES_MEMBER_ACTION_AUDIT = 'Update Roles Member',
+	MOVE_MEMBER_ACTION_AUDIT = 'Move Member',
+	DISCONNECT_MEMBER_ACTION_AUDIT = 'Disconnect Member',
+	ADD_BOT_ACTION_AUDIT = 'Add Bot',
+	CREATE_THREAD_ACTION_AUDIT = 'Create Thread',
+	UPDATE_THREAD_ACTION_AUDIT = 'Update Thread',
+	DELETE_THREAD_ACTION_AUDIT = 'Delete Thread',
+	CREATE_ROLE_ACTION_AUDIT = 'Create Role',
+	UPDATE_ROLE_ACTION_AUDIT = 'Update Role',
+	DELETE_ROLE_ACTION_AUDIT = 'Delete Role',
+	CREATE_WEBHOOK_ACTION_AUDIT = 'Create Webhook',
+	UPDATE_WEBHOOK_ACTION_AUDIT = 'Update Webhook',
+	DELETE_WEBHOOK_ACTION_AUDIT = 'Delete Webhook',
+	CREATE_EMOJI_ACTION_AUDIT = 'Create Emoji',
+	UPDATE_EMOJI_ACTION_AUDIT = 'Update Emoji',
+	DELETE_EMOJI_ACTION_AUDIT = 'Delete Emoji',
+	CREATE_STICKER_ACTION_AUDIT = 'Create Sticker',
+	UPDATE_STICKER_ACTION_AUDIT = 'Update Sticker',
+	DELETE_STICKER_ACTION_AUDIT = 'Delete Sticker',
+	CREATE_EVENT_ACTION_AUDIT = 'Create Event',
+	UPDATE_EVENT_ACTION_AUDIT = 'Update Event',
+	DELETE_EVENT_ACTION_AUDIT = 'Delete Event',
+	CREATE_CANVAS_ACTION_AUDIT = 'Create Canvas',
+	UPDATE_CANVAS_ACTION_AUDIT = 'Update Canvas',
+	DELETE_CANVAS_ACTION_AUDIT = 'Delete Canvas',
+	CREATE_CATEGORY_ACTION_AUDIT = 'Create Category',
+	UPDATE_CATEGORY_ACTION_AUDIT = 'Update Category',
+	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category'
+}
+
+export enum UserAuditLog {
+	ALL_USER_AUDIT = 'All Users'
+}
+
+export type IUserAuditLog = {
+	userId: string;
+	userName: string;
+};

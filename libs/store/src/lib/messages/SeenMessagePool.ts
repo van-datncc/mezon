@@ -1,3 +1,5 @@
+import { captureSentryError } from '@mezon/logger';
+
 type SeenMessagePayload = {
 	messageId: string;
 	channelId: string;
@@ -82,7 +84,7 @@ class SeenMessagePool {
 				this.updateKnownSeenMessage(payload);
 				this.removeSeenMessage(payload.channelId);
 			} catch (error) {
-				console.log(error);
+				captureSentryError(error, 'registerSeenMessageWorker');
 			}
 		}, ms);
 	}

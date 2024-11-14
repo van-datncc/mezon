@@ -67,13 +67,13 @@ const InputSearchMessageChannel = ({
 		}
 	}, [userMention, optionFilter]);
 
+	const onGoBack = () => {
+		navigation.goBack();
+	};
+
 	return (
 		<View style={styles.wrapper}>
-			<TouchableOpacity
-				onPress={() => {
-					navigation.goBack();
-				}}
-			>
+			<TouchableOpacity onPress={onGoBack}>
 				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>

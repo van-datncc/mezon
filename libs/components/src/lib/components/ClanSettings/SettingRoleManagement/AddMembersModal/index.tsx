@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
 import { RolesClanEntity, getSelectedRoleId, selectAllUserClans, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
-import { ThemeApp, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { ThemeApp, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -70,7 +70,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		if (selectedRoleId === 'New Role') {
 			dispatch(setAddMemberRoles(userIds));
 		} else {
-			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', userIds, [], [], []);
+			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', selectedRole?.color ?? '', userIds, [], [], []);
 		}
 	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 
@@ -169,6 +169,7 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 						alt={userName}
 						userName={userName}
 						className="min-w-5 min-h-5 max-w-5 max-h-5"
+						srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>

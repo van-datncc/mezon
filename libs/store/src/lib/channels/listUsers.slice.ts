@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IUsers, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUser } from 'mezon-js/api.gen';
@@ -45,16 +46,21 @@ export const fetchListUsersByUserCached = memoizeAndTrack(
 export const fetchListUsersByUser = createAsyncThunk(
 	'usersByUser/fetchListUsersByUser',
 	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchListUsersByUserCached.clear(mezon);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchListUsersByUserCached.clear(mezon);
+			}
+			const response = await fetchListUsersByUserCached(mezon);
+			if (!response?.users) {
+				return [];
+			}
+			const users = response?.users.map(mapUsersToEntity);
+			return users;
+		} catch (error) {
+			captureSentryError(error, 'usersByUser/fetchListUsersByUser');
+			return thunkAPI.rejectWithValue(error);
 		}
-		const response = await fetchListUsersByUserCached(mezon);
-		if (!response?.users) {
-			return [];
-		}
-		const users = response?.users.map(mapUsersToEntity);
-		return users;
 	}
 );
 

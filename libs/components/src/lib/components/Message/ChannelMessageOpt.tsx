@@ -71,7 +71,9 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode }: Chan
 	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
 
 	return (
-		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? 'top-0' : '-top-7'}  right-6 w-fit`}>
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-7' : 'top-0') : '-top-7'}  right-6 w-fit`}
+		>
 			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex items-center justify-between" ref={refOpt}>
 					<RecentEmoji message={message} />
@@ -105,7 +107,7 @@ const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 
 	const emojiRecentData = useMemo(() => {
 		return localStorage.getItem('recentEmojis');
-	}, [localStorage.getItem('recentEmojis')]);
+	}, []);
 
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);

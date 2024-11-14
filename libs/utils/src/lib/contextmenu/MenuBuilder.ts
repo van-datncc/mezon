@@ -77,7 +77,7 @@ export class MenuBuilder {
 		disabled = false,
 		classNames?: string
 	): ContextMenuItem {
-		const clickHandler = handleItemClick || (() => console.log('No handler for this item'));
+		const clickHandler = handleItemClick || (() => console.warn('No handler for this item'));
 		return {
 			id,
 			label,

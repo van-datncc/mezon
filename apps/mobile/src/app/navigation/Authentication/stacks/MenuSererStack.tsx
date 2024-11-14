@@ -57,7 +57,8 @@ export const MenuClanStacks = ({}: any) => {
 				}),
 				cardStyle: {
 					backgroundColor: 'transparent'
-				}
+				},
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen

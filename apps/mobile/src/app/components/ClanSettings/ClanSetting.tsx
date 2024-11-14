@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../componentUI';
+import useBackHardWare from '../../hooks/useBackHardWare';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { LogoClanSelector } from './LogoClanSelector';
 import { style } from './styles';
@@ -22,6 +23,7 @@ export function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSetti
 		EPermission.manageClan,
 		EPermission.clanOwner
 	]);
+	useBackHardWare();
 
 	const isCanEditRole = useMemo(() => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;

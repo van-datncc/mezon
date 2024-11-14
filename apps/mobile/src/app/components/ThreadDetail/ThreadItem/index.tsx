@@ -84,7 +84,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 			}}
 			style={styles.threadItemWrapper}
 		>
-			<View>
+			<View style={{ flex: 1 }}>
 				<Text style={styles.threadName}>{thread?.channel_label}</Text>
 				<View style={styles.threadContent}>
 					<Text style={styles.textThreadCreateBy}>{username}</Text>

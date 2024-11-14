@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import {EventManagementEntity, selectMemberClanByUserId2, useAppSelector} from '@mezon/store-mobile';
+import { EventManagementEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { EEventStatus } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';

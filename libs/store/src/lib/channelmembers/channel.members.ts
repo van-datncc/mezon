@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
@@ -82,49 +82,59 @@ type fetchChannelMembersPayload = {
 export const fetchChannelMembers = createAsyncThunk(
 	'channelMembers/fetchChannelMembers',
 	async ({ clanId, channelId, noCache, channelType, repace = false }: fetchChannelMembersPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		if (noCache) {
-			fetchChannelMembersCached.clear(mezon, clanId, channelId, channelType);
+			if (noCache) {
+				fetchChannelMembersCached.clear(mezon, clanId, channelId, channelType);
+			}
+
+			const state = thunkAPI.getState() as RootState;
+			const currentChannel = state?.channels?.entities[channelId] || {};
+			const parentChannel = state?.channels?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
+
+			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
+				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
+				thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] }));
+			}
+
+			const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+			if (!response.channel_users) {
+				return [];
+			}
+			if (repace) {
+				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
+			}
+
+			thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members: response.channel_users }));
+			return response.channel_users;
+		} catch (error) {
+			captureSentryError(error, 'channelMembers/fetchChannelMembers');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const state = thunkAPI.getState() as RootState;
-		const currentChannel = state?.channels?.entities[channelId] || {};
-		const parentChannel = state?.channels?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
-
-		if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
-			const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
-			thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] }));
-		}
-
-		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
-		if (!response.channel_users) {
-			return [];
-		}
-		if (repace) {
-			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
-		}
-
-		thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members: response.channel_users }));
-		return response.channel_users;
 	}
 );
 
 export const fetchChannelMembersPresence = createAsyncThunk(
 	'channelMembers/fetchChannelMembersPresence',
 	async (channelPresence: ChannelPresenceEvent, thunkAPI) => {
-		if (channelPresence.joins.length > 0) {
-			const joinUser = channelPresence.joins[0];
-			const userId = joinUser.user_id;
-			const isMobile = joinUser.is_mobile;
-			const channelId = channelPresence.channel_id;
-			const state = thunkAPI.getState() as ChannelMemberRootState;
-			const existingMember = state[CHANNEL_MEMBERS_FEATURE_KEY].memberChannels[channelId]?.ids?.findIndex((item) => item === userId);
-			if (!existingMember) {
-				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
-				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
-				thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
+		try {
+			if (channelPresence.joins.length > 0) {
+				const joinUser = channelPresence.joins[0];
+				const userId = joinUser.user_id;
+				const isMobile = joinUser.is_mobile;
+				const channelId = channelPresence.channel_id;
+				const state = thunkAPI.getState() as ChannelMemberRootState;
+				const existingMember = state[CHANNEL_MEMBERS_FEATURE_KEY].memberChannels[channelId]?.ids?.findIndex((item) => item === userId);
+				if (!existingMember) {
+					thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
+					thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
+					thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
+				}
 			}
+		} catch (error) {
+			captureSentryError(error, 'channelMembers/fetchChannelMembersPresence');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -166,7 +176,8 @@ export const removeMemberChannel = createAsyncThunk(
 
 			return true;
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'channelMembers/removeChannelUser');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -187,9 +198,9 @@ export const updateCustomStatus = createAsyncThunk(
 			if (response) {
 				return response;
 			}
-		} catch (e) {
-			Sentry.captureException(e);
-			console.error('Error updating custom status user', e);
+		} catch (error) {
+			captureSentryError(error, 'channelMembers/updateCustomStatusUser');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

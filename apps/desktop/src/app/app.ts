@@ -233,83 +233,40 @@ export default class App {
 	private static setupWindowManager() {
 		if (process.platform === 'darwin') {
 			console.error('not implemented');
+			return;
 		}
 
-		const windowInfoArray = [];
 		let defaultApp = null;
 		const usageThreshold = 30 * 60 * 1000;
-		let hasSentDefaultApp = false;
 		let activityTimeout = null;
-		let isFirstRun = true;
 
-		const updateWindowInfoArray = () => {
-			windowInfoArray.length = 0;
+		const fetchActiveWindow = () => {
 			const window = activeWindows?.getActiveWindow();
-			if (window && window.isVisible()) {
-				const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
-				const fullPath = window.path.split(pathDelimiter).pop();
-				const appName = fullPath.replace(/\.(exe|app)$/, '');
-				const windowTitle = window.getTitle();
+			if (window) {
+				const appName = window?.windowClass.replace(/\.(exe|app)$/, '');
+				const windowTitle = window?.windowName;
+				const startTime = new Date().toISOString();
 
 				if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL, EActivities.VISUAL_STUDIO_CODE].includes(appName as EActivities)) {
-					const startTime = new Date().toISOString();
-					windowInfoArray.push({ appName, windowTitle, startTime });
+					const newAppInfo = { appName, windowTitle, startTime };
+
+					if (!defaultApp || defaultApp?.appName !== newAppInfo?.appName || defaultApp.windowTitle !== newAppInfo?.windowTitle) {
+						defaultApp = newAppInfo;
+						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
+					}
 				}
 			}
 		};
 
-		updateWindowInfoArray();
+		fetchActiveWindow();
 
-		if (windowInfoArray.length > 0) {
-			defaultApp = windowInfoArray[0];
+		if (activityTimeout) {
+			clearInterval(activityTimeout);
 		}
 
-		activeWindows?.on('window-activated', (window) => {
-			const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
-			const fullPath = window.path.split(pathDelimiter).pop();
-			const appName = fullPath.replace(/\.(exe|app)$/, '');
-			const windowTitle = window.getTitle();
-			const startTime = new Date().toISOString();
-
-			if (defaultApp && defaultApp?.appName) {
-				if (isFirstRun) {
-					App.mainWindow.webContents.send(ACTIVE_WINDOW, { ...defaultApp, startTime });
-					hasSentDefaultApp = true;
-					isFirstRun = false;
-				}
-			} else if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL, EActivities.VISUAL_STUDIO_CODE].includes(appName) && isFirstRun) {
-				defaultApp = { appName, windowTitle, startTime };
-				App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
-				hasSentDefaultApp = true;
-				isFirstRun = false;
-			}
-
-			if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL, EActivities.VISUAL_STUDIO_CODE].includes(appName) && !isFirstRun) {
-				if (activityTimeout) {
-					clearInterval(activityTimeout);
-				}
-
-				activityTimeout = setInterval(() => {
-					const newWindowTitle = window.getTitle();
-					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
-						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
-						hasSentDefaultApp = false;
-					}
-
-					if (!newWindowTitle) {
-						isFirstRun = true;
-						defaultApp = {};
-						clearInterval(activityTimeout);
-						hasSentDefaultApp = false;
-					}
-
-					if (defaultApp && !hasSentDefaultApp) {
-						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
-						hasSentDefaultApp = true;
-					}
-				}, usageThreshold);
-			}
-		});
+		activityTimeout = setInterval(() => {
+			fetchActiveWindow();
+		}, usageThreshold);
 	}
 
 	private static setupMenu() {

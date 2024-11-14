@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { INotification, LoadingStatus, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -48,30 +49,40 @@ const fetchListNotificationCached = memoizee(
 export const fetchListNotification = createAsyncThunk(
 	'notification/fetchListNotification',
 	async ({ clanId, noCache }: FetchNotificationArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchListNotificationCached.clear(mezon, clanId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchListNotificationCached.clear(mezon, clanId);
+			}
+			const response = await fetchListNotificationCached(mezon, clanId);
+			if (!response.notifications) {
+				return [];
+			}
+			if (Date.now() - response.time < 100) {
+				const notifications = response.notifications.map(mapNotificationToEntity);
+				return notifications;
+			}
+			return null;
+		} catch (error) {
+			captureSentryError(error, 'notification/fetchListNotification');
+			return thunkAPI.rejectWithValue(error);
 		}
-		const response = await fetchListNotificationCached(mezon, clanId);
-		if (!response.notifications) {
-			return [];
-		}
-		if (Date.now() - response.time < 100) {
-			const notifications = response.notifications.map(mapNotificationToEntity);
-			return notifications;
-		}
-		return null;
 	}
 );
 
 export const deleteNotify = createAsyncThunk('notification/deleteNotify', async ({ ids, clanId }: { ids: string[]; clanId: string }, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.deleteNotifications(mezon.session, ids);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteNotifications(mezon.session, ids);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId, noCache: true }));
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'notification/deleteNotify');
+		return thunkAPI.rejectWithValue(error);
 	}
-	thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId, noCache: true }));
-	return response;
 });
 
 export const initialNotificationState: NotificationState = notificationAdapter.getInitialState({
