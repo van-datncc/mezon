@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { IEmbedProps } from '@mezon/utils';
+import { createImgproxyUrl, IEmbedProps } from '@mezon/utils';
 import { memo } from 'react';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -25,7 +25,14 @@ export const EmbedMessage = memo((embed: IEmbedProps) => {
 						{!!description && <Text style={styles.description}>{description}</Text>}
 						{!!fields && <EmbedFields fields={fields} />}
 					</View>
-					{!!thumbnail && <FastImage source={{ uri: thumbnail?.url }} style={styles.thumbnail} />}
+					{!!thumbnail && (
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(thumbnail?.url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							}}
+							style={styles.thumbnail}
+						/>
+					)}
 				</View>
 				{!!image && (
 					<TouchableOpacity

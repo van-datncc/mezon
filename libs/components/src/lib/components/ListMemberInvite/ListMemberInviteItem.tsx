@@ -1,5 +1,6 @@
 import { useSendInviteMessage, useSilentSendMess } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
+import { createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -84,6 +85,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				alt={userName}
 				userName={userName}
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
+				srcImgProxy={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : createImgproxyUrl(avatar ?? '')}
 				src={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : avatar}
 			/>
 			<p style={{ marginRight: 'auto' }} className="px-[10px] flex-1 overflow-hidden text truncate">
@@ -117,7 +119,13 @@ const ItemInviteUser = (props: ItemInviteUserProps) => {
 	const { userId = '', avatar = '', displayName = '', userName = '', isInviteSent = false, onHandle } = props;
 	return (
 		<div key={userId} className="flex items-center justify-between h-14">
-			<AvatarImage alt={userName} userName={userName} className="min-w-10 min-h-10 max-w-10 max-h-10" src={avatar} />
+			<AvatarImage
+				alt={userName}
+				userName={userName}
+				className="min-w-10 min-h-10 max-w-10 max-h-10"
+				srcImgProxy={createImgproxyUrl(avatar ?? '')}
+				src={avatar}
+			/>
 			<p style={{ marginRight: 'auto' }} className="pl-[10px]">
 				{displayName}
 			</p>

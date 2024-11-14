@@ -420,6 +420,8 @@ export type IEmoji = {
 export type IChannelUser = ChannelDescription & {
 	id: string;
 	active?: number;
+	count_mess_unread?: number;
+	last_seen_message?: any;
 };
 
 export type IUsers = ApiUser & {
@@ -727,6 +729,8 @@ export type SearchItemProps = {
 	name?: string;
 	avatarUser?: string;
 	lastSentTimeStamp?: any;
+	lastSeenTimeStamp?: any;
+	count_messsage_unread?: number;
 	idDM?: string;
 	type?: number;
 	clanAvatar?: string;

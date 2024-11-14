@@ -3,10 +3,12 @@ import { useAuth, useFriends, useMemberCustomStatus, useMemberStatus } from '@me
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, channelMembersActions, selectCurrentClanId, selectUpdateToken, useAppDispatch } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonButton } from '../../componentUI';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
@@ -93,7 +95,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
-						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							}}
+							style={styles.imgWrapper}
+						/>
 					) : (
 						<Block
 							backgroundColor={themeValue.colorAvatarDefault}

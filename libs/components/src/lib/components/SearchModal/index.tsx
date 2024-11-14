@@ -80,7 +80,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
-						type: ChannelType.CHANNEL_TYPE_DM
+						type: ChannelType.CHANNEL_TYPE_DM,
+						count_messsage_unread: itemDM.count_mess_unread
 					};
 				})
 			: [];
@@ -93,7 +94,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
-						typeChat: TypeSearch.Dm_Type
+						typeChat: TypeSearch.Dm_Type,
+						count_messsage_unread: itemGr.count_mess_unread
 					};
 				})
 			: [];
@@ -118,7 +120,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
-				meeting_code: item.meeting_code
+				meeting_code: item.meeting_code,
+				count_messsage_unread: item?.count_mess_unread,
+				lastSeenTimeStamp: Number(item?.last_seen_message?.timestamp_seconds || 0)
 			};
 		});
 		return list;
@@ -217,16 +221,16 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const listItemWithoutRecent = useMemo(() => {
 		if (normalizeSearchText.startsWith('@')) {
-			return totalListMembersSorted.slice(0, 50);
+			return totalListMembersSorted;
 		}
 		if (normalizeSearchText.startsWith('#')) {
-			return channelSearchSorted.slice(0, 50);
+			return channelSearchSorted;
 		}
 
 		if (normalizeSearchText) {
-			return totalListsSorted.slice(0, 50);
+			return totalListsSorted;
 		}
-		return totalListSortedWithoutPreviousList.slice(0, 50);
+		return totalListSortedWithoutPreviousList;
 	}, [channelSearchSorted, normalizeSearchText, totalListMembersSorted, totalListSortedWithoutPreviousList, totalListsSorted]);
 
 	const handleSelectMem = useCallback(

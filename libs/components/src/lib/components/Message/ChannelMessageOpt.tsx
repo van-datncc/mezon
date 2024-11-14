@@ -105,13 +105,9 @@ interface RecentEmojiProps {
 const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 	const { emojiConverted } = useEmojiSuggestion();
 
-	const emojiRecentData = useMemo(() => {
-		return localStorage.getItem('recentEmojis');
-	}, []);
-
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);
-	}, [emojiConverted, emojiRecentData]);
+	}, [emojiConverted]);
 
 	return (
 		<div className="flex items-center">

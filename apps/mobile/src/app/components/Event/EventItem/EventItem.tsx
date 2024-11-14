@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { EEventStatus } from '@mezon/utils';
+import { EEventStatus, createImgproxyUrl } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -55,7 +55,13 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 					<EventTime eventStatus={eventStatus} event={event} />
 					<View style={[styles.inline, styles.infoRight]}>
 						<View style={styles.avatar}>
-							<FastImage source={{ uri: userCreate?.user?.avatar_url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(userCreate?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={{ width: '100%', height: '100%' }}
+								resizeMode="cover"
+							/>
 						</View>
 						<View style={styles.inline}>
 							<Icons.GroupIcon height={size.s_10} width={size.s_10} color={themeValue.text} />

@@ -19,6 +19,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { default as SimpleBarReact } from 'simplebar-react';
+import 'simplebar/src/simplebar.css';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
@@ -31,7 +33,7 @@ function ChannelList() {
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			id="channelList"
 			role="button"
 		>
@@ -93,7 +95,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 5;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
@@ -144,15 +146,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	return (
-		<div
-			ref={parentRef}
-			style={{
-				height: height,
-				overflowY: 'auto',
-				contain: 'strict'
-			}}
-			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
-		>
+		<SimpleBarReact scrollableNodeProps={{ ref: parentRef }} style={{ maxHeight: height }}>
 			<div
 				style={{
 					height: virtualizer.getTotalSize(),
@@ -202,7 +196,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					})}
 				</div>
 			</div>
-		</div>
+		</SimpleBarReact>
 	);
 });
 

@@ -2,9 +2,10 @@ import { useChatMessages } from '@mezon/core';
 import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { MessagesEntity, directActions, directMetaActions, gifsStickerEmojiActions, useAppDispatch } from '@mezon/store-mobile';
-import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
+import { SubPanelName, TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import React, { useEffect, useRef } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { UserStatus } from '../../../components/UserStatus';
 
 interface HeaderProps {
@@ -78,7 +79,12 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 				) : (
 					<View style={styles.avatarWrapper}>
 						{dmAvatar ? (
-							<Image source={{ uri: dmAvatar || '' }} style={styles.friendAvatar} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(dmAvatar ?? '', { width: 300, height: 300, resizeType: 'fit' })
+								}}
+								style={styles.friendAvatar}
+							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>

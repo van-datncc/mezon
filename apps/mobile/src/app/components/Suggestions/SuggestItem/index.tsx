@@ -2,11 +2,12 @@ import { useCheckVoiceStatus } from '@mezon/core';
 import { Icons, ThreadIcon, ThreadIconLocker } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
-import { ChannelStatusEnum, checkIsThread, getSrcEmoji } from '@mezon/utils';
+import { ChannelStatusEnum, checkIsThread, createImgproxyUrl, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { style } from './SuggestItem.styles';
 
 type SuggestItemProps = {
@@ -51,10 +52,10 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 		<View style={styles.wrapperItem}>
 			<View style={styles.containerItem}>
 				{avatarUrl ? (
-					<Image
+					<FastImage
 						style={styles.image}
 						source={{
-							uri: avatarUrl
+							uri: createImgproxyUrl(avatarUrl ?? '', { width: 100, height: 100, resizeType: 'fit' })
 						}}
 					/>
 				) : (
