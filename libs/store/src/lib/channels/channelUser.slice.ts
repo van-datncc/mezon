@@ -92,12 +92,15 @@ export const listChannelsByUserSlice = createSlice({
 		},
 		updateCount: (state, action: PayloadAction<{ channelId: string }>) => {
 			const payload = action.payload;
-			listChannelsByUserAdapter.updateOne(state, {
-				id: payload.channelId,
-				changes: {
-					count_mess_unread: undefined
-				}
-			});
+			const existingChannel = listChannelsByUserAdapter.getSelectors().selectById(state, payload.channelId);
+			if (existingChannel) {
+				listChannelsByUserAdapter.updateOne(state, {
+					id: payload.channelId,
+					changes: {
+						count_mess_unread: undefined
+					}
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {

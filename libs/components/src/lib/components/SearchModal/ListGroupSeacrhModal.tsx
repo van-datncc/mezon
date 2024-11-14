@@ -17,16 +17,20 @@ type ClassifiedLists = {
 	unreadList: SearchItemProps[];
 };
 export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWithoutRecent, normalizeSearchText, handleItemClick }) => {
-	const classificationList = listItemWithoutRecent.reduce<ClassifiedLists>(
-		(acc, item) => {
-			if (item.count_messsage_unread && item.count_messsage_unread > 0) {
-				acc.mentionList.push(item);
-			} else if (!item.count_messsage_unread && item.lastSentTimeStamp > item.lastSeenTimeStamp) {
-				acc.unreadList.push(item);
-			}
-			return acc;
-		},
-		{ mentionList: [], unreadList: [] }
+	const classificationList = useMemo(
+		() =>
+			listItemWithoutRecent.reduce<ClassifiedLists>(
+				(acc, item) => {
+					if (item.count_messsage_unread && item.count_messsage_unread > 0) {
+						acc.mentionList.push(item);
+					} else if (!item.count_messsage_unread && item.lastSentTimeStamp > item.lastSeenTimeStamp) {
+						acc.unreadList.push(item);
+					}
+					return acc;
+				},
+				{ mentionList: [], unreadList: [] }
+			),
+		[listItemWithoutRecent]
 	);
 
 	const { mentionList, unreadList } = classificationList;
