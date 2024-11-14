@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { ETypeLinkMedia, IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelStreamMode } from 'mezon-js';
@@ -60,19 +61,24 @@ export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachmen
 export const fetchChannelAttachments = createAsyncThunk(
 	'attachment/fetchChannelAttachments',
 	async ({ clanId, channelId, noCache }: fetchChannelAttachmentsPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchChannelAttachmentsCached.clear();
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchChannelAttachmentsCached.clear();
+			}
+
+			const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
+
+			if (!response.attachments) {
+				return [];
+			}
+
+			const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));
+			return attachments;
+		} catch (error) {
+			captureSentryError(error, 'attachment/fetchChannelAttachments');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
-
-		if (!response.attachments) {
-			return [];
-		}
-
-		const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));
-		return attachments;
 	}
 );
 

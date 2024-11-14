@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus, SearchFilter } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
@@ -37,21 +38,26 @@ export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
 export const fetchListSearchMessage = createAsyncThunk(
 	'searchMessage/fetchListSearchMessage',
 	async ({ filters, from, size, sorts, isMobile = false }: any, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
 
-		if (!response.messages) {
-			thunkAPI.dispatch(searchMessagesActions.setTotalResults(isMobile ? response.total || 0 : 0));
-			return { searchMessage: [], isMobile };
+			if (!response.messages) {
+				thunkAPI.dispatch(searchMessagesActions.setTotalResults(isMobile ? response.total || 0 : 0));
+				return { searchMessage: [], isMobile };
+			}
+
+			const searchMessage = response.messages.map(mapSearchMessageToEntity);
+			thunkAPI.dispatch(searchMessagesActions.setTotalResults(response.total ?? 0));
+
+			return {
+				searchMessage,
+				isMobile
+			};
+		} catch (error) {
+			captureSentryError(error, 'searchMessage/fetchListSearchMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const searchMessage = response.messages.map(mapSearchMessageToEntity);
-		thunkAPI.dispatch(searchMessagesActions.setTotalResults(response.total ?? 0));
-
-		return {
-			searchMessage,
-			isMobile
-		};
 	}
 );
 

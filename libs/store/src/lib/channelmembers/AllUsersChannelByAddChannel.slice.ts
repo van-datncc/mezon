@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
@@ -53,7 +54,8 @@ export const fetchUserChannels = createAsyncThunk(
 				return response ?? [];
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'allUsersByAddChannel/fetchUserChannels');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

@@ -61,7 +61,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.AUDIT_LOG:
 				return <AuditLog currentClanId={currentClanId} />;
 			case ItemSetting.ON_BOARDING:
-				return <SettingOnBoarding />;
+				return <SettingOnBoarding onClose={onClose} />;
 		}
 	};
 	const dispatch = useAppDispatch();

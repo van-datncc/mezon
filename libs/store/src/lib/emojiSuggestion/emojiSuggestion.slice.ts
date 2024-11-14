@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ClanEmoji } from 'mezon-js';
@@ -55,17 +56,22 @@ export const fetchEmojiCached = memoizeAndTrack(
 );
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-	if (noCache) {
-		fetchEmojiCached.clear(mezon);
-	}
-	const response = await fetchEmojiCached(mezon);
+		if (noCache) {
+			fetchEmojiCached.clear(mezon);
+		}
+		const response = await fetchEmojiCached(mezon);
 
-	if (!response?.emoji_list) {
-		throw new Error('Emoji list is undefined or null');
+		if (!response?.emoji_list) {
+			throw new Error('Emoji list is undefined or null');
+		}
+		return response.emoji_list;
+	} catch (error) {
+		captureSentryError(error, 'emoji/fetchEmoji');
+		return thunkAPI.rejectWithValue(error);
 	}
-	return response.emoji_list;
 });
 
 export const createEmojiSetting = createAsyncThunk(
@@ -79,7 +85,8 @@ export const createEmojiSetting = createAsyncThunk(
 			}
 			thunkAPI.dispatch(fetchEmoji({ noCache: true }));
 		} catch (error) {
-			return thunkAPI.rejectWithValue({ error });
+			captureSentryError(error, 'emoji/createEmoji');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -92,7 +99,8 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 			return { request, emojiId };
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({ error });
+		captureSentryError(error, 'settingClanEmoji/updateEmoji');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -104,7 +112,8 @@ export const deleteEmojiSetting = createAsyncThunk('settingClanEmoji/deleteEmoji
 			return data.emoji;
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({ error });
+		captureSentryError(error, 'settingClanEmoji/deleteEmoji');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

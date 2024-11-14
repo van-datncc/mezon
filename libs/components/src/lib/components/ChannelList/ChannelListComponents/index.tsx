@@ -192,12 +192,40 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 			</div>
 		);
 	});
+	const [openCongratulation, closeCongratulation] = useModal(() => {
+		return (
+			<div className="fixed z-[90] top-0 left-0 w-screen h-screen pointer-events-none items-center justify-center flex">
+				<div className="w-fit h-fit flex text-3xl text-white font-bold">
+					<p
+						style={{
+							textShadow: '1px 1px 5px #000000 '
+						}}
+					>
+						Congratulation Show In Here !
+					</p>
+				</div>
+			</div>
+		);
+	});
 	useEffect(() => {
 		openModalGetStarted();
 	}, []);
+	useEffect(() => {
+		let timeoutId: NodeJS.Timeout;
+
+		if (missionDone === missionSum) {
+			openCongratulation();
+			timeoutId = setTimeout(() => {
+				closeCongratulation();
+				clearTimeout(timeoutId);
+			}, 2000);
+		}
+
+		return () => clearTimeout(timeoutId);
+	}, [missionDone]);
 
 	return (
-		<div className="w-full h-12 flex flex-col gap-1 relative" onClick={handleNavigate}>
+		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>
 			<div className="flex justify-between">
 				<p className="text-sm font-bold text-white">Get Started</p>
 				<div className="flex gap-[1px] items-center">
