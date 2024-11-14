@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IMessageWithUser, IThread, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import memoizee from 'memoizee';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
@@ -80,31 +80,41 @@ const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
 };
 
 export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, noCache }: FetchThreadsArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchThreadsCached.clear(mezon, channelId, clanId);
-	}
-	const response = await fetchThreadsCached(mezon, channelId, clanId);
-	if (!response.channeldesc) {
-		return [];
-	}
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchThreadsCached.clear(mezon, channelId, clanId);
+		}
+		const response = await fetchThreadsCached(mezon, channelId, clanId);
+		if (!response.channeldesc) {
+			return [];
+		}
 
-	const threads = mapToThreadEntity(response.channeldesc);
-	return threads;
+		const threads = mapToThreadEntity(response.channeldesc);
+		return threads;
+	} catch (error) {
+		captureSentryError(error, 'threads/fetchThreads');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const fetchThread = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, threadId, noCache }: FetchThreadsArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchThreadsCached.clear(mezon, channelId, clanId, threadId);
-	}
-	const response = await fetchThreadsCached(mezon, channelId, clanId, threadId);
-	if (!response.channeldesc) {
-		return [];
-	}
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchThreadsCached.clear(mezon, channelId, clanId, threadId);
+		}
+		const response = await fetchThreadsCached(mezon, channelId, clanId, threadId);
+		if (!response.channeldesc) {
+			return [];
+		}
 
-	const threads = mapToThreadEntity(response.channeldesc);
-	return threads;
+		const threads = mapToThreadEntity(response.channeldesc);
+		return threads;
+	} catch (error) {
+		captureSentryError(error, 'threads/fetchThreads');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
@@ -127,8 +137,8 @@ export const checkDuplicateThread = createAsyncThunk(
 				return isDuplicateName.exist;
 			}
 		} catch (error) {
-			Sentry.captureException(error);
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'threads/duplicateNameCthread');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -149,8 +159,8 @@ export const leaveThread = createAsyncThunk('thread/leavethread', async ({ clanI
 			thunkAPI.dispatch(fetchChannels({ clanId: clanId, noCache: true }));
 		}
 	} catch (error) {
-		Sentry.captureException(error);
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'threads/leavethread');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

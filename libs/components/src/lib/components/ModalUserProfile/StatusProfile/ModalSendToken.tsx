@@ -1,5 +1,6 @@
 import { selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Label, Modal } from 'flowbite-react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
@@ -13,6 +14,7 @@ type ModalSendTokenProps = {
 	setToken: (token: number) => void;
 	handleSaveSendToken?: () => void;
 	setSelectedUserId: (id: string) => void;
+	setNote: (note: string) => void;
 	error: string | null;
 	userSearchError: string | null;
 	userId: string;
@@ -25,6 +27,7 @@ const ModalSendToken = ({
 	setToken,
 	handleSaveSendToken,
 	setSelectedUserId,
+	setNote,
 	error,
 	userSearchError,
 	userId
@@ -76,6 +79,11 @@ const ModalSendToken = ({
 	const handleChangeSendToken = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setToken(Number(value));
+	};
+
+	const handleChangeNote = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setNote(value);
 	};
 
 	const mergeUniqueUsers = (usersClan: any[], directMessages: any[]) => {
@@ -173,6 +181,11 @@ const ModalSendToken = ({
 																<AvatarImage
 																	alt={user.username || ''}
 																	userName={user.username}
+																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
+																		width: 100,
+																		height: 100,
+																		resizeType: 'fit'
+																	})}
 																	src={user.avatar_url}
 																	className="size-4 mr-2"
 																	classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
@@ -203,6 +216,23 @@ const ModalSendToken = ({
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
 							placeholder="$"
 							onChange={handleChangeSendToken}
+						/>
+						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+					</div>
+					<div className="px-4 mb-4">
+						<div className="mb-2 block">
+							<Label
+								htmlFor="clearAfter"
+								value="Note"
+								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+							/>
+						</div>
+						<input
+							type="text"
+							defaultValue={'send token'}
+							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
+							placeholder="send token"
+							onChange={handleChangeNote}
 						/>
 						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 					</div>

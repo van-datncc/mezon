@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
@@ -59,10 +60,12 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 			}
 			return response;
 		} else {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError('no response', 'direct/createNewDirectMessage');
+			return thunkAPI.rejectWithValue('no reponse');
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'direct/createNewDirectMessage');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -74,10 +77,12 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			return response;
 		} else {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError('no reponse', 'direct/createNewDirectMessage');
+			return thunkAPI.rejectWithValue('no reponse');
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		captureSentryError(error, 'direct/closeDirectMessage');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -92,7 +97,8 @@ export const openDirectMessage = createAsyncThunk(
 				await mezon.client.openDirectMess(mezon.session, { channel_id: channelId });
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'direct/openDirectMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -108,46 +114,51 @@ type fetchDmGroupArgs = {
 export const fetchDirectMessage = createAsyncThunk(
 	'direct/fetchDirectMessage',
 	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		if (noCache) {
-			fetchChannelsCached.clear(mezon, 500, 1, '', channelType);
-		}
-		const response = await fetchChannelsCached(mezon, 500, 1, '', channelType);
-		if (!response.channeldesc) {
-			return [];
-		}
-		if (Date.now() - response.time < 100) {
-			const listStatusUnreadDM = response.channeldesc.map((channel) => {
-				const status = getStatusUnread(
-					Number(channel.last_seen_message?.timestamp_seconds),
-					Number(channel.last_sent_message?.timestamp_seconds)
-				);
-				return { dmId: channel.channel_id ?? '', isUnread: status };
+			if (noCache) {
+				fetchChannelsCached.clear(mezon, 500, 1, '', channelType);
+			}
+			const response = await fetchChannelsCached(mezon, 500, 1, '', channelType);
+			if (!response.channeldesc) {
+				return [];
+			}
+			if (Date.now() - response.time < 100) {
+				const listStatusUnreadDM = response.channeldesc.map((channel) => {
+					const status = getStatusUnread(
+						Number(channel.last_seen_message?.timestamp_seconds),
+						Number(channel.last_sent_message?.timestamp_seconds)
+					);
+					return { dmId: channel.channel_id ?? '', isUnread: status };
+				});
+				thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
+			}
+
+			const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
+				if (
+					a === undefined ||
+					b === undefined ||
+					a.last_sent_message === undefined ||
+					a.last_seen_message?.id === undefined ||
+					b.last_sent_message === undefined ||
+					b.last_seen_message?.id === undefined
+				) {
+					return 0;
+				}
+				if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
+					return 1;
+				}
+
+				return -1;
 			});
-			thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
+			const channels = sorted.map(mapDmGroupToEntity);
+			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
+			return channels;
+		} catch (error) {
+			captureSentryError(error, 'direct/fetchDirectMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
-			if (
-				a === undefined ||
-				b === undefined ||
-				a.last_sent_message === undefined ||
-				a.last_seen_message?.id === undefined ||
-				b.last_sent_message === undefined ||
-				b.last_seen_message?.id === undefined
-			) {
-				return 0;
-			}
-			if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
-				return 1;
-			}
-
-			return -1;
-		});
-		const channels = sorted.map(mapDmGroupToEntity);
-		thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
-		return channels;
 	}
 );
 
@@ -200,7 +211,8 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				})
 			);
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'direct/joinDirectMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

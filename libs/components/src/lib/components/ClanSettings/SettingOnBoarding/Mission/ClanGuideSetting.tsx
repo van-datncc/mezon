@@ -2,8 +2,8 @@ import { useMemberContext } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { ChangeEvent, ReactNode, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { GuideItemLayout } from './GuideBody';
-import ModalControlRule, { ControlInput } from './ModalControlRule';
+import GuideItemLayout from '../GuideItemLayout';
+import ModalControlRule, { ControlInput } from '../ModalControlRule';
 
 type TypeMission = {
 	id: number;
@@ -49,7 +49,7 @@ function ClanGuideSetting() {
 					<GuideItemLayout
 						hightLightIcon={true}
 						icon={<Icons.Hashtag />}
-						gap="gap-4"
+						gap={16}
 						className="px-3"
 						title="chat with the community"
 						description="in #general"
@@ -63,7 +63,7 @@ function ClanGuideSetting() {
 					<GuideItemLayout
 						hightLightIcon={true}
 						icon={<Icons.Hashtag />}
-						gap="gap-4"
+						gap={16}
 						className="px-3"
 						title="chat with the community"
 						description="in #general"
@@ -77,7 +77,7 @@ function ClanGuideSetting() {
 					<GuideItemLayout
 						hightLightIcon={true}
 						icon={<Icons.Hashtag />}
-						gap="gap-4"
+						gap={16}
 						className="px-3"
 						title="chat with the community"
 						description="in #general"
@@ -90,8 +90,8 @@ function ClanGuideSetting() {
 					/>
 					<GuideItemLayout
 						hightLightIcon={true}
+						gap={16}
 						icon={<Icons.RuleIcon />}
-						gap="gap-4"
 						className="px-3"
 						description={<div className="h-full flex items-center text-base text-white font-bold">Read the Rules </div>}
 					/>
@@ -125,7 +125,7 @@ function ClanGuideSetting() {
 				<div className="flex flex-col gap-3">
 					<GuideItemLayout
 						icon={<Icons.RuleIcon />}
-						gap="gap-4"
+						gap={16}
 						className="px-4 py-3"
 						description={'This is description of rules'}
 						title={'Rule #1'}

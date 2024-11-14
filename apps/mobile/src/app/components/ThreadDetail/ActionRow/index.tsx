@@ -2,9 +2,10 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
 import { usePermissionChecker } from '@mezon/core';
-import { ENotificationActive, EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
+import { ENotificationActive, ETypeSearch, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { EOverriddenPermission, EPermission } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
@@ -29,6 +30,9 @@ export const ActionRow = React.memo(() => {
 		currentChannel?.channel_id ?? ''
 	);
 	const { statusMute } = useStatusMuteChannel();
+	const isChannelDm = useMemo(() => {
+		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
+	}, [currentChannel]);
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -37,13 +41,22 @@ export const ActionRow = React.memo(() => {
 		{
 			title: 'Search',
 			action: () => {
-				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-					screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
-					params: {
-						openSearchChannelFrom: EOpenSearchChannelFrom.ActionMenu,
-						currentChannel
-					}
-				});
+				if (isChannelDm) {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM,
+						params: {
+							currentChannel
+						}
+					});
+				} else {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+						params: {
+							typeSearch: ETypeSearch.SearchChannel,
+							currentChannel
+						}
+					});
+				}
 			},
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			isShow: true,

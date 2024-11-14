@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { useSendForwardMessage } from '@mezon/core';
-import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
+import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
@@ -17,18 +17,18 @@ import {
 import { ChannelThreads, IMessageWithUser, normalizeString } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { MezonInput } from '../../../../../componentUI';
 import { SeparatorWithLine } from '../../../../../components/Common';
+import ForwardMessageItem from './ForwardMessageItem/ForwardMessageItem';
 import { styles } from './styles';
 
-interface IForwardIObject {
+export interface IForwardIObject {
 	channelId: string;
 	type: number;
 	clanId?: string;
@@ -46,7 +46,6 @@ interface ForwardMessageModalProps {
 
 const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessageModalProps) => {
 	const [searchText, setSearchText] = useState('');
-	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
 
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const listChannels = useSelector(selectAllChannelsByUser);
@@ -59,6 +58,8 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const selectedMessage = useSelector(getSelectedMessage);
+	const [count, setCount] = useState('');
+	const selectedForwardObjectsRef = useRef<IForwardIObject[]>([]);
 
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
@@ -119,7 +120,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 
 	const isChecked = (forwardObject: IForwardIObject) => {
 		const { channelId, type } = forwardObject;
-		const existingIndex = selectedForwardObjects.findIndex((item) => item.channelId === channelId && item.type === type);
+		const existingIndex = selectedForwardObjectsRef.current?.findIndex((item) => item.channelId === channelId && item.type === type);
 		return existingIndex !== -1;
 	};
 
@@ -128,7 +129,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	};
 
 	const handleForwardAllMessage = async () => {
-		if (!selectedForwardObjects.length) return;
+		if (!selectedForwardObjectsRef.current?.length) return;
 		try {
 			const combineMessages: MessagesEntity[] = [];
 			combineMessages.push(selectedMessage);
@@ -142,8 +143,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				combineMessages.push(allMessagesBySenderId[index]);
 				index++;
 			}
-
-			for (const selectedObjectSend of selectedForwardObjects) {
+			for (const selectedObjectSend of selectedForwardObjectsRef.current) {
 				const { type, channelId, clanId = '' } = selectedObjectSend;
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
@@ -180,9 +180,9 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	};
 
 	const sentToMessage = async () => {
-		if (!selectedForwardObjects.length) return;
+		if (!selectedForwardObjectsRef.current?.length) return;
 		try {
-			for (const selectedObjectSend of selectedForwardObjects) {
+			for (const selectedObjectSend of selectedForwardObjectsRef.current) {
 				const { type, channelId, clanId = '' } = selectedObjectSend;
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
@@ -211,90 +211,19 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 		onClose && onClose();
 	};
 
-	const onSelectChange = (value: boolean, item: IForwardIObject) => {
+	const onSelectChange = useCallback((value: boolean, item: IForwardIObject) => {
+		if (!item || !item?.channelId) return;
 		if (value) {
-			setSelectedForwardObjects((prevValue) => [...prevValue, item]);
-			return;
+			selectedForwardObjectsRef.current = [...selectedForwardObjectsRef.current, item];
+		} else {
+			selectedForwardObjectsRef.current = selectedForwardObjectsRef.current.filter((ob) => ob.channelId !== item.channelId);
 		}
-		const newValue = selectedForwardObjects.filter((ob) => ob.channelId !== item.channelId);
-		setSelectedForwardObjects(newValue);
-	};
-
-	const renderAvatar = (item: IForwardIObject) => {
-		const { type } = item;
-		switch (type) {
-			case ChannelType.CHANNEL_TYPE_DM:
-				if (item?.avatar) {
-					return <Image source={{ uri: item?.avatar || '' }} style={styles.memberAvatar} />;
-				}
-				return (
-					<Block
-						height={size.s_34}
-						width={size.s_34}
-						justifyContent="center"
-						borderRadius={50}
-						backgroundColor={themeValue.colorAvatarDefault}
-					>
-						<Text center>{item?.name?.charAt(0)?.toUpperCase()}</Text>
-					</Block>
-				);
-			case ChannelType.CHANNEL_TYPE_GROUP:
-				return (
-					<View style={styles.groupAvatar}>
-						<UserGroupIcon />
-					</View>
-				);
-			case ChannelType.CHANNEL_TYPE_TEXT:
-				return (
-					<Block width={size.s_16} height={size.s_34} justifyContent="center">
-						<Text center h3 color={themeValue.white}>
-							#
-						</Text>
-					</Block>
-				);
-			default:
-				break;
-		}
-	};
+		setCount(selectedForwardObjectsRef.current?.length ? ` (${selectedForwardObjectsRef.current?.length})` : '');
+	}, []);
 
 	const renderForwardObject = ({ item }: { item: IForwardIObject }) => {
-		return (
-			<TouchableOpacity onPress={() => onSelectChange(!isChecked(item), item)}>
-				<Block flexDirection="row" padding={size.s_10} gap={size.s_6} justifyContent="center">
-					<Block>{renderAvatar(item)}</Block>
-					<Block flex={1} justifyContent="center">
-						{item.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-							<Text color={themeValue.textStrong} numberOfLines={1}>{`${item.name} (${item.clanName})`}</Text>
-						) : (
-							<Text color={themeValue.textStrong} numberOfLines={1}>
-								{item.name}
-							</Text>
-						)}
-					</Block>
-					<Block justifyContent="center">
-						<BouncyCheckbox
-							size={20}
-							isChecked={isChecked(item)}
-							onPress={(value) => onSelectChange(value, item)}
-							fillColor={Colors.bgButton}
-							iconStyle={{ borderRadius: 5 }}
-							innerIconStyle={{
-								borderWidth: 1.5,
-								borderColor: isChecked ? Colors.bgButton : Colors.white,
-								borderRadius: 5,
-								opacity: 1
-							}}
-							textStyle={{ fontFamily: 'JosefinSans-Regular' }}
-						/>
-					</Block>
-				</Block>
-			</TouchableOpacity>
-		);
+		return <ForwardMessageItem isItemChecked={isChecked(item)} onSelectChange={onSelectChange} item={item} />;
 	};
-
-	const count = useMemo(() => {
-		if (selectedForwardObjects.length) return ` (${selectedForwardObjects.length})`;
-	}, [selectedForwardObjects]);
 
 	return (
 		<Modal isVisible={show} hasBackdrop={false} style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}>
@@ -332,7 +261,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 
 					<Block paddingTop={size.s_10}>
 						<TouchableOpacity
-							style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]}
+							style={[styles.btn, !selectedForwardObjectsRef.current?.length && { backgroundColor: themeValue.charcoal }]}
 							onPress={handleForward}
 						>
 							<Text style={styles.btnText}>

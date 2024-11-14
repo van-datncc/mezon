@@ -1,6 +1,6 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { appActions, getStoreAsync, giveCoffeeActions, selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
-import { TokenSentEvent } from 'mezon-js/dist/socket';
+import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useState } from 'react';
 import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -14,7 +14,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { formValue } = route.params;
-	const jsonObject: TokenSentEvent = JSON.parse(formValue || '{}');
+	const jsonObject: ApiTokenSentEvent = JSON.parse(formValue || '{}');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState('1');
 	const userProfile = useSelector(selectAllAccount);
@@ -44,11 +44,12 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 			}
 			store.dispatch(appActions.setLoadingMainMobile(true));
 
-			const tokenEvent: TokenSentEvent = {
+			const tokenEvent: ApiTokenSentEvent = {
 				sender_id: userProfile?.user?.id || '',
 				sender_name: userProfile?.user?.username || '',
 				receiver_id: jsonObject?.receiver_id || '',
-				amount: Number(tokenCount || 1)
+				amount: Number(tokenCount || 1),
+				note: jsonObject.note || 'send token'
 			};
 
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));

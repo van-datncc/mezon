@@ -9,7 +9,6 @@ interface IHeaderTabSearchProps {
 }
 function HeaderTabSearch({ onPress, tabList, activeTab }: IHeaderTabSearchProps) {
 	const { themeValue } = useTheme();
-
 	return (
 		<Block flexDirection={'row'} justifyContent={'flex-start'} alignItems={'center'} borderBottomColor={Colors.borderDim} borderBottomWidth={1}>
 			{tabList?.map((tab: ITabList, index: number) => (

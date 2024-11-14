@@ -1,8 +1,9 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiGiveCoffeeEvent } from 'mezon-js/api.gen';
-import { TokenSentEvent } from 'mezon-js/dist/socket';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { toastActions } from '../toasts/toasts.slice';
 
 export const GIVE_COFEE = 'giveCoffee';
@@ -39,9 +40,9 @@ export const updateGiveCoffee = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'giveCoffee/updateGiveCoffee');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -55,10 +56,14 @@ export const initialGiveCoffeeState: GiveCoffeeState = giveCoffeeAdapter.getInit
 	tokenUpdate: {}
 });
 
-export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: TokenSentEvent, thunkAPI) => {
+export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: ApiTokenSentEvent, thunkAPI) => {
 	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.sendToken(tokenEvent.receiver_id, tokenEvent.amount);
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.updateWallets(mezon.session, {
+			receiver_id: tokenEvent.receiver_id,
+			amount: tokenEvent.amount,
+			note: tokenEvent.note
+		});
 
 		if (response) {
 			thunkAPI.dispatch(toastActions.addToast({ message: 'Token sent successfully', type: 'success' }));
@@ -67,9 +72,9 @@ export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: 
 		} else {
 			thunkAPI.dispatch(toastActions.addToast({ message: 'An error occurred, please try again', type: 'error' }));
 		}
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
+	} catch (error) {
+		captureSentryError(error, 'token/sendToken');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -82,7 +87,7 @@ export const giveCoffeeSlice = createSlice({
 		setShowModalSendToken: (state, action: PayloadAction<boolean>) => {
 			state.showModalSendToken = action.payload;
 		},
-		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: TokenSentEvent }>) => {
+		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
 			const { tokenEvent } = action.payload;
 			const userId = tokenEvent.sender_id;
 			if (!userId) return;
@@ -90,10 +95,10 @@ export const giveCoffeeSlice = createSlice({
 			state.tokenSocket[userId] = tokenEvent ?? {};
 
 			if (userId === tokenEvent.sender_id) {
-				state.tokenUpdate[userId] -= tokenEvent.amount;
+				state.tokenUpdate[userId] -= tokenEvent.amount || 0;
 			}
 		},
-		handleSocketToken: (state, action: PayloadAction<{ currentUserId: string; tokenEvent: TokenSentEvent }>) => {
+		handleSocketToken: (state, action: PayloadAction<{ currentUserId: string; tokenEvent: ApiTokenSentEvent }>) => {
 			const { currentUserId, tokenEvent } = action.payload;
 			if (!currentUserId) return;
 			if (currentUserId !== tokenEvent.receiver_id) return;
@@ -102,7 +107,7 @@ export const giveCoffeeSlice = createSlice({
 			state.tokenSocket[currentUserId] = tokenEvent ?? {};
 
 			if (currentUserId === tokenEvent.receiver_id) {
-				state.tokenUpdate[currentUserId] += tokenEvent.amount;
+				state.tokenUpdate[currentUserId] += tokenEvent.amount || 0;
 			}
 		},
 		setTokenFromSocket: (state, action: PayloadAction<{ userId: string | undefined; coffeeEvent: ApiGiveCoffeeEvent }>) => {

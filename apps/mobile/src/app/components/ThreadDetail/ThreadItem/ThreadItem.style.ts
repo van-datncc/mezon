@@ -1,5 +1,5 @@
 import { Attributes, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -13,7 +13,7 @@ export const style = (colors: Attributes) =>
 			borderTopWidth: 0.2
 		},
 		threadName: { fontSize: size.label, color: colors.textStrong, fontWeight: '500' },
-		threadContent: { flexDirection: 'row', alignItems: 'center' },
+		threadContent: { flexDirection: 'row', alignItems: 'center', width: Platform.OS === 'ios' ? '70%' : '100%' },
 		textThreadCreateBy: { fontSize: size.medium, color: colors.textDisabled, fontWeight: '500' },
 		bullet: { marginHorizontal: 5, fontSize: size.s_18, color: colors.textDisabled, marginLeft: size.s_10 },
 		createTime: { fontSize: size.medium, color: colors.textDisabled, fontWeight: '500' },

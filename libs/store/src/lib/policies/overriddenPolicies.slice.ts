@@ -1,11 +1,10 @@
+import { captureSentryError } from '@mezon/logger';
 import { EOverriddenPermission } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 import { ApiPermission } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
-
 export const OVERRIDDEN_POLICIES_FEATURE_KEY = 'overriddenPolicies';
-
 export interface ChannelPermission {
 	channelId: string;
 	maxPermissions: Record<EOverriddenPermission, ApiPermission>;
@@ -86,7 +85,8 @@ export const fetchMaxChannelPermission = createAsyncThunk(
 			}
 			return thunkAPI.rejectWithValue(null);
 		} catch (error) {
-			return thunkAPI.rejectWithValue(null);
+			captureSentryError(error, 'messages/writeMessageReaction');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/ui';
-import { getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { ApiUser } from 'mezon-js/api.gen';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
@@ -58,6 +58,7 @@ const ItemMember = (props: ItemMemberProps) => {
 					alt={userName}
 					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 					classNameText="text-[9px] pt-[3px]"
 				/>

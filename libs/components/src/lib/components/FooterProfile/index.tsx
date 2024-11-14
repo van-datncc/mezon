@@ -16,7 +16,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { TokenSentEvent } from 'mezon-js/dist/socket';
+import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
@@ -45,6 +45,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
+	const [note, setNote] = useState<string>('send token');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
@@ -95,11 +96,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			setError('Token amount exceeds wallet balance');
 			return;
 		}
-		const tokenEvent: TokenSentEvent = {
+		const tokenEvent: ApiTokenSentEvent = {
 			sender_id: myProfile.userId as string,
 			sender_name: myProfile?.userProfile?.user?.username as string,
 			receiver_id: selectedUserId,
-			amount: token
+			amount: token,
+			note: note
 		};
 
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
@@ -170,6 +172,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					openModal={showModalSendToken}
 					onClose={handleCloseModalSendToken}
 					setSelectedUserId={setSelectedUserId}
+					setNote={setNote}
 					error={error}
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
