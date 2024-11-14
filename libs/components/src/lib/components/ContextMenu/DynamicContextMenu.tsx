@@ -18,13 +18,9 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	const appearanceTheme = useSelector(selectTheme);
 	const { emojiConverted } = useEmojiSuggestion();
 
-	const emojiRecentData = useMemo(() => {
-		return localStorage.getItem('recentEmojis');
-	}, [localStorage.getItem('recentEmojis')]);
-
 	const firstFourElements = useMemo(() => {
 		return emojiConverted.slice(0, 4);
-	}, [emojiConverted, emojiRecentData]);
+	}, [emojiConverted]);
 
 	const [warningStatus, setWarningStatus] = useState<string>('');
 
@@ -46,14 +42,12 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 		'--contexify-separator-color': '#ADB3B9'
 	} as CSSProperties;
 
-	const { posShowMenu } = useMessageContextMenu();
+	const { posShowMenu, onVisibilityChange } = useMessageContextMenu();
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
 			return true;
 		}
-		{
-			return false;
-		}
+		return false;
 	}, [posShowMenu]);
 
 	const children = useMemo(() => {
@@ -117,9 +111,8 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	}, [items]);
 
 	return (
-		<Menu id={menuId} style={className} className="z-50">
+		<Menu onVisibilityChange={onVisibilityChange} id={menuId} style={className} className="z-50">
 			{checkPos && <ReactionPart emojiList={firstFourElements} activeMode={mode} messageId={messageId} isOption={false} />}
-
 			{children}
 		</Menu>
 	);
