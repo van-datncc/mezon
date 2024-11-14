@@ -29,6 +29,8 @@ type SuggestItemProps = {
 	display?: string;
 	isHightLight?: boolean;
 	channel?: SearchItemProps;
+	count?: number;
+	isUnread?: boolean;
 };
 
 const SuggestItem = ({
@@ -43,7 +45,9 @@ const SuggestItem = ({
 	emojiId,
 	display,
 	isHightLight = true,
-	channel
+	channel,
+	count,
+	isUnread
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannelsByUser);
 	const getChannel = allChannels.find((channel) => {
@@ -139,8 +143,13 @@ const SuggestItem = ({
 				{channelIcon}
 
 				{display && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
-						{isHightLight ? HighlightMatchBold(display ?? '', valueHightLight ?? '') : display}
+					<span className={`text-[15px] font-thin dark:text-white text-textLightTheme one-line flex items-center`}>
+						<span className={`${isUnread ? ' font-medium' : ''}`}>
+							{isHightLight ? HighlightMatchBold(display ?? '', valueHightLight ?? '') : display}
+						</span>
+						{count && count > 0 && (
+							<span className="h-8 px-2 bg-red-500 rounded-sm font-semibold text-white ml-2">{count > 99 ? '99+' : count}</span>
+						)}{' '}
 					</span>
 				)}
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}

@@ -51,7 +51,7 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }:
 	};
 
 	return (
-		<div className="w-full flex gap-2">
+		<div className="w-full flex gap-2 relative">
 			<div
 				className="w-full p-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 				onClick={handleOpenCanvas}
@@ -61,14 +61,14 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }:
 					{canvas.title ? canvas.title : 'Untitled'}
 				</div>
 			</div>
-
-			<button
-				className={`flex-1 p-4 cursor-pointer rounded-lg ${isDisableDelCanvas ? 'bg-red-400' : 'bg-colorDanger hover:bg-colorDangerHover border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover'}`}
-				onClick={handleDeleteCanvas}
-				disabled={isDisableDelCanvas}
-			>
-				<div className="h-6 text-xs font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">Delete</div>
-			</button>
+			{!isDisableDelCanvas && (
+				<button
+					onClick={handleDeleteCanvas}
+					className="absolute top-0 right-0 dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full"
+				>
+					X
+				</button>
+			)}
 		</div>
 	);
 };

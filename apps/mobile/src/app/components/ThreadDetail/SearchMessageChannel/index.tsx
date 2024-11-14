@@ -4,9 +4,9 @@ import { DirectEntity, searchMessagesActions, selectCurrentClanId, useAppDispatc
 import { IChannel, SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
 import { createContext, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import useBackHardWare from '../../../hooks/useBackHardWare';
 import InputSearchMessageChannel from './InputSearchMessageChannel';
 import SearchMessagePage from './SearchMessagePage';
 import SearchOptionPage from './SearchOptionPage';
@@ -30,7 +30,6 @@ export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const { themeValue } = useTheme();
-	const { t } = useTranslation(['searchMessageChannel']);
 	const { currentChannel, typeSearch } = route?.params || {};
 
 	const [userMention, setUserMention] = useState<IUerMention>();
@@ -39,6 +38,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const [filtersSearch, setFiltersSearch] = useState<SearchFilter[]>();
 	const dispatch = useAppDispatch();
 	const [optionFilter, setOptionFilter] = useState<IOption>();
+	useBackHardWare();
 
 	const [searchText, setSearchText] = useState<string>('');
 	const handleSearchText = useCallback((text) => {

@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { captureSentryError } from '@mezon/logger';
 import {
 	AttachmentEntity,
 	appActions,
@@ -57,7 +58,6 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
-import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -88,7 +88,6 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
-	TokenSentEvent,
 	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -98,7 +97,7 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
+import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -223,7 +222,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const mess = mapMessageChannelToEntity(message);
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
-
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
 				if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
@@ -276,11 +274,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
-				console.error(error);
-				Sentry.captureException({
-					eventType: 'NEW_MESSAGE',
-					error
-				});
+				captureSentryError(message, 'onchannelmessage');
 			}
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
@@ -325,7 +319,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					statusPresenceQueue.current = [];
 					statusPresenceTimerRef.current = null;
-				}, 10000);
+				}, 5000);
 			}
 		},
 		[dispatch]
@@ -355,6 +349,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+
 					if (isNotCurrentDirect) {
 						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
 					}
@@ -665,7 +661,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ontokensent = useCallback(
-		(tokenEvent: TokenSentEvent) => {
+		(tokenEvent: ApiTokenSentEvent) => {
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
 		},
 		[dispatch, userId]
@@ -1061,10 +1057,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				} catch (error) {
 					// eslint-disable-next-line no-console
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					Sentry.captureException({
-						eventType: 'SOCKET_RECONNECT',
-						error
-					});
+					captureSentryError(error, 'SOCKET_RECONNECT');
 				}
 			}, 5000);
 		},

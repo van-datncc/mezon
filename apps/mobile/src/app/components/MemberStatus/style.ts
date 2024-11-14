@@ -14,7 +14,9 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			marginTop: size.s_10
 		},
-
+		textInvite: {
+			color: colors.text
+		},
 		box: {
 			backgroundColor: colors.primary,
 			marginTop: 10,

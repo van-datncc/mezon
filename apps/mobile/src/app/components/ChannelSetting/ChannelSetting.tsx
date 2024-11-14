@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../componentUI';
 import { IMezonSliderData } from '../../componentUI/MezonSlider';
+import useBackHardWare from '../../hooks/useBackHardWare';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
 import { validInput } from '../../utils/validate';
@@ -52,6 +53,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const currentCategoryName = useMemo(() => {
 		return channel?.category_name;
 	}, [channel?.category_name]);
+	useBackHardWare();
 
 	navigation.setOptions({
 		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
