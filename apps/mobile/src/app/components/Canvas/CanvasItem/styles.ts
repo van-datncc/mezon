@@ -7,7 +7,7 @@ export const style = (colors: Attributes) =>
 			flex: 1,
 			height: size.s_60,
 			marginHorizontal: size.s_10,
-			marginVertical: size.s_10,
+			marginVertical: size.s_4,
 			borderRadius: size.s_4,
 			backgroundColor: colors.primary,
 			padding: size.s_6,

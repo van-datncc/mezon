@@ -14,7 +14,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 	const { clanId, channelId, canvasId} = route.params;
 	const authState = useSelector(getAuthState);
 
-	const uri = `https://mezon.ai/chat/canvas-mobile/${clanId}/${channelId}/${canvasId}`;
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/canvas-mobile/${clanId}/${channelId}/${canvasId}`;
 
 	const injectedJS = `
     (function() {
@@ -30,13 +30,13 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
   `;
 
 	return (
-		<SafeAreaView style={styles.Container}>
+		<SafeAreaView style={styles.container}>
 			<StatusBar barStyle="light-content" backgroundColor={Colors.bgCharcoal}/>
 			<WebView
 				source={{
 					uri: uri
 				}}
-				style={styles.Container}
+				style={styles.container}
 				injectedJavaScriptBeforeContentLoaded={injectedJS}
 				startInLoadingState={true}
       			javaScriptEnabled={true}

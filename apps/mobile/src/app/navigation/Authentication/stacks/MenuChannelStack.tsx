@@ -86,7 +86,8 @@ export function MenuChannelStacks({}: any) {
 					headerStyle: {
 						backgroundColor: Colors.bgCharcoal
 					},
-					headerTintColor: Colors.white
+					headerTintColor: Colors.white,
+					headerLeftLabelVisible: false
 				}}
 			/>
 		</Stack.Navigator>

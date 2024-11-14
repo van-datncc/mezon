@@ -1,9 +1,10 @@
-import { Attributes } from '@mezon/mobile-ui';
+import { Attributes, Colors } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
-		Container: {
-			flex: 1
+		container: {
+			flex: 1,
+			backgroundColor: Colors.bgCharcoal
 		}
 	});
