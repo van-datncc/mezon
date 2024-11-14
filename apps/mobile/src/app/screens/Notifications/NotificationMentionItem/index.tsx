@@ -1,8 +1,10 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
@@ -75,7 +77,14 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 			<View style={styles.notifyContainer}>
 				<View style={styles.notifyHeader}>
 					<View style={styles.boxImage}>
-						<Image source={{ uri: avatarImg || AVATAR_DEFAULT_URL }} style={styles.image} />
+						<FastImage
+							source={{
+								uri: avatarImg
+									? createImgproxyUrl(avatarImg ?? '', { width: 100, height: 100, resizeType: 'fit' })
+									: AVATAR_DEFAULT_URL
+							}}
+							style={styles.image}
+						/>
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>

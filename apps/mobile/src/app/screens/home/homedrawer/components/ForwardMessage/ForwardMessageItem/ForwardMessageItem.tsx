@@ -1,9 +1,11 @@
 import { UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useState } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import FastImage from 'react-native-fast-image';
 import { IForwardIObject } from '..';
 import { styles } from '../styles';
 
@@ -24,7 +26,14 @@ function ForwardMessageItem({
 		switch (type) {
 			case ChannelType.CHANNEL_TYPE_DM:
 				if (item?.avatar) {
-					return <Image source={{ uri: item?.avatar || '' }} style={styles.memberAvatar} />;
+					return (
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(item?.avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })
+							}}
+							style={styles.memberAvatar}
+						/>
+					);
 				}
 				return (
 					<Block

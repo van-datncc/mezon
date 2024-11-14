@@ -2,9 +2,11 @@ import { useMemberStatus } from '@mezon/core';
 import { CallIcon, CheckIcon, CloseIcon, MessageIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
+import FastImage from 'react-native-fast-image';
 import { UserStatus } from '../UserStatus';
 import { style } from './styles';
 
@@ -62,10 +64,11 @@ export const FriendItem = React.memo(
 			>
 				<View style={styles.avatarWrapper}>
 					{friend?.user?.avatar_url ? (
-						<Image
-							source={{ uri: friend?.user?.avatar_url }}
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(friend?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+							}}
 							style={[styles.friendAvatar, disabled && styles.avatarDisabled]}
-							resizeMode="cover"
 						/>
 					) : (
 						<View style={styles.wrapperTextAvatar}>
