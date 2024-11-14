@@ -73,10 +73,17 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 					role="button"
 					style={{
 						letterSpacing: '-0.01rem',
-						color: userRolesClan.highestPermissionRoleColor
+						color:
+							mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+								? userRolesClan.highestPermissionRoleColor
+								: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
 					}}
 				>
-					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : message?.display_name ? message?.display_name : message?.username}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+						? nameShowed
+						: message?.display_name
+							? message?.display_name
+							: message?.username}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>

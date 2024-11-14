@@ -31,21 +31,14 @@ type AuditLogItemProps = {
 	logItem: ApiAuditLog;
 };
 
-const actionMap: Record<string, string> = {
-	'Create Channel': 'created',
-	'Delete Channel': 'removed',
-	'Change Channel': 'changed'
-};
-
 const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 	const auditLogTime = convertTimeString(logItem?.time_log as string);
 	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem.user_id ?? ''));
 	const userName = userAuditLogItem?.user?.username;
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
-	const actionText = (logItem.action_log && actionMap[logItem?.action_log]) || 'performed an action';
 
 	return (
-		<div className="dark:text-[#b5bac1] text-textLightTheme py-[20px] px-[16px] flex gap-3 items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary mb-4">
+		<div className="dark:text-[#b5bac1] text-textLightTheme p-[10px] flex gap-3 items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary mb-4">
 			<div className="w-10 h-10 rounded-full">
 				<div className="w-10 h-10">
 					{userAuditLogItem ? (
@@ -62,8 +55,9 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 				</div>
 			</div>
 			<div>
-				<div>
-					<strong>{userName}</strong> {actionText} #{logItem.entity_name || logItem.entity_id}
+				<div className="one-line">
+					<span>{userName}</span> <span className="lowercase">{logItem.action_log}</span>
+					<strong className="dark:text-white text-black font-medium"> #{logItem.entity_name || logItem.entity_id}</strong>
 				</div>
 				<div className="text-sm text-gray-500">{auditLogTime}</div>
 			</div>
