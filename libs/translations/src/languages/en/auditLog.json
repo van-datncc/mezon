@@ -1,0 +1,18 @@
+{
+  "auditLogComponent": {
+    "title": "Audit Log",
+    "filterByUser":"Filter By User",
+    "filterByAction":"Filter By Action",
+    "filterBtn": "Filter"
+  },
+  "auditLogItem": {
+    "performedAnAction":"performed an action"
+  },
+  "filterActionAuditLog": {
+    "placeholder": "Search Action"
+  },
+  "filterUserAuditLog": {
+    "placeholder": "Search Users",
+    "allUsers":"All Users"
+  }
+}

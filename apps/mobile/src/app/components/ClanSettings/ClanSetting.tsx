@@ -56,12 +56,15 @@ export function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSetti
 		// 	expandable: true,
 		// 	icon: <Icons.ModerationIcon color={themeValue.text} />,
 		// },
-		// {
-		// 	title: t('menu.settings.auditLog'),
-		// 	onPress: () => reserve(),
-		// 	expandable: true,
-		// 	icon: <Icons.ClipboardListIcon color={themeValue.text} />,
-		// },
+		{
+			title: t('menu.settings.auditLog'),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.AUDIT_LOG);
+			},
+			expandable: true,
+			icon: <Icons.ClipboardListIcon color={themeValue.text} />,
+			isShow: isCanEditRole
+		},
 		// {
 		// 	title: t('menu.settings.channels'),
 		// 	onPress: () => reserve(),
