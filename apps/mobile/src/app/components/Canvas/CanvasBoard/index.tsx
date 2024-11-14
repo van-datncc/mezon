@@ -13,6 +13,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 	const styles = style(themeValue);
 	const { clanId, channelId, canvasId} = route.params;
 	const authState = useSelector(getAuthState);
+	const session = JSON.stringify(authState.session);
 
 	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/canvas-mobile/${clanId}/${channelId}/${canvasId}`;
 
@@ -20,7 +21,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
     (function() {
 	const authData = {
 		"loadingStatus":JSON.stringify("loaded"),
-		"session": JSON.stringify(${authState.session}),
+		"session": JSON.stringify(${session}),	
 		"isLogin": "true",
 		"_persist": JSON.stringify({"version":-1,"rehydrated":true})
 	};
