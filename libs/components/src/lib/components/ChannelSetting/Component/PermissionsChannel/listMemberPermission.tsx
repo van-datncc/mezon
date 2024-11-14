@@ -8,7 +8,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { IChannel, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -93,7 +93,6 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 					alt={userName}
 					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 					classNameText="text-[9px] pt-[3px]"
 				/>

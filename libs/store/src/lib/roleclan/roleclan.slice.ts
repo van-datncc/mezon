@@ -127,6 +127,7 @@ export const fetchDeleteRole = createAsyncThunk(
 type CreateRolePayload = {
 	clanId: string;
 	title: string | undefined;
+	color: string | undefined;
 	addUserIds: string[];
 	activePermissionIds: string[];
 	maxPermissionId: string;
@@ -134,7 +135,7 @@ type CreateRolePayload = {
 
 export const fetchCreateRole = createAsyncThunk(
 	'CreatRole/fetchCreateRole',
-	async ({ clanId, title, addUserIds, activePermissionIds, maxPermissionId }: CreateRolePayload, thunkAPI) => {
+	async ({ clanId, title, color, addUserIds, activePermissionIds, maxPermissionId }: CreateRolePayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const body = {
@@ -142,7 +143,7 @@ export const fetchCreateRole = createAsyncThunk(
 				add_user_ids: addUserIds || [],
 				allow_mention: 0,
 				clan_id: clanId,
-				color: '',
+				color: color ?? '',
 				description: '',
 				display_online: 0,
 				title: title ?? '',
@@ -163,6 +164,7 @@ export const fetchCreateRole = createAsyncThunk(
 type UpdateRolePayload = {
 	roleId: string;
 	title: string | undefined;
+	color: string | undefined;
 	addUserIds: string[];
 	activePermissionIds: string[];
 	removeUserIds: string[];
@@ -174,7 +176,7 @@ type UpdateRolePayload = {
 export const fetchUpdateRole = createAsyncThunk(
 	'UpdateRole/fetchUpdateRole',
 	async (
-		{ roleId, title, addUserIds, activePermissionIds, removeUserIds, removePermissionIds, clanId, maxPermissionId }: UpdateRolePayload,
+		{ roleId, title, color, addUserIds, activePermissionIds, removeUserIds, removePermissionIds, clanId, maxPermissionId }: UpdateRolePayload,
 		thunkAPI
 	) => {
 		try {
@@ -182,7 +184,7 @@ export const fetchUpdateRole = createAsyncThunk(
 			const body = {
 				role_id: roleId,
 				title: title ?? '',
-				color: '',
+				color: color ?? '',
 				role_icon: '',
 				description: '',
 				display_online: 0,
@@ -247,10 +249,12 @@ export const RolesClanSlice = createSlice({
 		update: (state, action: PayloadAction<ApiRole>) => {
 			const changes: Partial<{
 				title: string;
+				color: string;
 				permission_list: typeof action.payload.permission_list;
 				role_user_list: typeof action.payload.role_user_list;
 			}> = {};
 			changes.title = action.payload.title;
+			changes.color = action.payload.color;
 			if (action.payload.permission_list?.permissions) {
 				changes.permission_list = action.payload.permission_list;
 			}
@@ -320,6 +324,7 @@ export const roleSlice = createSlice({
 	initialState: {
 		selectedRoleId: '',
 		nameRoleNew: '',
+		colorRoleNew: '',
 		selectedPermissions: [] as string[],
 		addPermissions: [],
 		addMemberRoles: [] as string[],
@@ -332,6 +337,9 @@ export const roleSlice = createSlice({
 		},
 		setNameRoleNew: (state, action) => {
 			state.nameRoleNew = action.payload;
+		},
+		setColorRoleNew: (state, action) => {
+			state.colorRoleNew = action.payload;
 		},
 		setSelectedPermissions: (state, action) => {
 			state.selectedPermissions = action.payload;
@@ -356,6 +364,7 @@ export const roleIdReducer = roleSlice.reducer;
 export const {
 	setSelectedRoleId,
 	setNameRoleNew,
+	setColorRoleNew,
 	setAddPermissions,
 	setAddMemberRoles,
 	setRemovePermissions,
@@ -366,6 +375,8 @@ export const {
 export const getSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
 
 export const getNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
+
+export const getNewColorRole = (state: RootState) => state.roleId.colorRoleNew;
 
 export const getNewSelectedPermissions = (state: RootState) => state.roleId.selectedPermissions;
 
