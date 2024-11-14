@@ -92,6 +92,7 @@ export const QRScanner = () => {
 
 				onNavigationScanned(res?.values?.[0]?.toString() || '');
 			}
+			store.dispatch(appActions.setLoadingMainMobile(false));
 		} catch (error) {
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			Toast.show({

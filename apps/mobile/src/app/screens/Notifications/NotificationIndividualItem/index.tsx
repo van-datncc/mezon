@@ -1,12 +1,13 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { getTimeDifferenceDate } from '@mezon/utils';
+import { createImgproxyUrl, getTimeDifferenceDate } from '@mezon/utils';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { style } from './NotificationIndividualItem.styles';
+import FastImage from "react-native-fast-image";
 
 function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, notify.sender_id || ''));
@@ -34,7 +35,14 @@ function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }
 			<View style={styles.notifyContainer}>
 				<View style={styles.notifyHeader}>
 					<View style={styles.boxImage}>
-						<Image source={{ uri: avatarImg || AVATAR_DEFAULT_URL }} style={styles.image} />
+						<FastImage
+							source={{
+								uri: avatarImg
+									? createImgproxyUrl(avatarImg ?? '', { width: 100, height: 100, resizeType: 'fit' })
+									: AVATAR_DEFAULT_URL
+							}}
+							style={styles.image}
+						/>
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>

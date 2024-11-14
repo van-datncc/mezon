@@ -26,7 +26,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { checkIsThread, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -377,7 +377,12 @@ export const Sharing = ({ data, onClose }) => {
 											{isFile ? (
 												<AttachmentFilePreview attachment={media} />
 											) : (
-												<FastImage source={{ uri: media?.url }} style={styles.itemMedia} />
+												<FastImage
+													source={{
+														uri: createImgproxyUrl(media?.url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+													}}
+													style={styles.itemMedia}
+												/>
 											)}
 											{isUploaded && (
 												<TouchableOpacity

@@ -1,4 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -15,7 +16,12 @@ export const EmbedAuthor = memo(({ name, icon_url, url }: EmbedAuthorProps) => {
 	const styles = style(themeValue);
 	return (
 		<View style={styles.container}>
-			<FastImage source={{ uri: url }} style={styles.imageWrapper} />
+			<FastImage
+				source={{
+					uri: createImgproxyUrl(url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+				}}
+				style={styles.imageWrapper}
+			/>
 			<Text style={styles.text}>{name}</Text>
 		</View>
 	);

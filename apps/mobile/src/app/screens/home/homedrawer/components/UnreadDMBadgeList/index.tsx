@@ -1,6 +1,7 @@
 import { UserGroupIcon } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectDirectById, selectDirectsUnreadlist, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { memo } from 'react';
@@ -21,7 +22,13 @@ const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: 
 				return (
 					<View style={styles.avatarWrapper}>
 						{dm?.channel_avatar?.[0] ? (
-							<FastImage source={{ uri: dm?.channel_avatar?.[0] }} resizeMode="cover" style={styles.groupAvatar} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(dm?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								resizeMode="cover"
+								style={styles.groupAvatar}
+							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>
