@@ -5732,7 +5732,7 @@ export const RuleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
 	return (
 		<svg
 			aria-hidden="true"
@@ -5742,7 +5742,7 @@ export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', 
 			height="20"
 			fill="none"
 			viewBox="0 0 24 24"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
 		>
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
