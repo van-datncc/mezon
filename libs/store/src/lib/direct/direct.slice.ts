@@ -367,3 +367,24 @@ export const selectDirectsOpenlistOrder = createSelector(selectDirectsOpenlist, 
 });
 
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);
+
+export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMessages) => {
+	const users = directMessages
+		.filter((dm) => {
+			return dm?.active === 1;
+		})
+		.flatMap((item) =>
+			item?.user_id?.map((userId, index) => ({
+				user: {
+					avatar_url: item?.channel_avatar ? item?.channel_avatar[index] : '',
+					display_name: item.usernames ? item.usernames.split(',')[index] : '',
+					id: userId,
+					username: item.usernames ? item.usernames.split(',')[index] : '',
+					online: item.is_online ? item.is_online[index] : false,
+					metadata: item.metadata ? item.metadata[index] : ''
+				},
+				id: userId
+			}))
+		);
+	return Array.from(new Map(users.map((item) => [item?.id, item])).values());
+});
