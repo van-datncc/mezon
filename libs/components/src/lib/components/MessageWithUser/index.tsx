@@ -15,6 +15,7 @@ import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from '
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
+import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
@@ -280,6 +281,16 @@ function MessageWithUser({
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{message.content?.embed && <EmbedMessage {...message.content.embed} />}
+												{message.content?.components &&
+													message.content.components.map((actionRow, index) => (
+														<div className={'flex flex-col'}>
+															<MessageActionsPanel
+																actionRow={actionRow}
+																messageId={message.id}
+																senderId={message.sender_id}
+															/>
+														</div>
+													))}
 											</div>
 										</div>
 									</div>

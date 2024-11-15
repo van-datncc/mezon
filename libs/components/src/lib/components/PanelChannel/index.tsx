@@ -78,6 +78,11 @@ export const notificationTypesList = [
 	}
 ];
 
+export const getNotificationLabel = (value: NotificationType) => {
+	const notificationType = notificationTypesList.find((type) => type.value === value);
+	return notificationType ? notificationType.label : null;
+};
+
 const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
