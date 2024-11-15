@@ -2,6 +2,7 @@ import { useChannelMembersActions } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	notificationSettingActions,
+	RolesClanEntity,
 	selectActivityByUserId,
 	selectAllAccount,
 	selectCurrentClan,
@@ -12,14 +13,14 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	ActivitiesName,
+	createImgproxyUrl,
 	DEFAULT_ROLE_COLOR,
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
 	MemberProfileType,
 	MouseButton,
 	WIDTH_CHANNEL_LIST_BOX,
-	WIDTH_PANEL_PROFILE,
-	createImgproxyUrl
+	WIDTH_PANEL_PROFILE
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -110,8 +111,9 @@ export function MemberProfile({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
+
 	const userRolesClan = useMemo(() => {
-		const activeRole: Record<string, string> = {};
+		const activeRole: Array<RolesClanEntity> = [];
 		let userRoleLength = 0;
 		let highestPermissionRole = null;
 		let maxLevelPermission = 0;
@@ -121,7 +123,7 @@ export function MemberProfile({
 			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === user?.user?.id);
 
 			if (checkHasRole) {
-				activeRole[key] = key;
+				activeRole.push(role);
 				userRoleLength++;
 
 				if (role.max_level_permission !== undefined && role.max_level_permission > maxLevelPermission) {
@@ -134,7 +136,7 @@ export function MemberProfile({
 		return {
 			usersRole: activeRole,
 			length: userRoleLength,
-			highestPermissionRoleColor: highestPermissionRole?.color || DEFAULT_ROLE_COLOR
+			highestPermissionRoleColor: highestPermissionRole?.color || activeRole[0]?.color || DEFAULT_ROLE_COLOR
 		};
 	}, [user?.user?.id, rolesClanEntity]);
 
@@ -390,17 +392,17 @@ export function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				          			${isListFriend ? ' inline-flex justify-start' : ''}
-									${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
 									${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
+									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis group-hover/itemListDm:text-black dark:group-hover/itemListDm:text-white` : ''}
 									${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
 									${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
+									${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis text-sm font-semibold text-black dark:text-white' : ''}
 							    `}
 									title={name}
 								>
 									<span
 										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
-										style={{ color: isDM ? DEFAULT_ROLE_COLOR : userRolesClan.highestPermissionRoleColor }}
+										style={isFooter || isDM ? undefined : { color: userRolesClan.highestPermissionRoleColor }}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>

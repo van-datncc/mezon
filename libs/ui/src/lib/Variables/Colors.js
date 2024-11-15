@@ -39,6 +39,7 @@ module.exports = {
 	bgMentionReply: 'color-mix( in oklab, hsl(40 calc(1 * 86.4%) 56.9% / 1) 100%, black 0.01% )',
 	bgMessageReplyHighline: 'color-mix( in oklab, hsl(235 calc(1 * 86.1%) 77.5% / 0.08) 100%, hsl(0 0% 0% / 0.08) 0.01% )',
 	bgDarkPopover: 'oklab(0.296332 -0.000731647 -0.00768477)',
+	bgDarkFooterProfile: '#3d3e45',
 
 	/* background light*/
 	bgLightPrimary: '#FFFFFF',
@@ -73,6 +74,7 @@ module.exports = {
 	textThreadPrimary: '#B5BAC1',
 	textAppDirectory: '#dbdee1',
 	textPro: '#2DC770',
+	textIconFooterProfile: '#d6d9dc',
 
 	/* border */
 	borderDefault: '#1E1E1E',
