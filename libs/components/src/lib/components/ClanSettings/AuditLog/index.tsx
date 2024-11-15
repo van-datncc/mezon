@@ -59,11 +59,13 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 					<div className="relative">
 						<div
 							onClick={handleSearchMemberClick}
-							className="flex items-center gap-3 dark:text-channelTextLabel text-black w-full text-[13px] line-clamp-1 break-all"
+							className="flex items-center gap-3 dark:text-textPrimary text-buttonProfile w-full text-[13px] line-clamp-1 break-all"
 						>
-							<div className="">Filter by User</div>
+							<div className="max-sm:hidden">Filter by User</div>
 							<div className="flex items-center gap-1 cursor-pointer">
-								<div>{userFilter && userFilter.userName !== UserAuditLog.ALL_USER_AUDIT ? userFilter.userName : 'All'}</div>
+								<div className=" one-line">
+									{userFilter && userFilter.userName !== UserAuditLog.ALL_USER_AUDIT ? userFilter.userName : 'All'}
+								</div>
 								<Icons.ArrowDown />
 							</div>
 						</div>
@@ -81,11 +83,11 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 					<div className="relative">
 						<div
 							onClick={handleSearchActionClick}
-							className="flex items-center gap-3 dark:text-channelTextLabel text-black w-full text-[13px] line-clamp-1 break-all"
+							className="flex items-center gap-3 dark:text-textPrimary text-buttonProfile w-full text-[13px] line-clamp-1 break-all"
 						>
-							<div>Filter by Action</div>
+							<div className="max-sm:hidden">Filter by Action</div>
 							<div className="flex items-center gap-1 cursor-pointer">
-								<div>{actionFilter && actionFilter !== ActionLog.ALL_ACTION_AUDIT ? actionFilter : 'All'}</div>
+								<div className=" one-line">{actionFilter && actionFilter !== ActionLog.ALL_ACTION_AUDIT ? actionFilter : 'All'}</div>
 								<Icons.ArrowDown />
 							</div>
 						</div>

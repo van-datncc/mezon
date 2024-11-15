@@ -1,9 +1,9 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider } from '@mezon/components';
-import { useAuth } from '@mezon/core';
 import {
 	messagesActions,
 	pinMessageActions,
+	selectAllAccount,
 	selectAllChannelMemberIds,
 	selectAllRoleIds,
 	selectDataReferences,
@@ -15,7 +15,7 @@ import {
 	selectIsViewingOlderMessagesByChannelId,
 	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
-	selectLastMessageIdByChannelId,
+	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
@@ -25,9 +25,10 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
@@ -58,27 +59,25 @@ function ChannelMessages({
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	const chatRef = useRef<HTMLDivElement | null>(null);
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
 	const isViewOlderMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
-	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const { userId } = useAuth();
+	const userId = useSelector(selectAllAccount)?.user?.id;
 	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
 	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
-	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
-	const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
-	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId as string));
+	const lastMessageId = lastMessage?.id;
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
+
+	const chatRef = useRef<HTMLDivElement | null>(null);
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb?: IBeforeRenderCb) => {
@@ -123,12 +122,13 @@ function ChannelMessages({
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
-	const rowVirtualizer = useVirtualizer({
-		count: messages.length,
-		overscan: 5,
-		getScrollElement: () => chatRef.current,
-		estimateSize: () => 50,
-		onChange: async (instance) => {
+
+	// maintain scroll position
+	const firsRowCached = useRef<string>('');
+	const lastRowCached = useRef<string>('');
+
+	const handleOnChange = useCallback(
+		async (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => {
 			if (!userActiveScroll.current) return;
 			toggleDisableHover(chatRef.current, scrollTimeoutId2);
 			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
@@ -162,8 +162,9 @@ function ChannelMessages({
 					}
 					break;
 			}
-		}
-	});
+		},
+		[loadMoreMessage, messages]
+	);
 
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
@@ -173,79 +174,11 @@ function ChannelMessages({
 		});
 	}, []);
 
-	// maintain scroll position
-	const firsRowCached = useRef<string>('');
-	const lastRowCached = useRef<string>('');
-	useLayoutEffect(() => {
-		if (!isLoadMore.current || !chatRef.current || !userActiveScroll.current) return;
-		const firstMessageId = messages[0];
-		const lastMessageId = messages[messages.length - 1];
-		if (firsRowCached.current !== firstMessageId) {
-			if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
-				const messageId = firsRowCached.current;
-				rowVirtualizer.scrollToIndex(
-					messages.findIndex((item) => item === messageId),
-					{ align: 'start' }
-				);
-			}
-			firsRowCached.current = messages[1];
-			lastRowCached.current = messages[messages.length - 1];
-			currentScrollDirection.current = null;
-			return;
-		}
-		if (lastRowCached.current !== lastMessageId) {
-			lastRowCached.current &&
-				currentScrollDirection.current === ELoadMoreDirection.bottom &&
-				rowVirtualizer.scrollToIndex(
-					messages.findIndex((messageId) => messageId === lastRowCached.current),
-					{ align: 'end' }
-				);
-			lastRowCached.current = messages[messages.length - 1];
-		}
-		currentScrollDirection.current = null;
-	}, [messages, rowVirtualizer]);
-
 	useEffect(() => {
 		if (dataReferences?.message_ref_id && getChatScrollBottomOffset() <= 100) {
 			scrollToLastMessage();
 		}
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
-
-	// Jump to ,message from pin and reply, notification...
-	const timerRef = useRef<number | null>(null);
-	useEffect(() => {
-		const handleScrollToIndex = (messageId: string) => {
-			const index = messages.findIndex((item) => item === messageId);
-			if (index >= 0) {
-				rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
-			}
-		};
-
-		if (timerRef.current) {
-			clearTimeout(timerRef.current);
-			timerRef.current = null;
-		}
-
-		if (jumpPinMessageId && isPinMessageExist) {
-			userActiveScroll.current = true;
-			handleScrollToIndex(jumpPinMessageId);
-			timerRef.current = window.setTimeout(() => {
-				dispatch(pinMessageActions.setJumpPinMessageId(null));
-			}, 1000);
-		} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
-			handleScrollToIndex(idMessageToJump);
-			timerRef.current = window.setTimeout(() => {
-				dispatch(messagesActions.setIdMessageToJump(null));
-			}, 1000);
-		}
-
-		return () => {
-			if (timerRef.current) {
-				clearTimeout(timerRef.current);
-				timerRef.current = null;
-			}
-		};
-	}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages, rowVirtualizer]);
 
 	// Jump to present when user is jumping to present
 	useEffect(() => {
@@ -268,18 +201,181 @@ function ChannelMessages({
 			scrollToLastMessage();
 			return;
 		}
-	}, [userId, messages.length, isViewOlderMessage, rowVirtualizer, scrollToLastMessage, getChatScrollBottomOffset]);
-
-	useLayoutEffect(() => {
-		if (!rowVirtualizer.getVirtualItems().length) return;
-		if (!rowVirtualizer.getTotalSize()) return;
-		if (chatRef.current && messages?.length && lastMessage?.channel_id && !userActiveScroll.current) {
-			chatRef.current.scrollTop = chatRef.current.scrollHeight;
-		}
-	});
+	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	return (
-		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
+		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
+			<ChatMessageList
+				messages={messages}
+				chatRef={chatRef}
+				userActiveScroll={userActiveScroll}
+				appearanceTheme={appearanceTheme}
+				idMessageToJump={idMessageToJump}
+				lastMessageId={lastMessageId as string}
+				dataReferences={dataReferences}
+				idMessageNotified={idMessageNotified}
+				lastMessageUnreadId={lastMessageUnreadId as string}
+				avatarDM={avatarDM}
+				userName={userName}
+				channelId={channelId}
+				mode={mode}
+				channelLabel={channelLabel}
+				onChange={handleOnChange}
+				isLoadMore={isLoadMore}
+				firsRowCached={firsRowCached}
+				lastRowCached={lastRowCached}
+				currentScrollDirection={currentScrollDirection}
+			/>
+		</MessageContextMenuProvider>
+	);
+}
+
+ChannelMessages.Skeleton = () => {
+	if (ChannelMessage.Skeleton) {
+		return (
+			<>
+				{/* <ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton /> */}
+			</>
+		);
+	}
+};
+
+type ChatMessageListProps = {
+	messages: string[];
+	chatRef: React.RefObject<HTMLDivElement>;
+	userActiveScroll: React.MutableRefObject<boolean>;
+	appearanceTheme: string;
+	idMessageToJump: string;
+	lastMessageId: string;
+	dataReferences: ApiMessageRef;
+	idMessageNotified: string;
+	lastMessageUnreadId: string;
+	avatarDM?: string;
+	userName?: string;
+	channelId: string;
+	mode: number;
+	channelLabel?: string;
+	onChange: (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => void;
+	isLoadMore: React.MutableRefObject<boolean>;
+	firsRowCached: React.MutableRefObject<string>;
+	lastRowCached: React.MutableRefObject<string>;
+	currentScrollDirection: React.MutableRefObject<ELoadMoreDirection | null>;
+};
+
+const ChatMessageList: React.FC<ChatMessageListProps> = memo(
+	({
+		messages,
+		chatRef,
+		userActiveScroll,
+		appearanceTheme,
+		idMessageToJump,
+		lastMessageId,
+		dataReferences,
+		idMessageNotified,
+		lastMessageUnreadId,
+		avatarDM,
+		userName,
+		channelId,
+		mode,
+		channelLabel,
+		onChange,
+		isLoadMore,
+		firsRowCached,
+		lastRowCached,
+		currentScrollDirection
+	}) => {
+		const dispatch = useAppDispatch();
+		const jumpPinMessageId = useSelector(selectJumpPinMessageId);
+		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
+		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
+		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
+
+		const rowVirtualizer = useVirtualizer({
+			count: messages.length,
+			overscan: 5,
+			getScrollElement: () => chatRef.current,
+			estimateSize: () => 50,
+			onChange
+		});
+
+		useLayoutEffect(() => {
+			if (!rowVirtualizer.getVirtualItems().length) return;
+			if (!rowVirtualizer.getTotalSize()) return;
+			if (chatRef.current && messages?.length && !userActiveScroll.current) {
+				chatRef.current.scrollTop = chatRef.current.scrollHeight;
+			}
+		});
+
+		useLayoutEffect(() => {
+			if (!isLoadMore.current || !chatRef.current || !userActiveScroll.current) return;
+			const firstMessageId = messages[0];
+			const lastMessageId = messages[messages.length - 1];
+			if (firsRowCached.current !== firstMessageId) {
+				if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
+					const messageId = firsRowCached.current;
+					rowVirtualizer.scrollToIndex(
+						messages.findIndex((item) => item === messageId),
+						{ align: 'start' }
+					);
+				}
+				firsRowCached && (firsRowCached.current = messages[1]);
+				lastRowCached.current = messages[messages.length - 1];
+				currentScrollDirection.current = null;
+				return;
+			}
+			if (lastRowCached.current !== lastMessageId) {
+				lastRowCached.current &&
+					currentScrollDirection.current === ELoadMoreDirection.bottom &&
+					rowVirtualizer.scrollToIndex(
+						messages.findIndex((messageId) => messageId === lastRowCached.current),
+						{ align: 'end' }
+					);
+				lastRowCached.current = messages[messages.length - 1];
+			}
+			currentScrollDirection.current = null;
+		}, [messages, rowVirtualizer]);
+
+		const timerRef = useRef<number | null>(null);
+		useEffect(() => {
+			const handleScrollToIndex = (messageId: string) => {
+				const index = messages.findIndex((item) => item === messageId);
+				if (index >= 0) {
+					rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
+				}
+			};
+
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+				timerRef.current = null;
+			}
+
+			if (jumpPinMessageId && isPinMessageExist) {
+				userActiveScroll.current = true;
+				handleScrollToIndex(jumpPinMessageId);
+				timerRef.current = window.setTimeout(() => {
+					dispatch(pinMessageActions.setJumpPinMessageId(null));
+				}, 1000);
+			} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
+				handleScrollToIndex(idMessageToJump);
+				timerRef.current = window.setTimeout(() => {
+					dispatch(messagesActions.setIdMessageToJump(null));
+				}, 1000);
+			}
+
+			return () => {
+				if (timerRef.current) {
+					clearTimeout(timerRef.current);
+					timerRef.current = null;
+				}
+			};
+		}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages, rowVirtualizer]);
+
+		return (
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
 					onWheelCapture={() => {
@@ -329,11 +425,11 @@ function ChannelMessages({
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={rowVirtualizer.measureElement}>
 										<MemorizedChannelMessage
 											index={virtualRow.index}
+											message={entities[messageId]}
+											previousMessage={entities[messages[virtualRow.index - 1]]}
 											avatarDM={avatarDM}
 											userName={userName}
-											key={messageId}
 											messageId={messageId}
-											previousMessageId={messages[virtualRow.index - 1]}
 											nextMessageId={messages[virtualRow.index + 1]}
 											channelId={channelId}
 											isHighlight={messageId === idMessageNotified}
@@ -351,25 +447,23 @@ function ChannelMessages({
 					</div>
 				</div>
 			</div>
-		</MessageContextMenuProvider>
-	);
-}
-
-ChannelMessages.Skeleton = () => {
-	if (ChannelMessage.Skeleton) {
+		);
+	},
+	(prev, curr) => {
 		return (
-			<>
-				{/* <ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton /> */}
-			</>
+			prev.messages === curr.messages &&
+			prev.idMessageToJump === curr.idMessageToJump &&
+			prev.lastMessageId === curr.lastMessageId &&
+			prev.dataReferences === curr.dataReferences &&
+			prev.idMessageNotified === curr.idMessageNotified &&
+			prev.lastMessageUnreadId === curr.lastMessageUnreadId &&
+			prev.appearanceTheme === curr.appearanceTheme
 		);
 	}
-};
+);
 
-const MemoizedChannelMessages = memo(ChannelMessages) as unknown as typeof ChannelMessages & { Skeleton: typeof ChannelMessages.Skeleton };
+const MemoizedChannelMessages = memo(ChannelMessages, (prev, cur) => prev.channelId === cur.channelId) as unknown as typeof ChannelMessages & {
+	Skeleton: typeof ChannelMessages.Skeleton;
+};
 
 export default MemoizedChannelMessages;

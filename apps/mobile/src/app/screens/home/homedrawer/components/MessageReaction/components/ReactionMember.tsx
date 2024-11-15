@@ -1,7 +1,9 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { selectAllChannelMembers, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { style } from '../styles';
 
 interface IReactionMemberProps {
@@ -32,7 +34,12 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 			<View style={styles.imageWrapper}>
 				{reactionMember?.user?.avatar_url ? (
 					<View>
-						<Image source={{ uri: reactionMember?.user?.avatar_url }} resizeMode="cover" style={styles.image} />
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(reactionMember?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							}}
+							style={styles.image}
+						/>
 					</View>
 				) : (
 					<View style={styles.avatarBoxDefault}>

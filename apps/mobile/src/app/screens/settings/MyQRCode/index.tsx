@@ -1,5 +1,6 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, Text } from 'react-native';
 import { Grid } from 'react-native-animated-spinkit';
@@ -50,7 +51,12 @@ export const MyQRCode = () => {
 					borderBottomColor={themeValue.border}
 					borderBottomWidth={1}
 				>
-					<FastImage source={{ uri: userProfile?.user?.avatar_url }} style={styles.avatar} />
+					<FastImage
+						source={{
+							uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 200, height: 200, resizeType: 'fit' })
+						}}
+						style={styles.avatar}
+					/>
 					<Block>
 						<Text style={styles.nameProfile}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
 						<Text style={styles.tokenProfile}>Token: {Number(tokenInWallet) + Number(getTokenSocket)}</Text>

@@ -24,6 +24,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 		listSearch.length > 0 &&
 		listSearch.map((item: SearchItemProps) => {
 			const isChannel = item.typeChat === TypeSearch.Channel_Type;
+			const isUnread = item.lastSeenTimeStamp < item.lastSentTimeStamp && !item.count_messsage_unread;
 			return (
 				<div
 					key={item.id}
@@ -43,6 +44,8 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							isOpenSearchModal
 							emojiId=""
 							channel={item}
+							count={item.count_messsage_unread}
+							isUnread={isUnread}
 						/>
 					) : (
 						<SuggestItem
@@ -55,6 +58,8 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							subTextStyle="text-[13px]"
 							isHightLight={!searchingUser}
 							emojiId=""
+							count={item.count_messsage_unread}
+							isUnread={isUnread}
 						/>
 					)}
 				</div>

@@ -4,10 +4,12 @@ import {
 	getIsShow,
 	getNewAddMembers,
 	getNewAddPermissions,
+	getNewColorRole,
 	getNewNameRole,
 	getRemovePermissions,
 	getSelectedRoleId,
 	selectCurrentClan,
+	setColorRoleNew,
 	setNameRoleNew,
 	setSelectedPermissions,
 	setSelectedRoleId
@@ -32,6 +34,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const { createRole, updateRole } = useRoles();
 	const clickRole = useSelector(getSelectedRoleId);
 	const nameRole = useSelector(getNewNameRole);
+	const colorRole = useSelector(getNewColorRole);
 	const addPermissions = useSelector(getNewAddPermissions);
 	const removePermissions = useSelector(getRemovePermissions);
 	const addUsers = useSelector(getNewAddMembers);
@@ -49,6 +52,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 			const permissionIds = permissions ? permissions.filter((permission) => permission.active === 1).map((permission) => permission.id) : [];
 
 			dispatch(setNameRoleNew(activeRole?.title));
+			dispatch(setColorRoleNew(activeRole?.color));
 			dispatch(setSelectedPermissions(permissionIds));
 		}
 	};
@@ -56,10 +60,10 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 
 	const handleUpdateUser = async (hasChangeRole?: boolean) => {
 		if (isCreateNewRole) {
-			const respond = await createRole(currentClan?.id || '', nameRole, addUsers, addPermissions);
+			const respond = await createRole(currentClan?.id || '', nameRole, colorRole, addUsers, addPermissions);
 			if (!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
 		} else {
-			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);
+			await updateRole(currentClan?.id ?? '', clickRole, nameRole, colorRole, [], addPermissions, [], removePermissions);
 		}
 	};
 

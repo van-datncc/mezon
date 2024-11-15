@@ -1,5 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -27,7 +28,12 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 			}}
 		>
 			{props?.data?.logo ? (
-				<FastImage source={{ uri: props?.data?.logo || '' }} style={[styles.logoClan, isActive && styles.logoClanActive]} />
+				<FastImage
+					source={{
+						uri: createImgproxyUrl(props?.data?.logo ?? '', { width: 100, height: 100, resizeType: 'fit' })
+					}}
+					style={[styles.logoClan, isActive && styles.logoClanActive]}
+				/>
 			) : (
 				<View style={[styles.clanIcon, isActive && styles.logoClanActive]}>
 					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name?.charAt(0)?.toUpperCase()}</Text>

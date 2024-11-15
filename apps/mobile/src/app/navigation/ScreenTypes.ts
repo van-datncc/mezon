@@ -95,7 +95,8 @@ export const APP_SCREEN = {
 		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
 		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
 		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
-		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM'
+		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM',
+		CANVAS: 'CANVAS'
 	},
 
 	SETTINGS: {
@@ -171,6 +172,11 @@ export type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM]: {
 		currentChannel: IChannel | DirectEntity;
+	};
+	[APP_SCREEN.MENU_CHANNEL.CANVAS]: {
+		clanId: string;
+		channelId: string;
+		canvasId: string;
 	};
 };
 

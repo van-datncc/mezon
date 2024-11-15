@@ -5,6 +5,7 @@ import {
 	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
+	setColorRoleNew,
 	setNameRoleNew,
 	setRemoveMemberRoles,
 	setRemovePermissions,
@@ -13,7 +14,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
-import { EVERYONE_ROLE_ID } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
@@ -42,6 +43,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 		dispatchRole(setSelectedPermissions(permissionIds));
 		dispatchRole(setNameRoleNew(activeRole?.title));
+		dispatchRole(setColorRoleNew(activeRole?.color));
 		dispatchRole(setSelectedRoleId(roleId));
 		dispatchRole(setAddPermissions([]));
 		dispatchRole(setRemovePermissions([]));
@@ -98,6 +100,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 							onClick={() => {
 								dispatch(setSelectedRoleId('New Role'));
 								dispatch(setNameRoleNew('New Role'));
+								dispatch(setColorRoleNew(DEFAULT_ROLE_COLOR));
 								dispatch(setAddPermissions([]));
 								dispatch(setAddMemberRoles([]));
 								setOpenEdit(true);

@@ -91,8 +91,10 @@ export function WebhooksEdit({ route, navigation }: { route: any; navigation: an
 		if (hasChange) {
 			const request: MezonUpdateWebhookByIdBody = {
 				avatar: urlImageWebhook,
-				channel_id: webhookChannel?.channel_id,
-				webhook_name: webhookName
+				channel_id_update: webhookChannel?.channel_id,
+				webhook_name: webhookName,
+				channel_id: currentChannel.channel_id,
+				clan_id: clanId
 			};
 			await dispatch(
 				updateWebhookBySpecificId({

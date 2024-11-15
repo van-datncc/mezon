@@ -54,13 +54,14 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 		if (settingItem.id === ItemSetting.AUDIT_LOG) {
 			if (currentClan?.clan_id) {
 				const body = {
+					noCache: true,
 					actionLog: auditLogFilterAction ?? '',
 					userId: auditLogFilterUser?.userId ?? '',
 					clanId: currentClan?.clan_id ?? '',
 					page: 1,
 					pageSize: 10000
 				};
-				const response = dispatch(auditLogList(body));
+				dispatch(auditLogList(body));
 			}
 		}
 		onClickItem?.(settingItem);

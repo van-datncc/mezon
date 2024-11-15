@@ -1,7 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -84,6 +83,7 @@ export type WriteMessageReactionArgs = {
 	messageSenderId: string;
 	actionDelete: boolean;
 	isPublic: boolean;
+	userId: string;
 };
 
 const reactionQueue: Array<() => Promise<void>> = [];
@@ -98,7 +98,7 @@ async function processReactionQueue() {
 			try {
 				await action();
 			} catch (e) {
-				Sentry.captureException(e);
+				captureSentryError(e, 'messages/writeMessageReaction');
 			}
 		}
 	}
@@ -108,7 +108,7 @@ async function processReactionQueue() {
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
 	async (
-		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic }: WriteMessageReactionArgs,
+		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic, userId }: WriteMessageReactionArgs,
 		thunkAPI
 	) => {
 		const action = async () => {
@@ -135,6 +135,16 @@ export const writeMessageReaction = createAsyncThunk(
 					messageSenderId,
 					actionDelete
 				);
+
+				const emojiLastest: EmojiStorage = {
+					emojiId: emoji_id,
+					emoji,
+					messageId,
+					senderId: userId,
+					action: actionDelete,
+					channel_id: channelId
+				};
+				saveRecentEmoji(emojiLastest);
 			} catch (error) {
 				captureSentryError(error, 'messages/writeMessageReaction');
 				thunkAPI.rejectWithValue(error);
@@ -192,17 +202,6 @@ export const reactionSlice = createSlice({
 				...action.payload,
 				count: action.payload.count || 1
 			};
-
-			const emojiLastest: EmojiStorage = {
-				emojiId: reactionDataSocket.emoji_id ?? '',
-				emoji: reactionDataSocket.emoji ?? '',
-				messageId: reactionDataSocket.message_id ?? '',
-				senderId: reactionDataSocket.sender_id ?? '',
-				action: reactionDataSocket.action ?? false,
-				channel_id: reactionDataSocket.channel_id
-			};
-
-			saveRecentEmoji(emojiLastest);
 
 			const isAdd = !action.payload.action;
 			// Server not send id
@@ -270,9 +269,15 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	const storedEmojis = localStorage.getItem('recentEmojis');
 	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
 
-	const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
-		return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
-	});
+	if (emojisRecentParse.length > 0) {
+		const lastEmoji = emojisRecentParse[emojisRecentParse.length - 1];
+		if (lastEmoji.emoji === emojiLastest.emoji && lastEmoji.senderId === emojiLastest.senderId) {
+			return;
+		}
+	}
+	const duplicateIndex = emojisRecentParse.findIndex(
+		(item: EmojiStorage) => item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId
+	);
 
 	if (emojiLastest.action === true) {
 		if (duplicateIndex !== -1) {
@@ -283,8 +288,13 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 			emojisRecentParse.push(emojiLastest);
 		}
 	}
-}
 
+	if (emojisRecentParse.length > 20) {
+		emojisRecentParse.splice(0, emojisRecentParse.length - 20);
+	}
+
+	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
+}
 function combineMessageReactions(state: ReactionState, combinedId: string): EmojiDataOptionals[] {
 	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
 	const [channel_id, message_id] = combinedId.split('_');

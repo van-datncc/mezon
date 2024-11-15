@@ -6,13 +6,12 @@ import { CustomLoaderFunction } from './appLoader';
 export const channelLoader: CustomLoaderFunction = async ({ params, request, dispatch }) => {
 	const { channelId, clanId } = params;
 	const messageId = new URL(request.url).searchParams.get('messageId');
-
-	if (!channelId) {
+	if (!channelId || !clanId) {
 		throw new Error('Channel ID null');
 	}
-
-	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, messageId: messageId || '' }));
-	dispatch(channelsActions.setPreviousChannels({ channelId: channelId }));
+	await dispatch(channelsActions.addThreadToChannels({ channelId, clanId }));
+	dispatch(channelsActions.joinChannel({ clanId, channelId, noFetchMembers: false, messageId: messageId || '' }));
+	dispatch(channelsActions.setPreviousChannels({ channelId }));
 	notificationService.setCurrentChannelId(channelId);
 	return null;
 };

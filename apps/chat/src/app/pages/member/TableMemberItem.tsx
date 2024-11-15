@@ -11,7 +11,7 @@ import {
 	usersClanActions
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
-import { ChannelMembersEntity, EPermission, EVERYONE_ROLE_ID, createImgproxyUrl } from '@mezon/utils';
+import { ChannelMembersEntity, DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID, createImgproxyUrl } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -34,18 +34,28 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	const userRolesClan = useMemo(() => {
 		const activeRole: Record<string, string> = {};
 		let userRoleLength = 0;
+		const userRoles = [];
 
 		for (const key in rolesClanEntity) {
+			const role = rolesClanEntity[key];
 			const checkHasRole = rolesClanEntity[key].role_user_list?.role_users?.some((listUser) => listUser.id === userId);
 			if (checkHasRole) {
 				activeRole[key] = key;
 				userRoleLength++;
+				userRoles.push(role);
 			}
 		}
 
+		userRoles.sort((a, b) => {
+			const aPermission = a.max_level_permission ?? 0;
+			const bPermission = b.max_level_permission ?? 0;
+			return bPermission - aPermission;
+		});
+
 		return {
 			usersRole: activeRole,
-			length: userRoleLength
+			length: userRoleLength,
+			sortedRoles: userRoles
 		};
 	}, [userId, rolesClanEntity]);
 
@@ -113,7 +123,15 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 							src={avatar}
 						/>
 						<div className="flex flex-col">
-							<p className="text-base font-medium">{HighlightMatchBold(displayName, searchQuery)}</p>
+							<p
+								className="text-base font-medium"
+								style={{
+									color: userRolesClan.sortedRoles[0]?.color || DEFAULT_ROLE_COLOR,
+									fontWeight: 'bold'
+								}}
+							>
+								{HighlightMatchBold(displayName, searchQuery)}
+							</p>
 							<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{HighlightMatchBold(username, searchQuery)}</p>
 						</div>
 					</div>
@@ -130,17 +148,23 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					<span className={'inline-flex items-center'}>
 						{userRolesClan?.length ? (
 							<>
-								<RoleNameCard roleName={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''} />
+								<RoleNameCard
+									roleName={userRolesClan.sortedRoles[0].title || ''}
+									roleColor={userRolesClan.sortedRoles[0].color || ''}
+								/>
 								{userRolesClan.length > 1 && (
-									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-opacity-50 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
 										<Tooltip
 											content={
 												<div className={'flex flex-col items-start'}>
-													{Object.keys(userRolesClan.usersRole)
+													{userRolesClan.sortedRoles
 														.slice(1)
 														.map((userRole) => (
-															<div className={'my-0.5'} key={rolesClanEntity[`${userRole}`].id}>
-																<RoleNameCard roleName={rolesClanEntity[`${userRole}`].title || ''} />
+															<div className={'my-0.5'} key={userRole.id}>
+																<RoleNameCard
+																	roleName={userRole.title || ''}
+																	roleColor={userRole.color || ''}
+																/>
 															</div>
 														))}
 												</div>
@@ -216,10 +240,10 @@ const ListOptionRole = ({
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
 		if (userRolesClan.usersRole[role.id]) {
-			await updateRole(role.clan_id || '', role.id, role.title || '', [], [], [userId], []);
+			await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [], [], [userId], []);
 			return;
 		}
-		await updateRole(role.clan_id || '', role.id, role.title || '', [userId], [], [], []);
+		await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [userId], [], [], []);
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: role.id,
@@ -233,7 +257,10 @@ const ListOptionRole = ({
 		if (key !== EVERYONE_ROLE_ID && (isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[key]?.max_level_permission))) {
 			roleElements.push(
 				<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
-					<div className="text-transparent size-3 rounded-full bg-white" />
+					<div
+						className="text-transparent size-3 rounded-full"
+						style={{ backgroundColor: rolesClanEntity[key].color || DEFAULT_ROLE_COLOR }}
+					/>
 					<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
 						{rolesClanEntity[key].title}
 					</span>

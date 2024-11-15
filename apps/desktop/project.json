@@ -48,7 +48,8 @@
       "win": {
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
         "target": [
-          "nsis"
+          "nsis",
+          "portable"
         ],
         "appId": "mezon.ai",
         "publish": [
@@ -67,6 +68,9 @@
         "createDesktopShortcut": "always",
         "createStartMenuShortcut": true,
         "deleteAppDataOnUninstall": false
+      },
+      "portable": {
+        "artifactName": "${name}-${version}-${os}-${arch}-portable.${ext}"
       },
       "msi": {
         "additionalWixArgs": [
@@ -186,7 +190,8 @@
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
-            "nsis"
+            "nsis",
+            "portable"
           ],
           "appId": "mezon.ai",
           "publish": [
@@ -205,6 +210,9 @@
           "createDesktopShortcut": "always",
           "createStartMenuShortcut": true,
           "deleteAppDataOnUninstall": false
+        },
+        "portable": {
+          "artifactName": "${name}-${version}-${os}-${arch}-portable.${ext}"
         },
         "msi": {
           "additionalWixArgs": [
@@ -269,7 +277,8 @@
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
-            "nsis"
+            "nsis",
+            "portable"
           ],
           "appId": "mezon.ai",
           "publish": [
@@ -287,6 +296,9 @@
           "createDesktopShortcut": "always",
           "createStartMenuShortcut": true,
           "deleteAppDataOnUninstall": false
+        },
+        "portable": {
+          "artifactName": "${name}-${version}-${os}-${arch}-portable.${ext}"
         },
         "msi": {
           "additionalWixArgs": [
