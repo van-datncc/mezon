@@ -5,6 +5,7 @@ import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RolesClanEntity,
+	selectAccountCustomStatus,
 	selectAllRolesClan,
 	selectDirectsOpenlist,
 	selectMemberClanByUserId2,
@@ -66,6 +67,7 @@ const UserProfile = React.memo(
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type), [currentChannel?.type]);
 		const { dismiss } = useBottomSheetModal();
+		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 
 		const isKicked = useMemo(() => {
 			return !userById;
@@ -84,6 +86,10 @@ const UserProfile = React.memo(
 			const id = userProfile?.user?.google_id || userProfile?.user?.id;
 			return userId === id;
 		}, [userById, userProfile]);
+
+		const displayStatus = useMemo(() => {
+			return isCheckOwner ? currentUserCustomStatus : userCustomStatus;
+		}, [currentUserCustomStatus, isCheckOwner, userCustomStatus]);
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
@@ -222,7 +228,7 @@ const UserProfile = React.memo(
 						<Text style={[styles.subUserName]}>
 							{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
-						{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
+						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
 							<View style={[styles.userAction]}>
