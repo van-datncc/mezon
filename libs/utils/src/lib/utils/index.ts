@@ -13,7 +13,7 @@ import {
 } from 'date-fns';
 import isElectron from 'is-electron';
 import { notificationTypesList } from 'libs/components/src/lib/components/PanelChannel';
-import { Client, NotificationType, Session } from 'mezon-js';
+import { ChannelType, Client, NotificationType, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
@@ -175,13 +175,13 @@ export const getVoiceChannelName = (clanName?: string, channelLabel?: string) =>
 export const removeDuplicatesById = (array: any) => {
 	return array.reduce((acc: any, current: any) => {
 		const isDuplicate = acc.some((item: any) => item.id === current.id);
-		if (!isDuplicate) {
+		if (!isDuplicate && (current.type !== ChannelType.CHANNEL_TYPE_DM || current.idDM !== undefined)) {
 			acc.push(current);
 		}
+
 		return acc;
 	}, []);
 };
-
 export const getTimeDifferenceDate = (dateString: string) => {
 	const now = new Date();
 	const codeTime = new Date(dateString);
