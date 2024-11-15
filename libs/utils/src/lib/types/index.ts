@@ -223,6 +223,51 @@ export interface IEmbedProps {
 	footer?: { text: string; icon_url?: string };
 }
 
+export enum EButtonMessageStyle {
+	PRIMARY = 1,
+	SECONDARY = 2,
+	SUCCESS = 3,
+	DANGER = 4,
+	LINK = 5
+}
+
+export enum EMessageComponentType {
+	BUTTON = 1,
+	SELECT = 2,
+	INPUT = 3
+}
+
+export interface IButtonMessage {
+	label: string;
+	disable?: boolean;
+	style?: EButtonMessageStyle;
+	url?: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IMessageSelect {
+	// some select specific properties
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IMessageInput {
+	// some input specific properties
+}
+
+export interface IMessageComponent<T> {
+	type: EMessageComponentType;
+	id: string;
+	component: T;
+}
+
+export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
+export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
+export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessageComponentType.INPUT };
+
+export interface IMessageActionRow {
+	components: Array<ButtonComponent | SelectComponent | InputComponent>;
+}
+
 export interface IMessageSendPayload {
 	t?: string;
 	hg?: IHashtagOnMessage[];
@@ -231,6 +276,7 @@ export interface IMessageSendPayload {
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps;
+	components?: IMessageActionRow[];
 }
 
 export type IUser = {
@@ -1075,4 +1121,18 @@ export enum UserAuditLog {
 export type IUserAuditLog = {
 	userId: string;
 	userName: string;
+};
+
+export type IUserProfileActivity = {
+	avatar_url?: string;
+	display_name?: string;
+	id?: string;
+	username?: string;
+	online?: boolean;
+	metadata?: { status?: string };
+};
+
+export type IUserItemActivity = {
+	id?: string;
+	user?: IUserProfileActivity;
 };

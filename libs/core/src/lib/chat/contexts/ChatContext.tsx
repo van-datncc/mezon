@@ -103,7 +103,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
 type ChatContextProviderProps = {
@@ -122,7 +121,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId, channelId, clanId } = useAppParams();
-	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
@@ -1163,13 +1161,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onroleevent,
 		ontokensent
 	]);
-
-	useEffect(() => {
-		initWorker();
-		return () => {
-			unInitWorker();
-		};
-	}, [initWorker, unInitWorker]);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({

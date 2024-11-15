@@ -1914,7 +1914,7 @@ export const Announcement = ({ defaultFill = '#AEAEAE', defaultSize = 20 }) => {
 
 export function IconPeople({ width = 32, height = 32, color = '#AEAEAE', ...props }) {
 	return (
-		<Svg width={32} height={32} viewBox="0 0 32 32" fill="none" {...props}>
+		<Svg width={width} height={height} viewBox="0 0 32 32" fill="none" {...props}>
 			<Path
 				d="M18.667 10.675a5.34 5.34 0 01-5.334 5.333A5.34 5.34 0 018 10.675a5.34 5.34 0 015.333-5.334 5.34 5.34 0 015.334 5.334zm-16 14.666c0-4.71 4.386-8 10.666-8 6.282 0 10.667 3.29 10.667 8v1.334H2.667V25.34z"
 				fill={color}
