@@ -59,7 +59,7 @@ export const initialGiveCoffeeState: GiveCoffeeState = giveCoffeeAdapter.getInit
 export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: ApiTokenSentEvent, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.updateWallets(mezon.session, {
+		const response = await mezon.client.sendToken(mezon.session, {
 			receiver_id: tokenEvent.receiver_id,
 			amount: tokenEvent.amount,
 			note: tokenEvent.note

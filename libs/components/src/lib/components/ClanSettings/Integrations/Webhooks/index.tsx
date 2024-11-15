@@ -34,7 +34,8 @@ const Webhooks = ({ allWebhooks, currentChannel, isClanSetting }: IWebhooksProps
 		const newWebhookReq: ApiWebhookCreateRequest = {
 			channel_id: currentChannel?.channel_id as string,
 			webhook_name: getRandomWebhookName(),
-			avatar: getRandomAvatar()
+			avatar: getRandomAvatar(),
+			clan_id: clanId
 		};
 		dispatch(
 			generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string, clanId: clanId, isClanSetting: isClanSetting })
