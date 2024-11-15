@@ -369,26 +369,26 @@ export const selectDirectsOpenlistOrder = createSelector(selectDirectsOpenlist, 
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);
 
 export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMessages) => {
-	const users = directMessages.reduce<IUserItemActivity[]>((acc, dm) => {
+	return directMessages.reduce<IUserItemActivity[]>((acc, dm) => {
 		if (dm?.active === 1) {
 			dm?.user_id?.forEach((userId: string, index: number) => {
-				const user = {
-					avatar_url: dm?.channel_avatar ? dm?.channel_avatar[index] : '',
-					display_name: dm?.usernames ? dm?.usernames.split(',')[index] : '',
-					id: userId,
-					username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
-					online: dm?.is_online ? dm?.is_online[index] : false,
-					metadata: dm?.metadata ? JSON.parse(dm?.metadata[index]) : {}
-				};
+				if (!acc.some((existingUser) => existingUser.id === userId)) {
+					const user = {
+						avatar_url: dm?.channel_avatar ? dm?.channel_avatar[index] : '',
+						display_name: dm?.usernames ? dm?.usernames.split(',')[index] : '',
+						id: userId,
+						username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
+						online: dm?.is_online ? dm?.is_online[index] : false,
+						metadata: dm?.metadata ? JSON.parse(dm?.metadata[index]) : {}
+					};
 
-				acc.push({
-					user,
-					id: userId
-				});
+					acc.push({
+						user,
+						id: userId
+					});
+				}
 			});
 		}
 		return acc;
 	}, []);
-
-	return Array.from(new Map(users.map((item) => [item?.id, item])).values());
 });
