@@ -377,11 +377,11 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 			item?.user_id?.map((userId, index) => ({
 				user: {
 					avatar_url: item?.channel_avatar ? item?.channel_avatar[index] : '',
-					display_name: item.usernames ? item.usernames.split(',')[index] : '',
+					display_name: item?.usernames ? item?.usernames.split(',')[index] : '',
 					id: userId,
-					username: item.usernames ? item.usernames.split(',')[index] : '',
-					online: item.is_online ? item.is_online[index] : false,
-					metadata: item.metadata ? item.metadata[index] : ''
+					username: item?.usernames ? item?.usernames.split(',')[index] : '',
+					online: item?.is_online ? item?.is_online[index] : false,
+					metadata: item?.metadata ? item?.metadata[index] : ''
 				},
 				id: userId
 			}))

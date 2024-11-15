@@ -29,20 +29,23 @@ const MemoizedMemberItem = memo((props: ActivityUserItemProps) => {
 
 const ActivityList = ({ listFriend }: ListActivityProps) => {
 	const listUserDM = useSelector(selectAllUserDM);
-	const mergeListFriendAndListUserDM = [
-		...listFriend.map((friend) => ({
-			user: {
-				avatar_url: friend?.user?.avatar_url,
-				display_name: friend?.user?.display_name,
-				id: friend.user?.id,
-				username: friend?.user?.username,
-				online: friend?.user?.online,
-				metadata: friend?.user?.metadata
-			},
-			id: friend?.id
-		})),
-		...listUserDM
-	];
+	const mergeListFriendAndListUserDM = useMemo(() => {
+		return [
+			...listFriend.map((friend) => ({
+				user: {
+					avatar_url: friend?.user?.avatar_url,
+					display_name: friend?.user?.display_name,
+					id: friend.user?.id,
+					username: friend?.user?.username,
+					online: friend?.user?.online,
+					metadata: friend?.user?.metadata
+				},
+				id: friend?.id
+			})),
+			...listUserDM
+		];
+	}, [listFriend, listUserDM]);
+
 	const listUser = Array.from(new Map(mergeListFriendAndListUserDM.map((item) => [item?.id, item])).values());
 	const userIds = listUser?.filter((user) => user?.user?.online).map((item) => item?.id);
 
