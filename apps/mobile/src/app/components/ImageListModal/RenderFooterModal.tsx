@@ -1,5 +1,6 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity } from '@mezon/store';
+import { createImgproxyUrl } from '@mezon/utils';
 import React, { memo, useEffect, useRef } from 'react';
 import { Animated, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -48,7 +49,13 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 		return (
 			<TouchableOpacity onPress={() => handlePress(item)}>
 				<Block style={[styles.imageWrapper, isSelected && [styles.imageSelected, { width: imageSize.width }]]}>
-					<FastImage source={{ uri: item?.url }} style={[styles.image]} resizeMode={imageSelected ? 'cover' : 'contain'} />
+					<FastImage
+						source={{
+							uri: createImgproxyUrl(item?.url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+						}}
+						style={[styles.image]}
+						resizeMode={imageSelected ? 'cover' : 'contain'}
+					/>
 				</Block>
 			</TouchableOpacity>
 		);

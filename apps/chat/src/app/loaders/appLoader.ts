@@ -1,4 +1,5 @@
 import { AppDispatch, appActions, authActions } from '@mezon/store';
+import isElectron from 'is-electron';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
 export interface IAppLoaderData {
@@ -29,12 +30,11 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const params = new URLSearchParams(paramString);
 	const result = Object.fromEntries(params.entries());
 	const { deepLinkUrl, notificationPath } = result;
-	if (deepLinkUrl) {
+	if (deepLinkUrl && !isElectron()) {
 		redirectTo = '/desktop/login?deepLinkUrl=' + deepLinkUrl;
 		try {
-			let data = JSON.parse(decodeURIComponent(deepLinkUrl));
-			data = data.split('#')[0];
-			await dispatch(authActions.setSession(data));
+			const session = deepLinkUrl.split('#')[0];
+			await dispatch(authActions.setSession(JSON.parse(decodeURIComponent(session))));
 		} catch (error) {
 			console.error('Invalid JSON in deepLinkUrl:', error);
 		}

@@ -34,18 +34,28 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	const userRolesClan = useMemo(() => {
 		const activeRole: Record<string, string> = {};
 		let userRoleLength = 0;
+		const userRoles = [];
 
 		for (const key in rolesClanEntity) {
+			const role = rolesClanEntity[key];
 			const checkHasRole = rolesClanEntity[key].role_user_list?.role_users?.some((listUser) => listUser.id === userId);
 			if (checkHasRole) {
 				activeRole[key] = key;
 				userRoleLength++;
+				userRoles.push(role);
 			}
 		}
 
+		userRoles.sort((a, b) => {
+			const aPermission = a.max_level_permission ?? 0;
+			const bPermission = b.max_level_permission ?? 0;
+			return bPermission - aPermission;
+		});
+
 		return {
 			usersRole: activeRole,
-			length: userRoleLength
+			length: userRoleLength,
+			sortedRoles: userRoles
 		};
 	}, [userId, rolesClanEntity]);
 
@@ -116,7 +126,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 							<p
 								className="text-base font-medium"
 								style={{
-									color: rolesClanEntity[Object.keys(userRolesClan.usersRole)[0]]?.color || DEFAULT_ROLE_COLOR,
+									color: userRolesClan.sortedRoles[0]?.color || DEFAULT_ROLE_COLOR,
 									fontWeight: 'bold'
 								}}
 							>
@@ -139,24 +149,19 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						{userRolesClan?.length ? (
 							<>
 								<RoleNameCard
-									roleName={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''}
-									roleColor={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].color || ''}
+									roleName={userRolesClan.sortedRoles[0].title || ''}
+									roleColor={userRolesClan.sortedRoles[0].color || ''}
 								/>
 								{userRolesClan.length > 1 && (
 									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-opacity-50 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
 										<Tooltip
 											content={
 												<div className={'flex flex-col items-start'}>
-													{Object.keys(userRolesClan.usersRole)
-														.slice(1)
-														.map((userRole) => (
-															<div className={'my-0.5'} key={rolesClanEntity[`${userRole}`].id}>
-																<RoleNameCard
-																	roleName={rolesClanEntity[`${userRole}`].title || ''}
-																	roleColor={rolesClanEntity[`${userRole}`].color || ''}
-																/>
-															</div>
-														))}
+													{userRolesClan.sortedRoles.slice(1).map((userRole) => (
+														<div className={'my-0.5'} key={userRole.id}>
+															<RoleNameCard roleName={userRole.title || ''} roleColor={userRole.color || ''} />
+														</div>
+													))}
 												</div>
 											}
 											trigger={'hover'}

@@ -213,6 +213,7 @@ const RoleClanItem = ({
 	hasPermissionEditRole: boolean;
 	appearanceTheme: string;
 }) => {
+	const [isHovered, setIsHovered] = useState(false);
 	return (
 		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
@@ -220,6 +221,8 @@ const RoleClanItem = ({
 					className="p-0.5 rounded-full h-fit"
 					onClick={() => deleteRole(role.id)}
 					style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 				>
 					<Tooltip
 						content="Remove role"
@@ -228,7 +231,7 @@ const RoleClanItem = ({
 						style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						className="dark:!text-white !text-black"
 					>
-						<Icons.IconRemove className="dark:text-channelActiveColor text-channelActiveLightColor size-2" />
+						<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
 					</Tooltip>
 				</button>
 			) : (

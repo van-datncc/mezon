@@ -38,6 +38,7 @@ type ChannelMessageOptProps = {
 	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
 	isCombine: boolean;
 	mode: number;
+	isDifferentDay: boolean;
 };
 
 type JsonObject = {
@@ -56,7 +57,7 @@ enum EMessageOpt {
 	OPTION = 'option'
 }
 
-const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDifferentDay }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const refOpt = useRef<HTMLDivElement>(null);
@@ -72,7 +73,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode }: Chan
 
 	return (
 		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-7' : 'top-0') : '-top-7'}  right-6 w-fit`}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-5' : 'top-0') : '-top-5'} ${isDifferentDay ? 'top-4' : ''} right-6 w-fit`}
 		>
 			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex items-center justify-between" ref={refOpt}>
@@ -105,13 +106,9 @@ interface RecentEmojiProps {
 const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 	const { emojiConverted } = useEmojiSuggestion();
 
-	const emojiRecentData = useMemo(() => {
-		return localStorage.getItem('recentEmojis');
-	}, []);
-
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);
-	}, [emojiConverted, emojiRecentData]);
+	}, [emojiConverted]);
 
 	return (
 		<div className="flex items-center">

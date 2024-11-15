@@ -14,11 +14,13 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ICategoryChannel, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { default as SimpleBarReact } from 'simplebar-react';
+import 'simplebar/src/simplebar.css';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
@@ -31,7 +33,7 @@ function ChannelList() {
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			id="channelList"
 			role="button"
 		>
@@ -49,7 +51,11 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 		<>
 			{currentClan?.banner && (
 				<div className="h-[136px]">
-					<img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />
+					<img
+						src={createImgproxyUrl(currentClan?.banner ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+						alt="imageCover"
+						className="h-full w-full object-cover"
+					/>
 				</div>
 			)}
 			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
@@ -93,7 +99,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 5;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
@@ -144,15 +150,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	return (
-		<div
-			ref={parentRef}
-			style={{
-				height: height,
-				overflowY: 'auto',
-				contain: 'strict'
-			}}
-			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
-		>
+		<SimpleBarReact scrollableNodeProps={{ ref: parentRef }} style={{ maxHeight: height }}>
 			<div
 				style={{
 					height: virtualizer.getTotalSize(),
@@ -202,7 +200,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					})}
 				</div>
 			</div>
-		</div>
+		</SimpleBarReact>
 	);
 });
 

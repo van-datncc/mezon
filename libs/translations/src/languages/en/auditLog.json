@@ -1,0 +1,22 @@
+{
+  "auditLogComponent": {
+    "title": "Audit Log",
+    "filterByUser":"Filter By User",
+    "filterByAction":"Filter By Action",
+    "filterBtn": "Filter"
+  },
+  "auditLogItem": {
+    "performedAnAction":"performed an action"
+  },
+  "filterActionAuditLog": {
+    "placeholder": "Search Action"
+  },
+  "filterUserAuditLog": {
+    "placeholder": "Search Users",
+    "allUsers":"All Users"
+  },
+  "emptyAuditLog": {
+    "noLogsYet": "NO LOGS YET",
+    "description": "Once moderators begin moderating, you can moderate the moderation here."
+  }
+}

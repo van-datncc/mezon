@@ -137,7 +137,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-					isPublic: payload.is_public
+					isPublic: payload.is_public,
+					userId: userId as string
 				})
 			).unwrap();
 		},

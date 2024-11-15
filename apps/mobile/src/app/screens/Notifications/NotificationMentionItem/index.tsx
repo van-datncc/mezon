@@ -1,8 +1,10 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { selectChannelById, selectClanById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl, getNameForPrioritize } from '@mezon/utils';
+import React, { useMemo } from 'react';
+import { Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
@@ -60,8 +62,19 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 	const { avatarImg } = useMessageSender(user as any);
 	const channelInfo = useAppSelector((state) => selectChannelById(state, notify?.content?.channel_id || ''));
 	const data = parseObject(notify?.content);
+	const clan = useAppSelector(selectClanById(notify?.content?.clan_id as string));
 
 	const { messageTimeDifference } = useMessageParser(data);
+	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
+	const subjectText = useMemo(() => {
+		return clan?.clan_name && channelInfo?.channel_label
+			? `${clan?.clan_name ? `(${clan.clan_name})` : ''} - ${channelInfo?.channel_label || ''}`
+			: '';
+	}, [clan?.clan_name, channelInfo?.channel_label]);
+
+	const userName = useMemo(() => {
+		return getNameForPrioritize(notify?.content?.clan_nick, notify?.content?.display_name, notify?.content?.username);
+	}, [notify]);
 
 	return (
 		<TouchableOpacity
@@ -75,11 +88,19 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 			<View style={styles.notifyContainer}>
 				<View style={styles.notifyHeader}>
 					<View style={styles.boxImage}>
-						<Image source={{ uri: avatarImg || AVATAR_DEFAULT_URL }} style={styles.image} />
+						<FastImage
+							source={{
+								uri: avatarImg
+									? createImgproxyUrl(avatarImg ?? '', { width: 100, height: 100, resizeType: 'fit' })
+									: AVATAR_DEFAULT_URL
+							}}
+							style={styles.image}
+						/>
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							{notify?.subject} - {channelInfo?.channel_label}:
+							<Text style={{ ...styles.username, color: colorsUsername }}>{userName} </Text>
+							{subjectText}
 						</Text>
 						<View style={styles.contentMessage}>
 							<MessageNotification message={data} />

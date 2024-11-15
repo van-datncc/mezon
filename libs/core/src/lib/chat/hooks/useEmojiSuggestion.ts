@@ -32,22 +32,6 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 	const userId = useAuth();
 	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
 
-	function filterEmojisByUserId(emojis: EmojiStorage[], userId: string): EmojiStorage[] {
-		return emojis.filter((emojiItem) => emojiItem.senderId === userId);
-	}
-
-	function convertedEmojiRecent(emojiArr: EmojiStorage[], emojiSource: any) {
-		return emojiArr.map((item: any) => {
-			const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
-			return {
-				id: emojiFound?.id,
-				src: emojiFound?.src,
-				category: 'Recent',
-				shortname: emojiFound?.shortname
-			};
-		});
-	}
-
 	useEffect(() => {
 		const fetchRecentEmojis = async () => {
 			try {
@@ -66,16 +50,28 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 			const emojiRecentStorage = localStorage.getItem('recentEmojis');
 			setEmojiRecentData(emojiRecentStorage);
 		}
-	}, []);
+	}, [isMobile]);
 
-	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
-	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
-	const reversedEmojisRecentDataParse = emojiFiltered.reverse();
+	const emojisRecentDataParse = useMemo(() => {
+		if (!emojiRecentData) return [];
+		const parsedData = JSON.parse(emojiRecentData);
+		return parsedData.filter((emojiItem: EmojiStorage) => emojiItem.senderId === userId.userId);
+	}, [emojiRecentData, userId.userId]);
 
-	const emojiConverted = convertedEmojiRecent(reversedEmojisRecentDataParse, emojiMetadata);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const emojiCombine = [...emojiMetadata, ...emojiConverted];
-	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
+	const emojiConverted = useMemo(() => {
+		return emojisRecentDataParse.reverse().map((item: EmojiStorage) => {
+			const emojiFound = emojiMetadata.find((emoji) => emoji.shortname === item.emoji);
+			return {
+				id: emojiFound?.id,
+				src: emojiFound?.src,
+				category: 'Recent',
+				shortname: emojiFound?.shortname
+			};
+		});
+	}, [emojisRecentDataParse, emojiMetadata]);
+
+	const emojis = useMemo(() => filterEmojiData([...emojiMetadata, ...emojiConverted]), [emojiMetadata, emojiConverted]);
+
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
 
@@ -120,16 +116,28 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		[dispatch]
 	);
 
-	const categoriesEmoji = ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
-	const categoryEmoji = emojiMetadata
-		.map((emoji) => ({
-			id: emoji.clan_id,
-			clan_name: emoji.clan_name,
-			clan_logo: emoji.logo
-		}))
-		.filter((emoji, index, self) => emoji.id !== '0' && index === self.findIndex((s) => s.id === emoji.id));
-	const clanNames = categoryEmoji.map((emoji) => emoji.clan_name || '');
-	categoriesEmoji.splice(2, 0, ...clanNames);
+	const categoriesEmoji = useMemo(
+		() => ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'],
+		[]
+	);
+
+	const categoryEmoji = useMemo(() => {
+		return emojiMetadata
+			.map((emoji) => ({
+				id: emoji.clan_id,
+				clan_name: emoji.clan_name,
+				clan_logo: emoji.logo
+			}))
+			.filter((emoji, index, self) => emoji.id !== '0' && index === self.findIndex((s) => s.id === emoji.id));
+	}, [emojiMetadata]);
+
+	const clanNames = useMemo(() => {
+		return categoryEmoji.map((emoji) => emoji.clan_name || '');
+	}, [categoryEmoji]);
+
+	useEffect(() => {
+		categoriesEmoji.splice(2, 0, ...clanNames);
+	}, [clanNames, categoriesEmoji]);
 
 	return useMemo(
 		() => ({

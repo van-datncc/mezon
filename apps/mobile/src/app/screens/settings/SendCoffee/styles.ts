@@ -45,8 +45,7 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_10,
 			fontSize: size.s_16,
 			height: size.s_50,
-			color: colors.text,
-			width: '90%'
+			color: colors.text
 		},
 		button: {
 			position: 'absolute',

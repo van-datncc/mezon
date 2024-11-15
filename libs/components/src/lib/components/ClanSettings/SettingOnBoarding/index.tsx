@@ -7,7 +7,7 @@ import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
 import Questions from './Questions/Questions';
 
-enum EOnboardingStep {
+export enum EOnboardingStep {
 	QUESTION,
 	MISSION,
 	MAIN
@@ -26,7 +26,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	};
 
 	return (
-		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm">
+		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
@@ -35,7 +35,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					onCloseSetting={onClose}
 				/>
 			)}
-			{currentPage === EOnboardingStep.QUESTION && <Questions />}
+			{currentPage === EOnboardingStep.QUESTION && <Questions handleGoToPage={handleGoToPage} />}
 			{currentPage === EOnboardingStep.MISSION && (
 				<MemberProvider>
 					<ClanGuideSetting />
@@ -99,6 +99,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					title="Onboarding Is Enabled"
 					description="Changes will not take effect until you save."
 					className="hover:bg-bgTertiary bg-bgTertiary rounded-none rounded-t-lg "
+					noNeedHover
 					action={
 						<div className="h-full flex items-center">
 							<input
@@ -148,7 +149,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				<div className="mx-4 border-t border-bgModifierHover" />
 				<GuideItemLayout
 					hightLightIcon
-					icon={<Icons.People className="w-6 text-channelTextLabel" />}
+					icon={<Icons.GuideIcon defaultSize="w-6 text-channelTextLabel" defaultFill="currentColor" />}
 					title="Server Guide"
 					description="Your Welcome Message, Banner, To-Do tasks and Resources are all set up"
 					className="hover:bg-bgSecondaryHover rounded-none"
