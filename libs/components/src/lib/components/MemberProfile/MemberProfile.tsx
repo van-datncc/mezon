@@ -389,18 +389,18 @@ export function MemberProfile({
 							<div className="flex flex-row items-center w-full overflow-x-hidden" style={{ minWidth: `${minWidthNameMain}px` }}>
 								<p
 									className={`text-base font-medium nameMemberProfile
-				          ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
-                  ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-                  ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-                  ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-                  ${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
+				          			${isListFriend ? ' inline-flex justify-start' : ''}
+									${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
+									${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
+									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
+									${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
+									${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
 							    `}
 									title={name}
 								>
 									<span
 										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
-										style={{ color: userRolesClan.highestPermissionRoleColor }}
+										style={{ color: isDM ? DEFAULT_ROLE_COLOR : userRolesClan.highestPermissionRoleColor }}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>
