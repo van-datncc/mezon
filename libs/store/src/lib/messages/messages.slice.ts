@@ -29,6 +29,7 @@ import {
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { MessageButtonClicked } from 'mezon-js/socket';
 import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -621,6 +622,18 @@ export const sendTypingUser = createAsyncThunk(
 	}
 );
 
+export const clickButtonMessage = createAsyncThunk(
+	'messages/clickButtonMessage',
+	async ({ message_id, channel_id, button_id, sender_id, user_id }: MessageButtonClicked, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		try {
+			const response = mezon.socketRef.current?.handleMessageButtonClick({ message_id, channel_id, button_id, sender_id, user_id });
+		} catch (e) {
+			console.error(e);
+		}
+	}
+);
+
 export type SetChannelLastMessageArgs = {
 	channelId: string;
 	messageId: string;
@@ -1001,7 +1014,8 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
-	jumpToMessage
+	jumpToMessage,
+	clickButtonMessage
 };
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
