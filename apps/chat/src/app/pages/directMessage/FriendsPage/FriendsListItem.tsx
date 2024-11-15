@@ -38,11 +38,11 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	};
 
 	return (
-		<div className="border-t-[1px] dark:border-borderDefault border-gray-300 group/list_friends">
+		<div className="border-t-[1px] dark:border-[#3f4147] border-gray-300 group/list_friends">
 			<div
 				key={friend.user?.id}
 				onClick={() => directMessageWithUser(friend.user?.id ?? '')}
-				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-gray-800 hover:bg-white rounded-lg"
+				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-[#393c41] hover:bg-[#eaebed] rounded-lg"
 			>
 				<div key={friend.user?.id} className={'flex-1'}>
 					<MemberProfile
