@@ -84,7 +84,11 @@ export const deleteWebhookById = createAsyncThunk(
 	async (data: { webhook: ApiWebhook; clanId: string; channelId: string; isClanSetting?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string);
+			const body = {
+				channel_id: data.channelId,
+				clan_id: data.clanId
+			};
+			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string, body);
 			if (response) {
 				if (data.isClanSetting) {
 					thunkAPI.dispatch(fetchWebhooks({ channelId: '0', clanId: data.clanId, noCache: true }));
