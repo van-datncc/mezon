@@ -92,7 +92,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			clanRole.clan_id,
 			clanRole.id,
 			currentRoleName,
-			clanRole?.color,
+			clanRole?.color || '',
 			selectedMembers,
 			selectedPermissions,
 			[],

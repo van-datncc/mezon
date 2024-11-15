@@ -109,10 +109,10 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const updateMemberToRole = async () => {
 		const selectedPermissions = newRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
 		const response = await updateRole(
-			newRole.clan_id,
-			newRole.id,
-			newRole.title,
-			newRole.color,
+			newRole?.clan_id,
+			newRole?.id,
+			newRole?.title,
+			newRole?.color || '',
 			selectedMemberIdList,
 			selectedPermissions,
 			[],
