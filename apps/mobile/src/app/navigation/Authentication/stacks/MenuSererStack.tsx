@@ -49,7 +49,7 @@ export const MenuClanStacks = ({}: any) => {
 					backgroundColor: themeValue.secondary
 				},
 				headerTitleStyle: {
-					fontSize: Fonts.size.h6,
+					fontSize: Fonts.size.label,
 					fontWeight: 'bold',
 					color: themeValue.textStrong
 				},

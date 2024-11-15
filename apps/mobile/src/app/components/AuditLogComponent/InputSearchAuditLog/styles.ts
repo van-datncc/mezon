@@ -12,8 +12,9 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_6
 		},
 		searchInput: {
-			padding: 5,
+			padding: 0,
 			color: colors.textDisabled,
+			height: size.s_40,
 			flex: 1
 		}
 	});
