@@ -52,7 +52,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 	return button.url ? (
 		<a href={button.url} target="_blank" rel="noopener noreferrer" className={commonClass + ' flex items-center hover:underline'}>
 			{button.label}
-			<Icons.ForwardRightClick defaultSize="w-4 h-4 mr-5" defaultFill={'#ffffff'} />
+			<Icons.ForwardRightClick defaultSize="w-4 h-4 ml-2" defaultFill={'#ffffff'} />
 		</a>
 	) : (
 		<button className={commonClass} onClick={handleClickButton}>
