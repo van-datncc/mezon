@@ -28,6 +28,7 @@ import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
 import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
@@ -126,41 +127,44 @@ function ChannelMessages({
 	const firsRowCached = useRef<string>('');
 	const lastRowCached = useRef<string>('');
 
-	const handleOnChange = async (instance: any) => {
-		if (!userActiveScroll.current) return;
-		toggleDisableHover(chatRef.current, scrollTimeoutId2);
-		if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
-		switch (instance.scrollDirection) {
-			case 'backward':
-				if (chatRef.current.scrollTop <= SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
-					currentScrollDirection.current = ELoadMoreDirection.top;
-					isLoadMore.current = true;
-					firsRowCached.current = messages[1];
-					await loadMoreMessage(ELoadMoreDirection.top);
-					isLoadMore.current = false;
-					return;
-				}
-
-				break;
-			case 'forward':
-				{
-					const scrollElement = instance.scrollElement;
-					if (!scrollElement) {
+	const handleOnChange = useCallback(
+		async (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => {
+			if (!userActiveScroll.current) return;
+			toggleDisableHover(chatRef.current, scrollTimeoutId2);
+			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
+			switch (instance.scrollDirection) {
+				case 'backward':
+					if (chatRef.current.scrollTop <= SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
+						currentScrollDirection.current = ELoadMoreDirection.top;
+						isLoadMore.current = true;
+						firsRowCached.current = messages[1];
+						await loadMoreMessage(ELoadMoreDirection.top);
+						isLoadMore.current = false;
 						return;
 					}
-					const isAtBottom =
-						Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
-					if (isAtBottom) {
-						currentScrollDirection.current = ELoadMoreDirection.bottom;
-						isLoadMore.current = true;
-						lastRowCached.current = messages[messages.length - 1];
-						await loadMoreMessage(ELoadMoreDirection.bottom);
-						isLoadMore.current = false;
+
+					break;
+				case 'forward':
+					{
+						const scrollElement = instance.scrollElement;
+						if (!scrollElement) {
+							return;
+						}
+						const isAtBottom =
+							Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
+						if (isAtBottom) {
+							currentScrollDirection.current = ELoadMoreDirection.bottom;
+							isLoadMore.current = true;
+							lastRowCached.current = messages[messages.length - 1];
+							await loadMoreMessage(ELoadMoreDirection.bottom);
+							isLoadMore.current = false;
+						}
 					}
-				}
-				break;
-		}
-	};
+					break;
+			}
+		},
+		[loadMoreMessage, messages]
+	);
 
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
@@ -200,7 +204,7 @@ function ChannelMessages({
 	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	return (
-		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
+		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<ChatMessageList
 				messages={messages}
 				chatRef={chatRef}
@@ -248,7 +252,7 @@ type ChatMessageListProps = {
 	appearanceTheme: string;
 	idMessageToJump: string;
 	lastMessageId: string;
-	dataReferences: any;
+	dataReferences: ApiMessageRef;
 	idMessageNotified: string;
 	lastMessageUnreadId: string;
 	avatarDM?: string;
@@ -336,7 +340,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			currentScrollDirection.current = null;
 		}, [messages, rowVirtualizer]);
 
-		// Jump to ,message from pin and reply, notification...
 		const timerRef = useRef<number | null>(null);
 		useEffect(() => {
 			const handleScrollToIndex = (messageId: string) => {
@@ -447,7 +450,15 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		);
 	},
 	(prev, curr) => {
-		return prev.messages === curr.messages;
+		return (
+			prev.messages === curr.messages &&
+			prev.idMessageToJump === curr.idMessageToJump &&
+			prev.lastMessageId === curr.lastMessageId &&
+			prev.dataReferences === curr.dataReferences &&
+			prev.idMessageNotified === curr.idMessageNotified &&
+			prev.lastMessageUnreadId === curr.lastMessageUnreadId &&
+			prev.appearanceTheme === curr.appearanceTheme
+		);
 	}
 );
 
