@@ -148,8 +148,10 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IE
 	const handleEditWebhook = async () => {
 		const request: MezonUpdateWebhookByIdBody = {
 			avatar: dataForUpdate.webhookAvatarUrl,
-			channel_id: dataForUpdate.channelIdForUpdate,
-			webhook_name: dataForUpdate.webhookNameInput
+			channel_id_update: dataForUpdate.channelIdForUpdate,
+			webhook_name: dataForUpdate.webhookNameInput,
+			channel_id: currentChannel?.channel_id,
+			clan_id: clanId
 		};
 		await dispatch(
 			updateWebhookBySpecificId({

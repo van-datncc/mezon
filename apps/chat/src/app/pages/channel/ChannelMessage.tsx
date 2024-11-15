@@ -90,7 +90,15 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	})();
 
 	const popup = useCallback(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} mode={mode} />;
+		return (
+			<ChannelMessageOpt
+				message={message}
+				handleContextMenu={handleContextMenu}
+				isCombine={isCombine}
+				mode={mode}
+				isDifferentDay={isDifferentDay}
+			/>
+		);
 	}, [message, handleContextMenu, isCombine, mode]);
 
 	useEffect(() => {
