@@ -1,0 +1,18 @@
+{
+  "auditLogComponent": {
+    "title": "Nhật ký kiểm tra",
+    "filterByUser": "Lọc theo người dùng",
+    "filterByAction": "Lọc theo hành động",
+    "filterBtn": "Lọc"
+  },
+  "auditLogItem": {
+    "performedAnAction": "đã thực hiện một hành động"
+  },
+  "filterActionAuditLog": {
+    "placeholder": "Tìm kiếm hành động"
+  },
+  "filterUserAuditLog": {
+    "placeholder": "Tìm kiếm người dùng",
+    "allUsers": "Tất cả người dùng"
+  }
+}
