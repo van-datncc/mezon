@@ -395,6 +395,26 @@ export const fetchChannelsCached = memoizeAndTrack(
 	}
 );
 
+export const addThreadToChannels = createAsyncThunk(
+	'channels/addThreadToChannels',
+	async ({ clanId, channelId }: { clanId: string; channelId: string }, thunkAPI) => {
+		if (channelId && !selectChannelById2(getChannelsRootState(thunkAPI), channelId)) {
+			const data = await thunkAPI
+				.dispatch(
+					threadsActions.fetchThread({
+						channelId: '0',
+						clanId,
+						threadId: channelId
+					})
+				)
+				.unwrap();
+			if (data?.length > 0) {
+				thunkAPI.dispatch(channelsActions.upsertOne({ ...data[0], active: 1 } as ChannelsEntity));
+			}
+		}
+	}
+);
+
 export const fetchChannels = createAsyncThunk(
 	'channels/fetchChannels',
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
@@ -790,7 +810,8 @@ export const channelsActions = {
 	fetchAppChannels,
 	fetchListFavoriteChannel,
 	addFavoriteChannel,
-	removeFavoriteChannel
+	removeFavoriteChannel,
+	addThreadToChannels
 };
 
 /*
