@@ -21,7 +21,7 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_10,
 			paddingHorizontal: size.s_10,
 			alignItems: 'center',
-			justifyContent: 'space-between'
+			justifyContent: 'flex-end'
 		},
 		filterText: {
 			fontWeight: '500',
@@ -29,8 +29,8 @@ export const style = (colors: Attributes) =>
 			color: colors.white
 		},
 		textFilterBtn: {
-			fontWeight: '400',
-			fontSize: size.s_14,
+			fontSize: size.s_12,
+			paddingHorizontal: size.s_10,
 			color: colors.text
 		}
 	});
