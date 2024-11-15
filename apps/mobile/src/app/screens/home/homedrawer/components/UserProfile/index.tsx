@@ -2,8 +2,15 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
+import {
+	ChannelsEntity,
+	RolesClanEntity,
+	selectAllRolesClan,
+	selectDirectsOpenlist,
+	selectMemberClanByUserId2,
+	useAppSelector
+} from '@mezon/store-mobile';
+import { DEFAULT_ROLE_COLOR, IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -46,7 +53,7 @@ const UserProfile = React.memo(
 		const { t } = useTranslation(['userProfile']);
 		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
 		const userStatus = useMemberStatus(userId || user?.id);
-		const rolesClan = useSelector(selectAllRolesClan);
+		const rolesClan: RolesClanEntity[] = useSelector(selectAllRolesClan);
 		const messageAvatar = useMemo(() => {
 			return message?.clan_avatar || message?.avatar;
 		}, [message?.clan_avatar, message?.avatar]);
@@ -264,7 +271,12 @@ const UserProfile = React.memo(
 									<View style={[styles.roles]}>
 										{userRolesClan?.map((role, index) => (
 											<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
-												<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.bgToggleOnBtn}></Block>
+												<Block
+													width={15}
+													height={15}
+													borderRadius={50}
+													backgroundColor={role?.color || DEFAULT_ROLE_COLOR}
+												></Block>
 												<Text style={[styles.textRole]}>{role?.title}</Text>
 											</View>
 										))}
