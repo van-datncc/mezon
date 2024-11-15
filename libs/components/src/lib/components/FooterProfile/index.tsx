@@ -147,9 +147,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 						<div
 							onClick={openSetting}
-							className="ml-auto p-1 opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hover:rounded-md"
+							className="ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
 						>
-							<Icons.SettingProfile className="w-5 h-5" />
+							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
 						</div>
 					</Tooltip>
 				</div>

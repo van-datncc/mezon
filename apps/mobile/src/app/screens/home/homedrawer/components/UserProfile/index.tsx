@@ -2,7 +2,14 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	selectAccountCustomStatus,
+	selectAllRolesClan,
+	selectDirectsOpenlist,
+	selectMemberClanByUserId2,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -59,6 +66,7 @@ const UserProfile = React.memo(
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type), [currentChannel?.type]);
 		const { dismiss } = useBottomSheetModal();
+		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 
 		const isKicked = useMemo(() => {
 			return !userById;
@@ -77,6 +85,10 @@ const UserProfile = React.memo(
 			const id = userProfile?.user?.google_id || userProfile?.user?.id;
 			return userId === id;
 		}, [userById, userProfile]);
+
+		const displayStatus = useMemo(() => {
+			return isCheckOwner ? currentUserCustomStatus : userCustomStatus;
+		}, [currentUserCustomStatus, isCheckOwner, userCustomStatus]);
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
@@ -215,7 +227,7 @@ const UserProfile = React.memo(
 						<Text style={[styles.subUserName]}>
 							{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
-						{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
+						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
 							<View style={[styles.userAction]}>

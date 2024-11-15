@@ -4,18 +4,17 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		userName: {
-			fontSize: size.s_16,
-			fontWeight: '500',
-			color: colors.white
+			fontSize: size.s_14,
+			color: colors.text
 		},
 		textTime: {
-			fontSize: size.s_14,
-			fontWeight: '400',
-			color: colors.text
+			fontSize: size.s_12,
+			color: colors.textDisabled,
+			marginTop: size.s_8
 		},
 		actionText: {
 			fontSize: size.s_14,
-			fontWeight: '400',
-			color: colors.text
+			fontWeight: '600',
+			color: colors.white
 		}
 	});

@@ -14,5 +14,9 @@
   "filterUserAuditLog": {
     "placeholder": "Tìm kiếm người dùng",
     "allUsers": "Tất cả người dùng"
+  },
+  "emptyAuditLog": {
+    "khongCoNhatKy": "CHƯA CÓ NHẬT KÝ",
+    "moTa": "Khi các quản trị viên bắt đầu quản lý, bạn có thể theo dõi hoạt động quản lý ở đây."
   }
 }

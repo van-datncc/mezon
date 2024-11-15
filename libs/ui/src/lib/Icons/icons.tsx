@@ -5747,9 +5747,9 @@ export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', 
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
 				fill="currentColor"
-				fill-rule="evenodd"
+				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm5.7-13.3a1 1 0 0 0-1.4-1.4L10 14.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l7-7Z"
-				clip-rule="evenodd"
+				clipRule="evenodd"
 			></path>
 		</svg>
 	);
@@ -5857,9 +5857,9 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 			<circle cx="12" cy="12" r="10" fill="transparent" className=""></circle>
 			<path
 				fill="currentColor"
-				fill-rule="evenodd"
+				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm0-17a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1Z"
-				clip-rule="evenodd"
+				clipRule="evenodd"
 				className=""
 			></path>
 		</svg>

@@ -61,4 +61,5 @@ jobs:
           mc cp dist/executables/mezon-*-mac-arm64.dmg mezon-app/mezon/release/
           mc cp dist/executables/mezon-*-mac-arm64.zip mezon-app/mezon/release/
           mc cp dist/executables/mezon-*-mac-x64.dmg mezon-app/mezon/release/
+          mc cp dist/executables/mezon-*-mac-x64.zip mezon-app/mezon/release/
 

@@ -22,10 +22,10 @@ export default function FilterUserAuditLog() {
 	const userOptions = useMemo(
 		() =>
 			[
-				{ title: t('filterUserAuditLog.allUsers'), icon: <Icons.IconPeople />, value: '' },
+				{ title: t('filterUserAuditLog.allUsers'), icon: <Icons.IconPeople height={size.s_30} width={size.s_30} />, value: '' },
 				...(usersClan || []).map((item: UsersClanEntity) => ({
 					title: item?.user?.display_name || '',
-					icon: <MezonAvatar avatarUrl={item?.user?.avatar_url} username={item?.user?.display_name} />,
+					icon: <MezonAvatar height={size.s_30} width={size.s_30} avatarUrl={item?.user?.avatar_url} username={item?.user?.display_name} />,
 					value: item?.user?.id || ''
 				}))
 			]?.filter((user) => user?.title?.toLowerCase()?.includes(searchText?.toLowerCase())),
@@ -49,7 +49,13 @@ export default function FilterUserAuditLog() {
 		<Block width={'100%'} height={'100%'} backgroundColor={themeValue.primary} paddingHorizontal={size.s_10} paddingVertical={size.s_10}>
 			<InputSearchAuditLog onChangeText={handleSearchTerm} placeHolder={t('filterUserAuditLog.placeholder')} />
 			<Block marginVertical={size.s_10}>
-				<ScrollView showsVerticalScrollIndicator={false}>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					scrollEventThrottle={16}
+					removeClippedSubviews={false}
+					nestedScrollEnabled={true}
+					bounces={false}
+				>
 					<MezonOption data={userOptions} onChange={handleOptionChange} value={userOption} />
 				</ScrollView>
 			</Block>

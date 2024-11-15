@@ -1,5 +1,6 @@
 import { selectTheme } from '@mezon/store';
 import { SearchItemProps, toggleDisableHover } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ListGroupSearchModalContext } from './ListGroupSearchModalContext';
@@ -21,9 +22,20 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		() =>
 			listItemWithoutRecent.reduce<ClassifiedLists>(
 				(acc, item) => {
-					if (item.count_messsage_unread && item.count_messsage_unread > 0) {
+					const hasCountUnread = item.count_messsage_unread && item.count_messsage_unread > 0;
+					const isTextChannel = item.type === ChannelType.CHANNEL_TYPE_TEXT;
+					const isThreadChannel = item.type === ChannelType.CHANNEL_TYPE_THREAD;
+					const isDMMessage = item.type === ChannelType.CHANNEL_TYPE_DM;
+					const isGrMessage = item.type === ChannelType.CHANNEL_TYPE_GROUP;
+					const hasUnread = item.lastSentTimeStamp > item.lastSeenTimeStamp;
+					const hasUnreadChannel =
+						(isTextChannel && !item.count_messsage_unread && hasUnread) || (isThreadChannel && !item.count_messsage_unread && hasUnread);
+					const hasUnreadDmGr = (isDMMessage && hasUnread) || (isGrMessage && hasUnread);
+					const isInListRecent = listRecent.some((recentItem) => recentItem.id === item.id);
+
+					if ((hasCountUnread && isTextChannel) || (hasCountUnread && isThreadChannel)) {
 						acc.mentionList.push(item);
-					} else if (!item.count_messsage_unread && item.lastSentTimeStamp > item.lastSeenTimeStamp) {
+					} else if (hasUnreadChannel || (hasUnreadDmGr && !isInListRecent)) {
 						acc.unreadList.push(item);
 					}
 					return acc;
