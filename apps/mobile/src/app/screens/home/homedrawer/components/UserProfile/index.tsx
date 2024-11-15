@@ -272,9 +272,9 @@ const UserProfile = React.memo(
 										{userRolesClan?.map((role, index) => (
 											<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
 												<Block
-													width={15}
-													height={15}
-													borderRadius={50}
+													width={size.s_15}
+													height={size.s_15}
+													borderRadius={size.s_50}
 													backgroundColor={role?.color || DEFAULT_ROLE_COLOR}
 												></Block>
 												<Text style={[styles.textRole]}>{role?.title}</Text>
