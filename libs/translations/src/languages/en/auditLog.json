@@ -14,5 +14,9 @@
   "filterUserAuditLog": {
     "placeholder": "Search Users",
     "allUsers":"All Users"
+  },
+  "emptyAuditLog": {
+    "noLogsYet": "NO LOGS YET",
+    "description": "Once moderators begin moderating, you can moderate the moderation here."
   }
 }

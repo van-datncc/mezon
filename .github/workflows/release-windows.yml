@@ -48,15 +48,8 @@ jobs:
           NX_IMGPROXY_BASE_URL: ${{ secrets.NX_IMGPROXY_BASE_URL }}
           NX_IMGPROXY_KEY: ${{ secrets.NX_IMGPROXY_KEY }}
 
-      - name: Zip portable
-        run: |
-           $version = (Get-Content -Path package.json | ConvertFrom-Json).version
-           echo "$version"
-           cd ./dist/executables/
-           zip mezon-$version-win-portable-x64.zip  mezon-*-win-x64.exe
-
       - name: Push to MinIO
         run: |
           powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/latest.yml mezon/mezon/release/latest.yml'"
           powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-x64.exe mezon/mezon/release/'"
-          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-portable-x64.zip mezon/mezon/release/'"
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-x64-portable.exe mezon/mezon/release/'"

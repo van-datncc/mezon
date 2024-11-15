@@ -14,7 +14,9 @@ import {
 	accountActions,
 	channelsActions,
 	clansActions,
+	fetchDirectMessage,
 	getIsShowPopupForward,
+	listChannelsByUserActions,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
@@ -86,6 +88,8 @@ function MyApp() {
 			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
+				dispatch(fetchDirectMessage({ noCache: true }));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				openSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {

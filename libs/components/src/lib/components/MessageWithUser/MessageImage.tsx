@@ -15,6 +15,8 @@ export type MessageImage = {
 };
 
 const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
+	const imageUrlKey = `${attachmentData.url}?timestamp=${new Date().getTime()}`;
+
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
@@ -111,6 +113,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				<div className="flex">
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
+						key={imageUrlKey}
 						onContextMenu={handleContextMenu}
 						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
 						style={{ width: width || 'auto', height }}

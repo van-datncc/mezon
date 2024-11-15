@@ -1,6 +1,6 @@
 import { SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
 import MessageContextMenu from './MessageContextMenu';
 
@@ -63,11 +63,13 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 export const MessageContextMenuProvider = ({
 	children,
 	allUserIdsInChannel,
-	allRolesInClan
+	allRolesInClan,
+	channelId
 }: {
 	children: React.ReactNode;
 	allUserIdsInChannel: string[];
 	allRolesInClan: string[];
+	channelId?: string;
 }) => {
 	const messageIdRef = useRef<string>('');
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
@@ -80,7 +82,7 @@ export const MessageContextMenuProvider = ({
 		id: MESSAGE_CONTEXT_MENU_ID
 	});
 
-	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false); // New state for menu visibility
+	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
 
 	const menu = useMemo(() => {
 		if (!isMenuVisible) return null;
@@ -93,11 +95,12 @@ export const MessageContextMenuProvider = ({
 		setPosShowMenu(pos);
 	}, []);
 
-	const onVisibilityChange = useCallback((status: boolean) => {
-		if (!status) {
-			setIsMenuVisible(false);
-		}
-	}, []);
+	useEffect(() => {
+		// change channel hide menu keep not mount
+		channelId && setIsMenuVisible(false);
+	}, [channelId]);
+
+	const onVisibilityChange = useCallback((status: boolean) => {}, []);
 
 	const setImageURL = useCallback((src: string) => {
 		setImageSrc(src);

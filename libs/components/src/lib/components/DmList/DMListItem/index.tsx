@@ -74,6 +74,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				countMember={(directMessage?.user_id?.length || 0) + 1}
 				user={directMessage as ChannelMembersEntity}
 				isMute={directMessage?.is_mute}
+				isDM
 			/>
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}
