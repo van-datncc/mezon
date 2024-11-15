@@ -1,5 +1,5 @@
 import { useShowName } from '@mezon/core';
-import { selectMemberClanByUserId2, selectRolesClanEntities, useAppSelector } from '@mezon/store';
+import { RolesClanEntity, selectMemberClanByUserId2, selectRolesClanEntities, useAppSelector } from '@mezon/store';
 import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, IMessageWithUser, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
@@ -20,30 +20,26 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	const displayName = userClan?.user?.display_name;
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
 	const userRolesClan = useMemo(() => {
-		const activeRole: Record<string, string> = {};
+		const activeRole: Array<RolesClanEntity> = [];
 		let userRoleLength = 0;
 		let highestPermissionRole = null;
 		let maxLevelPermission = 0;
-
 		for (const key in rolesClanEntity) {
 			const role = rolesClanEntity[key];
 			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === message?.sender_id);
-
 			if (checkHasRole) {
-				activeRole[key] = key;
+				activeRole.push(role);
 				userRoleLength++;
-
 				if (role.max_level_permission !== undefined && role.max_level_permission > maxLevelPermission) {
 					maxLevelPermission = role.max_level_permission;
 					highestPermissionRole = role;
 				}
 			}
 		}
-
 		return {
 			usersRole: activeRole,
 			length: userRoleLength,
-			highestPermissionRoleColor: highestPermissionRole?.color || DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
+			highestPermissionRoleColor: highestPermissionRole?.color || activeRole[0]?.color || DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
 		};
 	}, [message?.sender_id, rolesClanEntity]);
 
