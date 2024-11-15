@@ -80,6 +80,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 			clanRole.clan_id,
 			clanRole.id,
 			clanRole?.title,
+			clanRole?.color,
 			selectedMembers,
 			selectedPermissions,
 			[],
@@ -160,7 +161,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	};
 
 	const handleNextStep = async () => {
-		const response = updateRole(newRole.clan_id, newRole.id, newRole.title, [], selectedPermissions, [], []);
+		const response = updateRole(newRole.clan_id, newRole.id, newRole.title, newRole.color, [], selectedPermissions, [], []);
 		if (response) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
 			// Toast.show({
