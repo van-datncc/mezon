@@ -20,7 +20,7 @@ import { Icons } from '@mezon/ui';
 import { isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton } from '../../ChannelTopbar';
@@ -241,14 +241,11 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
+	const peerConnection = useMemo(() => {
+		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+	}, []);
 
-	const handleShow = async () => {
-		setIsShow(true);
-	};
-
-	const startCall = async () => {
-		// Initialize WebRTC connection and join the session
-		const peerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+	useEffect(() => {
 		peerConnection.onicecandidate = (event: any) => {
 			if (event && event.candidate) {
 				if (mezon.socketRef.current?.isOpen() === true) {
@@ -283,7 +280,13 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
+	}, [mezon.socketRef, peerConnection]);
 
+	const handleShow = async () => {
+		setIsShow(true);
+	};
+
+	const startCall = async () => {
 		const offer = await peerConnection.createOffer();
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
