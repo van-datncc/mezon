@@ -2,6 +2,7 @@
 import { captureSentryError } from '@mezon/logger';
 import {
 	AttachmentEntity,
+	DMCallActions,
 	appActions,
 	attachmentActions,
 	channelMembers,
@@ -95,8 +96,7 @@ import {
 	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
-	WebrtcSignalingFwd,
-	WebrtcSignalingType
+	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
@@ -911,22 +911,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
-		switch (event.dataType) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				// Get peerConnection from receiver event.receiverId
-				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-				//const answer = await peerConnection.createAnswer();
-				//await peerConnection.setLocalDescription(answer);
-				break;
-			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
-				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				//await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-				break;
-			default:
-				break;
-		}
+		dispatch(
+			DMCallActions.add({
+				calleeId: event.receiverId,
+				signalingData: event,
+				id: '',
+				callerId: ''
+			})
+		);
 	}, []);
 
 	const setCallbackEventFn = React.useCallback(

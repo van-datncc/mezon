@@ -1,7 +1,8 @@
 import { IDMCall, LoadingStatus } from '@mezon/utils';
 import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { WebrtcSignalingFwd } from 'mezon-js';
 
-export const DMCALL_FEATURE_KEY = 'voice';
+export const DMCALL_FEATURE_KEY = 'dmcall';
 
 /*
  * Update these interfaces according to your requirements.
@@ -15,9 +16,7 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	error?: string | null;
 	callerId: string;
 	calleeId: string;
-	showCamera: boolean;
-	showScreen: boolean;
-	statusCall: boolean;
+	signalingData: WebrtcSignalingFwd;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -27,9 +26,11 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	error: null,
 	callerId: '',
 	calleeId: '',
-	showCamera: false,
-	showScreen: false,
-	statusCall: false
+	signalingData: {
+		receiverId: '',
+		dataType: 0,
+		jsonData: ''
+	}
 });
 
 export const DMCallSlice = createSlice({
@@ -84,8 +85,16 @@ export const DMCallActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll } = DMCallAdapter.getSelectors();
+const { selectAll, selectEntities } = DMCallAdapter.getSelectors();
 
 export const getDMCallState = (rootState: { [DMCALL_FEATURE_KEY]: DMCallState }): DMCallState => rootState[DMCALL_FEATURE_KEY];
 
 export const selectAllDMCallVoice = createSelector(getDMCallState, selectAll);
+
+export const selectDMVoiceEntities = createSelector(getDMCallState, selectEntities);
+
+export const selectSignalingDataByUserId = (userId: string) =>
+	createSelector(selectDMVoiceEntities, (entities) => {
+		const dmcalls = Object.values(entities);
+		return dmcalls.filter((dmcall) => dmcall && dmcall.calleeId === userId);
+	});

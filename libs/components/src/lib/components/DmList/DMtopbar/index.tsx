@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useMenu } from '@mezon/core';
+import { useAppParams, useAuth, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
@@ -9,6 +9,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectPinMessageByChannelId,
+	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -241,6 +242,8 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
+	const { userId } = useAuth();
+	const signalingData = useSelector(selectSignalingDataByUserId(userId || ''));
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 	}, []);
@@ -280,7 +283,45 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
-	}, [mezon.socketRef, peerConnection]);
+
+		const data = signalingData[0].signalingData;
+		const objData = JSON.parse(data.jsonData);
+		switch (signalingData[0].signalingData.dataType) {
+			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				{
+					const processData = async () => {
+						// Get peerConnection from receiver event.receiverId
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+						const answer = await peerConnection.createAnswer();
+						await peerConnection.setLocalDescription(answer);
+					};
+
+					processData().catch(console.error);
+				}
+
+				break;
+			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+				{
+					const processData = async () => {
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+					};
+
+					processData().catch(console.error);
+				}
+				break;
+			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+				{
+					const processData = async () => {
+						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+					};
+
+					processData().catch(console.error);
+				}
+				break;
+			default:
+				break;
+		}
+	}, [mezon.socketRef, peerConnection, signalingData]);
 
 	const handleShow = async () => {
 		setIsShow(true);
