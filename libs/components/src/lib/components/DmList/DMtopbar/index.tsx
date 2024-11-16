@@ -19,8 +19,8 @@ import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton } from '../../ChannelTopbar';
@@ -242,22 +242,18 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
 
-	useEffect(() => {
-		const peerConnection = mezon.socketRef.current?.getRTCPeerConnection();
-		if (!peerConnection) {
-			console.error('RTCPeerConnection is not available.');
-			return;
-		}
+	const handleShow = async () => {
+		setIsShow(true);
+	};
+
+	const startCall = async () => {
+		// Initialize WebRTC connection and join the session
+		const peerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 		peerConnection.onicecandidate = (event: any) => {
 			if (event && event.candidate) {
 				if (mezon.socketRef.current?.isOpen() === true) {
 					mezon.socketRef.current
-						?.sendICECandidateInit({
-							candidate: event.candidate.candidate,
-							sdpMid: event.candidate?.sdpMid,
-							sdpMLineIndex: event.candidate?.sdpMLineIndex,
-							usernameFragment: event.candidate?.usernameFragment
-						})
+						?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_ICE_CANDIDATE, JSON.stringify(event.candidate))
 						.then((ok) => {
 							// eslint-disable-next-line no-console
 							console.log('onicecandidate: ', ok);
@@ -287,27 +283,11 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
-	}, []);
 
-	const handleShow = async () => {
-		setIsShow(true);
-	};
-
-	const startCall = async () => {
-		// await mezon.socketRef.current?.startCall(localVideoRef.current, remoteVideoRef.current, { video: false, audio: true });
-		// Create offer and send it to backend via WebSocket
-		const peerConnection = mezon.socketRef.current?.getRTCPeerConnection();
-		if (!peerConnection) {
-			console.error('RTCPeerConnection is not available.');
-			return;
-		}
 		const offer = await peerConnection.createOffer();
 		await peerConnection.setLocalDescription(offer);
-		if (offer && offer.sdp) {
-			await mezon.socketRef.current?.sendCallRequest({
-				sdp: offer.sdp,
-				type: 'offer'
-			});
+		if (offer) {
+			await mezon.socketRef.current?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
 		}
 	};
 

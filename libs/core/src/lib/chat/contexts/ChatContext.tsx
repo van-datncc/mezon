@@ -94,7 +94,9 @@ import {
 	UserClanRemovedEvent,
 	VoiceEndedEvent,
 	VoiceJoinedEvent,
-	VoiceLeavedEvent
+	VoiceLeavedEvent,
+	WebrtcSignalingFwd,
+	WebrtcSignalingType
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
@@ -907,6 +909,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		};
 		handleRoleEvent();
 	}, []);
+
+	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
+		switch (event.dataType) {
+			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+				//const answer = await peerConnection.createAnswer();
+				//await peerConnection.setLocalDescription(answer);
+				//ws.send(JSON.stringify({ type: 'answer', answer: answer }));
+				break;
+			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+				break;
+			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+				//await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+				break;
+			default:
+				break;
+		}
+	}, []);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -986,6 +1008,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onroleevent = onroleevent;
 
 			socket.ontokensent = ontokensent;
+
+			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
+
+			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1025,7 +1051,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent,
-			ontokensent
+			ontokensent,
+			//onmessagebuttonclicked,
+			onwebrtcsignalingfwd
 		]
 	);
 
