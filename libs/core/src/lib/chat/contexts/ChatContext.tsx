@@ -913,10 +913,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
 		switch (event.dataType) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				// Get peerConnection from receiver event.receiverId
 				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
 				//const answer = await peerConnection.createAnswer();
 				//await peerConnection.setLocalDescription(answer);
-				//ws.send(JSON.stringify({ type: 'answer', answer: answer }));
 				break;
 			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
 				//await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));

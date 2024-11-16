@@ -323,6 +323,11 @@ export type IStreamInfo = {
 	parentId: string;
 };
 
+export type IDMCall = {
+	callerId: string;
+	calleeId: string;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;
