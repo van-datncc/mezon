@@ -12,7 +12,8 @@ import {
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -243,7 +244,7 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
 	const { userId } = useAuth();
-	const signalingData = useSelector(selectSignalingDataByUserId(userId || ''));
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 	}, []);

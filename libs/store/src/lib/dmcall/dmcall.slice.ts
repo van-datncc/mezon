@@ -93,8 +93,7 @@ export const selectAllDMCallVoice = createSelector(getDMCallState, selectAll);
 
 export const selectDMVoiceEntities = createSelector(getDMCallState, selectEntities);
 
-export const selectSignalingDataByUserId = (userId: string) =>
-	createSelector(selectDMVoiceEntities, (entities) => {
-		const dmcalls = Object.values(entities);
-		return dmcalls.filter((dmcall) => dmcall && dmcall.calleeId === userId);
-	});
+export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities, (state, userId) => userId], (entities, userId) => {
+	const dmcalls = Object.values(entities);
+	return dmcalls.filter((dmcall) => dmcall && dmcall.calleeId === userId);
+});
