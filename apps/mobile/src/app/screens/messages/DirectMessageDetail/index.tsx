@@ -219,6 +219,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				styles={styles}
 				themeValue={themeValue}
 				directMessageId={directMessageId}
+				firstUserId={firstUserId}
 			/>
 			{directMessageId && (
 				<ChatMessageWrapper handleBack={handleBack} directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />

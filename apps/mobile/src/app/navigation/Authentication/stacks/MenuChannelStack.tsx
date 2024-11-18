@@ -9,6 +9,7 @@ import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessage
 import SearchMessageDm from '../../../components/ThreadDetail/SearchMessageDm/SearchMessageDm';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
+import { DirectMessageCall } from '../../../screens/messages/DirectMessageCall';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -88,6 +89,13 @@ export function MenuChannelStacks({}: any) {
 					},
 					headerTintColor: Colors.white,
 					headerLeftLabelVisible: false
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.CALL_DIRECT}
+				component={DirectMessageCall}
+				options={{
+					headerShown: false
 				}}
 			/>
 		</Stack.Navigator>
