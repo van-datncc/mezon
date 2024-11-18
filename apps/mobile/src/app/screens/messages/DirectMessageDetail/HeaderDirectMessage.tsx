@@ -11,12 +11,14 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { SubPanelName, createImgproxyUrl } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../components/UserStatus';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 
 interface HeaderProps {
 	handleBack: () => void;
@@ -28,6 +30,7 @@ interface HeaderProps {
 	styles: any;
 	themeValue: any;
 	directMessageId: string;
+	firstUserId: string;
 }
 
 function useChannelSeen(channelId: string) {
@@ -82,9 +85,20 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 	userStatus,
 	styles,
 	themeValue,
-	directMessageId
+	directMessageId,
+	firstUserId
 }) => {
 	useChannelSeen(directMessageId || '');
+	const navigation = useNavigation<any>();
+
+	const goToCall = () => {
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+			params: {
+				receiverId: firstUserId
+			}
+		});
+	};
 
 	return (
 		<View style={styles.headerWrapper}>
@@ -116,6 +130,11 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
+				{!isTypeDMGroup && !!firstUserId && (
+					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
+						<Icons.PhoneCallIcon width={size.s_18} height={size.s_18} color={themeValue.text} />
+					</TouchableOpacity>
+				)}
 			</Pressable>
 		</View>
 	);
