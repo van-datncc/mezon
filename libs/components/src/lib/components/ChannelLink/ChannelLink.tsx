@@ -1,5 +1,6 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	appActions,
 	channelsActions,
 	notificationSettingActions,
 	selectCloseMenu,
@@ -135,6 +136,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
 			}
+			dispatch(appActions.setIsShowCanvas(false));
 		};
 
 		const openModalJoinVoiceChannel = useCallback(
