@@ -286,8 +286,8 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 			.catch((err) => console.error('Failed to get local media:', err));
 		if (!signalingData?.[0]) return;
 		const data = signalingData[0].signalingData;
-		const objData = JSON.parse(data.jsonData);
-		switch (signalingData[0].signalingData.dataType) {
+		const objData = JSON.parse(data.json_data);
+		switch (signalingData[0].signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				{
 					const processData = async () => {
