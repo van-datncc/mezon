@@ -1,5 +1,5 @@
 import { ACTIVE_WINDOW, NAVIGATE_TO_URL, SENDER_ID, START_NOTIFICATION_SERVICE, TRIGGER_SHORTCUT } from './constants';
-import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI, MezonNotificationOptions } from './types';
+import { ElectronBridgeHandler, IElectronBridge, MezonDownloadFile, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
 	private readonly bridge: MezonElectronAPI = window.electron;
@@ -33,11 +33,20 @@ export class ElectronBridge implements IElectronBridge {
 
 	public removeAllListeners() {
 		this.bridge.removeListener(TRIGGER_SHORTCUT, this.triggerShortcut);
+		this.bridge.removeListener(ACTIVE_WINDOW, this.triggerActiveWindow);
 		this.hasListeners = false;
 	}
 
 	public setBadgeCount(badgeCount: number | null) {
 		this.bridge.setBadgeCount(badgeCount);
+	}
+
+	public invoke(channel: string, data?: MezonDownloadFile): Promise<MezonDownloadFile> {
+		if (this.bridge.invoke) {
+			return this.bridge.invoke(channel, data);
+		}
+		console.error(`invoke is not supported on this bridge`);
+		return Promise.reject(new Error('invoke is not implemented in this bridge'));
 	}
 
 	public setActiveWindow() {
