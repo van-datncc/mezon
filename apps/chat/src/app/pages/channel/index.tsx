@@ -29,8 +29,8 @@ import {
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
-	selectListMission,
 	selectMissionDone,
+	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectStatusMenu,
 	selectTheme,
@@ -291,8 +291,8 @@ const SearchMessageChannel = () => {
 
 const OnboardingGuide = () => {
 	const missionDone = useSelector(selectMissionDone);
-	const listMission = useSelector(selectListMission);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const onboardingClan = useSelector(selectOnboardingByClan(currentClanId as string));
 	const { navigate, toGuidePage } = useAppNavigation();
 	const handleDoNextMission = () => {
 		const link = toGuidePage(currentClanId as string);
@@ -300,15 +300,15 @@ const OnboardingGuide = () => {
 	};
 	return (
 		<>
-			{missionDone < listMission.length ? (
+			{missionDone < onboardingClan.mission.length ? (
 				<div
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold">{listMission[missionDone].title} </div>
-						<div className="text-[10px] font-normal text-channelTextLabel"> {listMission[missionDone].description} </div>
+						<div className="text-base font-semibold">{onboardingClan.mission[missionDone].title} </div>
+						<div className="text-[10px] font-normal text-channelTextLabel"> {onboardingClan.mission[missionDone].content} </div>
 					</div>
 				</div>
 			) : null}
