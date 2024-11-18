@@ -1,5 +1,5 @@
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectCurrentChannel, useAppSelector } from '@mezon/store-mobile';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useRef } from 'react';
@@ -15,11 +15,10 @@ import { style } from './styles';
 type ChatBoxStreamScreen = typeof APP_SCREEN.MESSAGES.STACK;
 
 const ChatBoxStream = ({ navigation }: AppStackScreenProps<ChatBoxStreamScreen>) => {
-	const currentStreamInfo = useSelector(selectCurrentChannel);
 	const panelKeyboardRef = useRef(null);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentChannel = useAppSelector((state) => selectChannelById(state, currentStreamInfo?.channel_id || ''));
+	const currentChannel = useSelector(selectCurrentChannel);
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
