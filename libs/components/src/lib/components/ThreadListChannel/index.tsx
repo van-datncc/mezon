@@ -1,5 +1,6 @@
 import { useMenu } from '@mezon/core';
 import {
+	appActions,
 	referencesActions,
 	selectChannelMetaEntities,
 	selectCloseMenu,
@@ -50,6 +51,7 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		}
 		dispatch(threadsActions.setOpenThreadMessageState(false));
 		dispatch(threadsActions.setValueThread(null));
+		dispatch(appActions.setIsShowCanvas(false));
 	};
 
 	const isShowThread = (thread: IChannel) => {

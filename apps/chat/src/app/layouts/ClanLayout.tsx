@@ -1,5 +1,5 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo } from '@mezon/components';
-import { useApp } from '@mezon/core';
+import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -35,6 +35,8 @@ const ClanEffects: React.FC<{
 	isShowCreateThread: boolean;
 }> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread }) => {
 	// move code thanh.levan
+
+	const { canvasId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
@@ -72,7 +74,9 @@ const ClanEffects: React.FC<{
 			);
 			dispatch(appActions.setIsShowChatStream(false));
 		}
-		dispatch(appActions.setIsShowCanvas(false));
+		if (!canvasId) {
+			dispatch(appActions.setIsShowCanvas(false));
+		}
 	}, [currentStreamInfo, currentClan, currentChannel]);
 
 	useEffect(() => {

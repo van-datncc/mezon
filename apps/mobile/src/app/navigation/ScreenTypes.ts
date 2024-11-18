@@ -96,7 +96,8 @@ export const APP_SCREEN = {
 		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
 		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
 		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM',
-		CANVAS: 'CANVAS'
+		CANVAS: 'CANVAS',
+		CALL_DIRECT: 'CALL_DIRECT'
 	},
 
 	SETTINGS: {
@@ -129,6 +130,7 @@ type MessagesStackParamList = {
 	[APP_SCREEN.MESSAGES.MESSAGE_DETAIL]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_MESSAGE]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_GROUP]: undefined;
+	[APP_SCREEN.MESSAGES.CHAT_STREAMING]: undefined;
 };
 
 type FriendsStackParamList = {
@@ -177,6 +179,9 @@ export type MenuChannelStackParamList = {
 		clanId: string;
 		channelId: string;
 		canvasId: string;
+	};
+	[APP_SCREEN.MENU_CHANNEL.CALL_DIRECT]: {
+		receiverId: string;
 	};
 };
 

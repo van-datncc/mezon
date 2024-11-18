@@ -21,7 +21,8 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			category_id: category.id,
 			channel_id: channel?.channel_id ?? '',
-			channel_label: channel?.channel_label
+			channel_label: channel?.channel_label,
+			app_url: ''
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
 			navigation.goBack();

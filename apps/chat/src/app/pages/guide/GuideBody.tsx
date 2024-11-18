@@ -1,16 +1,27 @@
 import { GuideItemLayout } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
-import { ETypeMission, onboardingActions, selectChannelFirst, selectCurrentClanId, selectOnboardingMode } from '@mezon/store';
+import {
+	ETypeMission,
+	fetchOnboarding,
+	onboardingActions,
+	selectChannelById,
+	selectChannelFirst,
+	selectCurrentClanId,
+	selectOnboardingByClan,
+	selectOnboardingMode,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 function GuideBody() {
 	const onboadingMode = useSelector(selectOnboardingMode);
 	const firstChannelId = useSelector(selectChannelFirst);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { navigate, toChannelPage, toMembersPage } = useAppNavigation();
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const handleDoMission = (type: number) => {
 		if (onboadingMode) {
@@ -37,27 +48,11 @@ function GuideBody() {
 		}
 	};
 
-	const listMission = useMemo(() => {
-		if (!firstChannelId) {
-			return [];
-		}
+	const onboardingItem = useSelector(selectOnboardingByClan(currentClanId as string));
 
-		const listTask = [
-			{
-				title: `Sends message in #${firstChannelId.channel_label}`,
-				description: `Sends message in #${firstChannelId.channel_label}`
-			},
-			{
-				title: "Visit clan's members list ",
-				description: `Open clan's members list`
-			},
-			{
-				title: 'Visit events clans ',
-				description: `Open events clan`
-			}
-		];
-		return listTask;
-	}, [firstChannelId]);
+	useEffect(() => {
+		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
+	}, []);
 
 	return (
 		<div className="w-full h-full pt-4 ">
@@ -65,28 +60,31 @@ function GuideBody() {
 				<div className="flex-1 flex flex-col gap-2">
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Resources</p>
-						<GuideItemLayout
-							title="Title"
-							hightLightIcon={true}
-							icon={<Icons.RuleIcon />}
-							action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
-						/>
+						{onboardingItem &&
+							onboardingItem.rule.length > 0 &&
+							onboardingItem.rule.map((rule) => (
+								<GuideItemLayout
+									key={rule.id}
+									title="Title"
+									hightLightIcon={true}
+									icon={<Icons.RuleIcon />}
+									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
+								/>
+							))}
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Missions </p>
-						{listMission.map((mission, index) => (
-							<GuideItemLayout
-								key={mission.title}
-								title={mission.title}
-								className="cursor-pointer"
-								hightLightIcon={true}
-								icon={<Icons.TargetIcon defaultSize="w-6 h-6" />}
-								onClick={() => handleDoMission(index)}
-								description={mission.description}
-								action={<div className={`w-6 aspect-square  rounded-full ${onboadingMode ? 'bg-green-500' : 'bg-black'}`}></div>}
-							/>
-						))}
+						{onboardingItem &&
+							onboardingItem.mission.length > 0 &&
+							onboardingItem.mission.map((mission, index) => (
+								<GuideItemMission
+									key={mission.id}
+									mission={mission}
+									onClick={() => handleDoMission(index)}
+									onboadingMode={onboadingMode}
+								/>
+							))}
 					</div>
 				</div>
 				<div className="flex flex-col gap-2 h-20 p-4 w-[300px] text-base justify-between bg-[#282a2e] rounded-lg">
@@ -97,5 +95,32 @@ function GuideBody() {
 		</div>
 	);
 }
+
+type TypeItemMission = {
+	mission: ApiOnboardingItem;
+	onClick: () => void;
+	onboadingMode: boolean;
+};
+
+const GuideItemMission = ({ mission, onClick, onboadingMode }: TypeItemMission) => {
+	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
+	return (
+		<GuideItemLayout
+			key={mission.id}
+			title={mission.title}
+			className="cursor-pointer"
+			hightLightIcon={true}
+			icon={<Icons.TargetIcon defaultSize="w-6 h-6" />}
+			onClick={onClick}
+			description={
+				<span>
+					{' '}
+					{mission.content || ''} <span className="font-semibold text-channelActiveColor"> #{channelById?.channel_label} </span>{' '}
+				</span>
+			}
+			action={<div className={`w-6 aspect-square  rounded-full ${onboadingMode ? 'bg-green-500' : 'bg-black'}`}></div>}
+		/>
+	);
+};
 
 export default GuideBody;

@@ -1,9 +1,9 @@
 import { RolesClanEntity, selectAllRolesClan } from '@mezon/store-mobile';
-import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export function useColorsRoleById(messageSenderId: string, defaultColor: string = DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR) {
+export function useColorsRoleById(messageSenderId: string) {
 	const rolesClan = useSelector(selectAllRolesClan);
 
 	const userRolesClan = useMemo(() => {
@@ -17,9 +17,9 @@ export function useColorsRoleById(messageSenderId: string, defaultColor: string 
 		}, null);
 
 		return {
-			highestPermissionRoleColor: highestPermissionRole?.color || activeRoles[0]?.color || defaultColor
+			highestPermissionRoleColor: highestPermissionRole?.color || activeRoles[0]?.color || DEFAULT_ROLE_COLOR
 		};
-	}, [messageSenderId, rolesClan, defaultColor]);
+	}, [messageSenderId, rolesClan]);
 
 	return userRolesClan;
 }
