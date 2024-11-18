@@ -81,7 +81,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					lastSeenTimestamp: timestamp,
 					lastSentTimestamp: timestamp,
 					lastSeenPinMessage: '',
-					clanId: currentChannel?.clan_id ?? ''
+					clanId: currentChannel?.clan_id ?? '',
+					isMute: false
 				}
 			])
 		);
