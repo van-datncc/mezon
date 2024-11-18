@@ -7,7 +7,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_10,
-			paddingVertical: size.s_10
+			padding: size.s_10
 		},
 		activityAppLabel: {
 			fontSize: size.s_18,
