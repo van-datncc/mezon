@@ -41,10 +41,8 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const mode =
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
-		if (isUnreadChannel || lastMessage?.sender_id === userId) {
-			if (lastMessage) {
-				markAsReadSeen(lastMessage, mode);
-			}
+		if (lastMessage) {
+			markAsReadSeen(lastMessage, mode);
 		}
 	}, [lastMessage, channelId]);
 

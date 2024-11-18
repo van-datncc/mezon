@@ -1,6 +1,5 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
 
@@ -12,6 +11,7 @@ export interface ChannelMetaEntity {
 	lastSentTimestamp: number;
 	lastSeenPinMessage: string;
 	clanId: string;
+	isMute: boolean;
 }
 
 export interface ChannelMetaState extends EntityState<ChannelMetaEntity, string> {
@@ -120,10 +120,10 @@ export const selectLastSeenPinMessageChannelById = (channelId: string) =>
 	});
 
 export const selectIsUnreadChannelById = createSelector(
-	[getChannelMetaState, selectEntiteschannelCategorySetting, (state, channelId) => channelId],
+	[getChannelMetaState, selectChannelMetaEntities, (state, channelId) => channelId],
 	(state, settings, channelId) => {
 		const channel = state?.entities[channelId];
-		const inactiveMuteSetting = settings?.[channelId]?.action !== enableMute;
+		const inactiveMuteSetting = settings?.[channelId]?.isMute !== true;
 		// unread last seen timestamp is less than last sent timestamp
 		return inactiveMuteSetting && channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 	}
@@ -135,8 +135,8 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 		return channel?.lastSeenTimestamp || 0;
 	});
 
-export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selectEntiteschannelCategorySetting], (state, settings) => {
-	if (state.lastSentChannelId && settings?.[state.lastSentChannelId]?.action !== enableMute) {
+export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selectChannelMetaEntities], (state, settings) => {
+	if (state.lastSentChannelId && settings?.[state.lastSentChannelId]?.isMute !== true) {
 		const lastSentChannel = state?.entities?.[state.lastSentChannelId];
 		if (lastSentChannel?.lastSeenTimestamp && lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
 			return true;
@@ -145,7 +145,7 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 
 	for (let index = 0; index < state?.ids?.length; index++) {
 		const channel = state?.entities?.[state?.ids[index]];
-		if (settings?.[channel?.id]?.action === enableMute) continue;
+		if (settings?.[channel?.id]?.isMute === true) continue;
 		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
 			return true;
 		}
