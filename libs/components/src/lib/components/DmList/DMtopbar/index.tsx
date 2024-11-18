@@ -284,7 +284,7 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
-
+		if (!signalingData?.[0]) return;
 		const data = signalingData[0].signalingData;
 		const objData = JSON.parse(data.jsonData);
 		switch (signalingData[0].signalingData.dataType) {
