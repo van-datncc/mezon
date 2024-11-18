@@ -1,9 +1,8 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectStatusStream, useAppDispatch } from '@mezon/store';
+import { selectHiddenBottomTabMobile, selectStatusStream, useAppDispatch } from '@mezon/store';
 import { appActions } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, DeviceEventEmitter, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
+import { Animated, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import StreamingRoom from '../StreamingRoom';
 import { style } from './styles';
@@ -19,16 +18,7 @@ export const StreamingPopup = () => {
 	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const dispatch = useAppDispatch();
-	const [isOpenDrawer, setIsOpenDrawer] = useState(true);
-
-	useEffect(() => {
-		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.OPEN_CLOSE_DRAWER, ({ isOpenDrawer }) => {
-			setIsOpenDrawer(isOpenDrawer);
-		});
-		return () => {
-			showSKlListener.remove();
-		};
-	}, []);
+	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
 	const panResponder = useRef(
 		PanResponder.create({
 			onMoveShouldSetPanResponder: () => true,
@@ -78,12 +68,12 @@ export const StreamingPopup = () => {
 				}).start(() => {
 					setIsAnimationComplete(false);
 				});
-				dispatch(appActions.setHiddenBottomTabMobile(!isOpenDrawer));
+				dispatch(appActions.setHiddenBottomTabMobile(isHiddenTab));
 			}
 			setIsFullScreen(isFullScreen);
 			Keyboard.dismiss();
 		},
-		[isOpenDrawer]
+		[isHiddenTab]
 	);
 	if (!streamPlay) return null;
 	return (

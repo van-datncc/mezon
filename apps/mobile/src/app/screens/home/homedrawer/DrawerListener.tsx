@@ -15,7 +15,6 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
-import { useDrawerStatus } from '@react-navigation/drawer';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -68,12 +67,8 @@ function useChannelSeen(channelId: string) {
 }
 
 function DrawerListener({ channelId }: { channelId: string }) {
-	const isOpenDrawer = useDrawerStatus() === 'open';
 	useChannelSeen(channelId || '');
 
-	useEffect(() => {
-		DeviceEventEmitter.emit(ActionEmitEvent.OPEN_CLOSE_DRAWER, { isOpenDrawer: isOpenDrawer });
-	}, [isOpenDrawer]);
 	return <View />;
 }
 

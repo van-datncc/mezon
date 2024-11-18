@@ -65,7 +65,7 @@ const DrawerContent = React.memo(() => {
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<ServerList />
-			<BackNativeListener />
+			{!isTabletLandscape && <BackNativeListener />}
 			<ChannelListWrapper />
 			{isTabletLandscape && <View style={styles.wall}></View>}
 		</View>
