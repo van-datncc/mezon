@@ -2,6 +2,7 @@ import { useAuth } from '@mezon/core';
 import { appActions, canvasActions, canvasAPIActions, selectCanvasEntityById, selectIdCanvas, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 type GroupCanvasProps = {
@@ -89,16 +90,17 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }:
 					</div>
 				</Link>
 			</div>
-			<button
-				onClick={() =>
-					handleCopyToClipboard(process.env.NX_CHAT_APP_REDIRECT_URI + `/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`)
-				}
-				className={`absolute top-0 dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete font-bold w-6 h-6 flex items-center justify-center rounded-full ${isCopied ? 'text-red-600' : 'text-white'} ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}`}
-				style={{ top: '5px' }}
-				title={isCopied ? 'Copied Canvas' : 'Copy Canvas'}
+			<CopyToClipboard
+				text={process.env.NX_CHAT_APP_REDIRECT_URI + `/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`}
+				onCopy={() => setIsCopied(true)}
 			>
-				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
-			</button>
+				<button
+					style={{ top: '5px' }}
+					className={`absolute top-0 dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete font-bold w-6 h-6 flex items-center justify-center rounded-full ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}`}
+				>
+					{isCopied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
+				</button>
+			</CopyToClipboard>
 			{!isDisableDelCanvas && (
 				<button
 					title="Delete Canvas"
