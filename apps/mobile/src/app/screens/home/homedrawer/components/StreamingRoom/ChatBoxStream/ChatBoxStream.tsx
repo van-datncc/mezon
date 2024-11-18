@@ -1,37 +1,52 @@
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectCurrentStreamInfo, useAppSelector } from '@mezon/store-mobile';
+import { selectChannelById, selectCurrentChannel, useAppSelector } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useRef } from 'react';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import ChannelMessagesWrapper from '../../../ChannelMessagesWrapper';
 import { ChatBox } from '../../../ChatBox';
 import PanelKeyboard from '../../../PanelKeyboard';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { style } from './styles';
+type ChatBoxStreamScreen = typeof APP_SCREEN.MESSAGES.STACK;
 
-const ChatBoxStream = () => {
-	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+const ChatBoxStream = ({ navigation }: AppStackScreenProps<ChatBoxStreamScreen>) => {
+	const currentStreamInfo = useSelector(selectCurrentChannel);
 	const panelKeyboardRef = useRef(null);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentChannel = useAppSelector((state) => selectChannelById(state, currentStreamInfo?.streamId || ''));
+	const currentChannel = useAppSelector((state) => selectChannelById(state, currentStreamInfo?.channel_id || ''));
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
 		}
 	}, []);
 
+	const onHandlerStateChange = useCallback((event: { nativeEvent: { translationX: any; velocityX: any } }) => {
+		const { translationX, velocityX } = event.nativeEvent;
+		if (translationX > 50 && velocityX > 300) {
+			navigation?.goBack();
+		}
+	}, []);
+
 	return (
 		<Block height={'100%'} width={'100%'}>
 			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
-				<ChannelMessagesWrapper
-					channelId={currentChannel?.channel_id}
-					clanId={currentChannel?.clan_id}
-					isPublic={isPublicChannel(currentChannel)}
-					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
+				<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
+					<View style={{ flex: 1 }}>
+						<ChannelMessagesWrapper
+							channelId={currentChannel?.channel_id}
+							clanId={currentChannel?.clan_id}
+							isPublic={isPublicChannel(currentChannel)}
+							mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+						/>
+					</View>
+				</PanGestureHandler>
+
 				<ChatBox
 					hiddenIcon={{
 						threadIcon: true
