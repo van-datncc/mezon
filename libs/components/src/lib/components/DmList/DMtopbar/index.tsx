@@ -99,7 +99,10 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								</Tooltip>
 							</button>
 							<div>
-								<CallButton isLightMode={appearanceTheme === 'light'} />
+								<CallButton
+									isLightMode={appearanceTheme === 'light'}
+									dmUserId={currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : ''}
+								/>
 							</div>
 							<div>
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -237,7 +240,7 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 	);
 };
 
-function CallButton({ isLightMode }: { isLightMode: boolean }) {
+function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId: string }) {
 	const [isShow, setIsShow] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -246,22 +249,18 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const { userId } = useAuth();
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const peerConnection = useMemo(() => {
-		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
 	}, []);
 
 	useEffect(() => {
 		peerConnection.onicecandidate = (event: any) => {
 			if (event && event.candidate) {
 				if (mezon.socketRef.current?.isOpen() === true) {
-					mezon.socketRef.current
-						?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_ICE_CANDIDATE, JSON.stringify(event.candidate))
-						.then((ok) => {
-							// eslint-disable-next-line no-console
-							console.log('onicecandidate: ', ok);
-						})
-						.catch((err) => {
-							console.error('Error sending ICE candidate:', err, event.candidate);
-						});
+					mezon.socketRef.current?.forwardWebrtcSignaling(
+						dmUserId,
+						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+						JSON.stringify(event.candidate)
+					);
 				}
 			}
 		};
@@ -275,7 +274,7 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 
 		// Get user media
 		navigator.mediaDevices
-			.getUserMedia({ video: false, audio: true })
+			.getUserMedia({ video: true, audio: true })
 			.then((stream) => {
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
@@ -284,10 +283,11 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
+
 		if (!signalingData?.[0]) return;
 		const data = signalingData[0].signalingData;
-		const objData = JSON.parse(data.jsonData);
-		switch (signalingData[0].signalingData.dataType) {
+		const objData = JSON.parse(data.json_data);
+		switch (signalingData[0].signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				{
 					const processData = async () => {
@@ -295,8 +295,12 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
 						const answer = await peerConnection.createAnswer();
 						await peerConnection.setLocalDescription(answer);
+						await mezon.socketRef.current?.forwardWebrtcSignaling(
+							dmUserId,
+							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
+							JSON.stringify(answer)
+						);
 					};
-
 					processData().catch(console.error);
 				}
 
@@ -306,16 +310,18 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 					const processData = async () => {
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
 					};
-
 					processData().catch(console.error);
 				}
 				break;
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				{
 					const processData = async () => {
-						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+						if (peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
+							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+						} else {
+							console.error('Remote description is null, skipping ICE candidate');
+						}
 					};
-
 					processData().catch(console.error);
 				}
 				break;
@@ -329,16 +335,25 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	};
 
 	const startCall = async () => {
-		const offer = await peerConnection.createOffer();
+		const offer = await peerConnection.createOffer({
+			iceRestart: true,
+			offerToReceiveAudio: true,
+			offerToReceiveVideo: true
+		});
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
-			await mezon.socketRef.current?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
+			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
 		}
 	};
 
-	const handleClose = useCallback(() => {
+	// const handleClose = useCallback(() => {
+	// 	setIsShow(false);
+	// }, []);
+
+	const endCall = async () => {
 		setIsShow(false);
-	}, []);
+		peerConnection.close();
+	};
 
 	const { directId } = useAppParams();
 	const pinMsgs = useSelector(selectPinMessageByChannelId(directId));
@@ -389,8 +404,8 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 							<button onClick={startCall} className="px-6 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600">
 								Start Call
 							</button>
-							<button onClick={() => setIsShow(false)} className="px-6 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600">
-								Close
+							<button onClick={endCall} className="px-6 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600">
+								End
 							</button>
 						</div>
 					</div>
