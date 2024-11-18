@@ -130,6 +130,7 @@ type MessagesStackParamList = {
 	[APP_SCREEN.MESSAGES.MESSAGE_DETAIL]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_MESSAGE]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_GROUP]: undefined;
+	[APP_SCREEN.MESSAGES.CHAT_STREAMING]: undefined;
 };
 
 type FriendsStackParamList = {
