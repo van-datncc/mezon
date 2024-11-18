@@ -27,9 +27,9 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	callerId: '',
 	calleeId: '',
 	signalingData: {
-		receiverId: '',
-		dataType: 0,
-		jsonData: ''
+		receiver_id: '',
+		data_type: 0,
+		json_data: ''
 	}
 });
 

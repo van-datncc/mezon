@@ -914,7 +914,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
 		dispatch(
 			DMCallActions.add({
-				calleeId: event.receiverId,
+				calleeId: event.receiver_id,
 				signalingData: event,
 				id: '',
 				callerId: ''

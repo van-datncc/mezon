@@ -2,7 +2,15 @@ import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core'
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { EOverriddenPermission, IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, processFile } from '@mezon/utils';
+import {
+	EOverriddenPermission,
+	IMessageSendPayload,
+	MAX_FILE_ATTACHMENTS,
+	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	ThreadValue,
+	processFile
+} from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -83,7 +91,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				}
 
 				if (files.length > 0) {
-					if (files.length + attachmentFilteredByChannelId?.files?.length > 10) {
+					if (files.length + attachmentFilteredByChannelId?.files?.length > MAX_FILE_ATTACHMENTS) {
 						setOverUploadingState(true);
 						return;
 					}

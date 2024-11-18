@@ -31,6 +31,7 @@ import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import AppDirectory from '../pages/AppDirectory';
 import MezonPage from '../pages/homepage/mezonpage';
 import ThreadsMain from '../pages/thread';
+import CanvasRoutes from './CanvasRoutes';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
@@ -180,6 +181,18 @@ export const Routes = memo(() => {
 																						{
 																							path: ':threadId',
 																							element: <ThreadsMain />
+																						}
+																					]
+																				},
+																				{
+																					path: 'canvas',
+																					element: <CanvasRoutes />,
+																					children: [
+																						{
+																							path: ':canvasId',
+																							loader: loaderWithStore(canvasLoader),
+																							shouldRevalidate: shouldRevalidateCanvas,
+																							element: <Canvas />
 																						}
 																					]
 																				}

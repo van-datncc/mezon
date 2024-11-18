@@ -1,4 +1,5 @@
 import { useEscapeKey } from '@mezon/core';
+import { MAX_FILE_ATTACHMENTS } from '@mezon/utils';
 import DocumentThumbnail from './DocumentThumbnail';
 
 interface ITooManyUploadProps {
@@ -20,7 +21,7 @@ const TooManyUpload = ({ togglePopup }: ITooManyUploadProps) => {
 							<h1 className=" font-bold text-2xl mt-[1rem] text-center">Too many uploads!</h1>
 						</div>
 						<div className=" w-full flex flex-row justify-center text-center mt-[1rem]">
-							<p className="w-[85%]">You can only upload 10 files at a time!</p>
+							<p className="w-[85%]">You can only upload {MAX_FILE_ATTACHMENTS} files at a time!</p>
 						</div>
 					</div>
 				</div>
