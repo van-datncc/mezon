@@ -8,7 +8,8 @@ export const style = (colors: Attributes) =>
 			padding: Metrics.size.xl,
 			margin: Metrics.size.l,
 			borderRadius: 10,
-			overflow: 'hidden'
+			overflow: 'hidden',
+			marginHorizontal: '30%'
 		},
 
 		title: {

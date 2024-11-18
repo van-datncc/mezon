@@ -1,0 +1,42 @@
+import { useAuth, useMemberStatus } from '@mezon/core';
+import { useTheme } from '@mezon/mobile-ui';
+
+import { selectAccountCustomStatus } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
+import { memo } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
+import { UserStatus } from '../../../../components/UserStatus';
+import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
+import { style } from './styles';
+
+const ProfileBar = () => {
+	const { themeValue } = useTheme();
+	const navigation = useNavigation<any>();
+	const styles = style(themeValue);
+	const user = useAuth();
+	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
+	const userStatus = useMemberStatus(user?.userId || '');
+
+	const handleOpenProfileSettings = () => {
+		navigation.navigate(APP_SCREEN.PROFILE.HOME);
+	};
+
+	return (
+		<Pressable style={styles.wrapperProfile} onPress={handleOpenProfileSettings}>
+			<View>
+				<FastImage source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imageWrapper} />
+				<UserStatus status={userStatus} />
+			</View>
+			<View>
+				<Text style={styles.userName}>{user?.userProfile?.user?.username}</Text>
+				<Text style={styles.status} numberOfLines={1}>
+					{currentUserCustomStatus}
+				</Text>
+			</View>
+		</Pressable>
+	);
+};
+
+export default memo(ProfileBar);

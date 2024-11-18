@@ -8,6 +8,8 @@ export const style = (colors: Attributes) =>
 			width: '100%',
 			height: '100%',
 			overflow: 'hidden',
+			borderTopLeftRadius: size.s_14,
+			borderTopRightRadius: size.s_14,
 			paddingBottom: size.s_10
 		},
 		messageActionsWrapper: {

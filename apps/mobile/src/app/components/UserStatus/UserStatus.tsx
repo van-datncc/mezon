@@ -6,8 +6,8 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 export const UserStatus = React.memo(({ status, customStyles }: IUserStatusProps) => {
 	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const iconSize = isTabletLandscape ? size.s_18 : size.s_12;
-	const mobileIconSize = isTabletLandscape ? size.s_24 : size.s_16;
+	const iconSize = isTabletLandscape ? size.s_16 : size.s_12;
+	const mobileIconSize = isTabletLandscape ? size.s_20 : size.s_16;
 
 	return (
 		<Block

@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
+import ProfileBar from './ProfileBar';
 import ServerList from './ServerList';
 import UserEmptyClan from './UserEmptyClan';
 import { style } from './styles';
@@ -64,9 +65,14 @@ const DrawerContent = React.memo(() => {
 		);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
-			<ServerList />
-			<BackNativeListener />
-			<ChannelListWrapper />
+			<View style={styles.container}>
+				<View style={styles.rowContainer}>
+					<ServerList />
+					<BackNativeListener />
+					<ChannelListWrapper />
+				</View>
+				{isTabletLandscape && <ProfileBar />}
+			</View>
 			{isTabletLandscape && <View style={styles.wall}></View>}
 		</View>
 	);
