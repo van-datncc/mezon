@@ -31,6 +31,7 @@ import {
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
+	selectIsShowNumberCallDM,
 	selectIsUnreadDMById,
 	selectIsUseProfileDM,
 	selectPositionEmojiButtonSmile,
@@ -126,6 +127,7 @@ const DirectMessage = () => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+	const isShowNumberCallDM = useSelector(selectIsShowNumberCallDM) ?? [];
 
 	const HEIGHT_EMOJI_PANEL = 457;
 	const WIDTH_EMOJI_PANEL = 500;
@@ -175,6 +177,7 @@ const DirectMessage = () => {
 	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	const handleClose = useCallback(() => {}, []);
+	console.log(isShowNumberCallDM,'isShowNumberCallDM')
 
 	return (
 		<>
@@ -182,12 +185,12 @@ const DirectMessage = () => {
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-				h-[100%] overflow-visible`}
+				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row flex-1 w-full">
+				<div className={`flex flex-row flex-1 w-full ${Array.isArray(isShowNumberCallDM) && isShowNumberCallDM?.includes(directId ?? '') ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>

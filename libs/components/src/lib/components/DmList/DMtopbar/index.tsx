@@ -2,23 +2,28 @@
 import { useAppParams, useAuth, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
-	DirectEntity,
-	appActions,
-	selectCloseMenu,
-	selectDmGroupCurrent,
-	selectIsShowMemberListDM,
-	selectIsUseProfileDM,
-	selectPinMessageByChannelId,
-	selectSignalingDataByUserId,
-	selectStatusMenu,
-	selectTheme,
-	useAppDispatch
+  DirectEntity,
+  appActions,
+  selectCloseMenu,
+  selectDmGroupCurrent,
+  selectIsMuteMicrophone,
+  selectIsShowMemberListDM,
+  selectIsShowNumberCallDM,
+  selectIsShowShareScreen,
+  selectIsUseProfileDM,
+  selectPinMessageByChannelId,
+  selectSignalingDataByUserId,
+  selectStatusMenu,
+  selectTheme,
+  useAppDispatch,
+  useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { isMacDesktop } from '@mezon/utils';
+import { AvatarImage } from '@mezon/components';
+import { createImgproxyUrl, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -44,6 +49,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+	const isShowNumberCallDM = useSelector(selectIsShowNumberCallDM) ?? [];
+	const avatarImages = currentDmGroup?.channel_avatar || [];
+	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
+	const isShowShareScreen = useSelector(selectIsShowShareScreen);
+
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
@@ -58,119 +68,283 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		[dispatch]
 	);
 
-	return (
-		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
-		>
-			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
-				<div className="flex flex-row gap-1 items-center flex-1">
-					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
-						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
-					</div>
-					<MemberProfile
-						numberCharacterCollapse={22}
-						avatar={
-							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
-								? 'assets/images/avatar-group.png'
-								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
-						}
-						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
-						status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
-						isHideStatus={true}
-						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
-						key={currentDmGroup?.channel_id}
-						isHiddenAvatarPanel={true}
-					/>
-					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
-				</div>
+	const setIsShowNumberCallDM = useCallback(
+		async (dmGroupId: string) => {
+			await dispatch(appActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
+		},
+		[dispatch, isShowNumberCallDM]
+	);
 
-				<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
-					<div className=" items-center gap-2 flex">
-						<div className="justify-start items-center gap-[15px] flex">
-							<button>
+	const handleShowShareScreenToggle = () => {
+		dispatch(appActions.setIsShowShareScreen(!isShowShareScreen));
+	};
+	const handleMuteToggle = () => {
+		dispatch(appActions.setIsMuteMicrophone(!isMuteMicrophone));
+	};
+
+	return (
+		<>
+			{!Array.isArray(isShowNumberCallDM) || !isShowNumberCallDM.includes(dmGroupId ?? '') ? (
+				<div
+					className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
+				>
+					<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
+						<div className="flex flex-row gap-1 items-center flex-1">
+							<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
+								<Icons.OpenMenu defaultSize={`w-5 h-5`} />
+							</div>
+							<MemberProfile
+								numberCharacterCollapse={22}
+								avatar={
+									Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
+										? 'assets/images/avatar-group.png'
+										: (currentDmGroup?.channel_avatar?.at(0) ?? '')
+								}
+								name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
+								status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
+								isHideStatus={true}
+								isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
+								key={currentDmGroup?.channel_id}
+								isHiddenAvatarPanel={true}
+							/>
+							<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
+						</div>
+
+						<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
+							<div className=" items-center gap-2 flex">
+								<div className="justify-start items-center gap-[15px] flex">
+									<button onClick={() => setIsShowNumberCallDM(dmGroupId ?? '')}>
+										<Tooltip
+											content="Start voice call"
+											trigger="hover"
+											animation="duration-500"
+											style={appearanceTheme === 'light' ? 'light' : 'dark'}
+										>
+											<Icons.IconPhoneDM />
+										</Tooltip>
+									</button>
+									<div>
+										<CallButton isLightMode={appearanceTheme === 'light'} />
+									</div>
+									<div>
+										<PinButton isLightMode={appearanceTheme === 'light'} />
+									</div>
+									<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
+									{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+										<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
+											<Tooltip
+												content="Show Member List"
+												trigger="hover"
+												animation="duration-500"
+												style={appearanceTheme === 'light' ? 'light' : 'dark'}
+											>
+												<Icons.MemberList isWhite={isShowMemberListDM} />
+											</Tooltip>
+										</button>
+									)}
+									{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
+										<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
+											<Tooltip
+												content="Show User Profile"
+												trigger="hover"
+												animation="duration-500"
+												style={appearanceTheme === 'light' ? 'light' : 'dark'}
+											>
+												<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+											</Tooltip>
+										</button>
+									)}
+								</div>
+								<SearchMessageChannel
+									mode={
+										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+											? ChannelStreamMode.STREAM_MODE_DM
+											: ChannelStreamMode.STREAM_MODE_GROUP
+									}
+								/>
+								<div
+									className={`gap-4 relative flex  w-fit h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
+									id="inBox"
+								>
+									{/* <InboxButton /> */}
+									<HelpButton />
+								</div>
+							</div>
+						</div>
+						{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+							<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
 								<Tooltip
-									content="Start voice call"
+									content="Show Member List"
 									trigger="hover"
 									animation="duration-500"
 									style={appearanceTheme === 'light' ? 'light' : 'dark'}
 								>
-									<Icons.IconPhoneDM />
+									<Icons.MemberList isWhite={isShowMemberListDM} />
 								</Tooltip>
 							</button>
-							<div>
-								<CallButton isLightMode={appearanceTheme === 'light'} />
+						)}
+						{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
+							<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
+								<Tooltip
+									content="Show User Profile"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
+									<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+								</Tooltip>
+							</button>
+						)}
+					</div>
+				</div>
+			) : (
+				<div
+					className={`flex flex-col min-h-[240px] z-10 relative w-full h-heightTopBar p-3 min-w-0 items-center dark:bg-bgTertiary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
+				>
+					<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
+						<div className="flex flex-row gap-1 items-center flex-1">
+							<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
+								<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 							</div>
-							<div>
-								<PinButton isLightMode={appearanceTheme === 'light'} />
-							</div>
-							<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
-							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
-								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
-									<Tooltip
-										content="Show Member List"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.MemberList isWhite={isShowMemberListDM} />
-									</Tooltip>
-								</button>
-							)}
-							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
-								<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
-									<Tooltip
-										content="Show User Profile"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-									</Tooltip>
-								</button>
-							)}
+							<MemberProfile
+								numberCharacterCollapse={22}
+								avatar={
+									Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
+										? 'assets/images/avatar-group.png'
+										: (currentDmGroup?.channel_avatar?.at(0) ?? '')
+								}
+								name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
+								status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
+								isHideStatus={true}
+								isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
+								key={currentDmGroup?.channel_id}
+								isHiddenAvatarPanel={true}
+							/>
+							<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
 						</div>
-						<SearchMessageChannel
-							mode={
-								currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
-									? ChannelStreamMode.STREAM_MODE_DM
-									: ChannelStreamMode.STREAM_MODE_GROUP
-							}
-						/>
-						<div
-							className={`gap-4 relative flex  w-fit h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
-							id="inBox"
-						>
-							{/* <InboxButton /> */}
-							<HelpButton />
+
+						<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
+							<div className=" items-center gap-2 flex">
+								<div className="justify-start items-center gap-[15px] flex">
+									<div>
+										<PinButton isLightMode={appearanceTheme === 'light'} />
+									</div>
+									<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
+									{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+										<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
+											<Tooltip
+												content="Show Member List"
+												trigger="hover"
+												animation="duration-500"
+												style={appearanceTheme === 'light' ? 'light' : 'dark'}
+											>
+												<Icons.MemberList isWhite={isShowMemberListDM} />
+											</Tooltip>
+										</button>
+									)}
+									{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
+										<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
+											<Tooltip
+												content="Show User Profile"
+												trigger="hover"
+												animation="duration-500"
+												style={appearanceTheme === 'light' ? 'light' : 'dark'}
+											>
+												<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+											</Tooltip>
+										</button>
+									)}
+								</div>
+								<SearchMessageChannel
+									mode={
+										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+											? ChannelStreamMode.STREAM_MODE_DM
+											: ChannelStreamMode.STREAM_MODE_GROUP
+									}
+								/>
+								<div
+									className={`gap-4 relative flex  w-fit h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
+									id="inBox"
+								>
+									{/* <InboxButton /> */}
+									<HelpButton />
+								</div>
+							</div>
+						</div>
+						{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+							<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
+								<Tooltip
+									content="Show Member List"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
+									<Icons.MemberList isWhite={isShowMemberListDM} />
+								</Tooltip>
+							</button>
+						)}
+						{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
+							<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
+								<Tooltip
+									content="Show User Profile"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
+									<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+								</Tooltip>
+							</button>
+						)}
+					</div>
+					<div className="w-full h-full flex flex-col justify-around">
+						<div className="justify-center items-center gap-4 flex w-full">
+							{avatarImages.map((avatar, index) => (
+								<AvatarImage
+									height={'75px'}
+									alt={`Avatar ${index + 1}`}
+									userName={`Avatar ${index + 1}`}
+									className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
+									srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+									src={avatar}
+									classNameText="!text-4xl font-semibold"
+								/>
+							))}
+						</div>
+						<div className="justify-center items-center gap-4 flex w-full">
+							<div
+								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+							>
+								<Icons.StartCall />
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								onClick={handleShowShareScreenToggle}
+							>
+								<Icons.ShareScreen
+									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isShowShareScreen={isShowShareScreen}
+								/>
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								onClick={handleMuteToggle}
+							>
+								<Icons.Microphone
+									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isMuteMicrophone={isMuteMicrophone}
+								/>
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+								onClick={() => setIsShowNumberCallDM('')}
+							>
+								<Icons.StopCall />
+							</div>
 						</div>
 					</div>
 				</div>
-				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
-					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
-						<Tooltip
-							content="Show Member List"
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-						>
-							<Icons.MemberList isWhite={isShowMemberListDM} />
-						</Tooltip>
-					</button>
-				)}
-				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
-					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
-						<Tooltip
-							content="Show User Profile"
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-						>
-							<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-						</Tooltip>
-					</button>
-				)}
-			</div>
-		</div>
+			)}
+		</>
 	);
 }
 
@@ -243,7 +417,7 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
 	const { userId } = useAuth();
-	const signalingData = useSelector(selectSignalingDataByUserId(userId || ''));
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 	}, []);
@@ -283,7 +457,7 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
-
+		if (!signalingData?.[0]) return;
 		const data = signalingData[0].signalingData;
 		const objData = JSON.parse(data.jsonData);
 		switch (signalingData[0].signalingData.dataType) {

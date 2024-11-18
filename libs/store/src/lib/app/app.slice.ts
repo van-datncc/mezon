@@ -39,6 +39,10 @@ export interface AppState {
 	isShowSettingFooter: showSettingFooterProps;
 	isShowPopupQuickMess: boolean;
 	categoryChannelOffsets: { [key: number]: number };
+	isShowCallDM: boolean;
+	isShowNumberCallDM: string[];
+	isMuteMicrophone: boolean;
+	isShowShareScreen: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -60,7 +64,11 @@ export const initialAppState: AppState = {
 	isFromFcmMobile: false,
 	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true },
 	isShowPopupQuickMess: false,
-	categoryChannelOffsets: {}
+	categoryChannelOffsets: {},
+	isShowCallDM: false,
+	isShowNumberCallDM: [],
+	isMuteMicrophone: false,
+	isShowShareScreen: false
 };
 
 export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id: string }, thunkAPI) => {
@@ -184,7 +192,19 @@ export const appSlice = createSlice({
 				...state.categoryChannelOffsets,
 				...action.payload
 			};
-		}
+		},
+		setIsShowCallDM: (state, action) => {
+			state.isShowCallDM = action.payload;
+		},
+		setIsShowNumberCallDM: (state, action) => {
+			state.isShowNumberCallDM = action.payload;
+		},
+		setIsMuteMicrophone: (state, action) => {
+			state.isMuteMicrophone = action.payload;
+		},
+		setIsShowShareScreen: (state, action) => {
+			state.isShowShareScreen = action.payload;
+		},
 	}
 });
 
@@ -236,3 +256,9 @@ export const selectIsShowSettingFooter = createSelector(getAppState, (state: App
 export const selectIsShowPopupQuickMess = createSelector(getAppState, (state: AppState) => state.isShowPopupQuickMess);
 
 export const selectCategoryChannelOffsets = createSelector(getAppState, (state: AppState) => state.categoryChannelOffsets);
+
+export const selectIsShowNumberCallDM = createSelector(getAppState, (state: AppState) => state.isShowNumberCallDM);
+
+export const selectIsMuteMicrophone = createSelector(getAppState, (state: AppState) => state.isMuteMicrophone);
+
+export const selectIsShowShareScreen = createSelector(getAppState, (state: AppState) => state.isShowShareScreen);
