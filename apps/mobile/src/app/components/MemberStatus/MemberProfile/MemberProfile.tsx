@@ -1,7 +1,7 @@
 import { useMemberStatus } from '@mezon/core';
 import { OwnerIcon } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, DEFAULT_ROLE_COLOR } from '@mezon/utils';
+import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
 import { Text, View } from 'react-native';
@@ -47,7 +47,13 @@ export function MemberProfile({
 			return nickName || userInfo?.display_name || userInfo?.username;
 		}
 	}, [userInfo]);
-	const colorUserName = useColorsRoleById(userInfo?.id || '', DEFAULT_ROLE_COLOR)?.highestPermissionRoleColor;
+	const userColorRolesClan = useColorsRoleById(userInfo?.id || '')?.highestPermissionRoleColor;
+
+	const colorUserName = useMemo(() => {
+		return ![ChannelType?.CHANNEL_TYPE_DM, ChannelType?.CHANNEL_TYPE_GROUP]?.includes(currentChannel?.type)
+			? userColorRolesClan
+			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
+	}, [userColorRolesClan, currentChannel?.type]);
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}

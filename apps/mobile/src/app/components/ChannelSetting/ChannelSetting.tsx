@@ -90,7 +90,8 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: currentSettingValue?.channelName,
-			category_id: channel.category_id
+			category_id: channel.category_id,
+			app_url: ''
 		};
 		if (isCheckNameChannelValue || !isCheckValid) return;
 		await dispatch(channelsActions.updateChannel(updateChannel));
@@ -373,7 +374,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				)}
 			</View>
 
-			<MezonMenu menu={topMenu} />
+			{/*<MezonMenu menu={topMenu} />*/}
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
 

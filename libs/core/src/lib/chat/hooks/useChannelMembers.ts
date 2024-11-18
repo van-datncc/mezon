@@ -42,7 +42,8 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 					lastSeenTimestamp: timestamp,
 					lastSentTimestamp: timestamp,
 					lastSeenPinMessage: '',
-					clanId: currentChannel?.clan_id ?? ''
+					clanId: currentChannel?.clan_id ?? '',
+					isMute: false
 				}
 			])
 		);

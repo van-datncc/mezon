@@ -20,7 +20,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const styles = style(themeValue);
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
-	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
