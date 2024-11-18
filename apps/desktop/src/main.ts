@@ -1,8 +1,9 @@
-import { BrowserWindow, Notification, app, dialog, ipcMain } from 'electron';
+import { BrowserWindow, Notification, app, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log/main';
 import { UpdateInfo, autoUpdater } from 'electron-updater';
+import fs from 'fs';
 import App from './app/app';
-import { NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
+import { DOWNLOAD_FILE, NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -29,6 +30,35 @@ export default class Main {
 		}
 	}
 }
+
+ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
+	const { filePath, canceled } = await dialog.showSaveDialog({
+		title: 'Save File',
+		defaultPath: defaultFileName,
+		buttonLabel: 'Save',
+		filters: [
+			{ name: 'Text Files', extensions: ['txt'] },
+			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] },
+			{ name: 'All Files', extensions: ['*'] }
+		]
+	});
+
+	if (canceled || !filePath) {
+		return null;
+	}
+
+	try {
+		const response = await fetch(url);
+		const buffer = await response.arrayBuffer();
+		fs.writeFileSync(filePath, Buffer.from(buffer));
+
+		shell.showItemInFolder(filePath);
+		return filePath;
+	} catch (error) {
+		console.error('Error downloading file:', error);
+		throw new Error('Failed to download file');
+	}
+});
 
 ipcMain.handle(SENDER_ID, () => {
 	return environment.senderId;

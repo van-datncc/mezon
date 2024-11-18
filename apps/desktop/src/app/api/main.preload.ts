@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	onWindowFocused: (callback: () => void) => {
 		ipcRenderer.on('window-focused', callback);
-	}
+	},
+	invoke: (channel, data) => ipcRenderer.invoke(channel, data)
 });

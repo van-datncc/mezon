@@ -1,5 +1,6 @@
 import { Icons } from '@mezon/ui';
-import { EFailAttachment } from '@mezon/utils';
+import { DOWNLOAD_FILE, EFailAttachment, electronBridge } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
@@ -26,12 +27,23 @@ function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 		if (!response.ok) {
 			return;
 		}
-		const blob = await response.blob();
-		const dataUrl = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = dataUrl;
-		a.download = attachmentData.filename as string;
-		a.click();
+		if (isElectron()) {
+			try {
+				await electronBridge.invoke(DOWNLOAD_FILE, {
+					url: attachmentData.url as string,
+					defaultFileName: attachmentData.filename as string
+				});
+			} catch (error) {
+				console.error('Error during download:', error);
+			}
+		} else {
+			const blob = await response.blob();
+			const dataUrl = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = dataUrl;
+			a.download = attachmentData.filename as string;
+			a.click();
+		}
 	};
 	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
 
