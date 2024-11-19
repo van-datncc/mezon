@@ -9,7 +9,8 @@ import {
 	selectCurrentClanId,
 	selectOnboardingByClan,
 	selectOnboardingMode,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
@@ -48,7 +49,7 @@ function GuideBody() {
 		}
 	};
 
-	const onboardingItem = useSelector(selectOnboardingByClan(currentClanId as string));
+	const onboardingItem = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
@@ -65,8 +66,9 @@ function GuideBody() {
 							onboardingItem.rule.map((rule) => (
 								<GuideItemLayout
 									key={rule.id}
-									title="Title"
+									title={rule.title}
 									hightLightIcon={true}
+									description={rule.content}
 									icon={<Icons.RuleIcon />}
 									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
 								/>

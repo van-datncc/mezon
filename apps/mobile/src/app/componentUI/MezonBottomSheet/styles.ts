@@ -1,7 +1,9 @@
 import { Attributes, Fonts, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+const marginWidth = Dimensions.get('screen').width * 0.3;
+
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		backgroundStyle: {
 			backgroundColor: colors.primary
@@ -47,5 +49,9 @@ export const style = (colors: Attributes) =>
 		},
 		handleIndicator: {
 			backgroundColor: colors.bgInputPrimary
+		},
+		container: {
+			overflow: 'hidden',
+			marginHorizontal: isTabletLandscape ? marginWidth : 0
 		}
 	});

@@ -16,7 +16,7 @@ type GuideItemLayoutProps = {
 
 export const GuideItemLayout = ({
 	title,
-	description = 'Description',
+	description,
 	icon,
 	hightLightIcon = false,
 	action,
@@ -44,7 +44,7 @@ export const GuideItemLayout = ({
 			)}
 			<div className={`flex flex-1 text-base flex-col h-full justify-start`}>
 				{title && <div className="font-bold text-white">{title}</div>}
-				<div className="text-channelTextLabel text-xs flex-1">{description}</div>
+				{description && <div className="text-channelTextLabel text-xs flex-1">{description}</div>}
 			</div>
 			{action && <div className="flex items-center h-full">{action}</div>}
 		</div>

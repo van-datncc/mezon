@@ -44,6 +44,13 @@ export class MezonNotificationService {
 			window.electron.onWindowBlurred(() => {
 				this.isFocusOnApp = false;
 			});
+		} else {
+			window.onfocus = () => {
+				this.isFocusOnApp = true;
+			};
+			window.onblur = () => {
+				this.isFocusOnApp = false;
+			};
 		}
 	}
 
@@ -82,13 +89,7 @@ export class MezonNotificationService {
 					if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
 						return;
 					}
-					electronBridge.pushNotification(title, {
-						body: message,
-						icon: image ?? '',
-						data: {
-							link: link ?? ''
-						}
-					});
+					this.pushNotification(title, message, image, link);
 				}
 			} catch (err) {
 				// eslint-disable-next-line no-console
@@ -107,6 +108,33 @@ export class MezonNotificationService {
 
 		this.ws = ws;
 	};
+
+	private pushNotification(title: string, message: string, image: string, link: string | undefined) {
+		if (isElectron()) {
+			electronBridge.pushNotification(title, {
+				body: message,
+				icon: image ?? '',
+				data: {
+					link: link ?? ''
+				}
+			});
+		} else {
+			const notification = new Notification(title, {
+				body: message,
+				icon: image ?? '',
+				data: {
+					link: link ?? ''
+				}
+			});
+			notification.onclick = (event) => {
+				event.preventDefault();
+				if (!link) {
+					return;
+				}
+				window.open(link);
+			};
+		}
+	}
 
 	public get isActive() {
 		return this.wsActive;

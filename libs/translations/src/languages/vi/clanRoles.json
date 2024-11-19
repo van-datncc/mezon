@@ -1,52 +1,58 @@
 {
-    "roleDescription": "Sử dụng vai trò để nhóm các thành viên trong clan của bạn và gán quyền",
-    "defaultRole": "Quyền mặc định cho tất cả thành viên clan",
-    "roles": "Vai trò",
+  "roleDescription": "Sử dụng vai trò để nhóm các thành viên trong clan của bạn và gán quyền",
+  "defaultRole": "Quyền mặc định cho tất cả thành viên clan",
+  "roles": "Vai trò",
+  "members": "Thành viên",
+  "noRole": "Hiện tại không có vai trò nào",
+  "skipStep": "Bỏ qua bước này",
+  "failed": "Thất bại",
+  "createNewRole": {
+    "title": "Bước 1 của 3",
+    "createANewRole": "Tạo một vai trò mới",
+    "description": "Đặt tên và màu sắc độc đáo cho vai trò này. Bạn luôn có thể thay đổi điều này sau.",
+    "create": "Tạo",
+    "newRole": "vai trò mới",
+    "roleName": "TÊN VAI TRÒ",
+    "createSuccess": "Tạo vai trò {{roleName}} thành công",
+    "cannotCreate": "Không thể tạo {{roleName}}"
+  },
+  "setupPermission": {
+    "title": "Bước 2 của 3",
+    "setupPermissionTitle": "Thiết lập quyền",
+    "setupPermissionSuccessfully": "Thiết lập quyền thành công",
+    "next": "Tiếp theo",
+    "searchPermission": "Tìm kiếm quyền"
+  },
+  "setupMember": {
+    "title": "Bước 3 của 3",
+    "addMember": "Thêm thành viên",
+    "description": "Gán vai trò này cho các thành viên của bạn. Thành viên có thể có nhiều hơn một vai trò.",
+    "finish": "Hoàn thành",
+    "addedMember": "Thêm thành viên thành công",
+    "searchMembers": "Tìm kiếm thành viên",
+    "deletedMember": "Đã xoá {{memberName}} thành công",
+    "add": "Thêm",
+    "noMembersFound": "Không tìm thấy thành viên nào"
+  },
+  "roleDetail": {
+    "permissions": "Quyền",
     "members": "Thành viên",
-    "noRole": "Hiện tại không có vai trò nào",
-    "skipStep": "Bỏ qua bước này",
-    "failed": "Thất bại",
-    "createNewRole": {
-        "title": "Bước 1 của 3",
-        "createANewRole": "Tạo một vai trò mới",
-        "description": "Đặt tên và màu sắc độc đáo cho vai trò này. Bạn luôn có thể thay đổi điều này sau.",
-        "create": "Tạo",
-        "newRole": "vai trò mới",
-        "roleName": "TÊN VAI TRÒ",
-        "createSuccess": "Tạo vai trò {{roleName}} thành công",
-        "cannotCreate": "Không thể tạo {{roleName}}"
-    },
-    "setupPermission": {
-        "title": "Bước 2 của 3",
-        "setupPermissionTitle": "Thiết lập quyền",
-        "setupPermissionSuccessfully": "Thiết lập quyền thành công",
-        "next": "Tiếp theo",
-        "searchPermission": "Tìm kiếm quyền"
-    },
-    "setupMember": {
-        "title": "Bước 3 của 3",
-        "addMember": "Thêm thành viên",
-        "description": "Gán vai trò này cho các thành viên của bạn. Thành viên có thể có nhiều hơn một vai trò.",
-        "finish": "Hoàn thành",
-        "addedMember": "Thêm thành viên thành công",
-        "searchMembers": "Tìm kiếm thành viên",
-        "deletedMember": "Đã xoá {{memberName}} thành công",
-        "add": "Thêm",
-        "noMembersFound": "Không tìm thấy thành viên nào"
-    },
-    "roleDetail": {
-        "permissions": "Quyền",
-        "members": "Thành viên",
-        "role": "Vai trò",
-        "roleName": "Tên vai trò",
-        "deleteRole": "Xóa vai trò",
-        "deleteRoleSuccessfully": "Đã xóa vai trò {{roleName}} thành công",
-        "changesSaved": "Đã lưu thay đổi",
-        "save": "Lưu",
-        "confirmSaveTitle": "Lưu thay đổi?",
-        "confirmSaveContent": "Bạn đã thực hiện các thay đổi. Bạn có muốn lưu chúng không?",
-        "yes": "Có",
-        "doNotSave": "Không lưu"
-    },
-    "notifyEveryone":"Thông báo cho tất cả những người có quyền xem kênh này."
+    "role": "Vai trò",
+    "roleName": "Tên vai trò",
+    "deleteRole": "Xóa vai trò",
+    "deleteRoleSuccessfully": "Đã xóa vai trò {{roleName}} thành công",
+    "changesSaved": "Đã lưu thay đổi",
+    "save": "Lưu",
+    "confirmSaveTitle": "Lưu thay đổi?",
+    "confirmSaveContent": "Bạn đã thực hiện các thay đổi. Bạn có muốn lưu chúng không?",
+    "yes": "Có",
+    "doNotSave": "Không lưu"
+  },
+  "roleColorPicker": {
+    "textBtnRole": "Màu Vai Trò",
+    "titleBS": "Chọn Màu",
+    "reset": "Đặt Lại",
+    "save": "Lưu"
+  },
+  "notifyEveryone": "Thông báo cho tất cả những người có quyền xem kênh này."
 }

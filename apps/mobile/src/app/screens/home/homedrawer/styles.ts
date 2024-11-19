@@ -7,8 +7,8 @@ export const style = (colors: Attributes) =>
 		mainList: {
 			height: '100%',
 			width: '78%',
-			borderTopLeftRadius: 10,
-			borderTopRightRadius: 10,
+			borderTopLeftRadius: size.s_10,
+			borderTopRightRadius: size.s_10,
 			overflow: 'hidden'
 		},
 		btnIcon: {
@@ -22,8 +22,8 @@ export const style = (colors: Attributes) =>
 		closeIcon: {
 			color: Colors.bgDarkSlate,
 			backgroundColor: Colors.white,
-			borderRadius: 50,
-			fontSize: 19
+			borderRadius: size.s_50,
+			fontSize: size.s_20
 		},
 		iconContainer: {
 			width: size.s_40,
@@ -61,7 +61,7 @@ export const style = (colors: Attributes) =>
 		},
 		iconEmoji: {
 			position: 'absolute',
-			right: 10
+			right: size.s_10
 		},
 		iconSend: {
 			backgroundColor: baseColor.blurple
@@ -94,14 +94,14 @@ export const style = (colors: Attributes) =>
 		},
 		channelListSection: {
 			width: '100%',
-			paddingHorizontal: 8,
-			marginBottom: 20
+			paddingHorizontal: size.s_8,
+			marginBottom: size.s_20
 		},
 		channelListHeader: {
 			width: '100%',
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			marginBottom: 10
+			marginBottom: size.s_10
 		},
 		channelListHeaderItem: {
 			flexDirection: 'row',
@@ -109,17 +109,17 @@ export const style = (colors: Attributes) =>
 		},
 		channelListHeaderItemTitle: {
 			textTransform: 'uppercase',
-			fontSize: 15,
+			fontSize: size.s_15,
 			fontWeight: 'bold',
 			color: Colors.tertiary,
 			flexBasis: '75%'
 		},
 		channelListItem: {
-			paddingHorizontal: 10,
+			paddingHorizontal: size.s_10,
 			flexDirection: 'row',
 			alignItems: 'center',
-			paddingVertical: 8,
-			borderRadius: 5
+			paddingVertical: size.s_8,
+			borderRadius: size.s_4
 		},
 		channelListItemActive: {
 			backgroundColor: Colors.secondaryLight,
@@ -138,12 +138,12 @@ export const style = (colors: Attributes) =>
 		},
 		channelDotWrapper: {
 			backgroundColor: Colors.textRed,
-			height: 20,
-			width: 20,
+			height: size.s_10,
+			width: size.s_10,
 			display: 'flex',
 			justifyContent: 'center',
 			alignItems: 'center',
-			borderRadius: 10
+			borderRadius: size.s_10
 		},
 		channelDot: {
 			color: Colors.white,
@@ -151,7 +151,7 @@ export const style = (colors: Attributes) =>
 		},
 		dotIsNew: {
 			position: 'absolute',
-			left: -10,
+			left: -size.s_10,
 			width: size.s_6,
 			height: size.s_6,
 			borderRadius: size.s_6,
@@ -159,7 +159,7 @@ export const style = (colors: Attributes) =>
 		},
 		channelListSearch: {
 			width: '100%',
-			paddingHorizontal: 8,
+			paddingHorizontal: size.s_8,
 			marginBottom: size.s_16,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
@@ -171,7 +171,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_16,
 			alignItems: 'center',
 			paddingHorizontal: size.s_6,
-			gap: 10,
+			gap: size.s_10,
 			flexDirection: 'row',
 			justifyContent: 'space-between'
 		},
@@ -218,12 +218,12 @@ export const style = (colors: Attributes) =>
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
-			width: 4,
+			width: size.s_4,
 			height: '80%',
 			top: '10%',
-			left: -13,
-			borderTopRightRadius: 10,
-			borderBottomEndRadius: 10,
+			left: -size.s_13,
+			borderTopRightRadius: size.s_10,
+			borderBottomEndRadius: size.s_10,
 			position: 'absolute'
 		},
 		clanIconActive: {
@@ -255,8 +255,8 @@ export const style = (colors: Attributes) =>
 			gap: size.s_10
 		},
 		friendItemWrapper: {
-			marginHorizontal: 20,
-			paddingVertical: 12,
+			marginHorizontal: size.s_20,
+			paddingVertical: size.s_10,
 			flexDirection: 'row',
 			justifyContent: 'space-between'
 		},
@@ -267,16 +267,16 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row'
 		},
 		friendItemName: {
-			paddingTop: 10,
-			paddingLeft: 10,
-			lineHeight: 20,
+			paddingTop: size.s_10,
+			paddingLeft: size.s_10,
+			lineHeight: size.s_20,
 			color: colors.text,
-			maxWidth: 200
+			maxWidth: size.s_100 * 2
 		},
 		inviteButton: {
-			paddingVertical: 6,
-			paddingHorizontal: 12,
-			borderRadius: 50,
+			paddingVertical: size.s_6,
+			paddingHorizontal: size.s_12,
+			borderRadius: size.s_50,
 			borderColor: colors.border,
 			minWidth: size.s_60,
 			backgroundColor: colors.tertiary
@@ -362,7 +362,7 @@ export const style = (colors: Attributes) =>
 			// marginBottom: size.s_10,
 		},
 		rowMessageBox: {
-			marginLeft: 15,
+			marginLeft: size.s_15,
 			justifyContent: 'space-between',
 			width: '90%'
 		},
@@ -383,7 +383,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			top: -size.s_8,
-			gap: 4
+			gap: size.s_4
 		},
 		tapToSeeAttachmentText: {
 			color: colors.text,
@@ -447,7 +447,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			display: 'flex',
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			backgroundColor: Colors.tertiaryWeight,
 			width: size.s_30,
 			height: size.s_30
@@ -640,7 +640,7 @@ export const style = (colors: Attributes) =>
 		aboveMessageDeleteReply: {
 			flexDirection: 'row',
 			paddingLeft: size.s_10,
-			gap: 5,
+			gap: size.s_4,
 			marginTop: size.s_6,
 			alignItems: 'center'
 		},
@@ -652,7 +652,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			paddingRight: size.s_6,
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			marginLeft: size.s_6
 		},
 		messageDeleteReplyText: {
@@ -683,10 +683,10 @@ export const style = (colors: Attributes) =>
 		inviteIconWrapper: {
 			alignItems: 'center',
 			justifyContent: 'center',
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			backgroundColor: Colors.tertiaryWeight,
-			width: 40,
-			height: 40
+			width: size.s_40,
+			height: size.s_40
 		},
 		sortButton: {
 			paddingHorizontal: size.s_14,
@@ -736,5 +736,12 @@ export const style = (colors: Attributes) =>
 		wall: {
 			height: '100%',
 			width: size.s_4
+		},
+		container: {
+			flex: 1
+		},
+		rowContainer: {
+			flex: 1,
+			flexDirection: 'row'
 		}
 	});
