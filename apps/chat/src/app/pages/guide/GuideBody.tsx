@@ -65,8 +65,9 @@ function GuideBody() {
 							onboardingItem.rule.map((rule) => (
 								<GuideItemLayout
 									key={rule.id}
-									title="Title"
+									title={rule.title}
 									hightLightIcon={true}
+									description={rule.content}
 									icon={<Icons.RuleIcon />}
 									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
 								/>
