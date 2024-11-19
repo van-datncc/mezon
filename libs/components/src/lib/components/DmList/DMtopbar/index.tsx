@@ -36,6 +36,34 @@ export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
 };
 
+// Todo: move to utils
+const compress = async (str: string, encoding = 'gzip' as CompressionFormat) => {
+	const byteArray = new TextEncoder().encode(str);
+	const cs = new CompressionStream(encoding);
+	const writer = cs.writable.getWriter();
+	writer.write(byteArray);
+	writer.close();
+	const arrayBuffer = await new Response(cs.readable).arrayBuffer();
+	return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+};
+
+// Todo: move to utils
+const decompress = async (compressedStr: string, encoding = 'gzip' as CompressionFormat) => {
+	const binaryString = atob(compressedStr);
+	const byteArray = new Uint8Array(binaryString.length);
+	for (let i = 0; i < binaryString.length; i++) {
+		byteArray[i] = binaryString.charCodeAt(i);
+	}
+
+	const cs = new DecompressionStream(encoding);
+	const writer = cs.writable.getWriter();
+	writer.write(byteArray);
+	writer.close();
+
+	const arrayBuffer = await new Response(cs.readable).arrayBuffer();
+	return new TextDecoder().decode(arrayBuffer);
+};
+
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
@@ -253,10 +281,10 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 	}, []);
 
 	useEffect(() => {
-		peerConnection.onicecandidate = (event: any) => {
+		peerConnection.onicecandidate = async (event: any) => {
 			if (event && event.candidate) {
 				if (mezon.socketRef.current?.isOpen() === true) {
-					mezon.socketRef.current?.forwardWebrtcSignaling(
+					await mezon.socketRef.current?.forwardWebrtcSignaling(
 						dmUserId,
 						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
 						JSON.stringify(event.candidate)
@@ -272,34 +300,23 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 			}
 		};
 
-		// Get user media
-		navigator.mediaDevices
-			.getUserMedia({ video: true, audio: true })
-			.then((stream) => {
-				if (localVideoRef.current) {
-					localVideoRef.current.srcObject = stream;
-				}
-				// Add tracks to PeerConnection
-				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
-			})
-			.catch((err) => console.error('Failed to get local media:', err));
+		if (!signalingData?.[signalingData?.length - 1]) return;
+		const data = signalingData?.[signalingData?.length - 1]?.signalingData;
 
-		if (!signalingData?.[0]) return;
-		const data = signalingData[0].signalingData;
-		const objData = JSON.parse(data.json_data);
-		switch (signalingData[0].signalingData.data_type) {
+		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				{
 					const processData = async () => {
+						const dataDec = await decompress(data?.json_data);
+						const objData = JSON.parse(dataDec || '{}');
+
 						// Get peerConnection from receiver event.receiverId
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
 						const answer = await peerConnection.createAnswer();
 						await peerConnection.setLocalDescription(answer);
-						await mezon.socketRef.current?.forwardWebrtcSignaling(
-							dmUserId,
-							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
-							JSON.stringify(answer)
-						);
+
+						const answerEn = await compress(JSON.stringify(answer));
+						await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEn);
 					};
 					processData().catch(console.error);
 				}
@@ -308,6 +325,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
 				{
 					const processData = async () => {
+						const dataDec = await decompress(data.json_data);
+						const objData = JSON.parse(dataDec || '{}');
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
 					};
 					processData().catch(console.error);
@@ -316,11 +335,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				{
 					const processData = async () => {
-						if (peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
-							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-						} else {
-							console.error('Remote description is null, skipping ICE candidate');
-						}
+						const objData = JSON.parse(data?.json_data || '{}');
+						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
 					};
 					processData().catch(console.error);
 				}
@@ -335,15 +351,28 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 	};
 
 	const startCall = async () => {
-		const offer = await peerConnection.createOffer({
-			iceRestart: true,
-			offerToReceiveAudio: true,
-			offerToReceiveVideo: true
-		});
-		await peerConnection.setLocalDescription(offer);
-		if (offer) {
-			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
-		}
+		// Get user media
+		navigator.mediaDevices
+			.getUserMedia({ video: true, audio: true })
+			.then(async (stream) => {
+				if (localVideoRef.current) {
+					localVideoRef.current.srcObject = stream;
+				}
+				// Add tracks to PeerConnection
+				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+
+				const offer = await peerConnection.createOffer({
+					iceRestart: true,
+					offerToReceiveAudio: true,
+					offerToReceiveVideo: true
+				});
+				await peerConnection.setLocalDescription(offer);
+				if (offer && mezon.socketRef.current) {
+					const offerEn = await compress(JSON.stringify(offer));
+					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn);
+				}
+			})
+			.catch((err) => console.error('Failed to get local media:', err));
 	};
 
 	// const handleClose = useCallback(() => {
