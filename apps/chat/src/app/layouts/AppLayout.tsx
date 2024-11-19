@@ -2,7 +2,6 @@ import { ToastController } from '@mezon/components';
 import { fcmActions, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
-import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
@@ -83,10 +82,6 @@ const AppLayout = () => {
 
 	// TODO: move this to a firebase context
 	useEffect(() => {
-		if (!isElectron()) {
-			return;
-		}
-
 		if (!isLogin) {
 			notificationService.isActive && notificationService.close();
 			return;
