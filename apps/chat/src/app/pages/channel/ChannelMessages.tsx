@@ -366,7 +366,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				const index = messages.findIndex((item) => item === messageId);
 				if (index >= 0) {
 					userActiveScroll.current = true;
-					rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
+					rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
 				}
 			};
 
