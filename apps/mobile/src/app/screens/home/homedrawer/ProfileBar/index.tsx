@@ -1,5 +1,5 @@
 import { useAuth, useMemberStatus } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 
 import { selectAccountCustomStatus } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
@@ -27,7 +27,7 @@ const ProfileBar = () => {
 		<Pressable style={styles.wrapperProfile} onPress={handleOpenProfileSettings}>
 			<View>
 				<FastImage source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imageWrapper} />
-				<UserStatus status={userStatus} />
+				<UserStatus status={userStatus} iconSize={size.s_16} />
 			</View>
 			<View>
 				<Text style={styles.userName}>{user?.userProfile?.user?.username}</Text>

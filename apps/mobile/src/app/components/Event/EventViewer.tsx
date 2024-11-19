@@ -70,6 +70,7 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 				<MezonTab
 					views={[<EventDetail event={currentEvent} eventDetailRef={bottomSheetDetail} />, <EventMember event={currentEvent} />]}
 					titles={['Event Info', 'Interested']}
+					isBottomSheet={true}
 				/>
 			</MezonBottomSheet>
 		</View>

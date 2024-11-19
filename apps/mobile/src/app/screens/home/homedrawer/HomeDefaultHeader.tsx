@@ -103,7 +103,7 @@ const HomeDefaultHeader = React.memo(
 				</TouchableOpacity>
 				{isTabletLandscape && (
 					<TouchableOpacity style={styles.iconBell} onPress={navigateToNotifications}>
-						<Icons.BellIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				)}
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (

@@ -1,13 +1,10 @@
 import { Icons, IUserStatusProps, OfflineStatus, OnlineStatus } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 
-export const UserStatus = React.memo(({ status, customStyles }: IUserStatusProps) => {
-	const isTabletLandscape = useTabletLandscape();
+export const UserStatus = React.memo(({ status, customStyles, iconSize = size.s_12 }: IUserStatusProps) => {
 	const { themeValue } = useTheme();
-	const iconSize = isTabletLandscape ? size.s_16 : size.s_12;
-	const mobileIconSize = isTabletLandscape ? size.s_20 : size.s_16;
+	const mobileIconSize = iconSize + size.s_4;
 
 	return (
 		<Block
