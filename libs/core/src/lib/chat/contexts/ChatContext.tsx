@@ -451,7 +451,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					dispatch(fetchDirectMessage({ noCache: true }));
+					await dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(
 						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: true, isFetchingLatestMessages: false })
 					);
@@ -510,7 +510,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(userChannelsActions.fetchUserChannels({ channelId: userAdds.channel_id, noCache: true }));
 
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					dispatch(fetchDirectMessage({ noCache: true }));
+					await dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(fetchListFriends({ noCache: true }));
 				}
 			}
