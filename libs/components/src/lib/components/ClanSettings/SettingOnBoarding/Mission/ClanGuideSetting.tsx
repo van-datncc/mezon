@@ -93,6 +93,7 @@ function ClanGuideSetting() {
 				<div className="flex flex-col gap-3">
 					{onboardingTemp.rules.map((rule) => (
 						<GuideItemLayout
+							key={rule.title}
 							icon={<Icons.RuleIcon />}
 							gap={16}
 							className="px-4 py-3"
