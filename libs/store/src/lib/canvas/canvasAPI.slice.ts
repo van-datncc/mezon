@@ -27,7 +27,8 @@ export interface CanvasAPIState {
 }
 
 export const canvasAPIAdapter = createEntityAdapter({
-	selectId: (canvas: CanvasAPIEntity) => canvas.id || ''
+	selectId: (canvas: CanvasAPIEntity) => canvas.id || '',
+	sortComparer: (a, b) => b.id.localeCompare(a.id)
 });
 
 type fetchCanvasPayload = {
