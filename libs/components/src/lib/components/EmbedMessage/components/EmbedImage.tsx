@@ -11,7 +11,7 @@ export function EmbedImage({ url }: EmbedImageProps) {
 	});
 
 	return (
-		<div className="mt-4 rounded overflow-hidden">
+		<div className="mt-2 rounded overflow-hidden">
 			<img src={url} alt="Embed image" className="w-full h-auto max-w-full cursor-pointer" onClick={showPreview} />
 		</div>
 	);

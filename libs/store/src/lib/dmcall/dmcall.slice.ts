@@ -95,5 +95,5 @@ export const selectDMVoiceEntities = createSelector(getDMCallState, selectEntiti
 
 export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities, (state, userId) => userId], (entities, userId) => {
 	const dmcalls = Object.values(entities);
-	return dmcalls.filter((dmcall) => dmcall && dmcall.calleeId === userId);
+	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
 });

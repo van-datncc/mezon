@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, Icons, IS_TABLET } from '@mezon/mobile-components';
+import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
 import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
@@ -91,7 +91,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 									) : (
 										<View style={titleStyle}>{title}</View>
 									)}
-									<Block width={IS_TABLET ? size.s_30 : size.s_60}>
+									<Block width={size.s_60}>
 										{rightBtnText ? (
 											<Pressable onPress={() => onClickRightBtn()}>
 												<Text style={styles.confirm}>{rightBtnText}</Text>

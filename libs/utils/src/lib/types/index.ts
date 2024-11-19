@@ -275,7 +275,7 @@ export interface IMessageSendPayload {
 	lk?: ILinkOnMessage[];
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
-	embed?: IEmbedProps;
+	embed?: IEmbedProps[];
 	components?: IMessageActionRow[];
 }
 

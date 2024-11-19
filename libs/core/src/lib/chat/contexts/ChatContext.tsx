@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { captureSentryError } from '@mezon/logger';
 import {
+	ActivitiesEntity,
 	AttachmentEntity,
 	DMCallActions,
+	acitvitiesActions,
 	appActions,
 	attachmentActions,
 	channelMembers,
@@ -59,6 +61,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -75,6 +78,7 @@ import {
 	EventEmoji,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
+	ListActivity,
 	MessageTypingEvent,
 	Notification,
 	PermissionChangedEvent,
@@ -210,6 +214,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channel: StreamingEndedEvent) => {
 			dispatch(channelsStreamActions.remove(channel.channel_id));
 			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
+		},
+		[dispatch]
+	);
+
+	const onactivityupdated = useCallback(
+		(activities: ListActivity) => {
+			const mappedActivities: ActivitiesEntity[] = activities.acts.map((activity) => ({
+				...activity,
+				id: activity.user_id || ''
+			}));
+			dispatch(acitvitiesActions.updateListActivity(mappedActivities));
 		},
 		[dispatch]
 	);
@@ -450,7 +465,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					dispatch(fetchDirectMessage({ noCache: true }));
+					await dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(
 						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: true, isFetchingLatestMessages: false })
 					);
@@ -509,7 +524,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(userChannelsActions.fetchUserChannels({ channelId: userAdds.channel_id, noCache: true }));
 
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					dispatch(fetchDirectMessage({ noCache: true }));
+					await dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(fetchListFriends({ noCache: true }));
 				}
 			}
@@ -914,9 +929,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
 		dispatch(
 			DMCallActions.add({
-				calleeId: event.receiver_id,
+				calleeId: event?.receiver_id,
 				signalingData: event,
-				id: '',
+				// todo: refactor this
+				id: Snowflake.generate(),
 				callerId: ''
 			})
 		);
@@ -931,6 +947,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onvoiceleaved = onvoiceleaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onactivityupdated = onactivityupdated;
 
 			socket.onstreamingchannelleaved = onstreamingchannelleaved;
 

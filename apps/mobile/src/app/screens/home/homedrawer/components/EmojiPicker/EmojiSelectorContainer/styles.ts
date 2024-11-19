@@ -1,7 +1,7 @@
 import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 	StyleSheet.create({
 		cateContainer: {
 			gap: size.s_10
@@ -18,12 +18,12 @@ export const style = (colors: Attributes) =>
 			flexWrap: 'wrap'
 		},
 		wrapperIconEmoji: {
-			width: (Metrics.screenWidth - size.s_22) / 9,
+			width: (isTabletLandscape ? Metrics.screenWidth * 0.7 - size.s_22 : Metrics.screenWidth - size.s_22) / 9,
 			paddingVertical: size.s_10,
 			alignSelf: 'center'
 		},
 		iconEmoji: {
-			width: (Metrics.screenWidth - size.s_20) / 9 - size.s_6,
+			width: (isTabletLandscape ? Metrics.screenWidth * 0.7 - size.s_20 : Metrics.screenWidth - size.s_20) / 9 - size.s_6,
 			height: size.s_30
 		},
 		displayByCategories: {

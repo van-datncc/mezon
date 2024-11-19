@@ -46,7 +46,6 @@ export * from './lib/chat/hooks/useGifs';
 export * from './lib/chat/hooks/useGifsStickersEmojis';
 export * from './lib/chat/hooks/useHandlePopupQuickMess';
 export * from './lib/chat/hooks/useInvite';
-export * from './lib/chat/hooks/useJumpMessage';
 export * from './lib/chat/hooks/useMarkAsRead';
 export * from './lib/chat/hooks/useMenu';
 export * from './lib/chat/hooks/useMessageValue';
