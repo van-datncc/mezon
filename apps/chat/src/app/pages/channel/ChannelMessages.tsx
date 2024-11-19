@@ -79,18 +79,34 @@ function ChannelMessages({
 
 	const chatRef = useRef<HTMLDivElement | null>(null);
 
+	const isFetchingRef = useRef<boolean>(false);
+	const hasMoreTopRef = useRef<boolean>(false);
+	const hasMoreBottomRef = useRef<boolean>(false);
+
+	useEffect(() => {
+		isFetchingRef.current = isFetching;
+	}, [isFetching]);
+
+	useEffect(() => {
+		hasMoreTopRef.current = hasMoreTop;
+	}, [hasMoreTop]);
+
+	useEffect(() => {
+		hasMoreBottomRef.current = hasMoreBottom;
+	}, [hasMoreBottom]);
+
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb?: IBeforeRenderCb) => {
-			if (isFetching) {
+			if (isFetchingRef.current) {
 				return;
 			}
 
-			if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
+			if (direction === ELoadMoreDirection.bottom && !hasMoreBottomRef.current) {
 				dispatch(messagesActions.setViewingOlder({ channelId, status: false }));
 				return;
 			}
 
-			if (direction === ELoadMoreDirection.top && !hasMoreTop) {
+			if (direction === ELoadMoreDirection.top && !hasMoreTopRef.current) {
 				return;
 			}
 
@@ -108,7 +124,7 @@ function ChannelMessages({
 
 			return true;
 		},
-		[dispatch, clanId, channelId, hasMoreTop, hasMoreBottom, isFetching]
+		[dispatch, clanId, channelId]
 	);
 
 	const getChatScrollBottomOffset = useCallback(() => {
@@ -139,7 +155,9 @@ function ChannelMessages({
 						isLoadMore.current = true;
 						firsRowCached.current = messages[1];
 						await loadMoreMessage(ELoadMoreDirection.top);
-						isLoadMore.current = false;
+						setTimeout(() => {
+							isLoadMore.current = false;
+						}, 100);
 						return;
 					}
 
@@ -157,7 +175,9 @@ function ChannelMessages({
 							isLoadMore.current = true;
 							lastRowCached.current = messages[messages.length - 1];
 							await loadMoreMessage(ELoadMoreDirection.bottom);
-							isLoadMore.current = false;
+							setTimeout(() => {
+								isLoadMore.current = false;
+							}, 100);
 						}
 					}
 					break;
@@ -345,7 +365,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			const handleScrollToIndex = (messageId: string) => {
 				const index = messages.findIndex((item) => item === messageId);
 				if (index >= 0) {
-					rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
+					userActiveScroll.current = true;
+					rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
 				}
 			};
 
