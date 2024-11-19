@@ -16,8 +16,8 @@ const ModalControlRule = ({
 }) => {
 	return (
 		<div className="fixed h-screen w-screen z-50 bg-bgSurface bg-opacity-80 top-0 left-0 flex items-center justify-center">
-			<div className="w-[440px] p-5 pt-12 pb-[72px] h-fit max-h-[90%] bg-bgSecondary rounded-md relative text-channelTextLabel ">
-				<div className="max-h-full overflow-y-auto hide-scrollbar">{children}</div>
+			<div className="w-[440px] p-5 pt-12 pb-[72px] max-h-[90vh] bg-bgSecondary rounded-md relative text-channelTextLabel flex">
+				<div className="flex-1 overflow-y-auto hide-scrollbar">{children}</div>
 				<div className="absolute top-2 right-2 w-6 h-6 cursor-pointer" onClick={onClose}>
 					<Icons.CloseButton />
 				</div>
