@@ -195,6 +195,16 @@ export const selectMissionDone = createSelector(getOnboardingState, (state) => s
 
 export const selectMissionSum = createSelector(getOnboardingState, (state) => state.missionSum);
 export const selectFinishGuide = createSelector(getOnboardingState, (state) => state.guideFinished);
-export const selectOnboardingByClan = (clan_id: string) => createSelector(getOnboardingState, (state) => state.listOnboarding[clan_id]);
 
 export const selectFormOnboarding = createSelector(getOnboardingState, (state) => state.formOnboarding);
+
+export const selectOnboardingByClan = createSelector([getOnboardingState, (state, clan_id: string) => clan_id], (state, clan_id) => {
+	return (
+		state.listOnboarding[clan_id] || {
+			greeting: null,
+			mission: [],
+			question: [],
+			rule: []
+		}
+	);
+});

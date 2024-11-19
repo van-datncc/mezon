@@ -1,5 +1,5 @@
 import { useMemberContext } from '@mezon/core';
-import { selectChannelById, selectCurrentClanId, selectFormOnboarding, selectOnboardingByClan } from '@mezon/store';
+import { selectChannelById, selectCurrentClanId, selectFormOnboarding, selectOnboardingByClan, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
 import { ApiOnboardingContent } from 'mezon-js/api.gen';
@@ -20,7 +20,7 @@ function ClanGuideSetting() {
 	});
 
 	const currentClanId = useSelector(selectCurrentClanId);
-	const onboardingByClan = useSelector(selectOnboardingByClan(currentClanId as string));
+	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const onboardingTemp = useSelector(selectFormOnboarding);
 
 	return (

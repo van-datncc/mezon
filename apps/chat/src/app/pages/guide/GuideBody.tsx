@@ -9,7 +9,8 @@ import {
 	selectCurrentClanId,
 	selectOnboardingByClan,
 	selectOnboardingMode,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
@@ -48,7 +49,7 @@ function GuideBody() {
 		}
 	};
 
-	const onboardingItem = useSelector(selectOnboardingByClan(currentClanId as string));
+	const onboardingItem = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));

@@ -290,7 +290,7 @@ const SearchMessageChannel = () => {
 const OnboardingGuide = () => {
 	const missionDone = useSelector(selectMissionDone);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const onboardingClan = useSelector(selectOnboardingByClan(currentClanId as string));
+	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const { navigate, toGuidePage } = useAppNavigation();
 	const handleDoNextMission = () => {
 		const link = toGuidePage(currentClanId as string);
