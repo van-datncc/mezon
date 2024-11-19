@@ -94,7 +94,7 @@ const BottomNavigator = () => {
 				screenOptions={{
 					tabBarHideOnKeyboard: true,
 					tabBarStyle: {
-						position: isTabletLandscape ? 'relative' : 'absolute',
+						position: 'absolute',
 						zIndex: hiddenBottomTab ? -1 : 100,
 						height: size.s_80,
 						paddingHorizontal: 0,
