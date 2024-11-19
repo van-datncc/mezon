@@ -142,41 +142,50 @@ export const onboardingSlice = createSlice({
 		}
 	},
 	extraReducers: (builder) => {
-		builder.addCase(fetchOnboarding.fulfilled, (state, action) => {
-			if (!Object.prototype.hasOwnProperty.call(state.listOnboarding, action.payload.clan_id)) {
-				const onboardingClan: OnboardingClanType = {
-					greeting: undefined,
-					mission: [],
-					question: [],
-					rule: []
+		builder
+			.addCase(fetchOnboarding.fulfilled, (state, action) => {
+				if (!Object.prototype.hasOwnProperty.call(state.listOnboarding, action.payload.clan_id)) {
+					const onboardingClan: OnboardingClanType = {
+						greeting: undefined,
+						mission: [],
+						question: [],
+						rule: []
+					};
+					action.payload.response.map((onboardingItem) => {
+						switch (onboardingItem.guide_type) {
+							case EGuideType.GREETING:
+								onboardingClan.greeting = onboardingItem;
+								break;
+							case EGuideType.RULE:
+								onboardingClan.rule.push(onboardingItem);
+								break;
+							case EGuideType.QUESTION:
+								onboardingClan.question.push(onboardingItem);
+								break;
+							case EGuideType.TASK:
+								onboardingClan.mission.push(onboardingItem);
+								break;
+							default:
+								break;
+						}
+						state.listOnboarding[action.payload.clan_id] = onboardingClan;
+					});
+				}
+			})
+			.addCase(createOnboardingTask.fulfilled, (state, action) => {
+				state.formOnboarding = {
+					greeting: null,
+					rules: [],
+					questions: [],
+					task: []
 				};
-				action.payload.response.map((onboardingItem) => {
-					switch (onboardingItem.guide_type) {
-						case EGuideType.GREETING:
-							onboardingClan.greeting = onboardingItem;
-							break;
-						case EGuideType.RULE:
-							onboardingClan.rule.push(onboardingItem);
-							break;
-						case EGuideType.QUESTION:
-							onboardingClan.question.push(onboardingItem);
-							break;
-						case EGuideType.TASK:
-							onboardingClan.mission.push(onboardingItem);
-							break;
-						default:
-							break;
-					}
-					state.listOnboarding[action.payload.clan_id] = onboardingClan;
-				});
-			}
-		});
+			});
 	}
 });
 
 export const onboardingReducer = onboardingSlice.reducer;
 
-export const onboardingActions = { ...onboardingSlice.actions, createOnboardingTask };
+export const onboardingActions = { ...onboardingSlice.actions, createOnboardingTask, fetchOnboarding };
 
 export const getOnboardingState = (rootState: { [ONBOARDING_FEATURE_KEY]: OnboardingState }): OnboardingState => rootState[ONBOARDING_FEATURE_KEY];
 
@@ -186,6 +195,16 @@ export const selectMissionDone = createSelector(getOnboardingState, (state) => s
 
 export const selectMissionSum = createSelector(getOnboardingState, (state) => state.missionSum);
 export const selectFinishGuide = createSelector(getOnboardingState, (state) => state.guideFinished);
-export const selectOnboardingByClan = (clan_id: string) => createSelector(getOnboardingState, (state) => state.listOnboarding[clan_id]);
 
 export const selectFormOnboarding = createSelector(getOnboardingState, (state) => state.formOnboarding);
+
+export const selectOnboardingByClan = createSelector([getOnboardingState, (state, clan_id: string) => clan_id], (state, clan_id) => {
+	return (
+		state.listOnboarding[clan_id] || {
+			greeting: null,
+			mission: [],
+			question: [],
+			rule: []
+		}
+	);
+});
