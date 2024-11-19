@@ -59,6 +59,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -914,9 +915,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
 		dispatch(
 			DMCallActions.add({
-				calleeId: event.receiver_id,
+				calleeId: event?.receiver_id,
 				signalingData: event,
-				id: '',
+				// todo: refactor this
+				id: Snowflake.generate(),
 				callerId: ''
 			})
 		);
