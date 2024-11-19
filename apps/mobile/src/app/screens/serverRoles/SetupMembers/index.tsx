@@ -83,8 +83,8 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 
 	const setInitialSelectedMember = useCallback(() => {
 		const assignedMemberIds = clanRole?.role_user_list?.role_users?.map((user) => user?.id);
-		const membersInRole = usersClan?.filter((user) => assignedMemberIds.includes(user?.user?.id));
-		const membersNotInRole = usersClan?.filter((user) => !assignedMemberIds.includes(user?.user?.id));
+		const membersInRole = usersClan?.filter((user) => assignedMemberIds?.includes(user?.user?.id));
+		const membersNotInRole = usersClan?.filter((user) => !assignedMemberIds?.includes(user?.user?.id));
 		setAssignedMemberList(membersInRole);
 		setUnAssignedMemberList(membersNotInRole);
 	}, [clanRole?.role_user_list?.role_users, usersClan]);
