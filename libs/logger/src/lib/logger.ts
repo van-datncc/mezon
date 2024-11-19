@@ -1,11 +1,14 @@
 import * as Sentry from '@sentry/react';
 
+const SKIP_LOG = 'skip_log';
+
 export function logger(): string {
 	return 'logger';
 }
 
 export async function captureSentryError(error: unknown, actionName: string): Promise<void> {
 	const errorDetail = await getErrorMessage(error);
+	if (errorDetail === SKIP_LOG) return;
 	const errorLabel = (actionName || 'unknown') + ' - ' + new Date().toLocaleTimeString('en-GB', { hour12: false });
 
 	const logTitle = new Error(errorLabel);
@@ -29,6 +32,7 @@ async function getErrorMessage(error: unknown): Promise<string> {
 
 async function handleResponseError(response: Response): Promise<string> {
 	try {
+		if (response?.status === 403 || response?.status === 429) return SKIP_LOG;
 		const clonedResponse = response.clone();
 		const errorData = await clonedResponse.json();
 		return safeJSONStringify(errorData);
