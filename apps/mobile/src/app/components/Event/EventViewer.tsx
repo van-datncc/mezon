@@ -8,6 +8,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet, MezonTab } from '../../componentUI';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { EventDetail } from './EventDetail';
 import { EventItem } from './EventItem';
 import { EventMember } from './EventMember';
@@ -15,6 +16,7 @@ import { style } from './styles';
 
 export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate: () => void }) {
 	// const { dismiss } = useBottomSheetModal()
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const allEventManagement = useSelector(selectAllEventManagement);
@@ -70,7 +72,7 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 				<MezonTab
 					views={[<EventDetail event={currentEvent} eventDetailRef={bottomSheetDetail} />, <EventMember event={currentEvent} />]}
 					titles={['Event Info', 'Interested']}
-					isBottomSheet={true}
+					isBottomSheet={isTabletLandscape}
 				/>
 			</MezonBottomSheet>
 		</View>
