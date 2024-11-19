@@ -1,20 +1,25 @@
 import { useMemberContext } from '@mezon/core';
-import { useAppDispatch } from '@mezon/store';
+import { selectChannelById, selectFormOnboarding } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChangeEvent, ReactNode, useState } from 'react';
+import { titleMission } from '@mezon/utils';
+import { ApiOnboardingContent } from 'mezon-js/api.gen';
+import { ReactNode } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import GuideItemLayout from '../GuideItemLayout';
-import ModalControlRule, { ControlInput } from '../ModalControlRule';
+import ModalAddMission from './ModalAddMission';
+import ModalAddRules from './ModalAddRule';
 
-type TypeMission = {
-	id: number;
-	description: string;
-	name: string;
-};
 function ClanGuideSetting() {
 	const [openModalAddTask, closeModalAddTask] = useModal(() => {
 		return <ModalAddMission onClose={closeModalAddTask} />;
 	});
+
+	const [openModalAddRules, closeModalAddRule] = useModal(() => {
+		return <ModalAddRules onClose={closeModalAddRule} />;
+	});
+
+	const onboardingTemp = useSelector(selectFormOnboarding);
 
 	return (
 		<div className="h-full flex gap-8 text-channelTextLabel w-[660px] text-sm font-medium">
@@ -47,48 +52,10 @@ function ClanGuideSetting() {
 				</div>
 
 				<div className="flex flex-col gap-3">
-					<GuideItemLayout
-						hightLightIcon={true}
-						icon={<Icons.Hashtag />}
-						gap={16}
-						className="px-3"
-						title="chat with the community"
-						description="in #general"
-						action={
-							<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-								{' '}
-								<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-							</button>
-						}
-					/>
-					<GuideItemLayout
-						hightLightIcon={true}
-						icon={<Icons.Hashtag />}
-						gap={16}
-						className="px-3"
-						title="chat with the community"
-						description="in #general"
-						action={
-							<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-								{' '}
-								<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-							</button>
-						}
-					/>
-					<GuideItemLayout
-						hightLightIcon={true}
-						icon={<Icons.Hashtag />}
-						gap={16}
-						className="px-3"
-						title="chat with the community"
-						description="in #general"
-						action={
-							<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-								{' '}
-								<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-							</button>
-						}
-					/>
+					{onboardingTemp.task.map((mission) => (
+						<MissionItem mission={mission} key={mission.title} />
+					))}
+
 					<GuideItemLayout
 						hightLightIcon={true}
 						gap={16}
@@ -124,21 +91,26 @@ function ClanGuideSetting() {
 				/>
 
 				<div className="flex flex-col gap-3">
-					<GuideItemLayout
-						icon={<Icons.RuleIcon />}
-						gap={16}
-						className="px-4 py-3"
-						description={'This is description of rules'}
-						title={'Rule #1'}
-						action={
-							<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-								{' '}
-								<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-							</button>
-						}
-					/>
+					{onboardingTemp.rules.map((rule) => (
+						<GuideItemLayout
+							icon={<Icons.RuleIcon />}
+							gap={16}
+							className="px-4 py-3"
+							description={rule.content}
+							title={rule.title}
+							action={
+								<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
+									{' '}
+									<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
+								</button>
+							}
+						/>
+					))}
 
-					<button className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-channelTextLabel rounded-md">
+					<button
+						className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-channelTextLabel rounded-md"
+						onClick={openModalAddRules}
+					>
 						<Icons.AddIcon className="w-4 h-4" /> Add a resource
 					</button>
 				</div>
@@ -185,103 +157,30 @@ const OwnerGreeting = () => {
 	);
 };
 
-const ModalAddMission = ({ onClose }: { onClose?: () => void }) => {
-	const listTypeMisstion: TypeMission[] = [
-		{
-			id: 1,
-			description: 'Member sends a message in the channel',
-			name: 'mission1'
-		},
-		{
-			id: 2,
-			description: 'Member visits the channel',
-			name: 'mission2'
-		},
-		{
-			id: 3,
-			description: 'Member visits the thread',
-			name: 'mission3'
-		}
-	];
+const MissionItem = ({ mission }: { mission: ApiOnboardingContent }) => {
+	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
 
-	const [title, setTitle] = useState('');
-	const [mission, setMission] = useState<number | null>(null);
-	const dispatch = useAppDispatch();
-	const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
-		setTitle(e.target.value);
-	};
-
-	const handleSetMission = (value: number) => {
-		setMission(value);
-	};
-
-	const handleAddTask = () => {
-		// dispatch(onboardingActions.createOnboardingTask()); TO-DO : FINISHED CREATE ONBOARDING
-	};
 	return (
-		<ModalControlRule onClose={onClose} onSave={handleAddTask}>
-			<div className="flex flex-col ">
-				<ControlInput
-					message="Actions must be at least 7 characters"
-					placeholder="Ex. Post a photo of your pet"
-					title="What should the new member do?"
-					onChange={handleChangeTitle}
-					value={title}
-					required
-				/>
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
-
-				<div className="flex flex-col gap-2">
-					<h1 className="text-base font-semibold text-white">
-						Where should they do it? <span className="text-red-500">*</span>
-					</h1>
-					<div className="flex flex-col">
-						<select className="w-full p-[10px] outline-none rounded bg-borderDefault">
-							<option value="">Select</option>
-							<option value="volvo">Volvo</option>
-							<option value="saab">Saab</option>
-							<option value="mercedes">Mercedes</option>
-							<option value="audi">Audi</option>
-						</select>
-
-						<span className="text-xs mt-1">Channels must be viewable by @everyone (public channel)</span>
-					</div>
-				</div>
-
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
-
-				<GuideItemLayout
-					className="!p-0"
-					background="bg-transparent hover:bg-transparent"
-					title="Upload a custom thumbnail"
-					description="72x72 minimum. 1:1 aspect ratio. PNG, JPG"
-				/>
-
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
-
-				<div className="flex flex-col">
-					<h1 className="text-base font-semibold text-white">
-						{' '}
-						This task is complete when: <span className="text-red-500">*</span>
-					</h1>
-
-					{listTypeMisstion.map((missions) => (
-						<div className="w-full flex mt-2 gap-2 items-center">
-							<input
-								id={missions.name}
-								onClick={(e) => handleSetMission(missions.id)}
-								type="radio"
-								className={`appearance-none text-white w-5 h-5 bg-transparent relative rounded-full accent-white border-2  border-channelTextLabel checked:after:absolute checked:after:w-3 checked:after:h-3 checked:after:top-[2.4px] checked:after:left-[2.4px] checked:after:bg-white checked:after:content-[""] checked:after:rounded-full ${mission === missions.id ? 'border-white' : ''} `}
-								name="mission"
-							/>
-							<label htmlFor={missions.name} className={`text-base font-medium ${mission === missions.id ? 'text-white' : ''}`}>
-								Member sends a message in the channel{' '}
-							</label>
-						</div>
-					))}
-				</div>
-			</div>
-		</ModalControlRule>
+		<GuideItemLayout
+			key={mission.title}
+			hightLightIcon={true}
+			icon={<Icons.Hashtag />}
+			gap={16}
+			className="px-3"
+			title={mission.title}
+			description={
+				<span>
+					{' '}
+					{titleMission[mission.task_type || 0]} <span className="font-semibold text-channelActiveColor">#{channelById.channel_label}</span>
+				</span>
+			}
+			action={
+				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
+					{' '}
+					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
+				</button>
+			}
+		/>
 	);
 };
 

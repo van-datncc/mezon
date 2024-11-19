@@ -31,6 +31,8 @@ export const threadError: ThreadError = {
 	message: 'Starter Message is required'
 };
 
+export const titleMission = ['Send a message in', 'Visit a channel', 'Do anything you want'];
+
 export const MIN_THRESHOLD_CHARS = 4000;
 
 export type ITypeConvert = {
