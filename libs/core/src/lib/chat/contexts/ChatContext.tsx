@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { captureSentryError } from '@mezon/logger';
 import {
+	ActivitiesEntity,
 	AttachmentEntity,
 	DMCallActions,
+	acitvitiesActions,
 	appActions,
 	attachmentActions,
 	channelMembers,
@@ -76,6 +78,7 @@ import {
 	EventEmoji,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
+	ListActivity,
 	MessageTypingEvent,
 	Notification,
 	PermissionChangedEvent,
@@ -211,6 +214,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channel: StreamingEndedEvent) => {
 			dispatch(channelsStreamActions.remove(channel.channel_id));
 			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
+		},
+		[dispatch]
+	);
+
+	const onactivityupdated = useCallback(
+		(activities: ListActivity) => {
+			const mappedActivities: ActivitiesEntity[] = activities.acts.map((activity) => ({
+				...activity,
+				id: activity.user_id || ''
+			}));
+			dispatch(acitvitiesActions.updateListActivity(mappedActivities));
 		},
 		[dispatch]
 	);
@@ -933,6 +947,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onvoiceleaved = onvoiceleaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onactivityupdated = onactivityupdated;
 
 			socket.onstreamingchannelleaved = onstreamingchannelleaved;
 
