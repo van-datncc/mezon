@@ -39,10 +39,6 @@ export interface AppState {
 	isShowSettingFooter: showSettingFooterProps;
 	isShowPopupQuickMess: boolean;
 	categoryChannelOffsets: { [key: number]: number };
-	isShowCallDM: boolean;
-	isShowNumberCallDM: string[];
-	isMuteMicrophone: boolean;
-	isShowShareScreen: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -65,10 +61,6 @@ export const initialAppState: AppState = {
 	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true },
 	isShowPopupQuickMess: false,
 	categoryChannelOffsets: {},
-	isShowCallDM: false,
-	isShowNumberCallDM: [],
-	isMuteMicrophone: false,
-	isShowShareScreen: false
 };
 
 export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id: string }, thunkAPI) => {
@@ -193,18 +185,6 @@ export const appSlice = createSlice({
 				...action.payload
 			};
 		},
-		setIsShowCallDM: (state, action) => {
-			state.isShowCallDM = action.payload;
-		},
-		setIsShowNumberCallDM: (state, action) => {
-			state.isShowNumberCallDM = action.payload;
-		},
-		setIsMuteMicrophone: (state, action) => {
-			state.isMuteMicrophone = action.payload;
-		},
-		setIsShowShareScreen: (state, action) => {
-			state.isShowShareScreen = action.payload;
-		},
 	}
 });
 
@@ -257,8 +237,3 @@ export const selectIsShowPopupQuickMess = createSelector(getAppState, (state: Ap
 
 export const selectCategoryChannelOffsets = createSelector(getAppState, (state: AppState) => state.categoryChannelOffsets);
 
-export const selectIsShowNumberCallDM = createSelector(getAppState, (state: AppState) => state.isShowNumberCallDM);
-
-export const selectIsMuteMicrophone = createSelector(getAppState, (state: AppState) => state.isMuteMicrophone);
-
-export const selectIsShowShareScreen = createSelector(getAppState, (state: AppState) => state.isShowShareScreen);

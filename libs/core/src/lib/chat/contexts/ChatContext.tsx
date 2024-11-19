@@ -46,6 +46,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
+	selectIsShowNumberCallDM,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -132,6 +133,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const isShowNumberCallDM = useSelector(selectIsShowNumberCallDM);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
@@ -922,6 +924,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				callerId: ''
 			})
 		);
+		dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, event?.channel_id]));
 	}, []);
 
 	const setCallbackEventFn = React.useCallback(

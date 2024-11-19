@@ -2,6 +2,7 @@
 import { useAppParams, useAuth, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
+	DMCallActions,
 	DirectEntity,
 	appActions,
 	selectCloseMenu,
@@ -98,16 +99,16 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 	const setIsShowNumberCallDM = useCallback(
 		async (dmGroupId: string) => {
-			await dispatch(appActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
+			await dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
 		},
 		[dispatch, isShowNumberCallDM]
 	);
 
 	const handleShowShareScreenToggle = () => {
-		dispatch(appActions.setIsShowShareScreen(!isShowShareScreen));
+		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
 	};
 	const handleMuteToggle = () => {
-		dispatch(appActions.setIsMuteMicrophone(!isMuteMicrophone));
+		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 	};
 
 	return (
@@ -148,10 +149,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 											animation="duration-500"
 											style={appearanceTheme === 'light' ? 'light' : 'dark'}
 										>
-											<Icons.IconPhoneDM />
+											<Icons.IconPhoneDM
+												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+											/>
 										</Tooltip>
 									</button>
-									<div>{/* <CallButton isLightMode={appearanceTheme === 'light'} /> */}</div>
+									<div>
+										<CallButton
+											isLightMode={appearanceTheme === 'light'}
+											dmUserId={currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : ''}
+											dmGroupId={dmGroupId ?? ''}
+										/>
+									</div>
 									<div>
 										<PinButton isLightMode={appearanceTheme === 'light'} />
 									</div>
@@ -231,12 +240,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						<div className="flex flex-row gap-1 items-center flex-1">
 							<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 								<Icons.OpenMenu defaultSize={`w-5 h-5`} />
-							</div>
-							<div>
-								<CallButton
-									isLightMode={appearanceTheme === 'light'}
-									dmUserId={currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : ''}
-								/>
 							</div>
 							<MemberProfile
 								numberCharacterCollapse={22}
@@ -346,7 +349,26 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 							>
-								<Icons.StartCall />
+								<Icons.IconMeetDM />
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+							>
+								<Icons.IconPhoneDM />
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+							>
+								<Icons.CloseButton className={`w-[20px]`} />
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+							>
+								<Icons.IconMeetDM
+									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isShowShareScreen={isShowShareScreen}
+									isShowLine={true}
+								/>
 							</div>
 							<div
 								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
@@ -355,6 +377,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								<Icons.ShareScreen
 									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
 									isShowShareScreen={isShowShareScreen}
+									isShowLine={true}
 								/>
 							</div>
 							<div
@@ -364,6 +387,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								<Icons.Microphone
 									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
 									isMuteMicrophone={isMuteMicrophone}
+									isShowLine={true}
 								/>
 							</div>
 							<div
@@ -442,7 +466,7 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 	);
 };
 
-function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId: string }) {
+function CallButton({ isLightMode, dmUserId, dmGroupId }: { isLightMode: boolean; dmUserId: string; dmGroupId: string }) {
 	const [isShow, setIsShow] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -461,7 +485,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 					await mezon.socketRef.current?.forwardWebrtcSignaling(
 						dmUserId,
 						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate)
+						JSON.stringify(event.candidate),
+						dmGroupId
 					);
 				}
 			}
@@ -490,7 +515,7 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 						await peerConnection.setLocalDescription(answer);
 
 						const answerEn = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEn);
+						await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEn, dmGroupId);
 					};
 					processData().catch(console.error);
 				}
@@ -527,7 +552,7 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 	const startCall = async () => {
 		// Get user media
 		navigator.mediaDevices
-			.getUserMedia({ video: true, audio: true })
+			.getUserMedia({ video: false, audio: true })
 			.then(async (stream) => {
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
@@ -543,7 +568,7 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 				await peerConnection.setLocalDescription(offer);
 				if (offer && mezon.socketRef.current) {
 					const offerEn = await compress(JSON.stringify(offer));
-					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn);
+					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn, dmGroupId);
 				}
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
@@ -565,7 +590,9 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 		<div className="relative leading-5 size-6" ref={threadRef}>
 			<Tooltip content="Start Video Call" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShow} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.IconMeetDM isWhite={isShow} />
+					<Icons.IconMeetDM
+						className={`dark:hover:text-white hover:text-black ${isShow ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+					/>
 				</button>
 				{pinMsgs?.length > 0 && (
 					<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>

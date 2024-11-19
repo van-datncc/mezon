@@ -17,6 +17,9 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+	isShowNumberCallDM: string[];
+	isMuteMicrophone: boolean;
+	isShowShareScreen: boolean;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -29,8 +32,12 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	signalingData: {
 		receiver_id: '',
 		data_type: 0,
-		json_data: ''
-	}
+		json_data: '',
+		channel_id: ''
+	},
+	isShowNumberCallDM: [],
+	isMuteMicrophone: false,
+	isShowShareScreen: false
 });
 
 export const DMCallSlice = createSlice({
@@ -39,7 +46,16 @@ export const DMCallSlice = createSlice({
 	reducers: {
 		add: DMCallAdapter.addOne,
 		addMany: DMCallAdapter.addMany,
-		remove: DMCallAdapter.removeOne
+		remove: DMCallAdapter.removeOne,
+		setIsShowNumberCallDM: (state, action) => {
+			state.isShowNumberCallDM = action.payload;
+		},
+		setIsMuteMicrophone: (state, action) => {
+			state.isMuteMicrophone = action.payload;
+		},
+		setIsShowShareScreen: (state, action) => {
+			state.isShowShareScreen = action.payload;
+		},
 		// ...
 	}
 });
@@ -97,3 +113,8 @@ export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities
 	const dmcalls = Object.values(entities);
 	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
 });
+export const selectIsShowNumberCallDM = createSelector(getDMCallState, (state: DMCallState) => state.isShowNumberCallDM);
+
+export const selectIsMuteMicrophone = createSelector(getDMCallState, (state: DMCallState) => state.isMuteMicrophone);
+
+export const selectIsShowShareScreen = createSelector(getDMCallState, (state: DMCallState) => state.isShowShareScreen);

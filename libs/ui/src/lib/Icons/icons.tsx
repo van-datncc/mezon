@@ -2859,10 +2859,9 @@ export function IconClockChannel() {
 	);
 }
 
-export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
+export function IconPhoneDM({ ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2872,6 +2871,7 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
@@ -2882,10 +2882,9 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
+export function IconMeetDM({ isShowShareScreen = false, isShowLine = false, ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2895,11 +2894,37 @@ export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
 				d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z"
 			></path>
+			{isShowLine && (
+				<>
+					{' '}
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
@@ -5903,7 +5928,7 @@ export function StartCall(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function Microphone({ isMuteMicrophone = false, ...props }) {
+export function Microphone({ isMuteMicrophone = false, isShowLine = false, ...props }) {
 	return (
 		<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<path
@@ -5914,20 +5939,34 @@ export function Microphone({ isMuteMicrophone = false, ...props }) {
 				strokeLinejoin="round"
 			/>
 
-			<line
-				x1="4"
-				y1="20"
-				x2="20"
-				y2="4"
-				stroke="currentColor"
-				strokeLinecap="round"
-				strokeWidth="1.5"
-				className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
-			/>
+			{isShowLine && (
+				<>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
-export function ShareScreen({ isShowShareScreen = false, ...props }) {
+export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...props }) {
 	return (
 		<svg width="32px" height="32px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
 			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -5943,16 +5982,30 @@ export function ShareScreen({ isShowShareScreen = false, ...props }) {
 						>
 							{' '}
 						</path>{' '}
-						<line
-							x1="2"
-							y1="23"
-							x2="26"
-							y2="5"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeWidth="1.5"
-							className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
-						/>
+						{isShowLine && (
+							<>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="white"
+									strokeLinecap="round"
+									strokeWidth="3.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="black"
+									strokeLinecap="round"
+									strokeWidth="1.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+							</>
+						)}
 					</g>{' '}
 				</g>{' '}
 			</g>
