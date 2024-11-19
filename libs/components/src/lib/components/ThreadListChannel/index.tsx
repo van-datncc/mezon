@@ -57,7 +57,10 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 	const isShowThread = (thread: IChannel) => {
 		const threadId = thread.id;
 		return (
-			allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp || threadId === currentChannelId
+			(allChannelMetaEntities[threadId]?.isMute !== true &&
+				allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp) ||
+			(thread?.count_mess_unread ?? 0) > 0 ||
+			threadId === currentChannelId
 		);
 	};
 
