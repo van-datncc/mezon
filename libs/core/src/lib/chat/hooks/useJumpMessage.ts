@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
-import { useAppNavigation } from '../../app/hooks/useAppNavigation';
+import React, { useMemo } from 'react';
 
 export type useJumpToMessagesOptions = {
 	channelId: string;
@@ -10,8 +9,6 @@ export type useJumpToMessagesOptions = {
 let messID: string | null = null;
 
 export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMessagesOptions) {
-	const { navigate, toMessageChannel } = useAppNavigation();
-
 	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'center') => {
 		if (messageId) {
 			const messageElement = document.getElementById(messageId);
@@ -22,16 +19,11 @@ export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMess
 		}
 	}, []);
 
-	const directToMessageById = useCallback(async () => {
-		await navigate(toMessageChannel(channelId, clanId ?? '', messageID ?? ''));
-	}, [navigate, toMessageChannel, channelId, clanId, messageID]);
-
 	return useMemo(
 		() => ({
-			directToMessageById,
 			jumpToMessage
 		}),
-		[directToMessageById, jumpToMessage]
+		[jumpToMessage]
 	);
 }
 export function getJumpToMessageId() {
