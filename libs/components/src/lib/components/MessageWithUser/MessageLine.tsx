@@ -291,7 +291,8 @@ const RenderContent = memo(
 								textOverflow: 'ellipsis'
 							}
 						: {
-								whiteSpace: 'pre-line'
+								whiteSpace: 'break-spaces',
+								overflowWrap: 'break-word'
 							}
 				}
 				className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}

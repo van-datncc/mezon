@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -24,6 +24,12 @@ export interface OnboardingState {
 	missionSum: number;
 	guideFinished: boolean;
 	listOnboarding: Record<string, OnboardingClanType>;
+	formOnboarding: {
+		greeting: ApiOnboardingContent | null;
+		rules: ApiOnboardingContent[];
+		questions: ApiOnboardingContent[];
+		task: ApiOnboardingContent[];
+	};
 }
 
 const fetchOnboardingCached = memoizee(
@@ -83,7 +89,13 @@ export const initialOnboardingState: OnboardingState = {
 	missionDone: 0,
 	missionSum: 3,
 	guideFinished: false,
-	listOnboarding: {}
+	listOnboarding: {},
+	formOnboarding: {
+		greeting: null,
+		rules: [],
+		questions: [],
+		task: []
+	}
 };
 
 export enum ETypeMission {
@@ -115,6 +127,18 @@ export const onboardingSlice = createSlice({
 					state.guideFinished = true;
 				}
 			}
+		},
+		addGreeting: (state, action: PayloadAction<ApiOnboardingContent>) => {
+			state.formOnboarding.greeting = action.payload;
+		},
+		addRules: (state, action: PayloadAction<ApiOnboardingContent>) => {
+			state.formOnboarding.rules.push(action.payload);
+		},
+		addQuestion: (state, action: PayloadAction<ApiOnboardingContent>) => {
+			state.formOnboarding.questions.push(action.payload);
+		},
+		addMission: (state, action: PayloadAction<ApiOnboardingContent>) => {
+			state.formOnboarding.task.push(action.payload);
 		}
 	},
 	extraReducers: (builder) => {
@@ -163,3 +187,5 @@ export const selectMissionDone = createSelector(getOnboardingState, (state) => s
 export const selectMissionSum = createSelector(getOnboardingState, (state) => state.missionSum);
 export const selectFinishGuide = createSelector(getOnboardingState, (state) => state.guideFinished);
 export const selectOnboardingByClan = (clan_id: string) => createSelector(getOnboardingState, (state) => state.listOnboarding[clan_id]);
+
+export const selectFormOnboarding = createSelector(getOnboardingState, (state) => state.formOnboarding);
