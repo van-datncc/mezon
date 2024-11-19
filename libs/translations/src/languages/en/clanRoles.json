@@ -48,5 +48,11 @@
         "yes": "Yes",
         "doNotSave": "Don't Save"
     },
+    "roleColorPicker": {
+      "textBtnRole": "Role Colour",
+      "titleBS": "Pick a Colour",
+      "reset": "Reset",
+      "save": "Save"
+    },
     "notifyEveryone":"Notify everyone who has permission to see this channel."
 }
