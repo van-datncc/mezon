@@ -1033,3 +1033,7 @@ input:-webkit-autofill:active {
 #close-button {
   grid-column: 3;
 }
+
+textarea[aria-hidden="true"] {
+  display: none;
+}
