@@ -318,21 +318,20 @@ function CallButton({ isLightMode }: { isLightMode: boolean }) {
 	};
 
 	const startCall = async () => {
-		const offer = await peerConnection.createOffer();
-		await peerConnection.setLocalDescription(offer);
-		if (offer) {
-			await mezon.socketRef.current?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
-		}
-
 		// Get user media
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
-			.then((stream) => {
+			.then(async (stream) => {
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
 				}
 				// Add tracks to PeerConnection
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+				const offer = await peerConnection.createOffer();
+				await peerConnection.setLocalDescription(offer);
+				if (offer) {
+					await mezon.socketRef.current?.forwardWebrtcSignaling('', WebrtcSignalingType.WEBRTC_SDP_OFFER, JSON.stringify(offer));
+				}
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
 	};
