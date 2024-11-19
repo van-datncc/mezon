@@ -47,7 +47,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -185,23 +185,25 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
-			thunkAPI.dispatch(
-				messagesActions.fetchMessages({ clanId: '0', channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage })
-			);
-			const fetchChannelMembersResult = await thunkAPI.dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: '',
-					channelId: directMessageId,
-					channelType: ChannelType.CHANNEL_TYPE_TEXT,
-					noCache
-				})
-			);
-			const members = fetchChannelMembersResult.payload as members[];
-			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
-				const userIds = members.map((member) => member?.user_id as string);
-				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
+			if (directMessageId !== '') {
+				thunkAPI.dispatch(
+					messagesActions.fetchMessages({ clanId: '0', channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage })
+				);
+				const fetchChannelMembersResult = await thunkAPI.dispatch(
+					channelMembersActions.fetchChannelMembers({
+						clanId: '',
+						channelId: directMessageId,
+						channelType: ChannelType.CHANNEL_TYPE_TEXT,
+						noCache
+					})
+				);
+				const members = fetchChannelMembersResult.payload as members[];
+				if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
+					const userIds = members.map((member) => member?.user_id as string);
+					thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
+				}
+				thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			}
-			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(
 				channelsActions.joinChat({
 					clanId: '0',
