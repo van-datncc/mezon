@@ -25,7 +25,7 @@ function RoleCoLourComponent({ roleId }: { roleId: string }) {
 		bottomSheetRef?.current?.present();
 	};
 
-	const handlePickColor = useCallback(async (colorSelected: string) => {
+	const handleSaveRoleColor = useCallback(async (colorSelected: string) => {
 		if (colorSelected && activeRole) {
 			await updateRole(activeRole?.clan_id || '', activeRole?.id, activeRole?.title ?? '', colorSelected ?? '', [], [], [], []);
 			setRoleColorSelected(colorSelected);
@@ -43,7 +43,7 @@ function RoleCoLourComponent({ roleId }: { roleId: string }) {
 			</TouchableOpacity>
 
 			<MezonBottomSheet snapPoints={['50%']} ref={bottomSheetRef}>
-				<RoleColorPicker onPickColor={handlePickColor}></RoleColorPicker>
+				<RoleColorPicker onPickColor={handleSaveRoleColor}></RoleColorPicker>
 			</MezonBottomSheet>
 		</Block>
 	);
