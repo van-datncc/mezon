@@ -70,7 +70,10 @@ export const activitiesSlice = createSlice({
 	reducers: {
 		add: activityAdapter.addOne,
 		addMany: activityAdapter.addMany,
-		remove: activityAdapter.removeOne
+		remove: activityAdapter.removeOne,
+		updateListActivity: (state: ActivityState, action: PayloadAction<ActivitiesEntity[]>) => {
+			activityAdapter.setAll(state, action.payload);
+		}
 		// ...
 	},
 	extraReducers: (builder) => {
