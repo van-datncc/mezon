@@ -1,4 +1,5 @@
 import { useMemberContext } from '@mezon/core';
+import { useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChangeEvent, ReactNode, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -205,7 +206,7 @@ const ModalAddMission = ({ onClose }: { onClose?: () => void }) => {
 
 	const [title, setTitle] = useState('');
 	const [mission, setMission] = useState<number | null>(null);
-
+	const dispatch = useAppDispatch();
 	const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
 		setTitle(e.target.value);
 	};
@@ -213,8 +214,12 @@ const ModalAddMission = ({ onClose }: { onClose?: () => void }) => {
 	const handleSetMission = (value: number) => {
 		setMission(value);
 	};
+
+	const handleAddTask = () => {
+		// dispatch(onboardingActions.createOnboardingTask()); TO-DO : FINISHED CREATE ONBOARDING
+	};
 	return (
-		<ModalControlRule onClose={onClose}>
+		<ModalControlRule onClose={onClose} onSave={handleAddTask}>
 			<div className="flex flex-col ">
 				<ControlInput
 					message="Actions must be at least 7 characters"

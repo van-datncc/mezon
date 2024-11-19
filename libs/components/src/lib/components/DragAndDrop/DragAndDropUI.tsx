@@ -1,7 +1,5 @@
-import { useDragAndDrop } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { useCurrentInbox, useDragAndDrop } from '@mezon/core';
 import { DragEvent } from 'react';
-import { useSelector } from 'react-redux';
 import DocumentThumbnail from './DocumentThumbnail';
 
 type DragAndDropUIProps = {
@@ -13,7 +11,7 @@ type DragAndDropUIProps = {
 	onDrop: (e: DragEvent<HTMLElement>) => void;
 };
 function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
-	const currentChannel = useSelector(selectCurrentChannel);
+	const currentChannel = useCurrentInbox();
 	const { setDraggingState } = useDragAndDrop();
 
 	const handleParentDragLeave = (e: DragEvent<HTMLElement>) => {

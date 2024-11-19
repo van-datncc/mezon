@@ -122,7 +122,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			marginRight: size.s_30,
 			gap: size.s_30,
 			width: '40%',
-			flex: 1
+			height: size.s_50
 		},
 		contentWrapper: {
 			paddingHorizontal: isTabletLandscape ? size.s_30 : size.s_18,

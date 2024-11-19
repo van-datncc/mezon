@@ -899,6 +899,9 @@ type ImgproxyOptions = {
 
 export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
 	if (!sourceImageUrl) return '';
+	if (sourceImageUrl.includes('assets/images/')) {
+		return sourceImageUrl;
+	}
 	const { width, height, resizeType } = options;
 	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;
 	const path = `/${processingOptions}/plain/${sourceImageUrl}@png`;

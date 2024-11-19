@@ -81,5 +81,14 @@ export const style = (colors: Attributes) =>
 			textAlign: 'center',
 			fontSize: size.h6,
 			color: Colors.white
+		},
+		iconHeader: {
+			marginRight: size.s_16,
+			width: size.s_34,
+			height: size.s_34,
+			borderRadius: size.s_30,
+			backgroundColor: colors.secondaryLight,
+			alignItems: 'center',
+			justifyContent: 'center'
 		}
 	});

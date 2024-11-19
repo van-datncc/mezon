@@ -171,7 +171,7 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 		<ScrollView style={styles.container}>
 			<MezonInput label={t('fields.categoryName.title')} value={currentSettingValue} onTextChange={handleUpdateValue} />
 
-			<MezonMenu menu={menu} />
+			{/*<MezonMenu menu={menu} />*/}
 
 			<MezonConfirm
 				visible={isVisibleDeleteCategoryModal}

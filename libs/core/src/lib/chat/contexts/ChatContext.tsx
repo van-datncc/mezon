@@ -726,7 +726,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
 								lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
 								lastSeenPinMessage: '',
-								clanId: extendChannelCreated.clan_id ?? ''
+								clanId: extendChannelCreated.clan_id ?? '',
+								isMute: false
 							}
 						])
 					);

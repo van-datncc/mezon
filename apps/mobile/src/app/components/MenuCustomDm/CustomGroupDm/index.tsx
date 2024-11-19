@@ -35,7 +35,8 @@ const CustomGroupDm = ({ dmGroupId, channelLabel }: { dmGroupId: string; channel
 			const updateChannel: ApiUpdateChannelDescRequest = {
 				channel_id: dmGroupId || '',
 				channel_label: nameGroup || '',
-				category_id: '0'
+				category_id: '0',
+				app_url: ''
 			};
 			await dispatch(channelsActions.updateChannel(updateChannel));
 		}
