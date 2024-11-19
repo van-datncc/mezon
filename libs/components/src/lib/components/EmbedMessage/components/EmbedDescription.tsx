@@ -1,4 +1,5 @@
 import { convertMarkdown, ETokenMessage } from '@mezon/utils';
+import { useMemo } from 'react';
 import { MarkdownContent } from '../../MarkdownFormatText/MarkdownContent';
 import useProcessedContent from '../../MessageBox/ReactionMentionInput/useProcessedContent';
 import { ElementToken } from '../../MessageWithUser/MessageLine';
