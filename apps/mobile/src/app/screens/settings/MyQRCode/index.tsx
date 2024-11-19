@@ -8,6 +8,7 @@ import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import RNQRGenerator from 'rn-qr-generator';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 export const MyQRCode = () => {
@@ -15,6 +16,7 @@ export const MyQRCode = () => {
 	const styles = style(themeValue);
 	const userProfile = useSelector(selectAllAccount);
 	const [urlQRCode, setUrlQRCode] = useState<string>('');
+	const isTabletLandscape = useTabletLandscape();
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? JSON.parse(userProfile?.wallet || '{}')?.value : 0;
@@ -63,7 +65,20 @@ export const MyQRCode = () => {
 					</Block>
 				</Block>
 				{urlQRCode ? (
-					<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
+					isTabletLandscape ? (
+						<Block
+							height={size.s_100 * 3.6}
+							width={size.s_100 * 3.6}
+							backgroundColor={'white'}
+							alignSelf="center"
+							justifyContent="center"
+							marginVertical={size.s_40}
+						>
+							<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
+						</Block>
+					) : (
+						<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
+					)
 				) : (
 					<Block height={size.s_100 * 2.5} alignItems={'center'} justifyContent={'center'}>
 						<Grid color={themeValue.text} size={size.s_50} />

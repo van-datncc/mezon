@@ -1,5 +1,5 @@
 import { useMemberContext } from '@mezon/core';
-import { selectChannelById, selectFormOnboarding } from '@mezon/store';
+import { selectChannelById, selectCurrentClanId, selectFormOnboarding, selectOnboardingByClan, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
 import { ApiOnboardingContent } from 'mezon-js/api.gen';
@@ -19,6 +19,8 @@ function ClanGuideSetting() {
 		return <ModalAddRules onClose={closeModalAddRule} />;
 	});
 
+	const currentClanId = useSelector(selectCurrentClanId);
+	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const onboardingTemp = useSelector(selectFormOnboarding);
 
 	return (
@@ -52,6 +54,10 @@ function ClanGuideSetting() {
 				</div>
 
 				<div className="flex flex-col gap-3">
+					{onboardingByClan.mission.map((mission) => (
+						<MissionItem mission={mission} key={mission.title} />
+					))}
+
 					{onboardingTemp.task.map((mission) => (
 						<MissionItem mission={mission} key={mission.title} />
 					))}
@@ -91,6 +97,23 @@ function ClanGuideSetting() {
 				/>
 
 				<div className="flex flex-col gap-3">
+					{onboardingByClan.rule.map((rule) => (
+						<GuideItemLayout
+							key={rule.title}
+							icon={<Icons.RuleIcon />}
+							gap={16}
+							className="px-4 py-3"
+							description={rule.content}
+							title={rule.title}
+							action={
+								<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
+									{' '}
+									<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
+								</button>
+							}
+						/>
+					))}
+
 					{onboardingTemp.rules.map((rule) => (
 						<GuideItemLayout
 							key={rule.title}

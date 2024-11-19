@@ -1,6 +1,6 @@
-import {Attributes, size} from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-import {transparent} from "tailwindcss/colors";
+import { transparent } from 'tailwindcss/colors';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -11,7 +11,7 @@ export const style = (colors: Attributes) =>
 		main: {
 			flex: 1,
 			marginTop: size.s_10,
-			marginBottom: size.s_50,
+			marginBottom: size.s_50
 		},
 		menuHeader: {
 			width: '100%',
@@ -44,5 +44,5 @@ export const style = (colors: Attributes) =>
 			height: size.s_50,
 			backgroundColor: colors.badgeHighlight,
 			borderRadius: size.s_30
-		},
+		}
 	});

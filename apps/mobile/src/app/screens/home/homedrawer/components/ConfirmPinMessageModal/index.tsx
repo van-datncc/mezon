@@ -11,6 +11,7 @@ import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
 import { SeparatorWithLine } from '../../../../../components/Common';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import MessageItem from '../../MessageItem';
 import { EMessageActionType } from '../../enums';
 import { styles } from './styles';
@@ -24,6 +25,7 @@ interface IConfirmPinMessageModalProps {
 
 export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps) => {
 	const { isVisible, message, onClose, type } = props;
+	const isTabletLandscape = useTabletLandscape();
 	const route = useRoute();
 	const { params } = route;
 	const dispatch = useDispatch<AppDispatch>();
@@ -69,7 +71,7 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 			avoidKeyboard={false}
 			backdropColor={'rgba(0,0,0, 0.7)'}
 		>
-			<View style={styles.container}>
+			<View style={[styles.container, isTabletLandscape && { maxWidth: '40%' }]}>
 				<View>
 					<Text style={styles.title}>{EMessageActionType.PinMessage === type ? t('pinMessage') : t('unpinMessage')}</Text>
 					<SeparatorWithLine />

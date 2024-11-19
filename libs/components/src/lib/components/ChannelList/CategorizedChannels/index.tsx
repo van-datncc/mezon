@@ -6,8 +6,7 @@ import {
 	selectCategoryExpandStateByCategoryId,
 	selectCategoryIdSortChannel,
 	selectChannelMetaEntities,
-	selectCtrlKSelectedChannelId,
-	selectCurrentChannelId,
+	selectCurrentChannel,
 	selectCurrentClan,
 	useAppDispatch
 } from '@mezon/store';
@@ -222,17 +221,26 @@ type ChannelListProps = {
 };
 
 const ChannelList: React.FC<ChannelListProps> = ({ channels, categoryExpandState, channelRefs, permissions }) => {
-	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const refItem = useCallback((component: ChannelListItemRef | null) => {
 		channelRefs.current && (channelRefs.current[component?.channelId as string] = component);
 	}, []);
 
 	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 
-	const isUnreadChannel = (channelId: string) => {
-		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
+	const isUnreadChannel = (channel: ChannelThreads) => {
+		const isUnreadForChannel =
+			(allChannelMetaEntities[channel.id].isMute !== true &&
+				allChannelMetaEntities[channel.id]?.lastSeenTimestamp < allChannelMetaEntities[channel.id]?.lastSentTimestamp) ||
+			(channel?.count_mess_unread ?? 0) > 0;
+
+		const isUnreadForThreads = channel.threads?.some((thread) => {
+			const threadMeta = allChannelMetaEntities[thread.id];
+			return (
+				(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) || (thread?.count_mess_unread ?? 0) > 0
+			);
+		});
+		return isUnreadForChannel || isUnreadForThreads;
 	};
 
 	return (
@@ -240,15 +248,16 @@ const ChannelList: React.FC<ChannelListProps> = ({ channels, categoryExpandState
 			{channels.reduce<React.ReactNode[]>((acc, channel) => {
 				const shouldRender =
 					categoryExpandState ||
-					isUnreadChannel(channel.id) ||
-					channel.id === ctrlKSelectedChannelId ||
+					isUnreadChannel(channel as ChannelThreads) ||
+					channel.id === currentChannel?.id ||
+					channel.id === currentChannel?.parrent_id ||
 					channel.type === ChannelType.CHANNEL_TYPE_VOICE;
 
 				if (shouldRender) {
 					acc.push(
 						<ChannelListItem
 							ref={refItem}
-							isActive={currentChannelId === channel.id}
+							isActive={currentChannel?.id === channel.id}
 							key={channel.id}
 							channel={channel as ChannelThreads}
 							permissions={permissions}

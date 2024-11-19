@@ -18,8 +18,12 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			flex: 1
 		},
 
-		containerDetailMessage: {
+		leftContainer: {
 			flex: 2
+		},
+
+		containerDetailMessage: {
+			flex: 5
 		},
 
 		headerWrapper: {

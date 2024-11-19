@@ -1,14 +1,15 @@
 import { Attributes, Colors, Fonts, Metrics } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		container: {
 			backgroundColor: colors.secondary,
 			padding: Metrics.size.xl,
 			margin: Metrics.size.l,
 			borderRadius: 10,
-			overflow: 'hidden'
+			overflow: 'hidden',
+			marginHorizontal: isTabletLandscape ? '30%' : 0
 		},
 
 		title: {

@@ -24,6 +24,7 @@ import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
 import { MezonClanAvatar } from '../../../../../../componentUI';
+import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 type EmojiSelectorContainerProps = {
@@ -56,8 +57,9 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 }
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect }) => {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = style(themeValue, isTabletLandscape);
 	return (
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {

@@ -667,6 +667,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
 
+	useEffect(() => {
+		const textarea = document.getElementById('editorReactMention');
+		if (textarea) {
+			textarea.removeAttribute('aria-hidden');
+		}
+	}, []);
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (

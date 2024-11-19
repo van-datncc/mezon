@@ -21,6 +21,7 @@ import { MezonBottomSheet } from '../../componentUI';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { FriendsTablet } from '../friend/FriendsTablet';
+import ProfileBar from '../home/homedrawer/ProfileBar';
 import ServerList from '../home/homedrawer/ServerList';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
@@ -92,67 +93,72 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 
 	return (
 		<View style={styles.containerMessages}>
-			<View>
-				<ServerList />
-			</View>
+			<View style={styles.leftContainer}>
+				<View style={styles.containerMessages}>
+					<View>
+						<ServerList />
+					</View>
 
-			<View style={styles.container}>
-				<View style={styles.headerWrapper}>
-					<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
-					<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-						<Icons.UserPlusIcon height={size.s_16} width={size.s_16} color={themeValue.textStrong} />
-						<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
-					</Pressable>
-				</View>
+					<View style={styles.container}>
+						<View style={styles.headerWrapper}>
+							<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
+							<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
+								<Icons.UserPlusIcon height={size.s_16} width={size.s_16} color={themeValue.textStrong} />
+								<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
+							</Pressable>
+						</View>
 
-				<View style={styles.searchMessage}>
-					<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
-					<TextInput
-						ref={searchInputRef}
-						placeholder={t('common:searchPlaceHolder')}
-						placeholderTextColor={themeValue.text}
-						style={styles.searchInput}
-						onChangeText={(text) => typingSearchDebounce(text)}
-					/>
-					{!!searchText?.length && (
-						<Pressable onPress={clearTextInput}>
-							<Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						<View style={styles.searchMessage}>
+							<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+							<TextInput
+								ref={searchInputRef}
+								placeholder={t('common:searchPlaceHolder')}
+								placeholderTextColor={themeValue.text}
+								style={styles.searchInput}
+								onChangeText={(text) => typingSearchDebounce(text)}
+							/>
+							{!!searchText?.length && (
+								<Pressable onPress={clearTextInput}>
+									<Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+								</Pressable>
+							)}
+						</View>
+
+						<Pressable
+							onPress={handleFriendsPress}
+							style={[styles.friendsWrapper, !currentDmGroupId && { backgroundColor: themeValue.secondary }]}
+						>
+							<Icons.FriendIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+							<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
 						</Pressable>
-					)}
+
+						{clansLoadingStatus === 'loaded' && !clans?.length && !dmGroupChatList?.length ? (
+							<UserEmptyMessage
+								onPress={() => {
+									navigateToAddFriendScreen();
+								}}
+							/>
+						) : (
+							<FlatList
+								data={dmGroupChatList}
+								showsVerticalScrollIndicator={false}
+								keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
+								renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
+							/>
+						)}
+
+						<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
+							<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
+						</Pressable>
+
+						<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
+							<MessageMenu messageInfo={directMessageSelected} />
+						</MezonBottomSheet>
+					</View>
 				</View>
-
-				<Pressable
-					onPress={handleFriendsPress}
-					style={[styles.friendsWrapper, !currentDmGroupId && { backgroundColor: themeValue.secondary }]}
-				>
-					<Icons.FriendIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-					<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
-				</Pressable>
-
-				{clansLoadingStatus === 'loaded' && !clans?.length && !dmGroupChatList?.length ? (
-					<UserEmptyMessage
-						onPress={() => {
-							navigateToAddFriendScreen();
-						}}
-					/>
-				) : (
-					<FlatList
-						data={dmGroupChatList}
-						showsVerticalScrollIndicator={false}
-						keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
-						renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
-					/>
-				)}
-
-				<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-					<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
-				</Pressable>
-
-				<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
-					<MessageMenu messageInfo={directMessageSelected} />
-				</MezonBottomSheet>
+				{isTabletLandscape && <ProfileBar />}
 			</View>
-
+			<View style={{ height: '100%', width: size.s_4 }} />
 			<View style={styles.containerDetailMessage}>
 				{currentDmGroupId ? <DirectMessageDetailTablet directMessageId={currentDmGroupId} /> : <FriendsTablet navigation={navigation} />}
 			</View>

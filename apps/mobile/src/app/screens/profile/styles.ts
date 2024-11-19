@@ -19,7 +19,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			gap: size.s_10,
 			paddingTop: size.s_15,
 			justifyContent: 'flex-end',
-			paddingRight: size.s_15
+			paddingHorizontal: size.s_15
 		},
 
 		backgroundSetting: {
