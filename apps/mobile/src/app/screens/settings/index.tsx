@@ -119,7 +119,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 					},
 					expandable: true,
 					title: t('accountSettings.friendRequests'),
-					icon: <Icons.FriendIcon color={themeValue.textStrong} />
+					icon: <Icons.FriendIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
 				},
 				{
 					onPress: () => {

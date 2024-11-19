@@ -29,8 +29,8 @@ import {
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
-	selectListMission,
 	selectMissionDone,
+	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectStatusMenu,
 	selectTheme,
@@ -67,10 +67,8 @@ function useChannelSeen(channelId: string) {
 		}
 		const mode =
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
-		if (isUnreadChannel || lastMessage?.sender_id === userId) {
-			markAsReadSeen(lastMessage, mode);
-		}
-	}, [lastMessage, channelId]);
+		markAsReadSeen(lastMessage, mode);
+	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
@@ -291,8 +289,8 @@ const SearchMessageChannel = () => {
 
 const OnboardingGuide = () => {
 	const missionDone = useSelector(selectMissionDone);
-	const listMission = useSelector(selectListMission);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const onboardingClan = useSelector(selectOnboardingByClan(currentClanId as string));
 	const { navigate, toGuidePage } = useAppNavigation();
 	const handleDoNextMission = () => {
 		const link = toGuidePage(currentClanId as string);
@@ -300,15 +298,15 @@ const OnboardingGuide = () => {
 	};
 	return (
 		<>
-			{missionDone < listMission.length ? (
+			{missionDone < onboardingClan.mission.length ? (
 				<div
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold">{listMission[missionDone].title} </div>
-						<div className="text-[10px] font-normal text-channelTextLabel"> {listMission[missionDone].description} </div>
+						<div className="text-base font-semibold">{onboardingClan.mission[missionDone].title} </div>
+						<div className="text-[10px] font-normal text-channelTextLabel"> {onboardingClan.mission[missionDone].content} </div>
 					</div>
 				</div>
 			) : null}

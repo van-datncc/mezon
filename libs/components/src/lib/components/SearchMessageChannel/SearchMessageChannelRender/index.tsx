@@ -1,4 +1,3 @@
-import { useJumpToMessage } from '@mezon/core';
 import {
 	ChannelsEntity,
 	messagesActions,
@@ -154,15 +153,15 @@ interface ISearchedItemProps {
 const SearchedItem = ({ searchMessage, searchChannel }: ISearchedItemProps) => {
 	const dispatch = useAppDispatch();
 
-	const { directToMessageById } = useJumpToMessage({
-		channelId: searchChannel.channel_id as string,
-		messageID: searchMessage.message_id as string,
-		clanId: searchMessage.clan_id as string
-	});
-
 	const handleClickJump = () => {
-		dispatch(messagesActions.setIdMessageToJump(searchMessage.message_id));
-		directToMessageById();
+		if (!searchMessage) return;
+		dispatch(
+			messagesActions.jumpToMessage({
+				clanId: searchMessage?.clan_id || '',
+				messageId: searchMessage.id,
+				channelId: searchMessage?.channel_id as string
+			})
+		);
 	};
 
 	return (

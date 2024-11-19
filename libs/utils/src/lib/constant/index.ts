@@ -7,6 +7,7 @@ export const LIMIT_CLAN_ITEM = 50;
 export const SIZE_PAGE_SEARCH = 25;
 export const LIMIT_SIZE_UPLOAD_IMG = 1000000;
 export const MAX_FILE_NAME_EMOJI = 62;
+export const MAX_FILE_ATTACHMENTS = 100;
 export const DEBOUNCE_TYPING_TIME = 700;
 export const TIME_OF_SHOWING_FIRST_POPUP = 1000 * 60 * 5;
 export const KEY_KEYBOARD = { BACKSPACE: 8, TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
@@ -29,6 +30,8 @@ export const threadError: ThreadError = {
 	name: 'Thread Name is required',
 	message: 'Starter Message is required'
 };
+
+export const titleMission = ['Send a message in', 'Visit a channel', 'Do anything you want'];
 
 export const MIN_THRESHOLD_CHARS = 4000;
 

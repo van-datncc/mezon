@@ -68,10 +68,8 @@ function useChannelSeen(channelId: string) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
 		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (isUnreadDM || lastMessage?.sender_id === userId) {
-			if (lastMessage) {
-				markAsReadSeen(lastMessage, mode);
-			}
+		if (lastMessage) {
+			markAsReadSeen(lastMessage, mode);
 		}
 	}, [lastMessage, channelId]);
 
