@@ -287,7 +287,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 					await mezon.socketRef.current?.forwardWebrtcSignaling(
 						dmUserId,
 						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate)
+						JSON.stringify(event.candidate),
+						''
 					);
 				}
 			}
@@ -315,8 +316,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 						const answer = await peerConnection.createAnswer();
 						await peerConnection.setLocalDescription(answer);
 
-						const answerEn = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEn);
+						const answerEnc = await compress(JSON.stringify(answer));
+						await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEnc, '');
 					};
 					processData().catch(console.error);
 				}
@@ -368,8 +369,8 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 				});
 				await peerConnection.setLocalDescription(offer);
 				if (offer && mezon.socketRef.current) {
-					const offerEn = await compress(JSON.stringify(offer));
-					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn);
+					const offerEnc = await compress(JSON.stringify(offer));
+					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEnc, '');
 				}
 			})
 			.catch((err) => console.error('Failed to get local media:', err));
