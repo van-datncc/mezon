@@ -5,8 +5,8 @@ import {
 	fetchOnboarding,
 	onboardingActions,
 	selectChannelById,
-	selectChannelFirst,
 	selectCurrentClanId,
+	selectFormOnboarding,
 	selectMissionDone,
 	selectOnboardingByClan,
 	selectOnboardingMode,
@@ -21,23 +21,21 @@ import { useSelector } from 'react-redux';
 
 function GuideBody() {
 	const onboadingMode = useSelector(selectOnboardingMode);
-	const firstChannelId = useSelector(selectChannelFirst);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { navigate, toChannelPage, toMembersPage } = useAppNavigation();
+	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
-
+	const formOnboarding = useSelector(selectFormOnboarding);
 	const handleDoMission = (mission: ApiOnboardingItem) => {
 		if (onboadingMode) {
 			switch (mission.task_type) {
 				case ETypeMission.SEND_MESSAGE: {
-					const link = toChannelPage(firstChannelId.channel_id as string, currentClanId as string);
+					const link = toChannelPage(mission.channel_id as string, currentClanId as string);
 					navigate(link);
-					dispatch(onboardingActions.doneMission());
 					break;
 				}
 				case ETypeMission.VISIT: {
-					const memberPage = toMembersPage(currentClanId as string);
-					navigate(memberPage);
+					const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
+					navigate(linkChannel);
 					dispatch(onboardingActions.doneMission());
 					break;
 				}
@@ -76,10 +74,26 @@ function GuideBody() {
 								/>
 							))
 						) : (
-							<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
-								You don't have any rule. Setting rule for this clan first !!
-							</div>
+							<>
+								{(!onboadingMode || (onboadingMode && formOnboarding?.rules?.length === 0)) && (
+									<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+										You don't have any rule. Setting rule for this clan first !!
+									</div>
+								)}
+							</>
 						)}
+						{onboadingMode &&
+							formOnboarding?.rules?.length > 0 &&
+							formOnboarding.rules.map((rule, index) => (
+								<GuideItemLayout
+									key={index}
+									title={rule.title}
+									hightLightIcon={true}
+									description={rule.content}
+									icon={<Icons.RuleIcon />}
+									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
+								/>
+							))}
 					</div>
 
 					<div className="flex flex-col gap-2">
@@ -94,10 +108,19 @@ function GuideBody() {
 								/>
 							))
 						) : (
-							<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
-								You don't have any mission. Setting mision for this clan first !!
-							</div>
+							<>
+								{(!onboadingMode || (onboadingMode && formOnboarding?.task?.length === 0)) && (
+									<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+										You don't have any mission. Setting mision for this clan first !!
+									</div>
+								)}
+							</>
 						)}
+						{onboadingMode &&
+							formOnboarding?.task?.length > 0 &&
+							formOnboarding.task.map((mission, index) => (
+								<GuideItemMission key={mission.title} mission={mission} onClick={() => handleDoMission(mission)} tick={true} />
+							))}
 					</div>
 				</div>
 				<div className="mt-8 flex flex-col gap-2 h-20 p-4 w-[300px] text-base justify-between bg-[#282a2e] rounded-lg">
