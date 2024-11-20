@@ -279,8 +279,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	}, [mezon.socketRef, peerConnection, signalingData]);
 
 	const startCall = async () => {
-		console.log(peerConnection.connectionState, 'peerConnection.connectionState');
-
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
 		// Get user media
