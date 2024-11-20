@@ -51,7 +51,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 				role.id !== EVERYONE_ROLE_ID &&
 				!userById.role_id?.includes(role.id) &&
 				role.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-				(isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[role.id]?.max_level_permission))
+				(isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[role.id]?.max_level_permission ?? -1))
 			);
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
