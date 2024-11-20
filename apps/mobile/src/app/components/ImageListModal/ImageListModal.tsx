@@ -56,15 +56,12 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		[visibleToolbarConfig]
 	);
 
-	const onIndexChange = useCallback(
-		(newIndex: number) => {
-			if (formattedImageList[newIndex]?.id !== currentImage?.id) {
-				setCurrentImage(formattedImageList[newIndex]);
-				ref.current?.reset(); //Note: reset scale
-			}
-		},
-		[currentImage?.id, formattedImageList]
-	);
+	const onIndexChange = useCallback((newIndex: number) => {
+		if (formattedImageList[newIndex]?.id !== currentImage?.id) {
+			setCurrentImage(formattedImageList[newIndex]);
+			ref.current?.reset();
+		}
+	}, []);
 
 	const setTimeoutHideFooter = useCallback(() => {
 		footerTimeoutRef.current = setTimeout(() => {
