@@ -1,6 +1,6 @@
 import { useAppParams, useAttachments } from '@mezon/core';
 import { attachmentActions, checkListAttachmentExist, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -117,7 +117,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						onContextMenu={handleContextMenu}
 						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
 						style={{ width: width || 'auto', height }}
-						src={attachmentData.url}
+						src={createImgproxyUrl(attachmentData.url ?? '', { width: 600, height: 300, resizeType: 'fit' })}
 						alt={'message'}
 						onClick={() => handleClick(attachmentData.url || '')}
 					/>

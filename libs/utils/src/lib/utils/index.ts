@@ -898,8 +898,9 @@ type ImgproxyOptions = {
 };
 
 export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
+	const extension = sourceImageUrl.split('.').pop()?.toLowerCase();
 	if (!sourceImageUrl) return '';
-	if (sourceImageUrl.includes('assets/images/')) {
+	if (sourceImageUrl.includes('assets/images/') || extension === 'gif') {
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;

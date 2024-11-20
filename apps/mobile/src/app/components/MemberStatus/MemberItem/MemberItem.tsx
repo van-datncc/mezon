@@ -1,4 +1,4 @@
-import { useMemberStatus } from '@mezon/core';
+import { useAuth, useMemberStatus } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	DirectEntity,
@@ -9,7 +9,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
@@ -43,6 +43,10 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 	const userStatus = useMemberStatus(user?.id || '');
 	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const { userProfile } = useAuth();
+	const isMe = useMemo(() => {
+		return user?.user?.id === userProfile?.user?.id;
+	}, [user?.user?.id, userProfile?.user?.id]);
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}
@@ -52,10 +56,10 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 		>
 			<MemberProfile
 				user={user}
-				status={userStatus.status}
+				userStatus={{ status: isMe ? true : !isOffline, isMobile: userStatus?.isMobile }}
 				numCharCollapse={30}
 				isHideIconStatus={userStatus ? false : true}
-				isOffline={isOffline}
+				isOffline={isMe ? false : isOffline}
 				nickName={clanProfile?.nick_name}
 				creatorClanId={currentClan?.creator_id}
 				creatorDMId={currentChannel?.creator_id}
