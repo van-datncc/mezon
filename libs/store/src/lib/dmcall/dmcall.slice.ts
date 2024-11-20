@@ -17,6 +17,7 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+	isInCall: boolean;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -31,7 +32,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 		data_type: 0,
 		json_data: '',
 		channel_id: ''
-	}
+	},
+	isInCall: false
 });
 
 export const DMCallSlice = createSlice({
@@ -40,7 +42,12 @@ export const DMCallSlice = createSlice({
 	reducers: {
 		add: DMCallAdapter.addOne,
 		addMany: DMCallAdapter.addMany,
-		remove: DMCallAdapter.removeOne
+		remove: DMCallAdapter.removeOne,
+		removeAll: DMCallAdapter.removeAll,
+
+		setIsInCall: (state, action) => {
+			state.isInCall = action.payload;
+		}
 		// ...
 	}
 });
@@ -98,3 +105,5 @@ export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities
 	const dmcalls = Object.values(entities);
 	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
 });
+
+export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);

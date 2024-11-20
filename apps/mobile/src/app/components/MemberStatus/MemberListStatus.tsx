@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectAllChannelMembers, selectClanMemberWithStatusIds, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -27,6 +27,7 @@ export const MemberListStatus = React.memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const members = useSelector(selectClanMemberWithStatusIds);
+
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.channel_id));
 	const lisMembers = useMemo(() => {
 		if (!userChannels || !members) {
@@ -125,6 +126,7 @@ export const MemberListStatus = React.memo(() => {
 							{title} - {title === 'Member' ? onlineMembers?.length : offlineMembers?.length}
 						</Text>
 					)}
+					contentContainerStyle={{ paddingBottom: size.s_60 }}
 					nestedScrollEnabled
 					removeClippedSubviews={true}
 					showsVerticalScrollIndicator={false}

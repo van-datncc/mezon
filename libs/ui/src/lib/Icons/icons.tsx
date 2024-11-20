@@ -184,9 +184,9 @@ export function Check(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function Tick({ fill = '#155EEF' }: { fill?: string }) {
+export function Tick({ fill = 'fill:[#155EEF]', defaultSize = 'w-5 h-5' }: { fill?: string; defaultSize?: string }) {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg viewBox="0 0 20 20" className={`${defaultSize}`} xmlns="http://www.w3.org/2000/svg">
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
