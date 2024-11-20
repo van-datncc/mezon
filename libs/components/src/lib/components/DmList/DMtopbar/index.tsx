@@ -5,7 +5,6 @@ import {
 	DMCallActions,
 	DirectEntity,
 	appActions,
-	selectCalleeId,
 	selectCallerId,
 	selectChannelCall,
 	selectCloseMenu,
@@ -87,12 +86,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
 	const isShowShareScreen = useSelector(selectIsShowShareScreen);
 	const callerId = useSelector(selectCallerId);
-	const calleeId = useSelector(selectCalleeId);
 	const [isCallStarted, setIsCallStarted] = useState(false);
 
-	const [isShow, setIsShow] = useState<boolean>(false);
 	const { userId } = useAuth();
-	const [isMicMuted, setIsMicMuted] = useState(false);
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
@@ -116,7 +112,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			const audioTrack = localStream.getAudioTracks()[0];
 			if (audioTrack) {
 				audioTrack.enabled = !audioTrack.enabled;
-				setIsMicMuted(!audioTrack.enabled);
 			}
 		}
 
@@ -130,22 +125,25 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
 	}, []);
-	// const endCall = useCallback(async () => {
-	// 	const user = userId || '';
-	// 	const updatedCalls = { ...listOfCalls };
-	// 	if (updatedCalls[user]) {
-	// 		updatedCalls[user] = updatedCalls[user].filter((id) => id !== dmGroupId);
-	// 	}
-	// 	await dispatch(
-	// 		DMCallActions.setListOfCalls({
-	// 			userId: user,
-	// 			event: updatedCalls
-	// 		})
-	// 	);
-	// 	peerConnection.close();
-	// }, [dispatch, listOfCalls, userId, dmGroupId]);
 
-	const handleEndCall = () => {
+	const endCall = useCallback(async () => {
+		const user = userId || '';
+		const updatedCalls = { ...listOfCalls };
+		if (updatedCalls[user]) {
+			updatedCalls[user] = updatedCalls[user].filter((id) => id !== dmGroupId);
+		}
+
+		await dispatch(
+			DMCallActions.setListOfCalls({
+				userId: user,
+				event: updatedCalls
+			})
+		);
+	}, [dispatch, listOfCalls, dmGroupId]);
+
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+
+	const handleEndCall = async () => {
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
 			setLocalStream(null);
@@ -157,10 +155,19 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			if (remoteVideoRef.current) {
 				remoteVideoRef.current.srcObject = null;
 			}
+
+			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', dmGroupId ?? '');
+			if (
+				signalingData?.[signalingData?.length - 1]?.signalingData.data_type === 0 &&
+				signalingData?.[signalingData?.length - 1]?.signalingData.json_data === ''
+			) {
+				peerConnection.close();
+				endCall();
+				await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '');
+			}
 			dispatch(DMCallActions.setChannelCall(''));
 		}
 	};
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 
 	const setListOfCalls = useCallback(
 		async (dmGroupId: string) => {

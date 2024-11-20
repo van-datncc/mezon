@@ -54,6 +54,10 @@ export const DMCallSlice = createSlice({
 			if (!userId) return;
 
 			if (userId === event.receiver_id) {
+				if (event.data_type === 4 && event.json_data === '') {
+					state.listOfCalls[userId] = state.listOfCalls[userId].filter(id => id !== event.channel_id);
+					return;
+				}
 				if (!state.listOfCalls[userId]) {
 					state.listOfCalls[userId] = [];
 				}
@@ -69,7 +73,11 @@ export const DMCallSlice = createSlice({
 			if (!state.listOfCalls[userId]) {
 				state.listOfCalls[userId] = [];
 			}
-		
+
+			if (event[userId]?.length === 0) {
+				delete state.listOfCalls[userId];
+			}
+
 			event[userId].forEach((channelId) => {
 				if (!state.listOfCalls[userId].includes(channelId)) {
 					state.listOfCalls[userId].push(channelId);
