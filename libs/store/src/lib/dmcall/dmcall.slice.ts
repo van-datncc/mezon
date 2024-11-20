@@ -29,7 +29,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	signalingData: {
 		receiver_id: '',
 		data_type: 0,
-		json_data: ''
+		json_data: '',
+		channel_id: ''
 	}
 });
 
