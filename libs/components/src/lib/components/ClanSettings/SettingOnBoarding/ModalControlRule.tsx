@@ -81,6 +81,7 @@ export const ControlInput = ({
 					placeholder={placeholder}
 					type={type}
 					onChange={handleOnChange}
+					value={value}
 					className="w-full p-[10px] outline-none rounded bg-borderDefault z-10"
 				/>
 				{note && <span className="text-xs mt-1 font-light animate-move_down">{note}</span>}
