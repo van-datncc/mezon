@@ -554,27 +554,27 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						<div className="justify-center items-center gap-4 flex w-full">
 							{(callerId === '' || channelCall !== dmGroupId) && (
 								<>
-									<div
+									{/* <div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 									>
 										<Icons.IconMeetDM />
-									</div>
+									</div> */}
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 										onClick={startCall}
 									>
 										<Icons.IconPhoneDM />
 									</div>
-									<div
+									{/* <div
 										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 									>
 										<Icons.CloseButton className={`w-[20px]`} />
-									</div>
+									</div> */}
 								</>
 							)}
 							{callerId === userId && channelCall === dmGroupId && (
 								<>
-									<div
+									{/* <div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 									>
 										<Icons.IconMeetDM
@@ -582,8 +582,8 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 											isShowShareScreen={isShowShareScreen}
 											isShowLine={true}
 										/>
-									</div>
-									<div
+									</div> */}
+									{/* <div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 										onClick={handleShowShareScreenToggle}
 									>
@@ -592,7 +592,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 											isShowShareScreen={isShowShareScreen}
 											isShowLine={true}
 										/>
-									</div>
+									</div> */}
 									<div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 										onClick={handleMuteToggle}
