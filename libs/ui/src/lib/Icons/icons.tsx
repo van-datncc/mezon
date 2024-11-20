@@ -2882,7 +2882,7 @@ export function IconPhoneDM({ ...props }) {
 	);
 }
 
-export function IconMeetDM({ isShowShareScreen = false, isShowLine = false, ...props }) {
+export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props }) {
 	return (
 		<svg
 			x="0"
@@ -2911,7 +2911,7 @@ export function IconMeetDM({ isShowShareScreen = false, isShowLine = false, ...p
 						stroke="white"
 						strokeLinecap="round"
 						strokeWidth="3.5"
-						className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
 					/>
 					<line
 						x1="4"
@@ -2921,7 +2921,7 @@ export function IconMeetDM({ isShowShareScreen = false, isShowLine = false, ...p
 						stroke="black"
 						strokeLinecap="round"
 						strokeWidth="1.5"
-						className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
 					/>
 				</>
 			)}

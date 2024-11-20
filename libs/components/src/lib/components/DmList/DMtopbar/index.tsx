@@ -6,14 +6,16 @@ import {
 	DirectEntity,
 	appActions,
 	selectCallerId,
-	selectChannelCall,
+	selectChannelCallId,
 	selectCloseMenu,
 	selectDmGroupCurrent,
 	selectIsMuteMicrophone,
+	selectIsShowMeetDM,
 	selectIsShowMemberListDM,
 	selectIsShowShareScreen,
 	selectIsUseProfileDM,
 	selectListOfCalls,
+	selectLocalStream,
 	selectPinMessageByChannelId,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -81,15 +83,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const listOfCalls = useSelector(selectListOfCalls) ?? [];
-	const channelCall = useSelector(selectChannelCall) ?? [];
+	const channelCallId = useSelector(selectChannelCallId) ?? [];
 	const avatarImages = currentDmGroup?.channel_avatar || [];
 	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
 	const isShowShareScreen = useSelector(selectIsShowShareScreen);
+	const isShowMeetDM = useSelector(selectIsShowMeetDM);
 	const callerId = useSelector(selectCallerId);
-	const [isCallStarted, setIsCallStarted] = useState(false);
+	const localStream = useSelector(selectLocalStream);
+	const [peerConnection, setPeerConnection] = useState(() => new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] }));
+
+	// const [isCallStarted, setIsCallStarted] = useState(false);
 
 	const { userId } = useAuth();
-	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
@@ -107,6 +112,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const handleShowShareScreenToggle = () => {
 		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
 	};
+	const handleShowMeetDm = () => {
+		dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
+	};
 	const handleMuteToggle = () => {
 		if (localStream) {
 			const audioTrack = localStream.getAudioTracks()[0];
@@ -121,10 +129,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
+	const resetPeerConnection = () => {
+		peerConnection.close();
+		setPeerConnection(new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] }));
+	};
 
-	const peerConnection = useMemo(() => {
-		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
-	}, []);
 
 	const endCall = useCallback(async () => {
 		const user = userId || '';
@@ -146,8 +155,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const handleEndCall = async () => {
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
-			setLocalStream(null);
-			setIsCallStarted(true);
+			dispatch(DMCallActions.setLocalStream(null));
 			peerConnection.getSenders().forEach((sender) => {
 				peerConnection.removeTrack(sender);
 			});
@@ -161,14 +169,22 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				signalingData?.[signalingData?.length - 1]?.signalingData.data_type === 0 &&
 				signalingData?.[signalingData?.length - 1]?.signalingData.json_data === ''
 			) {
-				peerConnection.close();
 				endCall();
 				await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '');
+				peerConnection.close();
 			}
-			dispatch(DMCallActions.setChannelCall(''));
+			dispatch(DMCallActions.setChannelCallId(''));
 		}
 	};
-
+	useEffect(() => {
+		if (
+			signalingData?.[signalingData?.length - 1]?.signalingData.data_type === 4 &&
+			signalingData?.[signalingData?.length - 1]?.signalingData.json_data === ''
+		) {
+			peerConnection.close();
+			resetPeerConnection();
+		}
+	}, [mezon.socketRef, signalingData, listOfCalls]);
 	const setListOfCalls = useCallback(
 		async (dmGroupId: string) => {
 			startCall();
@@ -260,18 +276,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			default:
 				break;
 		}
-	}, [mezon.socketRef, peerConnection, signalingData, isCallStarted]);
+	}, [mezon.socketRef, peerConnection, signalingData]);
 
 	const startCall = async () => {
 		console.log(peerConnection.connectionState, 'peerConnection.connectionState');
 
 		await dispatch(DMCallActions.setCallerId(userId));
-		await dispatch(DMCallActions.setChannelCall(dmGroupId));
+		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
 		// Get user media
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
 			.then(async (stream) => {
-				setLocalStream(stream);
+				dispatch(DMCallActions.setLocalStream(stream));
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
 				}
@@ -552,38 +568,39 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							/>
 						</div>
 						<div className="justify-center items-center gap-4 flex w-full">
-							{(callerId === '' || channelCall !== dmGroupId) && (
+							{(callerId === '' || channelCallId !== dmGroupId) && (
 								<>
-									{/* <div
+									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 									>
 										<Icons.IconMeetDM />
-									</div> */}
+									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 										onClick={startCall}
 									>
 										<Icons.IconPhoneDM />
 									</div>
-									{/* <div
+									<div
 										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 									>
 										<Icons.CloseButton className={`w-[20px]`} />
-									</div> */}
+									</div>
 								</>
 							)}
-							{callerId === userId && channelCall === dmGroupId && (
+							{callerId === userId && channelCallId === dmGroupId && (
 								<>
-									{/* <div
+									<div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+										onClick={handleShowMeetDm}
 									>
 										<Icons.IconMeetDM
-											className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-											isShowShareScreen={isShowShareScreen}
+											className={`${isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+											isShowMeetDM={isShowMeetDM}
 											isShowLine={true}
 										/>
-									</div> */}
-									{/* <div
+									</div>
+									<div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 										onClick={handleShowShareScreenToggle}
 									>
@@ -592,7 +609,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 											isShowShareScreen={isShowShareScreen}
 											isShowLine={true}
 										/>
-									</div> */}
+									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 										onClick={handleMuteToggle}

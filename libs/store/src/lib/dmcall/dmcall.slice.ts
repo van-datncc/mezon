@@ -18,9 +18,11 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
 	listOfCalls: Record<string, string[]>;
-	channelCall: string;
+	channelCallId: string;
 	isMuteMicrophone: boolean;
 	isShowShareScreen: boolean;
+	isShowMeetDM: boolean;
+	localStream: MediaStream | null;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -36,10 +38,12 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 		json_data: '',
 		channel_id: ''
 	},
-	channelCall: '',
+	channelCallId: '',
 	listOfCalls: {},
 	isMuteMicrophone: false,
-	isShowShareScreen: false
+	isShowShareScreen: false,
+	isShowMeetDM: false,
+	localStream: null,
 });
 
 export const DMCallSlice = createSlice({
@@ -96,8 +100,14 @@ export const DMCallSlice = createSlice({
 		setCalleeId: (state, action) => {
 			state.calleeId = action.payload;
 		},
-		setChannelCall: (state, action) => {
-			state.channelCall = action.payload;
+		setChannelCallId: (state, action) => {
+			state.channelCallId = action.payload;
+		},
+		setIsShowMeetDM: (state, action) => {
+			state.isShowMeetDM = action.payload;
+		},
+		setLocalStream: (state, action) => {
+			state.localStream = action.payload;
 		}
 		// ...
 	}
@@ -166,4 +176,8 @@ export const selectCallerId = createSelector(getDMCallState, (state: DMCallState
 
 export const selectCalleeId = createSelector(getDMCallState, (state: DMCallState) => state.calleeId);
 
-export const selectChannelCall = createSelector(getDMCallState, (state: DMCallState) => state.channelCall);
+export const selectChannelCallId = createSelector(getDMCallState, (state: DMCallState) => state.channelCallId);
+
+export const selectIsShowMeetDM = createSelector(getDMCallState, (state: DMCallState) => state.isShowMeetDM);
+
+export const selectLocalStream = createSelector(getDMCallState, (state: DMCallState) => state.localStream);
