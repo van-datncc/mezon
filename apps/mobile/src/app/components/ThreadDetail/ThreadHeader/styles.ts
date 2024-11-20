@@ -8,7 +8,6 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			gap: size.s_12,
-			// backgroundColor: colors.secondary,
 			paddingVertical: Metrics.size.m
 		},
 		channelText: {
@@ -69,7 +68,6 @@ export const style = (colors: Attributes) =>
 			zIndex: 1000,
 			position: 'absolute',
 			left: size.s_2,
-			top: size.s_10,
 			padding: size.s_10
 		},
 		iconMenuHeader: {

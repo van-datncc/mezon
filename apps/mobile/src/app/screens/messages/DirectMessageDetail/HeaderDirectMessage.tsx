@@ -43,8 +43,6 @@ function useChannelSeen(channelId: string) {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
@@ -95,7 +93,8 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
-				receiverId: firstUserId
+				receiverId: firstUserId,
+				receiverAvatar: dmAvatar
 			}
 		});
 	};

@@ -182,6 +182,7 @@ export type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.CALL_DIRECT]: {
 		receiverId: string;
+		receiverAvatar?: string;
 	};
 };
 
