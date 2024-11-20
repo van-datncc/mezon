@@ -243,6 +243,7 @@ export const onboardingSlice = createSlice({
 								break;
 						}
 						state.listOnboarding[action.payload.clan_id] = onboardingClan;
+						state.missionSum = onboardingClan.mission.length;
 					});
 				}
 			})
