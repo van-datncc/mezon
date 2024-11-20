@@ -62,6 +62,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
 		}
 		if (isShowCanvas) {
+			navigate(toChannelPage(channel?.id ?? '', channel?.clan_id ?? ''));
 			dispatch(appActions.setIsShowCanvas(false));
 		}
 	};
