@@ -1178,6 +1178,48 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	);
 };
 
+export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 -4 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="m 8 0 c -1.660156 0 -3 1.339844 -3 3 v 5 c 0 1.660156 1.339844 3 3 3 s 3 -1.339844 3 -3 v -5 c 0 -1.660156 -1.339844 -3 -3 -3 z m -6 6 v 2.011719 c 0 2.964843 2.164062 5.429687 5 5.90625 v 2.082031 h 2 v -2.082031 c 2.835938 -0.476563 5 -2.941407 5 -5.90625 v -2.011719 h -1.5 v 2.011719 c 0 2.5 -1.992188 4.488281 -4.5 4.488281 s -4.5 -1.988281 -4.5 -4.488281 v -2.011719 z m 0 0"
+			/>
+		</svg>
+	);
+};
+
+export const JoinPTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 0 32 32"
+		>
+			<path
+				fill="currentColor"
+				d="M20,6a9.9355,9.9355,0,0,0-4,.8418A9.999,9.999,0,1,0,16,25.16,9.998,9.998,0,1,0,20,6ZM12,24A8,8,0,1,1,13.7573,8.2017a9.9734,9.9734,0,0,0,0,15.5986A7.9919,7.9919,0,0,1,12,24Zm8,0a7.9919,7.9919,0,0,1-1.7573-.2,9.9734,9.9734,0,0,0,0-15.5986A7.9972,7.9972,0,1,1,20,24Z"
+			/>
+		</svg>
+	);
+};
+
 export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg

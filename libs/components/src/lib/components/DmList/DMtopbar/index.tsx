@@ -8,6 +8,7 @@ import {
 	selectDmGroupCurrent,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
+	selectJoinPTTByChannelId,
 	selectPinMessageByChannelId,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -87,6 +88,105 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		[dispatch]
 	);
 
+	const mezon = useMezon();
+	const { userId } = useAuth();
+	const joinPTTData = useAppSelector((state) => selectJoinPTTByChannelId(state, currentDmGroup.channel_id || ''));
+	const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
+
+	useEffect(() => {
+		if (!peerConnection) return;
+
+		// peerConnection.onicecandidate = async (event: any) => {
+		// 	if (event && event.candidate) {
+		// 		if (mezon.socketRef.current?.isOpen() === true) {
+		// 			await mezon.socketRef.current?.forwardWebrtcSignaling(
+		// 				dmUserId,
+		// 				WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+		// 				JSON.stringify(event.candidate),
+		// 				''
+		// 			);
+		// 		}
+		// 	}
+		// };
+
+		// peerConnection.ontrack = (event: any) => {
+		// 	// Display remote stream in remote video element
+		// 	if (remoteVideoRef.current) {
+		// 		remoteVideoRef.current.srcObject = event.streams[0];
+		// 	}
+		// };
+
+		if (!joinPTTData?.[joinPTTData?.length - 1]) return;
+		const data = joinPTTData?.[joinPTTData?.length - 1]?.joinPttData;
+		switch (data.data_type) {
+			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				// {
+				// 	const processData = async () => {
+				// 		const dataDec = await decompress(data?.json_data);
+				// 		const objData = JSON.parse(dataDec || '{}');
+
+				// 		// Get peerConnection from receiver event.receiverId
+				// 		await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+				// 		const answer = await peerConnection.createAnswer();
+				// 		await peerConnection.setLocalDescription(answer);
+
+				// 		const answerEnc = await compress(JSON.stringify(answer));
+				// 		await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEnc, '');
+				// 	};
+				// 	processData().catch(console.error);
+				// }
+
+				break;
+			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+				{
+					const processData = async () => {
+						// console.log('WebrtcSignalingType.WEBRTC_SDP_ANSWER: ', data.json_data);
+						const dataDec = await decompress(data.json_data);
+						const objData = JSON.parse(dataDec || '{}');
+
+						// console.log('WebrtcSignalingType.WEBRTC_SDP_ANSWER objData: ', objData);
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+
+						// console.log(' peerConnection.setRemoteDescription ');
+					};
+					processData().catch(console.error);
+				}
+				break;
+			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+				{
+					const processData = async () => {
+						const objData = JSON.parse(data?.json_data || '{}');
+						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+					};
+					processData().catch(console.error);
+				}
+				break;
+			default:
+				break;
+		}
+	}, [mezon.socketRef, peerConnection, joinPTTData]);
+
+	const startJoinPTT = async ({ channelId }: { channelId: string }) => {
+		const newPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+		setPeerConnection(newPeerConnection);
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+			stream.getTracks().forEach((track) => newPeerConnection.addTrack(track, stream));
+
+			const offer = await newPeerConnection.createOffer();
+			await newPeerConnection.setLocalDescription(offer);
+
+			if (offer && mezon.socketRef.current) {
+				const offerEnc = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.joinPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEnc);
+				console.log('PTT offer ', offerEnc);
+			}
+		} catch (err) {
+			console.error('Failed to get local media:', err);
+		}
+	};
+
 	return (
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
@@ -116,6 +216,26 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
+							<button>
+								<Tooltip
+									content="Talk"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
+									<Icons.TalkPTT />
+								</Tooltip>
+							</button>
+							<button onClick={() => startJoinPTT({ channelId: currentDmGroup?.channel_id || '' })}>
+								<Tooltip
+									content="Start PTT"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
+									<Icons.JoinPTT />
+								</Tooltip>
+							</button>
 							<button>
 								<Tooltip
 									content="Start voice call"
