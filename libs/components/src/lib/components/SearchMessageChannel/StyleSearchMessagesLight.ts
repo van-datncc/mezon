@@ -1,3 +1,5 @@
+import { MsOverflowStyle, OverflowY, ScrollbarWidth } from '@mezon/utils';
+
 export default {
 	control: {
 		fontSize: 16
@@ -25,10 +27,10 @@ export default {
 		list: {
 			backgroundColor: '#FFFFFF',
 			fontSize: 14,
-			overflowY: 'scroll',
+			overflowY: 'scroll' as OverflowY,
 			maxHeight: '500px',
-			scrollbarWidth: 'none',
-			msOverflowStyle: 'none'
+			scrollbarWidth: 'none' as ScrollbarWidth,
+			msOverflowStyle: 'none' as MsOverflowStyle
 		},
 		item: {
 			'&focused': {

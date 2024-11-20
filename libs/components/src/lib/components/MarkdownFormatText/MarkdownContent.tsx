@@ -38,10 +38,11 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const origin = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/';
+	const originClan = process.env.NX_CHAT_APP_REDIRECT_URI + '/chat/clans/';
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
-				if (url.startsWith(origin)) {
+				if (url.startsWith(origin) || url.startsWith(originClan)) {
 					const urlInvite = new URL(url);
 					dispatch(inviteActions.setIsClickInvite(true));
 					navigate(urlInvite.pathname);
@@ -117,7 +118,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'nowrap' }}
 			>
-				{contentBacktick.trim()}
+				{contentBacktick?.trim()}
 			</code>
 		</span>
 	);

@@ -148,12 +148,12 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 
 		addMessage: {
 			position: 'absolute',
-			bottom: 10,
-			right: 10,
+			bottom: size.s_100,
+			right: size.s_10,
 			width: size.s_50,
 			height: size.s_50,
 			backgroundColor: baseColor.blurple,
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			alignItems: 'center',
 			justifyContent: 'center'
 		},
