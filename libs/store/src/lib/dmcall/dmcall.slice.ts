@@ -1,5 +1,5 @@
 import { IDMCall, LoadingStatus } from '@mezon/utils';
-import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { WebrtcSignalingFwd } from 'mezon-js';
 
 export const DMCALL_FEATURE_KEY = 'dmcall';
@@ -17,7 +17,8 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
-	isShowNumberCallDM: string[];
+	listOfCalls: Record<string, string[]>;
+	channelCall: string;
 	isMuteMicrophone: boolean;
 	isShowShareScreen: boolean;
 }
@@ -35,7 +36,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 		json_data: '',
 		channel_id: ''
 	},
-	isShowNumberCallDM: [],
+	channelCall: '',
+	listOfCalls: {},
 	isMuteMicrophone: false,
 	isShowShareScreen: false
 });
@@ -47,8 +49,32 @@ export const DMCallSlice = createSlice({
 		add: DMCallAdapter.addOne,
 		addMany: DMCallAdapter.addMany,
 		remove: DMCallAdapter.removeOne,
-		setIsShowNumberCallDM: (state, action) => {
-			state.isShowNumberCallDM = action.payload;
+		setListOfCallsSocket: (state, action: PayloadAction<{ userId: string | undefined; event: WebrtcSignalingFwd }>) => {
+			const { userId, event } = action.payload;
+			if (!userId) return;
+
+			if (userId === event.receiver_id) {
+				if (!state.listOfCalls[userId]) {
+					state.listOfCalls[userId] = [];
+				}
+				if (!state.listOfCalls[userId].includes(event.channel_id)) {
+					state.listOfCalls[userId].push(event.channel_id);
+				}
+			}
+		},
+		setListOfCalls: (state, action: PayloadAction<{ userId: string; event: Record<string, string[]> }>) => {
+			const { userId, event } = action.payload;
+			if (!userId) return;
+
+			if (!state.listOfCalls[userId]) {
+				state.listOfCalls[userId] = [];
+			}
+		
+			event[userId].forEach((channelId) => {
+				if (!state.listOfCalls[userId].includes(channelId)) {
+					state.listOfCalls[userId].push(channelId);
+				}
+			});
 		},
 		setIsMuteMicrophone: (state, action) => {
 			state.isMuteMicrophone = action.payload;
@@ -62,6 +88,9 @@ export const DMCallSlice = createSlice({
 		setCalleeId: (state, action) => {
 			state.calleeId = action.payload;
 		},
+		setChannelCall: (state, action) => {
+			state.channelCall = action.payload;
+		}
 		// ...
 	}
 });
@@ -119,7 +148,7 @@ export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities
 	const dmcalls = Object.values(entities);
 	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
 });
-export const selectIsShowNumberCallDM = createSelector(getDMCallState, (state: DMCallState) => state.isShowNumberCallDM);
+export const selectListOfCalls = createSelector(getDMCallState, (state: DMCallState) => state.listOfCalls);
 
 export const selectIsMuteMicrophone = createSelector(getDMCallState, (state: DMCallState) => state.isMuteMicrophone);
 
@@ -128,3 +157,5 @@ export const selectIsShowShareScreen = createSelector(getDMCallState, (state: DM
 export const selectCallerId = createSelector(getDMCallState, (state: DMCallState) => state.callerId);
 
 export const selectCalleeId = createSelector(getDMCallState, (state: DMCallState) => state.calleeId);
+
+export const selectChannelCall = createSelector(getDMCallState, (state: DMCallState) => state.channelCall);

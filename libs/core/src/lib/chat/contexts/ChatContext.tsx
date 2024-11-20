@@ -46,7 +46,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
-	selectIsShowNumberCallDM,
+	selectListOfCalls,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -133,7 +133,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const isShowNumberCallDM = useSelector(selectIsShowNumberCallDM);
+	const listOfCalls = useSelector(selectListOfCalls);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
@@ -914,19 +914,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		handleRoleEvent();
 	}, []);
 
-	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
-		dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, event?.channel_id]));
-		dispatch(DMCallActions.setCalleeId(event?.receiver_id));
-		dispatch(
-			DMCallActions.add({
-				calleeId: event?.receiver_id,
-				signalingData: event,
-				// todo: refactor this
-				id: Snowflake.generate(),
-				callerId: ''
-			})
-		);
-	}, []);
+	const onwebrtcsignalingfwd = useCallback(
+		(event: WebrtcSignalingFwd) => {
+			dispatch(
+				DMCallActions.add({
+					calleeId: event?.receiver_id,
+					signalingData: event,
+					// todo: refactor this
+					id: Snowflake.generate(),
+					callerId: ''
+				})
+			);
+			console.log(event, 'event');
+
+			dispatch(DMCallActions.setListOfCallsSocket({ userId, event }));
+			dispatch(DMCallActions.setCalleeId(event?.receiver_id));
+		},
+		[dispatch]
+	);
 
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {

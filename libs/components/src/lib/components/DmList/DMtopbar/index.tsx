@@ -7,13 +7,14 @@ import {
 	appActions,
 	selectCalleeId,
 	selectCallerId,
+	selectChannelCall,
 	selectCloseMenu,
 	selectDmGroupCurrent,
 	selectIsMuteMicrophone,
 	selectIsShowMemberListDM,
-	selectIsShowNumberCallDM,
 	selectIsShowShareScreen,
 	selectIsUseProfileDM,
+	selectListOfCalls,
 	selectPinMessageByChannelId,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -80,18 +81,19 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
-	const isShowNumberCallDM = useSelector(selectIsShowNumberCallDM) ?? [];
+	const listOfCalls = useSelector(selectListOfCalls) ?? [];
+	const channelCall = useSelector(selectChannelCall) ?? [];
 	const avatarImages = currentDmGroup?.channel_avatar || [];
 	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
 	const isShowShareScreen = useSelector(selectIsShowShareScreen);
 	const callerId = useSelector(selectCallerId);
 	const calleeId = useSelector(selectCalleeId);
+	const [isCallStarted, setIsCallStarted] = useState(false);
 
+	const [isShow, setIsShow] = useState<boolean>(false);
 	const { userId } = useAuth();
-	console.log(calleeId, 'calleeId');
-	console.log(callerId, 'callerId');
-	console.log(userId, 'userId');
-
+	const [isMicMuted, setIsMicMuted] = useState(false);
+	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
@@ -110,6 +112,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
 	};
 	const handleMuteToggle = () => {
+		if (localStream) {
+			const audioTrack = localStream.getAudioTracks()[0];
+			if (audioTrack) {
+				audioTrack.enabled = !audioTrack.enabled;
+				setIsMicMuted(!audioTrack.enabled);
+			}
+		}
+
 		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 	};
 	const dmUserId = currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : '';
@@ -117,19 +127,62 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
 
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
 	}, []);
+	// const endCall = useCallback(async () => {
+	// 	const user = userId || '';
+	// 	const updatedCalls = { ...listOfCalls };
+	// 	if (updatedCalls[user]) {
+	// 		updatedCalls[user] = updatedCalls[user].filter((id) => id !== dmGroupId);
+	// 	}
+	// 	await dispatch(
+	// 		DMCallActions.setListOfCalls({
+	// 			userId: user,
+	// 			event: updatedCalls
+	// 		})
+	// 	);
+	// 	peerConnection.close();
+	// }, [dispatch, listOfCalls, userId, dmGroupId]);
 
-	const setIsShowNumberCallDM = useCallback(
+	const handleEndCall = () => {
+		if (localStream) {
+			localStream.getTracks().forEach((track) => track.stop());
+			setLocalStream(null);
+			setIsCallStarted(true);
+			peerConnection.getSenders().forEach((sender) => {
+				peerConnection.removeTrack(sender);
+			});
+
+			if (remoteVideoRef.current) {
+				remoteVideoRef.current.srcObject = null;
+			}
+			dispatch(DMCallActions.setChannelCall(''));
+		}
+	};
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+
+	const setListOfCalls = useCallback(
 		async (dmGroupId: string) => {
 			startCall();
 			await dispatch(DMCallActions.setCallerId(userId));
 			await dispatch(DMCallActions.setCalleeId(dmUserId));
-			await dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
+
+			const updatedCalls = JSON.parse(JSON.stringify(listOfCalls));
+
+			if (!updatedCalls[userId || '']) {
+				updatedCalls[userId || ''] = [];
+			}
+			updatedCalls[userId || ''].push(dmGroupId);
+
+			await dispatch(
+				DMCallActions.setListOfCalls({
+					userId: userId || '',
+					event: updatedCalls
+				})
+			);
 		},
-		[dispatch, isShowNumberCallDM]
+		[dispatch, listOfCalls, userId, dmUserId]
 	);
 
 	useEffect(() => {
@@ -147,7 +200,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		};
 
 		peerConnection.ontrack = (event: any) => {
-			// Display remote stream in remote video element
 			if (remoteVideoRef.current) {
 				remoteVideoRef.current.srcObject = event.streams[0];
 			}
@@ -163,7 +215,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						const dataDec = await decompress(data?.json_data);
 						const objData = JSON.parse(dataDec || '{}');
 
-						// Get peerConnection from receiver event.receiverId
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
 						const answer = await peerConnection.createAnswer();
 						await peerConnection.setLocalDescription(answer);
@@ -202,18 +253,21 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			default:
 				break;
 		}
-	}, [mezon.socketRef, peerConnection, signalingData]);
+	}, [mezon.socketRef, peerConnection, signalingData, isCallStarted]);
 
 	const startCall = async () => {
+		console.log(peerConnection.connectionState, 'peerConnection.connectionState');
+
 		await dispatch(DMCallActions.setCallerId(userId));
+		await dispatch(DMCallActions.setChannelCall(dmGroupId));
 		// Get user media
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
 			.then(async (stream) => {
+				setLocalStream(stream);
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
 				}
-				// Add tracks to PeerConnection
 				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
 
 				const offer = await peerConnection.createOffer({
@@ -232,7 +286,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 	return (
 		<>
-			{!Array.isArray(isShowNumberCallDM) || !isShowNumberCallDM.includes(dmGroupId ?? '') ? (
+			{!listOfCalls[userId || '']?.includes(dmGroupId ?? '') ? (
 				<div
 					className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
 				>
@@ -261,7 +315,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 							<div className=" items-center gap-2 flex">
 								<div className="justify-start items-center gap-[15px] flex">
-									<button onClick={() => setIsShowNumberCallDM(dmGroupId ?? '')}>
+									<button onClick={() => setListOfCalls(dmGroupId ?? '')}>
 										<Tooltip
 											content="Start voice call"
 											trigger="hover"
@@ -491,7 +545,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							/>
 						</div>
 						<div className="justify-center items-center gap-4 flex w-full">
-							{callerId === '' && (
+							{(callerId === '' || channelCall !== dmGroupId) && (
 								<>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
@@ -500,8 +554,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+										onClick={startCall}
 									>
-										<Icons.IconPhoneDM onClick={startCall} />
+										<Icons.IconPhoneDM />
 									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
@@ -510,7 +565,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									</div>
 								</>
 							)}
-							{callerId === userId && (
+							{callerId === userId && channelCall === dmGroupId && (
 								<>
 									<div
 										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
@@ -543,7 +598,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
-										onClick={() => setIsShowNumberCallDM('')}
+										onClick={handleEndCall}
 									>
 										<Icons.StopCall />
 									</div>
@@ -703,9 +758,6 @@ function CallButton({ isLightMode, dmUserId, dmGroupId }: { isLightMode: boolean
 	};
 
 	const startCall = async () => {
-		console.log(dmUserId, 'dmUserId');
-		console.log(dmGroupId, 'dmGroupId');
-
 		// Get user media
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
