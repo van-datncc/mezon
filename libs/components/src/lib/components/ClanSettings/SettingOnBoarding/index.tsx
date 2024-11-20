@@ -30,7 +30,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={currentClan?.is_onboarding || false}
+					isEnableOnBoarding={!!currentClan?.is_onboarding}
 					toggleEnableStatus={toggleEnableStatus}
 					onCloseSetting={onClose}
 				/>

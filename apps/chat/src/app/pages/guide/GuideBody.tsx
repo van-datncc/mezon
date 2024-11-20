@@ -64,7 +64,7 @@ function GuideBody() {
 				<div className="flex-1 flex flex-col gap-2">
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Resources</p>
-						{onboardingItem && onboardingItem.rule.length > 0 ? (
+						{onboardingItem?.rule?.length > 0 ? (
 							onboardingItem.rule.map((rule) => (
 								<GuideItemLayout
 									key={rule.id}
@@ -84,7 +84,7 @@ function GuideBody() {
 
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Missions </p>
-						{onboardingItem && onboardingItem.mission.length > 0 ? (
+						{onboardingItem?.mission?.length > 0 ? (
 							onboardingItem.mission.map((mission, index) => (
 								<GuideItemMission
 									key={mission.id}
