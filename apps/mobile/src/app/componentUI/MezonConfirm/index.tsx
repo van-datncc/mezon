@@ -47,7 +47,7 @@ export default function MezonConfirm({
 			animationIn={'bounceIn'}
 			animationOut={'bounceOut'}
 			hasBackdrop={hasBackdrop}
-			coverScreen={true}
+			coverScreen={false}
 			avoidKeyboard={false}
 			onBackdropPress={handleClose}
 			onSwipeComplete={handleClose}
