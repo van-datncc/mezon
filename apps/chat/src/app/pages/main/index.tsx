@@ -319,7 +319,7 @@ const SidebarMenu = memo(
 					<div className="flex flex-col gap-3 ">
 						{clans.map((clan: IClan) => {
 							return (
-								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
+								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name} clan={clan}>
 									<SidebarClanItem
 										linkClan={`/chat/clans/${clan.id}`}
 										option={clan}
