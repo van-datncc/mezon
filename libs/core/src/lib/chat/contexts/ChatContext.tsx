@@ -915,6 +915,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
+		dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, event?.channel_id]));
+		dispatch(DMCallActions.setCalleeId(event?.receiver_id));
 		dispatch(
 			DMCallActions.add({
 				calleeId: event?.receiver_id,
@@ -924,7 +926,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				callerId: ''
 			})
 		);
-		dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, event?.channel_id]));
 	}, []);
 
 	const setCallbackEventFn = React.useCallback(

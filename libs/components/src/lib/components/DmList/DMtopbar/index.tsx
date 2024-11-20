@@ -5,6 +5,8 @@ import {
 	DMCallActions,
 	DirectEntity,
 	appActions,
+	selectCalleeId,
+	selectCallerId,
 	selectCloseMenu,
 	selectDmGroupCurrent,
 	selectIsMuteMicrophone,
@@ -82,6 +84,13 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const avatarImages = currentDmGroup?.channel_avatar || [];
 	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
 	const isShowShareScreen = useSelector(selectIsShowShareScreen);
+	const callerId = useSelector(selectCallerId);
+	const calleeId = useSelector(selectCalleeId);
+
+	const { userId } = useAuth();
+	console.log(calleeId, 'calleeId');
+	console.log(callerId, 'callerId');
+	console.log(userId, 'userId');
 
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
@@ -97,18 +106,127 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		[dispatch]
 	);
 
-	const setIsShowNumberCallDM = useCallback(
-		async (dmGroupId: string) => {
-			await dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
-		},
-		[dispatch, isShowNumberCallDM]
-	);
-
 	const handleShowShareScreenToggle = () => {
 		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
 	};
 	const handleMuteToggle = () => {
 		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
+	};
+	const dmUserId = currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : '';
+	const localVideoRef = useRef<HTMLVideoElement>(null);
+	const remoteVideoRef = useRef<HTMLVideoElement>(null);
+	const mezon = useMezon();
+
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+	const peerConnection = useMemo(() => {
+		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
+	}, []);
+
+	const setIsShowNumberCallDM = useCallback(
+		async (dmGroupId: string) => {
+			startCall();
+			await dispatch(DMCallActions.setCallerId(userId));
+			await dispatch(DMCallActions.setCalleeId(dmUserId));
+			await dispatch(DMCallActions.setIsShowNumberCallDM([...isShowNumberCallDM, dmGroupId]));
+		},
+		[dispatch, isShowNumberCallDM]
+	);
+
+	useEffect(() => {
+		peerConnection.onicecandidate = async (event: any) => {
+			if (event && event.candidate) {
+				if (mezon.socketRef.current?.isOpen() === true) {
+					await mezon.socketRef.current?.forwardWebrtcSignaling(
+						dmUserId,
+						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+						JSON.stringify(event.candidate),
+						dmGroupId ?? ''
+					);
+				}
+			}
+		};
+
+		peerConnection.ontrack = (event: any) => {
+			// Display remote stream in remote video element
+			if (remoteVideoRef.current) {
+				remoteVideoRef.current.srcObject = event.streams[0];
+			}
+		};
+
+		if (!signalingData?.[signalingData?.length - 1]) return;
+		const data = signalingData?.[signalingData?.length - 1]?.signalingData;
+
+		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
+			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				{
+					const processData = async () => {
+						const dataDec = await decompress(data?.json_data);
+						const objData = JSON.parse(dataDec || '{}');
+
+						// Get peerConnection from receiver event.receiverId
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+						const answer = await peerConnection.createAnswer();
+						await peerConnection.setLocalDescription(answer);
+
+						const answerEn = await compress(JSON.stringify(answer));
+						await mezon.socketRef.current?.forwardWebrtcSignaling(
+							dmUserId,
+							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
+							answerEn,
+							dmGroupId ?? ''
+						);
+					};
+					processData().catch(console.error);
+				}
+
+				break;
+			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+				{
+					const processData = async () => {
+						const dataDec = await decompress(data.json_data);
+						const objData = JSON.parse(dataDec || '{}');
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+					};
+					processData().catch(console.error);
+				}
+				break;
+			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+				{
+					const processData = async () => {
+						const objData = JSON.parse(data?.json_data || '{}');
+						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+					};
+					processData().catch(console.error);
+				}
+				break;
+			default:
+				break;
+		}
+	}, [mezon.socketRef, peerConnection, signalingData]);
+
+	const startCall = async () => {
+		// Get user media
+		navigator.mediaDevices
+			.getUserMedia({ video: false, audio: true })
+			.then(async (stream) => {
+				if (localVideoRef.current) {
+					localVideoRef.current.srcObject = stream;
+				}
+				// Add tracks to PeerConnection
+				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+
+				const offer = await peerConnection.createOffer({
+					iceRestart: true,
+					offerToReceiveAudio: true,
+					offerToReceiveVideo: true
+				});
+				await peerConnection.setLocalDescription(offer);
+				if (offer && mezon.socketRef.current) {
+					const offerEn = await compress(JSON.stringify(offer));
+					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn, dmGroupId ?? '');
+				}
+			})
+			.catch((err) => console.error('Failed to get local media:', err));
 	};
 
 	return (
@@ -344,58 +462,92 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									classNameText="!text-4xl font-semibold"
 								/>
 							))}
+							<video
+								ref={localVideoRef}
+								autoPlay
+								muted
+								playsInline
+								style={{
+									width: '400px',
+									height: '300px',
+									backgroundColor: 'black',
+									borderRadius: '8px',
+									display: 'none'
+								}}
+							/>
+
+							<video
+								ref={remoteVideoRef}
+								autoPlay
+								playsInline
+								style={{
+									width: '400px',
+									height: '300px',
+									backgroundColor: 'black',
+									borderRadius: '8px',
+									display: 'none'
+								}}
+							/>
 						</div>
 						<div className="justify-center items-center gap-4 flex w-full">
-							<div
-								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-							>
-								<Icons.IconMeetDM />
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-							>
-								<Icons.IconPhoneDM />
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
-							>
-								<Icons.CloseButton className={`w-[20px]`} />
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-							>
-								<Icons.IconMeetDM
-									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowShareScreen={isShowShareScreen}
-									isShowLine={true}
-								/>
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-								onClick={handleShowShareScreenToggle}
-							>
-								<Icons.ShareScreen
-									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowShareScreen={isShowShareScreen}
-									isShowLine={true}
-								/>
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-								onClick={handleMuteToggle}
-							>
-								<Icons.Microphone
-									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isMuteMicrophone={isMuteMicrophone}
-									isShowLine={true}
-								/>
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
-								onClick={() => setIsShowNumberCallDM('')}
-							>
-								<Icons.StopCall />
-							</div>
+							{calleeId === userId && (
+								<>
+									<div
+										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+									>
+										<Icons.IconMeetDM />
+									</div>
+									<div
+										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+									>
+										<Icons.IconPhoneDM onClick={startCall} />
+									</div>
+									<div
+										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+									>
+										<Icons.CloseButton className={`w-[20px]`} />
+									</div>
+								</>
+							)}
+							{callerId === userId && (
+								<>
+									<div
+										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+									>
+										<Icons.IconMeetDM
+											className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+											isShowShareScreen={isShowShareScreen}
+											isShowLine={true}
+										/>
+									</div>
+									<div
+										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+										onClick={handleShowShareScreenToggle}
+									>
+										<Icons.ShareScreen
+											className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+											isShowShareScreen={isShowShareScreen}
+											isShowLine={true}
+										/>
+									</div>
+									<div
+										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+										onClick={handleMuteToggle}
+									>
+										<Icons.Microphone
+											className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+											isMuteMicrophone={isMuteMicrophone}
+											isShowLine={true}
+										/>
+									</div>
+									<div
+										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+										onClick={() => setIsShowNumberCallDM('')}
+									>
+										<Icons.StopCall />
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 				</div>
@@ -550,6 +702,9 @@ function CallButton({ isLightMode, dmUserId, dmGroupId }: { isLightMode: boolean
 	};
 
 	const startCall = async () => {
+		console.log(dmUserId, 'dmUserId');
+		console.log(dmGroupId, 'dmGroupId');
+
 		// Get user media
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
@@ -614,7 +769,8 @@ function CallButton({ isLightMode, dmUserId, dmGroupId }: { isLightMode: boolean
 									width: '400px',
 									height: '300px',
 									backgroundColor: 'black',
-									borderRadius: '8px'
+									borderRadius: '8px',
+									display: 'none'
 								}}
 							/>
 							{/* Remote Video */}
@@ -626,7 +782,8 @@ function CallButton({ isLightMode, dmUserId, dmGroupId }: { isLightMode: boolean
 									width: '400px',
 									height: '300px',
 									backgroundColor: 'black',
-									borderRadius: '8px'
+									borderRadius: '8px',
+									display: 'none'
 								}}
 							/>
 						</div>

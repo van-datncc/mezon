@@ -56,6 +56,12 @@ export const DMCallSlice = createSlice({
 		setIsShowShareScreen: (state, action) => {
 			state.isShowShareScreen = action.payload;
 		},
+		setCallerId: (state, action) => {
+			state.callerId = action.payload;
+		},
+		setCalleeId: (state, action) => {
+			state.calleeId = action.payload;
+		},
 		// ...
 	}
 });
@@ -118,3 +124,7 @@ export const selectIsShowNumberCallDM = createSelector(getDMCallState, (state: D
 export const selectIsMuteMicrophone = createSelector(getDMCallState, (state: DMCallState) => state.isMuteMicrophone);
 
 export const selectIsShowShareScreen = createSelector(getDMCallState, (state: DMCallState) => state.isShowShareScreen);
+
+export const selectCallerId = createSelector(getDMCallState, (state: DMCallState) => state.callerId);
+
+export const selectCalleeId = createSelector(getDMCallState, (state: DMCallState) => state.calleeId);
