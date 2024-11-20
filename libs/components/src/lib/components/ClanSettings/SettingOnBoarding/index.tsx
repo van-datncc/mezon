@@ -1,7 +1,7 @@
 import { MemberProvider } from '@mezon/core';
-import { channelSettingActions, onboardingActions, selectEnableStatusOfOnBoarding, useAppDispatch } from '@mezon/store';
+import { onboardingActions, selectCurrentClan, selectCurrentClanId, selectFormOnboarding, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
@@ -14,23 +14,23 @@ export enum EOnboardingStep {
 }
 const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
-	const toggleEnableStatus = () => {
-		dispatch(channelSettingActions.toggleOnBoarding());
+	const currentClanId = useSelector(selectCurrentClanId);
+	const toggleEnableStatus = (enable: boolean) => {
+		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClanId as string, onboarding: enable }));
 	};
-
-	const isEnableOnBoarding = useSelector(selectEnableStatusOfOnBoarding);
 
 	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
 	const handleGoToPage = (page: EOnboardingStep) => {
 		setCurrentPage(page);
 	};
 
+	const currentClan = useSelector(selectCurrentClan);
 	return (
 		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={isEnableOnBoarding}
+					isEnableOnBoarding={!!currentClan?.is_onboarding}
 					toggleEnableStatus={toggleEnableStatus}
 					onCloseSetting={onClose}
 				/>
@@ -38,7 +38,13 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			{currentPage === EOnboardingStep.QUESTION && <Questions handleGoToPage={handleGoToPage} />}
 			{currentPage === EOnboardingStep.MISSION && (
 				<MemberProvider>
-					<ClanGuideSetting />
+					<div className="flex flex-col gap-8">
+						<div onClick={() => handleGoToPage(EOnboardingStep.MAIN)} className="flex gap-3 cursor-pointer">
+							<Icons.LongArrowRight className="rotate-180 w-3" />
+							<div className="font-semibold">BACK</div>
+						</div>
+						<ClanGuideSetting />
+					</div>
 				</MemberProvider>
 			)}
 		</div>
@@ -47,7 +53,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 interface IMainIndexProps {
 	isEnableOnBoarding: boolean;
-	toggleEnableStatus: () => void;
+	toggleEnableStatus: (enable: boolean) => void;
 	handleGoToPage: (page: EOnboardingStep) => void;
 	onCloseSetting?: () => void;
 }
@@ -60,6 +66,29 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 			onCloseSetting();
 		}
 	};
+	const currentClanId = useSelector(selectCurrentClanId);
+	const formOnboarding = useSelector(selectFormOnboarding);
+	const handleCreateOnboarding = () => {
+		const formOnboardingData = [...formOnboarding.questions, ...formOnboarding.rules, ...formOnboarding.task];
+		if (formOnboarding.greeting) {
+			formOnboardingData.unshift(formOnboarding.greeting);
+		}
+		dispatch(
+			onboardingActions.createOnboardingTask({
+				clan_id: currentClanId as string,
+				content: formOnboardingData
+			})
+		);
+	};
+
+	const checkCreateValidate = useMemo(() => {
+		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;
+	}, [formOnboarding]);
+
+	useEffect(() => {
+		dispatch(onboardingActions.fetchOnboarding({ clan_id: currentClanId as string }));
+	}, []);
+
 	return (
 		<div className="flex flex-col gap-6 flex-1">
 			<div className="flex flex-col gap-2">
@@ -111,7 +140,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 														disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
 								checked={isEnableOnBoarding}
-								onChange={toggleEnableStatus}
+								onChange={() => toggleEnableStatus(!isEnableOnBoarding)}
 							/>
 						</div>
 					}
@@ -175,6 +204,16 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 						</div>
 					}
 				/>
+			</div>
+
+			<div className="w-full flex justify-end">
+				<button
+					onClick={handleCreateOnboarding}
+					disabled={!checkCreateValidate}
+					className="text-white font-semibold rounded-md px-4 py-2 bg-primary cursor-pointer disabled:bg-slate-500 disabled:text-slate-700 disabled:cursor-default disabled:opacity-65"
+				>
+					Create Onboarding
+				</button>
 			</div>
 		</div>
 	);

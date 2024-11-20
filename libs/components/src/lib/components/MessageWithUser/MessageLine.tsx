@@ -76,7 +76,7 @@ interface RenderContentProps {
 	isInPinMsg?: boolean;
 }
 
-interface ElementToken {
+export interface ElementToken {
 	s?: number;
 	e?: number;
 	kindOf: ETokenMessage;

@@ -18,6 +18,7 @@ import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../components/UserStatus';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 
 interface HeaderProps {
@@ -42,8 +43,6 @@ function useChannelSeen(channelId: string) {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
@@ -88,13 +87,21 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 }) => {
 	useChannelSeen(directMessageId || '');
 	const navigation = useNavigation<any>();
+	const isTabletLandscape = useTabletLandscape();
 
 	const goToCall = () => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
-				receiverId: firstUserId
+				receiverId: firstUserId,
+				receiverAvatar: dmAvatar
 			}
+		});
+	};
+
+	const navigateToNotifications = () => {
+		navigation.navigate(APP_SCREEN.NOTIFICATION.STACK, {
+			screen: APP_SCREEN.NOTIFICATION.HOME
 		});
 	};
 
@@ -128,6 +135,11 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
+				{isTabletLandscape && (
+					<TouchableOpacity style={styles.iconHeader} onPress={navigateToNotifications}>
+						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+					</TouchableOpacity>
+				)}
 				{!isTypeDMGroup && !!firstUserId && (
 					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
 						<Icons.PhoneCallIcon width={size.s_18} height={size.s_18} color={themeValue.text} />

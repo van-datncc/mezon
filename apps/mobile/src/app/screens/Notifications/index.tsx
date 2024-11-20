@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import EmptyNotification from './EmptyNotification';
 import NotificationItem from './NotificationItem';
@@ -39,7 +40,7 @@ const Notifications = () => {
 	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
 	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
 	const dispatch = useAppDispatch();
-
+	const isTabletLandscape = useTabletLandscape();
 	const { t } = useTranslation(['notification']);
 	const navigation = useNavigation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -198,9 +199,20 @@ const Notifications = () => {
 		bottomSheetOptionsRef.current?.dismiss();
 	};
 
+	const handleGoback = () => {
+		navigation.goBack();
+	};
+
 	return (
 		<View style={styles.notifications}>
 			<View style={styles.notificationsHeader}>
+				{isTabletLandscape && (
+					<Pressable onPress={handleGoback}>
+						<View style={styles.notificationHeaderIcon}>
+							<Icons.ChevronSmallLeftIcon height={20} width={20} color={themeValue.textStrong} />
+						</View>
+					</Pressable>
+				)}
 				<Text style={styles.notificationHeaderTitle}>{t('headerTitle')}</Text>
 				<Pressable onPress={() => openBottomSheet(ENotifyBsToShow.notification)}>
 					<View style={styles.notificationHeaderIcon}>

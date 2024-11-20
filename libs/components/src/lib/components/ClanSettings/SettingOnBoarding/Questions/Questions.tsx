@@ -1,7 +1,19 @@
+import {
+	EGuideType,
+	onboardingActions,
+	selectCurrentClanId,
+	selectFormOnboarding,
+	selectOnboardingByClan,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useState } from 'react';
+import { ApiAnswer, ApiOnboardingItem } from 'mezon-js/api.gen';
+import { ChangeEvent, useState } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import { EOnboardingStep } from '..';
+import GuideItemLayout from '../GuideItemLayout';
 import ModalControlRule, { ControlInput } from '../ModalControlRule';
 
 interface IQuestionsProps {
@@ -15,16 +27,27 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 		setShowChannelNotAssigned(!showChannelNotAssigned);
 	};
 
-	const [preJoinQuestions, setPreJoinQuestion] = useState<number[]>([]);
-	const [postJoinQuestions, setPostJoinQuestion] = useState<number[]>([]);
+	const formOnboarding = useSelector(selectFormOnboarding);
 
+	const [preJoinQuestions, setPreJoinQuestion] = useState<number>(formOnboarding.questions.length || 0);
+	const [postJoinQuestions, setPostJoinQuestion] = useState<number>(0);
+	const dispatch = useAppDispatch();
 	const handleAddPreJoinQuestion = () => {
-		setPreJoinQuestion([...preJoinQuestions, 1]);
+		dispatch(
+			onboardingActions.addQuestion({
+				answers: [],
+				title: '',
+				guide_type: EGuideType.QUESTION
+			})
+		);
 	};
 
 	const handleAddPostJoinQuestion = () => {
-		setPostJoinQuestion([...postJoinQuestions, 1]);
+		setPostJoinQuestion(postJoinQuestions + 1);
 	};
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -75,8 +98,11 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 							Members will be asked these questions before they join your server. Use them to assign channels and important roles.
 							Pre-join Questions will also be available on the Channels & Roles page.
 						</div>
-						{preJoinQuestions.map((question, index) => (
-							<QuestionItem key={index} />
+						{onboardingByClan.question.map((question, index) => (
+							<QuestionItem key={question.id} question={question} index={index} />
+						))}
+						{formOnboarding.questions.map((question, index) => (
+							<QuestionItem key={index} question={question} index={index + onboardingByClan.question.length} tempId={index} />
 						))}
 						<div
 							onClick={handleAddPreJoinQuestion}
@@ -93,9 +119,11 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 							Members will be asked these questions after they join your server, on the Channels & Roles page. Use them to assign roles
 							that members can pick later, like vanity roles.
 						</div>
-						{postJoinQuestions.map((question, index) => (
-							<QuestionItem key={index} />
-						))}
+						{Array(postJoinQuestions)
+							.fill(1)
+							.map((question, index) => (
+								<QuestionItem key={index} question={formOnboarding.questions[index]} index={index} />
+							))}
 						<div
 							onClick={handleAddPostJoinQuestion}
 							className="rounded-xl text-[#949cf7] justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
@@ -110,47 +138,110 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 	);
 };
 
-const QuestionItem = () => {
-	const [openAnswerPopup, closeAnswerPopup] = useModal(() => (
-		<ModalControlRule bottomLeftBtn="Remove" onClose={closeAnswerPopup}>
-			<>
-				<div className="absolute top-5 flex flex-col gap-2">
-					<div className="uppercase text-xs font-medium">Question 1</div>
-					<div className="text-xl text-white font-semibold">What do you want to do in this community?</div>
-				</div>
-				<div className="pb-5 pt-10 flex flex-col gap-2">
-					<ControlInput
-						title="Add answer title"
-						message="Title is required"
-						onChange={() => {}}
-						value=""
-						placeholder="Enter an answer..."
-						required
-					/>
-					<ControlInput title="Add answer description" onChange={() => {}} value="" placeholder="Enter a description... (optional)" />
-				</div>
-			</>
-		</ModalControlRule>
-	));
+const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem; index: number; tempId?: number }) => {
+	const [titleQuestion, setTitleQuestion] = useState(question?.title || '');
+	const [answers, setAnswer] = useState<ApiAnswer[]>(question?.answers || []);
+	const [titleAnswer, setTitleAnswer] = useState('');
+	const [answerDescription, setAnswerDescription] = useState('');
 
-	const [isExpanded, setIsExpanded] = useState(true);
-	const [question, setQuestion] = useState('');
+	const dispatch = useAppDispatch();
+
+	const handleSaveAnswer = () => {
+		setAnswer([...answers, { title: titleAnswer, description: answerDescription }]);
+		setTitleAnswer('');
+		setAnswerDescription('');
+		closeAnswerPopup();
+	};
+
+	const handleChangeTitleAnswer = (e: ChangeEvent<HTMLInputElement>) => {
+		setTitleAnswer(e.target.value);
+	};
+
+	const handleChangeTitleDescription = (e: ChangeEvent<HTMLInputElement>) => {
+		setAnswerDescription(e.target.value);
+	};
+
+	const [openAnswerPopup, closeAnswerPopup] = useModal(
+		() => (
+			<ModalControlRule bottomLeftBtn="Remove" onClose={closeAnswerPopup} onSave={handleSaveAnswer}>
+				<>
+					<div className="absolute top-5 flex flex-col gap-2">
+						<div className="uppercase text-xs font-medium">Question {index + 1}</div>
+						<div className="text-xl text-white font-semibold">{titleQuestion || 'What is your question'} ?</div>
+					</div>
+					<div className="pb-5 pt-10 flex flex-col gap-2">
+						<ControlInput
+							title="Add answer title"
+							message="Title is required"
+							onChange={handleChangeTitleAnswer}
+							value={titleAnswer}
+							placeholder="Enter an answer..."
+							required
+						/>
+						<ControlInput
+							title="Add answer description"
+							onChange={handleChangeTitleDescription}
+							value={answerDescription}
+							placeholder="Enter a description... (optional)"
+						/>
+					</div>
+				</>
+			</ModalControlRule>
+		),
+		[titleQuestion, titleAnswer, answerDescription]
+	);
+
+	const [isExpanded, setIsExpanded] = useState(question ? false : true);
 
 	const handleQuestionOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setQuestion(e.target.value);
+		setTitleQuestion(e.target.value);
 	};
 
 	const toggleExpand = () => {
 		setIsExpanded(!isExpanded);
 	};
 
+	const handleAddQuestion = () => {
+		dispatch(
+			onboardingActions.addQuestion({
+				title: titleQuestion,
+				answers: answers,
+				guide_type: EGuideType.QUESTION
+			})
+		);
+		toggleExpand();
+	};
+
+	const handleRemoveQuestion = () => {
+		if (tempId !== undefined) {
+			dispatch(
+				onboardingActions.removeTempTask({
+					idTask: tempId,
+					type: EGuideType.QUESTION
+				})
+			);
+			return;
+		}
+		if (question.id) {
+			dispatch(
+				onboardingActions.removeOnboardingTask({
+					idTask: question.id,
+					type: EGuideType.QUESTION,
+					clan_id: question.clan_id as string
+				})
+			);
+		}
+	};
+
 	return (
 		<div className="flex flex-col gap-6 bg-bgSecondary p-4 rounded-lg">
 			<div className="flex flex-col gap-2">
 				<div className="flex justify-between items-center">
-					<div className="uppercase text-xs font-medium">Question 1</div>
+					<div className="uppercase text-xs font-medium">Question {index + 1}</div>
 					<div className="flex gap-2 items-center">
-						<Icons.TrashIcon className="w-4" />
+						<div onClick={handleRemoveQuestion}>
+							<Icons.TrashIcon className="w-4" />
+						</div>
 						<div onClick={toggleExpand}>
 							<Icons.ArrowRight defaultSize={`${isExpanded ? 'rotate-90' : '-rotate-90'} w-4`} />
 						</div>
@@ -161,38 +252,55 @@ const QuestionItem = () => {
 						className="text-[20px] bg-bgTertiary font-semibold outline-none focus:outline-blue-500 rounded-lg p-[10px]"
 						type="text"
 						placeholder="Enter a question..."
-						value={question}
+						value={titleQuestion}
 						onChange={handleQuestionOnchange}
 					/>
 				) : (
-					<div className="text-white text-xl font-semibold">{question}</div>
+					<div className="text-white text-xl font-semibold">{titleQuestion}</div>
 				)}
 			</div>
 			{isExpanded && (
-				<div className="flex flex-col gap-2">
-					<div>Available answers - 0 of 50</div>
-					<div className="flex gap-[1%] gap-y-[1%]">
-						<div
-							onClick={openAnswerPopup}
-							className="w-[49.5%] rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
-						>
-							<Icons.CirclePlusFill className="w-5" />
-							<div>Add an Answer</div>
+				<>
+					<div className="flex flex-col gap-2">
+						<div>Available answers - 0 of 50</div>
+						<div className="flex gap-[1%] gap-y-2 flex-wrap">
+							{answers.map((answer) => (
+								<GuideItemLayout
+									key={answer.title}
+									icon={answer.answer}
+									description={answer.description}
+									title={answer.title}
+									className="w-[49.5%] rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+								/>
+							))}
+							<GuideItemLayout
+								onClick={openAnswerPopup}
+								icon={<Icons.CirclePlusFill className="w-5" />}
+								title={'Add an Answer'}
+								className="w-[49.5%] hover:bg-transparent rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c] border-dashed font-medium flex gap-2"
+							/>
 						</div>
 					</div>
-				</div>
-			)}
-			{isExpanded && (
-				<div className="flex gap-6">
-					<div className="flex items-center gap-2">
-						<input type="checkbox" name="multiple-answer" className="w-5 h-5" />
-						<label htmlFor="multiple-answer">Allow multiple answers</label>
+
+					<div className="flex justify-between">
+						<div className="flex gap-6">
+							<div className="flex items-center gap-2">
+								<input type="checkbox" name="multiple-answer" className="w-5 h-5" />
+								<label htmlFor="multiple-answer">Allow multiple answers</label>
+							</div>
+							<div className="flex items-center gap-2">
+								<input type="checkbox" name="required" className="w-5 h-5" />
+								<label htmlFor="required">Required</label>
+							</div>
+						</div>
+						<div
+							className="rounded-md w-28 h-9 bg-primary text-white flex items-center font-semibold justify-center"
+							onClick={handleAddQuestion}
+						>
+							Save
+						</div>
 					</div>
-					<div className="flex items-center gap-2">
-						<input type="checkbox" name="required" className="w-5 h-5" />
-						<label htmlFor="required">Required</label>
-					</div>
-				</div>
+				</>
 			)}
 		</div>
 	);

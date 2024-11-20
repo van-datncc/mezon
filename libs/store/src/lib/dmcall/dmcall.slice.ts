@@ -23,6 +23,7 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	isShowShareScreen: boolean;
 	isShowMeetDM: boolean;
 	localStream: MediaStream | null;
+	isInCall: boolean;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -44,6 +45,7 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowShareScreen: false,
 	isShowMeetDM: false,
 	localStream: null,
+	isInCall: false
 });
 
 export const DMCallSlice = createSlice({
@@ -108,6 +110,10 @@ export const DMCallSlice = createSlice({
 		},
 		setLocalStream: (state, action) => {
 			state.localStream = action.payload;
+		},
+		removeAll: DMCallAdapter.removeAll,
+		setIsInCall: (state, action) => {
+			state.isInCall = action.payload;
 		}
 		// ...
 	}
@@ -166,6 +172,7 @@ export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities
 	const dmcalls = Object.values(entities);
 	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
 });
+
 export const selectListOfCalls = createSelector(getDMCallState, (state: DMCallState) => state.listOfCalls);
 
 export const selectIsMuteMicrophone = createSelector(getDMCallState, (state: DMCallState) => state.isMuteMicrophone);
@@ -181,3 +188,5 @@ export const selectChannelCallId = createSelector(getDMCallState, (state: DMCall
 export const selectIsShowMeetDM = createSelector(getDMCallState, (state: DMCallState) => state.isShowMeetDM);
 
 export const selectLocalStream = createSelector(getDMCallState, (state: DMCallState) => state.localStream);
+
+export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);

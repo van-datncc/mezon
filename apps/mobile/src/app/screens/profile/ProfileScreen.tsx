@@ -62,6 +62,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
 	};
 
+	const navigateGoback = () => {
+		navigation.goBack();
+	};
+
 	const navigateToProfileSetting = () => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
 	};
@@ -94,7 +98,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
-				<View style={styles.backgroundListIcon}>
+				<View style={[styles.backgroundListIcon, isTabletLandscape && { justifyContent: 'space-between' }]}>
+					{isTabletLandscape && (
+						<TouchableOpacity style={styles.backgroundSetting} onPress={navigateGoback}>
+							<Icons.ChevronSmallLeftIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						</TouchableOpacity>
+					)}
 					<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
 						<Icons.SettingsIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
@@ -121,7 +130,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</Block>
 					)}
-					<UserStatus status={userStatus} customStyles={styles.dotStatusUser} />
+					<UserStatus status={userStatus} customStyles={styles.dotStatusUser} iconSize={isTabletLandscape ? size.s_20 : size.s_12} />
 				</TouchableOpacity>
 			</View>
 

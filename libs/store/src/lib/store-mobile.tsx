@@ -9,6 +9,7 @@ import { authReducer } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
 import { channelMembersReducer } from './channelmembers/channel.members';
 import { channelsReducer } from './channels/channels.slice';
+import { DMCallReducer } from './dmcall/dmcall.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
@@ -67,7 +68,8 @@ import { integrationWebhookReducer } from './webhook/webhook.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
-		storage
+		storage,
+		blacklist: ['loadingStatus']
 	},
 	authReducer
 );
@@ -383,7 +385,8 @@ const reducer = {
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
-	clanMembersMeta: clanMembersMetaReducer
+	clanMembersMeta: clanMembersMetaReducer,
+	dmcall: DMCallReducer
 };
 
 let storeInstance = configureStore({

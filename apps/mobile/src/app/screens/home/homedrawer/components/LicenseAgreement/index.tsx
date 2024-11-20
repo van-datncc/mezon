@@ -1,6 +1,7 @@
 import React from 'react';
 import { Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { styles } from './styles';
 
 interface ForwardMessageModalProps {
@@ -9,9 +10,10 @@ interface ForwardMessageModalProps {
 }
 
 const LicenseAgreement = ({ show, onClose }: ForwardMessageModalProps) => {
+	const isTabletLandscape = useTabletLandscape();
 	return (
 		<Modal isVisible={show} animationIn={'fadeIn'} hasBackdrop={true} coverScreen={true} avoidKeyboard={false} backdropColor={'rgba(0,0,0, 0.7)'}>
-			<View style={styles.sheetContainer}>
+			<View style={(styles.sheetContainer, isTabletLandscape && { maxWidth: '40%' })}>
 				<View style={styles.headerModal}>
 					<Text style={styles.headerText}>License Agreement</Text>
 					<View style={{ width: 16 }}></View>

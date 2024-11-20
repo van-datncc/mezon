@@ -2,6 +2,7 @@ import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { ReactNode } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 interface IMezonConfirmProps {
@@ -26,8 +27,9 @@ export default function MezonConfirm({
 	onConfirm,
 	onCancel
 }: IMezonConfirmProps) {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = style(themeValue, isTabletLandscape);
 
 	function handleClose() {
 		onCancel && onCancel();
@@ -45,7 +47,7 @@ export default function MezonConfirm({
 			animationIn={'bounceIn'}
 			animationOut={'bounceOut'}
 			hasBackdrop={hasBackdrop}
-			coverScreen={true}
+			coverScreen={false}
 			avoidKeyboard={false}
 			onBackdropPress={handleClose}
 			onSwipeComplete={handleClose}

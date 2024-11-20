@@ -9,6 +9,7 @@ import { useReducedMotion } from 'react-native-reanimated';
 import { useSelector } from 'react-redux';
 import { MezonModal, MezonSwitch } from '../../../../../componentUI';
 import Backdrop from '../../../../../componentUI/MezonBottomSheet/backdrop';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
 import { FriendList } from './FriendList';
@@ -25,9 +26,9 @@ export const InviteToChannel = React.memo(
 		({ isUnknownChannel, onClose, isDMThread = false }: IInviteToChannelProp, refRBSheet: React.MutableRefObject<BottomSheetModal>) => {
 			const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 			const reducedMotion = useReducedMotion();
-
+			const isTabletLandscape = useTabletLandscape();
 			const { themeValue } = useTheme();
-			const styles = style(themeValue);
+			const styles = style(themeValue, isTabletLandscape);
 			const currentClan = useSelector(selectCurrentClan);
 			const { t } = useTranslation(['inviteToChannel']);
 			const timeoutRef = useRef(null);
@@ -97,6 +98,7 @@ export const InviteToChannel = React.memo(
 							// resetSearch();
 						}}
 						handleComponent={() => null}
+						style={styles.bottomSheetContainer}
 					>
 						<FriendList
 							isUnknownChannel={isUnknownChannel}

@@ -17,7 +17,6 @@ export interface SettingClanChannelState extends EntityState<ApiChannelSettingIt
 	threadCount: number;
 	threadsByChannel: Record<string, ApiChannelSettingItem[]>;
 	listSearchChannel: ApiChannelSettingItem[];
-	isEnableOnBoarding: boolean;
 }
 
 export const channelSettingAdapter = createEntityAdapter({
@@ -30,8 +29,7 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 	channelCount: 0,
 	threadCount: 0,
 	threadsByChannel: {},
-	listSearchChannel: [],
-	isEnableOnBoarding: false
+	listSearchChannel: []
 });
 
 export enum ETypeFetchChannelSetting {
@@ -105,11 +103,7 @@ export const fetchChannelSettingInClan = createAsyncThunk(
 export const settingClanChannelSlice = createSlice({
 	name: SETTING_CLAN_CHANNEL,
 	initialState: initialSettingClanChannelState,
-	reducers: {
-		toggleOnBoarding: (state) => {
-			state.isEnableOnBoarding = !state.isEnableOnBoarding;
-		}
-	},
+	reducers: {},
 	extraReducers(builder) {
 		builder
 			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
@@ -158,7 +152,5 @@ export const selectThreadsListByParentId = (parentId: string) => createSelector(
 export const settingChannelReducer = settingClanChannelSlice.reducer;
 export const selectNumberChannelCount = createSelector(getChannelSettingState, (state) => state.channelCount);
 export const selectNumberThreadCount = createSelector(getChannelSettingState, (state) => state.threadCount);
-
-export const selectEnableStatusOfOnBoarding = createSelector(getChannelSettingState, (state) => state.isEnableOnBoarding);
 
 export const selectListChannelBySearch = createSelector(getChannelSettingState, (state) => state.listSearchChannel);
