@@ -13,6 +13,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -116,8 +117,8 @@ const GuideItemMission = ({ mission, onClick, onboadingMode }: TypeItemMission) 
 			onClick={onClick}
 			description={
 				<span>
-					{' '}
-					{mission.content || ''} <span className="font-semibold text-channelActiveColor"> #{channelById?.channel_label} </span>{' '}
+					{titleMission[mission.task_type ? mission.task_type - 1 : 0] || ''}{' '}
+					<span className="font-semibold text-channelActiveColor"> #{channelById?.channel_label} </span>{' '}
 				</span>
 			}
 			action={<div className={`w-6 aspect-square  rounded-full ${onboadingMode ? 'bg-green-500' : 'bg-black'}`}></div>}
