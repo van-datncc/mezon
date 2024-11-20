@@ -24,6 +24,7 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	isShowMeetDM: boolean;
 	localStream: MediaStream | null;
 	isInCall: boolean;
+	peerConnection: RTCPeerConnection;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -45,7 +46,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowShareScreen: false,
 	isShowMeetDM: false,
 	localStream: null,
-	isInCall: false
+	isInCall: false,
+	peerConnection: new RTCPeerConnection()
 });
 
 export const DMCallSlice = createSlice({
@@ -59,9 +61,9 @@ export const DMCallSlice = createSlice({
 			const { userId, event } = action.payload;
 			if (!userId) return;
 
-			if (userId === event.receiver_id) {
+			if (userId === event.receiver_id && event.channel_id !== '') {
 				if (event.data_type === 4 && event.json_data === '') {
-					state.listOfCalls[userId] = state.listOfCalls[userId].filter(id => id !== event.channel_id);
+					state.listOfCalls[userId] = state.listOfCalls[userId].filter((id) => id !== event.channel_id);
 					return;
 				}
 				if (!state.listOfCalls[userId]) {
@@ -114,6 +116,9 @@ export const DMCallSlice = createSlice({
 		removeAll: DMCallAdapter.removeAll,
 		setIsInCall: (state, action) => {
 			state.isInCall = action.payload;
+		},
+		setPeerConnection: (state, action) => {
+			state.peerConnection = action.payload;
 		}
 		// ...
 	}
@@ -190,3 +195,5 @@ export const selectIsShowMeetDM = createSelector(getDMCallState, (state: DMCallS
 export const selectLocalStream = createSelector(getDMCallState, (state: DMCallState) => state.localStream);
 
 export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
+
+export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);
