@@ -37,6 +37,7 @@ export const style = (colors: Attributes) =>
 		},
 		confirm: {
 			color: colors.textStrong,
-			fontSize: size.s_18
+			fontSize: size.s_18,
+			textAlign: 'right'
 		}
 	});

@@ -43,6 +43,12 @@ const HomeDefaultHeader = React.memo(
 			});
 		};
 
+		const navigateToNotifications = () => {
+			navigation.navigate(APP_SCREEN.NOTIFICATION.STACK, {
+				screen: APP_SCREEN.NOTIFICATION.HOME
+			});
+		};
+
 		const renderChannelIcon = () => {
 			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)) {
 				return <Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
@@ -95,6 +101,11 @@ const HomeDefaultHeader = React.memo(
 						)}
 					</View>
 				</TouchableOpacity>
+				{isTabletLandscape && (
+					<TouchableOpacity style={styles.iconBell} onPress={navigateToNotifications}>
+						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+					</TouchableOpacity>
+				)}
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
 						{statusMute === ENotificationActive.OFF ? (

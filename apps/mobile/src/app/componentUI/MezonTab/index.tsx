@@ -8,9 +8,10 @@ import { style } from './styles';
 interface IMezonTabProps {
 	views: ReactNode[];
 	titles: string[];
+	isBottomSheet?: boolean;
 }
 
-export default function MezonTab({ views, titles }: IMezonTabProps) {
+export default function MezonTab({ views, titles, isBottomSheet = false }: IMezonTabProps) {
 	const [tab, setTab] = useState<number>(0);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -22,7 +23,7 @@ export default function MezonTab({ views, titles }: IMezonTabProps) {
 	return (
 		<View style={styles.container}>
 			<MezonTabHeader tabIndex={tab} onChange={handleTabChange} tabs={titles} />
-			<MezonTabView pageIndex={tab} onChange={handleTabChange} views={views} />
+			<MezonTabView pageIndex={tab} onChange={handleTabChange} views={views} isBottomSheet={isBottomSheet} />
 		</View>
 	);
 }

@@ -280,7 +280,7 @@ function MessageWithUser({
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
-												{message.content?.embed &&
+												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => <EmbedMessage {...embed} key={index} />)}
 
 												{message.content?.components &&

@@ -1,7 +1,9 @@
 import { Attributes, Colors, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+const marginWidth = Dimensions.get('screen').width * 0.3;
+
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		radioContainer: {
 			flexDirection: 'row',
@@ -164,5 +166,8 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.tertiary,
 			borderTopRightRadius: 8,
 			borderTopLeftRadius: 8
+		},
+		bottomSheetContainer: {
+			marginHorizontal: isTabletLandscape ? marginWidth : 0
 		}
 	});
