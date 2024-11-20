@@ -7,6 +7,7 @@ import {
 	selectChannelById,
 	selectChannelFirst,
 	selectCurrentClanId,
+	selectMissionDone,
 	selectOnboardingByClan,
 	selectOnboardingMode,
 	useAppDispatch,
@@ -25,9 +26,9 @@ function GuideBody() {
 	const { navigate, toChannelPage, toMembersPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
 
-	const handleDoMission = (type: number) => {
+	const handleDoMission = (mission: ApiOnboardingItem) => {
 		if (onboadingMode) {
-			switch (type) {
+			switch (mission.task_type) {
 				case ETypeMission.SEND_MESSAGE: {
 					const link = toChannelPage(firstChannelId.channel_id as string, currentClanId as string);
 					navigate(link);
@@ -56,14 +57,14 @@ function GuideBody() {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
 	}, []);
 
+	const missionDone = useSelector(selectMissionDone);
 	return (
 		<div className="w-full h-full pt-4 ">
 			<div className="flex gap-6">
 				<div className="flex-1 flex flex-col gap-2">
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Resources</p>
-						{onboardingItem &&
-							onboardingItem.rule.length > 0 &&
+						{onboardingItem && onboardingItem.rule.length > 0 ? (
 							onboardingItem.rule.map((rule) => (
 								<GuideItemLayout
 									key={rule.id}
@@ -73,24 +74,33 @@ function GuideBody() {
 									icon={<Icons.RuleIcon />}
 									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
 								/>
-							))}
+							))
+						) : (
+							<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+								You don't have any rule. Setting rule for this clan first !!
+							</div>
+						)}
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Missions </p>
-						{onboardingItem &&
-							onboardingItem.mission.length > 0 &&
+						{onboardingItem && onboardingItem.mission.length > 0 ? (
 							onboardingItem.mission.map((mission, index) => (
 								<GuideItemMission
 									key={mission.id}
 									mission={mission}
-									onClick={() => handleDoMission(index)}
-									onboadingMode={onboadingMode}
+									onClick={() => handleDoMission(mission)}
+									tick={missionDone - 1 >= index}
 								/>
-							))}
+							))
+						) : (
+							<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+								You don't have any mission. Setting mision for this clan first !!
+							</div>
+						)}
 					</div>
 				</div>
-				<div className="flex flex-col gap-2 h-20 p-4 w-[300px] text-base justify-between bg-[#282a2e] rounded-lg">
+				<div className="mt-8 flex flex-col gap-2 h-20 p-4 w-[300px] text-base justify-between bg-[#282a2e] rounded-lg">
 					<div className="font-bold text-white">About</div>
 					<div className="text-channelTextLabel text-xs">Members online</div>
 				</div>
@@ -102,10 +112,10 @@ function GuideBody() {
 type TypeItemMission = {
 	mission: ApiOnboardingItem;
 	onClick: () => void;
-	onboadingMode: boolean;
+	tick: boolean;
 };
 
-const GuideItemMission = ({ mission, onClick, onboadingMode }: TypeItemMission) => {
+const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
 	return (
 		<GuideItemLayout
@@ -121,7 +131,15 @@ const GuideItemMission = ({ mission, onClick, onboadingMode }: TypeItemMission) 
 					<span className="font-semibold text-channelActiveColor"> #{channelById?.channel_label} </span>{' '}
 				</span>
 			}
-			action={<div className={`w-6 aspect-square  rounded-full ${onboadingMode ? 'bg-green-500' : 'bg-black'}`}></div>}
+			action={
+				<>
+					{tick && (
+						<div className={`w-6 aspect-square  rounded-full flex items-center justify-center`}>
+							<Icons.Tick fill="#40C174" defaultSize="w-6 h-6" />
+						</div>
+					)}
+				</>
+			}
 		/>
 	);
 };

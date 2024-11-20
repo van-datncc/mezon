@@ -1,12 +1,5 @@
 import { MemberProvider } from '@mezon/core';
-import {
-	channelSettingActions,
-	onboardingActions,
-	selectCurrentClanId,
-	selectEnableStatusOfOnBoarding,
-	selectFormOnboarding,
-	useAppDispatch
-} from '@mezon/store';
+import { onboardingActions, selectCurrentClan, selectCurrentClanId, selectFormOnboarding, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,23 +14,23 @@ export enum EOnboardingStep {
 }
 const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
-	const toggleEnableStatus = () => {
-		dispatch(channelSettingActions.toggleOnBoarding());
+	const currentClanId = useSelector(selectCurrentClanId);
+	const toggleEnableStatus = (enable: boolean) => {
+		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClanId as string, onboarding: enable }));
 	};
-
-	const isEnableOnBoarding = useSelector(selectEnableStatusOfOnBoarding);
 
 	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
 	const handleGoToPage = (page: EOnboardingStep) => {
 		setCurrentPage(page);
 	};
 
+	const currentClan = useSelector(selectCurrentClan);
 	return (
 		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={isEnableOnBoarding}
+					isEnableOnBoarding={currentClan?.is_onboarding || false}
 					toggleEnableStatus={toggleEnableStatus}
 					onCloseSetting={onClose}
 				/>
@@ -60,7 +53,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 interface IMainIndexProps {
 	isEnableOnBoarding: boolean;
-	toggleEnableStatus: () => void;
+	toggleEnableStatus: (enable: boolean) => void;
 	handleGoToPage: (page: EOnboardingStep) => void;
 	onCloseSetting?: () => void;
 }
@@ -147,7 +140,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 														disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
 								checked={isEnableOnBoarding}
-								onChange={toggleEnableStatus}
+								onChange={() => toggleEnableStatus(!isEnableOnBoarding)}
 							/>
 						</div>
 					}

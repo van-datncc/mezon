@@ -333,6 +333,15 @@ export const clansSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
+		},
+		updateOnboardingMode: (state, action: PayloadAction<{ clanId: string; onboarding: boolean }>) => {
+			const { clanId, onboarding } = action.payload;
+			clansAdapter.updateOne(state, {
+				id: clanId,
+				changes: {
+					is_onboarding: onboarding
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {
