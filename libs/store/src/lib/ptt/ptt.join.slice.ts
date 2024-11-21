@@ -25,7 +25,8 @@ export const initialJoinPTTState: JoinPTTState = JoinPTTAdapter.getInitialState(
 	joinPttData: {
 		data_type: 0,
 		json_data: '',
-		channel_id: ''
+		channel_id: '',
+		receiver_id: ''
 	}
 });
 
