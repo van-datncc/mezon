@@ -1,6 +1,13 @@
-import { ClanHeader, DirectMessageList, FooterProfile, StreamInfo } from '@mezon/components';
+import { ClanHeader, DirectMessageList, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
 import { useAuth } from '@mezon/core';
-import { clansActions, selectCloseMenu, selectStatusMenu, selectStatusStream } from '@mezon/store';
+import {
+	clansActions,
+	selectCloseMenu,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
+	selectStatusMenu,
+	selectStatusStream
+} from '@mezon/store';
 import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +20,8 @@ const Direct = () => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const streamPlay = useSelector(selectStatusStream);
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 
 	useEffect(() => {
 		dispatch(clansActions.setCurrentClanId('0'));
@@ -30,6 +39,7 @@ const Direct = () => {
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				{streamPlay && <StreamInfo />}
+				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={IsElectronDownloading} />}
 				<FooterProfile
 					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
