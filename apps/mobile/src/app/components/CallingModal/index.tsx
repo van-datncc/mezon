@@ -11,6 +11,7 @@ import {
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
+import { WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
@@ -26,14 +27,16 @@ const CallingModal = () => {
 	const dispatch = useAppDispatch();
 	const ringtoneRef = useRef<Sound | null>(null);
 	const navigation = useNavigation<any>();
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
-
 	const userProfile = useSelector(selectAllAccount);
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const isInCall = useSelector(selectIsInCall);
 	const usersClan = useSelector(selectAllUserClans);
 
 	const callerInfo = useMemo(() => {
-		if (signalingData?.[signalingData?.length - 1]?.callerId) {
+		if (
+			signalingData?.[signalingData?.length - 1]?.callerId &&
+			signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
+		) {
 			return usersClan.find((user) => user.id === signalingData?.[signalingData?.length - 1]?.callerId);
 		} else {
 			return {};
@@ -50,7 +53,13 @@ const CallingModal = () => {
 	};
 
 	useEffect(() => {
-		if (signalingData && !!signalingData?.[signalingData?.length - 1] && !isVisible && !isInCall) {
+		if (
+			signalingData &&
+			!!signalingData?.[signalingData?.length - 1] &&
+			!isVisible &&
+			!isInCall &&
+			signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
+		) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 

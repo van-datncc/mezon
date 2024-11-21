@@ -51,14 +51,16 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>We need access to Apple Music to play your selected songs</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Mezon app needs access to the camera to take and send pictures in messages</string>
+	<string>Mezon app needs access to the camera to call video or take add pricture send to chat</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We use your location to enhance your experience by showing nearby content and providing location-specific features when you're using the app. Your privacy is important to us, and we only access your location while you’re actively using the app.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to enhance your experience by showing nearby content and providing location-specific features when you're using the app. Your privacy is important to us, and we only access your location while you’re actively using the app.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
+	<string>Allow Mezon access to your microphone to enable voice chat</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Mezon app needs access to the photo library to select and send images in messages</string>
 	<key>NSPhotoLibraryUsageDescription</key>
