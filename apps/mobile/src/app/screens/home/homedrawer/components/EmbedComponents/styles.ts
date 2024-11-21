@@ -7,6 +7,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			gap: size.s_8,
 			paddingVertical: size.s_8,
-			alignItems: 'center'
+			alignItems: 'center',
+			flexWrap: 'wrap'
 		}
 	});
