@@ -81,7 +81,8 @@ export const ThreadHeader = memo(() => {
 				</View>
 			) : (
 				<View style={styles.channelText}>
-					{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+					{currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
+					[ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type) ? (
 						isChannel ? (
 							<Icons.TextLockIcon width={20} height={20} color={themeValue.text} />
 						) : (

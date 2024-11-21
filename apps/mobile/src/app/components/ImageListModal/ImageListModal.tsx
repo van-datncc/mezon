@@ -1,5 +1,6 @@
 import { Block, Colors, size, Text } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
+import { createImgproxyUrl } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -56,15 +57,12 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		[visibleToolbarConfig]
 	);
 
-	const onIndexChange = useCallback(
-		(newIndex: number) => {
-			if (formattedImageList[newIndex]?.id !== currentImage?.id) {
-				setCurrentImage(formattedImageList[newIndex]);
-				ref.current?.reset(); //Note: reset scale
-			}
-		},
-		[currentImage?.id, formattedImageList]
-	);
+	const onIndexChange = useCallback((newIndex: number) => {
+		if (formattedImageList[newIndex]?.id !== currentImage?.id) {
+			setCurrentImage(formattedImageList[newIndex]);
+			ref.current?.reset();
+		}
+	}, []);
 
 	const setTimeoutHideFooter = useCallback(() => {
 		footerTimeoutRef.current = setTimeout(() => {
@@ -128,7 +126,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const renderItem = ({ item, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
 			<FastImage
-				source={{ uri: item?.url ?? '' }}
+				source={{ uri: createImgproxyUrl(item?.url ?? '', { width: 700, height: 700, resizeType: 'fit' }) }}
 				style={StyleSheet.absoluteFillObject}
 				resizeMode="contain"
 				onLoad={(e) => {

@@ -1,10 +1,11 @@
 import { EGuideType, onboardingActions, useAppDispatch } from '@mezon/store';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import ModalControlRule, { ControlInput } from '../ModalControlRule';
 
-const ModalAddRules = ({ onClose }: { onClose: () => void }) => {
-	const [ruleTitle, setRuleTitle] = useState('');
-	const [ruleDescription, setRuleDescription] = useState('');
+const ModalAddRules = ({ onClose, ruleEdit, tempId }: { onClose: () => void; ruleEdit?: ApiOnboardingItem; tempId?: number }) => {
+	const [ruleTitle, setRuleTitle] = useState(ruleEdit?.title || '');
+	const [ruleDescription, setRuleDescription] = useState(ruleEdit?.content || '');
 	const dispatch = useAppDispatch();
 
 	const handleChangeRuleTitle = (e: ChangeEvent<HTMLInputElement>) => {
@@ -24,8 +25,35 @@ const ModalAddRules = ({ onClose }: { onClose: () => void }) => {
 		onClose();
 	};
 
+	const handleRemoveRule = () => {
+		if (!ruleEdit) {
+			return;
+		}
+		if (tempId !== undefined) {
+			dispatch(
+				onboardingActions.removeTempTask({
+					idTask: tempId,
+					type: EGuideType.RULE
+				})
+			);
+			return;
+		}
+
+		dispatch(
+			onboardingActions.removeOnboardingTask({
+				clan_id: ruleEdit.clan_id as string,
+				idTask: ruleEdit.id as string,
+				type: EGuideType.RULE
+			})
+		);
+	};
 	return (
-		<ModalControlRule onClose={onClose} onSave={handleAddRules}>
+		<ModalControlRule
+			onClose={onClose}
+			onSave={handleAddRules}
+			bottomLeftBtn={ruleEdit ? 'Remove' : undefined}
+			bottomLeftBtnFunction={handleRemoveRule}
+		>
 			<div className="flex flex-col pb-6">
 				<div className="text-base font-semibold absolute top-3 left-5 text-white">Edit Resources</div>
 				<ControlInput

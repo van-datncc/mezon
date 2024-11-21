@@ -11,17 +11,18 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	ETypeMission,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
 	gifsStickerEmojiActions,
 	listChannelsByUserActions,
+	onboardingActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
-	selectCurrentClanId,
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
@@ -30,6 +31,7 @@ import {
 	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
 	selectMissionDone,
+	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectStatusMenu,
@@ -39,9 +41,10 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons, Loading } from '@mezon/ui';
-import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop, titleMission } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -104,6 +107,12 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
 	const onboardingMode = useSelector(selectOnboardingMode);
+	const missionDone = useSelector(selectMissionDone);
+	const missionSum = useSelector(selectMissionSum);
+	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentChannel.clan_id as string));
+	const currentMission = useMemo(() => {
+		return onboardingClan.mission[missionDone];
+	}, [missionDone, channelId]);
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	useEffect(() => {
@@ -136,7 +145,9 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{onboardingMode && <OnboardingGuide />}
+			{onboardingMode && channelId === currentMission?.channel_id && (
+				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
+			)}
 			{currentChannel ? (
 				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
 			) : (
@@ -287,26 +298,55 @@ const SearchMessageChannel = () => {
 	);
 };
 
-const OnboardingGuide = () => {
-	const missionDone = useSelector(selectMissionDone);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
-	const { navigate, toGuidePage } = useAppNavigation();
-	const handleDoNextMission = () => {
-		const link = toGuidePage(currentClanId as string);
-		navigate(link);
-	};
+const OnboardingGuide = ({
+	currentMission,
+	missionDone,
+	missionSum
+}: {
+	currentMission: ApiOnboardingItem;
+	missionDone: number;
+	missionSum: number;
+}) => {
+	const { navigate, toChannelPage } = useAppNavigation();
+	const dispatch = useAppDispatch();
+	const handleDoNextMission = useCallback(() => {
+		switch (currentMission.task_type) {
+			case ETypeMission.SEND_MESSAGE: {
+				const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+				navigate(link);
+				break;
+			}
+			case ETypeMission.VISIT: {
+				const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+				navigate(linkChannel);
+				dispatch(onboardingActions.doneMission());
+				break;
+			}
+			case ETypeMission.DOSOMETHING: {
+				dispatch(onboardingActions.doneMission());
+				break;
+			}
+			default:
+				break;
+		}
+	}, [currentMission.id]);
+	const channelMission = useSelector((state) => selectChannelById(state, currentMission.channel_id as string));
+
 	return (
 		<>
-			{missionDone < onboardingClan.mission.length ? (
+			{missionDone < missionSum ? (
 				<div
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold">{onboardingClan.mission[missionDone].title} </div>
-						<div className="text-[10px] font-normal text-channelTextLabel"> {onboardingClan.mission[missionDone].content} </div>
+						<div className="text-base font-semibold">{currentMission.title} </div>
+						<div className="text-[10px] font-normal text-channelTextLabel">
+							{' '}
+							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
+							<strong className="text-channelActiveColor">#{channelMission.channel_label}</strong>{' '}
+						</div>
 					</div>
 				</div>
 			) : null}

@@ -1,15 +1,19 @@
-import { useAuth } from '@mezon/core';
 import { Icons, isEmpty, peerConstraints, sessionConstraints } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { DMCallActions, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { DMCallActions, selectAllAccount, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingType } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { deflate, inflate } from 'react-native-gzip';
+import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription, RTCView, mediaDevices } from 'react-native-webrtc';
+import { useSelector } from 'react-redux';
+import Images from '../../../../assets/Images';
+import { MezonConfirm } from '../../../componentUI';
 import { usePermission } from '../../../hooks/useRequestPermission';
 import { style } from './styles';
 
@@ -37,16 +41,20 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const styles = style(themeValue);
 	const mezon = useMezon();
 	const receiverId = route.params?.receiverId;
-	const { userId } = useAuth();
+	const receiverAvatar = route.params?.receiverAvatar;
+	const userProfile = useSelector(selectAllAccount);
 	const [remoteStream, setRemoteStream] = useState<MediaStream | undefined>();
 	const [localStream, setLocalStream] = useState<MediaStream | undefined>();
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+	const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
+	const [isShowControl, setIsShowControl] = useState<boolean>(true);
+	const [isSpeaker, setIsSpeaker] = useState<boolean>(false);
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 
 	const { cameraPermissionGranted, microphonePermissionGranted, requestMicrophonePermission, requestCameraPermission } = usePermission();
 
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
-		mic: microphonePermissionGranted,
-		camera: cameraPermissionGranted
+		mic: true,
+		camera: false
 	});
 
 	const peerConnection = useMemo(() => {
@@ -56,7 +64,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 				await mezon.socketRef.current?.forwardWebrtcSignaling(
 					receiverId,
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate)
+					JSON.stringify(event.candidate),
+					'',
+					userProfile?.user?.id
 				);
 			}
 		});
@@ -68,7 +78,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		});
 
 		return pc;
-	}, [mezon.socketRef, receiverId]);
+	}, [mezon.socketRef, receiverId, userProfile?.user?.id]);
 
 	const openMediaDevices = useCallback(
 		async (audio: boolean, video: boolean) => {
@@ -86,28 +96,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		[peerConnection]
 	);
 
-	const onCleanUp = () => {
-		return () => {
-			dispatch(DMCallActions.removeAll());
-			if (peerConnection) {
-				peerConnection.close();
-			}
-			if (remoteStream) {
-				remoteStream.getTracks().forEach((track) => track.stop());
-				setRemoteStream(undefined);
-			}
-			if (localStream) {
-				localStream.getTracks().forEach((track) => track.stop());
-				setLocalStream(undefined);
-			}
-		};
-	};
-
 	useEffect(() => {
-		setLocalMediaControl({
-			mic: microphonePermissionGranted,
-			camera: cameraPermissionGranted
-		});
 		if (cameraPermissionGranted || microphonePermissionGranted) {
 			openMediaDevices(microphonePermissionGranted, cameraPermissionGranted);
 		}
@@ -131,7 +120,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 							await mezon.socketRef.current?.forwardWebrtcSignaling(
 								receiverId,
 								WebrtcSignalingType.WEBRTC_SDP_ANSWER,
-								JSON.stringify(answerEn)
+								JSON.stringify(answerEn),
+								'',
+								userProfile?.user?.id
 							);
 						};
 						processData().catch(console.error);
@@ -167,75 +158,186 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		} catch (e) {
 			console.error('log  => e', e);
 		}
-	}, [mezon.socketRef, peerConnection, receiverId, signalingData]);
+	}, [mezon.socketRef, peerConnection, receiverId, signalingData, userProfile?.user?.id]);
 
 	const startCall = async () => {
+		InCallManager.start({ media: 'audio' });
 		const offer = await peerConnection.createOffer(sessionConstraints);
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
 			const offerEn = await compress(JSON.stringify(offer));
-			await mezon.socketRef.current?.forwardWebrtcSignaling(receiverId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn);
+			dispatch(DMCallActions.setIsInCall(true));
+			await mezon.socketRef.current?.forwardWebrtcSignaling(
+				receiverId,
+				WebrtcSignalingType.WEBRTC_SDP_OFFER,
+				offerEn,
+				'',
+				userProfile?.user?.id
+			);
+		}
+	};
+
+	const endCall = async () => {
+		dispatch(DMCallActions.removeAll());
+		if (peerConnection) {
+			peerConnection.close();
+		}
+		if (remoteStream) {
+			remoteStream.getTracks().forEach((track) => track.stop());
+			setRemoteStream(undefined);
+		}
+		if (localStream) {
+			localStream.getTracks().forEach((track) => track.stop());
+			setLocalStream(undefined);
+		}
+		navigation.goBack();
+		dispatch(DMCallActions.setIsInCall(false));
+	};
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			startCall();
+		}, 1000);
+
+		return () => {
+			clearTimeout(timer);
+			InCallManager.stop();
+		};
+	}, []);
+
+	const toggleCamera = useCallback(() => {
+		// check if permission is granted, if not call request permission
+		if (cameraPermissionGranted) {
+			// update state in local mediaControl
+			setLocalMediaControl((prev) => ({
+				...prev,
+				camera: !prev.camera
+			}));
+
+			// update camera value of localStream
+			localStream?.getVideoTracks().forEach((track) => {
+				localMediaControl?.camera ? (track.enabled = false) : (track.enabled = true);
+			});
+		} else {
+			requestCameraPermission();
+		}
+	}, [cameraPermissionGranted, localMediaControl?.camera, localStream, requestCameraPermission]);
+
+	const toggleMicrophone = useCallback(() => {
+		// check if permission is granted, if not call request permission
+		if (microphonePermissionGranted) {
+			// update state in local mediaControl
+			setLocalMediaControl((prev) => ({
+				...prev,
+				mic: !prev.mic
+			}));
+
+			// update mic value of localStream
+			localStream?.getAudioTracks().forEach((track) => {
+				localMediaControl?.mic ? (track.enabled = false) : (track.enabled = true);
+			});
+		} else {
+			requestMicrophonePermission();
+		}
+	}, [localMediaControl?.mic, localStream, microphonePermissionGranted, requestMicrophonePermission]);
+	const toggleControl = async () => {
+		setIsShowControl(!isShowControl);
+	};
+
+	const toggleSpeaker = () => {
+		try {
+			InCallManager.setSpeakerphoneOn(!isSpeaker);
+			setIsSpeaker(!isSpeaker);
+		} catch (error) {
+			console.error('Failed to toggle speaker', error);
 		}
 	};
 
 	return (
 		<SafeAreaView edges={['top']} style={styles.container}>
-			<Block style={[styles.menuHeader]}>
-				<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-					<TouchableOpacity
-						onPress={() => {
-							onCleanUp();
-							navigation.goBack();
-						}}
-						style={styles.buttonCircle}
-					>
-						<Icons.ChevronSmallDownIcon />
-					</TouchableOpacity>
-				</Block>
-				<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-					<TouchableOpacity onPress={() => {}} style={styles.buttonCircle}>
-						{/*<Icons.VoiceXIcon />*/}
-						<Icons.VoiceLowIcon />
-					</TouchableOpacity>
-				</Block>
-			</Block>
-			<Block style={[styles.main]}>
-				<Block flex={1}>
-					{remoteStream ? (
-						<Block margin={size.s_10} flex={1}>
-							<RTCView streamURL={remoteStream.toURL()} style={{ flex: 1, backgroundColor: 'red' }} mirror={true} objectFit={'cover'} />
-						</Block>
-					) : (
-						<Block flex={1} />
-					)}
-					{localStream && localMediaControl?.camera ? (
-						<Block margin={size.s_10} flex={1}>
-							<RTCView streamURL={localStream.toURL()} style={{ flex: 1, backgroundColor: 'red' }} mirror={true} objectFit={'cover'} />
-						</Block>
-					) : (
-						<Block flex={1} />
-					)}
-				</Block>
-			</Block>
-			<Block style={[styles.menuFooter]}>
-				<Block borderRadius={size.s_40} backgroundColor={themeValue.primary}>
-					<Block gap={size.s_30} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
-						<TouchableOpacity onPress={requestCameraPermission} style={styles.menuIcon}>
-							<Icons.VideoIcon />
+			{isShowControl && (
+				<Block style={[styles.menuHeader]}>
+					<Block flexDirection="row" alignItems="center" gap={size.s_20}>
+						<TouchableOpacity
+							onPress={() => {
+								setShowModalConfirm(true);
+							}}
+							style={styles.buttonCircle}
+						>
+							<Icons.ChevronSmallLeftIcon />
 						</TouchableOpacity>
-						<TouchableOpacity onPress={requestMicrophonePermission} style={styles.menuIcon}>
-							<Icons.MicrophoneIcon />
-						</TouchableOpacity>
-						<TouchableOpacity onPress={() => {}} style={styles.menuIcon}>
-							<Icons.ChatIcon />
-						</TouchableOpacity>
+					</Block>
 
-						<TouchableOpacity onPress={startCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
-							<Icons.PhoneCallIcon />
+					<Block flexDirection="row" alignItems="center" gap={size.s_20}>
+						<TouchableOpacity onPress={toggleSpeaker} style={styles.buttonCircle}>
+							{isSpeaker ? <Icons.VoiceNormalIcon /> : <Icons.VoiceLowIcon />}
 						</TouchableOpacity>
 					</Block>
 				</Block>
-			</Block>
+			)}
+
+			<TouchableOpacity activeOpacity={1} style={[styles.main, !isShowControl && { marginBottom: size.s_20 }]} onPress={toggleControl}>
+				<Block flex={1}>
+					{remoteStream ? (
+						<Block style={styles.card}>
+							<RTCView streamURL={remoteStream.toURL()} style={{ flex: 1 }} mirror={true} objectFit={'cover'} />
+						</Block>
+					) : (
+						<Block style={[styles.card, styles.cardNoVideo]}>
+							<FastImage source={receiverAvatar ? { uri: receiverAvatar } : Images.ANONYMOUS_AVATAR} style={styles.avatar} />
+						</Block>
+					)}
+					{localStream && localMediaControl?.camera ? (
+						<Block style={styles.card}>
+							<RTCView streamURL={localStream.toURL()} style={{ flex: 1 }} mirror={true} objectFit={'cover'} />
+						</Block>
+					) : (
+						<Block style={[styles.card, styles.cardNoVideo]}>
+							<FastImage source={{ uri: userProfile?.user?.avatar_url }} style={styles.avatar} />
+						</Block>
+					)}
+				</Block>
+			</TouchableOpacity>
+			{isShowControl && (
+				<Block style={[styles.menuFooter]}>
+					<Block borderRadius={size.s_40} backgroundColor={themeValue.primary}>
+						<Block gap={size.s_30} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
+							<TouchableOpacity onPress={toggleCamera} style={[styles.menuIcon, localMediaControl?.camera && styles.menuIconActive]}>
+								{localMediaControl?.camera ? (
+									<Icons.VideoIcon width={size.s_24} height={size.s_24} color={themeValue.black} />
+								) : (
+									<Icons.VideoSlashIcon width={size.s_24} height={size.s_24} color={themeValue.white} />
+								)}
+							</TouchableOpacity>
+							<TouchableOpacity onPress={toggleMicrophone} style={[styles.menuIcon, localMediaControl?.mic && styles.menuIconActive]}>
+								{localMediaControl?.mic ? (
+									<Icons.MicrophoneIcon width={size.s_24} height={size.s_24} color={themeValue.black} />
+								) : (
+									<Icons.MicrophoneDenyIcon width={size.s_24} height={size.s_24} color={themeValue.white} />
+								)}
+							</TouchableOpacity>
+							<TouchableOpacity onPress={() => {}} style={styles.menuIcon}>
+								<Icons.ChatIcon />
+							</TouchableOpacity>
+
+							<TouchableOpacity onPress={endCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
+								<Icons.PhoneCallIcon />
+							</TouchableOpacity>
+						</Block>
+					</Block>
+				</Block>
+			)}
+
+			<MezonConfirm
+				visible={showModalConfirm}
+				onVisibleChange={setShowModalConfirm}
+				onConfirm={endCall}
+				title="End Call"
+				confirmText="Yes, End Call"
+				hasBackdrop={true}
+			>
+				<Text style={styles.titleConfirm}>Are you sure you want to end the call?</Text>
+			</MezonConfirm>
 		</SafeAreaView>
 	);
 });

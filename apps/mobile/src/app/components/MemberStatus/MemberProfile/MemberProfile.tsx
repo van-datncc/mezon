@@ -1,5 +1,4 @@
-import { useMemberStatus } from '@mezon/core';
-import { OwnerIcon } from '@mezon/mobile-components';
+import { IUserStatus, OwnerIcon } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -10,7 +9,7 @@ import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
 import { style } from './style';
 interface IProps {
 	user: ChannelMembersEntity;
-	status?: boolean;
+	userStatus?: IUserStatus;
 	numCharCollapse?: number;
 	isHideIconStatus?: boolean;
 	isHideUserName?: boolean;
@@ -23,7 +22,7 @@ interface IProps {
 
 export function MemberProfile({
 	user,
-	status,
+	userStatus,
 	isHideIconStatus,
 	isHideUserName,
 	numCharCollapse = 6,
@@ -39,7 +38,6 @@ export function MemberProfile({
 	const userInfo: any = useMemo(() => {
 		return user?.user || user;
 	}, [user]);
-	const userStatus = useMemberStatus(userInfo?.id || '');
 
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {

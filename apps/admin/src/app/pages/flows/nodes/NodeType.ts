@@ -47,7 +47,9 @@ const NodeTypes = [
 		type: 'uploadedImage',
 		label: 'Command Output',
 		schema: yup.object().shape({
-			message: yup.string(),
+			message: yup
+				.string()
+				.test('no-starts-with-asterisk', 'Message can not start with an asterisk (*)', (value) => !!value && !value.startsWith('*')),
 			image: yup.array().nullable()
 		}),
 		bridgeSchema: {
@@ -74,7 +76,9 @@ const NodeTypes = [
 		type: 'commandOutput',
 		label: 'Command Output',
 		schema: yup.object().shape({
-			message: yup.string(),
+			message: yup
+				.string()
+				.test('no-starts-with-asterisk', 'Message can not start with an asterisk (*)', (value) => !!value && !value.startsWith('*')),
 			image: yup.array().nullable()
 		}),
 		bridgeSchema: {
@@ -161,7 +165,8 @@ const NodeTypes = [
 		type: 'formatFunction',
 		label: 'Custom JS Function',
 		schema: yup.object().shape({
-			variable: yup.string(),
+			variable: yup.string().required('Variable is required'),
+			triggerUser: yup.string(),
 			functionName: yup.string().required('Function Name is required'),
 			functionBody: yup.string().required('Function Body is required')
 		}),
@@ -170,6 +175,7 @@ const NodeTypes = [
 			properties: {
 				functionName: { type: 'string', uniforms: { component: CustomTextField, label: 'Function Name', name: 'functionName' } },
 				variable: { type: 'string', uniforms: { component: CustomTextField, label: 'Variable', name: 'variable' } },
+				triggerUser: { type: 'string', uniforms: { component: CustomTextField, label: 'Trigger User', name: 'triggerUser' } },
 				functionBody: {
 					type: 'string',
 					uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' }
@@ -184,6 +190,7 @@ const NodeTypes = [
 		initialValue: {
 			functionName: '',
 			variable: '',
+			triggerUser: 'author',
 			functionBody: ''
 		}
 	}

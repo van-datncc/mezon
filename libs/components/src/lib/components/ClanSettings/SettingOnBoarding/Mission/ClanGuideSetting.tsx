@@ -2,7 +2,7 @@ import { useMemberContext } from '@mezon/core';
 import { selectChannelById, selectCurrentClanId, selectFormOnboarding, selectOnboardingByClan, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
-import { ApiOnboardingContent } from 'mezon-js/api.gen';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { ReactNode } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -58,8 +58,8 @@ function ClanGuideSetting() {
 						<MissionItem mission={mission} key={mission.title} />
 					))}
 
-					{onboardingTemp.task.map((mission) => (
-						<MissionItem mission={mission} key={mission.title} />
+					{onboardingTemp.task.map((mission, index) => (
+						<MissionItem mission={mission} key={mission.title} temp={index} />
 					))}
 
 					<GuideItemLayout
@@ -98,37 +98,11 @@ function ClanGuideSetting() {
 
 				<div className="flex flex-col gap-3">
 					{onboardingByClan.rule.map((rule) => (
-						<GuideItemLayout
-							key={rule.title}
-							icon={<Icons.RuleIcon />}
-							gap={16}
-							className="px-4 py-3"
-							description={rule.content}
-							title={rule.title}
-							action={
-								<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-									{' '}
-									<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-								</button>
-							}
-						/>
+						<RuleItem rule={rule} key={rule.title} />
 					))}
 
-					{onboardingTemp.rules.map((rule) => (
-						<GuideItemLayout
-							key={rule.title}
-							icon={<Icons.RuleIcon />}
-							gap={16}
-							className="px-4 py-3"
-							description={rule.content}
-							title={rule.title}
-							action={
-								<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
-									{' '}
-									<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
-								</button>
-							}
-						/>
+					{onboardingTemp.rules.map((rule, index) => (
+						<RuleItem rule={rule} temp={index} key={rule.title} />
 					))}
 
 					<button
@@ -181,8 +155,12 @@ const OwnerGreeting = () => {
 	);
 };
 
-const MissionItem = ({ mission }: { mission: ApiOnboardingContent }) => {
+const MissionItem = ({ mission, temp }: { mission: ApiOnboardingItem; temp?: number }) => {
 	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
+
+	const [openEditModal, closeEditModal] = useModal(() => {
+		return <ModalAddMission onClose={closeEditModal} missionEdit={mission} tempId={temp} />;
+	});
 
 	return (
 		<GuideItemLayout
@@ -195,17 +173,40 @@ const MissionItem = ({ mission }: { mission: ApiOnboardingContent }) => {
 			description={
 				<span>
 					{' '}
-					{titleMission[mission.task_type || 0]} <span className="font-semibold text-channelActiveColor">#{channelById.channel_label}</span>
+					{titleMission[mission?.task_type ? mission?.task_type - 1 : 0]}{' '}
+					<span className="font-semibold text-channelActiveColor">#{channelById.channel_label}</span>{' '}
 				</span>
 			}
 			action={
-				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white">
+				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white" onClick={openEditModal}>
 					{' '}
-					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />
+					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
 				</button>
 			}
 		/>
 	);
 };
 
+const RuleItem = ({ rule, temp }: { rule: ApiOnboardingItem; temp?: number }) => {
+	const [openEditModal, closeEditModal] = useModal(() => {
+		return <ModalAddRules onClose={closeEditModal} ruleEdit={rule} tempId={temp} />;
+	});
+
+	return (
+		<GuideItemLayout
+			key={rule.title}
+			icon={<Icons.RuleIcon />}
+			gap={16}
+			className="px-4 py-3"
+			description={rule.content}
+			title={rule.title}
+			action={
+				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white" onClick={openEditModal}>
+					{' '}
+					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
+				</button>
+			}
+		/>
+	);
+};
 export default ClanGuideSetting;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
-import { PERMISSIONS, PermissionStatus, RESULTS, check, openSettings, request } from 'react-native-permissions';
+import { PERMISSIONS, PermissionStatus, RESULTS, openSettings, request } from 'react-native-permissions';
 
 const isIOS = Platform.OS === 'ios';
 export const usePermission = () => {
@@ -30,8 +30,8 @@ export const usePermission = () => {
 	}, [microphoneStatus]);
 
 	const checkPermission = useCallback(async () => {
-		const camera = await check(isIOS ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA);
-		const microphone = await check(isIOS ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO);
+		const camera = await request(isIOS ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA);
+		const microphone = await request(isIOS ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO);
 		if (camera === RESULTS.DENIED) {
 			requestCameraPermission();
 		}
