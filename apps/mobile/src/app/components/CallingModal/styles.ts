@@ -1,5 +1,5 @@
 import { Attributes, baseColor, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_20,
 			paddingVertical: size.s_20,
 			position: 'absolute',
-			top: 0,
+			top: Platform.OS === 'ios' ? size.s_20 : 0,
 			width: '90%',
 			alignSelf: 'center',
 			justifyContent: 'center',

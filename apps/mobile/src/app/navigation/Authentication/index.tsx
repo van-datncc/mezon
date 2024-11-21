@@ -3,6 +3,7 @@ import React from 'react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
+import CallingModal from '../../components/CallingModal';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigator from './BottomNavigator';
@@ -45,6 +46,7 @@ export const Authentication = () => {
 				<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
 			</RootStack.Navigator>
 			<AuthenticationLoader />
+			<CallingModal />
 		</BottomSheetModalProvider>
 	);
 };

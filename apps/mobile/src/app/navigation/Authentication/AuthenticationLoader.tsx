@@ -16,7 +16,6 @@ import { Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-import CallingModal from '../../components/CallingModal';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
@@ -133,7 +132,6 @@ export const AuthenticationLoader = () => {
 		<>
 			<LoadingModal isVisible={isLoadingMain} />
 			{!!fileShared && !isLoadingMain && <Sharing data={fileShared} onClose={onCloseFileShare} />}
-			<CallingModal />
 		</>
 	);
 };
