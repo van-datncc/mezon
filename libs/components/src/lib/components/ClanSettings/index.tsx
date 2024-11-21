@@ -1,5 +1,5 @@
 import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
-import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchClanWebhooks, fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -68,6 +68,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	useEffect(() => {
 		if (canManageClan) {
 			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
+			dispatch(fetchClanWebhooks({ clanId: currentClanId }));
 		}
 	}, [canManageClan, currentClanId, dispatch]);
 
