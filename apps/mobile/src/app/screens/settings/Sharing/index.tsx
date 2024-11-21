@@ -28,6 +28,7 @@ import {
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -39,6 +40,7 @@ import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../componentUI';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { styles } from './styles';
@@ -69,9 +71,9 @@ export const Sharing = ({ data, onClose }) => {
 	const session = mezon.sessionRef.current;
 	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
 	const { handleReconnect } = useContext(ChatContext);
-
+	const navigation = useNavigation<any>();
 	const dataMedia = useMemo(() => {
-		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
+		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
 
 	useEffect(() => {
@@ -144,6 +146,13 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
+		navigation.goBack();
+		setTimeout(() => {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: channelSelected?.channel_id || '' }
+			});
+		}, 1000);
 		const store = await getStoreAsync();
 		await store.dispatch(
 			channelsActions.joinChat({

@@ -1,6 +1,6 @@
 import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectLastMessageByChannelId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -20,6 +20,8 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const styles = style(themeValue);
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, id));
+
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
@@ -163,7 +165,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					) : null}
 				</View>
 
-				{getLastMessageContent(directMessage?.last_sent_message?.content)}
+				{getLastMessageContent(lastMessage?.content || directMessage?.last_sent_message?.content)}
 			</View>
 		</TouchableOpacity>
 	);
