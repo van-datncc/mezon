@@ -100,15 +100,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const [height, setHeight] = useState(0);
 	const clanTopbarEle = 60;
-	const heightAppUpdate = 40;
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
 			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
-			const electronAdjustment = IsElectronDownloading || isElectronUpdateAvailable ? heightAppUpdate : 0;
-			setHeight(window.innerHeight - outsideHeight - titleBarHeight - electronAdjustment);
+			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
 		};
 		calculateHeight();
 		window.addEventListener('resize', calculateHeight);
