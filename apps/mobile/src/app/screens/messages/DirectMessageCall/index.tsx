@@ -8,6 +8,7 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { deflate, inflate } from 'react-native-gzip';
+import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription, RTCView, mediaDevices } from 'react-native-webrtc';
 import { useSelector } from 'react-redux';
@@ -46,13 +47,14 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const [localStream, setLocalStream] = useState<MediaStream | undefined>();
 	const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
+	const [isSpeaker, setIsSpeaker] = useState<boolean>(false);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 
 	const { cameraPermissionGranted, microphonePermissionGranted, requestMicrophonePermission, requestCameraPermission } = usePermission();
 
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
-		mic: microphonePermissionGranted,
-		camera: cameraPermissionGranted
+		mic: true,
+		camera: false
 	});
 
 	const peerConnection = useMemo(() => {
@@ -63,6 +65,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					receiverId,
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
 					JSON.stringify(event.candidate),
+					'',
 					userProfile?.user?.id
 				);
 			}
@@ -94,10 +97,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	);
 
 	useEffect(() => {
-		setLocalMediaControl({
-			mic: microphonePermissionGranted,
-			camera: cameraPermissionGranted
-		});
 		if (cameraPermissionGranted || microphonePermissionGranted) {
 			openMediaDevices(microphonePermissionGranted, cameraPermissionGranted);
 		}
@@ -122,6 +121,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 								receiverId,
 								WebrtcSignalingType.WEBRTC_SDP_ANSWER,
 								JSON.stringify(answerEn),
+								'',
 								userProfile?.user?.id
 							);
 						};
@@ -161,12 +161,19 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	}, [mezon.socketRef, peerConnection, receiverId, signalingData, userProfile?.user?.id]);
 
 	const startCall = async () => {
+		InCallManager.start({ media: 'audio' });
 		const offer = await peerConnection.createOffer(sessionConstraints);
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
 			const offerEn = await compress(JSON.stringify(offer));
 			dispatch(DMCallActions.setIsInCall(true));
-			await mezon.socketRef.current?.forwardWebrtcSignaling(receiverId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEn, userProfile?.user?.id);
+			await mezon.socketRef.current?.forwardWebrtcSignaling(
+				receiverId,
+				WebrtcSignalingType.WEBRTC_SDP_OFFER,
+				offerEn,
+				'',
+				userProfile?.user?.id
+			);
 		}
 	};
 
@@ -194,8 +201,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 		return () => {
 			clearTimeout(timer);
+			InCallManager.stop();
 		};
-	}, [startCall]);
+	}, []);
 
 	const toggleCamera = useCallback(() => {
 		// check if permission is granted, if not call request permission
@@ -236,6 +244,15 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		setIsShowControl(!isShowControl);
 	};
 
+	const toggleSpeaker = () => {
+		try {
+			InCallManager.setSpeakerphoneOn(!isSpeaker);
+			setIsSpeaker(!isSpeaker);
+		} catch (error) {
+			console.error('Failed to toggle speaker', error);
+		}
+	};
+
 	return (
 		<SafeAreaView edges={['top']} style={styles.container}>
 			{isShowControl && (
@@ -251,12 +268,11 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 						</TouchableOpacity>
 					</Block>
 
-					{/*<Block flexDirection="row" alignItems="center" gap={size.s_20}>*/}
-					{/*	<TouchableOpacity onPress={() => {}} style={styles.buttonCircle}>*/}
-					{/*		/!*<Icons.VoiceXIcon />*!/*/}
-					{/*		<Icons.VoiceLowIcon />*/}
-					{/*	</TouchableOpacity>*/}
-					{/*</Block>*/}
+					<Block flexDirection="row" alignItems="center" gap={size.s_20}>
+						<TouchableOpacity onPress={toggleSpeaker} style={styles.buttonCircle}>
+							{isSpeaker ? <Icons.VoiceNormalIcon /> : <Icons.VoiceLowIcon />}
+						</TouchableOpacity>
+					</Block>
 				</Block>
 			)}
 
