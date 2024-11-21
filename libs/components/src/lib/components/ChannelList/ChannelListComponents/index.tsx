@@ -228,11 +228,12 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 		let timeoutId: NodeJS.Timeout;
 
 		if (missionDone === missionSum) {
-			openCongratulation();
-			timeoutId = setTimeout(() => {
-				closeCongratulation();
-				clearTimeout(timeoutId);
-			}, 2000);
+			// update later: Truong Anh
+			// openCongratulation();
+			// timeoutId = setTimeout(() => {
+			// 	closeCongratulation();
+			// 	clearTimeout(timeoutId);
+			// }, 2000);
 		}
 
 		return () => clearTimeout(timeoutId);
