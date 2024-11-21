@@ -75,6 +75,7 @@ export const Sharing = ({ data, onClose }) => {
 	const dataMedia = useMemo(() => {
 		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		if (data) {
@@ -147,7 +148,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
 		navigation.goBack();
-		setTimeout(() => {
+		timerRef.current = setTimeout(() => {
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
 				params: { directMessageId: channelSelected?.channel_id || '' }
@@ -178,6 +179,14 @@ export const Sharing = ({ data, onClose }) => {
 			[]
 		);
 	};
+
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+			}
+		};
+	}, []);
 
 	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
