@@ -1,11 +1,16 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import {
+	ETypeMission,
+	onboardingActions,
 	referencesActions,
 	selectAnonymousMode,
 	selectCurrentChannel,
+	selectCurrentClan,
 	selectDataReferences,
-	selectIsViewingOlderMessagesByChannelId
+	selectIsViewingOlderMessagesByChannelId,
+	selectMissionDone,
+	selectOnboardingByClan
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
@@ -25,7 +30,7 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channel?.channel_id ?? ''));
-
+	const currentMission = useSelector(selectMissionDone);
 	const channelId = useMemo(() => {
 		return channel?.channel_id;
 	}, [channel?.channel_id]);
@@ -36,8 +41,9 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-
 	const chatboxRef = useRef<HTMLDivElement | null>(null);
+	const currentClan = useSelector(selectCurrentClan);
+	const onboardingList = useSelector((state) => selectOnboardingByClan(state, clanId as string));
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -49,6 +55,9 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			mentionEveryone?: boolean
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
+			if (currentClan?.is_onboarding && onboardingList.mission[currentMission].task_type === ETypeMission.SEND_MESSAGE) {
+				dispatch(onboardingActions.doneMission());
+			}
 		},
 		[sendMessage]
 	);
