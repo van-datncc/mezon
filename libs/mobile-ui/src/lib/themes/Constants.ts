@@ -47,10 +47,7 @@ export const baseColor = {
 	purple: '#fc74fc',
 	green: '#42a869',
 	gray: '#949AA4',
-	flamingo: '#f23f43'
-} satisfies Colors;
-
-export const backgroundColor = {
+	flamingo: '#f23f43',
 	bgButtonPrimary: '#5865F2',
 	bgButtonSecondary: '#4E5057',
 	bgSuccess: '#16A34A',

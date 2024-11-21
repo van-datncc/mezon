@@ -1,4 +1,4 @@
-import { backgroundColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, selectCurrentUserId, useAppDispatch } from '@mezon/store-mobile';
 import { EButtonMessageStyle, IButtonMessage } from '@mezon/utils';
 import { memo, useMemo } from 'react';
@@ -43,17 +43,17 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 	const buttonColor = useMemo(() => {
 		switch (button.style) {
 			case EButtonMessageStyle.PRIMARY:
-				return backgroundColor.bgButtonPrimary;
+				return baseColor.bgButtonPrimary;
 			case EButtonMessageStyle.SECONDARY:
-				return backgroundColor.bgButtonSecondary;
+				return baseColor.bgButtonSecondary;
 			case EButtonMessageStyle.SUCCESS:
-				return backgroundColor.bgSuccess;
+				return baseColor.bgSuccess;
 			case EButtonMessageStyle.DANGER:
-				return backgroundColor.bgDanger;
+				return baseColor.bgDanger;
 			case EButtonMessageStyle.LINK:
-				return backgroundColor.bgButtonSecondary;
+				return baseColor.bgButtonSecondary;
 			default:
-				return backgroundColor.bgButtonPrimary;
+				return baseColor.bgButtonPrimary;
 		}
 	}, [button.style]);
 
