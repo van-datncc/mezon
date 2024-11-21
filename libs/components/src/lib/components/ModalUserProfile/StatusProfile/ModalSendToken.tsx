@@ -110,7 +110,7 @@ const ModalSendToken = ({
 				userMap.set(userIdStr, {
 					id: userIdStr,
 					username: usernames,
-					avatar_url: channel_avatar
+					avatar_url: channel_avatar[0]
 				});
 			}
 		});
