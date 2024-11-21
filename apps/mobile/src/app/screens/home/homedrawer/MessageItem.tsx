@@ -342,11 +342,13 @@ const MessageItem = React.memo(
 									/>
 								)}
 								{!!message?.content?.embed?.length &&
-									message?.content?.embed?.map((embed, index) => <EmbedMessage {...embed} key={index} />)}
+									message?.content?.embed?.map((embed, index) => (
+										<EmbedMessage {...embed} key={`message_embed_${message?.id}_${index}`} />
+									))}
 								{!!message?.content?.components?.length &&
-									message?.content.components?.map((component) => (
+									message?.content.components?.map((component, index) => (
 										<EmbedComponentsPanel
-											key={message?.id}
+											key={`message_embed_component_${message?.id}_${index}`}
 											actionRow={component}
 											messageId={message?.id}
 											senderId={message?.sender_id}

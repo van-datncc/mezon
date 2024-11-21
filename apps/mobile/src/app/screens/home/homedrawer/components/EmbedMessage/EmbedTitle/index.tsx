@@ -1,5 +1,4 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, getStoreAsync } from '@mezon/store-mobile';
 import { memo } from 'react';
 import { Linking, Text, TouchableOpacity, View } from 'react-native';
 import { style } from './styles';
@@ -14,10 +13,11 @@ export const EmbedTitle = memo(({ title, url }: EmbedDescriptionProps) => {
 	const styles = style(themeValue);
 
 	const handleOpenUrl = async () => {
-		const store = await getStoreAsync();
-		store.dispatch(appActions.setLoadingMainMobile(true));
-		await Linking.openURL(url);
-		store.dispatch(appActions.setLoadingMainMobile(false));
+		try {
+			await Linking.openURL(url);
+		} catch (err) {
+			throw new Error(err);
+		}
 	};
 
 	return (

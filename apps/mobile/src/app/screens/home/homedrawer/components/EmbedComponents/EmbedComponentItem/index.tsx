@@ -1,8 +1,8 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { backgroundColor, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, selectCurrentUserId, useAppDispatch } from '@mezon/store-mobile';
 import { EButtonMessageStyle, IButtonMessage } from '@mezon/utils';
 import { memo, useMemo } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Linking, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
 
@@ -20,8 +20,14 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 	const currentUserId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 
-	const handleClickOptions = () => {
-		if (!button.url) {
+	const handleClickOptions = async () => {
+		if (button?.url) {
+			try {
+				await Linking.openURL(button.url);
+			} catch (err) {
+				throw new Error(err);
+			}
+		} else {
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,
@@ -37,23 +43,23 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 	const buttonColor = useMemo(() => {
 		switch (button.style) {
 			case EButtonMessageStyle.PRIMARY:
-				return themeValue.bgViolet;
+				return backgroundColor.bgButtonPrimary;
 			case EButtonMessageStyle.SECONDARY:
-				return themeValue.bgViolet;
+				return backgroundColor.bgButtonSecondary;
 			case EButtonMessageStyle.SUCCESS:
-				return themeValue.bgViolet;
+				return backgroundColor.bgSuccess;
 			case EButtonMessageStyle.DANGER:
-				return themeValue.bgViolet;
+				return backgroundColor.bgDanger;
 			case EButtonMessageStyle.LINK:
-				return themeValue.bgViolet;
+				return backgroundColor.bgButtonSecondary;
 			default:
-				return themeValue.bgViolet;
+				return backgroundColor.bgButtonPrimary;
 		}
-	}, [button.style, themeValue]);
+	}, [button.style]);
 
 	return (
 		<TouchableOpacity style={[styles.button, { backgroundColor: buttonColor }]} onPress={handleClickOptions}>
-			<Text style={styles.buttonLabel}>{button.label}</Text>
+			<Text style={[styles.buttonLabel, !!button?.url && { textDecorationLine: 'underline' }]}>{button.label}</Text>
 		</TouchableOpacity>
 	);
 });
