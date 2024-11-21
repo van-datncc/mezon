@@ -1143,3 +1143,21 @@ export type IUserItemActivity = {
 	id?: string;
 	user?: IUserProfileActivity;
 };
+
+export type UserStatus = {
+	user_id: string;
+	status: string;
+};
+
+export type UserStatusUpdate = {
+	status: string;
+	minutes?: number;
+	until_turn_on: boolean;
+};
+
+export enum EUserStatus {
+	ONLINE = 'online',
+	IDLE = 'idle',
+	DO_NOT_DISTURB = 'do not disturb',
+	INVISIBLE = 'invisible'
+}
