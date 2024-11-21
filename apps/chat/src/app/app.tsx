@@ -56,6 +56,10 @@ const AppInitializer = () => {
 		}
 	}
 
+	useEffect(() => {
+		isElectron() && isLogin && electronBridge.invoke('APP::CHECK_UPDATE');
+	}, [isLogin]);
+
 	return null;
 };
 

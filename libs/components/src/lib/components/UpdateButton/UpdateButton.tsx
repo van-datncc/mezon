@@ -21,9 +21,9 @@ const UpdateButton: React.FC<UpdateButtonProps> = ({ className = '', isDownloadi
 		>
 			<span className={`flex w-4 h-4 rounded-full bg-white justify-center items-center mr-1 ${isDownloading ? 'animate-spin' : ''}`}>
 				<svg
-					width="12px"
-					height="12px"
-					fill="green"
+					width="10px"
+					height="10px"
+					fill="black"
 					id="Layer_1"
 					data-name="Layer 1"
 					xmlns="http://www.w3.org/2000/svg"
