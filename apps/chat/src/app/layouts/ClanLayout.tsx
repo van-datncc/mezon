@@ -122,7 +122,7 @@ const ClanLayout = () => {
 				<ChannelList />
 				<div id="clan-footer">
 					{streamPlay && <StreamInfo />}
-					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={IsElectronDownloading} />}
+					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 					<FooterProfile
 						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}

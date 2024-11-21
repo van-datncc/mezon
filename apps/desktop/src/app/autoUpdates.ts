@@ -1,7 +1,8 @@
-import { BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
 import type { UpdateInfo } from 'electron-updater';
 import { autoUpdater, DOWNLOAD_PROGRESS } from 'electron-updater';
 
+import log from 'electron-log/main';
 import { CHECK_UPDATE, INSTALL_UPDATE, UPDATE_AVAILABLE, UPDATE_ERROR } from './events/constants';
 import { forceQuit } from './utils';
 
@@ -11,7 +12,6 @@ export default function setupAutoUpdates() {
 	if (isUpdateCheckStarted) {
 		return;
 	}
-
 	isUpdateCheckStarted = true;
 	autoUpdater.autoDownload = true;
 	autoUpdater.autoInstallOnAppQuit = true;
@@ -55,3 +55,8 @@ export default function setupAutoUpdates() {
 		}).show();
 	});
 }
+
+autoUpdater.on('update-available', (info: UpdateInfo) => {
+	log.info(`The current version is ${app.getVersion()}. There is a new update for the app ${info.version}`);
+	autoUpdater.downloadUpdate();
+});

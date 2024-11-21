@@ -39,7 +39,7 @@ const Direct = () => {
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				{streamPlay && <StreamInfo />}
-				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={IsElectronDownloading} />}
+				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 				<FooterProfile
 					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
