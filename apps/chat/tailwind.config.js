@@ -21,6 +21,7 @@ const heightMessageViewChatDM = `calc(100vh - ${topBarHeight})`;
 const heightMessageViewChatThread = `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`;
 const heightWithoutTopBar = `calc(100vh - ${topBarHeight})`;
 const heightWithoutTopBarMobile = `calc(100vh)`;
+const heightCallDm = `calc(100% - 240px)`;
 const messageViewChatDM = `calc(100vh - 60px)`;
 
 const plugin = require('tailwindcss/plugin');
@@ -88,6 +89,7 @@ module.exports = {
         heightWithoutTopBar: heightWithoutTopBar,
         heightWithoutTopBarMobile: heightWithoutTopBarMobile,
         heightTopBar: topBarHeight,
+        heightCallDm: heightCallDm,
         heightChatBox: chatBoxHeight,
         heightModalSearch: heightModalSearch,
         heightHeader: "60px",

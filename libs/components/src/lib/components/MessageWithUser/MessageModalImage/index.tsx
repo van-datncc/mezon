@@ -175,6 +175,10 @@ const MessageModalImage = () => {
 			return;
 		}
 		setScale(1);
+		setPosition({
+			x: 0,
+			y: 0
+		});
 	};
 
 	const handleDownloadImage = async () => {
@@ -196,7 +200,7 @@ const MessageModalImage = () => {
 			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
 				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative" onClick={closeModal}>
 					<img
-						src={urlImg}
+						src={createImgproxyUrl(urlImg ?? '', { width: 0, height: 0, resizeType: 'force' })}
 						alt={urlImg}
 						className={`max-h-full object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-auto'}`}
 						onDragStart={handleDrag}

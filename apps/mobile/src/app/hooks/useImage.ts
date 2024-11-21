@@ -33,14 +33,15 @@ export function useImage() {
 	);
 
 	const saveImageToCameraRoll = useCallback(
-		async (filePath: string, type: string) => {
+		async (filePath: string, type: string, isShowSuccessToast = true) => {
 			try {
 				await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
 
-				Toast.show({
-					text1: 'Save successfully',
-					type: 'info'
-				});
+				isShowSuccessToast &&
+					Toast.show({
+						text1: 'Save successfully',
+						type: 'info'
+					});
 			} catch (err) {
 				Toast.show({
 					text1: 'Error saving image',

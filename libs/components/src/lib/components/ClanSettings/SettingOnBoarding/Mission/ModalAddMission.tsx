@@ -1,5 +1,6 @@
 import { EGuideType, ETypeMission, onboardingActions, selectChannelsByClanId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { ChannelStatusEnum } from '@mezon/utils';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from '../GuideItemLayout';
@@ -9,7 +10,7 @@ type TypeMission = {
 	description: string;
 	name: string;
 };
-const ModalAddMission = ({ onClose }: { onClose: () => void }) => {
+const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void; missionEdit?: ApiOnboardingItem; tempId?: number }) => {
 	const listTypeMisstion: TypeMission[] = [
 		{
 			id: ETypeMission.SEND_MESSAGE,
@@ -33,9 +34,9 @@ const ModalAddMission = ({ onClose }: { onClose: () => void }) => {
 		return allChannel.filter((channel) => channel.channel_private !== ChannelStatusEnum.isPrivate).slice(0, 7);
 	}, [allChannel]);
 
-	const [title, setTitle] = useState('');
-	const [missionChannel, setMissionChannel] = useState(listMissionChannel[0].id);
-	const [mission, setMission] = useState<number | null>(null);
+	const [title, setTitle] = useState(missionEdit?.title || '');
+	const [missionChannel, setMissionChannel] = useState(missionEdit?.channel_id || listMissionChannel[0].id);
+	const [mission, setMission] = useState<ETypeMission>(missionEdit?.task_type || ETypeMission.SEND_MESSAGE);
 	const dispatch = useAppDispatch();
 	const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
 		setTitle(e.target.value);
@@ -60,8 +61,35 @@ const ModalAddMission = ({ onClose }: { onClose: () => void }) => {
 		);
 		onClose();
 	};
+
+	const handleRemoveTask = () => {
+		if (!missionEdit) {
+			return;
+		}
+		if (tempId !== undefined) {
+			dispatch(
+				onboardingActions.removeTempTask({
+					idTask: tempId,
+					type: EGuideType.TASK
+				})
+			);
+			return;
+		}
+		dispatch(
+			onboardingActions.removeOnboardingTask({
+				clan_id: missionEdit.clan_id as string,
+				idTask: missionEdit.id as string,
+				type: EGuideType.TASK
+			})
+		);
+	};
 	return (
-		<ModalControlRule onClose={onClose} onSave={handleAddTask}>
+		<ModalControlRule
+			onClose={onClose}
+			onSave={handleAddTask}
+			bottomLeftBtn={missionEdit ? 'Remove' : undefined}
+			bottomLeftBtnFunction={handleRemoveTask}
+		>
 			<div className="flex flex-col ">
 				<ControlInput
 					message="Actions must be at least 7 characters"
@@ -81,7 +109,7 @@ const ModalAddMission = ({ onClose }: { onClose: () => void }) => {
 						<select
 							className="w-full p-[10px] outline-none rounded bg-borderDefault"
 							onChange={handleSetChannelMission}
-							value={listMissionChannel[0].id}
+							value={missionChannel}
 						>
 							{listMissionChannel.map((channel) => (
 								<option value={channel.id} key={channel.id}>
@@ -114,10 +142,11 @@ const ModalAddMission = ({ onClose }: { onClose: () => void }) => {
 						<div className="w-full flex mt-2 gap-2 items-center" key={missions.name}>
 							<input
 								id={missions.name}
-								onClick={(e) => handleSetMission(missions.id)}
+								onChange={(e) => handleSetMission(missions.id)}
 								type="radio"
 								className={`appearance-none text-white w-5 h-5 bg-transparent relative rounded-full accent-white border-2  border-channelTextLabel checked:after:absolute checked:after:w-3 checked:after:h-3 checked:after:top-[2.4px] checked:after:left-[2.4px] checked:after:bg-white checked:after:content-[""] checked:after:rounded-full ${mission === missions.id ? 'border-white' : ''} `}
 								name="mission"
+								checked={mission === missions.id}
 							/>
 							<label htmlFor={missions.name} className={`text-base font-medium ${mission === missions.id ? 'text-white' : ''}`}>
 								{missions.description}

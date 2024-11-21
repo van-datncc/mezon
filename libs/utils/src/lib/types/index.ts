@@ -41,6 +41,7 @@ import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMes
 export * from './messageLine';
 export * from './mimeTypes';
 export * from './permissions';
+export * from './style';
 export * from './thumbnailPos';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';

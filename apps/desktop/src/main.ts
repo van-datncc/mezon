@@ -32,15 +32,21 @@ export default class Main {
 }
 
 ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
+	let fileExtension = defaultFileName.split('.').pop().toLowerCase();
+	if (!fileExtension || !/^[a-z0-9]+$/.test(fileExtension)) {
+		const match = url.match(/\.(\w+)(\?.*)?$/);
+		fileExtension = match ? match[1].toLowerCase() : '';
+	}
+
+	const fileFilter = fileExtension
+		? [{ name: `${fileExtension.toUpperCase()} Files`, extensions: [fileExtension] }]
+		: [{ name: 'All Files', extensions: ['*'] }];
+
 	const { filePath, canceled } = await dialog.showSaveDialog({
 		title: 'Save File',
 		defaultPath: defaultFileName,
 		buttonLabel: 'Save',
-		filters: [
-			{ name: 'Text Files', extensions: ['txt'] },
-			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] },
-			{ name: 'All Files', extensions: ['*'] }
-		]
+		filters: fileFilter
 	});
 
 	if (canceled || !filePath) {

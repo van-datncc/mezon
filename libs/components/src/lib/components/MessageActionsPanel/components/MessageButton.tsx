@@ -1,6 +1,13 @@
-import { messagesActions, selectCurrentChannelId, selectCurrentUserId, useAppDispatch } from '@mezon/store';
+import {
+	messagesActions,
+	selectCurrentChannelId,
+	selectCurrentUserId,
+	selectDmGroupCurrentId,
+	selectModeResponsive,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EButtonMessageStyle, IButtonMessage } from '@mezon/utils';
+import { EButtonMessageStyle, IButtonMessage, ModeResponsive } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -13,6 +20,8 @@ type MessageButtonProps = {
 
 export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button, senderId, buttonId }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
 	const currentUserId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 
@@ -38,7 +47,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,
-					channel_id: currentChannelId as string,
+					channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
 					button_id: buttonId,
 					sender_id: senderId,
 					user_id: currentUserId

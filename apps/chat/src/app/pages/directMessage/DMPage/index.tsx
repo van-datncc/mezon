@@ -33,6 +33,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUnreadDMById,
 	selectIsUseProfileDM,
+	selectListOfCalls,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
 	selectStatusMenu,
@@ -124,6 +125,8 @@ const DirectMessage = () => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+	const listOfCalls = useSelector(selectListOfCalls);
+	const { userId } = useAuth();
 
 	const HEIGHT_EMOJI_PANEL = 457;
 	const WIDTH_EMOJI_PANEL = 500;
@@ -180,12 +183,12 @@ const DirectMessage = () => {
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-				h-[100%] overflow-visible`}
+				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row flex-1 w-full">
+				<div className={`flex flex-row flex-1 w-full ${listOfCalls[userId || '']?.includes(directId ?? '') ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>

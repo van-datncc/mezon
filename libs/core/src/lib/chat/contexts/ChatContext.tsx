@@ -50,6 +50,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
+	selectListOfCalls,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -139,6 +140,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const listOfCalls = useSelector(selectListOfCalls);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
@@ -937,9 +939,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				signalingData: event,
 				// todo: refactor this
 				id: Snowflake.generate(),
-				callerId: ''
+				callerId: event?.caller_id
 			})
 		);
+		dispatch(DMCallActions.setListOfCallsSocket({ userId, event }));
+		dispatch(DMCallActions.setCalleeId(event?.receiver_id));
 	}, []);
 
 	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
