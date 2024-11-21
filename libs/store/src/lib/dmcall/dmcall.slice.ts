@@ -38,7 +38,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 		receiver_id: '',
 		data_type: 0,
 		json_data: '',
-		channel_id: ''
+		channel_id: '',
+		caller_id: ''
 	},
 	channelCallId: '',
 	listOfCalls: {},
