@@ -1,6 +1,7 @@
-import { EMessageComponentType, IMessageActionRow } from '@mezon/utils';
-import React from 'react';
+import { EMessageComponentType, EMessageSelectType, IMessageActionRow } from '@mezon/utils';
+import React, { Fragment } from 'react';
 import { MessageButton } from './components/MessageButton';
+import { MessageSelect } from './components/MessageSelect';
 
 type MessageActionsPanelProps = {
 	actionRow: IMessageActionRow;
@@ -12,18 +13,40 @@ export const MessageActionsPanel: React.FC<MessageActionsPanelProps> = ({ action
 	return (
 		<div className={'flex flex-row gap-2 py-2'}>
 			{actionRow.components.map((component) => (
-				<>
+				<Fragment key={component.id}>
 					{component.type === EMessageComponentType.BUTTON && (
-						<MessageButton
-							button={component.component}
-							messageId={messageId}
-							key={component.id}
-							senderId={senderId}
-							buttonId={component.id}
-						/>
+						<MessageButton button={component.component} messageId={messageId} senderId={senderId} buttonId={component.id} />
 					)}
-				</>
+					{component.type === EMessageComponentType.SELECT && <MessageSelect select={component.component} />}
+				</Fragment>
 			))}
 		</div>
 	);
 };
+export const actionRows: IMessageActionRow[] = [
+	{
+		components: [
+			{
+				id: 'select-id',
+				type: EMessageComponentType.SELECT,
+				component: {
+					type: EMessageSelectType.TEXT,
+					options: [
+						{
+							label: 'option 1',
+							value: '1'
+						},
+						{
+							label: 'option 2',
+							value: '2'
+						},
+						{
+							label: 'option 3',
+							value: '3'
+						}
+					]
+				}
+			}
+		]
+	}
+];
