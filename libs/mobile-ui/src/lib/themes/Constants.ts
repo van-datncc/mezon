@@ -50,6 +50,13 @@ export const baseColor = {
 	flamingo: '#f23f43'
 } satisfies Colors;
 
+export const backgroundColor = {
+	bgButtonPrimary: '#5865F2',
+	bgButtonSecondary: '#4E5057',
+	bgSuccess: '#16A34A',
+	bgDanger: '#DA373C'
+} satisfies Colors;
+
 export const brandColors = {
 	google: '#155EEF'
 } satisfies Colors;
