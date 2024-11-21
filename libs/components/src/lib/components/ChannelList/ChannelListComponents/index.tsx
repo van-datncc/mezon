@@ -3,6 +3,7 @@ import {
 	EventManagementOnGogoing,
 	eventManagementActions,
 	onboardingActions,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectMissionDone,
 	selectMissionSum,
@@ -26,6 +27,7 @@ export const Events = memo(() => {
 
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const onboardingMode = useSelector(selectOnboardingMode);
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
@@ -70,19 +72,21 @@ export const Events = memo(() => {
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
-			<Link
-				to={serverGuidePath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
-			>
-				<div className="grow w-5 flex-row items-center gap-2 flex">
-					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+			{currentClan && currentClan.is_onboarding && (
+				<Link
+					to={serverGuidePath}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				>
+					<div className="grow w-5 flex-row items-center gap-2 flex">
+						<div className="w-5 h-5 relative flex flex-row items-center">
+							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+								<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+							</div>
 						</div>
+						<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Clan Guide</div>
 					</div>
-					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Clan Guide</div>
-				</div>
-			</Link>
+				</Link>
+			)}
 
 			<div
 				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"

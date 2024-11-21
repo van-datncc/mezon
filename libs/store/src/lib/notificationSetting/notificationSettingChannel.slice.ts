@@ -143,7 +143,7 @@ export const setMuteNotificationSetting = createAsyncThunk(
 			}
 			if (clan_id !== '0' && clan_id !== '') {
 				thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
-				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			} else {
 				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			}

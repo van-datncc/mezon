@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem } from 'mezon-js/api.gen';
+import { clansActions } from '../clans/clans.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
 
@@ -72,13 +73,67 @@ export const createOnboardingTask = createAsyncThunk(
 				clan_id,
 				contents: [...content]
 			});
-			if (!response.channeldesc) {
+			if (!response) {
 				return [];
 			}
 
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'onboarding/createOnboarding');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const removeOnboardingTask = createAsyncThunk(
+	'onboarding/removeOnboardingTask',
+	async ({ idTask, clan_id, type }: { idTask: string; clan_id: string; type: EGuideType }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const response = await mezon.client.deleteOnboarding(mezon.session, idTask, clan_id);
+			if (!response) {
+				return {
+					clan_id: null,
+					idTask: null,
+					type: null
+				};
+			}
+
+			return {
+				clan_id,
+				idTask,
+				type
+			};
+		} catch (error) {
+			captureSentryError(error, 'onboarding/removeOnboardingTask');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const enableOnboarding = createAsyncThunk(
+	'clans/updateClans',
+	async ({ clan_id, onboarding }: { clan_id: string; onboarding: boolean }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const response = await mezon.client.updateClanDesc(mezon.session, clan_id, {
+				is_onboarding: onboarding
+			});
+
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(
+				clansActions.updateOnboardingMode({
+					clanId: clan_id,
+					onboarding
+				})
+			);
+			return onboarding;
+		} catch (error) {
+			captureSentryError(error, 'clans/updateClans');
 			return thunkAPI.rejectWithValue(error);
 		}
 	}
@@ -99,9 +154,9 @@ export const initialOnboardingState: OnboardingState = {
 };
 
 export enum ETypeMission {
-	SEND_MESSAGE = 0,
-	VISIT = 1,
-	DOSOMETHING = 2
+	SEND_MESSAGE = 1,
+	VISIT = 2,
+	DOSOMETHING = 3
 }
 export enum EGuideType {
 	GREETING = 1,
@@ -139,6 +194,25 @@ export const onboardingSlice = createSlice({
 		},
 		addMission: (state, action: PayloadAction<ApiOnboardingContent>) => {
 			state.formOnboarding.task.push(action.payload);
+		},
+		removeTempTask: (state, action: PayloadAction<{ idTask: number; type: EGuideType }>) => {
+			const removeIndex = action.payload.idTask;
+			switch (action.payload.type) {
+				case EGuideType.GREETING:
+					state.formOnboarding.greeting = null;
+					break;
+				case EGuideType.RULE:
+					state.formOnboarding.rules.splice(removeIndex, 1);
+					break;
+				case EGuideType.QUESTION:
+					state.formOnboarding.questions.splice(removeIndex, 1);
+					break;
+				case EGuideType.TASK:
+					state.formOnboarding.task.splice(removeIndex, 1);
+					break;
+				default:
+					break;
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -169,6 +243,7 @@ export const onboardingSlice = createSlice({
 								break;
 						}
 						state.listOnboarding[action.payload.clan_id] = onboardingClan;
+						state.missionSum = onboardingClan.mission.length;
 					});
 				}
 			})
@@ -179,13 +254,33 @@ export const onboardingSlice = createSlice({
 					questions: [],
 					task: []
 				};
+			})
+			.addCase(removeOnboardingTask.fulfilled, (state, action) => {
+				if (action.payload.clan_id) {
+					switch (action.payload.type) {
+						case EGuideType.GREETING:
+							state.listOnboarding[action.payload.clan_id].greeting = undefined;
+							break;
+						case EGuideType.RULE:
+							state.listOnboarding[action.payload.clan_id].rule.filter((task) => task.id !== action.payload.idTask);
+							break;
+						case EGuideType.QUESTION:
+							state.listOnboarding[action.payload.clan_id].question.filter((task) => task.id !== action.payload.idTask);
+							break;
+						case EGuideType.TASK:
+							state.listOnboarding[action.payload.clan_id].mission.filter((task) => task.id !== action.payload.idTask);
+							break;
+						default:
+							break;
+					}
+				}
 			});
 	}
 });
 
 export const onboardingReducer = onboardingSlice.reducer;
 
-export const onboardingActions = { ...onboardingSlice.actions, createOnboardingTask, fetchOnboarding };
+export const onboardingActions = { ...onboardingSlice.actions, createOnboardingTask, fetchOnboarding, removeOnboardingTask, enableOnboarding };
 
 export const getOnboardingState = (rootState: { [ONBOARDING_FEATURE_KEY]: OnboardingState }): OnboardingState => rootState[ONBOARDING_FEATURE_KEY];
 

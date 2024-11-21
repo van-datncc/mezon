@@ -158,6 +158,7 @@ export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, 
 			offline: []
 		};
 	}
+
 	const users = members.map((item) => ({
 		...item,
 		user: {
@@ -174,9 +175,11 @@ export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, 
 		return a.user?.online ? -1 : 1;
 	});
 	const firstOfflineIndex = users.findIndex((user) => !user.user?.online);
+	const onlineUsers = firstOfflineIndex === -1 ? users : users?.slice(0, firstOfflineIndex);
+	const offlineUsers = firstOfflineIndex === -1 ? [] : users?.slice(firstOfflineIndex);
 
 	return {
-		online: users.slice(0, firstOfflineIndex).map((item) => item.id),
-		offline: users.slice(firstOfflineIndex).map((item) => item.id)
+		online: onlineUsers?.map((item) => item?.id),
+		offline: offlineUsers?.map((item) => item?.id)
 	};
 });
