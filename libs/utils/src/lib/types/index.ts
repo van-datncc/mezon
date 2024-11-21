@@ -1156,8 +1156,8 @@ export type UserStatusUpdate = {
 };
 
 export enum EUserStatus {
-	ONLINE = 'online',
-	IDLE = 'idle',
-	DO_NOT_DISTURB = 'do not disturb',
-	INVISIBLE = 'invisible'
+	ONLINE = 'Online',
+	IDLE = 'Idle',
+	DO_NOT_DISTURB = 'Do Not Disturb',
+	INVISIBLE = 'Invisible'
 }
