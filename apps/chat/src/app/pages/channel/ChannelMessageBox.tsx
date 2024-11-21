@@ -55,7 +55,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			mentionEveryone?: boolean
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
-			if (currentClan?.is_onboarding && onboardingList.mission[currentMission].task_type === ETypeMission.SEND_MESSAGE) {
+			if (currentClan?.is_onboarding && onboardingList?.mission?.[currentMission]?.task_type === ETypeMission.SEND_MESSAGE) {
 				dispatch(onboardingActions.doneMission());
 			}
 		},
