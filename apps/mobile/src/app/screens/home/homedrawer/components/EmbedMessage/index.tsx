@@ -2,15 +2,17 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl, IEmbedProps } from '@mezon/utils';
 import { memo } from 'react';
-import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { EmbedAuthor } from './EmbedAuthor';
+import { EmbedDescription } from './EmbedDescription';
 import { EmbedFields } from './EmbedFields';
 import { EmbedFooter } from './EmbedFooter';
+import { EmbedTitle } from './EmbedTitle';
 import { style } from './styles';
 
 export const EmbedMessage = memo((embed: IEmbedProps) => {
-	const { color, title, url, author, description, fields = [], image, timestamp, footer, thumbnail } = embed || {};
+	const { color, title, url, author, description, fields, image, timestamp, footer, thumbnail } = embed;
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -21,8 +23,8 @@ export const EmbedMessage = memo((embed: IEmbedProps) => {
 				<View style={styles.valueContainer}>
 					<View style={styles.content}>
 						{!!author && <EmbedAuthor {...author} />}
-						{!!title && <Text style={[styles.title, !!url && { textDecorationLine: 'underline' }]}>{title}</Text>}
-						{!!description && <Text style={styles.description}>{description}</Text>}
+						{!!title && <EmbedTitle title={title} url={url} />}
+						{!!description && <EmbedDescription description={description} />}
 						{!!fields && <EmbedFields fields={fields} />}
 					</View>
 					{!!thumbnail && (
