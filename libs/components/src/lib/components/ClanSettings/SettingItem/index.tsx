@@ -1,4 +1,4 @@
-import { selectCloseMenu, selectEnableStatusOfOnBoarding } from '@mezon/store';
+import { selectCloseMenu, selectCurrentClan } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ItemObjProps } from '../ItemObj';
 
@@ -11,7 +11,7 @@ type SettingItemProps = {
 };
 
 const SettingItem = ({ name, active, onClick, handleMenu, setting }: SettingItemProps) => {
-	const isEnableOnBoarding = useSelector(selectEnableStatusOfOnBoarding);
+	const currentClan = useSelector(selectCurrentClan);
 
 	const closeMenu = useSelector(selectCloseMenu);
 	return (
@@ -26,7 +26,7 @@ const SettingItem = ({ name, active, onClick, handleMenu, setting }: SettingItem
 		>
 			{setting?.id === 'on-boarding' && (
 				<div className="absolute top-[4px] right-[8px] dark:text-channelTextLabel text-colorTextLightMode">
-					{isEnableOnBoarding ? 'ON' : 'OFF'}
+					{currentClan?.is_onboarding ? 'ON' : 'OFF'}
 				</div>
 			)}
 			{name}

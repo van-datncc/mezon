@@ -10,7 +10,6 @@ export const style = (colors: Attributes) =>
 		},
 		main: {
 			flex: 1,
-			marginTop: size.s_10,
 			marginBottom: size.s_50
 		},
 		menuHeader: {
@@ -26,6 +25,19 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.border,
 			padding: size.s_8,
 			borderRadius: size.s_22
+		},
+		card: {
+			flex: 1,
+			margin: size.s_10,
+			borderRadius: size.s_10,
+			borderWidth: 1,
+			borderColor: colors.border,
+			backgroundColor: colors.primary,
+			overflow: 'hidden'
+		},
+		cardNoVideo: {
+			alignItems: 'center',
+			justifyContent: 'center'
 		},
 		menuFooter: {
 			position: 'absolute',
@@ -44,5 +56,20 @@ export const style = (colors: Attributes) =>
 			height: size.s_50,
 			backgroundColor: colors.badgeHighlight,
 			borderRadius: size.s_30
+		},
+		menuIconActive: {
+			backgroundColor: colors.white
+		},
+		avatar: {
+			width: size.s_70,
+			height: size.s_70,
+			borderRadius: size.s_70,
+			alignSelf: 'center'
+		},
+		titleConfirm: {
+			color: colors.textStrong,
+			marginVertical: size.s_10,
+			fontSize: size.s_18,
+			textAlign: 'center'
 		}
 	});

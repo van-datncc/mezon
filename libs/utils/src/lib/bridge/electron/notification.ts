@@ -17,6 +17,12 @@ export interface NotificationData {
 	extras?: IMessageExtras;
 }
 
+export enum NotificationPermissionStatus {
+	DEFAULT = 'default',
+	DENIED = 'denied',
+	GRANTED = 'granted'
+}
+
 const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
 const DEFAULT_RECONNECT_INTERVAL = 1000; // 1s
 const DEFAULT_MAX_RECONNECT_INTERVAL = 32000; // 32s (after 5 reconnect attempts)
@@ -61,7 +67,13 @@ export class MezonNotificationService {
 		return MezonNotificationService.instance;
 	}
 
-	public connect = (token: string) => {
+	public connect = async (token: string) => {
+		const hasPermission = await this.checkNotificationPermission();
+
+		if (!hasPermission) {
+			return;
+		}
+
 		if (!token || this.wsActive) {
 			return;
 		}
@@ -109,6 +121,26 @@ export class MezonNotificationService {
 		this.ws = ws;
 	};
 
+	private async checkNotificationPermission() {
+		if (!('Notification' in window)) {
+			console.warn('This browser does not support desktop notification');
+			return;
+		}
+
+		switch (Notification.permission) {
+			case NotificationPermissionStatus.GRANTED:
+				return true;
+			case NotificationPermissionStatus.DENIED:
+				return false;
+			case NotificationPermissionStatus.DEFAULT: {
+				const permission = await Notification.requestPermission();
+				return permission === NotificationPermissionStatus.GRANTED;
+			}
+			default:
+				return false;
+		}
+	}
+
 	private pushNotification(title: string, message: string, image: string, link: string | undefined) {
 		if (isElectron()) {
 			electronBridge.pushNotification(title, {
@@ -119,21 +151,29 @@ export class MezonNotificationService {
 				}
 			});
 		} else {
-			const notification = new Notification(title, {
-				body: message,
-				icon: image ?? '',
-				data: {
-					link: link ?? ''
-				}
-			});
-			notification.onclick = (event) => {
-				event.preventDefault();
-				if (!link) {
-					return;
-				}
-				window.open(link);
-			};
+			this.pushNotificationForWeb(title, message, image, link);
 		}
+	}
+
+	private pushNotificationForWeb(title: string, message: string, image: string, link: string | undefined) {
+		if (!('Notification' in window)) {
+			console.warn('This browser does not support desktop notification');
+			return;
+		}
+		const notification = new Notification(title, {
+			body: message,
+			icon: image ?? '',
+			data: {
+				link: link ?? ''
+			}
+		});
+		notification.onclick = (event) => {
+			event.preventDefault();
+			if (!link) {
+				return;
+			}
+			window.open(link);
+		};
 	}
 
 	public get isActive() {
