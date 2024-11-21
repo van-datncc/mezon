@@ -5,6 +5,7 @@ import {
 	getAttachmentUnique,
 	getUpdateOrAddClanChannelCache,
 	PenIcon,
+	PlayIcon,
 	save,
 	SearchIcon,
 	SendIcon,
@@ -32,6 +33,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
+import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -279,7 +281,11 @@ export const Sharing = ({ data, onClose }) => {
 						{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
 					]);
 					const fileSize = await getSizeImage(media);
-					const fileData = await RNFS.readFile(media.filePath || media?.contentUri, 'base64');
+					const pathCompressed =
+						(media?.filetype && media?.filetype?.startsWith('video')) || (media?.mimeType && media?.mimeType?.startsWith('video'))
+							? await compressVideo(media?.filePath || media?.contentUri)
+							: await compressImage(media?.filePath || media?.contentUri);
+					const fileData = await RNFS.readFile(pathCompressed || '', 'base64');
 
 					return {
 						uri: media.contentUri || media?.filePath,
@@ -293,6 +299,29 @@ export const Sharing = ({ data, onClose }) => {
 			handleFiles(fileFormats);
 		} catch (e) {
 			console.error(e);
+		}
+	};
+
+	const compressImage = async (image: string) => {
+		try {
+			return await Image.compress(image, {
+				compressionMethod: 'auto',
+				quality: 0.8
+			});
+		} catch (error) {
+			console.error('log  => error compressImage', error);
+			return image;
+		}
+	};
+
+	const compressVideo = async (video: string) => {
+		try {
+			return await Video.compress(video, {
+				compressionMethod: 'auto'
+			});
+		} catch (error) {
+			console.error('log  => error compressVideo', error);
+			return video;
 		}
 	};
 
@@ -374,6 +403,11 @@ export const Sharing = ({ data, onClose }) => {
 											key={`${media?.url}_${index}_media_sharing`}
 											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
 										>
+											{isVideo(media?.filename?.toLowerCase()) && isVideo(media?.url?.toLowerCase()) && (
+												<View style={styles.videoOverlay}>
+													<PlayIcon width={size.s_20} height={size.s_20} />
+												</View>
+											)}
 											{isFile ? (
 												<AttachmentFilePreview attachment={media} />
 											) : (
