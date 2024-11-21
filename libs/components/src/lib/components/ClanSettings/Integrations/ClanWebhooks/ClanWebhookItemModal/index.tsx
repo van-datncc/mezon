@@ -4,6 +4,7 @@ import { Icons } from '@mezon/ui';
 import { ApiClanWebhook, ApiMessageAttachment, MezonUpdateClanWebhookByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteClanWebhookPopup from './DeleteWebhookPopup';
 
@@ -75,7 +76,15 @@ const ExpendedClanWebhookModal = ({ webhookItem }: IExpendedClanWebhookModal) =>
 	}, []);
 
 	const handleCopyUrl = (url: string) => {
-		navigator.clipboard.writeText(url);
+		navigator.clipboard
+			.writeText(url)
+			.then(() => {
+				toast.success('URL copied to clipboard!');
+			})
+			.catch((error) => {
+				toast.error('Failed to copy URL');
+				console.error('Copy failed:', error);
+			});
 	};
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -138,15 +147,25 @@ const ExpendedClanWebhookModal = ({ webhookItem }: IExpendedClanWebhookModal) =>
 
 	const handleResetToken = async () => {
 		const request: MezonUpdateClanWebhookByIdBody = {
+			avatar: dataForUpdate.webhookAvatarUrl,
+			webhook_name: dataForUpdate.webhookNameInput,
+			clan_id: clanId,
 			reset_token: true
 		};
-		await dispatch(
-			updateClanWebhookById({
-				request: request,
-				webhookId: webhookItem.id,
-				clanId: clanId
-			})
-		);
+
+		try {
+			await dispatch(
+				updateClanWebhookById({
+					request: request,
+					webhookId: webhookItem.id,
+					clanId: clanId
+				})
+			);
+
+			toast.success('Token reset successfully!');
+		} catch (error) {
+			toast.error('Failed to reset token');
+		}
 	};
 
 	const handleResetChange = () => {

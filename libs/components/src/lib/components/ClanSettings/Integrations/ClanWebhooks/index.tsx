@@ -38,10 +38,13 @@ const ClanWebhooks = ({ allClanWebhooks }: IClanWebhooksProps) => {
 
 	return (
 		<div className="pb-5">
-			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5">
-				Webhooks are a simple way to post messages from other apps and websites into Mezon using internet magic.
-				<b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer"> Learn more</b> or try{' '}
-				<b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer">building one yourself.</b>
+			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5 flex flex-col">
+				<span className="font-semibold">
+					Clan Webhooks are a simple way to post messages from other apps and websites for each Mezon user using internet technology.
+				</span>
+				<span className="font-semibold text-[#00a8fc]">
+					Tip: If you feel the token on your URL is compromised or outdated, reset it and copy the new URL.
+				</span>
 			</div>
 			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
 			{allClanWebhooks?.length !== 0 ? (
