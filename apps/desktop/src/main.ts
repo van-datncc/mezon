@@ -32,15 +32,67 @@ export default class Main {
 }
 
 ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
+	const fileExtension = url.split('.').pop().toLowerCase();
+
+	let fileFilter = [{ name: 'All Files', extensions: ['*'] }];
+
+	const extensionFilters = {
+		txt: ['txt'],
+		png: ['png'],
+		jpg: ['jpg', 'jpeg'],
+		gif: ['gif'],
+		mp3: ['mp3'],
+		mp4: ['mp4'],
+		apk: ['apk'],
+		pdf: ['pdf'],
+		zip: ['zip'],
+		html: ['html'],
+		json: ['json'],
+		csv: ['csv'],
+		doc: ['doc', 'docx'],
+		xls: ['xls', 'xlsx'],
+		ppt: ['ppt', 'pptx'],
+		rar: ['rar'],
+		tar: ['tar'],
+		markdown: ['md', 'markdown'],
+		svg: ['svg'],
+		webp: ['webp'],
+		tiff: ['tiff', 'tif'],
+		bmp: ['bmp'],
+		ico: ['ico'],
+		flv: ['flv'],
+		avi: ['avi'],
+		wmv: ['wmv'],
+		mov: ['mov'],
+		m4v: ['m4v'],
+		exe: ['exe'],
+		dll: ['dll'],
+		jar: ['jar'],
+		iso: ['iso'],
+		dmg: ['dmg'],
+		msi: ['msi'],
+		xz: ['xz'],
+		gzip: ['gz'],
+		'7z': ['7z'],
+		wav: ['wav'],
+		aac: ['aac'],
+		ogg: ['ogg'],
+		flac: ['flac'],
+		midi: ['midi'],
+		eps: ['eps'],
+		ai: ['ai'],
+		psd: ['psd']
+	};
+
+	if (extensionFilters[fileExtension]) {
+		fileFilter = [{ name: `${fileExtension.toUpperCase()} Files`, extensions: extensionFilters[fileExtension] }];
+	}
+
 	const { filePath, canceled } = await dialog.showSaveDialog({
 		title: 'Save File',
 		defaultPath: defaultFileName,
 		buttonLabel: 'Save',
-		filters: [
-			{ name: 'Text Files', extensions: ['txt'] },
-			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] },
-			{ name: 'All Files', extensions: ['*'] }
-		]
+		filters: fileFilter
 	});
 
 	if (canceled || !filePath) {
