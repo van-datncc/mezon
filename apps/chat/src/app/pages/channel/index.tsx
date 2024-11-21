@@ -23,6 +23,7 @@ import {
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectCurrentClan,
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
@@ -33,7 +34,7 @@ import {
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
-	selectOnboardingMode,
+	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
@@ -106,13 +107,15 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
-	const onboardingMode = useSelector(selectOnboardingMode);
+	const currentClan = useSelector(selectCurrentClan);
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
 	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentChannel.clan_id as string));
 	const currentMission = useMemo(() => {
 		return onboardingClan.mission[missionDone];
 	}, [missionDone, channelId]);
+
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	useEffect(() => {
@@ -145,7 +148,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{onboardingMode && channelId === currentMission?.channel_id && (
+			{channelId === currentMission?.channel_id && currentClan?.is_onboarding && (
 				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
 			)}
 			{currentChannel ? (
