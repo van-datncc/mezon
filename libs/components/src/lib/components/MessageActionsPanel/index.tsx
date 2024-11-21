@@ -1,4 +1,4 @@
-import { EMessageComponentType, EMessageSelectType, IMessageActionRow } from '@mezon/utils';
+import { EMessageComponentType, IMessageActionRow } from '@mezon/utils';
 import React, { Fragment } from 'react';
 import { MessageButton } from './components/MessageButton';
 import { MessageSelect } from './components/MessageSelect';
@@ -23,30 +23,3 @@ export const MessageActionsPanel: React.FC<MessageActionsPanelProps> = ({ action
 		</div>
 	);
 };
-export const actionRows: IMessageActionRow[] = [
-	{
-		components: [
-			{
-				id: 'select-id',
-				type: EMessageComponentType.SELECT,
-				component: {
-					type: EMessageSelectType.TEXT,
-					options: [
-						{
-							label: 'option 1',
-							value: '1'
-						},
-						{
-							label: 'option 2',
-							value: '2'
-						},
-						{
-							label: 'option 3',
-							value: '3'
-						}
-					]
-				}
-			}
-		]
-	}
-];
