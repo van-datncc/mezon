@@ -2859,10 +2859,9 @@ export function IconClockChannel() {
 	);
 }
 
-export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
+export function IconPhoneDM({ ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2872,6 +2871,7 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
@@ -2882,10 +2882,9 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
+export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2895,11 +2894,37 @@ export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
 				d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z"
 			></path>
+			{isShowLine && (
+				<>
+					{' '}
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
@@ -5862,6 +5887,128 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 				clipRule="evenodd"
 				className=""
 			></path>
+		</svg>
+	);
+}
+
+export function StopCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="m 14.234375 11.714844 c -0.382813 0.382812 -1 0.382812 -1.386719 0 l -1.039062 -1.039063 l -1.039063 -1.042969 c -0.386719 -0.382812 -0.386719 -1 0 -1.386718 l 0.492188 -0.492188 c -2.035157 -1.109375 -4.5 -1.109375 -6.535157 0 l 0.492188 0.492188 c 0.386719 0.386718 0.386719 1.003906 0 1.386718 l -1.039062 1.042969 l -1.039063 1.039063 c -0.386719 0.382812 -1.003906 0.382812 -1.386719 0 l -1.042968 -1.039063 c -0.957032 -0.957031 -0.957032 -2.511719 0 -3.46875 l 0.347656 -0.347656 c 3.816406 -3.816406 10.054687 -3.816406 13.871094 0 l 0.347656 0.347656 c 0.957031 0.957031 0.957031 2.511719 0 3.46875 z m 0 0"
+					fill="#ffffff"
+				/>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function StartCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g fill="#ffffff">
+					{' '}
+					<path d="m 5.003906 2 c 0.554688 0 1 0.445312 1 1 v 3 c 0 0.554688 -0.445312 1 -1 1 h -0.710937 c 0.671875 2.265625 2.445312 4.042969 4.710937 4.710938 v -0.710938 c 0 -0.554688 0.449219 -1 1 -1 h 3 c 0.554688 0 1 0.445312 1 1 v 1.5 c 0 1.378906 -1.117187 2.5 -2.5 2.5 h -0.5 c -5.503906 0 -10 -4.496094 -10 -10 v -0.5 c 0 -1.378906 1.121094 -2.5 2.5 -2.5 z m 0 0" />{' '}
+					<path d="m 9 1 c -0.550781 0 -1 0.449219 -1 1 v 6 h 6 c 0.550781 0 1 -0.449219 1 -1 s -0.449219 -1 -1 -1 h -2.585938 l 4.292969 -4.292969 c 0.390625 -0.390625 0.390625 -1.023437 0 -1.414062 c -0.1875 -0.1875 -0.441406 -0.292969 -0.707031 -0.292969 s -0.519531 0.105469 -0.707031 0.292969 l -4.292969 4.292969 v -2.585938 c 0 -0.550781 -0.449219 -1 -1 -1 z m 0 0" />{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function Microphone({ isMuteMicrophone = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<path
+				d="M19 10V12C19 15.866 15.866 19 12 19M5 10V12C5 15.866 8.13401 19 12 19M12 19V22M8 22H16M12 15C10.3431 15 9 13.6569 9 12V5C9 3.34315 10.3431 2 12 2C13.6569 2 15 3.34315 15 5V12C15 13.6569 13.6569 15 12 15Z"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+
+			{isShowLine && (
+				<>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
+		</svg>
+	);
+}
+export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="32px" height="32px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="🔍-System-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+					{' '}
+					<g id="ic_fluent_share_screen_28_regular" fill="currentColor" fill-rule="nonzero">
+						{' '}
+						<path
+							d="M23.75,4.99939 C24.9926,4.99939 26,6.00675 26,7.24939 L26,20.75 C26,21.9926 24.9926,23 23.75,23 L4.25,23 C3.00736,23 2,21.9927 2,20.75 L2,7.24939 C2,6.00675 3.00736,4.99939 4.25,4.99939 L23.75,4.99939 Z M23.75,6.49939 L4.25,6.49939 C3.83579,6.49939 3.5,6.83518 3.5,7.24939 L3.5,20.75 C3.5,21.1642 3.83579,21.5 4.25,21.5 L23.75,21.5 C24.1642,21.5 24.5,21.1642 24.5,20.75 L24.5,7.24939 C24.5,6.83518 24.1642,6.49939 23.75,6.49939 Z M13.9975,8.62102995 C14.1965,8.62102995 14.3874,8.69998 14.5281,8.8407 L17.7826,12.0952 C18.0755,12.3881 18.0755,12.863 17.7826,13.1559 C17.4897,13.4488 17.0148,13.4488 16.7219,13.1559 L14.7477,11.1817 L14.7477,18.6284 C14.7477,19.0426 14.412,19.3784 13.9977,19.3784 C13.5835,19.3784 13.2477,19.0426 13.2477,18.6284 L13.2477,11.1835 L11.2784,13.1555 C10.9858,13.4486 10.5109,13.4489 10.2178,13.1562 C9.92469,12.8636 9.92436,12.3887 10.217,12.0956 L13.467,8.84107 C13.6077,8.70025 13.7985,8.62102995 13.9975,8.62102995 Z"
+							id="🎨-Color"
+						>
+							{' '}
+						</path>{' '}
+						{isShowLine && (
+							<>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="white"
+									strokeLinecap="round"
+									strokeWidth="3.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="black"
+									strokeLinecap="round"
+									strokeWidth="1.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+							</>
+						)}
+					</g>{' '}
+				</g>{' '}
+			</g>
 		</svg>
 	);
 }

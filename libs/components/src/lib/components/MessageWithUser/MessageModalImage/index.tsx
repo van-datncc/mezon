@@ -175,6 +175,10 @@ const MessageModalImage = () => {
 			return;
 		}
 		setScale(1);
+		setPosition({
+			x: 0,
+			y: 0
+		});
 	};
 
 	const handleDownloadImage = async () => {
