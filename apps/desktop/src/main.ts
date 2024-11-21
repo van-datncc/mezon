@@ -39,7 +39,7 @@ ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
 	const extensionFilters = {
 		txt: ['txt'],
 		png: ['png'],
-		jpeg: ['jpg', 'jpeg'],
+		jpg: ['jpg', 'jpeg'],
 		gif: ['gif'],
 		mp3: ['mp3'],
 		mp4: ['mp4'],
