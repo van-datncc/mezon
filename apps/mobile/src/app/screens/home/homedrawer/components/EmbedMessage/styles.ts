@@ -6,14 +6,15 @@ export const style = (colors: Attributes) =>
 		container: {
 			backgroundColor: colors.secondaryLight,
 			flexDirection: 'row',
-			borderRadius: size.s_4
+			borderRadius: size.s_4,
+			marginTop: size.s_4
 		},
 		embed: {
-			padding: 10
+			padding: 10,
+			flex: 1
 		},
 		content: {
-			gap: size.s_6,
-			width: '80%'
+			gap: size.s_6
 		},
 		sizeColor: {
 			width: size.s_4,
@@ -27,8 +28,8 @@ export const style = (colors: Attributes) =>
 		},
 		imageWrapper: {
 			marginTop: size.s_6,
-			height: size.s_100 * 2,
-			width: '90%',
+			height: size.s_100 * 3,
+			width: '100%',
 			borderRadius: size.s_4,
 			marginBottom: size.s_10
 		},
