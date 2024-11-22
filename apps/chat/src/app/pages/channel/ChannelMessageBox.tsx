@@ -68,7 +68,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				}
 			}
 		},
-		[sendMessage]
+		[sendMessage, currentMission]
 	);
 
 	const handleTyping = useCallback(() => {
