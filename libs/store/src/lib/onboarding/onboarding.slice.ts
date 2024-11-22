@@ -159,6 +159,22 @@ export const fetchProcessingOnboarding = createAsyncThunk('onboarding/fetchProce
 	}
 });
 
+export const doneOnboarding = createAsyncThunk('onboarding/doneOnboarding', async ({ clan_id }: { clan_id: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		const response = await mezon.client.updateOnboardingStepByClanId(mezon.session, clan_id, { onboarding_step: 3 });
+		if (!response) {
+			return false;
+		}
+
+		return clan_id;
+	} catch (error) {
+		captureSentryError(error, 'clans/updateClans');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const initialOnboardingState: OnboardingState = onboardingUserAdapter.getInitialState({
 	onboardingMode: false,
 	missionDone: 0,
@@ -282,13 +298,19 @@ export const onboardingSlice = createSlice({
 							state.listOnboarding[action.payload.clan_id].greeting = undefined;
 							break;
 						case EGuideType.RULE:
-							state.listOnboarding[action.payload.clan_id].rule.filter((task) => task.id !== action.payload.idTask);
+							state.listOnboarding[action.payload.clan_id].rule = state.listOnboarding[action.payload.clan_id].rule.filter(
+								(task) => task.id !== action.payload.idTask
+							);
 							break;
 						case EGuideType.QUESTION:
-							state.listOnboarding[action.payload.clan_id].question.filter((task) => task.id !== action.payload.idTask);
+							state.listOnboarding[action.payload.clan_id].question = state.listOnboarding[action.payload.clan_id].question.filter(
+								(task) => task.id !== action.payload.idTask
+							);
 							break;
 						case EGuideType.TASK:
-							state.listOnboarding[action.payload.clan_id].mission.filter((task) => task.id !== action.payload.idTask);
+							state.listOnboarding[action.payload.clan_id].mission = state.listOnboarding[action.payload.clan_id].mission.filter(
+								(task) => task.id !== action.payload.idTask
+							);
 							break;
 						default:
 							break;
@@ -300,6 +322,16 @@ export const onboardingSlice = createSlice({
 					onboardingUserAdapter.setAll(state, action.payload);
 				}
 			});
+		// .addCase(doneOnboarding.fulfilled, (state, action) => {
+		// 	if (action.payload) {
+		// 		onboardingUserAdapter.updateOne(state, {
+		// 			id: action.payload,
+		// 			changes: {
+		// 				onboarding_step: 3
+		// 			}
+		// 		});
+		// 	}
+		// });
 	}
 });
 
@@ -311,7 +343,8 @@ export const onboardingActions = {
 	fetchOnboarding,
 	removeOnboardingTask,
 	enableOnboarding,
-	fetchProcessingOnboarding
+	fetchProcessingOnboarding,
+	doneOnboarding
 };
 
 const { selectAll, selectEntities, selectById } = onboardingUserAdapter.getSelectors();
