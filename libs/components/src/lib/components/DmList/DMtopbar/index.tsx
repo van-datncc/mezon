@@ -138,6 +138,26 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
+	const [isCalling, setIsCalling] = useState(false);
+	const [isRinging, setIsRinging] = useState(false);
+
+	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
+	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
+
+	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+			audioRef.current.play().catch((error) => console.error('Audio playback error:', error));
+			audioRef.current.loop = true;
+		}
+	};
+
+	const stopAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
+		if (audioRef.current) {
+			audioRef.current.pause();
+			audioRef.current.currentTime = 0;
+		}
+	};
 
 	const endCall = useCallback(async () => {
 		const user = userId || '';
@@ -183,6 +203,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	};
 	const setListOfCalls = useCallback(
 		async (dmGroupId: string) => {
+			setIsCalling(true);
+			playAudio(dialTone);
+
 			startCall();
 			await dispatch(DMCallActions.setCallerId(userId));
 			await dispatch(DMCallActions.setCalleeId(dmUserId));
@@ -231,6 +254,13 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				{
+					if (!isCalling) {
+						setIsRinging(true);
+						playAudio(ringTone);
+					} else {
+						setIsCalling(false);
+						stopAudio(dialTone);
+					}
 					const processData = async () => {
 						const dataDec = await decompress(data?.json_data);
 						const objData = JSON.parse(dataDec || '{}');
@@ -285,7 +315,12 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
-		// Get user media
+
+		if (isRinging) {
+			stopAudio(ringTone);
+			setIsRinging(false);
+		}
+
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
 			.then(async (stream) => {

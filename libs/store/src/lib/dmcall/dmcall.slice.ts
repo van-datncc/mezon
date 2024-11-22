@@ -55,7 +55,7 @@ export const DMCallSlice = createSlice({
 	name: DMCALL_FEATURE_KEY,
 	initialState: initialDMCallState,
 	reducers: {
-		add: DMCallAdapter.addOne,
+		add: DMCallAdapter.upsertOne,
 		addMany: DMCallAdapter.addMany,
 		remove: DMCallAdapter.removeOne,
 		setListOfCallsSocket: (state, action: PayloadAction<{ userId: string | undefined; event: WebrtcSignalingFwd }>) => {
