@@ -148,7 +148,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{channelId === currentMission?.channel_id && currentClan?.is_onboarding && (
+			{(selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding && (
 				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
 			)}
 			{currentChannel ? (
@@ -313,27 +313,29 @@ const OnboardingGuide = ({
 	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const handleDoNextMission = useCallback(() => {
-		switch (currentMission.task_type) {
-			case ETypeMission.SEND_MESSAGE: {
-				const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
-				navigate(link);
-				break;
+		if (currentMission) {
+			switch (currentMission.task_type) {
+				case ETypeMission.SEND_MESSAGE: {
+					const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(link);
+					break;
+				}
+				case ETypeMission.VISIT: {
+					const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(linkChannel);
+					dispatch(onboardingActions.doneMission());
+					break;
+				}
+				case ETypeMission.DOSOMETHING: {
+					dispatch(onboardingActions.doneMission());
+					break;
+				}
+				default:
+					break;
 			}
-			case ETypeMission.VISIT: {
-				const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
-				navigate(linkChannel);
-				dispatch(onboardingActions.doneMission());
-				break;
-			}
-			case ETypeMission.DOSOMETHING: {
-				dispatch(onboardingActions.doneMission());
-				break;
-			}
-			default:
-				break;
 		}
-	}, [currentMission.id]);
-	const channelMission = useSelector((state) => selectChannelById(state, currentMission.channel_id as string));
+	}, [currentMission?.id]);
+	const channelMission = useSelector((state) => selectChannelById(state, currentMission?.channel_id as string));
 
 	return (
 		<>
