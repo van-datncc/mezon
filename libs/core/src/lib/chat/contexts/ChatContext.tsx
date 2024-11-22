@@ -928,7 +928,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
-		if (event?.data_type === 0 || event?.data_type === 4) return;
+		// TODO: AND TYPE IN BE
+		// TYPE = 4: USER CANCEL CALL
+		// TYPE = 0: REMOVE CALL (END CALL)
+		// if (event?.data_type === 0 || event?.data_type === 4) {
+		// 	dispatch(DMCallActions.removeAll());
+		// 	if (event?.data_type === 4) {
+		// 		dispatch(DMCallActions.setIsInCall(false));
+		// 		dispatch(
+		// 			toastActions.addToast({
+		// 				// TODO: Change content toast
+		// 				message: 'User busy and unable to answer the call. Please try again later',
+		// 				type: 'warning',
+		// 				autoClose: false
+		// 			})
+		// 		);
+		// 	}
+		// 	return;
+		// }
 		dispatch(
 			DMCallActions.add({
 				calleeId: event?.receiver_id,

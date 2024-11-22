@@ -213,9 +213,9 @@
   },
   "browser": {
     "fs": false,
-    "path": false,
-    "os": false,
     "net": false,
+    "os": false,
+    "path": false,
     "tls": false
   },
   "engines": {
