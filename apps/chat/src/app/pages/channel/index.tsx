@@ -339,7 +339,7 @@ const OnboardingGuide = ({
 
 	return (
 		<>
-			{missionDone < missionSum ? (
+			{missionDone < missionSum && currentMission ? (
 				<div
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
