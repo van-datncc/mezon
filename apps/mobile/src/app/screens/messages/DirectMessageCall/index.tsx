@@ -61,34 +61,15 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	});
 
 	const peerConnection = useMemo(() => {
-		const pc = new RTCPeerConnection(peerConstraints);
-		pc.addEventListener('icecandidate', async (event) => {
-			if (event?.candidate) {
-				await mezon.socketRef.current?.forwardWebrtcSignaling(
-					receiverId,
-					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					'',
-					userProfile?.user?.id
-				);
-			}
-		});
-
-		pc.addEventListener('track', (event) => {
-			if (event.streams[0]) {
-				setRemoteStream(event.streams[0] as MediaStream);
-			}
-		});
-
-		return pc;
-	}, [mezon.socketRef, receiverId, userProfile?.user?.id]);
+		return new RTCPeerConnection(peerConstraints);
+	}, []);
 
 	const openMediaDevices = useCallback(
 		async (audio: boolean, video: boolean) => {
 			// get media devices stream from webRTC API
 			const mediaStream = await mediaDevices.getUserMedia({
-				audio,
-				video
+				audio: true,
+				video: video
 			});
 
 			// add track from created mediaStream to peer connection
@@ -100,14 +81,29 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	);
 
 	useEffect(() => {
-		if (cameraPermissionGranted || microphonePermissionGranted) {
-			openMediaDevices(microphonePermissionGranted, localMediaControl?.camera && cameraPermissionGranted);
-		}
-	}, [cameraPermissionGranted, localMediaControl?.camera, microphonePermissionGranted, openMediaDevices]);
+		if (cameraPermissionGranted || microphonePermissionGranted) openMediaDevices(microphonePermissionGranted, cameraPermissionGranted);
+	}, [microphonePermissionGranted, cameraPermissionGranted, openMediaDevices]);
 
 	useEffect(() => {
 		try {
 			if (!signalingData?.[signalingData?.length - 1]) return;
+
+			peerConnection.addEventListener('icecandidate', async (event) => {
+				if (event?.candidate) {
+					await mezon.socketRef.current?.forwardWebrtcSignaling(
+						receiverId,
+						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+						JSON.stringify(event.candidate),
+						'',
+						userProfile?.user?.id
+					);
+				}
+			});
+			peerConnection.addEventListener('track', (event) => {
+				if (event.streams[0]) {
+					setRemoteStream(event.streams[0] as MediaStream);
+				}
+			});
 			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
 
 			switch (data?.data_type) {
@@ -198,7 +194,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
 			const offerEn = await compress(JSON.stringify(offer));
-			dispatch(DMCallActions.setIsInCall(true));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(
 				receiverId,
 				WebrtcSignalingType.WEBRTC_SDP_OFFER,
@@ -240,6 +235,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	};
 
 	useEffect(() => {
+		dispatch(DMCallActions.setIsInCall(true));
 		const timer = setTimeout(() => {
 			startCall();
 		}, 1000);

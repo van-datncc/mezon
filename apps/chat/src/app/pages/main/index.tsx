@@ -12,6 +12,7 @@ import {
 import { useAppParams, useAuth, useFriends, useMenu, useReference } from '@mezon/core';
 import {
 	accountActions,
+	audioCallActions,
 	channelsActions,
 	clansActions,
 	fetchDirectMessage,
@@ -20,6 +21,8 @@ import {
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
+	selectAudioDialTone,
+	selectAudioRingTone,
 	selectChatStreamWidth,
 	selectClanView,
 	selectCloseMenu,
@@ -32,6 +35,7 @@ import {
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
+	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
@@ -51,8 +55,8 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
@@ -62,6 +66,7 @@ import PopupQuickMess from './PopupQuickMess';
 import DirectUnread from './directUnreads';
 
 function MyApp() {
+	const dispatch = useAppDispatch();
 	const elementHTML = document.documentElement;
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
@@ -74,13 +79,69 @@ function MyApp() {
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
-
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
+	const isPlayDialTone = useSelector(selectAudioDialTone);
+	const isPlayRingTone = useSelector(selectAudioRingTone);
+
+	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
+	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
+
+	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+			audioRef.current.play().catch((error) => console.error('Audio playback error:', error));
+			audioRef.current.loop = true;
+		}
+	};
+
+	const stopAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
+		if (audioRef.current) {
+			audioRef.current.pause();
+			audioRef.current.currentTime = 0;
+		}
+	};
+
+	useEffect(() => {
+		if (!signalingData?.[signalingData?.length - 1]) return;
+		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
+			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+				if (!isPlayDialTone) {
+					dispatch(audioCallActions.setIsRingTone(true));
+				} else {
+					dispatch(audioCallActions.setIsDialTone(false));
+				}
+
+				break;
+			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+				break;
+			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+				break;
+			default:
+				break;
+		}
+	}, [signalingData]);
+
+	useEffect(() => {
+		if (isPlayDialTone) {
+			playAudio(dialTone);
+		} else {
+			stopAudio(dialTone);
+		}
+	}, [isPlayDialTone]);
+
+	useEffect(() => {
+		if (isPlayRingTone) {
+			playAudio(ringTone);
+		} else {
+			stopAudio(ringTone);
+		}
+	}, [isPlayRingTone]);
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
@@ -140,8 +201,6 @@ function MyApp() {
 	}, []);
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
-
-	const dispatch = useAppDispatch();
 
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannel?.id as string));
 	const allRolesInClan = useSelector(selectAllRoleIds);
