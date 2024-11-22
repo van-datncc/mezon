@@ -1165,3 +1165,9 @@ export type IUserItemActivity = {
 	id?: string;
 	user?: IUserProfileActivity;
 };
+
+export type IDmCallInfo = {
+	channel_id?: string;
+	caller_id?: string;
+	callee_id?: string;
+};
