@@ -24,18 +24,18 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 		},
 		{
 			id: ETypeMission.DOSOMETHING,
-			description: 'Member visits the thread',
+			description: 'Reading this mission',
 			name: 'mission3'
 		}
 	];
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allChannel = useSelector(selectChannelsByClanId(currentClanId as string));
 	const listMissionChannel = useMemo(() => {
-		return allChannel.filter((channel) => channel.channel_private !== ChannelStatusEnum.isPrivate).slice(0, 7);
+		return allChannel.filter((channel) => channel.channel_private !== ChannelStatusEnum.isPrivate);
 	}, [allChannel]);
 
 	const [title, setTitle] = useState(missionEdit?.title || '');
-	const [missionChannel, setMissionChannel] = useState(missionEdit?.channel_id || listMissionChannel[0].id);
+	const [missionChannel, setMissionChannel] = useState(missionEdit?.channel_id || listMissionChannel[0]?.id || '');
 	const [mission, setMission] = useState<ETypeMission>(missionEdit?.task_type || ETypeMission.SEND_MESSAGE);
 	const dispatch = useAppDispatch();
 	const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {

@@ -41,15 +41,23 @@ function GuideBody() {
 					const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
 					navigate(linkChannel);
 					dispatch(onboardingActions.doneMission());
+					doneAllMission(index);
 					break;
 				}
 				case ETypeMission.DOSOMETHING: {
 					dispatch(onboardingActions.doneMission());
+					doneAllMission(index);
 					break;
 				}
 				default:
 					break;
 			}
+		}
+	};
+
+	const doneAllMission = (indexMision: number) => {
+		if (indexMision + 1 === missionSum) {
+			dispatch(onboardingActions.doneOnboarding({ clan_id: currentClanId as string }));
 		}
 	};
 
