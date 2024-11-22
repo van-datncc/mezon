@@ -28,7 +28,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const isClanView = useSelector(selectClanView);
-
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
@@ -54,6 +53,10 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_THREAD;
 			channelIdActive = channel?.id || '';
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			clanIdActive = channel?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
+			channelIdActive = channel?.id || '';
 		}
 
 		return {
@@ -62,7 +65,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			channelIdActive
 		};
 	}, [isClanView, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id]);
-
 	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
 	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
@@ -83,7 +85,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					lastSeenTimestamp: timestamp,
 					lastSentTimestamp: timestamp,
 					lastSeenPinMessage: '',
-					clanId: currentChannel?.clan_id ?? ''
+					clanId: currentChannel?.clan_id ?? '',
+					isMute: false
 				}
 			])
 		);
@@ -120,7 +123,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				};
 				saveRecentEmojiMobile(emojiLastest);
 			}
-			addMemberToThread(userId || '');
+			isClanView && addMemberToThread(userId || '');
 			const payload = transformPayloadWriteSocket({
 				clanId: currentActive.clanIdActive,
 				isPublicChannel: is_public,
@@ -139,11 +142,12 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-					isPublic: payload.is_public
+					isPublic: payload.is_public,
+					userId: userId as string
 				})
 			).unwrap();
 		},
-		[dispatch, isMobile, isClanView, userId]
+		[dispatch, isMobile, isClanView, userId, currentActive, addMemberToThread]
 	);
 
 	return useMemo(

@@ -1,4 +1,5 @@
 import { Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
+import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -70,7 +71,7 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 		width: widthMedia
 	});
 
-	const isUploading = !image?.url?.includes('http');
+	const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 	const photoSize = useMemo(() => getPhotoSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
 
 	if (!image.url) {
@@ -92,7 +93,7 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 				]}
 				children={isUploading ? <UploadingIndicator /> : null}
 				source={{
-					uri: image?.url,
+					uri: createImgproxyUrl(image?.url ?? '', { width: 500, height: 500, resizeType: 'fit' }),
 					priority: FastImage.priority.high
 				}}
 				resizeMode={!imageSize?.height && !isUploading ? 'cover' : isMultiple ? 'cover' : 'contain'}
@@ -132,7 +133,7 @@ const RenderImageHaveSize = React.memo(
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
-		const isUploading = !image?.url?.includes('http');
+		const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 		const photoSize = useMemo(() => getPhotoSizeWithSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
 
 		if (!image.url) {
@@ -160,7 +161,7 @@ const RenderImageHaveSize = React.memo(
 					]}
 					children={isUploading ? <UploadingIndicator /> : null}
 					source={{
-						uri: image?.url,
+						uri: createImgproxyUrl(image?.url ?? '', { width: 500, height: 500, resizeType: 'fit' }),
 						priority: FastImage.priority.high
 					}}
 					resizeMode={isMultiple ? 'cover' : 'contain'}

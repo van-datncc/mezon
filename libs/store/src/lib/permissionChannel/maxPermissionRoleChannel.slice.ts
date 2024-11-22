@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiPermission } from 'mezon-js/api.gen';
@@ -38,9 +39,11 @@ export const fetchMaxPermissionRoleChannel = createAsyncThunk(
 				await thunkAPI.dispatch(maxPermissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
 				return response?.permissions.permissions;
 			}
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError('no reponse', 'permissionrolechannel/fetchMaxPermissionRoleChannel');
+			return thunkAPI.rejectWithValue('no reponse');
 		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
+			captureSentryError(error, 'permissionrolechannel/fetchMaxPermissionRoleChannel');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

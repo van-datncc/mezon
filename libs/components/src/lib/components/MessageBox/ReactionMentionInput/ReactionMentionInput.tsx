@@ -41,12 +41,14 @@ import {
 	selectTheme,
 	selectThreadCurrentChannel,
 	threadsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -57,19 +59,19 @@ import {
 	addMention,
 	blankReferenceObj,
 	checkIsThread,
+	convertMentionOnfile,
 	filterEmptyArrays,
 	filterMentionsWithAtSign,
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
-	getExtraPart,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -178,13 +180,15 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
+	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, currentDmOrChannelId));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
 	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
+	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
+	const [isPasteMulti, setIsPasteMulti] = useState<boolean>(false);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -280,6 +284,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 
 			if (payloadJson.length > MIN_THRESHOLD_CHARS && props.handleConvertToFile) {
+				setIsPasteMulti(true);
 				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
@@ -331,7 +336,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					isPasteMulti ? mentionUpdated : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -364,7 +369,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionList,
+						isPasteMulti ? mentionUpdated : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -393,6 +398,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
+			setMentionUpdated([]);
+			setDisplayPlaintext('');
+			setDisplayPlaintext('');
+			setIsPasteMulti(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -452,11 +461,33 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [props.mode, commonChannelDms]);
 
 	const [pastedContent, setPastedContent] = useState<string>('');
+	const prevValueRef = useRef('');
+	const prevPlainTextRef = useRef('');
+
+	useEffect(() => {
+		prevValueRef.current = request?.valueTextInput;
+	}, [request?.valueTextInput]);
+
+	useEffect(() => {
+		prevPlainTextRef.current = request?.content;
+	}, [request?.content]);
+
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const previousValue = prevValueRef.current;
+		const previousPlainText = prevPlainTextRef.current;
+
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
-		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
+		setRequestInput(
+			{
+				...request,
+				valueTextInput: newValue,
+				content: newPlainTextValue,
+				mentionRaw: mentions
+			},
+			props.isThread
+		);
 		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
@@ -469,25 +500,44 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		const onlyMention = filterMentionsWithAtSign(mentions);
 		const convertToMarkUpString = formatMentionsToString(onlyMention);
 		const convertToPlainTextString = getDisplayMention(onlyMention);
+		const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);
 		setDisplayPlaintext(convertToPlainTextString);
 		setDisplayMarkup(convertToMarkUpString);
-		if (props.handleConvertToFile !== undefined && newPlainTextValue.length > MIN_THRESHOLD_CHARS && pastedContent.length > MIN_THRESHOLD_CHARS) {
-			const extraPartMarkup = getExtraPart(pastedContent, newValue);
-			const extraPartPlainText = getExtraPart(pastedContent, newPlainTextValue);
-			props.handleConvertToFile(pastedContent);
+		setMentionUpdated(mentionUpdated);
+		if (!isPasteMulti) {
+			setDisplayPlaintext(convertToPlainTextString);
+			setDisplayMarkup(convertToMarkUpString);
+			setMentionUpdated(mentionUpdated);
+		} else {
+			setDisplayPlaintext(newPlainTextValue);
+			setDisplayMarkup(newValue);
+			setMentionUpdated(mentionList);
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: newValue,
+					content: newPlainTextValue
+				},
+				props.isThread
+			);
+			setIsPasteMulti(false);
+		}
 
-			if (extraPartPlainText.length > 0) {
-				setRequestInput(
-					{
-						...request,
-						valueTextInput: extraPartMarkup,
-						content: extraPartPlainText
-					},
-					props.isThread
-				);
-			} else {
-				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
-			}
+		if (
+			props.handleConvertToFile !== undefined &&
+			newPlainTextValue?.length > MIN_THRESHOLD_CHARS &&
+			pastedContent?.length > MIN_THRESHOLD_CHARS
+		) {
+			props.handleConvertToFile(pastedContent);
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: previousValue,
+					content: previousPlainText
+				},
+				props.isThread
+			);
+			setPastedContent('');
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -616,6 +666,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			);
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
+
+	useEffect(() => {
+		const textarea = document.getElementById('editorReactMention');
+		if (textarea) {
+			textarea.removeAttribute('aria-hidden');
+		}
+	}, []);
 
 	return (
 		<div className="relative">
@@ -764,8 +821,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					hasPermissionEdit={props.hasPermissionEdit || true}
 				/>
 			)}
-			{request?.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content.length}</div>
+			{request?.content?.length > MIN_THRESHOLD_CHARS && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - request?.content?.length}</div>
 			)}
 		</div>
 	);

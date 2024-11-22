@@ -32,13 +32,13 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
 
 			const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 			if (!arrayBuffer) {
-				console.log('Failed to read file data.');
+				console.error('Failed to read file data.');
 				return;
 			}
 
 			resolve(uploadFile(client, session, filename, fileType, Number(file.size) || 0, arrayBuffer, true));
 		} catch (error) {
-			console.log('handleUploadEmojiStickerMobile Error: ', error);
+			console.error('handleUploadEmojiStickerMobile Error: ', error);
 			reject(new Error(`${error}`));
 		}
 	});

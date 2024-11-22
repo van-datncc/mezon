@@ -6,7 +6,6 @@ import {
 	friendsActions,
 	requestAddFriendParam,
 	selectCloseMenu,
-	selectMemberStatus,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -15,6 +14,7 @@ import { Button, Icons, Image, InputField } from '@mezon/ui';
 import { isMacDesktop } from '@mezon/utils';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ActivityList from './ActivityList';
 import FriendList from './FriendsList';
 
 const tabData = [
@@ -31,7 +31,6 @@ const FriendsPage = () => {
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
-	const onlineStatus = useSelector(selectMemberStatus);
 
 	const handleChangeTab = (valueTab: string) => {
 		dispatch(friendsActions.changeCurrentStatusTab(valueTab));
@@ -241,7 +240,9 @@ const FriendsPage = () => {
 						</div>
 					)}
 				</div>
-				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden">
+					<ActivityList listFriend={friends} />
+				</div>
 			</div>
 			{showRequestFailedPopup && <RequestFailedPopup togglePopup={toggleRequestFailedPopup} />}
 		</div>
@@ -253,7 +254,7 @@ const RequestFailedPopup = ({ togglePopup }: { togglePopup: () => void }) => {
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={togglePopup} className="fixed inset-0 bg-black opacity-50" />
-			<div className="relative z-10 w-[440px] text-center animate-scale_up">
+			<div className="relative z-10 w-[440px] text-center">
 				<div className="dark:bg-[#313338] bg-white dark:text-[#dbdee1] text-textLightTheme px-4 py-5 flex flex-col gap-5 items-center rounded-t-md">
 					<div className="text-textLightTheme dark:text-textDarkTheme uppercase font-semibold text-[20px]">Friend request failed</div>
 					<div>You're already friends with that user!</div>

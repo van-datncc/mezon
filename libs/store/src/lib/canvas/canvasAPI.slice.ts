@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { CanvasUpdate, ICanvas, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
@@ -26,7 +27,8 @@ export interface CanvasAPIState {
 }
 
 export const canvasAPIAdapter = createEntityAdapter({
-	selectId: (canvas: CanvasAPIEntity) => canvas.id || ''
+	selectId: (canvas: CanvasAPIEntity) => canvas.id || '',
+	sortComparer: (a, b) => b.id.localeCompare(a.id)
 });
 
 type fetchCanvasPayload = {
@@ -65,9 +67,9 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
 		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content, is_default: body.is_default };
-	} catch (error: any) {
-		const errstream = await error.json();
-		return thunkAPI.rejectWithValue(errstream.message);
+	} catch (error) {
+		captureSentryError(error, 'canvas/editChannelCanvases');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -78,9 +80,9 @@ export const getChannelCanvasDetail = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
 			return response;
-		} catch (error: any) {
-			const errstream = await error.json();
-			return thunkAPI.rejectWithValue(errstream.message);
+		} catch (error) {
+			captureSentryError(error, 'canvas/getChannelCanvasDetail');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -96,9 +98,9 @@ export const getChannelCanvasList = createAsyncThunk(
 			}
 			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
 			return response;
-		} catch (error: any) {
-			const errstream = await error.json();
-			return thunkAPI.rejectWithValue(errstream.message);
+		} catch (error) {
+			captureSentryError(error, 'canvas/getChannelCanvasList');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -109,9 +111,9 @@ export const deleteCanvas = createAsyncThunk('canvas/deleteCanvas', async ({ id,
 
 		const response = await mezon.client.deleteChannelCanvas(mezon.session, id, clan_id, channel_id);
 		return response;
-	} catch (error: any) {
-		const errstream = await error.json();
-		return thunkAPI.rejectWithValue(errstream.message);
+	} catch (error) {
+		captureSentryError(error, 'canvas/deleteCanvas');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

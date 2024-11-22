@@ -1,6 +1,6 @@
 import { SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
 import MessageContextMenu from './MessageContextMenu';
 
@@ -28,6 +28,7 @@ type MessageContextMenuContextValue = {
 	allRolesInClan: string[];
 	posShortProfile: posShortProfileOpt;
 	setPosShortProfile: (pos: posShortProfileOpt) => void;
+	onVisibilityChange: (status: boolean) => void;
 };
 
 export type MessageContextMenuProps = {
@@ -37,6 +38,9 @@ export type MessageContextMenuProps = {
 
 export const MessageContextMenuContext = createContext<MessageContextMenuContextValue>({
 	showMessageContextMenu: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
+	onVisibilityChange: () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 	},
 
@@ -59,11 +63,13 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 export const MessageContextMenuProvider = ({
 	children,
 	allUserIdsInChannel,
-	allRolesInClan
+	allRolesInClan,
+	channelId
 }: {
 	children: React.ReactNode;
 	allUserIdsInChannel: string[];
 	allRolesInClan: string[];
+	channelId?: string;
 }) => {
 	const messageIdRef = useRef<string>('');
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
@@ -76,15 +82,25 @@ export const MessageContextMenuProvider = ({
 		id: MESSAGE_CONTEXT_MENU_ID
 	});
 
+	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
+
 	const menu = useMemo(() => {
+		if (!isMenuVisible) return null;
 		return (
 			<MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageIdRef.current} elementTarget={elementTarget} activeMode={activeMode} />
 		);
-	}, [elementTarget, activeMode]);
+	}, [elementTarget, activeMode, isMenuVisible]);
 
 	const setPositionShow = useCallback((pos: string) => {
 		setPosShowMenu(pos);
 	}, []);
+
+	useEffect(() => {
+		// change channel hide menu keep not mount
+		channelId && setIsMenuVisible(false);
+	}, [channelId]);
+
+	const onVisibilityChange = useCallback((status: boolean) => {}, []);
 
 	const setImageURL = useCallback((src: string) => {
 		setImageSrc(src);
@@ -93,11 +109,14 @@ export const MessageContextMenuProvider = ({
 	const showContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props: MessageContextMenuProps) => {
 			const position = props.position || null;
-			show({
-				event,
-				props,
-				position
-			});
+			setIsMenuVisible(true);
+			setTimeout(() => {
+				show({
+					event,
+					props,
+					position
+				});
+			}, 100);
 		},
 		[show]
 	);
@@ -126,7 +145,8 @@ export const MessageContextMenuProvider = ({
 			allUserIdsInChannel,
 			allRolesInClan,
 			posShortProfile,
-			setPosShortProfile
+			setPosShortProfile,
+			onVisibilityChange
 		}),
 		[
 			showMessageContextMenu,
@@ -137,7 +157,8 @@ export const MessageContextMenuProvider = ({
 			allUserIdsInChannel,
 			allRolesInClan,
 			posShortProfile,
-			setPosShortProfile
+			setPosShortProfile,
+			onVisibilityChange
 		]
 	);
 

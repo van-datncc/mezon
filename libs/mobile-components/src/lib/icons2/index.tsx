@@ -208,7 +208,7 @@ export const ShieldUserIcon = ({ width = 24, height = 24, color = 'white', ...pr
 	</Svg>
 );
 
-export const QRCodeCameraIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
+export const MyQRCodeIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
 		<Path d="M12 17.01c0-3.3 2.7-6 6-6h9a3 3 0 100-6h-9a12 12 0 00-12 12v9a3 3 0 006 0v-9zm0 36c0 3.3 2.7 6 6 6h9a3 3 0 010 6h-9a12 12 0 01-12-12v-9a3 3 0 016 0v9zm48-36a6 6 0 00-6-6h-9a3 3 0 110-6h9a12 12 0 0112 12v9a3 3 0 01-6 0v-9z" />
 		<Path
@@ -216,6 +216,13 @@ export const QRCodeCameraIcon = ({ width = 24, height = 24, color = 'white', ...
 			clipRule="evenodd"
 			d="M15 20.01c0-3.3 2.7-6 6-6h6a6 6 0 016 6v6a6 6 0 01-6 6h-6a6 6 0 01-6-6v-6zm6 0h6v6h-6v-6zm-6 24c0-3.3 2.7-6 6-6h6a6 6 0 016 6v6a6 6 0 01-6 6h-6a6 6 0 01-6-6v-6zm6 0h6v6h-6v-6zm18-24c0-3.3 2.7-6 6-6h6a6 6 0 016 6v6a6 6 0 01-6 6h-6a6 6 0 01-6-6v-6zm6 0h6v6h-6v-6zm6.24 18a4.5 4.5 0 00-4.26 3.09c-.27.75-.9 1.41-1.68 1.41H45a6 6 0 00-6 6v10.5c0 3.3 2.7 6 6 6h18a6 6 0 006-6v-10.5a6 6 0 00-6-6h-.3c-.78 0-1.41-.66-1.68-1.41a4.5 4.5 0 00-4.26-3.09h-5.52zm8.76 15a6 6 0 11-12 0 6 6 0 0112 0z"
 		/>
+	</Svg>
+);
+
+export const QRCodeCameraIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
+	<Svg viewBox="0 0 24 24" fill={color} width={width} height={height} {...props}>
+		<Path fill="none" d="M0 0h24v24H0z" />
+		<Path d="M15 3h6v5h-2V5h-4V3zM9 3v2H5v3H3V3h6zm6 18v-2h4v-3h2v5h-6zm-6 0H3v-5h2v3h4v2zM3 11h18v2H3v-2z" />
 	</Svg>
 );
 export const PaintPaletteIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
@@ -1902,5 +1909,33 @@ export const Announcement = ({ defaultFill = '#AEAEAE', defaultSize = 20 }) => {
 				</G>
 			</Svg>
 		</View>
+	);
+};
+
+export function IconPeople({ width = 32, height = 32, color = '#AEAEAE', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 32 32" fill="none" {...props}>
+			<Path
+				d="M18.667 10.675a5.34 5.34 0 01-5.334 5.333A5.34 5.34 0 018 10.675a5.34 5.34 0 015.333-5.334 5.34 5.34 0 015.334 5.334zm-16 14.666c0-4.71 4.386-8 10.666-8 6.282 0 10.667 3.29 10.667 8v1.334H2.667V25.34z"
+				fill={color}
+			/>
+			<Path
+				d="M18.667 10.675a5.34 5.34 0 01-5.334 5.333A5.34 5.34 0 018 10.675a5.34 5.34 0 015.333-5.334 5.34 5.34 0 015.334 5.334zm-16 14.666c0-4.71 4.386-8 10.666-8 6.282 0 10.667 3.29 10.667 8v1.334H2.667V25.34zM26.667 26.675h2.666V25.34c0-3.417-2.307-6.086-5.971-7.294 2.054 1.837 3.305 4.36 3.305 7.294v1.334zM19.845 15.877A5.343 5.343 0 0024 10.675a5.342 5.342 0 00-4.67-5.293 7.969 7.969 0 012.004 5.293 7.965 7.965 0 01-1.817 5.072c.11.042.22.085.328.13z"
+				fill={color}
+			/>
+		</Svg>
+	);
+}
+
+export const Inbox = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 24 24" fill="none" {...props}>
+			<Path
+				fill={color}
+				fillRule="evenodd"
+				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
+				clipRule="evenodd"
+			></Path>
+		</Svg>
 	);
 };

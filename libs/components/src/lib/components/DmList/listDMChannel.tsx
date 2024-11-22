@@ -1,5 +1,13 @@
 import { useAppParams, useMenu } from '@mezon/core';
-import { channelsActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import {
+	channelsActions,
+	selectCloseMenu,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
+	selectStatusStream,
+	selectTheme,
+	useAppDispatch
+} from '@mezon/store';
 import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,7 +20,8 @@ type ListDMChannelProps = {
 };
 
 const heightAroundComponent = 230;
-const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
+const heightAppUpdate = 40;
+const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -21,15 +30,25 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const appearanceTheme = useSelector(selectTheme);
 	const streamPlay = useSelector(selectStatusStream);
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 
-	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
+	const calculateHeight = useCallback(() => {
+		const baseHeight = window.innerHeight - heightAroundComponent;
+		const streamAdjustment = streamPlay ? 56 : 0;
+		const electronAdjustment = IsElectronDownloading || isElectronUpdateAvailable ? heightAppUpdate : 0;
+
+		return baseHeight - streamAdjustment - titleBarHeight - electronAdjustment;
+	}, [IsElectronDownloading, isElectronUpdateAvailable, streamPlay]);
+
+	const [height, setHeight] = useState(calculateHeight());
 
 	useEffect(() => {
-		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0) - titleBarHeight);
+		const updateHeight = () => setHeight(calculateHeight());
 		updateHeight();
 		window.addEventListener('resize', updateHeight);
 		return () => window.removeEventListener('resize', updateHeight);
-	}, [streamPlay]);
+	}, [calculateHeight]);
 
 	const parentRef = useRef(null);
 
@@ -43,8 +62,6 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const joinToChatAndNavigate = useCallback(
 		async (DMid: string, type: number) => {
 			dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: DMid, timestamp: timestamp }));
 			navigate(`/chat/direct/message/${DMid}/${type}`);
 
 			if (closeMenu) {
@@ -91,7 +108,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 								isActive={isActive}
 								navigateToFriends={() => navigate(`/chat/direct/friends`)}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								joinToChatAndNavigate={isActive ? () => { } : joinToChatAndNavigate}
+								joinToChatAndNavigate={isActive ? () => {} : joinToChatAndNavigate}
 							/>
 						</div>
 					);

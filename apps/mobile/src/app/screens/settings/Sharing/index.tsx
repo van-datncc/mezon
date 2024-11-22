@@ -5,6 +5,7 @@ import {
 	getAttachmentUnique,
 	getUpdateOrAddClanChannelCache,
 	PenIcon,
+	PlayIcon,
 	save,
 	SearchIcon,
 	SendIcon,
@@ -26,12 +27,13 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { checkIsThread, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
+import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -170,7 +172,6 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		// const isPublic = channelSelected ? (checkIsThread(channelSelected as ChannelsEntity) ? false : !channelSelected.channel_private) : false;
 		const isPublic = channelSelected ? isPublicChannel(channelSelected) : false;
 		const isDiffClan = currentClan?.id !== channelSelected?.clan_id;
 		const isDiffChannel = currentChannelId !== channelSelected?.channel_id;
@@ -280,7 +281,14 @@ export const Sharing = ({ data, onClose }) => {
 						{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
 					]);
 					const fileSize = await getSizeImage(media);
-					const fileData = await RNFS.readFile(media.filePath || media?.contentUri, 'base64');
+					const checkIsVideo =
+						(media?.filetype && media?.filetype?.startsWith('video')) ||
+						(media?.mimeType && media?.mimeType?.startsWith('video')) ||
+						isVideo(media?.filePath?.toLowerCase());
+					const pathCompressed = checkIsVideo
+						? await compressVideo(media?.filePath || media?.contentUri)
+						: await compressImage(media?.filePath || media?.contentUri);
+					const fileData = await RNFS.readFile(pathCompressed || media.filePath || media?.contentUri, 'base64');
 
 					return {
 						uri: media.contentUri || media?.filePath,
@@ -294,6 +302,29 @@ export const Sharing = ({ data, onClose }) => {
 			handleFiles(fileFormats);
 		} catch (e) {
 			console.error(e);
+		}
+	};
+
+	const compressImage = async (image: string) => {
+		try {
+			return await Image.compress(image, {
+				compressionMethod: 'auto',
+				quality: 0.8
+			});
+		} catch (error) {
+			console.error('log  => error compressImage', error);
+			return image;
+		}
+	};
+
+	const compressVideo = async (video: string) => {
+		try {
+			return await Video.compress(video, {
+				compressionMethod: 'auto'
+			});
+		} catch (error) {
+			console.error('log  => error compressVideo', error);
+			return video;
 		}
 	};
 
@@ -375,10 +406,20 @@ export const Sharing = ({ data, onClose }) => {
 											key={`${media?.url}_${index}_media_sharing`}
 											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
 										>
+											{isVideo(media?.filename?.toLowerCase()) && isVideo(media?.url?.toLowerCase()) && (
+												<View style={styles.videoOverlay}>
+													<PlayIcon width={size.s_20} height={size.s_20} />
+												</View>
+											)}
 											{isFile ? (
 												<AttachmentFilePreview attachment={media} />
 											) : (
-												<FastImage source={{ uri: media?.url }} style={styles.itemMedia} />
+												<FastImage
+													source={{
+														uri: createImgproxyUrl(media?.url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+													}}
+													style={styles.itemMedia}
+												/>
 											)}
 											{isUploaded && (
 												<TouchableOpacity

@@ -6,9 +6,9 @@ interface EmbedFooterProps {
 
 export function EmbedFooter({ text, icon_url, timestamp }: EmbedFooterProps) {
 	return (
-		<div className="mt-2 mb-4 flex items-center gap-2">
+		<div className="mt-2 flex items-center gap-2">
 			{icon_url && <img src={icon_url} alt="Footer icon" className="w-5 h-5 rounded-full object-cover" />}
-			<div className="flex gap-2 items-center text-xs text-gray-500">
+			<div className="flex gap-2 items-center text-xs text-textSecondary800 dark:text-textSecondary">
 				{text && <span>{text}</span>}
 				{timestamp && (
 					<>

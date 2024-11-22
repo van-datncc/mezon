@@ -5,13 +5,11 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		headerTab: {
 			marginTop: 20,
-			padding: 20,
-			paddingVertical: 10,
+			padding: 10,
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'flex-start',
-			alignItems: 'center',
-			gap: 20
+			alignItems: 'center'
 		},
 
 		tabLabel: {
@@ -30,5 +28,14 @@ export const style = (colors: Attributes) =>
 			height: 3,
 			top: 0,
 			borderRadius: 50
+		},
+		itemTab: {
+			paddingHorizontal: 10
+		},
+		itemTabActive: {
+			marginTop: 5,
+			width: '100%',
+			height: 2,
+			backgroundColor: 'black'
 		}
 	});

@@ -1,7 +1,7 @@
 import { useShowName, useUserById } from '@mezon/core';
 import { messagesActions, selectClanView, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
 
 import { useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
@@ -46,16 +46,22 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	const isClanView = useSelector(selectClanView);
 
 	return (
-		<div className="overflow-hidden max-w-[97%]" ref={markUpOnReplyParent}>
+		<div className="overflow-hidden max-w-[97%]" style={{ height: 24 }} ref={markUpOnReplyParent}>
 			{message.references?.[0].message_ref_id ? (
-				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] replyMessage">
 					<Icons.ReplyCorner />
-					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
+					<div className="flex flex-row gap-1 pb-2 pr-12 items-center w-full">
 						<div className="w-5 h-5">
 							<AvatarImage
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
+								srcImgProxy={createImgproxyUrl(
+									(!isClanView
+										? (message?.references?.[0]?.mesages_sender_avatar ?? '')
+										: messageSender?.clan_avatar || messageSender?.user?.avatar_url) ?? '',
+									{ width: 100, height: 100, resizeType: 'fit' }
+								)}
 								src={
 									!isClanView
 										? (message?.references?.[0]?.mesages_sender_avatar ?? '')
@@ -97,7 +103,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 					</div>
 				</div>
 			) : (
-				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+				<div
+					className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage"
+					style={{ height: 24 }}
+				>
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
 						<div className="rounded-full dark:bg-bgSurface bg-bgLightModeButton size-4">

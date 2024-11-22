@@ -1,4 +1,4 @@
-import { useAuth, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -8,6 +8,7 @@ import {
 	messagesActions,
 	reactionActions,
 	referencesActions,
+	selectChannelById,
 	selectCurrentChannel,
 	selectDefaultCanvasByChannelId,
 	selectTheme,
@@ -16,7 +17,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
+import {
+	EMOJI_GIVE_COFFEE,
+	IMessageWithUser,
+	SubPanelName,
+	findParentByClass,
+	isPublicChannel,
+	useMenuBuilder,
+	useMenuBuilderPlugin
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -29,6 +38,7 @@ type ChannelMessageOptProps = {
 	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
 	isCombine: boolean;
 	mode: number;
+	isDifferentDay: boolean;
 };
 
 type JsonObject = {
@@ -47,7 +57,7 @@ enum EMessageOpt {
 	OPTION = 'option'
 }
 
-const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDifferentDay }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const refOpt = useRef<HTMLDivElement>(null);
@@ -62,7 +72,9 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode }: Chan
 	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
 
 	return (
-		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? 'top-0' : '-top-7'}  right-6 w-fit`}>
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-5' : 'top-0') : '-top-5'} ${isDifferentDay ? 'top-4' : ''} right-6 w-fit`}
+		>
 			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex items-center justify-between" ref={refOpt}>
 					<RecentEmoji message={message} />
@@ -94,13 +106,9 @@ interface RecentEmojiProps {
 const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 	const { emojiConverted } = useEmojiSuggestion();
 
-	const emojiRecentData = useMemo(() => {
-		return localStorage.getItem('recentEmojis');
-	}, [localStorage.getItem('recentEmojis')]);
-
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);
-	}, [emojiConverted, emojiRecentData]);
+	}, [emojiConverted]);
 
 	return (
 		<div className="flex items-center">
@@ -116,10 +124,11 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const appearanceTheme = useSelector(selectTheme);
-
+	const { reactionMessageDispatch } = useChatReaction();
+	const channel = useAppSelector((state) => selectChannelById(state, message.channel_id ?? '')) || {};
 	const handleItemClick = useCallback(async () => {
 		try {
-			dispatch(
+			await dispatch(
 				giveCoffeeActions.updateGiveCoffee({
 					channel_id: message.channel_id,
 					clan_id: message.clan_id,
@@ -128,6 +137,17 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 					sender_id: userId,
 					token_count: 1
 				})
+			).unwrap();
+
+			await reactionMessageDispatch(
+				'',
+				message.id ?? '',
+				EMOJI_GIVE_COFFEE.emoji_id,
+				EMOJI_GIVE_COFFEE.emoji,
+				1,
+				message?.sender_id ?? '',
+				false,
+				isPublicChannel(channel)
 			);
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);

@@ -1,10 +1,10 @@
 import { Block } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
+import { AttachmentEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { isImage, isVideo } from '../../../utils/helpers';
 import styles from './MediaItem.styles';
@@ -16,7 +16,7 @@ interface IMediaItemProps {
 export const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 	const checkIsVideo = useMemo(() => isVideo(data?.url), [data?.url]);
 	const checkIsImage = useMemo(() => isImage(data?.url), [data?.url]);
-	const uploader = useSelector(selectMemberClanByUserId(data?.uploader || ''));
+	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, data?.uploader || ''));
 	const handlePress = useCallback(() => {
 		onPress(data);
 	}, [onPress, data]);
@@ -25,11 +25,17 @@ export const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 			<Block style={styles.boxAvatar}>
 				<MezonAvatar height={25} width={25} username={uploader?.user?.username} avatarUrl={uploader?.user?.avatar_url}></MezonAvatar>
 			</Block>
-			{checkIsImage ? <FastImage style={styles.image} source={{ uri: data?.url }} resizeMode="cover" /> : null}
+			{checkIsImage ? (
+				<FastImage
+					style={styles.image}
+					source={{ uri: createImgproxyUrl(data?.url ?? '', { width: 300, height: 300, resizeType: 'fit' }) }}
+					resizeMode="cover"
+				/>
+			) : null}
 			{checkIsVideo ? (
 				<ExpoVideo
 					onError={(err) => {
-						console.log('load error', err);
+						console.error('load error', err);
 					}}
 					source={{
 						uri: data?.url

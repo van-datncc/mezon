@@ -1,11 +1,21 @@
+import { auditLogFilterActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { UserAuditLog } from '@mezon/utils';
 
 export type ModalExitProps = {
 	onClose: () => void;
 };
 const ExitSetting = (props: ModalExitProps) => {
+	const dispatch = useAppDispatch();
 	const { onClose } = props;
 	const handleClose = () => {
+		dispatch(auditLogFilterActions.setAction(''));
+		dispatch(
+			auditLogFilterActions.setUser({
+				userId: '',
+				userName: UserAuditLog.ALL_USER_AUDIT
+			})
+		);
 		onClose();
 	};
 

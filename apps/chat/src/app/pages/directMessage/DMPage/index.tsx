@@ -11,10 +11,12 @@ import {
 	useApp,
 	useAppNavigation,
 	useAppParams,
+	useAuth,
 	useChatMessages,
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useSearchMessages,
+	useSeenMessagePool,
 	useWindowFocusState
 } from '@mezon/core';
 import {
@@ -29,11 +31,14 @@ import {
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
+	selectIsUnreadDMById,
 	selectIsUseProfileDM,
+	selectListOfCalls,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
 	selectStatusMenu,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -51,18 +56,28 @@ function useChannelSeen(channelId: string) {
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
-		const timestamp = Date.now() / 1000;
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId]);
+	const { userId } = useAuth();
+	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
+	const { markAsReadSeen } = useSeenMessagePool();
+	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
+	useEffect(() => {
+		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+		if (lastMessage) {
+			markAsReadSeen(lastMessage, mode);
+		}
+	}, [lastMessage, channelId]);
 
 	useEffect(() => {
 		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, [isFocusDesktop, isTabVisible]);
@@ -78,6 +93,11 @@ function useChannelSeen(channelId: string) {
 	}, [dispatch, channelId, lastMessage]);
 }
 
+function DirectSeenListener({ channelId }: { channelId: string }) {
+	useChannelSeen(channelId);
+	return null;
+}
+
 const DirectMessage = () => {
 	// TODO: move selector to store
 	const { clanId, directId, type } = useAppParams();
@@ -86,10 +106,9 @@ const DirectMessage = () => {
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
-	const isSearchMessage = useSelector(selectIsSearchMessage(directId || ''));
+	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, directId));
 	const dispatch = useAppDispatch();
 
-	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (defaultChannelId) {
@@ -106,6 +125,8 @@ const DirectMessage = () => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+	const listOfCalls = useSelector(selectListOfCalls);
+	const { userId } = useAuth();
 
 	const HEIGHT_EMOJI_PANEL = 457;
 	const WIDTH_EMOJI_PANEL = 500;
@@ -148,11 +169,9 @@ const DirectMessage = () => {
 		}
 	}, [isShowCreateThread]);
 
-	const setMarginleft = useMemo(() => {
-		if (messagesContainerRef?.current?.getBoundingClientRect()) {
-			return window.innerWidth - messagesContainerRef?.current?.getBoundingClientRect().right + 155;
-		}
-	}, [messagesContainerRef.current?.getBoundingClientRect()]);
+	const setMarginleft = messagesContainerRef?.current?.getBoundingClientRect()
+		? window.innerWidth - messagesContainerRef?.current?.getBoundingClientRect().right + 155
+		: 0;
 
 	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -164,12 +183,12 @@ const DirectMessage = () => {
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-				h-[100%] overflow-visible`}
+				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row flex-1 w-full">
+				<div className={`flex flex-row flex-1 w-full ${listOfCalls[userId || '']?.includes(directId ?? '') ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>
@@ -286,6 +305,7 @@ const DirectMessage = () => {
 					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
+			<DirectSeenListener channelId={directId as string} />
 		</>
 	);
 };

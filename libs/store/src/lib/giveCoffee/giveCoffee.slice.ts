@@ -1,7 +1,10 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiGiveCoffeeEvent } from 'mezon-js/api.gen';
+import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
+import { toastActions } from '../toasts/toasts.slice';
 
 export const GIVE_COFEE = 'giveCoffee';
 
@@ -12,6 +15,7 @@ export interface GiveCoffeeEntity {
 export interface GiveCoffeeState extends EntityState<GiveCoffeeEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	showModalSendToken: boolean;
 	tokenSocket: Record<string, ApiGiveCoffeeEvent>;
 	tokenUpdate: Record<string, number>;
 }
@@ -36,9 +40,9 @@ export const updateGiveCoffee = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch (error) {
+			captureSentryError(error, 'giveCoffee/updateGiveCoffee');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -47,8 +51,31 @@ export const initialGiveCoffeeState: GiveCoffeeState = giveCoffeeAdapter.getInit
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
+	showModalSendToken: false,
 	tokenSocket: {},
 	tokenUpdate: {}
+});
+
+export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: ApiTokenSentEvent, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.sendToken(mezon.session, {
+			receiver_id: tokenEvent.receiver_id,
+			amount: tokenEvent.amount,
+			note: tokenEvent.note
+		});
+
+		if (response) {
+			thunkAPI.dispatch(toastActions.addToast({ message: 'Token sent successfully', type: 'success' }));
+			thunkAPI.dispatch(giveCoffeeActions.updateTokenUser({ tokenEvent }));
+			return response;
+		} else {
+			thunkAPI.dispatch(toastActions.addToast({ message: 'An error occurred, please try again', type: 'error' }));
+		}
+	} catch (error) {
+		captureSentryError(error, 'token/sendToken');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const giveCoffeeSlice = createSlice({
@@ -57,6 +84,32 @@ export const giveCoffeeSlice = createSlice({
 	reducers: {
 		add: giveCoffeeAdapter.addOne,
 		remove: giveCoffeeAdapter.removeOne,
+		setShowModalSendToken: (state, action: PayloadAction<boolean>) => {
+			state.showModalSendToken = action.payload;
+		},
+		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
+			const { tokenEvent } = action.payload;
+			const userId = tokenEvent.sender_id;
+			if (!userId) return;
+			state.tokenUpdate[userId] = state.tokenUpdate[userId] ?? 0;
+			state.tokenSocket[userId] = tokenEvent ?? {};
+
+			if (userId === tokenEvent.sender_id) {
+				state.tokenUpdate[userId] -= tokenEvent.amount || 0;
+			}
+		},
+		handleSocketToken: (state, action: PayloadAction<{ currentUserId: string; tokenEvent: ApiTokenSentEvent }>) => {
+			const { currentUserId, tokenEvent } = action.payload;
+			if (!currentUserId) return;
+			if (currentUserId !== tokenEvent.receiver_id) return;
+
+			state.tokenUpdate[currentUserId] = state.tokenUpdate[currentUserId] ?? 0;
+			state.tokenSocket[currentUserId] = tokenEvent ?? {};
+
+			if (currentUserId === tokenEvent.receiver_id) {
+				state.tokenUpdate[currentUserId] += tokenEvent.amount || 0;
+			}
+		},
 		setTokenFromSocket: (state, action: PayloadAction<{ userId: string | undefined; coffeeEvent: ApiGiveCoffeeEvent }>) => {
 			const { userId, coffeeEvent } = action.payload;
 
@@ -99,7 +152,8 @@ export const giveCoffeeReducer = giveCoffeeSlice.reducer;
  */
 export const giveCoffeeActions = {
 	...giveCoffeeSlice.actions,
-	updateGiveCoffee
+	updateGiveCoffee,
+	sendToken
 };
 
 /*
@@ -117,6 +171,8 @@ export const giveCoffeeActions = {
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
 export const getCoffeeState = (rootState: { [GIVE_COFEE]: GiveCoffeeState }): GiveCoffeeState => rootState[GIVE_COFEE];
+
+export const selectShowModalSendToken = createSelector(getCoffeeState, (state) => state.showModalSendToken);
 
 export const selectUpdateToken = (userId: string) =>
 	createSelector(getCoffeeState, (state) => {

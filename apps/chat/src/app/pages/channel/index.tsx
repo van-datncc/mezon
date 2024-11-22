@@ -1,32 +1,51 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import { useDragAndDrop, usePermissionChecker, useSearchMessages, useWindowFocusState } from '@mezon/core';
+import {
+	useAppNavigation,
+	useAuth,
+	useDragAndDrop,
+	usePermissionChecker,
+	useSearchMessages,
+	useSeenMessagePool,
+	useWindowFocusState
+} from '@mezon/core';
 import {
 	ChannelsEntity,
+	ETypeMission,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
 	gifsStickerEmojiActions,
+	listChannelsByUserActions,
+	onboardingActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectCurrentClan,
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
+	selectIsUnreadChannelById,
+	selectLastMessageByChannelId,
+	selectMissionDone,
+	selectMissionSum,
+	selectOnboardingByClan,
+	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Loading } from '@mezon/ui';
-import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { Icons, Loading } from '@mezon/ui';
+import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop, titleMission } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -35,35 +54,43 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
-
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	useEffect(() => {
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
-
+	const { userId } = useAuth();
+	const { markAsReadSeen } = useSeenMessagePool();
+	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {
-		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
-		if (numberNotification && numberNotification > 0) {
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		if (!lastMessage) {
+			return;
 		}
-		if (!numberNotification && resetBadgeCount) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
-		}
-	}, [currentChannel?.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
-
+		const mode =
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
+		markAsReadSeen(lastMessage, mode);
+	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
 			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
 		}
-	}, [currentChannel.channel_id]);
+		if (!statusFetchChannel) return;
+		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
+		if (numberNotification && numberNotification > 0) {
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
+		}
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		if (!numberNotification && resetBadgeCount) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+		}
+	}, [currentChannel?.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
@@ -80,6 +107,15 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
+	const currentClan = useSelector(selectCurrentClan);
+	const missionDone = useSelector(selectMissionDone);
+	const missionSum = useSelector(selectMissionSum);
+	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentChannel.clan_id as string));
+	const currentMission = useMemo(() => {
+		return onboardingClan.mission[missionDone];
+	}, [missionDone, channelId]);
+
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	useEffect(() => {
@@ -112,6 +148,9 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
+			{(selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding && (
+				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
+			)}
 			{currentChannel ? (
 				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
 			) : (
@@ -133,7 +172,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));
+	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, channelId));
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
@@ -259,5 +298,71 @@ const SearchMessageChannel = () => {
 			totalResult={totalResult}
 			channelId={currentChannel?.id || ''}
 		/>
+	);
+};
+
+const OnboardingGuide = ({
+	currentMission,
+	missionDone,
+	missionSum
+}: {
+	currentMission: ApiOnboardingItem;
+	missionDone: number;
+	missionSum: number;
+}) => {
+	const { navigate, toChannelPage } = useAppNavigation();
+	const dispatch = useAppDispatch();
+
+	const handleDoNextMission = useCallback(() => {
+		if (currentMission) {
+			switch (currentMission.task_type) {
+				case ETypeMission.SEND_MESSAGE: {
+					const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(link);
+					break;
+				}
+				case ETypeMission.VISIT: {
+					const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(linkChannel);
+					dispatch(onboardingActions.doneMission());
+					doneAllMission();
+					break;
+				}
+				case ETypeMission.DOSOMETHING: {
+					dispatch(onboardingActions.doneMission());
+					doneAllMission();
+					break;
+				}
+				default:
+					break;
+			}
+		}
+	}, [currentMission?.id, missionDone]);
+
+	const channelMission = useSelector((state) => selectChannelById(state, currentMission?.channel_id as string));
+	const doneAllMission = useCallback(() => {
+		if (missionDone + 1 === missionSum) {
+			dispatch(onboardingActions.doneOnboarding({ clan_id: currentMission?.clan_id as string }));
+		}
+	}, [missionDone]);
+	return (
+		<>
+			{missionDone < missionSum && currentMission ? (
+				<div
+					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
+					onClick={handleDoNextMission}
+				>
+					<Icons.Hashtag />
+					<div className=" flex flex-col">
+						<div className="text-base font-semibold">{currentMission.title} </div>
+						<div className="text-[10px] font-normal text-channelTextLabel">
+							{' '}
+							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
+							<strong className="text-channelActiveColor">#{channelMission.channel_label}</strong>{' '}
+						</div>
+					</div>
+				</div>
+			) : null}
+		</>
 	);
 };

@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { INotifiReactMessage, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotifiReactMessage } from 'mezon-js/api.gen';
@@ -38,15 +39,20 @@ export const fetchNotifiReactMessageCached = memoizeAndTrack(
 export const getNotifiReactMessage = createAsyncThunk(
 	'notifireactmessage/getNotifiReactMessage',
 	async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotifiReactMessageCached.clear(mezon, channelId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchNotifiReactMessageCached.clear(mezon, channelId);
+			}
+			const response = await fetchNotifiReactMessageCached(mezon, channelId);
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notifireactmessage/getNotifiReactMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-		const response = await fetchNotifiReactMessageCached(mezon, channelId);
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
-		return response;
 	}
 );
 
@@ -57,13 +63,18 @@ type SetNotifiReactMessagePayload = {
 export const setNotifiReactMessage = createAsyncThunk(
 	'notifireactmessage/setNotifiReactMessage',
 	async ({ channel_id }: SetNotifiReactMessagePayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.setNotificationReactMessage(mezon.session, channel_id || '');
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.setNotificationReactMessage(mezon.session, channel_id || '');
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notifireactmessage/setNotifiReactMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
-		return response;
 	}
 );
 
@@ -74,13 +85,18 @@ type DeleteNotifiReactMessagePayload = {
 export const deleteNotifiReactMessage = createAsyncThunk(
 	'notifireactmessage/deleteNotifiReactMessage',
 	async ({ channel_id }: DeleteNotifiReactMessagePayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteNotiReactMessage(mezon.session, channel_id || '');
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteNotiReactMessage(mezon.session, channel_id || '');
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'notifireactmessage/deleteNotifiReactMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
-		return response;
 	}
 );
 

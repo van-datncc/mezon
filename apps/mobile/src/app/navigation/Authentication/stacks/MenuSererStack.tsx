@@ -1,6 +1,10 @@
-import { Fonts, useTheme } from '@mezon/mobile-ui';
+import { Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
+import AuditLogComponent from '../../../components/AuditLogComponent';
+import FilterActionAuditLog from '../../../components/AuditLogComponent/FilteActionAuditLog/FilterActionAuditLog';
+import FilterUserAuditLog from '../../../components/AuditLogComponent/FilterUserAuditLog/FilterUserAuditLog';
 import { CategoryCreator } from '../../../components/Category';
 import { CategorySetting } from '../../../components/CategorySetting';
 import { ChannelCreator } from '../../../components/ChannelCreator';
@@ -45,13 +49,19 @@ export const MenuClanStacks = ({}: any) => {
 					backgroundColor: themeValue.secondary
 				},
 				headerTitleStyle: {
-					fontSize: Fonts.size.h6,
+					fontSize: Fonts.size.label,
 					fontWeight: 'bold',
 					color: themeValue.textStrong
 				},
+				headerLeftContainerStyle: Platform.select({
+					ios: {
+						left: size.s_6
+					}
+				}),
 				cardStyle: {
 					backgroundColor: 'transparent'
-				}
+				},
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen
@@ -217,7 +227,25 @@ export const MenuClanStacks = ({}: any) => {
 				name={APP_SCREEN.MENU_CLAN.WEBHOOKS}
 				component={Webhooks}
 				options={{
-					headerTitle: t('menuClanStack.webhooks')
+					headerTitle: t('menuClanStack.webhooks'),
+					headerLeftLabelVisible: false
+				}}
+			/>
+			<Stack.Screen name={APP_SCREEN.MENU_CLAN.AUDIT_LOG} component={AuditLogComponent} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.FILTER_BY_USER}
+				component={FilterUserAuditLog}
+				options={{
+					headerTitle: t('menuClanStack.filterByUser'),
+					headerLeftLabelVisible: false
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.FILTER_BY_ACTION}
+				component={FilterActionAuditLog}
+				options={{
+					headerTitle: t('menuClanStack.filterByAction'),
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT} component={WebhooksEdit} />

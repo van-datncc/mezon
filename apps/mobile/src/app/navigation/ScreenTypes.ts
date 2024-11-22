@@ -1,4 +1,4 @@
-import { EOpenSearchChannelFrom, ICategoryChannelOption } from '@mezon/mobile-components';
+import { ETypeSearch, ICategoryChannelOption } from '@mezon/mobile-components';
 import { ChannelsEntity, DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
@@ -34,7 +34,8 @@ export const APP_SCREEN = {
 		HOME: 'ROUTES.MESSAGES.HOME',
 		MESSAGE_DETAIL: 'ROUTES.MESSAGES.MESSAGE_DETAIL',
 		NEW_MESSAGE: 'ROUTES.MESSAGES.NEW_MESSAGE',
-		NEW_GROUP: 'ROUTES.MESSAGES.NEW_GROUP'
+		NEW_GROUP: 'ROUTES.MESSAGES.NEW_GROUP',
+		CHAT_STREAMING: 'ROUTES.MESSAGES.CHAT_STREAMING'
 	},
 
 	FRIENDS: {
@@ -81,7 +82,10 @@ export const APP_SCREEN = {
 		CATEGORY_SETTING: 'ROUTES.MENU_CLAN.CATEGORY_SETTING',
 		INTEGRATIONS: 'INTEGRATIONS',
 		WEBHOOKS: 'WEBHOOKS',
-		WEBHOOKS_EDIT: 'WEBHOOKS_EDIT'
+		WEBHOOKS_EDIT: 'WEBHOOKS_EDIT',
+		AUDIT_LOG: 'AUDIT_LOG',
+		FILTER_BY_USER: 'FILTER_BY_USER',
+		FILTER_BY_ACTION: 'FILTER_BY_ACTION'
 	},
 
 	MENU_CHANNEL: {
@@ -90,7 +94,10 @@ export const APP_SCREEN = {
 		SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
 		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
 		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
-		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES'
+		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
+		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM',
+		CANVAS: 'CANVAS',
+		CALL_DIRECT: 'CALL_DIRECT'
 	},
 
 	SETTINGS: {
@@ -103,7 +110,9 @@ export const APP_SCREEN = {
 		APPEARANCE: 'ROUTES.SETTINGS.APPEARANCE',
 		APP_THEME: 'ROUTES.SETTINGS.APP_THEME',
 		ACCOUNT: 'ROUTES.SETTINGS.ACCOUNT',
-		BLOCKED_USERS: 'ROUTES.SETTINGS.BLOCKED_USERS'
+		BLOCKED_USERS: 'ROUTES.SETTINGS.BLOCKED_USERS',
+		SEND_COFFEE: 'ROUTES.SETTINGS.SEND_COFFEE',
+		MY_QR_CODE: 'ROUTES.SETTINGS.MY_QR_CODE'
 	}
 } as const;
 
@@ -121,6 +130,7 @@ type MessagesStackParamList = {
 	[APP_SCREEN.MESSAGES.MESSAGE_DETAIL]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_MESSAGE]: undefined;
 	[APP_SCREEN.MESSAGES.NEW_GROUP]: undefined;
+	[APP_SCREEN.MESSAGES.CHAT_STREAMING]: undefined;
 };
 
 type FriendsStackParamList = {
@@ -148,7 +158,7 @@ export type MenuChannelStackParamList = {
 		channelId: string;
 	};
 	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
-		openSearchChannelFrom: EOpenSearchChannelFrom;
+		typeSearch: ETypeSearch;
 		currentChannel: IChannel | DirectEntity;
 	};
 	[APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION]: {
@@ -161,6 +171,19 @@ export type MenuChannelStackParamList = {
 		channelId: string;
 		id: string;
 		type?: number;
+	};
+	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM]: {
+		currentChannel: IChannel | DirectEntity;
+	};
+	[APP_SCREEN.MENU_CHANNEL.CANVAS]: {
+		clanId: string;
+		channelId: string;
+		canvasId: string;
+	};
+	[APP_SCREEN.MENU_CHANNEL.CALL_DIRECT]: {
+		receiverId: string;
+		receiverAvatar?: string;
+		isVideoCall?: string;
 	};
 };
 
@@ -196,6 +219,9 @@ type MenuClanStackParamList = {
 	[APP_SCREEN.MENU_CLAN.MEMBER_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.ROLE_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE]: undefined;
+	[APP_SCREEN.MENU_CLAN.AUDIT_LOG]: undefined;
+	[APP_SCREEN.MENU_CLAN.FILTER_BY_ACTION]: undefined;
+	[APP_SCREEN.MENU_CLAN.FILTER_BY_USER]: undefined;
 	[APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS]: {
 		roleId: string;
 	};
@@ -228,6 +254,10 @@ type SettingStackParamList = {
 	[APP_SCREEN.SETTINGS.APP_THEME]: undefined;
 	[APP_SCREEN.SETTINGS.ACCOUNT]: undefined;
 	[APP_SCREEN.SETTINGS.BLOCKED_USERS]: undefined;
+	[APP_SCREEN.SETTINGS.MY_QR_CODE]: undefined;
+	[APP_SCREEN.SETTINGS.SEND_COFFEE]: {
+		formValue: string;
+	};
 };
 
 export type AppStackParamList = {

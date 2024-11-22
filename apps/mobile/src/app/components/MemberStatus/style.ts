@@ -5,15 +5,18 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
 			backgroundColor: colors.secondary,
-			paddingHorizontal: size.s_18,
-			width: Dimensions.get('screen').width,
-			paddingBottom: size.s_60
+			width: Dimensions.get('screen').width - size.s_20 * 2,
+			marginHorizontal: size.s_20
 		},
 
 		text: {
+			backgroundColor: colors.secondary,
+			color: colors.text,
+			marginTop: size.s_10
+		},
+		textInvite: {
 			color: colors.text
 		},
-
 		box: {
 			backgroundColor: colors.primary,
 			marginTop: 10,

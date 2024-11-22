@@ -32,8 +32,8 @@ function MezonPage() {
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
 	}, [platform, version]);
 
-	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
-	const portableUrl = `https://cdn.mezon.vn/release/mezon-${version}-win-portable-x64.zip`;
+	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-x64.dmg`;
+	const portableUrl = `https://cdn.mezon.vn/release/mezon-${version}-win-x64-portable.exe`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {

@@ -75,11 +75,12 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 	const handleEditPermissions = async () => {
 		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
-		const removePermissionList = permissionList.filter((permission) => !selectedPermissions.includes(permission?.id)).map((it) => it?.id);
+		const removePermissionList = permissionList?.filter((permission) => !selectedPermissions.includes(permission?.id)).map((it) => it?.id);
 		const response = await updateRole(
-			clanRole.clan_id,
-			clanRole.id,
+			clanRole?.clan_id,
+			clanRole?.id,
 			clanRole?.title,
+			clanRole?.color || '',
 			selectedMembers,
 			selectedPermissions,
 			[],
@@ -160,7 +161,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	};
 
 	const handleNextStep = async () => {
-		const response = updateRole(newRole.clan_id, newRole.id, newRole.title, [], selectedPermissions, [], []);
+		const response = updateRole(newRole?.clan_id, newRole?.id, newRole?.title, newRole?.color || '', [], selectedPermissions, [], []);
 		if (response) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
 			// Toast.show({
@@ -184,7 +185,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	//Note: edit role case
 	useEffect(() => {
 		if (clanRole?.id) {
-			const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
+			const selectedPermissions = clanRole?.permission_list?.permissions?.filter((it) => it?.active).map((it) => it?.id);
 			setOriginSelectedPermissions(selectedPermissions);
 			setSelectedPermissions(selectedPermissions);
 		}

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, usePermissionChecker, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useChatReaction, usePermissionChecker, useReference } from '@mezon/core';
 import {
 	MessagesEntity,
 	createEditCanvas,
@@ -34,6 +34,7 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	ContextMenuItem,
+	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	EPermission,
 	IMessageWithUser,
@@ -44,7 +45,8 @@ import {
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
-	handleSaveImage
+	handleSaveImage,
+	isPublicChannel
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
@@ -102,6 +104,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
+	const { reactionMessageDispatch } = useChatReaction();
 
 	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId;
@@ -309,10 +312,18 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.setChannelPinMessage({ clan_id: currentClanId ?? '', channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
-				clanId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
-				channelId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
+				clanId: activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD) ? '' : (currentClanId ?? ''),
+				channelId:
+					activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD)
+						? currentDmId || ''
+						: (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
-				isPublic: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
+				isPublic:
+					activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD)
+						? false
+						: currentChannel
+							? !currentChannel.channel_private
+							: false,
 				mode: activeMode as number
 			})
 		);
@@ -470,7 +481,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				async () => {
 					try {
 						if (userId !== message.sender_id) {
-							dispatch(
+							await dispatch(
 								giveCoffeeActions.updateGiveCoffee({
 									channel_id: message.channel_id,
 									clan_id: message.clan_id,
@@ -479,6 +490,16 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 									sender_id: userId,
 									token_count: 1
 								})
+							).unwrap();
+							await reactionMessageDispatch(
+								'',
+								message.id ?? '',
+								EMOJI_GIVE_COFFEE.emoji_id,
+								EMOJI_GIVE_COFFEE.emoji,
+								1,
+								message?.sender_id ?? '',
+								false,
+								isPublicChannel(currentChannel)
 							);
 						}
 					} catch (error) {

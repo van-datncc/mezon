@@ -1,5 +1,6 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	appActions,
 	channelsActions,
 	notificationSettingActions,
 	selectCloseMenu,
@@ -135,6 +136,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
 			}
+			dispatch(appActions.setIsShowCanvas(false));
 		};
 
 		const openModalJoinVoiceChannel = useCallback(
@@ -301,8 +303,14 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 	}
 );
 
-export const ChannelLink = memo(ChannelLinkComponent);
-
+export const ChannelLink = memo(
+	ChannelLinkComponent,
+	(prev, curr) =>
+		prev.channel?.id === curr?.channel?.id &&
+		prev.isActive === curr.isActive &&
+		prev.numberNotification === curr.numberNotification &&
+		prev.isUnReadChannel === curr.isUnReadChannel
+);
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;
 	channelId: string;

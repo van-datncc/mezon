@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -49,8 +50,8 @@ export const fetchWebhooks = createAsyncThunk(
 			const response = await fetchWebhooksCached(mezon, channelId, clanId);
 			return response.webhooks;
 		} catch (error) {
-			console.log(error);
-			return thunkAPI.rejectWithValue({ error });
+			captureSentryError(error, 'integration/fetchWebhooks');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -72,8 +73,8 @@ export const generateWebhook = createAsyncThunk(
 				thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
-			console.log(error);
-			return thunkAPI.rejectWithValue({ error });
+			captureSentryError(error, 'integration/createWebhook');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -83,7 +84,11 @@ export const deleteWebhookById = createAsyncThunk(
 	async (data: { webhook: ApiWebhook; clanId: string; channelId: string; isClanSetting?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string);
+			const body = {
+				channel_id: data.channelId,
+				clan_id: data.clanId
+			};
+			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string, body);
 			if (response) {
 				if (data.isClanSetting) {
 					thunkAPI.dispatch(fetchWebhooks({ channelId: '0', clanId: data.clanId, noCache: true }));
@@ -93,9 +98,9 @@ export const deleteWebhookById = createAsyncThunk(
 				return data.webhook;
 			}
 			thunkAPI.rejectWithValue({});
-		} catch (err) {
-			console.log(err);
-			return thunkAPI.rejectWithValue(err);
+		} catch (error) {
+			captureSentryError(error, 'integration/deleteWebhook');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -116,9 +121,9 @@ export const updateWebhookBySpecificId = createAsyncThunk(
 					thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
 				}
 			}
-		} catch (err) {
-			console.log(err);
-			return thunkAPI.rejectWithValue(err);
+		} catch (error) {
+			captureSentryError(error, 'integration/editWebhook');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

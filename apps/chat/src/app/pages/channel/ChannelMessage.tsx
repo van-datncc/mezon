@@ -1,31 +1,14 @@
-import {
-	ChannelMessageOpt,
-	ChatWelcome,
-	MessageContextMenuProps,
-	MessageWithUser,
-	UnreadMessageBreak,
-	useMessageContextMenu
-} from '@mezon/components';
-import { useSeenMessagePool } from '@mezon/core';
-import {
-	selectChannelDraftMessage,
-	selectCurrentUserId,
-	selectIdMessageRefEdit,
-	selectMessageEntityById,
-	selectOpenEditMessageState,
-	useAppSelector
-} from '@mezon/store';
+import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
+import { MessagesEntity, selectChannelDraftMessage, selectIdMessageRefEdit, selectOpenEditMessageState, useAppSelector } from '@mezon/store';
 import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
-import OnBoardWelcome from 'libs/components/src/lib/components/ChatWelcome/OnBoardWelcome';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 export type MessageProps = {
 	channelId: string;
 	messageId: string;
-	previousMessageId: string;
 	nextMessageId?: string;
 	mode: number;
 	isHighlight?: boolean;
@@ -36,6 +19,8 @@ export type MessageProps = {
 	index: number;
 	checkMessageTargetToMoved?: boolean;
 	messageReplyHighlight?: boolean;
+	message: MessagesEntity;
+	previousMessage: MessagesEntity;
 };
 
 export type MessageRef = {
@@ -57,39 +42,24 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	avatarDM,
 	userName,
 	isLastSeen,
-	previousMessageId,
 	nextMessageId,
 	checkMessageTargetToMoved,
-	messageReplyHighlight
+	messageReplyHighlight,
+	message,
+	previousMessage
 }: Readonly<MessageProps>) => {
-	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
-	const previousMessage = useSelector((state) => selectMessageEntityById(state, channelId, previousMessageId));
-	const { markMessageAsSeen } = useSeenMessagePool();
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-	const messageRef = useRef<HTMLDivElement | null>(null);
-	const currentUserId = useSelector(selectCurrentUserId);
-
-	const isMyMessage = currentUserId && currentUserId === message?.sender_id;
 
 	const isEditing = channelDraftMessage?.message_id === messageId ? openEditMessageState : openEditMessageState && idMessageRefEdit === messageId;
 
 	const isSameUser = message?.user?.id === previousMessage?.user?.id;
-	const isTimeGreaterThan60Minutes = useMemo(() => {
-		if (message?.create_time && previousMessage?.create_time) {
-			return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 60 * 60 * 1000;
-		}
-		return false;
-	}, [message?.create_time, previousMessage?.create_time]);
+	const isTimeGreaterThan60Minutes =
+		!!message?.create_time && Date.parse(message.create_time) - Date.parse(previousMessage?.create_time) < 60 * 60 * 1000;
 
-	const isDifferentDay = useMemo(() => {
-		if (message?.create_time && previousMessage?.create_time) {
-			return !isSameDay(new Date(message.create_time), new Date(previousMessage.create_time));
-		}
-		return false;
-	}, [message?.create_time, previousMessage?.create_time]);
+	const isDifferentDay = !!message?.create_time && !isSameDay(new Date(message.create_time), new Date(previousMessage?.create_time));
 
 	const isCombine = isSameUser && isTimeGreaterThan60Minutes;
 
@@ -108,12 +78,16 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	})();
 
 	const popup = useCallback(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} mode={mode} />;
+		return (
+			<ChannelMessageOpt
+				message={message}
+				handleContextMenu={handleContextMenu}
+				isCombine={isCombine}
+				mode={mode}
+				isDifferentDay={isDifferentDay}
+			/>
+		);
 	}, [message, handleContextMenu, isCombine, mode]);
-
-	useEffect(() => {
-		markMessageAsSeen(message);
-	}, [messageId]);
 
 	return (
 		<>
@@ -125,7 +99,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 			{!message.isFirst && (
-				<div ref={messageRef} className={`fullBoxText relative group ${!isCombine || mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
+				<div className={`fullBoxText relative group ${!isCombine || mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
 					<MessageWithUser
 						allowDisplayShortProfile={true}
 						message={mess}
@@ -142,9 +116,16 @@ export const ChannelMessage: ChannelMessageComponent = ({
 				</div>
 			)}
 
-			{!isMyMessage && isLastSeen && <UnreadMessageBreak />}
+			{/* {!isMyMessage && isLastSeen && <UnreadMessageBreak />} */}
 		</>
 	);
 };
 
-export const MemorizedChannelMessage = memo(ChannelMessage);
+export const MemorizedChannelMessage = memo(
+	ChannelMessage,
+	(prev, curr) =>
+		prev.messageId + prev?.message?.update_time === curr.messageId + curr?.message?.update_time &&
+		prev.channelId === curr.channelId &&
+		prev.messageReplyHighlight === curr.messageReplyHighlight &&
+		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved
+);

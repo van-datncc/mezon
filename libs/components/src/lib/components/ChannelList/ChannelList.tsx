@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, usePathMatch } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannels } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -7,6 +7,8 @@ import {
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
 	selectCurrentClan,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
 	selectStatusStream,
 	selectTheme,
@@ -14,11 +16,13 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ICategoryChannel, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { default as SimpleBarReact } from 'simplebar-react';
+import 'simplebar/src/simplebar.css';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
@@ -31,7 +35,7 @@ function ChannelList() {
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			id="channelList"
 			role="button"
 		>
@@ -45,18 +49,19 @@ function ChannelList() {
 }
 
 const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity | null }) => {
-	const memberPath = `/chat/clans/${currentClan?.id}/member-safety`;
-	const channelSettingPath = `/chat/clans/${currentClan?.id}/channel-setting`;
-	const { isMemberPath, isSettingPath } = usePathMatch({ isMemberPath: memberPath, isSettingPath: channelSettingPath });
 	return (
 		<>
 			{currentClan?.banner && (
 				<div className="h-[136px]">
-					<img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />
+					<img
+						src={createImgproxyUrl(currentClan?.banner ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+						alt="imageCover"
+						className="h-full w-full object-cover"
+					/>
 				</div>
 			)}
 			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
-				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
+				<Events />
 			</div>
 		</>
 	);
@@ -68,6 +73,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const streamPlay = useSelector(selectStatusStream);
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
@@ -96,15 +103,15 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
 			const outsideHeight = totalHeight;
-			const titleBarHeight = (isWindowsDesktop || isLinuxDesktop) ? 21 : 0;
+			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
 		};
 		calculateHeight();
 		window.addEventListener('resize', calculateHeight);
 		return () => window.removeEventListener('resize', calculateHeight);
-	}, [data, streamPlay]);
+	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
 	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
@@ -115,22 +122,27 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	useLayoutEffect(() => {
 		if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
+		if (!virtualizer.getVirtualItems().length) return;
+
 		const focusChannel = ctrlKFocusChannel;
 		const { id, parentId } = focusChannel as { id: string; parentId: string };
 		const categoryId = channels[id]?.category_id;
 		const index = data.findIndex((item) => item.id === categoryId);
+		if (index <= 0) return;
 
-		if (index === -1) return;
-
-		virtualizer.scrollToIndex(index, { align: 'center' });
-
+		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
+		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
+		const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
+		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
+			virtualizer.scrollToIndex(index, { align: 'center' });
+		}
 		if (id && parentId && parentId !== '0') {
 			if (channelRefs.current[parentId]?.channelRef) {
 				requestAnimationFrame(() => {
-					dispatch(categoriesActions.setCtrlKFocusChannel(null));
 					channelRefs.current[parentId]?.scrollIntoThread(id);
 				});
 			}
+			dispatch(categoriesActions.setCtrlKFocusChannel(null));
 		} else if (id) {
 			if (channelRefs.current[id]?.channelRef) {
 				requestAnimationFrame(() => {
@@ -142,15 +154,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	return (
-		<div
-			ref={parentRef}
-			style={{
-				height: height,
-				overflowY: 'auto',
-				contain: 'strict'
-			}}
-			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
-		>
+		<SimpleBarReact scrollableNodeProps={{ ref: parentRef }} style={{ maxHeight: height }}>
 			<div
 				style={{
 					height: virtualizer.getTotalSize(),
@@ -200,7 +204,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					})}
 				</div>
 			</div>
-		</div>
+		</SimpleBarReact>
 	);
 });
 
@@ -227,8 +231,8 @@ const FavoriteChannelsSection = ({
 			<div className="w-[94%] mx-auto">
 				{channelFavorites
 					? channelFavorites.map((id, index) => (
-						<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-					))
+							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+						))
 					: ''}
 			</div>
 		) : null}

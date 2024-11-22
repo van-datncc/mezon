@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -12,6 +13,8 @@ export interface IApplicationState {
 	appsData: ApiAppList;
 	appDetail: ApiApp;
 	currentAppId?: string;
+	isElectronDownLoading: boolean;
+	isElectronUpdateAvailable: boolean;
 }
 
 export const applicationInitialState: IApplicationState = {
@@ -32,7 +35,9 @@ export const applicationInitialState: IApplicationState = {
 		role: undefined,
 		token: undefined
 	},
-	currentAppId: undefined
+	currentAppId: undefined,
+	isElectronUpdateAvailable: false,
+	isElectronDownLoading: false
 };
 
 const FETCH_CACHED_TIME = 3 * 60 * 1000;
@@ -57,9 +62,9 @@ export const fetchApplications = createAsyncThunk('adminApplication/fetchApplica
 		}
 		const response = await fetchApplicationsCached(mezon);
 		return response;
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/fetchApplications');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -69,8 +74,9 @@ export const getApplicationDetail = createAsyncThunk('adminApplication/getApplic
 		const response = await mezon.client.getApp(mezon.session, appId);
 		thunkAPI.dispatch(setCurrentAppId(appId));
 		return response;
-	} catch (err) {
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/getApplicationDetail');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -83,9 +89,9 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 		} else {
 			thunkAPI.rejectWithValue({});
 		}
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/createApplication');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -93,9 +99,9 @@ export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async 
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/addBotChat');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -108,9 +114,9 @@ export const editApplication = createAsyncThunk(
 			if (response) {
 				return data.request;
 			}
-		} catch (err) {
-			console.log(err);
-			return thunkAPI.rejectWithValue({ err });
+		} catch (error) {
+			captureSentryError(error, 'adminApplication/editApplication');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -120,9 +126,9 @@ export const deleteApplication = createAsyncThunk('adminApplication/deleteApplic
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteApp(mezon.session, appId);
 		return response;
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue({ err });
+	} catch (error) {
+		captureSentryError(error, 'adminApplication/deleteApplication');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -132,6 +138,12 @@ export const adminApplicationSlice = createSlice({
 	reducers: {
 		setCurrentAppId: (state, action) => {
 			state.currentAppId = action.payload;
+		},
+		setIsElectronUpdateAvailable: (state, action) => {
+			state.isElectronUpdateAvailable = action.payload;
+		},
+		setIsElectronDownloading: (state, action) => {
+			state.isElectronDownLoading = action.payload;
 		}
 	},
 	extraReducers(builder) {
@@ -161,7 +173,9 @@ export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicat
 export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
 export const selectAppDetail = createSelector(getApplicationState, (state) => state.appDetail);
 export const selectCurrentAppId = createSelector(getApplicationState, (state) => state.currentAppId);
+export const selectIsElectronUpdateAvailable = createSelector(getApplicationState, (state) => state.isElectronUpdateAvailable);
+export const selectIsElectronDownloading = createSelector(getApplicationState, (state) => state.isElectronDownLoading);
 
 export const selectAppById = (appId: string) => createSelector(selectAllApps, (allApp) => allApp.apps?.find((app) => app.id === appId) || null);
 export const adminApplicationReducer = adminApplicationSlice.reducer;
-export const { setCurrentAppId } = adminApplicationSlice.actions;
+export const { setCurrentAppId, setIsElectronUpdateAvailable, setIsElectronDownloading } = adminApplicationSlice.actions;

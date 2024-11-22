@@ -1,12 +1,21 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
+import { useAuth, useFriends, useMemberStatus } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { FriendsEntity, channelMembersActions, selectCurrentClanId, selectUpdateToken, useAppDispatch } from '@mezon/store-mobile';
+import {
+	FriendsEntity,
+	channelMembersActions,
+	selectAccountCustomStatus,
+	selectCurrentClanId,
+	selectUpdateToken,
+	useAppDispatch
+} from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonButton } from '../../componentUI';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
@@ -32,14 +41,14 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation('profile');
 	const [isVisibleAddStatusUserModal, setIsVisibleAddStatusUserModal] = useState<boolean>(false);
 	const userStatusBottomSheetRef = useRef<BottomSheetModal>(null);
-	const userCustomStatus = useMemberCustomStatus(user?.userProfile?.user?.id || '');
+	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 	const getTokenSocket = useSelector(selectUpdateToken(user?.userId ?? ''));
 	const userStatus = useMemberStatus(user?.userId || '');
 
 	const tokenInWallet = useMemo(() => {
-		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet)?.value : 0;
+		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet || '{}')?.value : 0;
 	}, [user?.userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
@@ -51,6 +60,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	};
 	const navigateToSettingScreen = () => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
+	};
+
+	const navigateGoback = () => {
+		navigation.goBack();
 	};
 
 	const navigateToProfileSetting = () => {
@@ -85,7 +98,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
-				<View style={styles.backgroundListIcon}>
+				<View style={[styles.backgroundListIcon, isTabletLandscape && { justifyContent: 'space-between' }]}>
+					{isTabletLandscape && (
+						<TouchableOpacity style={styles.backgroundSetting} onPress={navigateGoback}>
+							<Icons.ChevronSmallLeftIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						</TouchableOpacity>
+					)}
 					<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
 						<Icons.SettingsIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
@@ -93,7 +111,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
-						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							}}
+							style={styles.imgWrapper}
+						/>
 					) : (
 						<Block
 							backgroundColor={themeValue.colorAvatarDefault}
@@ -107,7 +130,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</Block>
 					)}
-					<UserStatus status={userStatus} customStyles={styles.dotStatusUser} />
+					<UserStatus status={userStatus} customStyles={styles.dotStatusUser} iconSize={isTabletLandscape ? size.s_20 : size.s_12} />
 				</TouchableOpacity>
 			</View>
 

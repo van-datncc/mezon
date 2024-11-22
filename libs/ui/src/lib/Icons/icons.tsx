@@ -184,9 +184,9 @@ export function Check(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function Tick({ fill = '#155EEF' }: { fill?: string }) {
+export function Tick({ fill = 'fill:[#155EEF]', defaultSize = 'w-5 h-5' }: { fill?: string; defaultSize?: string }) {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg viewBox="0 0 20 20" className={`${defaultSize}`} xmlns="http://www.w3.org/2000/svg">
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
@@ -2859,10 +2859,9 @@ export function IconClockChannel() {
 	);
 }
 
-export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
+export function IconPhoneDM({ ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2872,6 +2871,7 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
@@ -2882,10 +2882,9 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
+export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2895,11 +2894,37 @@ export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
 				d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z"
 			></path>
+			{isShowLine && (
+				<>
+					{' '}
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
@@ -3100,7 +3125,7 @@ export function ThreadIconLocker(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconRemove({ className = '' }: { className: string }) {
+export function IconRemove({ className = '', fill = 'currentColor' }: { className?: string; fill?: string }) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -3113,7 +3138,7 @@ export function IconRemove({ className = '' }: { className: string }) {
 			className={className}
 		>
 			<path
-				fill="currentColor"
+				fill={fill}
 				d="M17.3 18.7a1 1 0 0 0 1.4-1.4L13.42 12l5.3-5.3a1 1 0 0 0-1.42-1.4L12 10.58l-5.3-5.3a1 1 0 0 0-1.4 1.42L10.58 12l-5.3 5.3a1 1 0 1 0 1.42 1.4L12 13.42l5.3 5.3Z"
 			></path>
 		</svg>
@@ -5671,18 +5696,319 @@ export function ShadowBotIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function WindowMinimize(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
-			<path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 		</svg>
 	);
 }
 export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 448 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props} {...props}>
+		<svg viewBox="0 0 448 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
 			<path
 				d="M384 80c8.8 0 16 7.2 16 16l0 320c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16L48 96c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"
 				fill="currentColor"
 			/>
+		</svg>
+	);
+}
+export const GuideIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fillRule="evenodd"
+			strokeLinejoin="round"
+			strokeMiterlimit="2"
+			clipRule="evenodd"
+			viewBox="0 0 32 32"
+			fill={defaultFill}
+			id="direction-board"
+			className={`${defaultSize}`}
+		>
+			<g transform="translate(-52 -156)">
+				<path
+					d="M72.125,117.091C72.125,116.657 71.769,116.241 71.136,115.934C70.504,115.627 69.645,115.455 68.75,115.455C68.26,115.455 67.74,115.455 67.25,115.455C66.355,115.455 65.496,115.627 64.864,115.934C64.231,116.241 63.875,116.657 63.875,117.091C63.875,120.012 63.875,127.988 63.875,130.909C63.875,131.343 64.231,131.759 64.864,132.066C65.496,132.373 66.355,132.545 67.25,132.545C67.74,132.545 68.26,132.545 68.75,132.545C69.645,132.545 70.504,132.373 71.136,132.066C71.769,131.759 72.125,131.343 72.125,130.909C72.125,127.988 72.125,120.012 72.125,117.091Z"
+					transform="matrix(0 .66667 -1.375 0 238.5 139.667)"
+				></path>
+				<path d="M67.25,157L67.25,183C67.25,183.414 67.586,183.75 68,183.75C68.414,183.75 68.75,183.414 68.75,183L68.75,157C68.75,156.586 68.414,156.25 68,156.25C67.586,156.25 67.25,156.586 67.25,157Z"></path>
+				<path
+					d="M81.386,162.036C81.612,161.923 81.75,161.72 81.75,161.5C81.75,161.28 81.612,161.077 81.386,160.964L76.386,158.464C76.269,158.406 76.136,158.375 76,158.375L68,158.375C67.586,158.375 67.25,158.655 67.25,159L67.25,164C67.25,164.345 67.586,164.625 68,164.625L76,164.625C76.136,164.625 76.269,164.594 76.386,164.536L81.386,162.036Z"
+					transform="matrix(1 0 0 1.2 0 -30.8)"
+				></path>
+				<path
+					d="M81.386,160.964C81.612,161.077 81.75,161.28 81.75,161.5C81.75,161.72 81.612,161.923 81.386,162.036L76.386,164.536C76.269,164.594 76.136,164.625 76,164.625L68,164.625C67.586,164.625 67.25,164.345 67.25,164L67.25,159C67.25,158.655 67.586,158.375 68,158.375L76,158.375C76.136,158.375 76.269,158.406 76.386,158.464L81.386,160.964Z"
+					transform="matrix(-1 0 0 1.2 136 -20.8)"
+				></path>
+			</g>
+		</svg>
+	);
+};
+
+export const RuleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg role="img" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize}`} width="22" height="20" fill="none" viewBox="0 0 24 24">
+			{' '}
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M15 2a3 3 0 0 1 3 3v12H5.5a1.5 1.5 0 0 0 0 3h14a.5.5 0 0 0 .5-.5V5h1a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h10Zm-.3 5.7a1 1 0 0 0-1.4-1.4L9 10.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l5-5Z"
+				clipRule="evenodd"
+			></path>
+		</svg>
+	);
+};
+
+export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
+		>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm5.7-13.3a1 1 0 0 0-1.4-1.4L10 14.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l7-7Z"
+				clipRule="evenodd"
+			></path>
+		</svg>
+	);
+};
+
+export function SendMoney(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0" />
+
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="M9.5 13.75C9.5 14.72 10.25 15.5 11.17 15.5H13.05C13.85 15.5 14.5 14.82 14.5 13.97C14.5 13.06 14.1 12.73 13.51 12.52L10.5 11.47C9.91 11.26 9.51001 10.94 9.51001 10.02C9.51001 9.17999 10.16 8.48999 10.96 8.48999H12.84C13.76 8.48999 14.51 9.26999 14.51 10.24"
+					stroke="#23b850"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>{' '}
+				<path d="M12 7.5V16.5" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path
+					d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2"
+					stroke="#23b850"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>{' '}
+				<path d="M22 6V2H18" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path d="M17 7L22 2" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function HashIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="channelIcon_a85c10"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M10.99 3.16A1 1 0 1 0 9 2.84L8.15 8H4a1 1 0 0 0 0 2h3.82l-.67 4H3a1 1 0 1 0 0 2h3.82l-.8 4.84a1 1 0 0 0 1.97.32L8.85 16h4.97l-.8 4.84a1 1 0 0 0 1.97.32l.86-5.16H20a1 1 0 1 0 0-2h-3.82l.67-4H21a1 1 0 1 0 0-2h-3.82l.8-4.84a1 1 0 1 0-1.97-.32L15.15 8h-4.97l.8-4.84ZM14.15 14l.67-4H9.85l-.67 4h4.97Z"
+				clipRule="evenodd"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function TargetIcon({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) {
+	return (
+		<svg
+			fill={defaultFill}
+			className={`${defaultSize}`}
+			height="20px"
+			width="20px"
+			version="1.1"
+			id="Icons"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			viewBox="0 0 32 32"
+			xmlSpace="preserve"
+		>
+			<path
+				d="M30.9,5.6C30.8,5.2,30.4,5,30,5h-3V2c0-0.4-0.2-0.8-0.6-0.9C26,0.9,25.6,1,25.3,1.3l-4,4C21.1,5.5,21,5.7,21,6v3.6l-5.7,5.7
+	c-0.4,0.4-0.4,1,0,1.4c0.2,0.2,0.5,0.3,0.7,0.3s0.5-0.1,0.7-0.3l5.7-5.7H26c0.3,0,0.5-0.1,0.7-0.3l4-4C31,6.4,31.1,6,30.9,5.6z"
+			/>
+			<path
+				d="M18.1,18.1C17.6,18.7,16.8,19,16,19s-1.6-0.3-2.1-0.9c-1.2-1.2-1.2-3.1,0-4.2l2.8-2.8C16.5,11,16.2,11,16,11
+	c-2.8,0-5,2.2-5,5s2.2,5,5,5s5-2.2,5-5c0-0.2,0-0.5-0.1-0.7L18.1,18.1z"
+			/>
+			<path
+				d="M28.1,12.1C27.6,12.7,26.8,13,26,13h-2.8l-0.7,0.7c0.3,0.7,0.4,1.5,0.4,2.3c0,3.9-3.1,7-7,7s-7-3.1-7-7s3.1-7,7-7
+	c0.8,0,1.6,0.2,2.3,0.4L19,8.8V6c0-0.8,0.3-1.6,0.9-2.1l1-1C19.3,2.3,17.7,2,16,2C8.3,2,2,8.3,2,16s6.3,14,14,14s14-6.3,14-14
+	c0-1.7-0.3-3.3-0.9-4.9L28.1,12.1z"
+			/>
+		</svg>
+	);
+}
+
+export function LongArrowRight(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="" {...props}>
+			<path
+				fill="currentColor"
+				d="M20.7 12.7a1 1 0 0 0 0-1.4l-5-5a1 1 0 1 0-1.4 1.4l3.29 3.3H4a1 1 0 1 0 0 2h13.59l-3.3 3.3a1 1 0 0 0 1.42 1.4l5-5Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg className="plusIcon_df2e1e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
+			<circle cx="12" cy="12" r="10" fill="transparent" className=""></circle>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm0-17a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1Z"
+				clipRule="evenodd"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function StopCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="m 14.234375 11.714844 c -0.382813 0.382812 -1 0.382812 -1.386719 0 l -1.039062 -1.039063 l -1.039063 -1.042969 c -0.386719 -0.382812 -0.386719 -1 0 -1.386718 l 0.492188 -0.492188 c -2.035157 -1.109375 -4.5 -1.109375 -6.535157 0 l 0.492188 0.492188 c 0.386719 0.386718 0.386719 1.003906 0 1.386718 l -1.039062 1.042969 l -1.039063 1.039063 c -0.386719 0.382812 -1.003906 0.382812 -1.386719 0 l -1.042968 -1.039063 c -0.957032 -0.957031 -0.957032 -2.511719 0 -3.46875 l 0.347656 -0.347656 c 3.816406 -3.816406 10.054687 -3.816406 13.871094 0 l 0.347656 0.347656 c 0.957031 0.957031 0.957031 2.511719 0 3.46875 z m 0 0"
+					fill="#ffffff"
+				/>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function StartCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g fill="#ffffff">
+					{' '}
+					<path d="m 5.003906 2 c 0.554688 0 1 0.445312 1 1 v 3 c 0 0.554688 -0.445312 1 -1 1 h -0.710937 c 0.671875 2.265625 2.445312 4.042969 4.710937 4.710938 v -0.710938 c 0 -0.554688 0.449219 -1 1 -1 h 3 c 0.554688 0 1 0.445312 1 1 v 1.5 c 0 1.378906 -1.117187 2.5 -2.5 2.5 h -0.5 c -5.503906 0 -10 -4.496094 -10 -10 v -0.5 c 0 -1.378906 1.121094 -2.5 2.5 -2.5 z m 0 0" />{' '}
+					<path d="m 9 1 c -0.550781 0 -1 0.449219 -1 1 v 6 h 6 c 0.550781 0 1 -0.449219 1 -1 s -0.449219 -1 -1 -1 h -2.585938 l 4.292969 -4.292969 c 0.390625 -0.390625 0.390625 -1.023437 0 -1.414062 c -0.1875 -0.1875 -0.441406 -0.292969 -0.707031 -0.292969 s -0.519531 0.105469 -0.707031 0.292969 l -4.292969 4.292969 v -2.585938 c 0 -0.550781 -0.449219 -1 -1 -1 z m 0 0" />{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function Microphone({ isMuteMicrophone = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<path
+				d="M19 10V12C19 15.866 15.866 19 12 19M5 10V12C5 15.866 8.13401 19 12 19M12 19V22M8 22H16M12 15C10.3431 15 9 13.6569 9 12V5C9 3.34315 10.3431 2 12 2C13.6569 2 15 3.34315 15 5V12C15 13.6569 13.6569 15 12 15Z"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+
+			{isShowLine && (
+				<>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
+		</svg>
+	);
+}
+export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="32px" height="32px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="🔍-System-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+					{' '}
+					<g id="ic_fluent_share_screen_28_regular" fill="currentColor" fill-rule="nonzero">
+						{' '}
+						<path
+							d="M23.75,4.99939 C24.9926,4.99939 26,6.00675 26,7.24939 L26,20.75 C26,21.9926 24.9926,23 23.75,23 L4.25,23 C3.00736,23 2,21.9927 2,20.75 L2,7.24939 C2,6.00675 3.00736,4.99939 4.25,4.99939 L23.75,4.99939 Z M23.75,6.49939 L4.25,6.49939 C3.83579,6.49939 3.5,6.83518 3.5,7.24939 L3.5,20.75 C3.5,21.1642 3.83579,21.5 4.25,21.5 L23.75,21.5 C24.1642,21.5 24.5,21.1642 24.5,20.75 L24.5,7.24939 C24.5,6.83518 24.1642,6.49939 23.75,6.49939 Z M13.9975,8.62102995 C14.1965,8.62102995 14.3874,8.69998 14.5281,8.8407 L17.7826,12.0952 C18.0755,12.3881 18.0755,12.863 17.7826,13.1559 C17.4897,13.4488 17.0148,13.4488 16.7219,13.1559 L14.7477,11.1817 L14.7477,18.6284 C14.7477,19.0426 14.412,19.3784 13.9977,19.3784 C13.5835,19.3784 13.2477,19.0426 13.2477,18.6284 L13.2477,11.1835 L11.2784,13.1555 C10.9858,13.4486 10.5109,13.4489 10.2178,13.1562 C9.92469,12.8636 9.92436,12.3887 10.217,12.0956 L13.467,8.84107 C13.6077,8.70025 13.7985,8.62102995 13.9975,8.62102995 Z"
+							id="🎨-Color"
+						>
+							{' '}
+						</path>{' '}
+						{isShowLine && (
+							<>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="white"
+									strokeLinecap="round"
+									strokeWidth="3.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="black"
+									strokeLinecap="round"
+									strokeWidth="1.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+							</>
+						)}
+					</g>{' '}
+				</g>{' '}
+			</g>
 		</svg>
 	);
 }

@@ -16,11 +16,13 @@ jobs:
         run: |
           echo "Environments"
           echo "NODE_ENV: ${{ env.NODE_ENV }}"
-          echo "Node version: $(node -v)"
+          export nv=$(node -v)
+          echo "Node version: $nv"
           echo "Installing dependencies"
+          yarn config set nodedir ~/.cache/node-gyp/"${nv:1}"
+          echo "Node directory: ${nv:1}"
           source ~/.bashrc
           yarn
-
       - name: Build
         run: |
           echo "Build"
@@ -47,7 +49,9 @@ jobs:
           NX_CHAT_SENTRY_DNS: ${{ secrets.NX_CHAT_SENTRY_DNS_PROD }}
           NX_CHAT_APP_ANNONYMOUS_USER_ID: ${{ secrets.NX_CHAT_APP_ANNONYMOUS_USER_ID_PROD }}
           NX_CHAT_APP_NOTIFICATION_WS_URL: ${{ secrets.NX_CHAT_APP_NOTIFICATION_WS_URL_PROD }}
-
+          NX_CHAT_SENTRY_DSN: ${{ secrets.NX_CHAT_SENTRY_DSN_PROD }}
+          NX_IMGPROXY_BASE_URL: ${{ secrets.NX_IMGPROXY_BASE_URL }}
+          NX_IMGPROXY_KEY: ${{ secrets.NX_IMGPROXY_KEY }}
 
       - name: Compress build artifact
         run: |

@@ -12,7 +12,7 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { Client, Session } from 'mezon-js';
+import { ChannelType, Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
@@ -174,13 +174,13 @@ export const getVoiceChannelName = (clanName?: string, channelLabel?: string) =>
 export const removeDuplicatesById = (array: any) => {
 	return array.reduce((acc: any, current: any) => {
 		const isDuplicate = acc.some((item: any) => item.id === current.id);
-		if (!isDuplicate) {
+		if (!isDuplicate && (current.type !== ChannelType.CHANNEL_TYPE_DM || current.idDM !== undefined)) {
 			acc.push(current);
 		}
+
 		return acc;
 	}, []);
 };
-
 export const getTimeDifferenceDate = (dateString: string) => {
 	const now = new Date();
 	const codeTime = new Date(dateString);
@@ -890,3 +890,22 @@ export const checkIsThread = (channel?: IChannel) => {
 export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();
 export const isMacDesktop = getPlatform() === Platform.MACOS && isElectron();
 export const isLinuxDesktop = getPlatform() === Platform.LINUX && isElectron();
+
+type ImgproxyOptions = {
+	width?: number;
+	height?: number;
+	resizeType?: string;
+};
+
+export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
+	const extension = sourceImageUrl.split('.').pop()?.toLowerCase();
+	if (!sourceImageUrl) return '';
+	if (extension === 'gif' || !sourceImageUrl.startsWith('https://cdn.mezon.vn')) {
+		return sourceImageUrl;
+	}
+	const { width, height, resizeType } = options;
+	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;
+	const path = `/${processingOptions}/plain/${sourceImageUrl}@png`;
+
+	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
+};

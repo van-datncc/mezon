@@ -1,11 +1,12 @@
 import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
-import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchClanWebhooks, fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
 import { ExitSetting } from '../SettingProfile';
+import AuditLog from './AuditLog';
 import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
@@ -13,6 +14,7 @@ import NotificationSoundSetting from './NotificationSoundSetting';
 import CategoryOrderSetting from './OrderCategorySetting';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
+import SettingOnBoarding from './SettingOnBoarding';
 import SettingSidebar from './SettingSidebar';
 import SettingSticker from './SettingSticker';
 
@@ -38,6 +40,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel) || undefined;
+	const currentClanId = useSelector(selectCurrentClanId) as string;
 
 	const currentSettingPage = () => {
 		switch (currentSettingId) {
@@ -55,13 +58,17 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
+			case ItemSetting.AUDIT_LOG:
+				return <AuditLog currentClanId={currentClanId} />;
+			case ItemSetting.ON_BOARDING:
+				return <SettingOnBoarding onClose={onClose} />;
 		}
 	};
 	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId) as string;
 	useEffect(() => {
 		if (canManageClan) {
 			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
+			dispatch(fetchClanWebhooks({ clanId: currentClanId }));
 		}
 	}, [canManageClan, currentClanId, dispatch]);
 

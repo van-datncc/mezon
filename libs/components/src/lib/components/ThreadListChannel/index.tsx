@@ -1,5 +1,6 @@
 import { useMenu } from '@mezon/core';
 import {
+	appActions,
 	referencesActions,
 	selectChannelMetaEntities,
 	selectCloseMenu,
@@ -50,11 +51,17 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		}
 		dispatch(threadsActions.setOpenThreadMessageState(false));
 		dispatch(threadsActions.setValueThread(null));
+		dispatch(appActions.setIsShowCanvas(false));
 	};
 
 	const isShowThread = (thread: IChannel) => {
 		const threadId = thread.id;
-		return allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp;
+		return (
+			(allChannelMetaEntities[threadId]?.isMute !== true &&
+				allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp) ||
+			(thread?.count_mess_unread ?? 0) > 0 ||
+			threadId === currentChannelId
+		);
 	};
 
 	const filteredThreads = threads.filter((thread) => {

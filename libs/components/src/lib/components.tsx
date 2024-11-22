@@ -4,6 +4,7 @@ export { default as ChannelTopbar } from './components/ChannelTopbar';
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
 export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
 export { default as ChatWelcome } from './components/ChatWelcome';
+export * from './components/ChatWelcome/OnBoardWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
 export { default as ModalCreateClan } from './components/CreateClanModal';
 export { default as DeleteClanModal } from './components/DeleteClanModal';
@@ -22,6 +23,7 @@ export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMar
 export { default as MarkdownContent } from './components/MarkdownFormatText/MarkdownContent';
 export { default as PlainText } from './components/MarkdownFormatText/PlainText';
 export { default as StreamInfo } from './components/StreamInfo';
+export { default as UpdateButton } from './components/UpdateButton/UpdateButton';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
 
@@ -52,6 +54,7 @@ export { default as ModalNotificationSetting } from './components/notificationSe
 export * from './components/AvatarImage/AvatarImage';
 export { default as AppDirectoryList } from './components/ClanSettings/AppDirectory/AppDirectoryList';
 export { default as ModalSaveChanges } from './components/ClanSettings/ClanSettingOverview/ModalSaveChanges';
+export { default as SettingOnBoarding } from './components/ClanSettings/SettingOnBoarding';
 export { default as CustomDropdown } from './components/CustomDropdown';
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
 export { default as FirstJoinPopup } from './components/FirstJoinPopup';
@@ -85,3 +88,5 @@ export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
 
 export { default as Canvas } from './components/Canvas';
+export { default as GuideItemLayout } from './components/ClanSettings/SettingOnBoarding/GuideItemLayout';
+export * from './components/ClanSettings/SettingOnBoarding/ModalControlRule';

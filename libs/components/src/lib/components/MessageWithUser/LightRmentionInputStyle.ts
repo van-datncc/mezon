@@ -1,3 +1,5 @@
+import { OverflowY } from '@mezon/utils';
+
 export default {
 	control: {
 		fontSize: 16
@@ -39,9 +41,8 @@ export default {
 		width: '100%',
 		left: '0px',
 		top: '20px',
-
 		list: {
-			overflowY: 'auto',
+			overflowY: 'auto' as OverflowY,
 			maxHeight: '450px'
 		},
 		item: {

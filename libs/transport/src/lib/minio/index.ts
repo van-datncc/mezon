@@ -82,7 +82,6 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			const shortFileType = getFileType(fileType);
-
 			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, false, index);
 			const buf = await file?.arrayBuffer();
 
@@ -115,14 +114,13 @@ export async function handleUploadFileMobile(
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
-					console.log('Failed to read file data.');
+					console.error('Failed to read file data.');
 					return;
 				}
 				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
 				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename, file?.width, file?.height));
 			}
 		} catch (error) {
-			console.log('handleUploadFileMobile Error: ', error);
 			reject(new Error(`${error}`));
 		}
 	});

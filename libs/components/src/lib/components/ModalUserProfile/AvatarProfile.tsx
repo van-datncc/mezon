@@ -1,6 +1,6 @@
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ActivitiesName, ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
+import { ActivitiesName, ChannelMembersEntity, IUserAccount, MemberProfileType, createImgproxyUrl } from '@mezon/utils';
 import { ApiUserActivity } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -51,6 +51,7 @@ const AvatarProfile = ({
 
 	const activityNames: { [key: string]: string } = {
 		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.VISUAL_STUDIO_CODE]: 'Visual Studio Code',
 		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
 		[ActivitiesName.LOL]: 'League of Legends'
 	};
@@ -64,6 +65,7 @@ const AvatarProfile = ({
 					alt={username || ''}
 					userName={username}
 					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}
+					srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 					src={avatar}
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"

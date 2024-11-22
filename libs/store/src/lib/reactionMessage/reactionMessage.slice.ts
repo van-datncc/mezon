@@ -1,6 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import * as Sentry from '@sentry/browser';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -42,7 +42,6 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionTopState: boolean;
 	reactionBottomState: boolean;
 	reactionRightState: boolean;
-	userReactionPanelState: boolean;
 	reactionBottomStateResponsive: boolean;
 	messageMatchWithRef: boolean;
 	positionOfSmileButton: {
@@ -65,9 +64,9 @@ export const updateReactionMessage = createAsyncThunk(
 	async ({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
 			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }));
-		} catch (e) {
-			console.error(e);
-			return thunkAPI.rejectWithValue([]);
+		} catch (error) {
+			captureSentryError(error, 'messages/updateReactionMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -84,6 +83,7 @@ export type WriteMessageReactionArgs = {
 	messageSenderId: string;
 	actionDelete: boolean;
 	isPublic: boolean;
+	userId: string;
 };
 
 const reactionQueue: Array<() => Promise<void>> = [];
@@ -98,7 +98,7 @@ async function processReactionQueue() {
 			try {
 				await action();
 			} catch (e) {
-				Sentry.captureException(e);
+				captureSentryError(e, 'messages/writeMessageReaction');
 			}
 		}
 	}
@@ -108,7 +108,7 @@ async function processReactionQueue() {
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
 	async (
-		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic }: WriteMessageReactionArgs,
+		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic, userId }: WriteMessageReactionArgs,
 		thunkAPI
 	) => {
 		const action = async () => {
@@ -135,9 +135,19 @@ export const writeMessageReaction = createAsyncThunk(
 					messageSenderId,
 					actionDelete
 				);
-			} catch (e) {
-				Sentry.captureException(e);
-				thunkAPI.rejectWithValue(e);
+
+				const emojiLastest: EmojiStorage = {
+					emojiId: emoji_id,
+					emoji,
+					messageId,
+					senderId: userId,
+					action: actionDelete,
+					channel_id: channelId
+				};
+				saveRecentEmoji(emojiLastest);
+			} catch (error) {
+				captureSentryError(error, 'messages/writeMessageReaction');
+				thunkAPI.rejectWithValue(error);
 			}
 		};
 
@@ -153,7 +163,6 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	reactionTopState: false,
 	reactionBottomState: false,
 	reactionRightState: false,
-	userReactionPanelState: false,
 	reactionBottomStateResponsive: false,
 	messageMatchWithRef: false,
 	positionOfSmileButton: {
@@ -194,17 +203,6 @@ export const reactionSlice = createSlice({
 				count: action.payload.count || 1
 			};
 
-			const emojiLastest: EmojiStorage = {
-				emojiId: reactionDataSocket.emoji_id ?? '',
-				emoji: reactionDataSocket.emoji ?? '',
-				messageId: reactionDataSocket.message_id ?? '',
-				senderId: reactionDataSocket.sender_id ?? '',
-				action: reactionDataSocket.action ?? false,
-				channel_id: reactionDataSocket.channel_id
-			};
-
-			saveRecentEmoji(emojiLastest);
-
 			const isAdd = !action.payload.action;
 			// Server not send id
 			// We have to find the id of the reaction by message_id and emoji and sender_id
@@ -243,10 +241,6 @@ export const reactionSlice = createSlice({
 				state.computedMessageReactions[combinedId] = combineMessageReactions(state, combinedId);
 			}
 		},
-
-		setUserReactionPanelState(state, action) {
-			state.userReactionPanelState = action.payload;
-		},
 		setMessageMatchWithRef(state, action) {
 			state.messageMatchWithRef = action.payload;
 		},
@@ -275,9 +269,15 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	const storedEmojis = localStorage.getItem('recentEmojis');
 	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
 
-	const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
-		return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
-	});
+	if (emojisRecentParse.length > 0) {
+		const lastEmoji = emojisRecentParse[emojisRecentParse.length - 1];
+		if (lastEmoji.emoji === emojiLastest.emoji && lastEmoji.senderId === emojiLastest.senderId) {
+			return;
+		}
+	}
+	const duplicateIndex = emojisRecentParse.findIndex(
+		(item: EmojiStorage) => item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId
+	);
 
 	if (emojiLastest.action === true) {
 		if (duplicateIndex !== -1) {
@@ -289,9 +289,12 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 		}
 	}
 
+	if (emojisRecentParse.length > 20) {
+		emojisRecentParse.splice(0, emojisRecentParse.length - 20);
+	}
+
 	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
 }
-
 function combineMessageReactions(state: ReactionState, combinedId: string): EmojiDataOptionals[] {
 	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
 	const [channel_id, message_id] = combinedId.split('_');
@@ -365,8 +368,6 @@ export const selectReactionBottomState = createSelector(getReactionState, (state
 export const selectReactionBottomStateResponsive = createSelector(getReactionState, (state: ReactionState) => state.reactionBottomStateResponsive);
 
 export const selectReactionRightState = createSelector(getReactionState, (state: ReactionState) => state.reactionRightState);
-
-export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
 
 export const selectMessageMatchWithRef = createSelector(getReactionState, (state: ReactionState) => state.messageMatchWithRef);
 

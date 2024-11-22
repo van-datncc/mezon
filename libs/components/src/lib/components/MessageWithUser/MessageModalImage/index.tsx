@@ -13,7 +13,7 @@ import {
 	selectOpenModalAttachment
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { SHOW_POSITION, handleSaveImage } from '@mezon/utils';
+import { SHOW_POSITION, createImgproxyUrl, handleSaveImage } from '@mezon/utils';
 import { format } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -175,6 +175,10 @@ const MessageModalImage = () => {
 			return;
 		}
 		setScale(1);
+		setPosition({
+			x: 0,
+			y: 0
+		});
 	};
 
 	const handleDownloadImage = async () => {
@@ -196,7 +200,7 @@ const MessageModalImage = () => {
 			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
 				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative" onClick={closeModal}>
 					<img
-						src={urlImg}
+						src={createImgproxyUrl(urlImg ?? '', { width: 0, height: 0, resizeType: 'force' })}
 						alt={urlImg}
 						className={`max-h-full object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-auto'}`}
 						onDragStart={handleDrag}
@@ -288,7 +292,11 @@ const SenderUser = () => {
 	return (
 		<div className="flex gap-2 overflow-hidden ">
 			<div className="w-10 aspect-square object-cover overflow-hidden">
-				<img src={user?.clan_avatar ?? user?.user?.avatar_url} alt="user-avatar" className="w-10 rounded-full aspect-square object-cover" />
+				<img
+					src={createImgproxyUrl(user?.clan_avatar ?? user?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+					alt="user-avatar"
+					className="w-10 rounded-full aspect-square object-cover"
+				/>
 			</div>
 			<div className="flex flex-col justify-between ">
 				<div className="text-[14px] font-semibold text-textDarkTheme truncate max-sm:w-12">

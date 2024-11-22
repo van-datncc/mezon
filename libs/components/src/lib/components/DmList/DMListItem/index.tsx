@@ -3,7 +3,6 @@ import { Icons } from '@mezon/ui';
 import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
@@ -22,7 +21,7 @@ export type directMessageValueProps = {
 function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFriends, isActive }: DirectMessProp) {
 	const dispatch = useAppDispatch();
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
-	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 
 	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
 		e.stopPropagation();
@@ -74,6 +73,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				countMember={(directMessage?.user_id?.length || 0) + 1}
 				user={directMessage as ChannelMembersEntity}
 				isMute={directMessage?.is_mute}
+				isDM
 			/>
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}

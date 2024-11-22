@@ -1,11 +1,17 @@
-import { useChatMessages } from '@mezon/core';
+import { useChatMessages, useSeenMessagePool } from '@mezon/core';
 import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { MessagesEntity, directActions, directMetaActions, gifsStickerEmojiActions, useAppDispatch } from '@mezon/store-mobile';
-import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
+import { MessagesEntity, directActions, directMetaActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../components/UserStatus';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 
 interface HeaderProps {
 	handleBack: () => void;
@@ -17,26 +23,31 @@ interface HeaderProps {
 	styles: any;
 	themeValue: any;
 	directMessageId: string;
+	firstUserId: string;
 }
-
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
-		const timestamp = Date.now() / 1000;
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
+	const { markAsReadSeen } = useSeenMessagePool();
+	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	}, [channelId]);
+		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+		if (lastMessage) {
+			markAsReadSeen(lastMessage, mode);
+		}
+	}, [lastMessage, channelId]);
 
 	useEffect(() => {
 		if (lastMessage) {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, []);
@@ -61,9 +72,28 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 	userStatus,
 	styles,
 	themeValue,
-	directMessageId
+	directMessageId,
+	firstUserId
 }) => {
 	useChannelSeen(directMessageId || '');
+	const navigation = useNavigation<any>();
+	const isTabletLandscape = useTabletLandscape();
+
+	const goToCall = () => {
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+			params: {
+				receiverId: firstUserId,
+				receiverAvatar: dmAvatar
+			}
+		});
+	};
+
+	const navigateToNotifications = () => {
+		navigation.navigate(APP_SCREEN.NOTIFICATION.STACK, {
+			screen: APP_SCREEN.NOTIFICATION.HOME
+		});
+	};
 
 	return (
 		<View style={styles.headerWrapper}>
@@ -78,7 +108,12 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 				) : (
 					<View style={styles.avatarWrapper}>
 						{dmAvatar ? (
-							<Image source={{ uri: dmAvatar || '' }} style={styles.friendAvatar} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(dmAvatar ?? '', { width: 300, height: 300, resizeType: 'fit' })
+								}}
+								style={styles.friendAvatar}
+							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
@@ -90,6 +125,16 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
+				{isTabletLandscape && (
+					<TouchableOpacity style={styles.iconHeader} onPress={navigateToNotifications}>
+						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+					</TouchableOpacity>
+				)}
+				{!isTypeDMGroup && !!firstUserId && (
+					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
+						<Icons.PhoneCallIcon width={size.s_18} height={size.s_18} color={themeValue.text} />
+					</TouchableOpacity>
+				)}
 			</Pressable>
 		</View>
 	);

@@ -3,6 +3,7 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode, Ref, forwardRef, useCallback, useMemo } from 'react';
 import { Text, View } from 'react-native';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import Backdrop from './backdrop';
 import { style } from './styles';
 
@@ -19,8 +20,9 @@ export interface IMezonBottomSheetProps extends BottomSheetModalProps {
 
 const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
 	const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = 'sm', footer } = props;
+	const isTabletLandscape = useTabletLandscape();
 	const themeValue = useTheme().themeValue;
-	const styles = useMemo(() => style(themeValue), [themeValue]);
+	const styles = useMemo(() => style(themeValue, isTabletLandscape), [isTabletLandscape, themeValue]);
 
 	const renderHeader = useCallback(() => {
 		if (title || headerLeft || headerRight) {
@@ -46,6 +48,7 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 			backdropComponent={Backdrop}
 			enableDynamicSizing={heightFitContent}
 			handleIndicatorStyle={styles.handleIndicator}
+			style={styles.container}
 		>
 			{renderHeader()}
 			<BottomSheetScrollView>{children}</BottomSheetScrollView>

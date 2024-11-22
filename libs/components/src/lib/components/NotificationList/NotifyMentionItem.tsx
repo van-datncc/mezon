@@ -1,9 +1,8 @@
-import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
-import { messagesActions, notificationActions } from '@mezon/store';
-import { IMentionOnMessage, IMessageWithUser, INotification, addMention } from '@mezon/utils';
+import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { messagesActions, useAppDispatch } from '@mezon/store';
+import { IMentionOnMessage, IMessageWithUser, INotification, addMention, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
@@ -37,7 +36,7 @@ function convertContentToObject(notify: any) {
 }
 function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const parseNotify = convertContentToObject(notify);
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const messageId = useMemo(() => {
 		if (parseNotify.content) {
 			return parseNotify.content.message_id;
@@ -56,13 +55,15 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 		}
 	}, [parseNotify.content.clan_id]);
 
-	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId, clanId: clanId });
-
 	const handleClickJump = useCallback(() => {
-		dispatch(messagesActions.setIdMessageToJump(messageId));
-		directToMessageById();
-		dispatch(notificationActions.setIsShowInbox(false));
-	}, [directToMessageById, dispatch, messageId, notify.id]);
+		dispatch(
+			messagesActions.jumpToMessage({
+				clanId: clanId || '',
+				messageId: messageId,
+				channelId: channelId
+			})
+		);
+	}, [dispatch, messageId, notify.id]);
 
 	return (
 		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
@@ -103,6 +104,11 @@ function MentionTabContent({ message }: IMentionTabContent) {
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
 					userName={message?.username}
+					srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : message.avatar) ?? '', {
+						width: 300,
+						height: 300,
+						resizeType: 'fit'
+					})}
 					src={priorityAvatar ? priorityAvatar : message.avatar}
 				/>
 

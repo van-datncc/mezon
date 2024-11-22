@@ -1,8 +1,9 @@
 import { useShowName } from '@mezon/core';
-import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, convertTimeString } from '@mezon/utils';
+import { RolesClanEntity, selectMemberClanByUserId2, selectRolesClanEntities, useAppSelector } from '@mezon/store';
+import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, DEFAULT_ROLE_COLOR, IMessageWithUser, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import usePendingNames from './usePendingNames';
 
 type IMessageHeadProps = {
@@ -17,6 +18,30 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	const usernameSender = userClan?.user?.username;
 	const clanNick = userClan?.clan_nick;
 	const displayName = userClan?.user?.display_name;
+	const rolesClanEntity = useSelector(selectRolesClanEntities);
+	const userRolesClan = useMemo(() => {
+		const activeRole: Array<RolesClanEntity> = [];
+		let userRoleLength = 0;
+		let highestPermissionRole = null;
+		let maxLevelPermission = 0;
+		for (const key in rolesClanEntity) {
+			const role = rolesClanEntity[key];
+			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === message?.sender_id);
+			if (checkHasRole) {
+				activeRole.push(role);
+				userRoleLength++;
+				if (role.max_level_permission !== undefined && role.max_level_permission > maxLevelPermission) {
+					maxLevelPermission = role.max_level_permission;
+					highestPermissionRole = role;
+				}
+			}
+		}
+		return {
+			usersRole: activeRole,
+			length: userRoleLength,
+			highestPermissionRoleColor: highestPermissionRole?.color || activeRole[0]?.color || DEFAULT_ROLE_COLOR
+		};
+	}, [message?.sender_id, rolesClanEntity]);
 
 	const { pendingClannick, pendingDisplayName, pendingUserName } = usePendingNames(
 		message,
@@ -39,12 +64,22 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base text-textLightUserName font-medium tracking-normal cursor-pointer break-all username hover:underline"
+					className="text-base font-medium tracking-normal cursor-pointer break-all username hover:underline"
 					onClick={onClick}
 					role="button"
-					style={{ letterSpacing: '-0.01rem' }}
+					style={{
+						letterSpacing: '-0.01rem',
+						color:
+							mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+								? userRolesClan.highestPermissionRoleColor
+								: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
+					}}
 				>
-					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : message?.display_name ? message?.display_name : message?.username}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+						? nameShowed
+						: message?.display_name
+							? message?.display_name
+							: message?.username}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>

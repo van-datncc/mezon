@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -31,6 +31,7 @@ import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMes
 export * from './messageLine';
 export * from './mimeTypes';
 export * from './permissions';
+export * from './style';
 export * from './thumbnailPos';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -223,6 +224,73 @@ export interface IEmbedProps {
 	footer?: { text: string; icon_url?: string };
 }
 
+export enum EButtonMessageStyle {
+	PRIMARY = 1,
+	SECONDARY = 2,
+	SUCCESS = 3,
+	DANGER = 4,
+	LINK = 5
+}
+
+export enum EMessageComponentType {
+	BUTTON = 1,
+	SELECT = 2,
+	INPUT = 3
+}
+
+export interface IButtonMessage {
+	label: string;
+	disable?: boolean;
+	style?: EButtonMessageStyle;
+	url?: string;
+}
+
+export interface IMessageSelectOption {
+	label: string;
+	value: string;
+	description?: string;
+	default?: boolean;
+}
+
+export enum EMessageSelectType {
+	TEXT = 1,
+	USER = 2,
+	ROLE = 3,
+	CHANNEL = 4
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IMessageSelect {
+	// some select specific properties
+	type: EMessageSelectType;
+	options: IMessageSelectOption[];
+	placeholder?: string;
+	// Minimum number of items that must be chosen (defaults to 1)
+	min_options?: number;
+	// Maximum number of items that can be chosen (defaults to 1)
+	max_options?: number;
+	disabled?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IMessageInput {
+	// some input specific properties
+}
+
+export interface IMessageComponent<T> {
+	type: EMessageComponentType;
+	id: string;
+	component: T;
+}
+
+export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
+export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
+export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessageComponentType.INPUT };
+
+export interface IMessageActionRow {
+	components: Array<ButtonComponent | SelectComponent | InputComponent>;
+}
+
 export interface IMessageSendPayload {
 	t?: string;
 	hg?: IHashtagOnMessage[];
@@ -230,7 +298,8 @@ export interface IMessageSendPayload {
 	lk?: ILinkOnMessage[];
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
-	embed?: IEmbedProps;
+	embed?: IEmbedProps[];
+	components?: IMessageActionRow[];
 }
 
 export type IUser = {
@@ -275,6 +344,12 @@ export type IStreamInfo = {
 	streamId: string;
 	streamName: string;
 	parentId: string;
+};
+
+export type IDMCall = {
+	callerId: string;
+	calleeId: string;
+	signalingData: WebrtcSignalingFwd;
 };
 
 export interface CategoryNameProps {
@@ -397,7 +472,8 @@ export enum MemberProfileType {
 	DM_LIST = 'dm_list_friends',
 	DM_MEMBER_GROUP = 'dm_member_group',
 	LIST_FRIENDS = 'list_friends',
-	MESSAGE = 'message'
+	MESSAGE = 'message',
+	LIST_ACTIVITY = 'list_activity'
 }
 
 export type IReaction = ApiMessageReaction & {
@@ -419,6 +495,8 @@ export type IEmoji = {
 export type IChannelUser = ChannelDescription & {
 	id: string;
 	active?: number;
+	count_mess_unread?: number;
+	last_seen_message?: any;
 };
 
 export type IUsers = ApiUser & {
@@ -726,6 +804,8 @@ export type SearchItemProps = {
 	name?: string;
 	avatarUser?: string;
 	lastSentTimeStamp?: any;
+	lastSeenTimeStamp?: any;
+	count_messsage_unread?: number;
 	idDM?: string;
 	type?: number;
 	clanAvatar?: string;
@@ -901,6 +981,7 @@ export enum ActivitiesType {
 
 export enum ActivitiesName {
 	CODE = 'Code',
+	VISUAL_STUDIO_CODE = 'Visual Studio Code',
 	SPOTIFY = 'Spotify',
 	LOL = 'LeagueClientUx'
 }
@@ -915,3 +996,172 @@ export enum TypeMessage {
 	CreateThread = 6,
 	CreatePin = 7
 }
+
+export enum ServerSettingsMenuValue {
+	Overview = 0,
+	Roles = 1,
+	Emoji = 2,
+	Stickers = 3,
+	Soundboard = 4,
+	Widget = 5,
+	ServerTemplate = 6,
+	CustomInviteLink = 7,
+	Integrations = 8,
+	AppDirectory = 9,
+	SafetySetup = 10,
+	AutoMod = 11,
+	AuditLog = 12,
+	Bans = 13,
+	CommunitySettings = 14,
+	ServerSubscriptions = 15,
+	ServerBoostStatus = 16,
+	Members = 17,
+	Invites = 18
+}
+
+export const serverSettingsMenuList = [
+	{
+		label: 'Overview',
+		value: ServerSettingsMenuValue.Overview
+	},
+	{
+		label: 'Roles',
+		value: ServerSettingsMenuValue.Roles
+	},
+	{
+		label: 'Emoji',
+		value: ServerSettingsMenuValue.Emoji
+	},
+	{
+		label: 'Stickers',
+		value: ServerSettingsMenuValue.Stickers
+	},
+	{
+		label: 'Soundboard',
+		value: ServerSettingsMenuValue.Soundboard
+	},
+	{
+		label: 'Widget',
+		value: ServerSettingsMenuValue.Widget
+	},
+	{
+		label: 'Server Template',
+		value: ServerSettingsMenuValue.ServerTemplate
+	},
+	{
+		label: 'Custom Invite Link',
+		value: ServerSettingsMenuValue.CustomInviteLink
+	},
+	{
+		label: 'Integrations',
+		value: ServerSettingsMenuValue.Integrations
+	},
+	{
+		label: 'App Directory',
+		value: ServerSettingsMenuValue.AppDirectory
+	},
+	{
+		label: 'Safety Setup',
+		value: ServerSettingsMenuValue.SafetySetup
+	},
+	{
+		label: 'AutoMod',
+		value: ServerSettingsMenuValue.AutoMod
+	},
+	{
+		label: 'Audit Log',
+		value: ServerSettingsMenuValue.AuditLog
+	},
+	{
+		label: 'Bans',
+		value: ServerSettingsMenuValue.Bans
+	},
+	{
+		label: 'Community Settings',
+		value: ServerSettingsMenuValue.CommunitySettings
+	},
+	{
+		label: 'Server Subscriptions',
+		value: ServerSettingsMenuValue.ServerSubscriptions
+	},
+	{
+		label: 'Server Boost Status',
+		value: ServerSettingsMenuValue.ServerBoostStatus
+	},
+	{
+		label: 'Members',
+		value: ServerSettingsMenuValue.Members
+	},
+	{
+		label: 'Invites',
+		value: ServerSettingsMenuValue.Invites
+	}
+];
+
+export enum ActionLog {
+	ALL_ACTION_AUDIT = 'All Actions',
+	UPDATE_CLAN_ACTION_AUDIT = 'Update Clan',
+	CREATE_CHANNEL_ACTION_AUDIT = 'Create Channel',
+	UPDATE_CHANNEL_ACTION_AUDIT = 'Update Channel',
+	UPDATE_CHANNEL_PRIVATE_ACTION_AUDIT = 'Update Channel private',
+	DELETE_CHANNE_ACTION_AUDIT = 'Delete Channel',
+	CREATE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Create Channel Permission',
+	UPDATE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Update Channel Permission',
+	DELETE_CHANNEL_PERMISSION_ACTION_AUDIT = 'Delete Channel Permission',
+	KICK_MEMBER_ACTION_AUDIT = 'Kick Member',
+	PRUNE_MEMBER_ACTION_AUDIT = 'Prune Member',
+	BAN_MEMBER_ACTION_AUDIT = 'Ban Member',
+	UNBAN_MEMBER_ACTION_AUDIT = 'Unban Member',
+	UPDATE_MEMBER_ACTION_AUDIT = 'Update Member',
+	UPDATE_ROLES_MEMBER_ACTION_AUDIT = 'Update Roles Member',
+	MOVE_MEMBER_ACTION_AUDIT = 'Move Member',
+	DISCONNECT_MEMBER_ACTION_AUDIT = 'Disconnect Member',
+	ADD_BOT_ACTION_AUDIT = 'Add Bot',
+	CREATE_THREAD_ACTION_AUDIT = 'Create Thread',
+	UPDATE_THREAD_ACTION_AUDIT = 'Update Thread',
+	DELETE_THREAD_ACTION_AUDIT = 'Delete Thread',
+	CREATE_ROLE_ACTION_AUDIT = 'Create Role',
+	UPDATE_ROLE_ACTION_AUDIT = 'Update Role',
+	DELETE_ROLE_ACTION_AUDIT = 'Delete Role',
+	CREATE_WEBHOOK_ACTION_AUDIT = 'Create Webhook',
+	UPDATE_WEBHOOK_ACTION_AUDIT = 'Update Webhook',
+	DELETE_WEBHOOK_ACTION_AUDIT = 'Delete Webhook',
+	CREATE_EMOJI_ACTION_AUDIT = 'Create Emoji',
+	UPDATE_EMOJI_ACTION_AUDIT = 'Update Emoji',
+	DELETE_EMOJI_ACTION_AUDIT = 'Delete Emoji',
+	CREATE_STICKER_ACTION_AUDIT = 'Create Sticker',
+	UPDATE_STICKER_ACTION_AUDIT = 'Update Sticker',
+	DELETE_STICKER_ACTION_AUDIT = 'Delete Sticker',
+	CREATE_EVENT_ACTION_AUDIT = 'Create Event',
+	UPDATE_EVENT_ACTION_AUDIT = 'Update Event',
+	DELETE_EVENT_ACTION_AUDIT = 'Delete Event',
+	CREATE_CANVAS_ACTION_AUDIT = 'Create Canvas',
+	UPDATE_CANVAS_ACTION_AUDIT = 'Update Canvas',
+	DELETE_CANVAS_ACTION_AUDIT = 'Delete Canvas',
+	CREATE_CATEGORY_ACTION_AUDIT = 'Create Category',
+	UPDATE_CATEGORY_ACTION_AUDIT = 'Update Category',
+	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category'
+}
+
+export enum UserAuditLog {
+	ALL_USER_AUDIT = 'All Users'
+}
+
+export type IUserAuditLog = {
+	userId: string;
+	userName: string;
+};
+
+export type IUserProfileActivity = {
+	avatar_url?: string;
+	display_name?: string;
+	id?: string;
+	username?: string;
+	online?: boolean;
+	metadata?: { status?: string };
+};
+
+export type IUserItemActivity = {
+	id?: string;
+	user?: IUserProfileActivity;
+};

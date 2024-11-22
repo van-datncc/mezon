@@ -2,7 +2,7 @@ import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
-import { IExtendedMessage, normalizeString } from '@mezon/utils';
+import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const styles = style(themeValue);
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
-	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
@@ -54,7 +54,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		if (!content) return null;
-		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
+		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content) || '{}')?.t;
 		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
 		if (!text) {
@@ -133,7 +133,12 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 			) : (
 				<View style={styles.avatarWrapper}>
 					{directMessage?.channel_avatar?.[0] ? (
-						<FastImage source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
+						<FastImage
+							source={{
+								uri: createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
+							}}
+							style={styles.friendAvatar}
+						/>
 					) : (
 						<View style={styles.wrapperTextAvatar}>
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>

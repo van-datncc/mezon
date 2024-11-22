@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
@@ -29,11 +30,16 @@ type UsersClanPayload = {
 	clanId: string;
 };
 export const fetchUsersClan = createAsyncThunk('UsersClan/fetchUsersClan', async ({ clanId }: UsersClanPayload, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listClanUsers(mezon.session, clanId);
-	const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
-	thunkAPI.dispatch(usersClanActions.setAll(users));
-	thunkAPI.dispatch(clanMembersMetaActions.updateBulkMetadata(users.map((item) => extracMeta(item))));
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listClanUsers(mezon.session, clanId);
+		const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
+		thunkAPI.dispatch(usersClanActions.setAll(users));
+		thunkAPI.dispatch(clanMembersMetaActions.updateBulkMetadata(users.map((item) => extracMeta(item))));
+	} catch (error) {
+		captureSentryError(error, 'UsersClan/fetchUsersClan');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const initialUsersClanState: UsersClanState = UsersClanAdapter.getInitialState({
@@ -50,8 +56,6 @@ export const UsersClanSlice = createSlice({
 		upsertMany: UsersClanAdapter.upsertMany,
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
-			console.log('UPDATE');
-
 			const { userId, clanNick, clanAvt } = action.payload;
 			UsersClanAdapter.updateOne(state, {
 				id: userId,
@@ -77,8 +81,6 @@ export const UsersClanSlice = createSlice({
 			});
 		},
 		addRoleIdUser: (state, action) => {
-			console.log('UPDATE');
-
 			const { userId, id } = action.payload;
 			const existingMember = state.entities[userId];
 
@@ -89,8 +91,6 @@ export const UsersClanSlice = createSlice({
 			}
 		},
 		removeRoleIdUser: (state, action) => {
-			console.log('UPDATE');
-
 			const { userId, id } = action.payload;
 			const existingMember = state.entities[userId];
 
@@ -141,11 +141,9 @@ export const selectMemberClanByUserId2 = createSelector(
 	(entities, userId) => entities[userId]
 );
 
-export const selectMemberClanByGoogleId = (googleId: string) =>
-	createSelector(selectAllUserClans, (members) => {
-		return members.find((member) => member.user?.google_id === googleId);
-	});
-
+export const selectMemberClanByGoogleId = createSelector([selectAllUserClans, (_, googleId: string) => googleId], (members, googleId) => {
+	return members.find((member) => member.user?.google_id === googleId);
+});
 export const selectMembersClanCount = createSelector(getUsersClanState, (state) => {
 	return state.ids.length;
 });
@@ -160,6 +158,7 @@ export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, 
 			offline: []
 		};
 	}
+
 	const users = members.map((item) => ({
 		...item,
 		user: {
@@ -176,9 +175,11 @@ export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, 
 		return a.user?.online ? -1 : 1;
 	});
 	const firstOfflineIndex = users.findIndex((user) => !user.user?.online);
+	const onlineUsers = firstOfflineIndex === -1 ? users : users?.slice(0, firstOfflineIndex);
+	const offlineUsers = firstOfflineIndex === -1 ? [] : users?.slice(firstOfflineIndex);
 
 	return {
-		online: users.slice(0, firstOfflineIndex).map((item) => item.id),
-		offline: users.slice(firstOfflineIndex).map((item) => item.id)
+		online: onlineUsers?.map((item) => item?.id),
+		offline: offlineUsers?.map((item) => item?.id)
 	};
 });

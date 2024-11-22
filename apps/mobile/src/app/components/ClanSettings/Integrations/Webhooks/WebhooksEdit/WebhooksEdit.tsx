@@ -91,8 +91,10 @@ export function WebhooksEdit({ route, navigation }: { route: any; navigation: an
 		if (hasChange) {
 			const request: MezonUpdateWebhookByIdBody = {
 				avatar: urlImageWebhook,
-				channel_id: webhookChannel?.channel_id,
-				webhook_name: webhookName
+				channel_id_update: webhookChannel?.channel_id,
+				webhook_name: webhookName,
+				channel_id: currentChannel.channel_id,
+				clan_id: clanId
 			};
 			await dispatch(
 				updateWebhookBySpecificId({
@@ -175,9 +177,9 @@ export function WebhooksEdit({ route, navigation }: { route: any; navigation: an
 
 		ImagePicker.launchImageLibrary(options as CameraOptions, async (response) => {
 			if (response.didCancel) {
-				console.log('User cancelled camera');
+				console.warn('User cancelled camera');
 			} else if (response.errorCode) {
-				console.log('Camera Error: ', response.errorMessage);
+				console.error('Camera Error: ', response.errorMessage);
 			} else {
 				const file = response.assets[0];
 				const fileData = await RNFS.readFile(file.uri, 'base64');

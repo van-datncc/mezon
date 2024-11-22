@@ -1,5 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save
+} from '@mezon/mobile-components';
 import {
 	channelsActions,
 	getStoreAsync,
@@ -75,32 +82,48 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		};
 	}, [props?.data?.id, isActive]);
 
-	const handleRouteData = useCallback(async (thread?: IChannel) => {
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-			bottomSheetChannelStreamingRef.current?.present();
-			return;
-		}
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
-				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
-				await Linking.openURL(urlVoice);
+	const handleRouteData = useCallback(
+		async (thread?: IChannel) => {
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				bottomSheetChannelStreamingRef.current?.present();
+				return;
 			}
-		} else {
-			if (!isTabletLandscape) {
-				navigation.dispatch(DrawerActions.closeDrawer());
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+				if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
+					const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
+					await Linking.openURL(urlVoice);
+				}
+			} else {
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
+				const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
+				const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				const isCached = channelsCache?.includes(channelId);
+				const store = await getStoreAsync();
+				timeoutRef.current = setTimeout(async () => {
+					requestAnimationFrame(async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
+						store.dispatch(
+							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+						);
+					});
+				}, 0);
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
-			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			const store = await getStoreAsync();
-			timeoutRef.current = setTimeout(async () => {
-				requestAnimationFrame(async () => {
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-				});
-			}, 100);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-		}
-	}, []);
+		},
+		[
+			isTabletLandscape,
+			navigation,
+			props?.data?.channel_id,
+			props?.data?.clan_id,
+			props?.data?.meeting_code,
+			props?.data?.status,
+			props?.data?.type
+		]
+	);
 
 	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
 
@@ -121,7 +144,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					isActive={isActive}
 				/>
 			)}
-			<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['50%']}>
+			<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['45%']}>
 				<SafeAreaView>
 					<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
 				</SafeAreaView>

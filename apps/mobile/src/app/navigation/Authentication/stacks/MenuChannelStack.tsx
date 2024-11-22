@@ -1,11 +1,15 @@
-import { Fonts, useTheme } from '@mezon/mobile-ui';
+import { Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
+import { CanvasScreen } from '../../../components/Canvas/CanvasBoard';
 import { ChangeCategory } from '../../../components/ChangeCategory';
 import { ChannelSetting } from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
+import SearchMessageDm from '../../../components/ThreadDetail/SearchMessageDm/SearchMessageDm';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
+import { DirectMessageCall } from '../../../screens/messages/DirectMessageCall';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -31,9 +35,15 @@ export function MenuChannelStacks({}: any) {
 					fontSize: Fonts.size.h6,
 					fontWeight: 'bold'
 				},
+				headerLeftContainerStyle: Platform.select({
+					ios: {
+						left: size.s_6
+					}
+				}),
 				cardStyle: {
 					backgroundColor: 'transparent'
-				}
+				},
+				animationEnabled: Platform.OS === 'ios'
 			}}
 		>
 			<Stack.Screen
@@ -58,9 +68,36 @@ export function MenuChannelStacks({}: any) {
 					headerLeftLabelVisible: false
 				}}
 			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM}
+				component={SearchMessageDm}
+				options={{
+					headerShown: false,
+					headerLeftLabelVisible: false
+				}}
+			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY} component={ChangeCategory} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.CANVAS}
+				component={CanvasScreen}
+				options={{
+					headerTitle: '',
+					headerStyle: {
+						backgroundColor: Colors.bgCharcoal
+					},
+					headerTintColor: Colors.white,
+					headerLeftLabelVisible: false
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.CALL_DIRECT}
+				component={DirectMessageCall}
+				options={{
+					headerShown: false
+				}}
+			/>
 		</Stack.Navigator>
 	);
 }

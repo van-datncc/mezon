@@ -20,14 +20,22 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, isPublicChannel, typeConverts } from '@mezon/utils';
+import {
+	IHashtagOnMessage,
+	IMentionOnMessage,
+	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	checkIsThread,
+	isPublicChannel,
+	typeConverts
+} from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { IFile } from 'apps/mobile/src/app/componentUI';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native';
+import { DeviceEventEmitter, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -99,7 +107,10 @@ export const ChatBoxBottomBar = memo(
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
 		const { sessionRef, clientRef } = useMezon();
-		const listMentions = UseMentionList({ channelID: channelId || '', channelMode: mode });
+		const listMentions = UseMentionList({
+			channelID: checkIsThread(currentChannel) ? currentChannel?.parrent_id : channelId || '',
+			channelMode: mode
+		});
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
@@ -420,13 +431,9 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [messageActionNeedToResolve]);
 
-		const handleClearText = () => {
-			setText('');
-		};
-
 		useEffect(() => {
 			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
-				handleClearText();
+				setText('');
 			});
 			const addEmojiPickedListener = DeviceEventEmitter.addListener(ActionEmitEvent.ADD_EMOJI_PICKED, (emoji) => {
 				handleEventAfterEmojiPicked(emoji.shortName);

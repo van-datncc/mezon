@@ -1,8 +1,8 @@
 import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectCurrentUserId, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { EPermission } from '@mezon/utils';
+import { emojiSuggestionActions, selectCurrentUserId, selectMemberClanByUserId2, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { EPermission, createImgproxyUrl } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { Ref, forwardRef, useMemo, useRef, useState } from 'react';
@@ -12,7 +12,6 @@ import FastImage from 'react-native-fast-image';
 import { Pressable, TextInput } from 'react-native-gesture-handler';
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
 import { style } from './styles';
 
 type ServerDetailProps = {
@@ -25,7 +24,7 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 	const styles = style(themeValue);
 	const { t } = useTranslation(['clanEmojiSetting']);
 	const dispatch = useAppDispatch();
-	const dataAuthor = useSelector(selectMemberClanByUserId(item.creator_id ?? ''));
+	const dataAuthor = useAppSelector((state) => selectMemberClanByUserId2(state, item.creator_id ?? ''));
 	const [emojiName, setEmojiName] = useState(item.shortname?.split(':')?.join(''));
 	const [isFocused, setIsFocused] = useState(false);
 	const textInputRef = useRef<TextInput>(null);
@@ -123,7 +122,12 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 							{dataAuthor?.user?.username}
 						</Text>
 						{dataAuthor?.user?.avatar_url ? (
-							<FastImage source={{ uri: dataAuthor?.user?.avatar_url }} style={styles.imgWrapper} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(dataAuthor?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={styles.imgWrapper}
+							/>
 						) : (
 							<Block
 								backgroundColor={themeValue.colorAvatarDefault}

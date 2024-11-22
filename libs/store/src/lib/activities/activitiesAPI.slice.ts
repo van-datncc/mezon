@@ -1,3 +1,4 @@
+import { captureSentryError } from '@mezon/logger';
 import { IActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiCreateActivityRequest, ApiUserActivity } from 'mezon-js/api.gen';
@@ -35,9 +36,9 @@ export const createActivity = createAsyncThunk('activity/createActiviy', async (
 			...response,
 			id: response.user_id
 		};
-	} catch (error: any) {
-		const errstream = await error.json();
-		return thunkAPI.rejectWithValue(errstream.message);
+	} catch (error) {
+		captureSentryError(error, 'activity/createActiviy');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -52,9 +53,9 @@ export const listActivities = createAsyncThunk('activity/listActivities', async 
 		const activities = response?.activities?.map(mapActivityEntity);
 		thunkAPI.dispatch(acitvitiesActions.addMany(activities));
 		return response.activities;
-	} catch (error: any) {
-		const errstream = await error.json();
-		return thunkAPI.rejectWithValue(errstream.message);
+	} catch (error) {
+		captureSentryError(error, 'activity/listActivities');
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -69,7 +70,10 @@ export const activitiesSlice = createSlice({
 	reducers: {
 		add: activityAdapter.addOne,
 		addMany: activityAdapter.addMany,
-		remove: activityAdapter.removeOne
+		remove: activityAdapter.removeOne,
+		updateListActivity: (state: ActivityState, action: PayloadAction<ActivitiesEntity[]>) => {
+			activityAdapter.setAll(state, action.payload);
+		}
 		// ...
 	},
 	extraReducers: (builder) => {

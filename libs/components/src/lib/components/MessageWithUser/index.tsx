@@ -14,6 +14,8 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import EmbedMessage from '../EmbedMessage/EmbedMessage';
+import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
@@ -278,6 +280,19 @@ function MessageWithUser({
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												{Array.isArray(message.content?.embed) &&
+													message.content.embed?.map((embed, index) => <EmbedMessage {...embed} key={index} />)}
+
+												{message.content?.components &&
+													message.content.components.map((actionRow, index) => (
+														<div className={'flex flex-col'} key={index}>
+															<MessageActionsPanel
+																actionRow={actionRow}
+																messageId={message.id}
+																senderId={message.sender_id}
+															/>
+														</div>
+													))}
 											</div>
 										</div>
 									</div>

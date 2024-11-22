@@ -5,13 +5,18 @@ interface EmbedTitleProps {
 
 export function EmbedTitle({ title, url }: EmbedTitleProps) {
 	return (
-		<div className="mt-2">
+		<div className="mt-2 h-fit">
 			{url ? (
-				<a href={url} className="text-[#00aff4] font-semibold no-underline" target={'_blank'} rel="noreferrer">
+				<a
+					href={url}
+					className="font-semibold no-underline text-contentBrandLight hover:underline cursor-pointer"
+					target={'_blank'}
+					rel="noreferrer"
+				>
 					{title}
 				</a>
 			) : (
-				<span className="text-[#00aff4] font-semibold">{title}</span>
+				<span className="font-semibold">{title}</span>
 			)}
 		</div>
 	);

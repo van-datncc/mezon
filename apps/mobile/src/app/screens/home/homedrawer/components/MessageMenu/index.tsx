@@ -14,11 +14,13 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -182,7 +184,12 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 				) : (
 					<View style={styles.avatarWrapper}>
 						{messageInfo?.channel_avatar?.[0] ? (
-							<Image source={{ uri: messageInfo?.channel_avatar?.[0] }} style={styles.friendAvatar} />
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(messageInfo?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={styles.friendAvatar}
+							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={styles.textAvatar}>{(messageInfo?.channel_label || messageInfo?.usernames)?.charAt?.(0)}</Text>

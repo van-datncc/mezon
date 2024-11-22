@@ -9,22 +9,26 @@ import {
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
-	selectCurrentClanId
+	RootState,
+	selectCurrentClanId,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import EmptyNotification from './EmptyNotification';
 import NotificationItem from './NotificationItem';
 import NotificationItemOption from './NotificationItemOption';
 import NotificationOption from './NotificationOption';
 import { style } from './Notifications.styles';
+import SkeletonNotification from './SkeletonNotification';
 import { EActionDataNotify, ENotifyBsToShow } from './types';
 
 const Notifications = () => {
@@ -33,7 +37,10 @@ const Notifications = () => {
 	const { notification, deleteNotify } = useNotification();
 	const [notify, setNotify] = useState<INotification>();
 	const currentClanId = useSelector(selectCurrentClanId);
-
+	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
+	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
+	const dispatch = useAppDispatch();
+	const isTabletLandscape = useTabletLandscape();
 	const { t } = useTranslation(['notification']);
 	const navigation = useNavigation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -43,11 +50,16 @@ const Notifications = () => {
 	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
-	useEffect(() => {
-		if (currentClanId && currentClanId !== '0') {
-			initLoader();
-		}
-	}, [currentClanId]);
+	useFocusEffect(
+		React.useCallback(() => {
+			if (currentClanId && currentClanId !== '0') {
+				initLoader();
+			}
+			return () => {
+				dispatch(notificationActions.refreshStatus());
+			};
+		}, [currentClanId])
+	);
 
 	useEffect(() => {
 		handleFilterNotify(EActionDataNotify.All);
@@ -55,7 +67,7 @@ const Notifications = () => {
 
 	const initLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
+		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId, noCache: true }));
 	};
 
 	const handleFilterNotify = (tabNotify) => {
@@ -187,9 +199,20 @@ const Notifications = () => {
 		bottomSheetOptionsRef.current?.dismiss();
 	};
 
+	const handleGoback = () => {
+		navigation.goBack();
+	};
+
 	return (
 		<View style={styles.notifications}>
 			<View style={styles.notificationsHeader}>
+				{isTabletLandscape && (
+					<Pressable onPress={handleGoback}>
+						<View style={styles.notificationHeaderIcon}>
+							<Icons.ChevronSmallLeftIcon height={20} width={20} color={themeValue.textStrong} />
+						</View>
+					</Pressable>
+				)}
 				<Text style={styles.notificationHeaderTitle}>{t('headerTitle')}</Text>
 				<Pressable onPress={() => openBottomSheet(ENotifyBsToShow.notification)}>
 					<View style={styles.notificationHeaderIcon}>
@@ -197,9 +220,11 @@ const Notifications = () => {
 					</View>
 				</Pressable>
 			</View>
-
-			{notificationsFilter?.length > 0 ? (
+			{isLoading ? (
+				<SkeletonNotification numberSkeleton={8} />
+			) : notificationsFilter?.length ? (
 				<FlashList
+					showsVerticalScrollIndicator={false}
 					data={notificationsFilter}
 					renderItem={({ item }) => {
 						return <NotificationItem notify={item} onLongPressNotify={openBottomSheet} onPressNotify={handleOnPressNotify} />;
@@ -213,6 +238,7 @@ const Notifications = () => {
 			) : (
 				<EmptyNotification />
 			)}
+
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize="md">
 				<NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabs} />
 			</MezonBottomSheet>

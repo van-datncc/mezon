@@ -48,6 +48,8 @@
   },
   "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
   "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
+  "forwardTo": "Chuyển tiếp đến",
+  "search": "Tìm kiếm",
   "reportMessage": {
       "reportSummary": "Tóm tắt báo cáo",
       "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",

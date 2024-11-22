@@ -24,6 +24,7 @@ import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
 import { MezonClanAvatar } from '../../../../../../componentUI';
+import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 type EmojiSelectorContainerProps = {
@@ -56,8 +57,9 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 }
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect }) => {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = style(themeValue, isTabletLandscape);
 	return (
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {
@@ -208,10 +210,12 @@ export default function EmojiSelectorContainer({
 							key={index}
 							onPress={() => {
 								setSelectedCategory(item.name);
-								refScrollView.current?.scrollTo({
-									y: categoryRefs.current[item.name].position - 130,
-									animated: true
-								});
+								if (categoryRefs?.current?.[item?.name]?.position) {
+									refScrollView.current?.scrollTo({
+										y: categoryRefs.current[item.name].position - 130,
+										animated: true
+									});
+								}
 							}}
 							style={{
 								...styles.cateItem,
@@ -232,7 +236,9 @@ export default function EmojiSelectorContainer({
 						<View
 							ref={categoryRefs.current[item.name]} // Pass the ref here
 							onLayout={(event) => {
-								categoryRefs.current[item.name].position = event.nativeEvent.layout.y;
+								if (categoryRefs?.current?.[item?.name]?.position !== undefined) {
+									categoryRefs.current[item.name].position = event.nativeEvent.layout.y;
+								}
 							}}
 						>
 							<DisplayByCategories

@@ -51,11 +51,15 @@ jobs:
           NX_CHAT_SENTRY_DNS: ${{ secrets.NX_CHAT_SENTRY_DNS_PROD }}
           NX_CHAT_APP_ANNONYMOUS_USER_ID: ${{ secrets.NX_CHAT_APP_ANNONYMOUS_USER_ID_PROD }}
           NX_CHAT_APP_NOTIFICATION_WS_URL: ${{ secrets.NX_CHAT_APP_NOTIFICATION_WS_URL_PROD }}
-          
+          NX_CHAT_SENTRY_DSN: ${{ secrets.NX_CHAT_SENTRY_DSN_PROD }}
+          NX_IMGPROXY_BASE_URL: ${{ secrets.NX_IMGPROXY_BASE_URL }}
+          NX_IMGPROXY_KEY: ${{ secrets.NX_IMGPROXY_KEY }}
+
       - name: Push to MinIO
         run: |
           mc cp dist/executables/latest-mac.yml mezon-app/mezon/release/latest-mac.yml
           mc cp dist/executables/mezon-*-mac-arm64.dmg mezon-app/mezon/release/
           mc cp dist/executables/mezon-*-mac-arm64.zip mezon-app/mezon/release/
-          mc cp dist/executables/mezon-*-mac-universal.dmg mezon-app/mezon/release/
-          mc cp dist/executables/mezon-*-mac-universal.zip mezon-app/mezon/release/
+          mc cp dist/executables/mezon-*-mac-x64.dmg mezon-app/mezon/release/
+          mc cp dist/executables/mezon-*-mac-x64.zip mezon-app/mezon/release/
+

@@ -29,12 +29,12 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const params = new URLSearchParams(paramString);
 	const result = Object.fromEntries(params.entries());
 	const { deepLinkUrl, notificationPath } = result;
-
 	if (deepLinkUrl) {
 		redirectTo = '/desktop/login?deepLinkUrl=' + deepLinkUrl;
 		try {
-			const data = JSON.parse(decodeURIComponent(deepLinkUrl));
-			await dispatch(authActions.setSession(data));
+			const session = deepLinkUrl.split('#')[0];
+			await dispatch(authActions.setSession(JSON.parse(decodeURIComponent(session))));
+			window.history.replaceState({}, document.title, pathname);
 		} catch (error) {
 			console.error('Invalid JSON in deepLinkUrl:', error);
 		}

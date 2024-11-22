@@ -1,6 +1,6 @@
 import loadable from '@loadable/component';
 import isElectron from 'is-electron';
-import { LoaderFunctionArgs, RouterProvider, createBrowserRouter, createHashRouter } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, RouterProvider, createBrowserRouter, createHashRouter } from 'react-router-dom';
 
 // Layouts
 import AppLayout from '../layouts/AppLayout';
@@ -22,13 +22,16 @@ import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 
 // Pages
+import { Canvas } from '@mezon/components';
 import { MemberProvider } from '@mezon/core';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { memo, useCallback, useEffect, useMemo } from 'react';
+import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import AppDirectory from '../pages/AppDirectory';
 import MezonPage from '../pages/homepage/mezonpage';
 import ThreadsMain from '../pages/thread';
+import CanvasRoutes from './CanvasRoutes';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
@@ -49,6 +52,7 @@ const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'))
 const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 const ChannelSettingMain = loadable(() => import('../pages/setting/channelSetting'));
+const GuideMain = loadable(() => import('../pages/guide'));
 // Components
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
@@ -179,10 +183,30 @@ export const Routes = memo(() => {
 																							element: <ThreadsMain />
 																						}
 																					]
+																				},
+																				{
+																					path: 'canvas',
+																					element: <CanvasRoutes />,
+																					children: [
+																						{
+																							path: ':canvasId',
+																							loader: loaderWithStore(canvasLoader),
+																							shouldRevalidate: shouldRevalidateCanvas,
+																							element: <Canvas />
+																						}
+																					]
 																				}
 																			]
 																		}
 																	]
+																},
+																{
+																	path: 'guide',
+																	element: (
+																		<MemberProvider>
+																			<GuideMain />
+																		</MemberProvider>
+																	)
 																}
 															]
 														}
@@ -216,6 +240,34 @@ export const Routes = memo(() => {
 																	loader: loaderWithStore(directMessageLoader),
 																	shouldRevalidate: shouldRevalidateChannel,
 																	element: <DirectMessage />
+																}
+															]
+														}
+													]
+												},
+												{
+													path: 'canvas-mobile',
+													element: <Outlet />,
+													children: [
+														{
+															path: ':clanId',
+															loader: loaderWithStore(clanLoader),
+															shouldRevalidate: shouldRevalidateServer,
+															element: <Outlet />,
+															children: [
+																{
+																	path: ':channelId',
+																	loader: loaderWithStore(channelLoader),
+																	shouldRevalidate: shouldRevalidateChannel,
+																	element: <Outlet />,
+																	children: [
+																		{
+																			path: ':canvasId',
+																			loader: loaderWithStore(canvasLoader),
+																			shouldRevalidate: shouldRevalidateCanvas,
+																			element: <Canvas />
+																		}
+																	]
 																}
 															]
 														}

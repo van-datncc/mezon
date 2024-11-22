@@ -1,5 +1,6 @@
 import { Block, Colors, size, Text } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
+import { createImgproxyUrl } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import Gallery, { GalleryRef, RenderItemInfo } from 'react-native-awesome-galler
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import LoadingModal from '../LoadingModal/LoadingModal';
 import { RenderFooterModal } from './RenderFooterModal';
 import { RenderHeaderModal } from './RenderHeaderModal';
 
@@ -33,6 +35,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const [visibleToolbarConfig, setVisibleToolbarConfig] = useState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
 	const [currentScale, setCurrentScale] = useState(1);
 	const [showSavedImage, setShowSavedImage] = useState(false);
+	const [isLoadingSaveImage, setIsLoadingSaveImage] = useState(false);
 	const allImageList = useSelector(selectAttachmentPhoto());
 	const ref = useRef<GalleryRef>(null);
 	const footerTimeoutRef = useRef<NodeJS.Timeout>(null);
@@ -45,7 +48,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const formattedImageList = useMemo(() => {
 		const index = allImageList.findIndex((file) => file?.url === imageSelected?.url);
 		return index === -1 ? [{ ...imageSelected, id: `${Snowflake.generate()}` }, ...allImageList] : allImageList;
-	}, []);
+	}, [allImageList, imageSelected]);
 
 	const updateToolbarConfig = useCallback(
 		(newValue: Partial<IVisibleToolbarConfig>) => {
@@ -54,15 +57,12 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		[visibleToolbarConfig]
 	);
 
-	const onIndexChange = useCallback(
-		(newIndex: number) => {
-			if (formattedImageList[newIndex]?.id !== currentImage?.id) {
-				setCurrentImage(formattedImageList[newIndex]);
-				ref.current?.reset(); //Note: reset scale
-			}
-		},
-		[currentImage?.id, formattedImageList]
-	);
+	const onIndexChange = useCallback((newIndex: number) => {
+		if (formattedImageList[newIndex]?.id !== currentImage?.id) {
+			setCurrentImage(formattedImageList[newIndex]);
+			ref.current?.reset();
+		}
+	}, []);
 
 	const setTimeoutHideFooter = useCallback(() => {
 		footerTimeoutRef.current = setTimeout(() => {
@@ -120,13 +120,13 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 				}
 			}
 		},
-		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter]
+		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig?.showFooter]
 	);
 
 	const renderItem = ({ item, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
 			<FastImage
-				source={{ uri: item?.url ?? '' }}
+				source={{ uri: createImgproxyUrl(item?.url ?? '', { width: 700, height: 700, resizeType: 'fit' }) }}
 				style={StyleSheet.absoluteFillObject}
 				resizeMode="contain"
 				onLoad={(e) => {
@@ -144,12 +144,16 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		}, TIME_TO_SHOW_SAVE_IMAGE_SUCCESS);
 	}, []);
 
+	const onLoading = useCallback((isLoading) => {
+		setIsLoadingSaveImage(isLoading);
+	}, []);
+
 	useEffect(() => {
 		if (visibleToolbarConfig.showFooter) {
 			clearTimeout(footerTimeoutRef.current);
 			setTimeoutHideFooter();
 		}
-	}, [visibleToolbarConfig.showFooter, currentImage?.id]);
+	}, [visibleToolbarConfig?.showFooter, currentImage?.id, setTimeoutHideFooter]);
 
 	useEffect(() => {
 		return () => {
@@ -163,7 +167,9 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	return (
 		<Modal visible={visible}>
 			<Block flex={1}>
-				{visibleToolbarConfig.showHeader && <RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} />}
+				{visibleToolbarConfig.showHeader && (
+					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} onLoading={onLoading} />
+				)}
 				<Gallery
 					ref={ref}
 					initialIndex={initialIndex === -1 ? 0 : initialIndex}
@@ -191,6 +197,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 					</Block>
 				)}
 			</Block>
+			<LoadingModal isVisible={isLoadingSaveImage} />
 		</Modal>
 	);
 });

@@ -14,7 +14,9 @@ import {
 	accountActions,
 	channelsActions,
 	clansActions,
+	fetchDirectMessage,
 	getIsShowPopupForward,
+	listChannelsByUserActions,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
@@ -86,6 +88,8 @@ function MyApp() {
 			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
+				dispatch(fetchDirectMessage({ noCache: true }));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				openSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
@@ -156,7 +160,7 @@ function MyApp() {
 			<MainContent />
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 				<div
-					className={`fixed h-[calc(100vh_-_60px)] bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
 					style={streamStyle}
 				>
 					<ChannelStream
@@ -188,6 +192,18 @@ const SidebarMenu = memo(
 	({ openCreateClanModal }: { openCreateClanModal: ShowModal }) => {
 		const dispatch = useAppDispatch();
 		const clans = useSelector(selectAllClans);
+		clans.sort((a, b) => {
+			const nameA = a.clan_name ?? '';
+			const nameB = b.clan_name ?? '';
+
+			if (nameA < nameB) {
+				return -1;
+			}
+			if (nameA > nameB) {
+				return 1;
+			}
+			return 0;
+		});
 		const listUnreadDM = useSelector(selectDirectsUnreadlist);
 		const isClanView = useSelector(selectClanView);
 		const appearanceTheme = useSelector(selectTheme);
@@ -303,7 +319,7 @@ const SidebarMenu = memo(
 					<div className="flex flex-col gap-3 ">
 						{clans.map((clan: IClan) => {
 							return (
-								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
+								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name} clan={clan}>
 									<SidebarClanItem
 										linkClan={`/chat/clans/${clan.id}`}
 										option={clan}

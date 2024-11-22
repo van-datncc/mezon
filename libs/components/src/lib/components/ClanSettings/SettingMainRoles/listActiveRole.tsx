@@ -1,7 +1,7 @@
 import { useClanOwner } from '@mezon/core';
 import { RolesClanEntity, selectTheme, selectUserMaxPermissionLevel } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { RoleEveryOne, SlugPermission } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR, RoleEveryOne, SlugPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ApiPermission } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
@@ -32,7 +32,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								setShowModal(false);
 							}}
 						>
-							<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" />
+							<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" defaultFill={`${role.color || DEFAULT_ROLE_COLOR}`} />
 							{!hasPermissionEdit && <Icons.IconLock defaultSize="size-3 text-contentTertiary" />}
 							<span className="one-line">{role.title}</span>
 						</p>

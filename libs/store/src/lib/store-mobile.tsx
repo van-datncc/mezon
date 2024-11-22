@@ -9,6 +9,7 @@ import { authReducer } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
 import { channelMembersReducer } from './channelmembers/channel.members';
 import { channelsReducer } from './channels/channels.slice';
+import { DMCallReducer } from './dmcall/dmcall.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
@@ -27,6 +28,8 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { auditLogReducer } from './auditLog/auditLog.slice';
+import { auditLogFilterReducer } from './auditLog/auditLogFilter.slice';
 import { canvasReducer } from './canvas/canvas.slice';
 import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
@@ -65,7 +68,8 @@ import { integrationWebhookReducer } from './webhook/webhook.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
-		storage
+		storage,
+		blacklist: ['loadingStatus']
 	},
 	authReducer
 );
@@ -366,6 +370,8 @@ const reducer = {
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
+	auditlog: auditLogReducer,
+	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
@@ -379,7 +385,8 @@ const reducer = {
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
-	clanMembersMeta: clanMembersMetaReducer
+	clanMembersMeta: clanMembersMetaReducer,
+	dmcall: DMCallReducer
 };
 
 let storeInstance = configureStore({

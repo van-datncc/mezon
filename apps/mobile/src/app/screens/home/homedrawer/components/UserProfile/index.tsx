@@ -1,8 +1,17 @@
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
+import {
+	ChannelsEntity,
+	RolesClanEntity,
+	selectAccountCustomStatus,
+	selectAllRolesClan,
+	selectDirectsOpenlist,
+	selectMemberClanByUserId2,
+	useAppSelector
+} from '@mezon/store-mobile';
+import { DEFAULT_ROLE_COLOR, IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -43,9 +52,9 @@ const UserProfile = React.memo(
 		const styles = style(themeValue);
 		const { userProfile } = useAuth();
 		const { t } = useTranslation(['userProfile']);
-		const userById = useAppSelector(selectMemberClanByUserId(userId || user?.id));
+		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
 		const userStatus = useMemberStatus(userId || user?.id);
-		const rolesClan = useSelector(selectAllRolesClan);
+		const rolesClan: RolesClanEntity[] = useSelector(selectAllRolesClan);
 		const messageAvatar = useMemo(() => {
 			return message?.clan_avatar || message?.avatar;
 		}, [message?.clan_avatar, message?.avatar]);
@@ -57,6 +66,8 @@ const UserProfile = React.memo(
 		const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type), [currentChannel?.type]);
+		const { dismiss } = useBottomSheetModal();
+		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 
 		const isKicked = useMemo(() => {
 			return !userById;
@@ -75,6 +86,10 @@ const UserProfile = React.memo(
 			const id = userProfile?.user?.google_id || userProfile?.user?.id;
 			return userId === id;
 		}, [userById, userProfile]);
+
+		const displayStatus = useMemo(() => {
+			return isCheckOwner ? currentUserCustomStatus : userCustomStatus;
+		}, [currentUserCustomStatus, isCheckOwner, userCustomStatus]);
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
@@ -102,6 +117,7 @@ const UserProfile = React.memo(
 				onClose();
 			}
 			directMessageWithUser(userId || user?.id);
+			dismiss();
 		};
 
 		const actionList = [
@@ -112,26 +128,37 @@ const UserProfile = React.memo(
 				action: navigateToMessageDetail,
 				isShow: true
 			},
-			// {
-			// 	id: 2,
-			// 	text: t('userAction.voiceCall'),
-			// 	icon: <Icons.PhoneCallIcon color={themeValue.text} />,
-			// 	action: () => {
-			// 		//TODO
-			// 		Toast.show({ type: 'info', text1: 'Updating...' });
-			// 	},
-			// 	isShow: true
-			// },
-			// {
-			// 	id: 3,
-			// 	text: t('userAction.videoCall'),
-			// 	icon: <Icons.VideoIcon color={themeValue.text} />,
-			// 	action: () => {
-			// 		//TODO
-			// 		Toast.show({ type: 'info', text1: 'Updating...' });
-			// 	},
-			// 	isShow: true
-			// },
+			{
+				id: 2,
+				text: t('userAction.voiceCall'),
+				icon: <Icons.PhoneCallIcon color={themeValue.text} />,
+				action: () => {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userById?.user?.id,
+							receiverAvatar: userById?.user?.avatar_url
+						}
+					});
+				},
+				isShow: true
+			},
+			{
+				id: 3,
+				text: t('userAction.videoCall'),
+				icon: <Icons.VideoIcon color={themeValue.text} />,
+				action: () => {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userById?.user?.id,
+							receiverAvatar: userById?.user?.avatar_url,
+							isVideoCall: true
+						}
+					});
+				},
+				isShow: true
+			},
 			{
 				id: 4,
 				text: t('userAction.addFriend'),
@@ -212,7 +239,7 @@ const UserProfile = React.memo(
 						<Text style={[styles.subUserName]}>
 							{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
-						{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
+						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
 							<View style={[styles.userAction]}>
@@ -261,7 +288,12 @@ const UserProfile = React.memo(
 									<View style={[styles.roles]}>
 										{userRolesClan?.map((role, index) => (
 											<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
-												<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.bgToggleOnBtn}></Block>
+												<Block
+													width={size.s_15}
+													height={size.s_15}
+													borderRadius={size.s_50}
+													backgroundColor={role?.color || DEFAULT_ROLE_COLOR}
+												></Block>
 												<Text style={[styles.textRole]}>{role?.title}</Text>
 											</View>
 										))}

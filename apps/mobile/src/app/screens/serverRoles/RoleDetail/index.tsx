@@ -3,7 +3,7 @@ import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { MezonConfirm, MezonInput } from '../../../componentUI';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
+import RoleCoLourComponent from '../RoleCoLourComponent/RoleCoLourComponent';
 
 enum EActionType {
 	permissions,
@@ -88,7 +89,16 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		setShowModalConfirmSave(false);
 		const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
 		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
-		const response = await updateRole(clanRole.clan_id, clanRole.id, currentRoleName, selectedMembers, selectedPermissions, [], []);
+		const response = await updateRole(
+			clanRole.clan_id,
+			clanRole.id,
+			currentRoleName,
+			clanRole?.color || '',
+			selectedMembers,
+			selectedPermissions,
+			[],
+			[]
+		);
 		if (response) {
 			Toast.show({
 				type: 'success',
@@ -199,6 +209,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				</Block>
 
 				<Block marginVertical={size.s_10} flex={1}>
+					<RoleCoLourComponent roleId={roleId} />
 					<Block borderRadius={size.s_10} overflow="hidden">
 						<FlatList
 							data={actionList}

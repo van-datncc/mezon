@@ -15,7 +15,11 @@ jobs:
 
       - name: Install package
         run: |
-          node -v
+          export nv=$(node -v)
+          echo "Node version: $nv"
+          echo "Installing dependencies"
+          yarn config set nodedir ~/.cache/node-gyp/"${nv:1}"
+          echo "Node directory: ${nv:1}"
           yarn
 
       - name: Change prod environment
@@ -47,7 +51,10 @@ jobs:
           NX_CHAT_SENTRY_DNS: ${{ secrets.NX_CHAT_SENTRY_DNS_PROD }}
           NX_CHAT_APP_ANNONYMOUS_USER_ID: ${{ secrets.NX_CHAT_APP_ANNONYMOUS_USER_ID_PROD }}
           NX_CHAT_APP_NOTIFICATION_WS_URL: ${{ secrets.NX_CHAT_APP_NOTIFICATION_WS_URL_PROD }}
-          
+          NX_CHAT_SENTRY_DSN: ${{ secrets.NX_CHAT_SENTRY_DSN_PROD }}
+          NX_IMGPROXY_BASE_URL: ${{ secrets.NX_IMGPROXY_BASE_URL }}
+          NX_IMGPROXY_KEY: ${{ secrets.NX_IMGPROXY_KEY }}
+
       - name: Push to MinIO
         run: |
           mc cp dist/executables/latest-linux.yml mezon/mezon/release/latest-linux.yml

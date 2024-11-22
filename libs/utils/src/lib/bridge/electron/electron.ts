@@ -1,5 +1,14 @@
-import { ACTIVE_WINDOW, NAVIGATE_TO_URL, SENDER_ID, START_NOTIFICATION_SERVICE, TRIGGER_SHORTCUT } from './constants';
-import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI, MezonNotificationOptions } from './types';
+import {
+	ACTIVE_WINDOW,
+	DOWNLOAD_PROGRESS,
+	NAVIGATE_TO_URL,
+	SENDER_ID,
+	START_NOTIFICATION_SERVICE,
+	TRIGGER_SHORTCUT,
+	UPDATE_AVAILABLE,
+	UPDATE_ERROR
+} from './constants';
+import { ElectronBridgeHandler, IElectronBridge, MezonDownloadFile, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
 	private readonly bridge: MezonElectronAPI = window.electron;
@@ -28,16 +37,31 @@ export class ElectronBridge implements IElectronBridge {
 		this.setupSenderId();
 		this.setupShortCut();
 		this.setActiveWindow();
+		this.setupUpdateAvaiable();
+		this.setupDownloadProgress();
+		this.setupUpdateError();
 		this.hasListeners = true;
 	}
 
 	public removeAllListeners() {
 		this.bridge.removeListener(TRIGGER_SHORTCUT, this.triggerShortcut);
+		this.bridge.removeListener(ACTIVE_WINDOW, this.triggerActiveWindow);
+		this.bridge.removeListener(UPDATE_AVAILABLE, this.triggerUpdateAvaiable);
+		this.bridge.removeListener(DOWNLOAD_PROGRESS, this.triggerDownloadprogress);
+		this.bridge.removeListener(UPDATE_ERROR, this.triggerUpdateError);
 		this.hasListeners = false;
 	}
 
 	public setBadgeCount(badgeCount: number | null) {
 		this.bridge.setBadgeCount(badgeCount);
+	}
+
+	public invoke(channel: string, data?: MezonDownloadFile): Promise<MezonDownloadFile> {
+		if (this.bridge.invoke) {
+			return this.bridge.invoke(channel, data);
+		}
+		console.error(`invoke is not supported on this bridge`);
+		return Promise.reject(new Error('invoke is not implemented in this bridge'));
 	}
 
 	public setActiveWindow() {
@@ -84,9 +108,42 @@ export class ElectronBridge implements IElectronBridge {
 		}
 	};
 
+	private setupUpdateAvaiable() {
+		this.bridge.on(UPDATE_AVAILABLE, this.listenerHandlers[UPDATE_AVAILABLE]);
+	}
+
+	private triggerUpdateAvaiable = (_: unknown, name: string) => {
+		if (this.handlers?.[UPDATE_AVAILABLE]) {
+			this.handlers?.[UPDATE_AVAILABLE]();
+		}
+	};
+
+	private setupDownloadProgress() {
+		this.bridge.on(DOWNLOAD_PROGRESS, this.listenerHandlers[DOWNLOAD_PROGRESS]);
+	}
+
+	private triggerDownloadprogress = (_: unknown, response: unknown) => {
+		if (this.handlers?.[DOWNLOAD_PROGRESS]) {
+			this.handlers?.[DOWNLOAD_PROGRESS](response);
+		}
+	};
+
+	private setupUpdateError() {
+		this.bridge.on(UPDATE_ERROR, this.listenerHandlers[UPDATE_ERROR]);
+	}
+
+	private triggerUpdateError = (_: unknown, error: unknown) => {
+		if (this.handlers?.[UPDATE_ERROR]) {
+			this.handlers?.[UPDATE_ERROR](error);
+		}
+	};
+
 	private readonly listenerHandlers: Record<string, ElectronBridgeHandler> = {
 		[TRIGGER_SHORTCUT]: this.triggerShortcut,
-		[ACTIVE_WINDOW]: this.triggerActiveWindow
+		[ACTIVE_WINDOW]: this.triggerActiveWindow,
+		[UPDATE_AVAILABLE]: this.triggerUpdateAvaiable,
+		[DOWNLOAD_PROGRESS]: this.triggerDownloadprogress,
+		[UPDATE_ERROR]: this.triggerUpdateError
 	};
 }
 

@@ -1,7 +1,6 @@
-import { useMemberStatus } from '@mezon/core';
-import { OwnerIcon } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity } from '@mezon/utils';
+import { IUserStatus, OwnerIcon } from '@mezon/mobile-components';
+import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
 import { Text, View } from 'react-native';
@@ -10,7 +9,7 @@ import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
 import { style } from './style';
 interface IProps {
 	user: ChannelMembersEntity;
-	status?: boolean;
+	userStatus?: IUserStatus;
 	numCharCollapse?: number;
 	isHideIconStatus?: boolean;
 	isHideUserName?: boolean;
@@ -23,7 +22,7 @@ interface IProps {
 
 export function MemberProfile({
 	user,
-	status,
+	userStatus,
 	isHideIconStatus,
 	isHideUserName,
 	numCharCollapse = 6,
@@ -39,7 +38,6 @@ export function MemberProfile({
 	const userInfo: any = useMemo(() => {
 		return user?.user || user;
 	}, [user]);
-	const userStatus = useMemberStatus(userInfo?.id || '');
 
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
@@ -47,6 +45,13 @@ export function MemberProfile({
 			return nickName || userInfo?.display_name || userInfo?.username;
 		}
 	}, [userInfo]);
+	const userColorRolesClan = useColorsRoleById(userInfo?.id || '')?.highestPermissionRoleColor;
+
+	const colorUserName = useMemo(() => {
+		return ![ChannelType?.CHANNEL_TYPE_DM, ChannelType?.CHANNEL_TYPE_GROUP]?.includes(currentChannel?.type)
+			? userColorRolesClan
+			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
+	}, [userColorRolesClan, currentChannel?.type]);
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
@@ -55,7 +60,7 @@ export function MemberProfile({
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
 				{!isHideUserName && (
-					<Text style={styles.textName}>
+					<Text style={{ color: colorUserName }}>
 						{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
 					</Text>
 				)}

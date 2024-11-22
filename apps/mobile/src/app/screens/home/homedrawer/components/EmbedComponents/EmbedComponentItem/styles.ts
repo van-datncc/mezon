@@ -1,0 +1,18 @@
+import { Attributes, size } from '@mezon/mobile-ui';
+import { StyleSheet } from 'react-native';
+
+export const style = (colors: Attributes) =>
+	StyleSheet.create({
+		button: {
+			height: size.s_40,
+			width: size.s_40,
+			backgroundColor: colors.bgViolet,
+			borderRadius: size.s_4,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		buttonLabel: {
+			color: colors.white,
+			fontSize: size.medium
+		}
+	});

@@ -1,19 +1,22 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
-//import { windowManager } from 'node-window-manager';
+import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 
-import { TRIGGER_SHORTCUT } from './events/constants';
+import setupAutoUpdates from './autoUpdates';
+import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
+import { forceQuit } from './utils';
 
 const isQuitting = false;
 
 export enum EActivities {
 	CODE = 'Code',
+	VISUAL_STUDIO_CODE = 'Visual Studio Code',
 	SPOTIFY = 'Spotify',
 	LOL = 'LeagueClientUx'
 }
@@ -52,7 +55,13 @@ export default class App {
 			App.setupMenu();
 			App.setupBadge();
 			tray.init(isQuitting);
-			//App.setupWindowManager();
+			App.setupWindowManager();
+			if (process.platform === 'win32') {
+				app.setAppUserModelId('mezon.ai');
+			}
+			App.mainWindow.webContents.once('dom-ready', () => {
+				setupAutoUpdates();
+			});
 		}
 	}
 
@@ -167,7 +176,15 @@ export default class App {
 		});
 
 		// Emitted when the window is closed.
-		App.mainWindow.on('close', (event) => this.onClose(event));
+		App.mainWindow.on('close', (event) => {
+			if (forceQuit.isEnabled) {
+				app.exit(0);
+				forceQuit.disable();
+			} else {
+				event.preventDefault();
+				App.mainWindow.hide();
+			}
+		});
 
 		App.application.on('before-quit', () => {
 			tray.destroy();
@@ -208,8 +225,6 @@ export default class App {
 				})
 			);
 		}
-
-		App.application.setAppUserModelId('mezon.ai');
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
@@ -228,94 +243,44 @@ export default class App {
 		return initBadge(App.application, App.mainWindow);
 	}
 
-	/*
 	private static setupWindowManager() {
 		if (process.platform === 'darwin') {
-			const permissionGranted = windowManager.requestAccessibility();
-			if (!permissionGranted) {
-				console.warn('Accessibility permission is required for this application to work correctly on macOS.');
-				return;
-			}
+			console.error('not implemented');
+			return;
 		}
 
-		const windowInfoArray = [];
 		let defaultApp = null;
 		const usageThreshold = 30 * 60 * 1000;
-		let hasSentDefaultApp = false;
 		let activityTimeout = null;
-		let isFirstRun = true;
 
-		const updateWindowInfoArray = () => {
-			windowInfoArray.length = 0;
-			windowManager.getWindows().forEach((window) => {
-				if (window.isVisible()) {
-					const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
-					const fullPath = window.path.split(pathDelimiter).pop();
-					const appName = fullPath.replace(/\.(exe|app)$/, '');
-					const windowTitle = window.getTitle();
+		const fetchActiveWindow = () => {
+			const window = activeWindows?.getActiveWindow();
+			if (window) {
+				const appName = window?.windowClass.replace(/\.(exe|app)$/, '');
+				const windowTitle = window?.windowName;
+				const startTime = new Date().toISOString();
 
-					if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName as EActivities)) {
-						const startTime = new Date().toISOString();
-						windowInfoArray.push({ appName, windowTitle, startTime });
+				if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL, EActivities.VISUAL_STUDIO_CODE].includes(appName as EActivities)) {
+					const newAppInfo = { appName, windowTitle, startTime };
+
+					if (!defaultApp || defaultApp?.appName !== newAppInfo?.appName || defaultApp.windowTitle !== newAppInfo?.windowTitle) {
+						defaultApp = newAppInfo;
+						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
 					}
 				}
-			});
+			}
 		};
 
-		updateWindowInfoArray();
+		fetchActiveWindow();
 
-		if (windowInfoArray.length > 0) {
-			defaultApp = windowInfoArray[0];
+		if (activityTimeout) {
+			clearInterval(activityTimeout);
 		}
 
-		windowManager.on('window-activated', (window) => {
-			const pathDelimiter = process.platform === 'win32' ? '\\' : '/';
-			const fullPath = window.path.split(pathDelimiter).pop();
-			const appName = fullPath.replace(/\.(exe|app)$/, '');
-			const windowTitle = window.getTitle();
-			const startTime = new Date().toISOString();
-
-			if (defaultApp && defaultApp?.appName) {
-				if (isFirstRun) {
-					App.mainWindow.webContents.send(ACTIVE_WINDOW, { ...defaultApp, startTime });
-					hasSentDefaultApp = true;
-					isFirstRun = false;
-				}
-			} else if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && isFirstRun) {
-				defaultApp = { appName, windowTitle, startTime };
-				App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
-				hasSentDefaultApp = true;
-				isFirstRun = false;
-			}
-
-			if ([EActivities.SPOTIFY, EActivities.CODE, EActivities.LOL].includes(appName) && !isFirstRun) {
-				if (activityTimeout) {
-					clearInterval(activityTimeout);
-				}
-
-				activityTimeout = setInterval(() => {
-					const newWindowTitle = window.getTitle();
-					if (!defaultApp || defaultApp.appName !== appName || defaultApp.windowTitle !== newWindowTitle) {
-						defaultApp = { appName, windowTitle: newWindowTitle, startTime };
-						hasSentDefaultApp = false;
-					}
-
-					if (!newWindowTitle) {
-						isFirstRun = true;
-						defaultApp = {};
-						clearInterval(activityTimeout);
-						hasSentDefaultApp = false;
-					}
-
-					if (defaultApp && !hasSentDefaultApp) {
-						App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
-						hasSentDefaultApp = true;
-					}
-				}, usageThreshold);
-			}
-		});
+		activityTimeout = setInterval(() => {
+			fetchActiveWindow();
+		}, usageThreshold);
 	}
-  */
 
 	private static setupMenu() {
 		const isMac = process.platform === 'darwin';

@@ -2,6 +2,7 @@ import { useAuth, useCheckOwnerForUser } from '@mezon/core';
 import { Icons, OwnerIcon } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { channelUsersActions, useAppDispatch } from '@mezon/store-mobile';
+import { createImgproxyUrl } from '@mezon/utils';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
@@ -87,7 +88,9 @@ export const MemberItem = memo(
 			<TouchableOpacity onPress={onPressMemberItem} disabled={disabled}>
 				<Block gap={size.s_10} flexDirection="row" padding={size.s_10} alignItems="center">
 					<FastImage
-						source={{ uri: member?.user?.avatar_url }}
+						source={{
+							uri: createImgproxyUrl(member?.user?.avatar_url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+						}}
 						resizeMode="cover"
 						style={{ width: size.s_40, height: size.s_40, borderRadius: 50 }}
 					/>

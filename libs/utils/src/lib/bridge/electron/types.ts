@@ -1,5 +1,6 @@
 export type ElectronBridgeHandler = (...args: any[]) => void;
 export type MezonElectronAPI = {
+	invoke?: (channel: string, data?: MezonDownloadFile) => Promise<MezonDownloadFile>;
 	platform: NodeJS.Platform;
 	getAppVersion: () => Promise<string>;
 	on: (eventName: string, callback: ElectronBridgeHandler) => void;
@@ -25,4 +26,9 @@ export interface IElectronBridge {
 
 export interface MezonNotificationOptions extends NotificationOptions {
 	data: { link: string };
+}
+
+export interface MezonDownloadFile {
+	url: string;
+	defaultFileName: string;
 }

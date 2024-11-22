@@ -5,7 +5,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
-import EmbedMessage from '../EmbedMessage/EmbedMessage';
 
 type MessageLineProps = {
 	mode?: number;
@@ -77,7 +76,7 @@ interface RenderContentProps {
 	isInPinMsg?: boolean;
 }
 
-interface ElementToken {
+export interface ElementToken {
 	s?: number;
 	e?: number;
 	kindOf: ETokenMessage;
@@ -102,7 +101,7 @@ const RenderContent = memo(
 		isEditted,
 		isInPinMsg
 	}: RenderContentProps) => {
-		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], embed } = data;
+		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
 		const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 		const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
@@ -192,7 +191,7 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
-							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s) ? true : false}
+							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s)}
 							key={`emoji-${index}-${s}-${element.emojiid}`}
 							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
@@ -282,10 +281,6 @@ const RenderContent = memo(
 			return formattedContent;
 		}, [elements, t, mode]);
 
-		if (embed) {
-			return <EmbedMessage {...embed} />;
-		}
-
 		return (
 			<div
 				style={
@@ -296,7 +291,8 @@ const RenderContent = memo(
 								textOverflow: 'ellipsis'
 							}
 						: {
-								whiteSpace: 'pre-line'
+								whiteSpace: 'break-spaces',
+								overflowWrap: 'break-word'
 							}
 				}
 				className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}

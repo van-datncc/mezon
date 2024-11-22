@@ -111,12 +111,26 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				// 	title: t('accountSettings.clip'),
 				// 	icon: <Icons.ClipIcon color={themeValue.textStrong} />,
 				// },
-				// {
-				// 	onPress: () => reserve(),
-				// 	expandable: true,
-				// 	title: t('accountSettings.friendRequests'),
-				// 	icon: <Icons.FriendIcon color={themeValue.textStrong} />,
-				// },
+				{
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.FRIENDS.STACK, {
+							screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND
+						});
+					},
+					expandable: true,
+					title: t('accountSettings.friendRequests'),
+					icon: <Icons.FriendIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
+				},
+				{
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+							screen: APP_SCREEN.SETTINGS.MY_QR_CODE
+						});
+					},
+					expandable: true,
+					title: t('accountSettings.MyQRCode'),
+					icon: <Icons.MyQRCodeIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
+				},
 				{
 					onPress: () => {
 						navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
@@ -128,7 +142,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 					icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
 				}
 			] satisfies IMezonMenuItemProps[],
-		[themeValue.textStrong]
+		[navigation, t, themeValue.textStrong]
 	);
 
 	const PaymentMenu = useMemo(
