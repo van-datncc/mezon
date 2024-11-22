@@ -933,8 +933,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			DMCallActions.add({
 				calleeId: event?.receiver_id,
 				signalingData: event,
-				// todo: refactor this
-				id: Snowflake.generate(),
+				id: event?.caller_id,
 				callerId: event?.caller_id
 			})
 		);
