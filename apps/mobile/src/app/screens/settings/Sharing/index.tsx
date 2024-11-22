@@ -299,11 +299,14 @@ export const Sharing = ({ data, onClose }) => {
 						{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
 					]);
 					const fileSize = await getSizeImage(media);
-					const pathCompressed =
-						(media?.filetype && media?.filetype?.startsWith('video')) || (media?.mimeType && media?.mimeType?.startsWith('video'))
-							? await compressVideo(media?.filePath || media?.contentUri)
-							: await compressImage(media?.filePath || media?.contentUri);
-					const fileData = await RNFS.readFile(pathCompressed || '', 'base64');
+					const checkIsVideo =
+						(media?.filetype && media?.filetype?.startsWith('video')) ||
+						(media?.mimeType && media?.mimeType?.startsWith('video')) ||
+						isVideo(media?.filePath?.toLowerCase());
+					const pathCompressed = checkIsVideo
+						? await compressVideo(media?.filePath || media?.contentUri)
+						: await compressImage(media?.filePath || media?.contentUri);
+					const fileData = await RNFS.readFile(pathCompressed || media.filePath || media?.contentUri, 'base64');
 
 					return {
 						uri: media.contentUri || media?.filePath,
