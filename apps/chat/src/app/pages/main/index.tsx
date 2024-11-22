@@ -3,6 +3,7 @@ import {
 	ForwardMessageModal,
 	MessageContextMenuProvider,
 	MessageModalImage,
+	ModalCall,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -34,6 +35,7 @@ import {
 	selectDmGroupCurrentType,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
+	selectListOfCalls,
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -86,8 +88,10 @@ function MyApp() {
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
+	const dataCall = signalingData?.[signalingData?.length - 1]?.signalingData;
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
+	const listOfCalls = useSelector(selectListOfCalls) ?? [];
 
 	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
 	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
@@ -231,6 +235,8 @@ function MyApp() {
 					/>
 				</div>
 			)}
+
+			{isPlayRingTone && !listOfCalls[userProfile?.user?.id || '']?.includes(directId ?? '') && <ModalCall dataCall={dataCall}></ModalCall>}
 
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
