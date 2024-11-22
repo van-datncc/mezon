@@ -279,7 +279,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			default:
 				break;
 		}
-	}, [mezon.socketRef, peerConnection, signalingData]);
+	}, [mezon.socketRef, peerConnection, signalingData, channelCallId]);
 
 	const startCall = async () => {
 		await dispatch(DMCallActions.setCallerId(userId));
@@ -718,84 +718,9 @@ function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId:
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
 	const { userId } = useAuth();
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const peerConnection = useMemo(() => {
 		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
 	}, []);
-
-	useEffect(() => {
-		peerConnection.onicecandidate = async (event: any) => {
-			if (event && event.candidate) {
-				if (mezon.socketRef.current?.isOpen() === true) {
-					await mezon.socketRef.current?.forwardWebrtcSignaling(
-						dmUserId,
-						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate),
-						'',
-						userId ?? ''
-					);
-				}
-			}
-		};
-
-		peerConnection.ontrack = (event: any) => {
-			// Display remote stream in remote video element
-			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = event.streams[0];
-			}
-		};
-
-		if (!signalingData?.[signalingData?.length - 1]) return;
-		const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-
-		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-
-						// Get peerConnection from receiver event.receiverId
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-						const answer = await peerConnection.createAnswer();
-						await peerConnection.setLocalDescription(answer);
-
-						const answerEnc = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.forwardWebrtcSignaling(
-							dmUserId,
-							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
-							answerEnc,
-							'',
-							userId ?? ''
-						);
-					};
-					processData().catch(console.error);
-				}
-
-				break;
-			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-					};
-					processData().catch(console.error);
-				}
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				{
-					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
-						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-					};
-					processData().catch(console.error);
-				}
-				break;
-			default:
-				break;
-		}
-	}, [mezon.socketRef, peerConnection, signalingData]);
 
 	const handleShow = async () => {
 		setIsShow(true);
