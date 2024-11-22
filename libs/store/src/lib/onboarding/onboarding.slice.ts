@@ -321,17 +321,17 @@ export const onboardingSlice = createSlice({
 				if (action.payload) {
 					onboardingUserAdapter.setAll(state, action.payload);
 				}
-			})
-			.addCase(doneOnboarding.fulfilled, (state, action) => {
-				if (action.payload) {
-					onboardingUserAdapter.updateOne(state, {
-						id: action.payload,
-						changes: {
-							onboarding_step: 3
-						}
-					});
-				}
 			});
+		// .addCase(doneOnboarding.fulfilled, (state, action) => {
+		// 	if (action.payload) {
+		// 		onboardingUserAdapter.updateOne(state, {
+		// 			id: action.payload,
+		// 			changes: {
+		// 				onboarding_step: 3
+		// 			}
+		// 		});
+		// 	}
+		// });
 	}
 });
 

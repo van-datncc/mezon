@@ -312,6 +312,7 @@ const OnboardingGuide = ({
 }) => {
 	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
+
 	const handleDoNextMission = useCallback(() => {
 		if (currentMission) {
 			switch (currentMission.task_type) {
@@ -324,19 +325,26 @@ const OnboardingGuide = ({
 					const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
 					navigate(linkChannel);
 					dispatch(onboardingActions.doneMission());
+					doneAllMission();
 					break;
 				}
 				case ETypeMission.DOSOMETHING: {
 					dispatch(onboardingActions.doneMission());
+					doneAllMission();
 					break;
 				}
 				default:
 					break;
 			}
 		}
-	}, [currentMission?.id]);
-	const channelMission = useSelector((state) => selectChannelById(state, currentMission?.channel_id as string));
+	}, [currentMission?.id, missionDone]);
 
+	const channelMission = useSelector((state) => selectChannelById(state, currentMission?.channel_id as string));
+	const doneAllMission = useCallback(() => {
+		if (missionDone + 1 === missionSum) {
+			dispatch(onboardingActions.doneOnboarding({ clan_id: currentMission?.clan_id as string }));
+		}
+	}, [missionDone]);
 	return (
 		<>
 			{missionDone < missionSum && currentMission ? (
