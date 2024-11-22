@@ -10,7 +10,8 @@ import {
 	selectDataReferences,
 	selectIsViewingOlderMessagesByChannelId,
 	selectMissionDone,
-	selectOnboardingByClan
+	selectOnboardingByClan,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
@@ -36,6 +37,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	}, [channel?.channel_id]);
 
 	const dispatch = useDispatch();
+	const appDispatch = useAppDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
 	const anonymousMode = useSelector(selectAnonymousMode);
@@ -55,12 +57,23 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			mentionEveryone?: boolean
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
-			if (currentClan?.is_onboarding && onboardingList?.mission?.[currentMission]?.task_type === ETypeMission.SEND_MESSAGE) {
-				dispatch(onboardingActions.doneMission());
-			}
+			handDoMessageMission();
 		},
-		[sendMessage]
+		[sendMessage, currentMission]
 	);
+
+	const handDoMessageMission = () => {
+		if (
+			currentClan?.is_onboarding &&
+			onboardingList?.mission?.[currentMission]?.channel_id === channel?.channel_id &&
+			onboardingList?.mission?.[currentMission]?.task_type === ETypeMission.SEND_MESSAGE
+		) {
+			dispatch(onboardingActions.doneMission());
+			if (currentMission + 1 === onboardingList.mission.length) {
+				appDispatch(onboardingActions.doneOnboarding({ clan_id: clanId as string }));
+			}
+		}
+	};
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
