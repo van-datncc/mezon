@@ -35,7 +35,7 @@ const CallingModal = () => {
 	const callerInfo = useMemo(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 
-		if (latestSignalingEntry?.callerId && latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
+		if (latestSignalingEntry?.callerId) {
 			return usersClan.find((user) => user.id === latestSignalingEntry?.callerId);
 		} else {
 			return {};
@@ -68,13 +68,7 @@ const CallingModal = () => {
 
 	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-		if (
-			signalingData &&
-			!!latestSignalingEntry &&
-			!isVisible &&
-			!isInCall &&
-			latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
-		) {
+		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && latestSignalingEntry) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 
