@@ -33,6 +33,7 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectListOfCalls,
@@ -89,6 +90,7 @@ function MyApp() {
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const dataCall = signalingData?.[signalingData?.length - 1]?.signalingData;
+	const isInCall = useSelector(selectIsInCall);
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
 	const listOfCalls = useSelector(selectListOfCalls) ?? [];
@@ -112,7 +114,11 @@ function MyApp() {
 	};
 
 	useEffect(() => {
-		if (!signalingData?.[signalingData?.length - 1]) return;
+		if (!signalingData?.[signalingData?.length - 1] || isInCall) {
+			dispatch(audioCallActions.setIsRingTone(false));
+			dispatch(audioCallActions.setIsDialTone(false));
+			return;
+		}
 		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				if (!isPlayDialTone) {
@@ -129,7 +135,7 @@ function MyApp() {
 			default:
 				break;
 		}
-	}, [signalingData]);
+	}, [signalingData, isInCall]);
 
 	useEffect(() => {
 		if (isPlayDialTone) {
@@ -236,7 +242,9 @@ function MyApp() {
 				</div>
 			)}
 
-			{isPlayRingTone && !listOfCalls[userProfile?.user?.id || '']?.includes(directId ?? '') && <ModalCall dataCall={dataCall}></ModalCall>}
+			{isPlayRingTone && !listOfCalls[userProfile?.user?.id || '']?.includes(directId ?? '') && !!dataCall && (
+				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} />
+			)}
 
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>

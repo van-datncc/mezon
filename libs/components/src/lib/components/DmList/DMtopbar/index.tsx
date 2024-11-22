@@ -6,7 +6,6 @@ import {
 	DirectEntity,
 	appActions,
 	audioCallActions,
-	selectAudioDialTone,
 	selectAudioRingTone,
 	selectCallerId,
 	selectChannelCallId,
@@ -20,7 +19,6 @@ import {
 	selectIsUseProfileDM,
 	selectListOfCalls,
 	selectLocalStream,
-	selectPeerConnection,
 	selectPinMessageByChannelId,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -95,7 +93,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
 	const callerId = useSelector(selectCallerId);
 	const localStream = useSelector(selectLocalStream);
-	const peerConnection = useSelector(selectPeerConnection);
+	const peerConnection = useMemo(() => {
+		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
+	}, []);
 	const isInCall = useSelector(selectIsInCall);
 	const { userId } = useAuth();
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
@@ -110,16 +110,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		},
 		[dispatch]
 	);
-
-	function createPeerConnection() {
-		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
-	}
-
-	useEffect(() => {
-		if (!peerConnection && isInChannelCalled) {
-			dispatch(DMCallActions.setPeerConnection(createPeerConnection()));
-		}
-	}, [dispatch, isInChannelCalled, peerConnection]);
 
 	const setIsShowMemberListDM = useCallback(
 		async (status: boolean) => {
@@ -146,7 +136,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
-	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
 
 	const endCall = useCallback(async () => {
@@ -187,7 +176,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				endCall();
 				await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '', userId ?? '');
 				peerConnection.close();
-				dispatch(DMCallActions.setPeerConnection(createPeerConnection()));
 			}
 			dispatch(DMCallActions.setChannelCallId(''));
 		}
@@ -199,6 +187,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			startCall({ isVideoCall });
 			await dispatch(DMCallActions.setCallerId(userId));
 			await dispatch(DMCallActions.setCalleeId(dmUserId));
+			await dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
 
 			const updatedCalls = JSON.parse(JSON.stringify(listOfCalls));
 
@@ -278,6 +267,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 					{
 						const processData = async () => {
+							await handleMuteSound();
 							const objData = JSON.parse(data?.json_data || '{}');
 							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
 						};
@@ -291,12 +281,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	}, [mezon.socketRef, peerConnection, signalingData, channelCallId, isInCall, dmUserId, dmGroupId, userId, isInChannelCalled]);
 
 	const startCall = async ({ isVideoCall = false }) => {
-		let newPeerConnection = peerConnection;
-
-		if (peerConnection.connectionState === 'closed') {
-			newPeerConnection = createPeerConnection();
-		}
-
+		await handleMuteSound();
 		await dispatch(DMCallActions.setIsInCall(true));
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
@@ -343,10 +328,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 	const handleCloseCall = async () => {
 		await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '', userId ?? '');
-		await dispatch(audioCallActions.setIsDialTone(false));
-		await dispatch(audioCallActions.setIsRingTone(false));
+		await handleMuteSound();
 		await dispatch(DMCallActions.setIsInCall(false));
 		await dispatch(DMCallActions.removeAll());
+	};
+
+	const handleMuteSound = async () => {
+		await dispatch(audioCallActions.setIsRingTone(false));
+		await dispatch(audioCallActions.setIsDialTone(false));
 	};
 
 	return (
@@ -575,19 +564,21 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						)}
 					</div>
 					<div className="w-full h-full flex flex-col justify-around">
-						<div className="justify-center items-center gap-4 flex w-full">
-							{avatarImages.map((avatar, index) => (
-								<AvatarImage
-									height={'75px'}
-									alt={`Avatar ${index + 1}`}
-									userName={`Avatar ${index + 1}`}
-									className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
-									srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-									src={avatar}
-									classNameText="!text-4xl font-semibold"
-								/>
-							))}
-						</div>
+						{!isShowMeetDM && (
+							<div className="justify-center items-center gap-4 flex w-full">
+								{avatarImages.map((avatar, index) => (
+									<AvatarImage
+										height={'75px'}
+										alt={`Avatar ${index + 1}`}
+										userName={`Avatar ${index + 1}`}
+										className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
+										srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+										src={avatar}
+										classNameText="!text-4xl font-semibold"
+									/>
+								))}
+							</div>
+						)}
 						<div className="justify-center items-center gap-4 flex w-full">
 							{(callerId === '' || channelCallId !== dmGroupId) && (
 								<>
@@ -614,35 +605,37 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							{callerId === userId && channelCallId === dmGroupId && (
 								<div className="h-[556px] ">
 									<div className="flex justify-between space-x-4">
-										<>
-											{/* Local Video */}
-											<video
-												ref={localVideoRef}
-												autoPlay
-												muted
-												playsInline
-												style={{
-													width: '400px',
-													height: '300px',
-													backgroundColor: 'black',
-													borderRadius: '8px'
-												}}
-											/>
-											{/* Remote Video */}
-											<video
-												ref={remoteVideoRef}
-												autoPlay
-												playsInline
-												style={{
-													width: '400px',
-													height: '300px',
-													backgroundColor: 'black',
-													borderRadius: '8px'
-												}}
-											/>
-										</>
+										{isShowMeetDM && (
+											<>
+												{/* Local Video */}
+												<video
+													ref={localVideoRef}
+													autoPlay
+													muted
+													playsInline
+													style={{
+														width: '400px',
+														height: '300px',
+														backgroundColor: 'black',
+														borderRadius: '8px'
+													}}
+												/>
+												{/* Remote Video */}
+												<video
+													ref={remoteVideoRef}
+													autoPlay
+													playsInline
+													style={{
+														width: '400px',
+														height: '300px',
+														backgroundColor: 'black',
+														borderRadius: '8px'
+													}}
+												/>
+											</>
+										)}
 									</div>
-									<div className="flex flex-row space-x-4 justify-center">
+									<div className="flex flex-row space-x-4 justify-center mt-10">
 										<div
 											className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 											onClick={handleShowMeetDm}

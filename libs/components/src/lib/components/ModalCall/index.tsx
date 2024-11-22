@@ -1,5 +1,6 @@
 import { useUserByUserId } from '@mezon/core';
-import { directActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { audioCallActions, directActions, DMCallActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import { WebrtcSignalingFwd } from 'mezon-js';
@@ -8,10 +9,12 @@ import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 interface ModalCallProps {
 	dataCall: WebrtcSignalingFwd;
+	userId: string;
 }
 
-const ModalCall = ({ dataCall }: ModalCallProps) => {
-	const user = useUserByUserId(dataCall.caller_id);
+const ModalCall = ({ dataCall, userId }: ModalCallProps) => {
+	const user = useUserByUserId(dataCall?.caller_id);
+	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 	const direct = useAppSelector((state) => selectDirectById(state, dataCall.channel_id)) || {};
 	const navigate = useNavigate();
@@ -28,8 +31,11 @@ const ModalCall = ({ dataCall }: ModalCallProps) => {
 		navigate(`/chat/direct/message/${direct.channel_id}/${direct.type}`);
 	};
 
-	const handleCloseCall = () => {
-		// console.log('close Call');
+	const handleCloseCall = async () => {
+		await mezon.socketRef.current?.forwardWebrtcSignaling(dataCall?.caller_id, 4, '', dataCall.channel_id ?? '', userId ?? '');
+		dispatch(DMCallActions.setIsInCall(false));
+		dispatch(audioCallActions.setIsRingTone(false));
+		dispatch(DMCallActions.removeAll());
 	};
 
 	return (
