@@ -5,7 +5,6 @@ import {
 	DMCallActions,
 	DirectEntity,
 	appActions,
-	audioCallActions,
 	selectAudioDialTone,
 	selectAudioRingTone,
 	selectCallerId,
@@ -133,9 +132,8 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			if (audioTrack) {
 				audioTrack.enabled = !audioTrack.enabled;
 			}
+			dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 		}
-
-		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 	};
 	const dmUserId = currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : '';
 	const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -188,8 +186,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	};
 	const setListOfCalls = useCallback(
 		async (dmGroupId: string) => {
-			dispatch(audioCallActions.setIsDialTone(true));
-
 			startCall();
 			await dispatch(DMCallActions.setCallerId(userId));
 			await dispatch(DMCallActions.setCalleeId(dmUserId));
@@ -281,21 +277,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			default:
 				break;
 		}
-	}, [mezon.socketRef, peerConnection, signalingData, channelCallId]);
+	}, [mezon.socketRef, peerConnection, signalingData]);
 
 	const startCall = async () => {
-		let newPeerConnection = peerConnection;
-
-		if (peerConnection.connectionState === 'closed') {
-			newPeerConnection = createPeerConnection();
-		}
-
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
-
-		if (isPlayRingTone) {
-			dispatch(audioCallActions.setIsRingTone(false));
-		}
 
 		navigator.mediaDevices
 			.getUserMedia({ video: false, audio: true })
@@ -304,14 +290,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
 				}
-				stream.getTracks().forEach((track) => newPeerConnection.addTrack(track, stream));
+				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+				const audioTrack = stream.getAudioTracks()[0];
+				if (audioTrack) {
+					dispatch(DMCallActions.setIsMuteMicrophone(!audioTrack.enabled));
+				}
 
-				const offer = await newPeerConnection.createOffer({
+				const offer = await peerConnection.createOffer({
 					iceRestart: true,
 					offerToReceiveAudio: true,
 					offerToReceiveVideo: true
 				});
-				await newPeerConnection.setLocalDescription(offer);
+				await peerConnection.setLocalDescription(offer);
 				if (offer && mezon.socketRef.current) {
 					const offerEn = await compress(JSON.stringify(offer));
 					await mezon.socketRef.current?.forwardWebrtcSignaling(
