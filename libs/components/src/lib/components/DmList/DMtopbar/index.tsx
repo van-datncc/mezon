@@ -9,6 +9,7 @@ import {
 	selectChannelCallId,
 	selectCloseMenu,
 	selectDmGroupCurrent,
+	selectIsInCall,
 	selectIsMuteMicrophone,
 	selectIsShowMeetDM,
 	selectIsShowMemberListDM,
@@ -92,8 +93,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const callerId = useSelector(selectCallerId);
 	const localStream = useSelector(selectLocalStream);
 	const peerConnection = useSelector(selectPeerConnection);
-
+	const isInCall = useSelector(selectIsInCall);
 	const { userId } = useAuth();
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+
+	const isInChannelCalled = useMemo(() => {
+		return currentDmGroup?.user_id?.some((i) => i === signalingData?.[0]?.callerId);
+	}, [currentDmGroup?.user_id, signalingData]);
+
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
@@ -106,10 +113,10 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	}
 
 	useEffect(() => {
-		if (!peerConnection) {
+		if (!peerConnection && isInChannelCalled) {
 			dispatch(DMCallActions.setPeerConnection(createPeerConnection()));
 		}
-	}, [dispatch, peerConnection]);
+	}, [dispatch, isInChannelCalled, peerConnection]);
 
 	const setIsShowMemberListDM = useCallback(
 		async (status: boolean) => {
@@ -122,14 +129,12 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
 	};
 	const handleShowMeetDm = () => {
+		if (localStream) localStream.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
 		dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
 	};
 	const handleMuteToggle = () => {
 		if (localStream) {
-			const audioTrack = localStream.getAudioTracks()[0];
-			if (audioTrack) {
-				audioTrack.enabled = !audioTrack.enabled;
-			}
+			if (localStream) localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
 		}
 
 		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
@@ -174,9 +179,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		);
 	}, [dispatch, listOfCalls, dmGroupId]);
 
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
-
 	const handleEndCall = async () => {
+		stopAudio(dialTone);
+		stopAudio(ringTone);
+		await dispatch(DMCallActions.setIsInCall(false));
+		await dispatch(DMCallActions.removeAll());
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
 			dispatch(DMCallActions.setLocalStream(null));
@@ -228,83 +235,84 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	);
 
 	useEffect(() => {
-		peerConnection.onicecandidate = async (event: any) => {
-			if (event && event.candidate) {
-				if (mezon.socketRef.current?.isOpen() === true) {
-					await mezon.socketRef.current?.forwardWebrtcSignaling(
-						dmUserId,
-						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate),
-						dmGroupId ?? '',
-						userId ?? ''
-					);
-				}
-			}
-		};
-
-		peerConnection.ontrack = (event: any) => {
-			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = event.streams[0];
-			}
-		};
-
-		if (!signalingData?.[signalingData?.length - 1]) return;
-		const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-
-		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				{
-					if (!isCalling) {
-						setIsRinging(true);
-						playAudio(ringTone);
-					} else {
-						setIsCalling(false);
-						stopAudio(dialTone);
-					}
-					const processData = async () => {
-						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-						const answer = await peerConnection.createAnswer();
-						await peerConnection.setLocalDescription(answer);
-
-						const answerEn = await compress(JSON.stringify(answer));
+		if (signalingData?.[signalingData?.length - 1] && isInCall && isInChannelCalled) {
+			peerConnection.onicecandidate = async (event: any) => {
+				if (event && event.candidate) {
+					if (mezon.socketRef.current?.isOpen() === true) {
 						await mezon.socketRef.current?.forwardWebrtcSignaling(
 							dmUserId,
-							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
-							answerEn,
+							WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+							JSON.stringify(event.candidate),
 							dmGroupId ?? '',
 							userId ?? ''
 						);
-					};
-					processData().catch(console.error);
+					}
 				}
+			};
 
-				break;
-			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-					};
-					processData().catch(console.error);
+			peerConnection.ontrack = (event: any) => {
+				if (remoteVideoRef.current) {
+					remoteVideoRef.current.srcObject = event.streams[0];
 				}
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				{
-					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
-						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-					};
-					processData().catch(console.error);
-				}
-				break;
-			default:
-				break;
+			};
+
+			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
+
+			switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
+				case WebrtcSignalingType.WEBRTC_SDP_OFFER:
+					{
+						if (!isCalling) {
+							setIsRinging(true);
+							playAudio(ringTone);
+						} else {
+							setIsCalling(false);
+							stopAudio(dialTone);
+						}
+						const processData = async () => {
+							const dataDec = await decompress(data?.json_data);
+							const objData = JSON.parse(dataDec || '{}');
+
+							await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+							const answer = await peerConnection.createAnswer();
+							await peerConnection.setLocalDescription(answer);
+
+							const answerEn = await compress(JSON.stringify(answer));
+							await mezon.socketRef.current?.forwardWebrtcSignaling(
+								dmUserId,
+								WebrtcSignalingType.WEBRTC_SDP_ANSWER,
+								answerEn,
+								dmGroupId ?? '',
+								userId ?? ''
+							);
+						};
+						processData().catch(console.error);
+					}
+
+					break;
+				case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
+					{
+						const processData = async () => {
+							const dataDec = await decompress(data.json_data);
+							const objData = JSON.parse(dataDec || '{}');
+							await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
+						};
+						processData().catch(console.error);
+					}
+					break;
+				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
+					{
+						const processData = async () => {
+							const objData = JSON.parse(data?.json_data || '{}');
+							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
+						};
+						processData().catch(console.error);
+					}
+					break;
+				default:
+					break;
+			}
 		}
-	}, [mezon.socketRef, peerConnection, signalingData, channelCallId]);
+	}, [mezon.socketRef, peerConnection, signalingData, channelCallId, isInCall, dmUserId, dmGroupId, userId, isCalling, isInChannelCalled]);
 
 	const startCall = async () => {
 		let newPeerConnection = peerConnection;
@@ -313,6 +321,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			newPeerConnection = createPeerConnection();
 		}
 
+		await dispatch(DMCallActions.setIsInCall(true));
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
 
@@ -322,7 +331,8 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		}
 
 		navigator.mediaDevices
-			.getUserMedia({ video: false, audio: true })
+			// todo: handel default disabled camera and microphone
+			.getUserMedia({ video: true, audio: true })
 			.then(async (stream) => {
 				dispatch(DMCallActions.setLocalStream(stream));
 				if (localVideoRef.current) {
@@ -350,9 +360,16 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			.catch((err) => console.error('Failed to get local media:', err));
 	};
 
+	const handleCloseCall = async () => {
+		stopAudio(dialTone);
+		stopAudio(ringTone);
+		await dispatch(DMCallActions.setIsInCall(false));
+		await dispatch(DMCallActions.removeAll());
+	};
+
 	return (
 		<>
-			{!listOfCalls[userId || '']?.includes(dmGroupId ?? '') ? (
+			{!isInCall && !isInChannelCalled ? (
 				<div
 					className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
 				>
@@ -582,32 +599,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									classNameText="!text-4xl font-semibold"
 								/>
 							))}
-							<video
-								ref={localVideoRef}
-								autoPlay
-								muted
-								playsInline
-								style={{
-									width: '400px',
-									height: '300px',
-									backgroundColor: 'black',
-									borderRadius: '8px',
-									display: 'none'
-								}}
-							/>
-
-							<video
-								ref={remoteVideoRef}
-								autoPlay
-								playsInline
-								style={{
-									width: '400px',
-									height: '300px',
-									backgroundColor: 'black',
-									borderRadius: '8px',
-									display: 'none'
-								}}
-							/>
 						</div>
 						<div className="justify-center items-center gap-4 flex w-full">
 							{(callerId === '' || channelCallId !== dmGroupId) && (
@@ -624,6 +615,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 										<Icons.IconPhoneDM />
 									</div>
 									<div
+										onClick={handleCloseCall}
 										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 									>
 										<Icons.CloseButton className={`w-[20px]`} />
@@ -631,44 +623,75 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								</>
 							)}
 							{callerId === userId && channelCallId === dmGroupId && (
-								<>
-									<div
-										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-										onClick={handleShowMeetDm}
-									>
-										<Icons.IconMeetDM
-											className={`${isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-											isShowMeetDM={isShowMeetDM}
-											isShowLine={true}
-										/>
+								<div className="h-[556px] ">
+									<div className="flex justify-between space-x-4">
+										<>
+											{/* Local Video */}
+											<video
+												ref={localVideoRef}
+												autoPlay
+												muted
+												playsInline
+												style={{
+													width: '400px',
+													height: '300px',
+													backgroundColor: 'black',
+													borderRadius: '8px'
+												}}
+											/>
+											{/* Remote Video */}
+											<video
+												ref={remoteVideoRef}
+												autoPlay
+												playsInline
+												style={{
+													width: '400px',
+													height: '300px',
+													backgroundColor: 'black',
+													borderRadius: '8px'
+												}}
+											/>
+										</>
 									</div>
-									<div
-										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-										onClick={handleShowShareScreenToggle}
-									>
-										<Icons.ShareScreen
-											className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-											isShowShareScreen={isShowShareScreen}
-											isShowLine={true}
-										/>
+									<div className="flex flex-row space-x-4 justify-center">
+										<div
+											className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+											onClick={handleShowMeetDm}
+										>
+											<Icons.IconMeetDM
+												className={`${isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+												isShowMeetDM={isShowMeetDM}
+												isShowLine={true}
+											/>
+										</div>
+										<div
+											className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+											onClick={handleShowShareScreenToggle}
+										>
+											<Icons.ShareScreen
+												className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+												isShowShareScreen={isShowShareScreen}
+												isShowLine={true}
+											/>
+										</div>
+										<div
+											className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+											onClick={handleMuteToggle}
+										>
+											<Icons.Microphone
+												className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+												isMuteMicrophone={isMuteMicrophone}
+												isShowLine={true}
+											/>
+										</div>
+										<div
+											className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+											onClick={handleEndCall}
+										>
+											<Icons.StopCall />
+										</div>
 									</div>
-									<div
-										className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-										onClick={handleMuteToggle}
-									>
-										<Icons.Microphone
-											className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-											isMuteMicrophone={isMuteMicrophone}
-											isShowLine={true}
-										/>
-									</div>
-									<div
-										className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
-										onClick={handleEndCall}
-									>
-										<Icons.StopCall />
-									</div>
-								</>
+								</div>
 							)}
 						</div>
 					</div>
