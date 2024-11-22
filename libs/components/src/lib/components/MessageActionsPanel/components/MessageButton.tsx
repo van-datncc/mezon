@@ -56,7 +56,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 		}
 	};
 
-	const commonClass = `px-5 py-1 rounded ${buttonColor} text-white font-medium hover:bg-opacity-70 active:shadow-lg active:bg-opacity-80`;
+	const commonClass = `px-5 py-1 rounded ${buttonColor} text-white font-medium hover:bg-opacity-70 active:bg-opacity-80`;
 
 	return (
 		<button className={commonClass} onClick={handleClickButton}>
