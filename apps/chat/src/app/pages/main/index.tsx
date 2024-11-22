@@ -109,7 +109,6 @@ function MyApp() {
 
 	useEffect(() => {
 		if (!signalingData?.[signalingData?.length - 1]) return;
-
 		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				if (!isPlayDialTone) {
@@ -126,7 +125,7 @@ function MyApp() {
 			default:
 				break;
 		}
-	}, [dispatch, isPlayDialTone, signalingData]);
+	}, [signalingData]);
 
 	useEffect(() => {
 		if (isPlayDialTone) {
