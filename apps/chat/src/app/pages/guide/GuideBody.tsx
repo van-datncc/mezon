@@ -17,7 +17,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 function GuideBody() {
@@ -29,31 +29,34 @@ function GuideBody() {
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
 
-	const handleDoMission = (mission: ApiOnboardingItem, index: number) => {
-		if (index === missionDone) {
-			switch (mission.task_type) {
-				case ETypeMission.SEND_MESSAGE: {
-					const link = toChannelPage(mission.channel_id as string, currentClanId as string);
-					navigate(link);
-					break;
+	const handleDoMission = useCallback(
+		(mission: ApiOnboardingItem, index: number) => {
+			if (index === missionDone) {
+				switch (mission.task_type) {
+					case ETypeMission.SEND_MESSAGE: {
+						const link = toChannelPage(mission.channel_id as string, currentClanId as string);
+						navigate(link);
+						break;
+					}
+					case ETypeMission.VISIT: {
+						const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
+						navigate(linkChannel);
+						dispatch(onboardingActions.doneMission());
+						doneAllMission(index);
+						break;
+					}
+					case ETypeMission.DOSOMETHING: {
+						dispatch(onboardingActions.doneMission());
+						doneAllMission(index);
+						break;
+					}
+					default:
+						break;
 				}
-				case ETypeMission.VISIT: {
-					const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
-					navigate(linkChannel);
-					dispatch(onboardingActions.doneMission());
-					doneAllMission(index);
-					break;
-				}
-				case ETypeMission.DOSOMETHING: {
-					dispatch(onboardingActions.doneMission());
-					doneAllMission(index);
-					break;
-				}
-				default:
-					break;
 			}
-		}
-	};
+		},
+		[missionSum]
+	);
 
 	const doneAllMission = (indexMision: number) => {
 		if (indexMision + 1 === missionSum) {

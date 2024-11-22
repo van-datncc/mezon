@@ -8,6 +8,7 @@ import {
 	selectHashtagDmById,
 	selectMembeGroupByUserId,
 	selectMemberClanByUserId2,
+	selectMemberDMByUserId,
 	useAppSelector
 } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
@@ -20,6 +21,16 @@ export const useUserById = (userID: string | undefined): ChannelMembersEntity | 
 		return isClanView
 			? (selectMemberClanByUserId2(state, userID ?? '') as unknown as ChannelMembersEntity)
 			: (selectMembeGroupByUserId(state, currentDMId as string, userID as string) as unknown as ChannelMembersEntity);
+	});
+};
+
+export const useUserByUserId = (userID: string | undefined): ChannelMembersEntity | undefined => {
+	return useAppSelector((state) => {
+		if (!userID) return undefined;
+		const isClanView = selectClanView(state);
+		return isClanView
+			? (selectMemberClanByUserId2(state, userID ?? '') as unknown as ChannelMembersEntity)
+			: (selectMemberDMByUserId(state, userID ?? '') as unknown as ChannelMembersEntity);
 	});
 };
 

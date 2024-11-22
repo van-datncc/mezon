@@ -5,6 +5,8 @@ import {
 	DMCallActions,
 	DirectEntity,
 	appActions,
+	audioCallActions,
+	selectAudioRingTone,
 	selectCallerId,
 	selectChannelCallId,
 	selectCloseMenu,
@@ -17,7 +19,6 @@ import {
 	selectIsUseProfileDM,
 	selectListOfCalls,
 	selectLocalStream,
-	selectPeerConnection,
 	selectPinMessageByChannelId,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -92,7 +93,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
 	const callerId = useSelector(selectCallerId);
 	const localStream = useSelector(selectLocalStream);
-	const peerConnection = useSelector(selectPeerConnection);
+	const peerConnection = useMemo(() => {
+		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
+	}, []);
 	const isInCall = useSelector(selectIsInCall);
 	const { userId } = useAuth();
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
@@ -107,16 +110,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		},
 		[dispatch]
 	);
-
-	function createPeerConnection() {
-		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
-	}
-
-	useEffect(() => {
-		if (!peerConnection && isInChannelCalled) {
-			dispatch(DMCallActions.setPeerConnection(createPeerConnection()));
-		}
-	}, [dispatch, isInChannelCalled, peerConnection]);
 
 	const setIsShowMemberListDM = useCallback(
 		async (status: boolean) => {
@@ -143,26 +136,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const mezon = useMezon();
-	const [isCalling, setIsCalling] = useState(false);
-	const [isRinging, setIsRinging] = useState(false);
-
-	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
-	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
-
-	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
-		if (audioRef.current) {
-			audioRef.current.currentTime = 0;
-			audioRef.current.play().catch((error) => console.error('Audio playback error:', error));
-			audioRef.current.loop = true;
-		}
-	};
-
-	const stopAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
-		if (audioRef.current) {
-			audioRef.current.pause();
-			audioRef.current.currentTime = 0;
-		}
-	};
+	const isPlayRingTone = useSelector(selectAudioRingTone);
 
 	const endCall = useCallback(async () => {
 		const user = userId || '';
@@ -180,15 +154,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	}, [dispatch, listOfCalls, dmGroupId]);
 
 	const handleEndCall = async () => {
-		stopAudio(dialTone);
-		stopAudio(ringTone);
+		await dispatch(audioCallActions.setIsDialTone(false));
 		await dispatch(DMCallActions.setIsInCall(false));
 		await dispatch(DMCallActions.removeAll());
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
 			dispatch(DMCallActions.setLocalStream(null));
 			peerConnection.getSenders().forEach((sender) => {
-				peerConnection.removeTrack(sender);
+				if (peerConnection) peerConnection.removeTrack(sender);
 			});
 
 			if (remoteVideoRef.current) {
@@ -203,19 +176,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				endCall();
 				await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '', userId ?? '');
 				peerConnection.close();
-				dispatch(DMCallActions.setPeerConnection(createPeerConnection()));
 			}
 			dispatch(DMCallActions.setChannelCallId(''));
 		}
 	};
 	const setListOfCalls = useCallback(
-		async (dmGroupId: string) => {
-			setIsCalling(true);
-			playAudio(dialTone);
+		async (dmGroupId: string, isVideoCall = false) => {
+			dispatch(audioCallActions.setIsDialTone(true));
 
-			startCall();
+			startCall({ isVideoCall });
 			await dispatch(DMCallActions.setCallerId(userId));
 			await dispatch(DMCallActions.setCalleeId(dmUserId));
+			await dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
 
 			const updatedCalls = JSON.parse(JSON.stringify(listOfCalls));
 
@@ -261,13 +233,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 			switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 				case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 					{
-						if (!isCalling) {
-							setIsRinging(true);
-							playAudio(ringTone);
-						} else {
-							setIsCalling(false);
-							stopAudio(dialTone);
-						}
 						const processData = async () => {
 							const dataDec = await decompress(data?.json_data);
 							const objData = JSON.parse(dataDec || '{}');
@@ -302,6 +267,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 					{
 						const processData = async () => {
+							await handleMuteSound();
 							const objData = JSON.parse(data?.json_data || '{}');
 							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
 						};
@@ -312,40 +278,39 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					break;
 			}
 		}
-	}, [mezon.socketRef, peerConnection, signalingData, channelCallId, isInCall, dmUserId, dmGroupId, userId, isCalling, isInChannelCalled]);
+	}, [mezon.socketRef, peerConnection, signalingData, channelCallId, isInCall, dmUserId, dmGroupId, userId, isInChannelCalled]);
 
-	const startCall = async () => {
-		let newPeerConnection = peerConnection;
-
-		if (peerConnection.connectionState === 'closed') {
-			newPeerConnection = createPeerConnection();
-		}
-
+	const startCall = async ({ isVideoCall = false }) => {
 		await dispatch(DMCallActions.setIsInCall(true));
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
 
-		if (isRinging) {
-			stopAudio(ringTone);
-			setIsRinging(false);
+		if (isPlayRingTone) {
+			dispatch(audioCallActions.setIsRingTone(false));
 		}
-
 		navigator.mediaDevices
-			// todo: handel default disabled camera and microphone
 			.getUserMedia({ video: true, audio: true })
 			.then(async (stream) => {
 				dispatch(DMCallActions.setLocalStream(stream));
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = stream;
 				}
-				stream.getTracks().forEach((track) => newPeerConnection.addTrack(track, stream));
+				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+				const audioTrack = stream.getAudioTracks()[0];
+				if (audioTrack) {
+					dispatch(DMCallActions.setIsMuteMicrophone(!audioTrack.enabled));
+				}
 
-				const offer = await newPeerConnection.createOffer({
+				if (!isVideoCall) {
+					stream.getVideoTracks().forEach((track) => (track.enabled = false));
+					dispatch(DMCallActions.setIsShowMeetDM(false));
+				}
+				const offer = await peerConnection.createOffer({
 					iceRestart: true,
 					offerToReceiveAudio: true,
 					offerToReceiveVideo: true
 				});
-				await newPeerConnection.setLocalDescription(offer);
+				await peerConnection.setLocalDescription(offer);
 				if (offer && mezon.socketRef.current) {
 					const offerEn = await compress(JSON.stringify(offer));
 					await mezon.socketRef.current?.forwardWebrtcSignaling(
@@ -361,10 +326,15 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	};
 
 	const handleCloseCall = async () => {
-		stopAudio(dialTone);
-		stopAudio(ringTone);
+		await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', dmGroupId ?? '', userId ?? '');
+		await handleMuteSound();
 		await dispatch(DMCallActions.setIsInCall(false));
 		await dispatch(DMCallActions.removeAll());
+	};
+
+	const handleMuteSound = async () => {
+		await dispatch(audioCallActions.setIsRingTone(false));
+		await dispatch(audioCallActions.setIsDialTone(false));
 	};
 
 	return (
@@ -410,12 +380,18 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 											/>
 										</Tooltip>
 									</button>
-									<div>
-										<CallButton
-											isLightMode={appearanceTheme === 'light'}
-											dmUserId={currentDmGroup?.user_id && currentDmGroup.user_id.length > 0 ? currentDmGroup?.user_id[0] : ''}
-										/>
-									</div>
+									<button onClick={() => setListOfCalls(dmGroupId ?? '', true)}>
+										<Tooltip
+											content="Start Video Call"
+											trigger="hover"
+											animation="duration-500"
+											style={appearanceTheme === 'light' ? 'light' : 'dark'}
+										>
+											<Icons.IconMeetDM
+												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+											/>
+										</Tooltip>
+									</button>
 									<div>
 										<PinButton isLightMode={appearanceTheme === 'light'} />
 									</div>
@@ -587,30 +563,33 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						)}
 					</div>
 					<div className="w-full h-full flex flex-col justify-around">
-						<div className="justify-center items-center gap-4 flex w-full">
-							{avatarImages.map((avatar, index) => (
-								<AvatarImage
-									height={'75px'}
-									alt={`Avatar ${index + 1}`}
-									userName={`Avatar ${index + 1}`}
-									className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
-									srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-									src={avatar}
-									classNameText="!text-4xl font-semibold"
-								/>
-							))}
-						</div>
+						{!isShowMeetDM && (
+							<div className="justify-center items-center gap-4 flex w-full">
+								{avatarImages.map((avatar, index) => (
+									<AvatarImage
+										height={'75px'}
+										alt={`Avatar ${index + 1}`}
+										userName={`Avatar ${index + 1}`}
+										className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
+										srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+										src={avatar}
+										classNameText="!text-4xl font-semibold"
+									/>
+								))}
+							</div>
+						)}
 						<div className="justify-center items-center gap-4 flex w-full">
 							{(callerId === '' || channelCallId !== dmGroupId) && (
 								<>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+										onClick={() => startCall({ isVideoCall: true })}
 									>
 										<Icons.IconMeetDM />
 									</div>
 									<div
 										className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-										onClick={startCall}
+										onClick={() => startCall({ isVideoCall: false })}
 									>
 										<Icons.IconPhoneDM />
 									</div>
@@ -625,35 +604,37 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							{callerId === userId && channelCallId === dmGroupId && (
 								<div className="h-[556px] ">
 									<div className="flex justify-between space-x-4">
-										<>
-											{/* Local Video */}
-											<video
-												ref={localVideoRef}
-												autoPlay
-												muted
-												playsInline
-												style={{
-													width: '400px',
-													height: '300px',
-													backgroundColor: 'black',
-													borderRadius: '8px'
-												}}
-											/>
-											{/* Remote Video */}
-											<video
-												ref={remoteVideoRef}
-												autoPlay
-												playsInline
-												style={{
-													width: '400px',
-													height: '300px',
-													backgroundColor: 'black',
-													borderRadius: '8px'
-												}}
-											/>
-										</>
+										{isShowMeetDM && (
+											<>
+												{/* Local Video */}
+												<video
+													ref={localVideoRef}
+													autoPlay
+													muted
+													playsInline
+													style={{
+														width: '400px',
+														height: '300px',
+														backgroundColor: 'black',
+														borderRadius: '8px'
+													}}
+												/>
+												{/* Remote Video */}
+												<video
+													ref={remoteVideoRef}
+													autoPlay
+													playsInline
+													style={{
+														width: '400px',
+														height: '300px',
+														backgroundColor: 'black',
+														borderRadius: '8px'
+													}}
+												/>
+											</>
+										)}
 									</div>
-									<div className="flex flex-row space-x-4 justify-center">
+									<div className="flex flex-row space-x-4 justify-center mt-10">
 										<div
 											className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 											onClick={handleShowMeetDm}
@@ -762,192 +743,6 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 		</div>
 	);
 };
-
-function CallButton({ isLightMode, dmUserId }: { isLightMode: boolean; dmUserId: string }) {
-	const [isShow, setIsShow] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement>(null);
-	const localVideoRef = useRef<HTMLVideoElement>(null);
-	const remoteVideoRef = useRef<HTMLVideoElement>(null);
-	const mezon = useMezon();
-	const { userId } = useAuth();
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
-	const peerConnection = useMemo(() => {
-		return new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
-	}, []);
-
-	useEffect(() => {
-		peerConnection.onicecandidate = async (event: any) => {
-			if (event && event.candidate) {
-				if (mezon.socketRef.current?.isOpen() === true) {
-					await mezon.socketRef.current?.forwardWebrtcSignaling(
-						dmUserId,
-						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate),
-						'',
-						userId ?? ''
-					);
-				}
-			}
-		};
-
-		peerConnection.ontrack = (event: any) => {
-			// Display remote stream in remote video element
-			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = event.streams[0];
-			}
-		};
-
-		if (!signalingData?.[signalingData?.length - 1]) return;
-		const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-
-		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-
-						// Get peerConnection from receiver event.receiverId
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-						const answer = await peerConnection.createAnswer();
-						await peerConnection.setLocalDescription(answer);
-
-						const answerEnc = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.forwardWebrtcSignaling(
-							dmUserId,
-							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
-							answerEnc,
-							'',
-							userId ?? ''
-						);
-					};
-					processData().catch(console.error);
-				}
-
-				break;
-			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-					};
-					processData().catch(console.error);
-				}
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				{
-					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
-						await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-					};
-					processData().catch(console.error);
-				}
-				break;
-			default:
-				break;
-		}
-	}, [mezon.socketRef, peerConnection, signalingData]);
-
-	const handleShow = async () => {
-		setIsShow(true);
-	};
-
-	const startCall = async () => {
-		// Get user media
-		navigator.mediaDevices
-			.getUserMedia({ video: true, audio: true })
-			.then(async (stream) => {
-				if (localVideoRef.current) {
-					localVideoRef.current.srcObject = stream;
-				}
-				// Add tracks to PeerConnection
-				stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
-
-				const offer = await peerConnection.createOffer({
-					iceRestart: true,
-					offerToReceiveAudio: true,
-					offerToReceiveVideo: true
-				});
-				await peerConnection.setLocalDescription(offer);
-				if (offer && mezon.socketRef.current) {
-					const offerEnc = await compress(JSON.stringify(offer));
-					await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, offerEnc, '', userId ?? '');
-				}
-			})
-			.catch((err) => console.error('Failed to get local media:', err));
-	};
-
-	// const handleClose = useCallback(() => {
-	// 	setIsShow(false);
-	// }, []);
-
-	const endCall = async () => {
-		setIsShow(false);
-		peerConnection.close();
-	};
-
-	const { directId } = useAppParams();
-	const pinMsgs = useSelector(selectPinMessageByChannelId(directId));
-
-	return (
-		<div className="relative leading-5 size-6" ref={threadRef}>
-			<Tooltip content="Start Video Call" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button className="focus-visible:outline-none" onClick={handleShow} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.IconMeetDM
-						className={`dark:hover:text-white hover:text-black ${isShow ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-					/>
-				</button>
-				{pinMsgs?.length > 0 && (
-					<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
-				)}
-			</Tooltip>
-			{isShow && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-					{/* Modal nội dung */}
-					<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-[900px] max-h-[90vh] overflow-hidden flex flex-col items-center">
-						<h2 className="text-lg font-semibold text-black dark:text-white mb-4">Video Call</h2>
-						<div className="flex justify-between space-x-4">
-							{/* Local Video */}
-							<video
-								ref={localVideoRef}
-								autoPlay
-								muted
-								playsInline
-								style={{
-									width: '400px',
-									height: '300px',
-									backgroundColor: 'black',
-									borderRadius: '8px'
-								}}
-							/>
-							{/* Remote Video */}
-							<video
-								ref={remoteVideoRef}
-								autoPlay
-								playsInline
-								style={{
-									width: '400px',
-									height: '300px',
-									backgroundColor: 'black',
-									borderRadius: '8px'
-								}}
-							/>
-						</div>
-						<div className="flex space-x-4 mt-6">
-							<button onClick={startCall} className="px-6 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600">
-								Start Call
-							</button>
-							<button onClick={endCall} className="px-6 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600">
-								End
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-}
 
 DmTopbar.Skeleton = () => {
 	return (
