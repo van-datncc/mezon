@@ -8,6 +8,7 @@ import {
 	selectCurrentClanId,
 	selectFormOnboarding,
 	selectMissionDone,
+	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
 	useAppDispatch,
@@ -25,8 +26,11 @@ function GuideBody() {
 	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const formOnboarding = useSelector(selectFormOnboarding);
-	const handleDoMission = (mission: ApiOnboardingItem) => {
-		if (onboadingMode) {
+	const missionSum = useSelector(selectMissionSum);
+	const missionDone = useSelector(selectMissionDone);
+
+	const handleDoMission = (mission: ApiOnboardingItem, index: number) => {
+		if (index === missionDone) {
 			switch (mission.task_type) {
 				case ETypeMission.SEND_MESSAGE: {
 					const link = toChannelPage(mission.channel_id as string, currentClanId as string);
@@ -55,11 +59,17 @@ function GuideBody() {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
 	}, []);
 
-	const missionDone = useSelector(selectMissionDone);
 	return (
 		<div className="w-full h-full pt-4 ">
 			<div className="flex gap-6">
 				<div className="flex-1 flex flex-col gap-2">
+					<div className="flex flex-col gap-2">
+						<p className="text-xl font-bold">Questions</p>
+						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg">
+							{onboardingItem?.question.length > 0 &&
+								onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
+						</div>
+					</div>
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-bold">Resources</p>
 						{onboardingItem?.rule?.length > 0 ? (
@@ -103,8 +113,8 @@ function GuideBody() {
 								<GuideItemMission
 									key={mission.id}
 									mission={mission}
-									onClick={() => handleDoMission(mission)}
-									tick={missionDone - 1 >= index}
+									onClick={() => handleDoMission(mission, index)}
+									tick={missionDone > index}
 								/>
 							))
 						) : (
@@ -119,7 +129,7 @@ function GuideBody() {
 						{onboadingMode &&
 							formOnboarding?.task?.length > 0 &&
 							formOnboarding.task.map((mission, index) => (
-								<GuideItemMission key={mission.title} mission={mission} onClick={() => handleDoMission(mission)} tick={true} />
+								<GuideItemMission key={mission.title} mission={mission} onClick={() => handleDoMission(mission, index)} tick={true} />
 							))}
 					</div>
 				</div>
@@ -164,6 +174,26 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 				</>
 			}
 		/>
+	);
+};
+
+const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
+	return (
+		<div className="w-full p-4 flex flex-col gap-2">
+			<p className="text-channelActiveColor font-semibold">{question.title} ?</p>
+			<div className="flex flex-wrap gap-2">
+				{question.answers &&
+					question.answers.map((answer) => (
+						<GuideItemLayout
+							key={answer.title}
+							icon={answer.answer}
+							description={answer.description}
+							title={answer.title}
+							className="w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+						/>
+					))}
+			</div>
+		</div>
 	);
 };
 

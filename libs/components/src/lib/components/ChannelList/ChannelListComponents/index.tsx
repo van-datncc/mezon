@@ -10,7 +10,9 @@ import {
 	selectNumberEvent,
 	selectOnboardingMode,
 	selectOngoingEvent,
-	selectShowNumEvent
+	selectProcessingByClan,
+	selectShowNumEvent,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
@@ -66,9 +68,17 @@ export const Events = memo(() => {
 		);
 	}, []);
 
+	const dispatch = useAppDispatch();
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
+	useEffect(() => {
+		if (currentClan?.is_onboarding) {
+			dispatch(onboardingActions.fetchProcessingOnboarding({}));
+		}
+	}, [currentClan?.is_onboarding]);
+
 	return (
 		<>
-			{onboardingMode && <OnboardingGetStart link={serverGuidePath} />}
+			{(!selectUserProcessing?.onboarding_step || selectUserProcessing.onboarding_step < 3) && <OnboardingGetStart link={serverGuidePath} />}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
@@ -211,18 +221,19 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 			</div>
 		);
 	});
-	useEffect(() => {
-		openModalGetStarted();
-	}, []);
+	// useEffect(() => {
+	//   openModalGetStarted();
+	// }, []);
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout;
 
 		if (missionDone === missionSum) {
-			openCongratulation();
-			timeoutId = setTimeout(() => {
-				closeCongratulation();
-				clearTimeout(timeoutId);
-			}, 2000);
+			// update later: Truong Anh
+			// openCongratulation();
+			// timeoutId = setTimeout(() => {
+			// 	closeCongratulation();
+			// 	clearTimeout(timeoutId);
+			// }, 2000);
 		}
 
 		return () => clearTimeout(timeoutId);

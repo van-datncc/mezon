@@ -245,9 +245,31 @@ export interface IButtonMessage {
 	url?: string;
 }
 
+export interface IMessageSelectOption {
+	label: string;
+	value: string;
+	description?: string;
+	default?: boolean;
+}
+
+export enum EMessageSelectType {
+	TEXT = 1,
+	USER = 2,
+	ROLE = 3,
+	CHANNEL = 4
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IMessageSelect {
 	// some select specific properties
+	type: EMessageSelectType;
+	options: IMessageSelectOption[];
+	placeholder?: string;
+	// Minimum number of items that must be chosen (defaults to 1)
+	min_options?: number;
+	// Maximum number of items that can be chosen (defaults to 1)
+	max_options?: number;
+	disabled?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
