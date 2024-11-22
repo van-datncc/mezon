@@ -5,6 +5,7 @@ import {
 	DMCallActions,
 	DirectEntity,
 	appActions,
+	audioCallActions,
 	selectAudioDialTone,
 	selectAudioRingTone,
 	selectCallerId,
@@ -193,7 +194,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	};
 	const setListOfCalls = useCallback(
 		async (dmGroupId: string, isVideoCall = false) => {
-			dispatch(audioCallActions.setIsDialTone(true));
+			// dispatch(audioCallActions.setIsDialTone(true));
 
 			startCall({ isVideoCall });
 			await dispatch(DMCallActions.setCallerId(userId));
@@ -300,6 +301,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		await dispatch(DMCallActions.setCallerId(userId));
 		await dispatch(DMCallActions.setChannelCallId(dmGroupId));
 
+		if (isPlayRingTone) {
+			dispatch(audioCallActions.setIsRingTone(false));
+		}
 		navigator.mediaDevices
 			.getUserMedia({ video: true, audio: true })
 			.then(async (stream) => {
