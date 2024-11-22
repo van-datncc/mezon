@@ -62,14 +62,18 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				onboardingList?.mission?.[currentMission]?.channel_id === channel?.channel_id &&
 				onboardingList?.mission?.[currentMission]?.task_type === ETypeMission.SEND_MESSAGE
 			) {
-				dispatch(onboardingActions.doneMission());
-				if (currentMission + 1 === onboardingList.mission.length) {
-					appDispatch(onboardingActions.doneOnboarding({ clan_id: clanId as string }));
-				}
+				handDoMessageMission();
 			}
 		},
 		[sendMessage, currentMission]
 	);
+
+	const handDoMessageMission = () => {
+		dispatch(onboardingActions.doneMission());
+		if (currentMission + 1 === onboardingList.mission.length) {
+			appDispatch(onboardingActions.doneOnboarding({ clan_id: clanId as string }));
+		}
+	};
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
