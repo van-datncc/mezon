@@ -92,7 +92,7 @@ export const selectAllJoinPTT = createSelector(getJoinPTTState, selectAll);
 
 export const selectJoinPTTEntities = createSelector(getJoinPTTState, selectEntities);
 
-export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, channelId) => channelId], (entities, channelId) => {
+export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, userId) => userId], (entities, userId) => {
 	const joins = Object.values(entities);
-	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.channel_id === channelId);
+	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.receiver_id === userId);
 });
