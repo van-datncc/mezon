@@ -147,13 +147,6 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
-		navigation.goBack();
-		timerRef.current = setTimeout(() => {
-			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-				params: { directMessageId: channelSelected?.channel_id || '' }
-			});
-		}, 1000);
 		const store = await getStoreAsync();
 		await store.dispatch(
 			channelsActions.joinChat({
@@ -178,6 +171,13 @@ export const Sharing = ({ data, onClose }) => {
 			getAttachmentUnique(attachmentUpload) || [],
 			[]
 		);
+		navigation.goBack();
+		timerRef.current = setTimeout(() => {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: channelSelected?.channel_id || '' }
+			});
+		}, 1000);
 	};
 
 	useEffect(() => {
