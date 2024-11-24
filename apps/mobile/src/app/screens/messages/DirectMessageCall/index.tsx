@@ -238,7 +238,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		dispatch(DMCallActions.setIsInCall(true));
 		const timer = setTimeout(() => {
 			startCall();
-		}, 5000);
+		}, 3000);
 
 		return () => {
 			clearTimeout(timer);
