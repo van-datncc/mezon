@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/mobile-components';
-import { Block, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { Block, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DMCallActions,
 	selectAllAccount,
@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import { WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
@@ -33,11 +33,10 @@ const CallingModal = () => {
 	const usersClan = useSelector(selectAllUserClans);
 
 	const callerInfo = useMemo(() => {
-		if (
-			signalingData?.[signalingData?.length - 1]?.callerId &&
-			signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
-		) {
-			return usersClan.find((user) => user.id === signalingData?.[signalingData?.length - 1]?.callerId);
+		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
+
+		if (latestSignalingEntry?.callerId) {
+			return usersClan.find((user) => user.id === latestSignalingEntry?.callerId);
 		} else {
 			return {};
 		}
@@ -53,13 +52,23 @@ const CallingModal = () => {
 	};
 
 	useEffect(() => {
-		if (
-			signalingData &&
-			!!signalingData?.[signalingData?.length - 1] &&
-			!isVisible &&
-			!isInCall &&
-			signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
-		) {
+		let timer: string | number | NodeJS.Timeout;
+		const statusInCallListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SET_STATUS_IN_CALL, ({ status = false }) => {
+			timer = setTimeout(() => {
+				if (!status) dispatch(DMCallActions.removeAll());
+				dispatch(DMCallActions.setIsInCall(status));
+			}, 4000);
+		});
+
+		return () => {
+			timer && clearTimeout(timer);
+			statusInCallListener.remove();
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
+		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
+		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && latestSignalingEntry) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 

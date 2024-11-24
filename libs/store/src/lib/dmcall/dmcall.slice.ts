@@ -55,7 +55,7 @@ export const DMCallSlice = createSlice({
 	name: DMCALL_FEATURE_KEY,
 	initialState: initialDMCallState,
 	reducers: {
-		add: DMCallAdapter.addOne,
+		add: DMCallAdapter.upsertOne,
 		addMany: DMCallAdapter.addMany,
 		remove: DMCallAdapter.removeOne,
 		setListOfCallsSocket: (state, action: PayloadAction<{ userId: string | undefined; event: WebrtcSignalingFwd }>) => {
@@ -64,7 +64,9 @@ export const DMCallSlice = createSlice({
 
 			if (userId === event.receiver_id && event.channel_id !== '') {
 				if (event.data_type === 4 && event.json_data === '') {
-					state.listOfCalls[userId] = state.listOfCalls[userId].filter((id) => id !== event.channel_id);
+					state.listOfCalls[userId] = state?.listOfCalls?.[userId]?.filter?.((id) => id !== event.channel_id);
+					state.peerConnection.close();
+					state.peerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19305' }] });
 					return;
 				}
 				if (!state.listOfCalls[userId]) {

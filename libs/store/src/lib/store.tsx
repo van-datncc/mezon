@@ -37,8 +37,10 @@ import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
+import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
+import { audioCallReducer } from './dmcall/audioCall.slice';
 import { DMCallReducer } from './dmcall/dmcall.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -340,6 +342,7 @@ const reducer = {
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
 	auditlog: auditLogReducer,
+	audiocall: audioCallReducer,
 	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
@@ -350,6 +353,7 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
+	integrationClanWebhook: integrationClanWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,

@@ -1,15 +1,16 @@
-import { Icons, isEmpty, peerConstraints, sessionConstraints } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, isEmpty, peerConstraints, sessionConstraints } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, selectAllAccount, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingType } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Sound from 'react-native-sound';
 import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription, RTCView, mediaDevices } from 'react-native-webrtc';
 import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
@@ -42,6 +43,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const mezon = useMezon();
 	const receiverId = route.params?.receiverId;
 	const receiverAvatar = route.params?.receiverAvatar;
+	const isVideoCall = route.params?.isVideoCall;
 	const userProfile = useSelector(selectAllAccount);
 	const [remoteStream, setRemoteStream] = useState<MediaStream | undefined>();
 	const [localStream, setLocalStream] = useState<MediaStream | undefined>();
@@ -49,43 +51,25 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
 	const [isSpeaker, setIsSpeaker] = useState<boolean>(false);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
+	const dialToneRef = useRef<Sound | null>(null);
 
 	const { cameraPermissionGranted, microphonePermissionGranted, requestMicrophonePermission, requestCameraPermission } = usePermission();
 
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
 		mic: true,
-		camera: false
+		camera: !!isVideoCall
 	});
 
 	const peerConnection = useMemo(() => {
-		const pc = new RTCPeerConnection(peerConstraints);
-		pc.addEventListener('icecandidate', async (event) => {
-			if (event?.candidate) {
-				await mezon.socketRef.current?.forwardWebrtcSignaling(
-					receiverId,
-					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					'',
-					userProfile?.user?.id
-				);
-			}
-		});
-
-		pc.addEventListener('track', (event) => {
-			if (event.streams[0]) {
-				setRemoteStream(event.streams[0] as MediaStream);
-			}
-		});
-
-		return pc;
-	}, [mezon.socketRef, receiverId, userProfile?.user?.id]);
+		return new RTCPeerConnection(peerConstraints);
+	}, []);
 
 	const openMediaDevices = useCallback(
 		async (audio: boolean, video: boolean) => {
 			// get media devices stream from webRTC API
 			const mediaStream = await mediaDevices.getUserMedia({
-				audio,
-				video
+				audio: true,
+				video: video
 			});
 
 			// add track from created mediaStream to peer connection
@@ -97,14 +81,29 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	);
 
 	useEffect(() => {
-		if (cameraPermissionGranted || microphonePermissionGranted) {
-			openMediaDevices(microphonePermissionGranted, cameraPermissionGranted);
-		}
-	}, [cameraPermissionGranted, microphonePermissionGranted, openMediaDevices]);
+		if (cameraPermissionGranted || microphonePermissionGranted) openMediaDevices(microphonePermissionGranted, cameraPermissionGranted);
+	}, [microphonePermissionGranted, cameraPermissionGranted, openMediaDevices]);
 
 	useEffect(() => {
 		try {
 			if (!signalingData?.[signalingData?.length - 1]) return;
+
+			peerConnection.addEventListener('icecandidate', async (event) => {
+				if (event?.candidate) {
+					await mezon.socketRef.current?.forwardWebrtcSignaling(
+						receiverId,
+						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+						JSON.stringify(event.candidate),
+						'',
+						userProfile?.user?.id
+					);
+				}
+			});
+			peerConnection.addEventListener('track', (event) => {
+				if (event.streams[0]) {
+					setRemoteStream(event.streams[0] as MediaStream);
+				}
+			});
 			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
 
 			switch (data?.data_type) {
@@ -131,6 +130,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					break;
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
 					{
+						stopDialTone();
 						const processData = async () => {
 							const dataDec = await decompress(data?.json_data);
 							const objData = JSON.parse(dataDec || '{}');
@@ -142,6 +142,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					break;
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 					{
+						stopDialTone();
 						const processData = async () => {
 							const objData = JSON.parse(data?.json_data || '{}');
 							if (!isEmpty(objData)) {
@@ -160,13 +161,39 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		}
 	}, [mezon.socketRef, peerConnection, receiverId, signalingData, userProfile?.user?.id]);
 
+	const playDialTone = () => {
+		Sound.setCategory('Playback');
+		const sound = new Sound('dialtone.mp3', Sound.MAIN_BUNDLE, (error) => {
+			if (error) {
+				console.error('failed to load the sound', error);
+				return;
+			}
+			sound.play((success) => {
+				if (!success) {
+					console.error('Sound playback failed');
+				}
+			});
+			sound.setNumberOfLoops(-1);
+			dialToneRef.current = sound;
+		});
+	};
+
+	const stopDialTone = () => {
+		if (dialToneRef.current) {
+			dialToneRef.current.pause();
+			dialToneRef.current.stop();
+			dialToneRef.current.release();
+			dialToneRef.current = null;
+		}
+	};
+
 	const startCall = async () => {
 		InCallManager.start({ media: 'audio' });
+		playDialTone();
 		const offer = await peerConnection.createOffer(sessionConstraints);
 		await peerConnection.setLocalDescription(offer);
 		if (offer) {
 			const offerEn = await compress(JSON.stringify(offer));
-			dispatch(DMCallActions.setIsInCall(true));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(
 				receiverId,
 				WebrtcSignalingType.WEBRTC_SDP_OFFER,
@@ -178,23 +205,37 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	};
 
 	const endCall = async () => {
-		dispatch(DMCallActions.removeAll());
 		if (peerConnection) {
 			peerConnection.close();
 		}
 		if (remoteStream) {
+			remoteStream?.getVideoTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			remoteStream?.getAudioTracks().forEach((track) => {
+				track.enabled = false;
+			});
 			remoteStream.getTracks().forEach((track) => track.stop());
 			setRemoteStream(undefined);
 		}
 		if (localStream) {
+			localStream?.getVideoTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			localStream?.getAudioTracks().forEach((track) => {
+				track.enabled = false;
+			});
 			localStream.getTracks().forEach((track) => track.stop());
 			setLocalStream(undefined);
 		}
+		stopDialTone();
+		dispatch(DMCallActions.removeAll());
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
 		navigation.goBack();
-		dispatch(DMCallActions.setIsInCall(false));
 	};
 
 	useEffect(() => {
+		dispatch(DMCallActions.setIsInCall(true));
 		const timer = setTimeout(() => {
 			startCall();
 		}, 1000);

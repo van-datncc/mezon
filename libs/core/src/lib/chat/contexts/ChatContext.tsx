@@ -50,7 +50,6 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
-	selectListOfCalls,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -64,7 +63,6 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
-import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -140,7 +138,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const listOfCalls = useSelector(selectListOfCalls);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
@@ -933,12 +930,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
+		// TODO: AND TYPE IN BE
+		// TYPE = 4: USER CANCEL CALL
+		// TYPE = 0: REMOVE CALL (END CALL)
+		if (event?.data_type === 0 || event?.data_type === 4) {
+			dispatch(DMCallActions.removeAll());
+			if (event?.data_type === 4) {
+				dispatch(DMCallActions.setIsInCall(false));
+				dispatch(
+					toastActions.addToast({
+						// TODO: Change content toast
+						message: 'User busy and unable to answer the call. Please try again later',
+						type: 'warning',
+						autoClose: false
+					})
+				);
+			}
+			return;
+		}
 		dispatch(
 			DMCallActions.add({
 				calleeId: event?.receiver_id,
 				signalingData: event,
-				// todo: refactor this
-				id: Snowflake.generate(),
+				id: event?.caller_id,
 				callerId: event?.caller_id
 			})
 		);

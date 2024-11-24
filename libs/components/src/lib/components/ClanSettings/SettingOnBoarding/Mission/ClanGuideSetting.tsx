@@ -1,5 +1,12 @@
-import { useMemberContext } from '@mezon/core';
-import { selectChannelById, selectCurrentClanId, selectFormOnboarding, selectOnboardingByClan, useAppSelector } from '@mezon/store';
+import {
+	selectChannelById,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectFormOnboarding,
+	selectMemberClanByUserId,
+	selectOnboardingByClan,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
@@ -132,14 +139,15 @@ const SectionDescription = ({ title, description }: { title: string; description
 	);
 };
 const OwnerGreeting = () => {
-	const { clanOwner } = useMemberContext();
+	const currenClan = useSelector(selectCurrentClan);
+	const clanOwner = useSelector(selectMemberClanByUserId(currenClan?.creator_id as string));
 	return (
 		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-[#d5ddec] to-[#bbbfc9]">
 			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-[#3d3f3d] to-[#1a1d1e] rounded-md">
 				<div className="flex  gap-3">
 					<div className="w-12 relative">
 						<img
-							src={clanOwner.clan_avatar ?? clanOwner.user?.avatar_url}
+							src={clanOwner?.clan_avatar ?? clanOwner.user?.avatar_url}
 							className="w-12 aspect-square rounded-full absolute bottom-0 left-0"
 						/>
 					</div>

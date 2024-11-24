@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import RenderMessageBlock from './RenderMessageBlock';
 import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
+import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
@@ -340,7 +341,20 @@ const MessageItem = React.memo(
 										onLongPress={handleLongPressMessage}
 									/>
 								)}
-								{!!message?.content?.embed && <EmbedMessage {...message.content.embed} />}
+								{!!message?.content?.embed?.length &&
+									message?.content?.embed?.map((embed, index) => (
+										<EmbedMessage {...embed} key={`message_embed_${message?.id}_${index}`} />
+									))}
+								{!!message?.content?.components?.length &&
+									message?.content.components?.map((component, index) => (
+										<EmbedComponentsPanel
+											key={`message_embed_component_${message?.id}_${index}`}
+											actionRow={component}
+											messageId={message?.id}
+											senderId={message?.sender_id}
+											channelId={message?.channel_id || ''}
+										/>
+									))}
 							</Block>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 							{!preventAction ? (

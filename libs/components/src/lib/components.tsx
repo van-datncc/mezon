@@ -23,6 +23,7 @@ export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMar
 export { default as MarkdownContent } from './components/MarkdownFormatText/MarkdownContent';
 export { default as PlainText } from './components/MarkdownFormatText/PlainText';
 export { default as StreamInfo } from './components/StreamInfo';
+export { default as UpdateButton } from './components/UpdateButton/UpdateButton';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
 
@@ -89,3 +90,4 @@ export * from './components/ThumbnailAttachmentRender';
 export { default as Canvas } from './components/Canvas';
 export { default as GuideItemLayout } from './components/ClanSettings/SettingOnBoarding/GuideItemLayout';
 export * from './components/ClanSettings/SettingOnBoarding/ModalControlRule';
+export { default as ModalCall } from './components/ModalCall';
