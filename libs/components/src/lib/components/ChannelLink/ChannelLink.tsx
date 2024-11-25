@@ -1,10 +1,13 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	ETypeMission,
 	JoinPTTActions,
 	appActions,
 	channelsActions,
 	notificationSettingActions,
+	onboardingActions,
 	selectCloseMenu,
+	selectCurrentMission,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -129,6 +132,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			dispatch(threadsActions.setValueThread(null));
 		};
 
+		const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
 		const handleClick = () => {
 			setTurnOffThreadMessage();
 			if (closeMenu) {
@@ -139,6 +143,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				dispatch(JoinPTTActions.clear());
 			}
 			dispatch(appActions.setIsShowCanvas(false));
+			if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
+				dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
+			}
 		};
 
 		const openModalJoinVoiceChannel = useCallback(
