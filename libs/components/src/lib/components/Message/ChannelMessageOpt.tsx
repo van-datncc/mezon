@@ -114,7 +114,7 @@ const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 		<div className="flex items-center">
 			<ReactionPart emojiList={firstThreeElements} activeMode={undefined} messageId={message.id} isOption={true} />
 			{firstThreeElements.length > 0 && (
-				<span className="opacity-50 px-1 ml-2 border-l dark:border-borderDividerLight border-borderDivider h-6 inline-flex"></span>
+				<span className="opacity-50 px-1 ml-2 border-l dark:border-borderDividerLight border-borderDivider h-6 inline-flex "></span>
 			)}
 		</div>
 	);
@@ -170,84 +170,88 @@ function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPI
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 
-	const handleItemClick = useCallback(() => {
-		if (!message) return;
+	const handleItemClick = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			e.currentTarget.classList.add('animate-wiggle');
+			if (!message) return;
 
-		const createCanvasBody = (content?: string, id?: string) => ({
-			channel_id: message.channel_id,
-			clan_id: message.clan_id,
-			content,
-			is_default: true,
-			...(id && { id }),
-			title: defaultCanvas?.title || 'Note'
-		});
-
-		const insertImageToJson = (jsonObject: JsonObject, imageUrl?: string) => {
-			if (!imageUrl) return;
-			const imageInsert = { insert: { image: imageUrl } };
-			jsonObject.ops.push(imageInsert);
-			jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-		};
-
-		const updateJsonWithInsert = (jsonObject: JsonObject, newInsert: string) => {
-			jsonObject.ops.push({ insert: newInsert });
-			jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-		};
-
-		const isContentExists = (jsonObject: JsonObject, newInsert: string) => {
-			return jsonObject.ops.some((op) => op.insert === newInsert);
-		};
-
-		const isImageExists = (jsonObject: JsonObject, imageUrl?: string) => {
-			return jsonObject.ops.some((op) => {
-				return typeof op.insert === 'object' && op.insert !== null && op.insert.image === imageUrl;
+			const createCanvasBody = (content?: string, id?: string) => ({
+				channel_id: message.channel_id,
+				clan_id: message.clan_id,
+				content,
+				is_default: true,
+				...(id && { id }),
+				title: defaultCanvas?.title || 'Note'
 			});
-		};
 
-		let formattedString;
-
-		if (!defaultCanvas || (defaultCanvas && !defaultCanvas.content)) {
-			const messageContent = message.content.t;
-			const jsonObject: JsonObject = { ops: [] };
-			if (message.attachments?.length) {
-				const newImageUrl = message.attachments[0].url;
-				insertImageToJson(jsonObject, newImageUrl);
-			}
-			if (messageContent) {
-				jsonObject.ops.push({ insert: messageContent });
+			const insertImageToJson = (jsonObject: JsonObject, imageUrl?: string) => {
+				if (!imageUrl) return;
+				const imageInsert = { insert: { image: imageUrl } };
+				jsonObject.ops.push(imageInsert);
 				jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-			}
-			formattedString = JSON.stringify(jsonObject);
-		} else {
-			const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+			};
 
-			if (message.attachments?.length) {
-				const newImageUrl = message.attachments[0].url;
-				if (!isImageExists(jsonObject, newImageUrl)) {
+			const updateJsonWithInsert = (jsonObject: JsonObject, newInsert: string) => {
+				jsonObject.ops.push({ insert: newInsert });
+				jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
+			};
+
+			const isContentExists = (jsonObject: JsonObject, newInsert: string) => {
+				return jsonObject.ops.some((op) => op.insert === newInsert);
+			};
+
+			const isImageExists = (jsonObject: JsonObject, imageUrl?: string) => {
+				return jsonObject.ops.some((op) => {
+					return typeof op.insert === 'object' && op.insert !== null && op.insert.image === imageUrl;
+				});
+			};
+
+			let formattedString;
+
+			if (!defaultCanvas || (defaultCanvas && !defaultCanvas.content)) {
+				const messageContent = message.content.t;
+				const jsonObject: JsonObject = { ops: [] };
+				if (message.attachments?.length) {
+					const newImageUrl = message.attachments[0].url;
 					insertImageToJson(jsonObject, newImageUrl);
-				} else {
-					return;
 				}
+				if (messageContent) {
+					jsonObject.ops.push({ insert: messageContent });
+					jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
+				}
+				formattedString = JSON.stringify(jsonObject);
 			} else {
-				const newInsert = message.content.t;
-				if (newInsert && !isContentExists(jsonObject, newInsert)) {
-					updateJsonWithInsert(jsonObject, newInsert);
+				const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+
+				if (message.attachments?.length) {
+					const newImageUrl = message.attachments[0].url;
+					if (!isImageExists(jsonObject, newImageUrl)) {
+						insertImageToJson(jsonObject, newImageUrl);
+					} else {
+						return;
+					}
 				} else {
-					return;
+					const newInsert = message.content.t;
+					if (newInsert && !isContentExists(jsonObject, newInsert)) {
+						updateJsonWithInsert(jsonObject, newInsert);
+					} else {
+						return;
+					}
 				}
+
+				formattedString = JSON.stringify(jsonObject);
 			}
 
-			formattedString = JSON.stringify(jsonObject);
-		}
-
-		dispatch(createEditCanvas(createCanvasBody(formattedString, defaultCanvas?.id)));
-	}, [dispatch, message, defaultCanvas]);
+			dispatch(createEditCanvas(createCanvasBody(formattedString, defaultCanvas?.id)));
+		},
+		[dispatch, message, defaultCanvas]
+	);
 
 	return useMenuBuilderPlugin((builder) => {
 		builder.when(
 			userId === currentChannel?.creator_id && mode !== ChannelStreamMode.STREAM_MODE_DM && mode !== ChannelStreamMode.STREAM_MODE_GROUP,
 			(builder) => {
-				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5" />);
+				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5 pointer-events-none " />);
 			}
 		);
 	});

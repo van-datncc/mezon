@@ -1,4 +1,5 @@
 import {
+	DmCalling,
 	FirstJoinPopup,
 	ForwardMessageModal,
 	MessageContextMenuProvider,
@@ -31,10 +32,12 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectCurrentStartDmCall,
 	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectGroupCallId,
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
@@ -94,12 +97,32 @@ function MyApp() {
 	const dataCall = useMemo(() => {
 		return signalingData?.[signalingData?.length - 1]?.signalingData;
 	}, [signalingData]);
+
 	const isInCall = useSelector(selectIsInCall);
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
-
+	const groupCallId = useSelector(selectGroupCallId);
 	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
 	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
+
+	const isDmCallInfo = useSelector(selectCurrentStartDmCall);
+	const dmCallingRef = useRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }>(null);
+
+	useEffect(() => {
+		if (isDmCallInfo?.groupId) {
+			dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo);
+		}
+	}, [isDmCallInfo?.groupId, isDmCallInfo?.isVideo]);
+
+	useEffect(() => {
+		if (dataCall?.channel_id) {
+			dispatch(audioCallActions.setGroupCallId(dataCall?.channel_id));
+		}
+	}, [dataCall?.channel_id, dispatch]);
+
+	const triggerCall = (isVideoCall = false) => {
+		dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo, true);
+	};
 
 	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
 		if (audioRef.current) {
@@ -253,9 +276,11 @@ function MyApp() {
 				</div>
 			)}
 
-			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall.channel_id && (
-				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} />
+			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall?.channel_id && (
+				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
 			)}
+
+			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
 
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
