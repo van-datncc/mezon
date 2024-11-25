@@ -1,5 +1,6 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	JoinPTTActions,
 	appActions,
 	channelsActions,
 	notificationSettingActions,
@@ -135,6 +136,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			}
 			if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
+				dispatch(JoinPTTActions.clear());
 			}
 			dispatch(appActions.setIsShowCanvas(false));
 		};

@@ -36,8 +36,8 @@ export const JoinPTTSlice = createSlice({
 	reducers: {
 		add: JoinPTTAdapter.addOne,
 		addMany: JoinPTTAdapter.addMany,
-		remove: JoinPTTAdapter.removeOne
-		// ...
+		remove: JoinPTTAdapter.removeOne,
+		clear: JoinPTTAdapter.removeAll
 	}
 });
 
