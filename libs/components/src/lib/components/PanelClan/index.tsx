@@ -1,12 +1,10 @@
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
-import { defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
+import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
 import { EPermission, IClan, serverSettingsMenuList } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
-import ModalInvite from '../ListMemberInvite/modalInvite';
 import { notificationTypesList } from '../PanelChannel';
 import GroupPanels from '../PanelChannel/GroupPanels';
 import ItemPanel from '../PanelChannel/ItemPanel';
@@ -24,9 +22,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	const [canManageCLan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
 	const dispatch = useAppDispatch();
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} setShowClanListMenuContext={setShowClanListMenuContext} open={true} clanId={clan?.clan_id} />
-	));
+
 	const [isOnClickOutsideActive, setIsOnClickOutsideActive] = useState(true);
 
 	useEffect(() => {
@@ -65,7 +61,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, [defaultNotificationClan?.notification_setting_type]);
 
 	const handleInvitePeople = () => {
-		openInviteClanModal();
+		dispatch(clansActions.toggleInvitePeople(true));
 		setIsOnClickOutsideActive(false);
 	};
 	return (

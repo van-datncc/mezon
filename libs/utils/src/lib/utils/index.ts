@@ -909,3 +909,27 @@ export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptio
 
 	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
 };
+
+export function copyChannelLink(clanId: string, channelId: string) {
+	const origin = isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin;
+	const link = `${origin}/chat/clans/${clanId}/channels/${channelId}`;
+	if (navigator.clipboard) {
+		navigator.clipboard
+			.writeText(link)
+			.then()
+			.catch((err) => {
+				console.error('Failed to copy the link: ', err);
+			});
+	} else {
+		const textArea = document.createElement('textarea');
+		textArea.value = link;
+		document.body.appendChild(textArea);
+		textArea.select();
+		try {
+			document.execCommand('copy');
+		} catch (err) {
+			console.error('Failed to copy the link: ', err);
+		}
+		document.body.removeChild(textArea);
+	}
+}
