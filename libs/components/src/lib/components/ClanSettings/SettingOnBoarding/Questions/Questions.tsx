@@ -8,7 +8,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiAnswer, ApiOnboardingItem } from 'mezon-js/api.gen';
+import { ApiOnboardingItem, OnboardingAnswer } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -140,7 +140,7 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 
 const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem; index: number; tempId?: number }) => {
 	const [titleQuestion, setTitleQuestion] = useState(question?.title || '');
-	const [answers, setAnswer] = useState<ApiAnswer[]>(question?.answers || []);
+	const [answers, setAnswer] = useState<OnboardingAnswer[]>(question?.answers || []);
 	const [titleAnswer, setTitleAnswer] = useState('');
 	const [answerDescription, setAnswerDescription] = useState('');
 
@@ -267,7 +267,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 							{answers.map((answer) => (
 								<GuideItemLayout
 									key={answer.title}
-									icon={answer.answer}
+									icon={answer.emoji}
 									description={answer.description}
 									title={answer.title}
 									className="w-[49.5%] rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"

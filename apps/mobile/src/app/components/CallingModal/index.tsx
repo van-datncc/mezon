@@ -11,7 +11,6 @@ import {
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
-import { WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';

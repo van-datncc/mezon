@@ -1,4 +1,4 @@
-import { AppDispatch, appActions, authActions } from '@mezon/store';
+import { AppDispatch, appActions, authActions, userStatusActions } from '@mezon/store';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
 export interface IAppLoaderData {
@@ -43,7 +43,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	if (notificationPath) {
 		redirectTo = notificationPath;
 	}
-
+	dispatch(userStatusActions.getUserStatus());
 	dispatch(appActions.setInitialParams(params));
 	return {
 		pathname,
