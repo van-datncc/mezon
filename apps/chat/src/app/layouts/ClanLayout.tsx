@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
 import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -9,6 +9,8 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectStatusMenu,
@@ -102,6 +104,9 @@ const ClanLayout = () => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const streamPlay = useSelector(selectStatusStream);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
+
 	const currentURL = isElectron() ? window.location.hash : window.location.pathname;
 	const memberPath = `/chat/clans/${currentClan?.clan_id}/member-safety`;
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -117,6 +122,7 @@ const ClanLayout = () => {
 				<ChannelList />
 				<div id="clan-footer">
 					{streamPlay && <StreamInfo />}
+					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 					<FooterProfile
 						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}

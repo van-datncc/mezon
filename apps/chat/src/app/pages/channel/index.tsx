@@ -23,6 +23,7 @@ import {
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectCurrentClan,
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
@@ -33,7 +34,7 @@ import {
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
-	selectOnboardingMode,
+	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
@@ -106,13 +107,15 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
-	const onboardingMode = useSelector(selectOnboardingMode);
+	const currentClan = useSelector(selectCurrentClan);
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
 	const onboardingClan = useAppSelector((state) => selectOnboardingByClan(state, currentChannel.clan_id as string));
 	const currentMission = useMemo(() => {
 		return onboardingClan.mission[missionDone];
 	}, [missionDone, channelId]);
+
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	useEffect(() => {
@@ -145,7 +148,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{onboardingMode && channelId === currentMission?.channel_id && (
+			{(selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding && (
 				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
 			)}
 			{currentChannel ? (
@@ -309,32 +312,42 @@ const OnboardingGuide = ({
 }) => {
 	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
-	const handleDoNextMission = useCallback(() => {
-		switch (currentMission.task_type) {
-			case ETypeMission.SEND_MESSAGE: {
-				const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
-				navigate(link);
-				break;
-			}
-			case ETypeMission.VISIT: {
-				const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
-				navigate(linkChannel);
-				dispatch(onboardingActions.doneMission());
-				break;
-			}
-			case ETypeMission.DOSOMETHING: {
-				dispatch(onboardingActions.doneMission());
-				break;
-			}
-			default:
-				break;
-		}
-	}, [currentMission.id]);
-	const channelMission = useSelector((state) => selectChannelById(state, currentMission.channel_id as string));
 
+	const handleDoNextMission = useCallback(() => {
+		if (currentMission) {
+			switch (currentMission.task_type) {
+				case ETypeMission.SEND_MESSAGE: {
+					const link = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(link);
+					break;
+				}
+				case ETypeMission.VISIT: {
+					const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
+					navigate(linkChannel);
+					dispatch(onboardingActions.doneMission());
+					doneAllMission();
+					break;
+				}
+				case ETypeMission.DOSOMETHING: {
+					dispatch(onboardingActions.doneMission());
+					doneAllMission();
+					break;
+				}
+				default:
+					break;
+			}
+		}
+	}, [currentMission?.id, missionDone]);
+
+	const channelMission = useSelector((state) => selectChannelById(state, currentMission?.channel_id as string));
+	const doneAllMission = useCallback(() => {
+		if (missionDone + 1 === missionSum) {
+			dispatch(onboardingActions.doneOnboarding({ clan_id: currentMission?.clan_id as string }));
+		}
+	}, [missionDone]);
 	return (
 		<>
-			{missionDone < missionSum ? (
+			{missionDone < missionSum && currentMission ? (
 				<div
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}

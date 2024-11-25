@@ -128,26 +128,37 @@ const UserProfile = React.memo(
 				action: navigateToMessageDetail,
 				isShow: true
 			},
-			// {
-			// 	id: 2,
-			// 	text: t('userAction.voiceCall'),
-			// 	icon: <Icons.PhoneCallIcon color={themeValue.text} />,
-			// 	action: () => {
-			// 		//TODO
-			// 		Toast.show({ type: 'info', text1: 'Updating...' });
-			// 	},
-			// 	isShow: true
-			// },
-			// {
-			// 	id: 3,
-			// 	text: t('userAction.videoCall'),
-			// 	icon: <Icons.VideoIcon color={themeValue.text} />,
-			// 	action: () => {
-			// 		//TODO
-			// 		Toast.show({ type: 'info', text1: 'Updating...' });
-			// 	},
-			// 	isShow: true
-			// },
+			{
+				id: 2,
+				text: t('userAction.voiceCall'),
+				icon: <Icons.PhoneCallIcon color={themeValue.text} />,
+				action: () => {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userById?.user?.id,
+							receiverAvatar: userById?.user?.avatar_url
+						}
+					});
+				},
+				isShow: true
+			},
+			{
+				id: 3,
+				text: t('userAction.videoCall'),
+				icon: <Icons.VideoIcon color={themeValue.text} />,
+				action: () => {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userById?.user?.id,
+							receiverAvatar: userById?.user?.avatar_url,
+							isVideoCall: true
+						}
+					});
+				},
+				isShow: true
+			},
 			{
 				id: 4,
 				text: t('userAction.addFriend'),

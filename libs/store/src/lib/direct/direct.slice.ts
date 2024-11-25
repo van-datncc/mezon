@@ -153,6 +153,7 @@ export const fetchDirectMessage = createAsyncThunk(
 				return -1;
 			});
 			const channels = sorted.map(mapDmGroupToEntity);
+			//
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
 			return channels;
 		} catch (error) {
@@ -395,4 +396,8 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 		}
 		return acc;
 	}, []);
+});
+
+export const selectMemberDMByUserId = createSelector([selectAllUserDM, (state, userId: string) => userId], (entities, userId) => {
+	return entities.find((item) => item?.user?.id === userId);
 });

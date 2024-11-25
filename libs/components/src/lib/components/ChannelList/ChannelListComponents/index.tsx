@@ -8,9 +8,11 @@ import {
 	selectMissionDone,
 	selectMissionSum,
 	selectNumberEvent,
-	selectOnboardingMode,
+	selectOnboardingByClan,
 	selectOngoingEvent,
-	selectShowNumEvent
+	selectProcessingByClan,
+	selectShowNumEvent,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
@@ -29,7 +31,7 @@ export const Events = memo(() => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
-	const onboardingMode = useSelector(selectOnboardingMode);
+	const onboardingByClan = useSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
 
 	const closeModal = () => {
@@ -66,9 +68,20 @@ export const Events = memo(() => {
 		);
 	}, []);
 
+	const dispatch = useAppDispatch();
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
+	useEffect(() => {
+		if (currentClan?.is_onboarding) {
+			dispatch(onboardingActions.fetchOnboarding({ clan_id: currentClanId as string }));
+			dispatch(onboardingActions.fetchProcessingOnboarding({}));
+		}
+	}, [currentClan?.is_onboarding]);
+
 	return (
 		<>
-			{onboardingMode && <OnboardingGetStart link={serverGuidePath} />}
+			{(!selectUserProcessing?.onboarding_step || selectUserProcessing.onboarding_step < 3) && onboardingByClan?.mission.length > 0 && (
+				<OnboardingGetStart link={serverGuidePath} />
+			)}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
@@ -211,22 +224,22 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 			</div>
 		);
 	});
-	useEffect(() => {
-		openModalGetStarted();
-	}, []);
-	useEffect(() => {
-		let timeoutId: NodeJS.Timeout;
+	// useEffect(() => {
+	//   openModalGetStarted();
+	// }, []);
+	// useEffect(() => {
+	//   let timeoutId: NodeJS.Timeout;
 
-		if (missionDone === missionSum) {
-			openCongratulation();
-			timeoutId = setTimeout(() => {
-				closeCongratulation();
-				clearTimeout(timeoutId);
-			}, 2000);
-		}
+	//   if (missionDone === missionSum) {
+	//     openCongratulation();
+	//     timeoutId = setTimeout(() => {
+	//       closeCongratulation();
+	//       clearTimeout(timeoutId);
+	//     }, 2000);
+	//   }
 
-		return () => clearTimeout(timeoutId);
-	}, [missionDone]);
+	//   return () => clearTimeout(timeoutId);
+	// }, [missionDone]);
 
 	return (
 		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>

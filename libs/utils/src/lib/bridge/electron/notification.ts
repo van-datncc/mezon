@@ -1,6 +1,5 @@
 import isElectron from 'is-electron';
 import { electronBridge } from './electron';
-
 export interface IMessageExtras {
 	link: string; // link for navigating
 }
@@ -40,6 +39,7 @@ export class MezonNotificationService {
 	private currentChannelId: string | undefined;
 	private pingTimeout: NodeJS.Timeout | null = null;
 	private isFocusOnApp = false;
+	private previousAppId = 0;
 
 	private constructor() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -102,6 +102,12 @@ export class MezonNotificationService {
 						return;
 					}
 					this.pushNotification(title, message, image, link);
+
+					//check app update
+					if (isElectron() && msg?.appid && msg.appid !== this.previousAppId) {
+						this.previousAppId = msg.appid;
+						electronBridge.invoke('APP::CHECK_UPDATE');
+					}
 				}
 			} catch (err) {
 				// eslint-disable-next-line no-console

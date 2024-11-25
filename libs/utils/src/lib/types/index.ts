@@ -1,4 +1,14 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
+import {
+	ChannelDescription,
+	ChannelMessage,
+	ChannelType,
+	HashtagDm,
+	JoinPTTChannel,
+	Notification,
+	NotificationType,
+	TalkPTTChannel,
+	WebrtcSignalingFwd
+} from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -245,9 +255,31 @@ export interface IButtonMessage {
 	url?: string;
 }
 
+export interface IMessageSelectOption {
+	label: string;
+	value: string;
+	description?: string;
+	default?: boolean;
+}
+
+export enum EMessageSelectType {
+	TEXT = 1,
+	USER = 2,
+	ROLE = 3,
+	CHANNEL = 4
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IMessageSelect {
 	// some select specific properties
+	type: EMessageSelectType;
+	options: IMessageSelectOption[];
+	placeholder?: string;
+	// Minimum number of items that must be chosen (defaults to 1)
+	min_options?: number;
+	// Maximum number of items that can be chosen (defaults to 1)
+	max_options?: number;
+	disabled?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -328,6 +360,14 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+};
+
+export type IJoinPtt = {
+	joinPttData: JoinPTTChannel;
+};
+
+export type ITalkPtt = {
+	talkPttData: TalkPTTChannel;
 };
 
 export interface CategoryNameProps {
@@ -1161,3 +1201,8 @@ export enum EUserStatus {
 	DO_NOT_DISTURB = 'Do Not Disturb',
 	INVISIBLE = 'Invisible'
 }
+export type IDmCallInfo = {
+	channel_id?: string;
+	caller_id?: string;
+	callee_id?: string;
+};

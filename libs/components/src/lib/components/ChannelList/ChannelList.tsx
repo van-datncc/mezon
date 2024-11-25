@@ -7,6 +7,8 @@ import {
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
 	selectCurrentClan,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
 	selectStatusStream,
 	selectTheme,
@@ -71,6 +73,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const streamPlay = useSelector(selectStatusStream);
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
@@ -99,7 +103,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 5;
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
@@ -107,7 +111,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		calculateHeight();
 		window.addEventListener('resize', calculateHeight);
 		return () => window.removeEventListener('resize', calculateHeight);
-	}, [data, streamPlay]);
+	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
 	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);

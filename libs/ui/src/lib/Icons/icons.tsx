@@ -1178,6 +1178,77 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	);
 };
 
+export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 -4 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="m 8 0 c -1.660156 0 -3 1.339844 -3 3 v 5 c 0 1.660156 1.339844 3 3 3 s 3 -1.339844 3 -3 v -5 c 0 -1.660156 -1.339844 -3 -3 -3 z m -6 6 v 2.011719 c 0 2.964843 2.164062 5.429687 5 5.90625 v 2.082031 h 2 v -2.082031 c 2.835938 -0.476563 5 -2.941407 5 -5.90625 v -2.011719 h -1.5 v 2.011719 c 0 2.5 -1.992188 4.488281 -4.5 4.488281 s -4.5 -1.988281 -4.5 -4.488281 v -2.011719 z m 0 0"
+			/>
+		</svg>
+	);
+};
+
+export const MutePTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 -4 24 24"
+		>
+			<path d="M12 1C13.6452 1 15.0585 1.99333 15.6728 3.41298L7.99997 11.0858V5C7.99997 2.79086 9.79083 1 12 1Z" fill="currentColor" />
+			<path
+				d="M6.24997 12C6.24997 12.2632 6.26801 12.5245 6.30342 12.7823L4.25194 14.8338C3.92295 13.9344 3.74997 12.9761 3.74997 12V11.8438C3.74997 11.2915 4.19769 10.8438 4.74997 10.8438H5.24997C5.80226 10.8438 6.24997 11.2915 6.24997 11.8438V12Z"
+				fill="#000000"
+			/>
+			<path
+				d="M7.3242 18.7971L3.76773 22.3535C3.3772 22.7441 2.74404 22.7441 2.35352 22.3535L1.64641 21.6464C1.25588 21.2559 1.25588 20.6227 1.64641 20.2322L20.2322 1.64644C20.6227 1.25591 21.2559 1.25591 21.6464 1.64644L22.3535 2.35354C22.744 2.74407 22.744 3.37723 22.3535 3.76776L16 10.1213V12C16 14.2091 14.2091 16 12 16C11.4457 16 10.9177 15.8873 10.4378 15.6835L9.13553 16.9857C9.99969 17.4822 10.986 17.75 12 17.75C13.525 17.75 14.9875 17.1442 16.0658 16.0659C17.1442 14.9875 17.75 13.525 17.75 12V11.8438C17.75 11.2915 18.1977 10.8438 18.75 10.8438H19.25C19.8023 10.8438 20.25 11.2915 20.25 11.8437V12C20.25 14.188 19.3808 16.2865 17.8336 17.8336C16.5842 19.0831 14.9753 19.8903 13.25 20.1548V23H10.75V20.1548C9.51944 19.9662 8.34812 19.5014 7.3242 18.7971Z"
+				fill="#000000"
+			/>
+		</svg>
+	);
+};
+
+export function NotJoinedPTT(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" className="" viewBox="0 0 32 32" {...props}>
+			<path
+				fill="currentColor"
+				d="M20,6a9.9355,9.9355,0,0,0-4,.8418A9.999,9.999,0,1,0,16,25.16,9.998,9.998,0,1,0,20,6ZM12,24A8,8,0,1,1,13.7573,8.2017a9.9734,9.9734,0,0,0,0,15.5986A7.9919,7.9919,0,0,1,12,24Zm8,0a7.9919,7.9919,0,0,1-1.7573-.2,9.9734,9.9734,0,0,0,0-15.5986A7.9972,7.9972,0,1,1,20,24Z"
+			/>
+		</svg>
+	);
+}
+
+export function JoinedPTT(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<circle cx="8" cy="8" r="8" fill="currentColor"></circle>{' '}
+			</g>
+		</svg>
+	);
+}
+
 export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg
@@ -6008,6 +6079,36 @@ export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...
 						)}
 					</g>{' '}
 				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function MicEnable(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg fill="currentColor" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<title></title>{' '}
+				<g>
+					{' '}
+					<path d="M84,36a6,6,0,0,0-12,0,24,24,0,0,1-48,0,6,6,0,0,0-12,0A35.9772,35.9772,0,0,0,42,71.3936V84H30a6,6,0,0,0,0,12H66a6,6,0,0,0,0-12H54V71.3936A35.9772,35.9772,0,0,0,84,36Z"></path>{' '}
+					<path d="M48,48A12.0157,12.0157,0,0,0,60,36V12a12,12,0,0,0-24,0V36A12.0157,12.0157,0,0,0,48,48Z"></path>{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function MicDisable(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg fill="currentColor" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<path d="M 33.7891 25.5859 L 33.7891 11.2656 C 33.7891 6.9297 30.8828 3.7187 26.7110 3.7187 C 22.6094 3.7187 19.6094 6.8125 19.6094 11.0078 L 19.6094 11.3828 Z M 46.3281 47.1484 C 47.0313 47.8516 48.1797 47.8516 48.8594 47.1484 C 49.5859 46.4687 49.5859 45.2969 48.8594 44.5937 L 9.6719 5.4062 C 8.9688 4.7031 7.7735 4.7031 7.0938 5.4062 C 6.4141 6.1094 6.4141 7.2813 7.0938 7.9609 Z M 15.7657 48.7422 C 14.8281 48.7422 13.9844 49.5859 13.9844 50.5234 C 13.9844 51.4609 14.8281 52.2813 15.7657 52.2813 L 37.6328 52.2813 C 38.5703 52.2813 39.4141 51.4609 39.4141 50.5234 C 39.4141 49.5859 38.5703 48.7422 37.6328 48.7422 L 28.4688 48.7422 L 28.4688 43.6094 C 31.4453 43.3516 34.0469 42.3906 36.1797 40.8906 L 33.6719 38.3828 C 31.7735 39.6484 29.4062 40.375 26.7110 40.375 C 19.3516 40.375 14.2188 35.125 14.2188 27.9766 L 14.2188 22.5391 C 14.2188 21.4375 13.5157 20.7578 12.4844 20.7578 C 11.4531 20.7578 10.7735 21.4375 10.7735 22.5391 L 10.7735 27.9766 C 10.7735 36.5547 16.3984 42.8594 24.9297 43.6094 L 24.9297 48.7422 Z M 42.6250 22.5391 C 42.6250 21.4375 41.9453 20.7578 40.9141 20.7578 C 39.8828 20.7578 39.1797 21.4375 39.1797 22.5391 L 39.1797 27.9766 C 39.1797 28.9140 39.0859 29.8047 38.8984 30.6953 L 41.7578 33.5313 C 42.3203 31.8203 42.6250 29.9687 42.6250 27.9766 Z M 29.9453 34.6562 L 19.6094 24.3203 L 19.6094 28.0000 C 19.6094 32.3125 22.5157 35.5469 26.7110 35.5469 C 27.9531 35.5469 29.0313 35.2187 29.9453 34.6562 Z"></path>
 			</g>
 		</svg>
 	);

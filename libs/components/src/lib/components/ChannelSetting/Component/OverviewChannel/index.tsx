@@ -3,19 +3,22 @@ import {
 	ChannelsEntity,
 	checkDuplicateChannelInCategory,
 	checkDuplicateThread,
+	IUpdateSystemMessage,
 	selectAppChannelById,
+	selectClanSystemMessage,
 	selectTheme,
+	updateSystemMessage,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons, Image, InputField, TextArea } from '@mezon/ui';
 import { checkIsThread, IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Dropdown } from 'flowbite-react';
+import { ModalSaveChanges } from 'libs/components/src/lib/components';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
-import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
@@ -29,7 +32,9 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
 	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label || '');
-	const [topicInit, setTopicInit] = useState('');
+	const [topicInit, setTopicInit] = useState(channel.topic);
+	const [ageRestrictedInit, setAgeRestrictedInit] = useState(channel.age_restricted);
+	const [e2eeInit, setE2eeInit] = useState(channel.e2ee);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
@@ -37,6 +42,23 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [checkValidateUrl, setCheckValidateUrl] = useState(!ValidateURL().test(appUrlInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const isThread = checkIsThread(channel as ChannelsEntity);
+	const [isAgeRestricted, setIsAgeRestricted] = useState(ageRestrictedInit);
+	const [isE2ee, setIsE2ee] = useState(e2eeInit);
+	const handleCheckboxAgeRestricted = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const checked = event.target.checked;
+		setIsAgeRestricted(checked ? 1 : 0);
+	};
+
+	const handleCheckboxE2ee = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const checked = event.target.checked;
+		setIsE2ee(checked ? 1 : 0);
+	};
+
+	const [isCheckForSystemMsg, setIsCheckForSystemMsg] = useState(false);
+	const currentSystemMessage = useSelector(selectClanSystemMessage);
+	const thisIsSystemMessageChannel = useMemo(() => {
+		return channel.channel_id === currentSystemMessage.channel_id;
+	}, [channel.channel_id, currentSystemMessage.channel_id]);
 
 	const label = useMemo(() => {
 		return isThread ? 'thread' : 'channel';
@@ -124,24 +146,47 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setTopic(topicInit);
 		setChannelLabel(channelLabelInit);
 		setAppUrl(appUrlInit);
-	}, [topicInit, channelLabelInit, appUrlInit]);
+		setIsCheckForSystemMsg(false);
+		setIsAgeRestricted(ageRestrictedInit);
+		setIsE2ee(e2eeInit);
+	}, [topicInit, channelLabelInit, appUrlInit, isAgeRestricted, isE2ee]);
 
 	const handleSave = useCallback(async () => {
 		const updatedChannelLabel = channelLabel === channelLabelInit ? '' : channelLabel;
 		const updatedAppUrl = appUrl === appUrlInit ? '' : appUrl;
 
+		if (isCheckForSystemMsg) {
+			const request: IUpdateSystemMessage = {
+				clanId: channel.clan_id as string,
+				newMessage: {
+					channel_id: channel.channel_id,
+					boost_message: currentSystemMessage.boost_message,
+					setup_tips: currentSystemMessage.boost_message,
+					welcome_random: currentSystemMessage.welcome_random,
+					welcome_sticker: currentSystemMessage.welcome_sticker
+				}
+			};
+			await dispatch(updateSystemMessage(request));
+			setIsCheckForSystemMsg(false);
+		}
+
 		setChannelLabelInit(channelLabel);
 		setAppUrlInit(appUrl);
 		setTopicInit(topic);
+		setAgeRestrictedInit(isAgeRestricted);
+		setE2eeInit(isE2ee);
 
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: updatedChannelLabel,
 			category_id: channel.category_id,
-			app_url: updatedAppUrl
+			app_url: updatedAppUrl,
+			topic: topic,
+			age_restricted: isAgeRestricted,
+			e2ee: isE2ee
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
-	}, [channelLabel, channelLabelInit, appUrl, appUrlInit, topic, channel, dispatch]);
+	}, [channelLabel, channelLabelInit, appUrl, appUrlInit, topic, channel, isCheckForSystemMsg, dispatch, isAgeRestricted, isE2ee]);
 
 	useEffect(() => {
 		const textArea = textAreaRef.current;
@@ -169,10 +214,35 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	];
 
 	const [slowModeDropdown, setSlowDropdown] = useState(slowModeValues[0]);
-
 	const hideInactivityTimes = ['1 Hour', '24 Hours', '3 Days', '1 Week'];
-
 	const [hideTimeDropdown, setHideTimeDropdown] = useState(hideInactivityTimes[2]);
+
+	const hasChange = useMemo(() => {
+		return (
+			(channelLabelInit !== channelLabel ||
+				appUrlInit !== appUrl ||
+				topicInit !== topic ||
+				ageRestrictedInit !== isAgeRestricted ||
+				e2eeInit !== isE2ee ||
+				isCheckForSystemMsg) &&
+			!checkValidate &&
+			(!appUrl || !checkValidateUrl)
+		);
+	}, [
+		channelLabelInit,
+		channelLabel,
+		appUrlInit,
+		appUrl,
+		topicInit,
+		topic,
+		checkValidate,
+		checkValidateUrl,
+		isCheckForSystemMsg,
+		ageRestrictedInit,
+		isAgeRestricted,
+		e2eeInit,
+		isE2ee
+	]);
 
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
@@ -226,13 +296,16 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					hideInactivityTimes={hideInactivityTimes}
 					hideTimeDropdown={hideTimeDropdown}
 					setHideTimeDropdown={setHideTimeDropdown}
+					isCheckForSystemMsg={isCheckForSystemMsg}
+					setIsCheckForSystemMsg={setIsCheckForSystemMsg}
+					thisIsSystemMessageChannel={thisIsSystemMessageChannel}
+					handleCheckboxAgeRestricted={handleCheckboxAgeRestricted}
+					handleCheckboxE2ee={handleCheckboxE2ee}
+					isAgeRestricted={isAgeRestricted || 0}
+					isE2ee={isE2ee || 0}
 				/>
 			</div>
-			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) &&
-				!checkValidate &&
-				(!appUrl || !checkValidateUrl) && (
-					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
-				)}
+			{hasChange && <ModalSaveChanges onReset={handleReset} onSave={handleSave} />}
 		</div>
 	);
 };
@@ -245,6 +318,13 @@ interface IBottomBlockProps {
 	hideInactivityTimes: string[];
 	hideTimeDropdown: string;
 	setHideTimeDropdown: (value: string) => void;
+	handleCheckboxAgeRestricted: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	handleCheckboxE2ee: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	isAgeRestricted: number;
+	isE2ee: number;
+	isCheckForSystemMsg: boolean;
+	setIsCheckForSystemMsg: (value: boolean) => void;
+	thisIsSystemMessageChannel: boolean;
 }
 
 const BottomBlock = ({
@@ -254,7 +334,14 @@ const BottomBlock = ({
 	setSlowDropdown,
 	hideInactivityTimes,
 	hideTimeDropdown,
-	setHideTimeDropdown
+	setHideTimeDropdown,
+	handleCheckboxAgeRestricted,
+	handleCheckboxE2ee,
+	isAgeRestricted,
+	isE2ee,
+	isCheckForSystemMsg,
+	setIsCheckForSystemMsg,
+	thisIsSystemMessageChannel
 }: IBottomBlockProps) => {
 	const logoImgSrc = useMemo(() => {
 		if (appearanceTheme === 'light') {
@@ -305,6 +392,8 @@ const BottomBlock = ({
 														focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
 														disabled:bg-slate-200 disabled:after:bg-slate-300"
 						type="checkbox"
+						checked={isAgeRestricted === 1}
+						onChange={handleCheckboxAgeRestricted}
 					/>
 				</div>
 				<div>
@@ -312,6 +401,52 @@ const BottomBlock = ({
 					explicit content filter.
 				</div>
 			</div>
+
+			<hr className="border-t border-solid dark:border-borderDivider" />
+			<div className="flex flex-col gap-3">
+				<div className="flex justify-between">
+					<div className="font-semibold text-base dark:text-white text-black"> End-to-End Encryption Channel</div>
+					<input
+						className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
+														bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+														after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+														hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
+														focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+														disabled:bg-slate-200 disabled:after:bg-slate-300"
+						type="checkbox"
+						checked={isE2ee === 1}
+						onChange={handleCheckboxE2ee}
+					/>
+				</div>
+			</div>
+
+			{!thisIsSystemMessageChannel && (
+				<>
+					<hr className="border-t border-solid dark:border-borderDivider" />
+					<div className="flex flex-col gap-3">
+						<div className="flex justify-between">
+							<div className="font-semibold text-base dark:text-white text-black">Announcement Channel</div>
+							<input
+								className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
+														bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+														after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+														hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
+														focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+														disabled:bg-slate-200 disabled:after:bg-slate-300"
+								type="checkbox"
+								checked={isCheckForSystemMsg}
+								onChange={() => setIsCheckForSystemMsg(!isCheckForSystemMsg)}
+							/>
+						</div>
+						<div>
+							Post messages that reach clans outside your own. Users can opt in to ‘Following’ this channel, so select posts you
+							‘Publish’ from here will appear directly in their own clans. Announcement channels will not receive messages from other
+							Announcement channels.
+						</div>
+					</div>
+				</>
+			)}
+
 			<hr className="border-t border-solid dark:border-borderDivider" />
 			<div className="flex flex-col gap-2">
 				<div className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Hide After Inactivity</div>

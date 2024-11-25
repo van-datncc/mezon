@@ -37,8 +37,10 @@ import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
+import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
+import { audioCallReducer } from './dmcall/audioCall.slice';
 import { DMCallReducer } from './dmcall/dmcall.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -54,6 +56,7 @@ import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboardi
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
+import { JoinPTTReducer } from './ptt/ptt.join.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
@@ -78,7 +81,8 @@ const persistedReducer = persistReducer(
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage
+		storage,
+		blacklist: ['invitePeople']
 	},
 	clansReducer
 );
@@ -340,6 +344,7 @@ const reducer = {
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
 	auditlog: auditLogReducer,
+	audiocall: audioCallReducer,
 	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
@@ -350,6 +355,7 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
+	integrationClanWebhook: integrationClanWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
@@ -357,6 +363,7 @@ const reducer = {
 	clanMembersMeta: clanMembersMetaReducer,
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
+	joinPTT: JoinPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer
 };
 

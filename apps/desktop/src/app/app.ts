@@ -7,8 +7,10 @@ import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 
+import setupAutoUpdates from './autoUpdates';
 import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
+import { forceQuit } from './utils';
 
 const isQuitting = false;
 
@@ -57,6 +59,9 @@ export default class App {
 			if (process.platform === 'win32') {
 				app.setAppUserModelId('mezon.ai');
 			}
+			App.mainWindow.webContents.once('dom-ready', () => {
+				setupAutoUpdates();
+			});
 		}
 	}
 
@@ -171,7 +176,15 @@ export default class App {
 		});
 
 		// Emitted when the window is closed.
-		App.mainWindow.on('close', (event) => this.onClose(event));
+		App.mainWindow.on('close', (event) => {
+			if (forceQuit.isEnabled) {
+				app.exit(0);
+				forceQuit.disable();
+			} else {
+				event.preventDefault();
+				App.mainWindow.hide();
+			}
+		});
 
 		App.application.on('before-quit', () => {
 			tray.destroy();
