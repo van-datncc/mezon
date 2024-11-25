@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, usePathMatch } from '@mezon/core';
+import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
 	ChannelsEntity,
 	appActions,
@@ -17,7 +17,6 @@ import {
 	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
-	selectJoinPTTByChannelId,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
 	selectStatusMenu,
@@ -26,22 +25,22 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { IChannel, checkIsThread, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelStreamMode, ChannelType, NotificationType, WebrtcSignalingType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { compress, decompress } from '../DmList/DMtopbar';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
+import { WebRTCProvider } from '../WebRTC/WebRTCContext';
 import { ChannelLabel } from './TopBarComponents';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
+import { PushToTalkBtn } from './TopBarComponents/PushToTalkButton/PushToTalkButton';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
@@ -110,33 +109,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	const channelParent =
 		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
 
-	const [isJoinedPTT, setIsJoinedPTT] = useState<boolean>(false);
-	const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
-	const [audioTrack, setAudioTrack] = useState<MediaStreamTrack | null>(null);
-	const [isTalking, setIsTalking] = useState(false);
-
-	const startTalking = async () => {
-		if (!peerConnection) {
-			console.error('PeerConnection is not initialized.');
-			return;
-		}
-
-		if (audioTrack) {
-			audioTrack.enabled = true;
-		}
-		setIsTalking(true);
-	};
-
-	const stopTalking = async () => {
-		if (!peerConnection) {
-			console.error('PeerConnection is not initialized.');
-			return;
-		}
-		if (audioTrack) {
-			audioTrack.enabled = false;
-		}
-		setIsTalking(false);
-	};
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -148,17 +120,9 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
 								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-								{isJoinedPTT && <MicIcon isTalking={isTalking} onClick={isTalking ? stopTalking : startTalking} />}
-								<PushToTalkBtn
-									setAudioTrack={setAudioTrack}
-									audioTrack={audioTrack}
-									isJoined={isJoinedPTT}
-									setIsJoined={setIsJoinedPTT}
-									setIsTalking={setIsTalking}
-									setPeerConnection={setPeerConnection}
-									peerConnection={peerConnection}
-									isLightMode={appearanceTheme === 'light'}
-								/>
+								<WebRTCProvider>
+									<PushToTalkBtn isLightMode={appearanceTheme === 'light'} />
+								</WebRTCProvider>
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -288,185 +252,6 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 				</button>
 			</Tooltip>
 			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
-		</div>
-	);
-}
-
-interface IPushToTalkBtnProps {
-	isLightMode: boolean;
-	isJoined: boolean;
-	setIsJoined: (value: boolean) => void;
-	peerConnection: RTCPeerConnection | null;
-	audioTrack: MediaStreamTrack | null;
-	setPeerConnection: (value: RTCPeerConnection | null) => void;
-	setIsTalking: (value: boolean) => void;
-	setAudioTrack: (value: MediaStreamTrack | null) => void;
-}
-
-function PushToTalkBtn({
-	isLightMode,
-	isJoined,
-	setIsJoined,
-	peerConnection,
-	audioTrack,
-	setPeerConnection,
-	setAudioTrack,
-	setIsTalking
-}: IPushToTalkBtnProps) {
-	const channelId = useSelector(selectCurrentChannelId);
-
-	const remoteAudioRef = useRef<HTMLAudioElement>(null);
-	const mezon = useMezon();
-	const { userId } = useAuth();
-	const joinPTTData = useAppSelector((state) => selectJoinPTTByChannelId(state, userId));
-
-	useEffect(() => {
-		if (!peerConnection) return;
-
-		peerConnection.onicecandidate = async (event: any) => {
-			if (event && event.candidate) {
-				if (mezon.socketRef.current?.isOpen() === true) {
-					await mezon.socketRef.current?.joinPTTChannel(
-						channelId as string,
-						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate)
-					);
-				}
-			}
-		};
-
-		peerConnection.ontrack = (event) => {
-			if (event.track.kind === 'audio') {
-				if (remoteAudioRef.current) {
-					remoteAudioRef.current.srcObject = event.streams[0];
-				}
-			}
-		};
-
-		if (!joinPTTData?.[joinPTTData?.length - 1]) return;
-		const data = joinPTTData?.[joinPTTData?.length - 1]?.joinPttData;
-		switch (data.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-
-						// Get peerConnection from receiver event.receiverId
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-						const answer = await peerConnection.createAnswer();
-						await peerConnection.setLocalDescription(answer);
-
-						const answerEnc = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.joinPTTChannel(channelId as string, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEnc);
-					};
-					processData().catch(console.error);
-				}
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				{
-					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
-						if (peerConnection.remoteDescription) {
-							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-						}
-					};
-					processData().catch(console.error);
-				}
-				break;
-			default:
-				break;
-		}
-
-		return () => {
-			peerConnection.onicecandidate = null;
-			peerConnection.onconnectionstatechange = null;
-			peerConnection.ontrack = null;
-		};
-	}, [mezon.socketRef, peerConnection, joinPTTData, channelId]);
-
-	const startJoinPTT = async () => {
-		try {
-			if (mezon.socketRef.current) {
-				if (peerConnection) {
-					peerConnection.close();
-					setPeerConnection(null);
-				}
-				const newPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-				setPeerConnection(newPeerConnection);
-				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-				// mute
-				audioTrack = stream.getAudioTracks()[0];
-				setAudioTrack(audioTrack);
-				audioTrack.enabled = false;
-				setIsTalking(false);
-				stream.getTracks().forEach((track) => {
-					newPeerConnection.addTrack(track, stream);
-				});
-
-				// set peer & call join to server
-				await mezon.socketRef.current?.joinPTTChannel(channelId as string, WebrtcSignalingType.WEBRTC_SDP_OFFER, '');
-				setIsJoined(true);
-			}
-		} catch (err) {
-			console.error('Failed to get local media:', err);
-		}
-	};
-
-	const quitPTT = async () => {
-		setIsTalking(false);
-		setIsJoined(false);
-		await mezon.socketRef.current?.joinPTTChannel(channelId as string, WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
-		if (peerConnection) {
-			peerConnection.close();
-			setPeerConnection(null);
-		}
-	};
-
-	return (
-		<div className="relative leading-5 h-5">
-			<Tooltip
-				className={`w-[140px] flex justify-center items-center`}
-				content={isJoined ? 'Push to end' : 'Push to talk'}
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-			>
-				<button onClick={!isJoined ? startJoinPTT : quitPTT} className="focus-visible:outline-none" onContextMenu={(e) => e.preventDefault()}>
-					{isJoined ? (
-						<>
-							<div className="size-6 flex items-center justify-center">
-								<Icons.JoinedPTT className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-							</div>
-							<div className="invisible fixed w-[1px] h-[1px] z-0 pointer-events-none">
-								<audio ref={remoteAudioRef} autoPlay playsInline controls></audio>
-							</div>
-						</>
-					) : (
-						<Icons.NotJoinedPTT className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-					)}
-				</button>
-			</Tooltip>
-		</div>
-	);
-}
-
-interface IMicIconProps {
-	onClick: () => void;
-	isTalking: boolean;
-}
-
-function MicIcon({ onClick, isTalking }: IMicIconProps) {
-	return (
-		<div className="relative leading-5 h-5">
-			<button className="focus-visible:outline-none" onClick={onClick} onContextMenu={(e) => e.preventDefault()}>
-				{isTalking ? (
-					<Icons.MicEnable className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-				) : (
-					<Icons.MicDisable className="size-6 text-red-600" />
-				)}
-			</button>
 		</div>
 	);
 }
