@@ -67,5 +67,6 @@ export * from './lib/systemMessages/systemMessage.slide';
 export * from './lib/threads/threads.slice';
 export * from './lib/toasts';
 export * from './lib/toasts/toasts.slice';
+export * from './lib/userstatus/userstatusAPI.slice';
 export * from './lib/voice/voice.slice';
 export * from './lib/webhook/webhook.slice';

@@ -1184,6 +1184,23 @@ export type IUserItemActivity = {
 	user?: IUserProfileActivity;
 };
 
+export type UserStatus = {
+	user_id: string;
+	status: string;
+};
+
+export type UserStatusUpdate = {
+	status: string;
+	minutes?: number;
+	until_turn_on: boolean;
+};
+
+export enum EUserStatus {
+	ONLINE = 'Online',
+	IDLE = 'Idle',
+	DO_NOT_DISTURB = 'Do Not Disturb',
+	INVISIBLE = 'Invisible'
+}
 export type IDmCallInfo = {
 	groupId?: string;
 	isVideo?: boolean;
