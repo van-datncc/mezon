@@ -61,6 +61,17 @@ export const accountSlice = createSlice({
 				const updatedUserMetadata = { ...userMetadata, status: action.payload };
 				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
 			}
+		},
+		setWalletValue(state, action: PayloadAction<number>) {
+			if (state.userProfile?.wallet) {
+				try {
+					const walletData = JSON.parse(state.userProfile.wallet);
+					walletData.value = action.payload;
+					state.userProfile.wallet = JSON.stringify(walletData);
+				} catch (error) {
+					console.error('Error updating wallet value:', error);
+				}
+			}
 		}
 	},
 	extraReducers: (builder) => {
