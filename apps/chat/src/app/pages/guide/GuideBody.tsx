@@ -41,12 +41,12 @@ function GuideBody() {
 					case ETypeMission.VISIT: {
 						const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
 						navigate(linkChannel);
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
 					case ETypeMission.DOSOMETHING: {
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
