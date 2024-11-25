@@ -4,6 +4,8 @@ import {
 	ActivitiesEntity,
 	AttachmentEntity,
 	DMCallActions,
+	JoinPTTActions,
+	TalkPTTActions,
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
@@ -61,6 +63,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -75,6 +78,7 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
+	JoinPTTChannel,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
@@ -92,6 +96,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
+	TalkPTTChannel,
 	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -942,6 +947,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		);
 	}, []);
 
+	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
+		dispatch(
+			JoinPTTActions.add({
+				joinPttData: event,
+				// todo: refactor this
+				id: Snowflake.generate()
+			})
+		);
+	}, []);
+
+	const ontalkpttchannel = useCallback((event: TalkPTTChannel) => {
+		dispatch(
+			TalkPTTActions.add({
+				talkPttData: event,
+				// todo: refactor this
+				id: Snowflake.generate()
+			})
+		);
+	}, []);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1027,6 +1052,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
+
+			socket.ontalkpttchannel = ontalkpttchannel;
+
+			socket.onjoinpttchannel = onjoinpttchannel;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1068,7 +1097,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onroleevent,
 			ontokensent,
 			//onmessagebuttonclicked,
-			onwebrtcsignalingfwd
+			onwebrtcsignalingfwd,
+			onjoinpttchannel,
+			ontalkpttchannel
 		]
 	);
 

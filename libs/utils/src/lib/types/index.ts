@@ -1,4 +1,14 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
+import {
+	ChannelDescription,
+	ChannelMessage,
+	ChannelType,
+	HashtagDm,
+	JoinPTTChannel,
+	Notification,
+	NotificationType,
+	TalkPTTChannel,
+	WebrtcSignalingFwd
+} from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -350,6 +360,14 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+};
+
+export type IJoinPtt = {
+	joinPttData: JoinPTTChannel;
+};
+
+export type ITalkPtt = {
+	talkPttData: TalkPTTChannel;
 };
 
 export interface CategoryNameProps {

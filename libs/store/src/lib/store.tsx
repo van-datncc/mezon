@@ -56,6 +56,7 @@ import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboardi
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
+import { JoinPTTReducer } from './ptt/ptt.join.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
@@ -360,7 +361,8 @@ const reducer = {
 	settingClanChannel: settingChannelReducer,
 	clanMembersMeta: clanMembersMetaReducer,
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
-	dmcall: DMCallReducer
+	dmcall: DMCallReducer,
+	joinPTT: JoinPTTReducer
 };
 
 let storeInstance = configureStore({
