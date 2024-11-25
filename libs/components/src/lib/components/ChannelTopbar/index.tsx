@@ -121,10 +121,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 			return;
 		}
 
-		// not use
-		// await mezon.socketRef.current?.talkPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_OFFER, '', 0);
-		// await sleep(1000);
-
 		if (audioTrack) {
 			audioTrack.enabled = true;
 		}
@@ -401,9 +397,10 @@ function PushToTalkBtn({
 				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
 				// mute
-				const audioTrack = stream.getAudioTracks()[0];
+				audioTrack = stream.getAudioTracks()[0];
 				setAudioTrack(audioTrack);
 				audioTrack.enabled = false;
+				setIsTalking(false);
 				stream.getTracks().forEach((track) => {
 					newPeerConnection.addTrack(track, stream);
 				});
@@ -420,11 +417,11 @@ function PushToTalkBtn({
 	const quitPTT = async () => {
 		setIsTalking(false);
 		setIsJoined(false);
+		await mezon.socketRef.current?.joinPTTChannel(channelId as string, WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
 		if (peerConnection) {
 			peerConnection.close();
 			setPeerConnection(null);
 		}
-		await mezon.socketRef.current?.joinPTTChannel(channelId as string, WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
 	};
 
 	return (
@@ -438,9 +435,14 @@ function PushToTalkBtn({
 			>
 				<button onClick={!isJoined ? startJoinPTT : quitPTT} className="focus-visible:outline-none" onContextMenu={(e) => e.preventDefault()}>
 					{isJoined ? (
-						<div className="size-6 flex items-center justify-center">
-							<Icons.JoinedPTT className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-						</div>
+						<>
+							<div className="size-6 flex items-center justify-center">
+								<Icons.JoinedPTT className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+							</div>
+							<div className="invisible fixed w-[1px] h-[1px] z-0 pointer-events-none">
+								<audio ref={remoteAudioRef} autoPlay playsInline controls></audio>
+							</div>
+						</>
 					) : (
 						<Icons.NotJoinedPTT className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
 					)}
@@ -460,9 +462,9 @@ function MicIcon({ onClick, isTalking }: IMicIconProps) {
 		<div className="relative leading-5 h-5">
 			<button className="focus-visible:outline-none" onClick={onClick} onContextMenu={(e) => e.preventDefault()}>
 				{isTalking ? (
-					<Icons.MicDisable className="size-6 text-red-600" />
-				) : (
 					<Icons.MicEnable className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+				) : (
+					<Icons.MicDisable className="size-6 text-red-600" />
 				)}
 			</button>
 		</div>
