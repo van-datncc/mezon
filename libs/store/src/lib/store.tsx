@@ -37,6 +37,7 @@ import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
+import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
 import { audioCallReducer } from './dmcall/audioCall.slice';
@@ -78,7 +79,8 @@ const persistedReducer = persistReducer(
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage
+		storage,
+		blacklist: ['invitePeople']
 	},
 	clansReducer
 );
@@ -351,6 +353,7 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
+	integrationClanWebhook: integrationClanWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,

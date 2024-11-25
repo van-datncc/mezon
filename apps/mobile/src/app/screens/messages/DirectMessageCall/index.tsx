@@ -238,13 +238,21 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		dispatch(DMCallActions.setIsInCall(true));
 		const timer = setTimeout(() => {
 			startCall();
-		}, 1000);
+		}, 3000);
 
 		return () => {
 			clearTimeout(timer);
 			InCallManager.stop();
 		};
 	}, []);
+
+	useEffect(() => {
+		localStream?.getVideoTracks().forEach((track) => {
+			if (!localMediaControl?.camera) {
+				track.enabled = false;
+			}
+		});
+	}, [localStream, localMediaControl?.camera]);
 
 	const toggleCamera = useCallback(() => {
 		// check if permission is granted, if not call request permission
@@ -272,15 +280,20 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 				...prev,
 				mic: !prev.mic
 			}));
-
 			// update mic value of localStream
 			localStream?.getAudioTracks().forEach((track) => {
 				localMediaControl?.mic ? (track.enabled = false) : (track.enabled = true);
 			});
+
+			peerConnection.getSenders().forEach((sender) => {
+				if (sender?.track && sender?.track?.kind === 'audio') {
+					sender.track.enabled = localMediaControl?.mic ? false : true;
+				}
+			});
 		} else {
 			requestMicrophonePermission();
 		}
-	}, [localMediaControl?.mic, localStream, microphonePermissionGranted, requestMicrophonePermission]);
+	}, [localMediaControl?.mic, localStream, microphonePermissionGranted, requestMicrophonePermission, peerConnection]);
 	const toggleControl = async () => {
 		setIsShowControl(!isShowControl);
 	};

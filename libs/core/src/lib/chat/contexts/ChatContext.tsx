@@ -48,7 +48,6 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
-	selectListOfCalls,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -62,7 +61,6 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
-import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -136,7 +134,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const listOfCalls = useSelector(selectListOfCalls);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
@@ -929,16 +926,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
+		// TODO: AND TYPE IN BE
+		// TYPE = 4: USER CANCEL CALL
+		// TYPE = 0: REMOVE CALL (END CALL)
+		if (event?.data_type === 4 || event?.data_type === 0) {
+			dispatch(DMCallActions.cancelCall({}));
+		}
 		dispatch(
-			DMCallActions.add({
+			DMCallActions.addOrUpdate({
 				calleeId: event?.receiver_id,
 				signalingData: event,
 				id: event?.caller_id,
 				callerId: event?.caller_id
 			})
 		);
-		dispatch(DMCallActions.setListOfCallsSocket({ userId, event }));
-		dispatch(DMCallActions.setCalleeId(event?.receiver_id));
 	}, []);
 
 	const setCallbackEventFn = React.useCallback(

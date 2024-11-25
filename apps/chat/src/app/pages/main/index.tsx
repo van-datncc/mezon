@@ -3,6 +3,7 @@ import {
 	ForwardMessageModal,
 	MessageContextMenuProvider,
 	MessageModalImage,
+	ModalCall,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -11,6 +12,7 @@ import {
 } from '@mezon/components';
 import { useAppParams, useAuth, useFriends, useMenu, useReference } from '@mezon/core';
 import {
+	DMCallActions,
 	accountActions,
 	audioCallActions,
 	channelsActions,
@@ -32,6 +34,7 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
@@ -56,7 +59,7 @@ import {
 	isWindowsDesktop
 } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
@@ -86,6 +89,10 @@ function MyApp() {
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
+	const dataCall = useMemo(() => {
+		return signalingData?.[signalingData?.length - 1]?.signalingData;
+	}, [signalingData]);
+	const isInCall = useSelector(selectIsInCall);
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
 
@@ -108,11 +115,13 @@ function MyApp() {
 	};
 
 	useEffect(() => {
-		if (!signalingData?.[signalingData?.length - 1]) return;
-
+		if (!signalingData?.[signalingData?.length - 1] && !isInCall) {
+			dispatch(audioCallActions.setIsDialTone(false));
+			return;
+		}
 		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				if (!isPlayDialTone) {
+				if (!isPlayDialTone && !isInCall) {
 					dispatch(audioCallActions.setIsRingTone(true));
 				} else {
 					dispatch(audioCallActions.setIsDialTone(false));
@@ -123,10 +132,16 @@ function MyApp() {
 				break;
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				break;
+			// 	CANCEL CALL
+			case 4:
+				dispatch(DMCallActions.removeAll());
+				dispatch(audioCallActions.setIsRingTone(false));
+				dispatch(audioCallActions.setIsDialTone(false));
+				break;
 			default:
 				break;
 		}
-	}, [dispatch, isPlayDialTone, signalingData]);
+	}, [dispatch, isInCall, isPlayDialTone, signalingData]);
 
 	useEffect(() => {
 		if (isPlayDialTone) {
@@ -231,6 +246,10 @@ function MyApp() {
 						currentStreamInfo={currentStreamInfo}
 					/>
 				</div>
+			)}
+
+			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall.channel_id && (
+				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} />
 			)}
 
 			{openModalAttachment && (
