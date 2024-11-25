@@ -1,4 +1,5 @@
 import {
+	channelMembersActions,
 	channelMetaActions,
 	ChannelsEntity,
 	channelUsersActions,
@@ -34,19 +35,24 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 			clanId: clanId
 		};
 
-		await dispatch(channelUsersActions.addChannelUsers(body));
-		dispatch(
-			channelMetaActions.updateBulkChannelMetadata([
-				{
-					id: currentChannel?.channel_id ?? '',
-					lastSeenTimestamp: timestamp,
-					lastSentTimestamp: timestamp,
-					lastSeenPinMessage: '',
-					clanId: currentChannel?.clan_id ?? '',
-					isMute: false
-				}
-			])
-		);
+		try {
+			await dispatch(channelUsersActions.addChannelUsers(body));
+			dispatch(
+				channelMetaActions.updateBulkChannelMetadata([
+					{
+						id: currentChannel?.channel_id ?? '',
+						lastSeenTimestamp: timestamp,
+						lastSentTimestamp: timestamp,
+						lastSeenPinMessage: '',
+						clanId: currentChannel?.clan_id ?? '',
+						isMute: false
+					}
+				])
+			);
+			dispatch(channelMembersActions.addNewMember({ channel_id: currentChannel?.channel_id ?? '', user_ids: userIds }));
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const addMemberToThread = useCallback(
