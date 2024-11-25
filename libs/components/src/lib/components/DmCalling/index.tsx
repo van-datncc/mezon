@@ -28,8 +28,9 @@ import LabelDm from './labelDm';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
+	directId: string;
 };
-const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, DmCallingProps>(({ dmGroupId }, ref) => {
+const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }, DmCallingProps>(({ dmGroupId, directId }, ref) => {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const { setStatusMenu } = useMenu();
@@ -78,8 +79,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 	};
 
-	const triggerCall = (isVideoCall = false) => {
-		dispatch(audioCallActions.setIsDialTone(true));
+	const triggerCall = (isVideoCall = false, isAnswer = false) => {
+		if (!isAnswer) {
+			dispatch(audioCallActions.setIsDialTone(true));
+		}
 		onStartCall({ isVideoCall });
 	};
 
@@ -96,6 +99,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 		dispatch(DMCallActions.setIsInCall(false));
 		dispatch(DMCallActions.removeAll());
 		handleMuteSound();
+		dispatch(audioCallActions.startDmCall({}));
 	};
 
 	const handleMuteSound = () => {
@@ -107,7 +111,9 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 
 	return (
 		<div
-			className={`${!isInChannelCalled && !isPlayDialTone ? '-z-50 opacity-0 hidden' : ''} flex flex-col ${!isShowMeetDM ? 'min-h-[240px]' : 'max-h-[510px]'} z-10 relative w-full p-3 min-w-0 items-center dark:bg-bgTertiary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
+			className={`${
+				(!isInChannelCalled && !isPlayDialTone) || dmGroupId !== directId ? '-z-50 opacity-0 hidden' : ''
+			} flex flex-col right-0 fixed w-widthThumnailAttachment  ${!isShowMeetDM ? 'h-[240px] min-h-[240px]' : 'max-h-[510px]'} z-10 w-full p-3 min-w-0 items-center dark:bg-bgTertiary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
 		>
 			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center flex-1">
@@ -131,6 +137,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
 				</div>
 			</div>
+
 			<div className={`flex justify-between space-x-4 ${!isShowMeetDM ? 'h-[0px] -z-10 opacity-0' : 'z-10 mb-5 mt-5'}`}>
 				{/* Local Video */}
 				<video
@@ -142,7 +149,8 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 						width: '400px',
 						height: '300px',
 						backgroundColor: 'black',
-						borderRadius: '8px'
+						borderRadius: '8px',
+						display: !isShowMeetDM ? 'none' : 'block'
 					}}
 				/>
 				{/* Remote Video */}
@@ -154,10 +162,12 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 						width: '400px',
 						height: '300px',
 						backgroundColor: 'black',
-						borderRadius: '8px'
+						borderRadius: '8px',
+						display: !isShowMeetDM ? 'none' : 'block'
 					}}
 				/>
 			</div>
+
 			<div className="w-full h-full flex flex-col justify-around">
 				{!isShowMeetDM && (
 					<div className="justify-center items-center gap-4 flex w-full">
@@ -180,7 +190,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 				)}
 				<div className="justify-center items-center gap-4 flex w-full">
 					{!isInCall ? (
-						<>
+						<div className="justify-center items-center gap-4 flex w-full">
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 								onClick={() => onStartCall({ isVideoCall: true })}
@@ -199,46 +209,44 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 							>
 								<Icons.CloseButton className={`w-[20px]`} />
 							</div>
-						</>
+						</div>
 					) : (
-						<div className="h-[556px] ">
-							<div className="flex flex-row space-x-4 justify-center mt-10">
-								<div
-									className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-									onClick={toggleVideo}
-								>
-									<Icons.IconMeetDM
-										className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isShowMeetDM={!isShowMeetDM}
-										isShowLine={true}
-									/>
-								</div>
-								<div
-									className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-									onClick={handleShowShareScreenToggle}
-								>
-									<Icons.ShareScreen
-										className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isShowShareScreen={isShowShareScreen}
-										isShowLine={true}
-									/>
-								</div>
-								<div
-									className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-									onClick={handleMuteToggle}
-								>
-									<Icons.Microphone
-										className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isMuteMicrophone={isMuteMicrophone}
-										isShowLine={true}
-									/>
-								</div>
-								<div
-									className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
-									onClick={handleCloseCall}
-								>
-									<Icons.StopCall />
-								</div>
+						<div className="flex flex-row space-x-4 justify-center">
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								onClick={toggleVideo}
+							>
+								<Icons.IconMeetDM
+									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isShowMeetDM={!isShowMeetDM}
+									isShowLine={true}
+								/>
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								onClick={handleShowShareScreenToggle}
+							>
+								<Icons.ShareScreen
+									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isShowShareScreen={isShowShareScreen}
+									isShowLine={true}
+								/>
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								onClick={handleMuteToggle}
+							>
+								<Icons.Microphone
+									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
+									isMuteMicrophone={isMuteMicrophone}
+									isShowLine={true}
+								/>
+							</div>
+							<div
+								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
+								onClick={handleCloseCall}
+							>
+								<Icons.StopCall />
 							</div>
 						</div>
 					)}

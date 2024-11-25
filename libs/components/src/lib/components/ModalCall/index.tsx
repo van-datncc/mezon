@@ -1,34 +1,24 @@
 import { useUserByUserId } from '@mezon/core';
-import { audioCallActions, directActions, DMCallActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { audioCallActions, DMCallActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import { WebrtcSignalingFwd } from 'mezon-js';
-import { NavLink, useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 interface ModalCallProps {
 	dataCall: WebrtcSignalingFwd;
 	userId: string;
+	triggerCall: () => void;
 }
 
-const ModalCall = ({ dataCall, userId }: ModalCallProps) => {
+const ModalCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
 	const user = useUserByUserId(dataCall?.caller_id);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
-	const direct = useAppSelector((state) => selectDirectById(state, dataCall.channel_id)) || {};
-	const navigate = useNavigate();
 
 	const handleJoinCall = async () => {
-		await dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: direct.id,
-				channelName: '',
-				type: direct.type
-			})
-		);
-
-		navigate(`/chat/direct/message/${direct.channel_id}/${direct.type}`);
+		triggerCall();
 	};
 
 	const handleCloseCall = async () => {
@@ -67,14 +57,12 @@ const ModalCall = ({ dataCall, userId }: ModalCallProps) => {
 					>
 						<Icons.CloseButton className={`w-[20px]`} />
 					</div>
-					<NavLink to="#" onClick={handleJoinCall}>
-						<div
-							className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-							onClick={handleJoinCall}
-						>
-							<Icons.IconPhoneDM />
-						</div>
-					</NavLink>
+					<div
+						className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+						onClick={handleJoinCall}
+					>
+						<Icons.IconPhoneDM />
+					</div>
 				</div>
 			</div>
 		</div>
