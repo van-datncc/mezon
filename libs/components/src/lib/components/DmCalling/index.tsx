@@ -21,7 +21,7 @@ import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
 import LabelDm from './labelDm';
@@ -78,14 +78,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean) => void }, D
 		dispatch(DMCallActions.setIsMuteMicrophone(!isMuteMicrophone));
 	};
 
-	const triggerCall = useCallback(
-		async (isVideoCall = false) => {
-			dispatch(audioCallActions.setIsDialTone(true));
-
-			onStartCall({ isVideoCall });
-		},
-		[dispatch]
-	);
+	const triggerCall = (isVideoCall = false) => {
+		dispatch(audioCallActions.setIsDialTone(true));
+		onStartCall({ isVideoCall });
+	};
 
 	const onStartCall = async ({ isVideoCall = false }) => {
 		dispatch(DMCallActions.setIsInCall(true));
