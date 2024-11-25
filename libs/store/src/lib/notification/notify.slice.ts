@@ -180,6 +180,10 @@ export const selectAllNotificationMentionAndReply = createSelector(selectAllNoti
 	)
 );
 
+export const selectAllNotificationClan = createSelector(selectAllNotification, (notifications) =>
+	notifications.filter((notification) => notification.code === NotificationCode.NOTIFICATION_CLAN)
+);
+
 export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSeenStamp: number) =>
 	createSelector(selectAllNotificationMentionAndReply, (notifications) => {
 		const result = notifications.filter((notification) => {
