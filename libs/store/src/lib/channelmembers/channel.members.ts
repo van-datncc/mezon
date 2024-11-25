@@ -127,7 +127,7 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 				const state = thunkAPI.getState() as ChannelMemberRootState;
 				const existingMember = state[CHANNEL_MEMBERS_FEATURE_KEY].memberChannels[channelId]?.ids?.findIndex((item) => item === userId);
 				if (!existingMember) {
-					thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
+					thunkAPI.dispatch(channelMembersActions.addNewMember({ channel_id: channelPresence.channel_id, user_ids: [userId] }));
 					thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
 					thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
 				}
@@ -274,18 +274,17 @@ export const channelMembers = createSlice({
 				ids: [...new Set(memberIds)]
 			};
 		},
-		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
+		addNewMember: (state, action: PayloadAction<{ channel_id: string; user_ids: string[] }>) => {
 			const payload = action.payload;
-			const userId = payload.joins[0].user_id;
+			const userIds = payload.user_ids;
 			const channelId = payload.channel_id;
-			state.memberChannels[channelId] = {
-				...channelMembersAdapter.getInitialState(),
-				id: channelId
-			};
+
 			const channelEntity = state.memberChannels[channelId];
-			if (!channelEntity.ids.find((id) => id === userId)) {
-				state.memberChannels[channelId]?.ids?.push(userId);
-			}
+			userIds.forEach((userId) => {
+				if (!channelEntity.ids.includes(userId)) {
+					channelEntity.ids.push(userId);
+				}
+			});
 		},
 		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[]; clanId: string }>) => {
 			const { userId, channelIds, clanId } = action.payload;
