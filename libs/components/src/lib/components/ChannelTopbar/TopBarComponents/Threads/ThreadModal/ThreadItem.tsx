@@ -1,4 +1,4 @@
-import { useAppNavigation, useChannels } from '@mezon/core';
+import { useAppNavigation } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ThreadsEntity,
@@ -7,16 +7,18 @@ import {
 	selectAllChannelMembers,
 	selectChannelById,
 	selectLastMessageIdByChannelId,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	selectMessageEntityById,
+	threadsActions,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useMemo, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../../../../ChannelLink';
 import SettingChannel from '../../../../ChannelSetting';
@@ -30,12 +32,13 @@ type ThreadItemProps = {
 	setIsShowThread: () => void;
 	isPublicThread?: boolean;
 	isHasContext?: boolean;
+	preventClosePannel: MutableRefObject<boolean>;
 };
 
-const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasContext = true }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasContext = true, preventClosePannel }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const threadMembers = useSelector((state) => selectAllChannelMembers(state, thread.channel_id));
 	const channelThread = useAppSelector((state) => selectChannelById(state, thread.id ?? '')) || {};
 
@@ -43,7 +46,9 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 	const message = useAppSelector((state) =>
 		selectMessageEntityById(state, thread.channel_id as string, messageId || thread?.last_sent_message?.id)
 	);
-	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
+	const user = useAppSelector((state) =>
+		selectMemberClanByUserId2(state, (message?.user?.id || thread?.last_sent_message?.sender_id) as string)
+	) as IChannelMember;
 	const { avatarImg, username } = useMessageSender(user);
 	const [openThreadSetting, closeThreadSetting] = useModal(() => {
 		return <SettingChannel onClose={closeThreadSetting} channel={{ ...channelThread, type: ChannelType.CHANNEL_TYPE_THREAD }} />;
@@ -111,6 +116,38 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 		setIsShowPanelChannel((s) => !s);
 	};
 
+	const handleDeleteThread = async () => {
+		await dispatch(channelsActions.deleteChannel({ channelId: channelThread?.channel_id as string, clanId: channelThread?.clan_id as string }));
+		const body = {
+			channelId: channelThread?.parrent_id as string,
+			clanId: channelThread?.clan_id as string,
+			noCache: true
+		};
+		await dispatch(threadsActions.fetchThreads(body));
+		closeConfirmDelete();
+		preventClosePannel.current = false;
+	};
+
+	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={() => {
+					closeConfirmDelete();
+					preventClosePannel.current = false;
+				}}
+				handleConfirm={handleDeleteThread}
+				title="delete"
+				modalName={`${channelThread?.channel_label}`}
+			/>
+		);
+	}, [channelThread?.id]);
+
+	const handleOpenConfirmDelete = useCallback(() => {
+		setIsShowPanelChannel(false);
+		preventClosePannel.current = true;
+		openConfirmDelete();
+	}, []);
+
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
@@ -160,6 +197,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 					panelRef={panelRef}
 					setIsShowPanelChannel={setIsShowPanelChannel}
 					openThreadSetting={openThreadSetting}
+					handleOpenConfirmDelete={handleOpenConfirmDelete}
 				/>
 			)}
 		</div>
@@ -171,34 +209,21 @@ const PannelThreadItem = ({
 	coords,
 	setIsShowPanelChannel,
 	panelRef,
-	openThreadSetting
+	openThreadSetting,
+	handleOpenConfirmDelete
 }: {
 	panelRef: React.MutableRefObject<HTMLDivElement | null>;
 	channelThread: IChannel;
 	coords: Coords;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	openThreadSetting: () => void;
+	handleOpenConfirmDelete: () => void;
 }) => {
-	const { handleConfirmDeleteChannel } = useChannels();
-	const handleDeleteChannel = () => {
-		handleConfirmDeleteChannel(channelThread?.channel_id as string, channelThread?.clan_id as string);
-		closeConfirmDelete();
-	};
-	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
-		return (
-			<ModalConfirm
-				handleCancel={closeConfirmDelete}
-				handleConfirm={handleDeleteChannel}
-				title="delete"
-				modalName={`${channelThread?.channel_label}`}
-			/>
-		);
-	}, [channelThread?.id]);
 	return (
 		<div onClick={(e) => e.stopPropagation()}>
 			<PanelChannel
 				selectedChannel={channelThread?.id}
-				onDeleteChannel={openConfirmDelete}
+				onDeleteChannel={handleOpenConfirmDelete}
 				channel={channelThread as IChannel}
 				coords={coords}
 				openSetting={openThreadSetting}

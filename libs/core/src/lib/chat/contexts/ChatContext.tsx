@@ -63,6 +63,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -933,31 +934,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TODO: AND TYPE IN BE
 		// TYPE = 4: USER CANCEL CALL
 		// TYPE = 0: REMOVE CALL (END CALL)
-		if (event?.data_type === 0 || event?.data_type === 4) {
-			dispatch(DMCallActions.removeAll());
-			if (event?.data_type === 4) {
-				dispatch(DMCallActions.setIsInCall(false));
-				dispatch(
-					toastActions.addToast({
-						// TODO: Change content toast
-						message: 'User busy and unable to answer the call. Please try again later',
-						type: 'warning',
-						autoClose: false
-					})
-				);
-			}
-			return;
+		if (event?.data_type === 4 || event?.data_type === 0) {
+			dispatch(DMCallActions.cancelCall({}));
 		}
 		dispatch(
-			DMCallActions.add({
+			DMCallActions.addOrUpdate({
 				calleeId: event?.receiver_id,
 				signalingData: event,
 				id: event?.caller_id,
 				callerId: event?.caller_id
 			})
 		);
-		dispatch(DMCallActions.setListOfCallsSocket({ userId, event }));
-		dispatch(DMCallActions.setCalleeId(event?.receiver_id));
 	}, []);
 
 	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
