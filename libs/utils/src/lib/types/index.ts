@@ -1185,7 +1185,6 @@ export type IUserItemActivity = {
 };
 
 export type IDmCallInfo = {
-	channel_id?: string;
-	caller_id?: string;
-	callee_id?: string;
+	groupId?: string;
+	isVideo?: boolean;
 };

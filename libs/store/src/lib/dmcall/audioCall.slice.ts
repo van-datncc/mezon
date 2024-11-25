@@ -7,12 +7,14 @@ export interface DmCallState {
 	dmCallInfo: IDmCallInfo | null;
 	isDialTone: boolean;
 	isRingTone: boolean;
+	groupCallId: string;
 }
 
 const initialState: DmCallState = {
 	dmCallInfo: null,
 	isDialTone: false,
-	isRingTone: false
+	isRingTone: false,
+	groupCallId: ''
 };
 
 const audioCallSlice = createSlice({
@@ -27,6 +29,9 @@ const audioCallSlice = createSlice({
 		},
 		setIsRingTone(state, action) {
 			state.isRingTone = action.payload;
+		},
+		setGroupCallId(state, action) {
+			state.groupCallId = action.payload;
 		}
 	}
 });
@@ -39,8 +44,10 @@ export const audioCallActions = {
 
 export const getAudioCallState = (rootState: { [AUDIO_CALL_FEATURE_KEY]: DmCallState }): DmCallState => rootState[AUDIO_CALL_FEATURE_KEY];
 
-export const selectCurrentstartDmCall = createSelector(getAudioCallState, (state) => state.dmCallInfo);
+export const selectCurrentStartDmCall = createSelector(getAudioCallState, (state) => state.dmCallInfo);
 
 export const selectAudioDialTone = createSelector(getAudioCallState, (state) => state.isDialTone);
 
 export const selectAudioRingTone = createSelector(getAudioCallState, (state) => state.isRingTone);
+
+export const selectGroupCallId = createSelector(getAudioCallState, (state) => state.groupCallId);
