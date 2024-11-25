@@ -79,7 +79,8 @@ const persistedReducer = persistReducer(
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage
+		storage,
+		blacklist: ['invitePeople']
 	},
 	clansReducer
 );

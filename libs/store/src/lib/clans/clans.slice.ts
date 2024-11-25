@@ -51,6 +51,7 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	error?: string | null;
 	currentClanId?: string | null;
 	clanMetadata: EntityState<ClanMeta, string>;
+	invitePeople: boolean;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -290,7 +291,8 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
-	clanMetadata: clanMetaAdapter.getInitialState()
+	clanMetadata: clanMetaAdapter.getInitialState(),
+	invitePeople: false
 });
 
 export const clansSlice = createSlice({
@@ -302,6 +304,9 @@ export const clansSlice = createSlice({
 		removeAll: clansAdapter.removeAll,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
+		},
+		toggleInvitePeople: (state, action: PayloadAction<boolean>) => {
+			state.invitePeople = action.payload;
 		},
 		updateBulkClanMetadata: (state, action: PayloadAction<ClanMeta[]>) => {
 			state.clanMetadata = clanMetaAdapter.upsertMany(state.clanMetadata, action.payload);
@@ -466,3 +471,5 @@ export const selectBadgeCountByClanId = (clanId: string) =>
 		const clan = state.entities[clanId];
 		return clan?.badge_count;
 	});
+
+export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
