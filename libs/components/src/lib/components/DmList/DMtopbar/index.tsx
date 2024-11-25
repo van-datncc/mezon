@@ -39,7 +39,7 @@ export type ChannelTopbarProps = {
 };
 
 // Todo: move to utils
-const compress = async (str: string, encoding = 'gzip' as CompressionFormat) => {
+export const compress = async (str: string, encoding = 'gzip' as CompressionFormat) => {
 	const byteArray = new TextEncoder().encode(str);
 	const cs = new CompressionStream(encoding);
 	const writer = cs.writable.getWriter();
@@ -50,7 +50,7 @@ const compress = async (str: string, encoding = 'gzip' as CompressionFormat) => 
 };
 
 // Todo: move to utils
-const decompress = async (compressedStr: string, encoding = 'gzip' as CompressionFormat) => {
+export const decompress = async (compressedStr: string, encoding = 'gzip' as CompressionFormat) => {
 	const binaryString = atob(compressedStr);
 	const byteArray = new Uint8Array(binaryString.length);
 	for (let i = 0; i < binaryString.length; i++) {
@@ -121,9 +121,6 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 								isHiddenAvatarPanel={true}
 							/>
 							<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
-						</div>
-						<div>
-							<PTTButton isLightMode={appearanceTheme === 'light'} channelId={currentDmGroup.channel_id || ''} />
 						</div>
 
 						<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
@@ -443,7 +440,7 @@ function PTTButton({ isLightMode, channelId }: { isLightMode: boolean; channelId
 		<div className="relative leading-5 size-6" ref={threadRef}>
 			<Tooltip content="Start Video Call" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShow} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.JoinPTT isWhite={isShow} />
+					{/* <Icons.JoinPTT isWhite={isShow} /> */}
 				</button>
 			</Tooltip>
 			{isShow && (
