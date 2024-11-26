@@ -13,7 +13,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
@@ -226,27 +226,35 @@ function MessageWithUser({
 
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
+	const [forceRender, setForceRender] = useState(false);
+
+	const triggerReRender = () => {
+		setForceRender((prev) => !prev);
+	};
 	useEffect(() => {
-		if (message.isSending || !message.id || !message.content.lk || message.content.lk.length === 0) return;
+		if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
 		const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
 
-		const updateAttachments = async () => {
-			try {
-				const attachmentUrls = await processLinks({
-					t: message.content.t as string,
-					lk: message.content.lk as IStartEndIndex[]
+		const updateAttachments = () => {
+			processLinks({
+				t: message.content.t as string,
+				lk: message.content.lk as IStartEndIndex[]
+			})
+				.then((attachmentUrls) => {
+					const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
+
+					if (newAttachmentUrls.length > 0) {
+						editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
+						triggerReRender();
+					}
+				})
+				.catch((error) => {
+					console.error('Failed to update message:', error);
 				});
-				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
-				if (newAttachmentUrls.length > 0) {
-					await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachmentUrls, true);
-				}
-			} catch (error) {
-				console.error('Failed to update message:', error);
-			}
 		};
 
 		updateAttachments();
-	}, [message.id]);
+	}, [message.id, forceRender]);
 
 	return (
 		<>
@@ -383,4 +391,4 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	);
 };
 
-export default memo(MessageWithUser);
+export default MessageWithUser;
