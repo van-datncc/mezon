@@ -1,9 +1,10 @@
-import { useAuth, useChatSending } from '@mezon/core';
-import { MessagesEntity, selectChannelById, selectDirectById, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { useAuth, useChatSending, useCurrentInbox } from '@mezon/core';
+import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { processLinks } from '@mezon/transport';
 import {
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
+	IStartEndIndex,
 	TypeMessage,
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_CLAN_SIDE_BAR,
@@ -80,17 +81,9 @@ function MessageWithUser({
 		profileItem: false
 	});
 
-	const selectedChannel = useAppSelector((state) => selectChannelById(state, message.channel_id));
-	const selectedDirect = useAppSelector((state) => selectDirectById(state, message.channel_id));
-	const currentDirectOrChannel = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
-			return selectedChannel;
-		} else {
-			return selectedDirect;
-		}
-	}, [mode, selectedChannel, selectedDirect]);
+	const currentDirectOrChannel = useCurrentInbox();
 
-	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel, mode });
+	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel!, mode });
 
 	// Computed values
 
@@ -233,34 +226,26 @@ function MessageWithUser({
 
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
-
 	useEffect(() => {
-		// eslint-disable-next-line prefer-const
-		let attachmentUrlsExistOnMessage: string[] = [];
-		if (message.attachments && message.attachments.length > 0) {
-			message.attachments.forEach((item) => {
-				if (item.url) attachmentUrlsExistOnMessage.push(item.url);
-			});
-		}
+		if (message.isSending || !message.id || !message.content.lk || message.content.lk.length === 0) return;
+		const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
 
-		if (!message.id) return;
-
-		const intervalId = setInterval(async () => {
-			if (message.content.lk && message.content.lk.length > 0) {
-				try {
-					const attachmentUrls = await processLinks({ t: message?.content.t as string, lk: message?.content.lk });
-					const newAttachmentUrls = attachmentUrls.filter((attachment) => !attachmentUrlsExistOnMessage.includes(attachment.url as string));
-					if (newAttachmentUrls.length > 0) {
-						await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachmentUrls, true);
-					}
-
-					clearInterval(intervalId);
-				} catch (error) {
-					console.error('Failed to update message:', error);
+		const updateAttachments = async () => {
+			try {
+				const attachmentUrls = await processLinks({
+					t: message.content.t as string,
+					lk: message.content.lk as IStartEndIndex[]
+				});
+				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
+				if (newAttachmentUrls.length > 0) {
+					await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachmentUrls, true);
 				}
+			} catch (error) {
+				console.error('Failed to update message:', error);
 			}
-		}, 1000);
-		return () => clearInterval(intervalId);
+		};
+
+		updateAttachments();
 	}, [message.id]);
 
 	return (
