@@ -41,12 +41,12 @@ function GuideBody() {
 					case ETypeMission.VISIT: {
 						const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
 						navigate(linkChannel);
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
 					case ETypeMission.DOSOMETHING: {
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
@@ -197,7 +197,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 					question.answers.map((answer) => (
 						<GuideItemLayout
 							key={answer.title}
-							icon={answer.answer}
+							icon={answer.emoji}
 							description={answer.description}
 							title={answer.title}
 							className="w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"

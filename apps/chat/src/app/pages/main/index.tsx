@@ -1,4 +1,5 @@
 import {
+	DmCalling,
 	FirstJoinPopup,
 	ForwardMessageModal,
 	MessageContextMenuProvider,
@@ -20,6 +21,7 @@ import {
 	fetchDirectMessage,
 	getIsShowPopupForward,
 	listChannelsByUserActions,
+	onboardingActions,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
@@ -30,13 +32,16 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectCurrentStartDmCall,
 	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectGroupCallId,
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
+	selectOnboardingMode,
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
@@ -47,7 +52,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import {
 	IClan,
 	ModeResponsive,
@@ -61,7 +66,7 @@ import {
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
@@ -92,12 +97,32 @@ function MyApp() {
 	const dataCall = useMemo(() => {
 		return signalingData?.[signalingData?.length - 1]?.signalingData;
 	}, [signalingData]);
+
 	const isInCall = useSelector(selectIsInCall);
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
-
+	const groupCallId = useSelector(selectGroupCallId);
 	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
 	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
+
+	const isDmCallInfo = useSelector(selectCurrentStartDmCall);
+	const dmCallingRef = useRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }>(null);
+
+	useEffect(() => {
+		if (isDmCallInfo?.groupId) {
+			dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo);
+		}
+	}, [isDmCallInfo?.groupId, isDmCallInfo?.isVideo]);
+
+	useEffect(() => {
+		if (dataCall?.channel_id) {
+			dispatch(audioCallActions.setGroupCallId(dataCall?.channel_id));
+		}
+	}, [dataCall?.channel_id, dispatch]);
+
+	const triggerCall = (isVideoCall = false) => {
+		dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo, true);
+	};
 
 	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
 		if (audioRef.current) {
@@ -225,11 +250,14 @@ function MyApp() {
 		? { width: `calc(100vw - ${chatStreamWidth}px - 352px)`, right: `${chatStreamWidth + 8}px` }
 		: { width: closeMenu ? undefined : `calc(100vw - 344px)`, right: '0' };
 
+	const previewMode = useSelector(selectOnboardingMode);
+
 	return (
 		<div
 			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
 			onClick={handleClick}
 		>
+			{previewMode && <PreviewOnboardingMode />}
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<SidebarMenu openCreateClanModal={openCreateClanModal} />
 			<MainContent />
@@ -248,9 +276,11 @@ function MyApp() {
 				</div>
 			)}
 
-			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall.channel_id && (
-				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} />
+			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall?.channel_id && (
+				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
 			)}
+
+			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
 
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
@@ -428,3 +458,21 @@ const SidebarMenu = memo(
 	},
 	() => true
 );
+
+const PreviewOnboardingMode = () => {
+	const dispatch = useDispatch();
+	const handleClosePreview = () => {
+		dispatch(onboardingActions.closeOnboardingPreviewMode());
+	};
+	return (
+		<div className="fixed z-50 top-0 left-0 w-screen  bg-black flex px-4 py-2 h-12 items-center justify-center ">
+			<div className="absolute cursor-pointer hover:bg-slate-950 left-6 px-2 flex gap-1 border-2 py-1 items-center justify-center  border-white rounded bg-transparent">
+				<Icons.LeftArrowIcon className="fill-white text-white" />
+				<p className="text-white text-xs font-medium" onClick={handleClosePreview}>
+					Close preview mode
+				</p>
+			</div>
+			<div className="text-base text-white font-semibold">You are viewing the clan as a new member. You have no roles.</div>
+		</div>
+	);
+};

@@ -60,8 +60,8 @@ interface IMainIndexProps {
 
 const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
 	const dispatch = useAppDispatch();
-	const openOnboardingMode = () => {
-		dispatch(onboardingActions.openOnboardingMode());
+	const openOnboardingPreviewMode = () => {
+		dispatch(onboardingActions.openOnboardingPreviewMode());
 		if (onCloseSetting) {
 			onCloseSetting();
 		}
@@ -97,7 +97,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				<div className="flex gap-2 items-center">
 					<div className="cursor-pointer text-blue-500 hover:underline">See examples</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />
-					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingMode}>
+					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingPreviewMode}>
 						Preview
 					</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />

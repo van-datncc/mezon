@@ -23,9 +23,9 @@ export const SelectOptions: React.FC<SelectOptionsProps> = ({ options, onSelectO
 					onClick={() => {
 						onSelectOption(option);
 					}}
-					className="flex w-[400px] flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
+					className="flex w-[400px] flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm hover:bg-bgIconDark dark:hover:bg-bgModifierHover text-sm w-full py-2 px-4 text-left cursor-pointer"
 				>
-					<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">{option.label}</p>
+					<p className="dark:text-textSecondary text-textSecondary800">{option.label}</p>
 				</Dropdown.Item>
 			))}
 		</>
