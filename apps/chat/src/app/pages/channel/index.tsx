@@ -34,6 +34,7 @@ import {
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
+	selectOnboardingMode,
 	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
@@ -135,6 +136,14 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		};
 	}, [canSendMessage]);
 
+	const previewMode = useSelector(selectOnboardingMode);
+	const showPreviewMode = useMemo(() => {
+		if (previewMode) {
+			return true;
+		}
+		return (selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding;
+	}, [selectUserProcessing?.onboarding_step, currentClan?.is_onboarding, previewMode]);
+
 	if (!canSendMessageDelayed) {
 		return (
 			<div
@@ -148,9 +157,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{(selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding && (
-				<OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />
-			)}
+			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
 			{currentChannel ? (
 				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
 			) : (
@@ -324,12 +331,12 @@ const OnboardingGuide = ({
 				case ETypeMission.VISIT: {
 					const linkChannel = toChannelPage(currentMission.channel_id as string, currentMission.clan_id as string);
 					navigate(linkChannel);
-					dispatch(onboardingActions.doneMission());
+					dispatch(onboardingActions.doneMission({ clan_id: currentMission.clan_id as string }));
 					doneAllMission();
 					break;
 				}
 				case ETypeMission.DOSOMETHING: {
-					dispatch(onboardingActions.doneMission());
+					dispatch(onboardingActions.doneMission({ clan_id: currentMission.clan_id as string }));
 					doneAllMission();
 					break;
 				}

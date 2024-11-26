@@ -1,4 +1,14 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
+import {
+	ChannelDescription,
+	ChannelMessage,
+	ChannelType,
+	HashtagDm,
+	JoinPTTChannel,
+	Notification,
+	NotificationType,
+	TalkPTTChannel,
+	WebrtcSignalingFwd
+} from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -350,6 +360,14 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+};
+
+export type IJoinPtt = {
+	joinPttData: JoinPTTChannel;
+};
+
+export type ITalkPtt = {
+	talkPttData: TalkPTTChannel;
 };
 
 export interface CategoryNameProps {
@@ -1167,8 +1185,24 @@ export type IUserItemActivity = {
 	user?: IUserProfileActivity;
 };
 
+export type UserStatus = {
+	user_id: string;
+	status: string;
+};
+
+export type UserStatusUpdate = {
+	status: string;
+	minutes?: number;
+	until_turn_on: boolean;
+};
+
+export enum EUserStatus {
+	ONLINE = 'Online',
+	IDLE = 'Idle',
+	DO_NOT_DISTURB = 'Do Not Disturb',
+	INVISIBLE = 'Invisible'
+}
 export type IDmCallInfo = {
-	channel_id?: string;
-	caller_id?: string;
-	callee_id?: string;
+	groupId?: string;
+	isVideo?: boolean;
 };

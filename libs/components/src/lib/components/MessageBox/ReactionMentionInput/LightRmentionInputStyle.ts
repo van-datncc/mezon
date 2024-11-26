@@ -14,7 +14,8 @@ export default {
 		},
 		highlighter: {
 			padding: 9,
-			border: '1px solid transparent'
+			border: '1px solid transparent',
+			maxHeight: '350px'
 		},
 		input: {
 			padding: '9px 100px 9px 10px',
