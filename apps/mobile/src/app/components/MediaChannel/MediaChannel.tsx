@@ -46,7 +46,7 @@ const MediaChannel = memo(() => {
 					data={attachments}
 					style={{ width: widthScreen }}
 					numColumns={3}
-					keyExtractor={(item, index) => `${item}_${index}_item_media_channel`}
+					keyExtractor={(item, index) => `${index}_item_media_channel`}
 					renderItem={renderItem}
 					contentContainerStyle={styles.contentContainer}
 					removeClippedSubviews={true}
