@@ -171,7 +171,10 @@ export const selectIsShowInbox = createSelector(getNotificationState, (state: No
 /////////////// New update ///////////////
 export const selectAllNotificationExcludeMentionAndReply = createSelector(selectAllNotification, (notifications) =>
 	notifications.filter(
-		(notification) => notification.code !== NotificationCode.USER_REPLIED && notification.code !== NotificationCode.USER_MENTIONED
+		(notification) =>
+			notification.code !== NotificationCode.USER_REPLIED &&
+			notification.code !== NotificationCode.USER_MENTIONED &&
+			notification.code !== NotificationCode.NOTIFICATION_CLAN
 	)
 );
 export const selectAllNotificationMentionAndReply = createSelector(selectAllNotification, (notifications) =>

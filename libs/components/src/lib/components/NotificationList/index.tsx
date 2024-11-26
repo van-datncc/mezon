@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
+import NotificationWebhookClan from './NotificationWebhookClan';
 
 export type MemberListProps = { className?: string };
 
@@ -45,8 +46,8 @@ type ListCreatimeMessage = {
 function NotificationList({ rootRef }: NotificationProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
-	const allNotificationClan = useSelector(selectAllNotificationClan);
 	const dispatch = useAppDispatch();
+	const allNotificationClan = useSelector(selectAllNotificationClan);
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.MENTIONS);
 	const handleChangeTab = (valueTab: string) => {
@@ -156,9 +157,15 @@ function NotificationList({ rootRef }: NotificationProps) {
 					{currentTabNotify === InboxType.MESSAGES && (
 						<div>
 							{getAllNotificationClan.length > 0 ? (
-								<NotificationChannel isUnreadTab={true} unreadListConverted={getAllNotificationClan} />
+								getAllNotificationClan.map((notification: INotification, index: number) => (
+									<NotificationWebhookClan
+										key={`message-${notification?.id}-${index}`}
+										isUnreadTab={true}
+										notification={notification}
+									/>
+								))
 							) : (
-								<EmptyNotification isEmptyUnread />
+								<EmptyNotification isEmptyMessages />
 							)}
 						</div>
 					)}
