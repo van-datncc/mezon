@@ -114,7 +114,8 @@ const CallingModal = () => {
 				receiverId: signalingData?.[signalingData?.length - 1]?.callerId,
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-expect-error
-				receiverAvatar: callerInfo?.user?.avatar_url || ''
+				receiverAvatar: callerInfo?.user?.avatar_url || '',
+				isAnswerCall: true
 			}
 		});
 	};

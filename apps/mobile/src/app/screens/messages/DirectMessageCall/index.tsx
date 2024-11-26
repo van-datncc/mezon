@@ -24,6 +24,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const receiverId = route.params?.receiverId;
 	const receiverAvatar = route.params?.receiverAvatar;
 	const isVideoCall = route.params?.isVideoCall;
+	const isAnswerCall = route.params?.isAnswerCall;
 	const userProfile = useSelector(selectAllAccount);
 	const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
@@ -46,14 +47,14 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
 		const timer = setTimeout(() => {
-			startCall(isVideoCall);
+			startCall(isVideoCall, isAnswerCall);
 		}, 2000);
 
 		return () => {
 			clearTimeout(timer);
 			InCallManager.stop();
 		};
-	}, [isVideoCall]);
+	}, [isAnswerCall, isVideoCall]);
 
 	const toggleControl = async () => {
 		setIsShowControl(!isShowControl);

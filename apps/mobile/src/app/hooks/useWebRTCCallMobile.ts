@@ -117,7 +117,7 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		}
 	}, [callState.localStream, localMediaControl?.camera]);
 
-	const startCall = async (isVideoCall: boolean) => {
+	const startCall = async (isVideoCall: boolean, isAnswerCall = false) => {
 		try {
 			InCallManager.start({ media: 'audio' });
 			playDialTone();
@@ -173,6 +173,9 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			});
 			// Send offer through signaling server
 			const compressedOffer = await compress(JSON.stringify(offer));
+			if (!isAnswerCall) {
+				await mezon.socketRef.current?.makeCallPush(dmUserId, '', channelId, userId);
+			}
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 		} catch (error) {
 			console.error('Error starting call:', error);
