@@ -1,5 +1,6 @@
-import { useAuth } from '@mezon/core';
-import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { useAuth, useChatSending } from '@mezon/core';
+import { MessagesEntity, selectChannelById, selectDirectById, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { processLinks } from '@mezon/transport';
 import {
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
@@ -11,7 +12,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
@@ -78,6 +79,18 @@ function MessageWithUser({
 	const modalState = useRef({
 		profileItem: false
 	});
+
+	const selectedChannel = useAppSelector((state) => selectChannelById(state, message.channel_id));
+	const selectedDirect = useAppSelector((state) => selectDirectById(state, message.channel_id));
+	const currentDirectOrChannel = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
+			return selectedChannel;
+		} else {
+			return selectedDirect;
+		}
+	}, [mode, selectedChannel, selectedDirect]);
+
+	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel, mode });
 
 	// Computed values
 
@@ -218,7 +231,24 @@ function MessageWithUser({
 		);
 	}, [message, avatar]);
 
-	const isMessageSystem = message.code == TypeMessage.Welcome || message.code == TypeMessage.CreateThread || message.code == TypeMessage.CreatePin;
+	const isMessageSystem =
+		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
+
+	useEffect(() => {
+		const intervalId = setInterval(async () => {
+			if (message.content.lk && message.content.lk.length > 0) {
+				try {
+					const attachments = await processLinks({ t: message?.content.t as string, lk: message?.content.lk });
+					await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachments, true);
+
+					clearInterval(intervalId);
+				} catch (error) {
+					console.error('Failed to update message:', error);
+				}
+			}
+		}, 1000);
+		return () => clearInterval(intervalId);
+	}, [message.id]);
 
 	return (
 		<>
