@@ -54,13 +54,12 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		peerConnection: null,
 		storedIceCandidates: null
 	});
-	const { cameraPermissionGranted, microphonePermissionGranted, requestMicrophonePermission, requestCameraPermission } =
-		usePermission();
+	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
-		mic: true,
+		mic: false,
 		camera: !!isVideoCall,
 		speaker: false
 	});
@@ -122,23 +121,38 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		try {
 			InCallManager.start({ media: 'audio' });
 			playDialTone();
-			if (!microphonePermissionGranted) {
+			const haveMicrophonePermission = await requestMicrophonePermission();
+			if (!haveMicrophonePermission) {
+				Toast.show({
+					type: 'error',
+					text1: 'Micro is not available'
+				});
+				navigation.goBack();
+				return;
+			} else {
 				setLocalMediaControl((prev) => ({
 					...prev,
-					mic: false
+					mic: true
 				}));
-				requestMicrophonePermission();
 			}
-			if (!cameraPermissionGranted && isVideoCall) {
-				requestCameraPermission();
-				setLocalMediaControl((prev) => ({
-					...prev,
-					camera: false
-				}));
+			let haveCameraPermission;
+			if (isVideoCall) {
+				haveCameraPermission = await requestCameraPermission();
+				if (!haveCameraPermission) {
+					Toast.show({
+						type: 'error',
+						text1: 'Camera is not available'
+					});
+				} else {
+					setLocalMediaControl((prev) => ({
+						...prev,
+						camera: true
+					}));
+				}
 			}
 			const stream = await mediaDevices.getUserMedia({
 				audio: true,
-				video: isVideoCall && cameraPermissionGranted
+				video: isVideoCall && haveCameraPermission
 			});
 
 			const pc = initializePeerConnection();
@@ -236,7 +250,6 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		}
 	};
 
-	// End call and cleanup
 	const handleEndCall = async () => {
 		try {
 			if (callState.localStream) {
@@ -262,6 +275,7 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 				callState.peerConnection.close();
 			}
 			stopDialTone();
+			playEndCall();
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
@@ -276,11 +290,12 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			console.error('Error ending call:', error);
 		}
 	};
-	// Toggle audio/video
+
 	const toggleAudio = async () => {
 		if (callState.localStream) {
+			const haveMicrophonePermission = await requestMicrophonePermission();
 			// check if permission is granted, if not call request permission
-			if (microphonePermissionGranted) {
+			if (haveMicrophonePermission) {
 				const audioTracks = callState.localStream.getAudioTracks();
 				if (audioTracks.length === 0) {
 					try {
@@ -321,15 +336,14 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 					type: 'error',
 					text1: 'Micro is not available'
 				});
-				requestMicrophonePermission();
 			}
 		}
 	};
 
 	const toggleVideo = async () => {
 		if (callState.localStream) {
-			if (!cameraPermissionGranted && !localMediaControl.camera) {
-				requestCameraPermission();
+			const haveCameraPermission = await requestCameraPermission();
+			if (!haveCameraPermission) {
 				Toast.show({
 					type: 'error',
 					text1: 'Camera is not available'
@@ -388,6 +402,21 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			});
 			sound.setNumberOfLoops(-1);
 			dialToneRef.current = sound;
+		});
+	};
+
+	const playEndCall = () => {
+		Sound.setCategory('Playback');
+		const sound = new Sound('endcall.mp3', Sound.MAIN_BUNDLE, (error) => {
+			if (error) {
+				console.error('failed to load the sound', error);
+				return;
+			}
+			sound.play((success) => {
+				if (!success) {
+					console.error('Sound playback failed');
+				}
+			});
 		});
 	};
 
