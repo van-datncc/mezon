@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
+import {app, BrowserWindow, ipcMain, ipcRenderer, Menu, MenuItemConstructorOptions, screen, shell} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -11,6 +11,8 @@ import setupAutoUpdates from './autoUpdates';
 import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
+import {ImageWindowProps} from "../main";
+
 
 const isQuitting = false;
 
@@ -234,6 +236,44 @@ export default class App {
 		App.application.on('window-all-closed', App.onWindowAllClosed);
 		App.application.on('ready', App.onReady);
 		App.application.on('activate', App.onActivate);
+	}
+	
+	static openNewWindow(
+		props: ImageWindowProps,
+		options?: Electron.BrowserWindowConstructorOptions,
+		params?: Record<string, string>,
+	) {
+		const defaultOptions: Electron.BrowserWindowConstructorOptions= {
+			width: 800,
+			height: 600,
+			show: true,
+			webPreferences: {
+				nodeIntegration: false,
+				contextIsolation: true,
+				preload: join(__dirname, 'main.preload.js'),
+			},
+		};
+		
+		const windowOptions = { ...defaultOptions, ...options };
+		
+		const newWindow = new BrowserWindow(windowOptions);
+		
+		const baseUrl = `http://localhost:${rendererAppPort}`;
+		const fullUrl = this.generateFullUrl(baseUrl, params);
+		newWindow.loadURL(fullUrl);
+		
+		newWindow.webContents.openDevTools();
+		
+		newWindow.webContents.on('did-start-loading', () => {
+			console.log ('start loading');
+			
+		})
+		
+		newWindow.webContents.on('did-finish-load', () => {
+			console.log ('newWindow receive data', props)
+			
+			newWindow.webContents.send('set-attachment-data', props);
+		});
 	}
 
 	/**

@@ -1,6 +1,6 @@
 import {
 	ChannelDescription,
-	ChannelMessage,
+	ChannelMessage, ChannelStreamMode,
 	ChannelType,
 	HashtagDm,
 	JoinPTTChannel,
@@ -1189,3 +1189,14 @@ export type IDmCallInfo = {
 	caller_id?: string;
 	callee_id?: string;
 };
+
+export type ImageWindowProps = {
+	attachmentData: ApiMessageAttachment & { create_time?: string },
+	messageId: string,
+	mode: ChannelStreamMode,
+	attachmentUrl: string,
+	currentClanId: string,
+	currentChannelId: string,
+	currentDmId: string,
+	checkListAttachment: boolean,
+}
