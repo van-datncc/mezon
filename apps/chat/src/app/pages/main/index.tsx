@@ -26,6 +26,7 @@ import {
 	selectAllClans,
 	selectAllRoleIds,
 	selectAudioDialTone,
+	selectAudioEndTone,
 	selectAudioRingTone,
 	selectChatStreamWidth,
 	selectClanView,
@@ -101,9 +102,11 @@ function MyApp() {
 	const isInCall = useSelector(selectIsInCall);
 	const isPlayDialTone = useSelector(selectAudioDialTone);
 	const isPlayRingTone = useSelector(selectAudioRingTone);
+	const isPlayEndTone = useSelector(selectAudioEndTone);
 	const groupCallId = useSelector(selectGroupCallId);
 	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
 	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
+	const endTone = useRef(new Audio('assets/audio/endcall.mp3'));
 
 	const isDmCallInfo = useSelector(selectCurrentStartDmCall);
 	const dmCallingRef = useRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }>(null);
@@ -148,6 +151,7 @@ function MyApp() {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				if (!isPlayDialTone && !isInCall) {
 					dispatch(audioCallActions.setIsRingTone(true));
+					dispatch(audioCallActions.setIsEndTone(false));
 				} else {
 					dispatch(audioCallActions.setIsDialTone(false));
 				}
@@ -183,6 +187,14 @@ function MyApp() {
 			stopAudio(ringTone);
 		}
 	}, [isPlayRingTone]);
+
+	useEffect(() => {
+		if (isPlayEndTone) {
+			endTone.current.play().catch((error) => console.error('Audio playback error:', error));
+		} else {
+			endTone.current.pause();
+		}
+	}, [isPlayEndTone]);
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {

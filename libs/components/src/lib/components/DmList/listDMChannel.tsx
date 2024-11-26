@@ -4,6 +4,7 @@ import {
 	selectCloseMenu,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
+	selectIsInCall,
 	selectStatusStream,
 	selectTheme,
 	useAppDispatch
@@ -30,16 +31,18 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const appearanceTheme = useSelector(selectTheme);
 	const streamPlay = useSelector(selectStatusStream);
+	const isInCall = useSelector(selectIsInCall);
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 
 	const calculateHeight = useCallback(() => {
 		const baseHeight = window.innerHeight - heightAroundComponent;
 		const streamAdjustment = streamPlay ? 56 : 0;
+		const callAdjustment = isInCall ? 56 : 0;
 		const electronAdjustment = IsElectronDownloading || isElectronUpdateAvailable ? heightAppUpdate : 0;
 
-		return baseHeight - streamAdjustment - titleBarHeight - electronAdjustment;
-	}, [IsElectronDownloading, isElectronUpdateAvailable, streamPlay]);
+		return baseHeight - streamAdjustment - callAdjustment - titleBarHeight - electronAdjustment;
+	}, [IsElectronDownloading, isElectronUpdateAvailable, streamPlay, isInCall]);
 
 	const [height, setHeight] = useState(calculateHeight());
 
