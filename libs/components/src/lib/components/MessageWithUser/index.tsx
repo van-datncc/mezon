@@ -235,11 +235,24 @@ function MessageWithUser({
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
 
 	useEffect(() => {
+		// eslint-disable-next-line prefer-const
+		let attachmentUrlsExistOnMessage: string[] = [];
+		if (message.attachments && message.attachments.length > 0) {
+			message.attachments.forEach((item) => {
+				if (item.url) attachmentUrlsExistOnMessage.push(item.url);
+			});
+		}
+
+		if (!message.id) return;
+
 		const intervalId = setInterval(async () => {
 			if (message.content.lk && message.content.lk.length > 0) {
 				try {
-					const attachments = await processLinks({ t: message?.content.t as string, lk: message?.content.lk });
-					await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachments, true);
+					const attachmentUrls = await processLinks({ t: message?.content.t as string, lk: message?.content.lk });
+					const newAttachmentUrls = attachmentUrls.filter((attachment) => !attachmentUrlsExistOnMessage.includes(attachment.url as string));
+					if (newAttachmentUrls.length > 0) {
+						await editSendMessage(message.content, message.id ?? '', message.mentions || [], attachmentUrls, true);
+					}
 
 					clearInterval(intervalId);
 				} catch (error) {
