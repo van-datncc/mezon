@@ -46,14 +46,9 @@ const MediaChannel = memo(() => {
 					data={attachments}
 					style={{ width: widthScreen }}
 					numColumns={3}
-					keyExtractor={(item, index) => `${index}_item_media_channel`}
+					keyExtractor={(item, index) => `${item}_${index}_item_media_channel`}
 					renderItem={renderItem}
-					contentContainerStyle={{
-						paddingBottom: size.s_50,
-						justifyContent: 'center',
-						alignItems: 'center',
-						flexGrow: 1
-					}}
+					contentContainerStyle={styles.contentContainer}
 					removeClippedSubviews={true}
 					showsVerticalScrollIndicator={true}
 					initialNumToRender={10}
