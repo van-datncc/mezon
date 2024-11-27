@@ -5,7 +5,7 @@ import { ChannelMessage } from 'mezon-js';
 import { ApiMessageMention, ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
-import { mapMessageChannelToEntity, messagesActions } from '../messages/messages.slice';
+import { mapMessageChannelToEntityAction, messagesActions } from '../messages/messages.slice';
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
 
@@ -111,7 +111,7 @@ export const setChannelPinMessage = createAsyncThunk(
 				sender_id: '0',
 				username: 'System'
 			};
-			const mess = mapMessageChannelToEntity(messageSystem);
+			const mess = await thunkAPI.dispatch(mapMessageChannelToEntityAction({ message: messageSystem, isSystem: true })).unwrap();
 			mess.isMe = true;
 			mess.hide_editted = true;
 			thunkAPI.dispatch(messagesActions.addNewMessage(mess));

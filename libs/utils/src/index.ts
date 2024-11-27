@@ -3,6 +3,7 @@ export * from './lib/bridge';
 export * from './lib/constant';
 export * from './lib/contextmenu';
 export * from './lib/dom';
+export * from './lib/e2ee';
 export * from './lib/errors';
 export * from './lib/hooks';
 export * from './lib/types';

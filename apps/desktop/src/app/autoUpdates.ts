@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import type { UpdateInfo } from 'electron-updater';
 import { autoUpdater, DOWNLOAD_PROGRESS } from 'electron-updater';
 
@@ -45,14 +45,6 @@ export default function setupAutoUpdates() {
 		BrowserWindow.getAllWindows().forEach((window) => {
 			window.webContents.send(DOWNLOAD_PROGRESS, progressObj);
 		});
-	});
-
-	autoUpdater.on('update-not-available', (info: UpdateInfo) => {
-		new Notification({
-			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
-			title: 'No update',
-			body: `The current version (${info.version}) is the latest.`
-		}).show();
 	});
 }
 
