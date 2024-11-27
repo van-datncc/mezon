@@ -5,13 +5,19 @@ import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 // Configuration constants
+// const STUN_SERVERS = [
+// 	{ urls: 'stun:stun.l.google.com:19302' },
+// 	{ urls: 'stun:stun1.l.google.com:19302' },
+// 	{ urls: 'stun:stun2.l.google.com:19302' },
+// 	{ urls: 'stun:stun1.3.google.com:19302' }
+// ];
 const STUN_SERVERS = [
-	{ urls: 'stun:stun.l.google.com:19302' },
-	{ urls: 'stun:stun1.l.google.com:19302' },
-	{ urls: 'stun:stun2.l.google.com:19302' },
-	{ urls: 'stun:stun1.3.google.com:19302' }
+	{
+		urls: process.env.NX_WEBRTC_ICESERVERS_URL as string,
+		username: process.env.NX_WEBRTC_ICESERVERS_USERNAME,
+		credential: process.env.NX_WEBRTC_ICESERVERS_CREDENTIAL
+	}
 ];
-// const STUN_SERVERS = [{ urls: 'stun:stun.l.google.com:19305' }];
 
 const RTCConfig = {
 	iceServers: STUN_SERVERS,
@@ -105,6 +111,24 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			if (pc.iceConnectionState === 'disconnected') {
 				dispatch(toastActions.addToast({ message: 'Connection disconnected', type: 'warning', autoClose: 3000 }));
 				handleEndCall();
+			}
+		};
+
+		pc.onnegotiationneeded = async () => {
+			try {
+				const offer = await pc.createOffer();
+				await pc.setLocalDescription(offer);
+
+				const compressedOffer = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
+			} catch (error) {
+				console.error('Error during negotiation:', error);
 			}
 		};
 
@@ -220,7 +244,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE: {
 					const candidate = JSON.parse(signalingData?.json_data || '{}');
 					if (candidate) {
-						if (callState.peerConnection.remoteDescription) {
+						if (callState.peerConnection?.remoteDescription?.type) {
 							await callState.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
 						} else {
 							console.warn('Remote description not set yet, storing candidate');
@@ -260,6 +284,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.setIsInCall(false));
+			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(audioCallActions.setIsRingTone(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
 			dispatch(DMCallActions.removeAll());

@@ -82,6 +82,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const triggerCall = (isVideoCall = false, isAnswer = false) => {
 		if (!isAnswer) {
 			dispatch(audioCallActions.setIsDialTone(true));
+			dispatch(audioCallActions.setIsEndTone(false));
 		}
 		onStartCall({ isVideoCall });
 	};
