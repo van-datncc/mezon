@@ -40,7 +40,13 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const servers: RTCConfiguration = useMemo(
 		() => ({
-			iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+			iceServers: [
+				{
+					urls: process.env.NX_WEBRTC_ICESERVERS_URL as string,
+					username: process.env.NX_WEBRTC_ICESERVERS_USERNAME,
+					credential: process.env.NX_WEBRTC_ICESERVERS_CREDENTIAL
+				}
+			]
 		}),
 		[]
 	);

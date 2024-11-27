@@ -1,8 +1,9 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useAuth, useMenu } from '@mezon/core';
+import { useAppParams, useAuth, useChatSending, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
+	RootState,
 	appActions,
 	audioCallActions,
 	selectCloseMenu,
@@ -20,9 +21,10 @@ import {
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useMezon } from '@mezon/transport';
-import { isMacDesktop } from '@mezon/utils';
+import { IMessageSendPayload, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -75,7 +77,26 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
-	// const dmCallingRef = useRef<{ triggerCall: (isVideoCall?: boolean) => void }>(null);
+	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
+	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const { userProfile } = useAuth();
+
+	const handleSend = useCallback(
+		(
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>
+		) => {
+			if (sessionUser) {
+				sendMessage(content, mentions, attachments, references);
+			} else {
+				console.error('Session is not available');
+			}
+		},
+		[sendMessage, sessionUser]
+	);
 
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
@@ -92,6 +113,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	);
 
 	const handleStartCall = (isVideoCall = false) => {
+		handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
 		dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
 		dispatch(audioCallActions.setGroupCallId(dmGroupId));
 	};

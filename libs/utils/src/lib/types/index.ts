@@ -1202,7 +1202,13 @@ export enum EUserStatus {
 	DO_NOT_DISTURB = 'Do Not Disturb',
 	INVISIBLE = 'Invisible'
 }
+
 export type IDmCallInfo = {
 	groupId?: string;
 	isVideo?: boolean;
 };
+
+export enum ESummaryInfo {
+	CALL = 'Call',
+	STREAM = 'Stream'
+}

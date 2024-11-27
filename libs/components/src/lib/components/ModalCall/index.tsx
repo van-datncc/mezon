@@ -24,6 +24,7 @@ const ModalCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
 	const handleCloseCall = async () => {
 		await mezon.socketRef.current?.forwardWebrtcSignaling(dataCall?.caller_id, 4, '', dataCall.channel_id ?? '', userId ?? '');
 		dispatch(DMCallActions.setIsInCall(false));
+		dispatch(audioCallActions.setIsEndTone(true));
 		dispatch(audioCallActions.setIsRingTone(false));
 		dispatch(DMCallActions.removeAll());
 	};
