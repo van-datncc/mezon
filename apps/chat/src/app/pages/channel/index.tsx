@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
+import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
 import {
 	useAppNavigation,
 	useAuth,
@@ -15,6 +15,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	directMetaActions,
 	gifsStickerEmojiActions,
 	listChannelsByUserActions,
 	onboardingActions,
@@ -35,6 +36,7 @@ import {
 	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
+	selectPreviousChannels,
 	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
@@ -43,7 +45,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons, Loading } from '@mezon/ui';
-import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop, titleMission } from '@mezon/utils';
+import {
+	DONE_ONBOARDING_STATUS,
+	EOverriddenPermission,
+	SubPanelName,
+	TIME_OFFSET,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	titleMission
+} from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -59,7 +69,7 @@ function useChannelSeen(channelId: string) {
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
-
+	const previousChannels = useSelector(selectPreviousChannels);
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
@@ -75,6 +85,13 @@ function useChannelSeen(channelId: string) {
 		markAsReadSeen(lastMessage, mode);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
+		if (previousChannels.at(1)) {
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+		}
+	}, [previousChannels]);
+	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
 			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
@@ -82,7 +99,6 @@ function useChannelSeen(channelId: string) {
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
@@ -141,7 +157,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		if (previewMode) {
 			return true;
 		}
-		return (selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding;
+		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && currentClan?.is_onboarding;
 	}, [selectUserProcessing?.onboarding_step, currentClan?.is_onboarding, previewMode]);
 
 	if (!canSendMessageDelayed) {
@@ -184,6 +200,11 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
+	const [isShowAgeRestricted, setIsShowAgeRestricted] = useState(false);
+
+	const closeAgeRestricted = () => {
+		setIsShowAgeRestricted(false);
+	};
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id));
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
@@ -221,6 +242,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel?.url]);
 
+	useEffect(() => {
+		const savedChannelIds = JSON.parse(localStorage.getItem('agerestrictedchannelIds') || '[]');
+		if (!savedChannelIds.includes(currentChannel.channel_id) && currentChannel.age_restricted === 1) {
+			setIsShowAgeRestricted(true);
+		} else {
+			setIsShowAgeRestricted(false);
+		}
+	}, [currentChannel]);
+
 	return currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
 		appChannel?.url ? (
 			<iframe title={appChannel?.url} src={appChannel?.url} className={'w-full h-full'}></iframe>
@@ -231,7 +261,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		)
 	) : (
 		<>
-			{!isShowCanvas && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			{!isShowCanvas && !isShowAgeRestricted && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
@@ -241,7 +271,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
 				>
-					{!isShowCanvas && (
+					{!isShowCanvas && !isShowAgeRestricted && (
 						<div
 							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
 						>
@@ -254,11 +284,19 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<ChannelMainContentText channelId={currentChannel?.channel_id as string} />
 						</div>
 					)}
-					{isShowCanvas && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+					{isShowCanvas && !isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 						<div
 							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 						>
 							<Canvas />
+						</div>
+					)}
+
+					{!isShowCanvas && isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+						<div
+							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
+							<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
 						</div>
 					)}
 					{isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (

@@ -16,6 +16,7 @@ export type directMessageValueProps = {
 	type?: number;
 	userId: string[];
 	dmID: string;
+	e2ee?: number;
 };
 
 function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFriends, isActive }: DirectMessProp) {
@@ -37,7 +38,8 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const directMessageValue: directMessageValueProps = {
 		type: directMessage.type,
 		userId: directMessage.user_id ?? [],
-		dmID: directMessage.id
+		dmID: directMessage.id,
+		e2ee: directMessage.e2ee
 	};
 
 	const isTypeDMGroup = Number(directMessage.type) === ChannelType.CHANNEL_TYPE_GROUP;
