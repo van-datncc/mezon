@@ -208,20 +208,21 @@ export async function handleUrlInput(url: string): Promise<ApiMessageAttachment>
 
 		const contentSize = response.headers.get('Content-Length');
 		const contentType = response.headers.get('Content-Type');
-		if (!contentType) {
-			throw new Error('Content type not found.');
+
+		if (!contentType || !contentType.startsWith('image/')) {
+			throw new Error('URL is not an image.');
 		}
 
 		return {
-			filename: `${Date.now()}_${contentType}`,
+			filename: `${Date.now()}_${contentType.replace('image/', '')}`,
 			url,
 			filetype: contentType,
 			size: Number(contentSize) || 0,
 			width: 0,
 			height: 0
 		};
-	} catch {
-		throw new Error('Failed to fetch URL.');
+	} catch (error) {
+		throw new Error(error instanceof Error ? error.message : 'Failed to fetch URL.');
 	}
 }
 
