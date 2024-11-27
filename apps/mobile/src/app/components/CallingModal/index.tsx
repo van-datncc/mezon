@@ -67,7 +67,7 @@ const CallingModal = () => {
 
 	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && latestSignalingEntry) {
+		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 
@@ -114,7 +114,8 @@ const CallingModal = () => {
 				receiverId: signalingData?.[signalingData?.length - 1]?.callerId,
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-expect-error
-				receiverAvatar: callerInfo?.user?.avatar_url || ''
+				receiverAvatar: callerInfo?.user?.avatar_url || '',
+				isAnswerCall: true
 			}
 		});
 	};

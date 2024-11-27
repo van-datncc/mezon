@@ -18,7 +18,7 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -199,6 +199,10 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
 		}, []);
 
+		const isAgeRestrictedChannel = useMemo(() => {
+			return channel?.age_restricted === 1;
+		}, [channel?.age_restricted]);
+
 		return (
 			<div
 				onContextMenu={handleMouseClick}
@@ -239,13 +243,16 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
-								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-									<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+								{channel.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel && (
+									<Icons.HashtagWarning className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
 								)}
+								{isPrivate === ChannelStatusEnum.isPrivate &&
+									channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
+									!isAgeRestrictedChannel && <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
-								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && !isAgeRestrictedChannel && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
