@@ -290,6 +290,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
+					if (mess.isMe) {
+						dispatch(channelsActions.updateChannelBadgeCount({ channelId: message.channel_id, count: 0, isReset: true }));
+					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));

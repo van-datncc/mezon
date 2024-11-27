@@ -15,6 +15,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	directMetaActions,
 	gifsStickerEmojiActions,
 	listChannelsByUserActions,
 	onboardingActions,
@@ -35,6 +36,7 @@ import {
 	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
+	selectPreviousChannels,
 	selectProcessingByClan,
 	selectStatusMenu,
 	selectTheme,
@@ -67,7 +69,7 @@ function useChannelSeen(channelId: string) {
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
-
+	const previousChannels = useSelector(selectPreviousChannels);
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
@@ -83,6 +85,13 @@ function useChannelSeen(channelId: string) {
 		markAsReadSeen(lastMessage, mode);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
+		if (previousChannels.at(1)) {
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+		}
+	}, [previousChannels]);
+	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
 			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
@@ -90,7 +99,6 @@ function useChannelSeen(channelId: string) {
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
