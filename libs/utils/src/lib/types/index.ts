@@ -232,6 +232,7 @@ export interface IEmbedProps {
 	image?: { url: string };
 	timestamp?: string;
 	footer?: { text: string; icon_url?: string };
+	options?: IMessageRatioOption[];
 }
 
 export enum EButtonMessageStyle {
@@ -260,6 +261,10 @@ export interface IMessageSelectOption {
 	value: string;
 	description?: string;
 	default?: boolean;
+}
+export interface IMessageRatioOption {
+	label: string;
+	description?: string;
 }
 
 export enum EMessageSelectType {
