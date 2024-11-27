@@ -52,6 +52,9 @@ jobs:
           NX_CHAT_SENTRY_DSN: ${{ secrets.NX_CHAT_SENTRY_DSN_PROD }}
           NX_IMGPROXY_BASE_URL: ${{ secrets.NX_IMGPROXY_BASE_URL }}
           NX_IMGPROXY_KEY: ${{ secrets.NX_IMGPROXY_KEY }}
+          NX_WEBRTC_ICESERVERS_URL: ${{ secrets.NX_WEBRTC_ICESERVERS_URL_PROD }}
+          NX_WEBRTC_ICESERVERS_USERNAME: ${{ secrets.NX_WEBRTC_ICESERVERS_USERNAME_PROD }}
+          NX_WEBRTC_ICESERVERS_CREDENTIAL: ${{ secrets.NX_WEBRTC_ICESERVERS_CREDENTIAL_PROD }}
 
       - name: Compress build artifact
         run: |
