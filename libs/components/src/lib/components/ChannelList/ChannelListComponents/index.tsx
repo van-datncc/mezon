@@ -16,7 +16,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission } from '@mezon/utils';
+import { DONE_ONBOARDING_STATUS, EPermission } from '@mezon/utils';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -82,12 +82,12 @@ export const Events = memo(() => {
 		if (previewMode) {
 			return true;
 		}
-		return (!selectUserProcessing?.onboarding_step || selectUserProcessing.onboarding_step < 3) && onboardingByClan?.mission.length > 0;
+		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && onboardingByClan?.mission.length > 0;
 	}, [selectUserProcessing?.onboarding_step, onboardingByClan?.mission.length, previewMode]);
 
 	return (
 		<>
-			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} />}
+			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} clanId={currentClanId as string} />}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
@@ -187,33 +187,22 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 	);
 };
 
-const OnboardingGetStart = ({ link }: { link: string }) => {
+const OnboardingGetStart = ({ link, clanId }: { link: string; clanId: string }) => {
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
 
 	const completionPercentage = useMemo(() => {
 		return missionDone ? (missionDone / missionSum) * 100 - 100 : -97;
 	}, [missionDone, missionSum]);
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { navigate } = useAppNavigation();
 	const handleNavigate = () => {
 		navigate(link);
 	};
-	const [openCongratulation, closeCongratulation] = useModal(() => {
-		return (
-			<div className="fixed z-[90] top-0 left-0 w-screen h-screen pointer-events-none items-center justify-center flex">
-				<div className="w-fit h-fit flex text-3xl text-white font-bold">
-					<p
-						style={{
-							textShadow: '1px 1px 5px #000000 '
-						}}
-					>
-						Congratulation Show In Here !
-					</p>
-				</div>
-			</div>
-		);
-	});
+
+	useEffect(() => {
+		dispatch(onboardingActions.fetchOnboarding({ clan_id: clanId }));
+	}, []);
 
 	return (
 		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>

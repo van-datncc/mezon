@@ -1,6 +1,7 @@
 import {
 	ChannelDescription,
-	ChannelMessage, ChannelStreamMode,
+	ChannelMessage,
+	ChannelStreamMode,
 	ChannelType,
 	HashtagDm,
 	JoinPTTChannel,
@@ -303,6 +304,7 @@ export interface IMessageActionRow {
 
 export interface IMessageSendPayload {
 	t?: string;
+	e2ee?: number;
 	hg?: IHashtagOnMessage[];
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];
@@ -1209,15 +1211,15 @@ export type IDmCallInfo = {
 };
 
 export type ImageWindowProps = {
-	attachmentData: ApiMessageAttachment & { create_time?: string },
-	messageId: string,
-	mode: ChannelStreamMode,
-	attachmentUrl: string,
-	currentClanId: string,
-	currentChannelId: string,
-	currentDmId: string,
-	checkListAttachment: boolean,
-}
+	attachmentData: ApiMessageAttachment & { create_time?: string };
+	messageId: string;
+	mode: ChannelStreamMode;
+	attachmentUrl: string;
+	currentClanId: string;
+	currentChannelId: string;
+	currentDmId: string;
+	checkListAttachment: boolean;
+};
 
 export enum ESummaryInfo {
 	CALL = 'Call',

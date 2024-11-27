@@ -47,6 +47,11 @@ export default class App {
 
 	private static onReady() {
 		autoUpdater.checkForUpdates();
+		const sixHoursInMilliseconds = 6 * 60 * 60 * 1000;
+		setInterval(() => {
+			autoUpdater.checkForUpdates();
+		}, sixHoursInMilliseconds);
+
 		if (rendererAppName) {
 			App.application.setLoginItemSettings({
 				openAtLogin: true
@@ -263,7 +268,7 @@ export default class App {
 		newWindow.loadURL(fullUrl);
 
 		newWindow.webContents.on('did-finish-load', () => {
-			ipcMain.on('finish-render', (event) => {
+			ipcMain.once('finish-render', (event) => {
 				newWindow.webContents.send('set-attachment-data', props);
 			});
 		});
@@ -323,7 +328,19 @@ export default class App {
 				label: app.name,
 				submenu: [
 					{ role: 'about' },
-					{ label: 'Check for Updates...', click: () => autoUpdater.checkForUpdates() },
+					{
+						label: 'Check for Updates...',
+						click: () =>
+							autoUpdater.checkForUpdates().then((data) => {
+								if (data) return;
+								const appVersion = app.getVersion();
+								new Notification({
+									icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+									title: 'No update',
+									body: `The current version (${appVersion}) is the latest.`
+								}).show();
+							})
+					},
 					{ type: 'separator' },
 					{
 						type: 'normal',

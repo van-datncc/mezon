@@ -1,5 +1,14 @@
 import { ChatContext, ChatContextProvider, useAttachments, useFriends } from '@mezon/core';
-import { attachmentActions, gifsStickerEmojiActions, selectAnyUnreadChannel, selectBadgeCountAllClan, useAppDispatch } from '@mezon/store';
+import {
+	attachmentActions,
+	e2eeActions,
+	gifsStickerEmojiActions,
+	selectAllAccount,
+	selectAnyUnreadChannel,
+	selectBadgeCountAllClan,
+	useAppDispatch
+} from '@mezon/store';
+import { MessageCrypt } from '@mezon/utils';
 
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
@@ -7,6 +16,7 @@ import { ImageWindowProps, SubPanelName, electronBridge, isLinuxDesktop, isWindo
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiPubKey } from 'mezon-js/api.gen';
 import { memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -20,6 +30,8 @@ const GlobalEventListener = () => {
 	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);
 
 	const totalUnreadMessages = useSelector(selectTotalUnreadDM);
+
+	const user = useAppSelector(selectAllAccount);
 
 	const { quantityPendingRequest } = useFriends();
 
@@ -66,6 +78,14 @@ const GlobalEventListener = () => {
 			document.title = notificationCount > 0 ? `(${displayCountBrowser}) Mezon` : 'Mezon';
 		}
 	}, [allNotificationReplyMentionAllClan, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
+
+	useEffect(() => {
+		if (!user?.user?.id) return;
+		MessageCrypt.initializeKeys(user?.user?.id as string).then((pubkey) => {
+			if (!pubkey) return;
+			dispatch(e2eeActions.pushPubKey(pubkey as ApiPubKey));
+		});
+	}, [user?.user?.id]);
 
 	useEffect(() => {
 		if (isElectron()) {
