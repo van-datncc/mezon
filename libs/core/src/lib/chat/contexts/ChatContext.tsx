@@ -936,7 +936,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TYPE = 4: USER CANCEL CALL
 		// TYPE = 0: REMOVE CALL (END CALL)
 		if (event?.data_type === 4 || event?.data_type === 0) {
-			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
 		}
