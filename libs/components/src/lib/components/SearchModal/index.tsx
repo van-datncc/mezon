@@ -25,6 +25,7 @@ import {
 	sortFilteredList
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
+import debounce from 'lodash.debounce';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,12 +39,14 @@ export type SearchModalProps = {
 function SearchModal({ open, onClose }: SearchModalProps) {
 	const dispatch = useAppDispatch();
 	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
-	const dmGroupChatList = useAppSelector(selectAllDirectMessages);
-	const listChannels = useAppSelector(selectAllChannelsByUser);
+	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
+	const listChannelsRef = useRef(useAppSelector(selectAllChannelsByUser));
 	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
 	const previousChannelsRef = useRef(useSelector(selectPreviousChannels));
-	const allClanUsersEntities = allClanUsersEntitiesRef.current;
 
+	const allClanUsersEntities = allClanUsersEntitiesRef.current;
+	const dmGroupChatList = dmGroupChatListRef.current;
+	const listChannels = listChannelsRef.current;
 	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 	const previousChannels = previousChannelsRef.current;
 
@@ -54,6 +57,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { createDirectMessageWithUser } = useDirect();
 
 	const [searchText, setSearchText] = useState('');
+
+	const debouncedSetSearchText = useMemo(() => debounce((value) => setSearchText(value), 200), []);
 
 	const listGroup = useMemo(
 		() => dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1),
@@ -315,8 +320,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						type="text"
 						placeholder="Where would you like to go?"
 						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
-						value={searchText}
-						onChange={(e) => setSearchText(e.target.value)}
+						onChange={(e) => debouncedSetSearchText(e.target.value)}
 					/>
 				</div>
 				<ListGroupSearchModal
