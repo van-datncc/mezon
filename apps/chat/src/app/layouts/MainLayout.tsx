@@ -1,16 +1,12 @@
-import {ChatContext, ChatContextProvider, useAttachments, useFriends} from '@mezon/core';
-import {
-	attachmentActions,
-	gifsStickerEmojiActions,
-	selectAnyUnreadChannel,
-	selectBadgeCountAllClan, useAppDispatch
-} from '@mezon/store';
+import { ChatContext, ChatContextProvider, useAttachments, useFriends } from '@mezon/core';
+import { attachmentActions, gifsStickerEmojiActions, selectAnyUnreadChannel, selectBadgeCountAllClan, useAppDispatch } from '@mezon/store';
 
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
-import {SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop, ImageWindowProps} from '@mezon/utils';
+import { ImageWindowProps, SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -20,7 +16,7 @@ const GlobalEventListener = () => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
-	
+
 	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);
 
 	const totalUnreadMessages = useSelector(selectTotalUnreadDM);
@@ -70,41 +66,49 @@ const GlobalEventListener = () => {
 			document.title = notificationCount > 0 ? `(${displayCountBrowser}) Mezon` : 'Mezon';
 		}
 	}, [allNotificationReplyMentionAllClan, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
-	
+
 	useEffect(() => {
-		console.log('start listen set attachment data');
-		
-		const handleSetAttachmentData = (props: ImageWindowProps) => {
-			console.log('listen set attachment data successfully');
-			const { attachmentData, messageId, mode, attachmentUrl, currentClanId, currentChannelId, currentDmId, checkListAttachment } = props;
-			dispatch(attachmentActions.setMode(mode));
-			setOpenModalAttachment(true);
-			setAttachment(attachmentUrl);
-			dispatch(
-				attachmentActions.setCurrentAttachment({
-					id: attachmentData.message_id as string,
-					uploader: attachmentData.sender_id,
-					create_time: attachmentData.create_time
-				})
-			);
-			
-			if (((currentClanId && currentChannelId) || currentDmId) && !checkListAttachment) {
-				const clanId = currentDmId ? '0' : (currentClanId as string);
-				const channelId = (currentDmId as string) || (currentChannelId as string);
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
-			}
-			
-			dispatch(attachmentActions.setMessageId(messageId));
-		};
-		
-		window.electron?.on('set-attachment-data', handleSetAttachmentData);
-		
-		return () => {
-			window.electron?.removeListener('set-attachment-data', handleSetAttachmentData);
-		};
+		if (isElectron()) {
+			window.electron.send('finish-render');
+
+			const handleSetAttachmentData = (props: ImageWindowProps) => {
+				const { attachmentData, messageId, mode, attachmentUrl, currentClanId, currentChannelId, currentDmId, checkListAttachment } = props;
+				const dmType = mode === ChannelStreamMode.STREAM_MODE_DM ? ChannelType.CHANNEL_TYPE_DM : ChannelType.CHANNEL_TYPE_GROUP;
+				if (currentDmId) {
+					navigate(`/chat/direct/message/${currentDmId}/${dmType}`);
+				} else {
+					navigate(`/chat/clans/${currentClanId}/channels/${currentChannelId}`);
+				}
+
+				dispatch(attachmentActions.setMode(mode));
+				setOpenModalAttachment(true);
+				setAttachment(attachmentUrl);
+				dispatch(
+					attachmentActions.setCurrentAttachment({
+						id: attachmentData.message_id as string,
+						uploader: attachmentData.sender_id,
+						create_time: attachmentData.create_time
+					})
+				);
+
+				if (((currentClanId && currentChannelId) || currentDmId) && !checkListAttachment) {
+					const clanId = currentDmId ? '0' : (currentClanId as string);
+					const channelId = (currentDmId as string) || (currentChannelId as string);
+					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
+				}
+
+				dispatch(attachmentActions.setMessageId(messageId));
+			};
+
+			window.electron.on('set-attachment-data', (event, data) => {
+				handleSetAttachmentData(data);
+			});
+
+			return () => {
+				window.electron?.removeListener('set-attachment-data', handleSetAttachmentData);
+			};
+		}
 	}, []);
-	
-	
 	return null;
 };
 

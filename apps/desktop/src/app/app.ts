@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain, ipcRenderer, Menu, MenuItemConstructorOptions, screen, shell} from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -7,12 +7,11 @@ import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 
+import { ImageWindowProps } from '../main';
 import setupAutoUpdates from './autoUpdates';
 import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
-import {ImageWindowProps} from "../main";
-
 
 const isQuitting = false;
 
@@ -237,42 +236,36 @@ export default class App {
 		App.application.on('ready', App.onReady);
 		App.application.on('activate', App.onActivate);
 	}
-	
-	static openNewWindow(
-		props: ImageWindowProps,
-		options?: Electron.BrowserWindowConstructorOptions,
-		params?: Record<string, string>,
-	) {
-		const defaultOptions: Electron.BrowserWindowConstructorOptions= {
-			width: 800,
-			height: 600,
+
+	static openNewWindow(props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
+		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
+			width: 1000,
+			height: 800,
 			show: true,
+			titleBarOverlay: process.platform == 'darwin',
+			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
+			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				preload: join(__dirname, 'main.preload.js'),
+				preload: join(__dirname, 'main.preload.js')
 			},
+			icon: join(__dirname, 'assets', 'desktop-taskbar-256x256.ico'),
+			autoHideMenuBar: true
 		};
-		
+
 		const windowOptions = { ...defaultOptions, ...options };
-		
+
 		const newWindow = new BrowserWindow(windowOptions);
-		
+
 		const baseUrl = `http://localhost:${rendererAppPort}`;
 		const fullUrl = this.generateFullUrl(baseUrl, params);
 		newWindow.loadURL(fullUrl);
-		
-		newWindow.webContents.openDevTools();
-		
-		newWindow.webContents.on('did-start-loading', () => {
-			console.log ('start loading');
-			
-		})
-		
+
 		newWindow.webContents.on('did-finish-load', () => {
-			console.log ('newWindow receive data', props)
-			
-			newWindow.webContents.send('set-attachment-data', props);
+			ipcMain.on('finish-render', (event) => {
+				newWindow.webContents.send('set-attachment-data', props);
+			});
 		});
 	}
 
