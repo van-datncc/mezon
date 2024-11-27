@@ -387,10 +387,36 @@ export const selectComputedReactionsByMessageId = (channelId: string, messageId:
 		return computedMessageReactions[combinedId] || [];
 	});
 
-export const selectReactionsByEmojiIdFromMessage = (channelId: string, messageId: string, emojiId: string) =>
-	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
-		const combinedId = `${channelId}_${messageId}`;
-		const reactionsForMessage = computedMessageReactions[combinedId] || [];
-		const filteredReactions = reactionsForMessage.filter((reaction) => reaction.emojiId === emojiId);
-		return filteredReactions[0];
-	});
+export const selectReactionsByEmojiIdFromMessage = createSelector(
+	[selectComputedMessageReactions, (_, channelId: string, messageId: string, emojiId: string) => `${channelId},${messageId},${emojiId}`],
+	(computedMessageReactions, payload) => {
+		const [channelId, messageId, emojiId] = payload.split(',');
+
+		if (channelId && messageId && emojiId) {
+			const combinedId = `${channelId}_${messageId}`;
+			const reactionsForMessage = computedMessageReactions[combinedId] || [];
+			const filteredReactions = reactionsForMessage.filter((reaction) => reaction.emojiId === emojiId);
+
+			if (filteredReactions.length > 0) {
+				const reaction = filteredReactions[0];
+
+				const senders =
+					reaction.senders?.map((sender) => ({
+						sender_id: sender.sender_id,
+						count: sender.count
+					})) || [];
+
+				return {
+					emojiId: reaction.emojiId,
+					emoji: reaction.emoji,
+					senders,
+					action: reaction.action ?? false,
+					messageId: reaction.message_id,
+					id: reaction.id || '',
+					channelId: reaction.channel_id || ''
+				};
+			}
+		}
+		return null;
+	}
+);

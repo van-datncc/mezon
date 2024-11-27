@@ -1,5 +1,5 @@
 import { useAuth, useChatReaction, useUserById } from '@mezon/core';
-import { selectCurrentChannel, selectReactionsByEmojiIdFromMessage } from '@mezon/store';
+import { selectCurrentChannel, selectReactionsByEmojiIdFromMessage, useAppSelector } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
 import {
 	EmojiDataOptionals,
@@ -24,7 +24,9 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const { reactionMessageDispatch } = useChatReaction();
 	const userId = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const getEmojiById = useSelector(selectReactionsByEmojiIdFromMessage(message.channel_id, message.id, emojiShowPanel.emojiId ?? ''));
+	const getEmojiById = useAppSelector((state) =>
+		selectReactionsByEmojiIdFromMessage(state, message.channel_id, message.id, emojiShowPanel.emojiId ?? '')
+	);
 
 	const removeEmojiSender = async (
 		id: string,
@@ -38,8 +40,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			id,
 
 			messageId,
-			getEmojiById.emojiId ?? '',
-			getEmojiById.emoji ?? '',
+			getEmojiById?.emojiId ?? '',
+			getEmojiById?.emoji ?? '',
 			countRemoved,
 			message_sender_id,
 			true,
@@ -55,7 +57,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		return newEmojiData;
 	}, []);
 
-	const count = calculateTotalCount(getEmojiById?.senders);
+	const count = calculateTotalCount(getEmojiById?.senders ?? []);
 
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
@@ -68,7 +70,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] 
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
-						<PanelHeader emojiId={getEmojiById.emojiId} emojiName={getEmojiById.emoji ?? ''} count={count} />
+						<PanelHeader emojiId={getEmojiById?.emojiId} emojiName={getEmojiById?.emoji ?? ''} count={count} />
 						<div className="max-h-40 overflow-y-auto hide-scrollbar">
 							{getEmojiById?.senders.map((sender: SenderInfoOptionals, index: number) => {
 								if (sender.count && sender.count > 0) {
