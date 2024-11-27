@@ -1,14 +1,17 @@
 import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
-import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
+import { selectAllAccount } from '../account/account.slice';
 import { StatusUserArgs, channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
+import { e2eeActions } from '../e2ee/e2ee.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
+import { RootState } from '../store';
 import { directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
@@ -28,10 +31,6 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 
 export interface DirectRootState {
 	[DIRECT_FEATURE_KEY]: DirectState;
-}
-
-function getDirectRootState(thunkAPI: GetThunkAPI<unknown>): DirectRootState {
-	return thunkAPI.getState() as DirectRootState;
 }
 
 export const directAdapter = createEntityAdapter<DirectEntity>();
@@ -91,7 +90,7 @@ export const openDirectMessage = createAsyncThunk(
 	async ({ channelId, clanId }: { channelId: string; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const state = getDirectRootState(thunkAPI);
+			const state = thunkAPI.getState() as RootState;
 			const dmChannel = selectDirectById(state, channelId) || {};
 			if (dmChannel?.active !== ActiveDm.OPEN_DM && clanId === '0') {
 				await mezon.client.openDirectMess(mezon.session, { channel_id: channelId });
@@ -199,6 +198,13 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 					})
 				);
 				const members = fetchChannelMembersResult.payload as members[];
+				const state = thunkAPI.getState() as RootState;
+				const currentUserId = selectAllAccount(state)?.user?.id;
+				const userIds = members.filter((m) => m.user_id && m.user_id !== currentUserId).map((m) => m.user_id) as string[];
+				if (userIds?.length) {
+					await thunkAPI.dispatch(e2eeActions.getPubKeys({ userIds }));
+				}
+
 				if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
 					const userIds = members.map((member) => member?.user_id as string);
 					thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));

@@ -9,11 +9,11 @@ import { authReducer } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
 import { channelMembersReducer } from './channelmembers/channel.members';
 import { channelsReducer } from './channels/channels.slice';
-import { DMCallReducer } from './dmcall/dmcall.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { directReducer } from './direct/direct.slice';
+import { DMCallReducer } from './dmcall/dmcall.slice';
 import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice';
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
@@ -41,6 +41,7 @@ import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
+import { E2EE_FEATURE_KEY, e2eeReducer } from './e2ee/e2ee.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
@@ -386,7 +387,8 @@ const reducer = {
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
 	clanMembersMeta: clanMembersMetaReducer,
-	dmcall: DMCallReducer
+	dmcall: DMCallReducer,
+	[E2EE_FEATURE_KEY]: e2eeReducer
 };
 
 let storeInstance = configureStore({

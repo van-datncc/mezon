@@ -303,6 +303,7 @@ export interface IMessageActionRow {
 
 export interface IMessageSendPayload {
 	t?: string;
+	e2ee?: number;
 	hg?: IHashtagOnMessage[];
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];

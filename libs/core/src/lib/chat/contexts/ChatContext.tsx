@@ -32,7 +32,7 @@ import {
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
-	mapMessageChannelToEntity,
+	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,
 	mapReactionToEntity,
 	messagesActions,
@@ -239,7 +239,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
-				const mess = mapMessageChannelToEntity(message);
+				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
@@ -784,6 +784,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
+			console.log(channelUpdated, 'channelUpdated');
 			if (channelUpdated) {
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
