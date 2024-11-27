@@ -104,8 +104,9 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	}, [channelId, localStream, mezon.socketRef]);
 
 	const toggleMicrophone = useCallback(
-		(value: boolean) => {
+		async (value: boolean) => {
 			if (localStream) {
+				await mezon.socketRef.current?.talkPTTChannel(channelId as string, 5, JSON.stringify({}), value === true ? 0 : -1);
 				localStream.getAudioTracks().forEach((track) => {
 					track.enabled = value;
 				});
