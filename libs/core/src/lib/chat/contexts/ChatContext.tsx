@@ -784,8 +784,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
-			console.log(channelUpdated, 'channelUpdated');
 			if (channelUpdated) {
+				//TODO: improve update once item
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
@@ -805,6 +805,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				) {
 					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				}
+
+				if (channelUpdated.clan_id === '0') {
+					dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				}
 			}
 		},

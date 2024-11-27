@@ -494,7 +494,7 @@ export class MessageCrypt {
 		} catch (error) {
 			if (error instanceof KeyStoreError) {
 				const privateKeyMaterial = await PrivateKeyMaterial.create(true);
-				await privateKeyMaterial.exportToFile(`mezon_private_key_${userID}.key`);
+				// await privateKeyMaterial.exportToFile(`mezon_private_key_${userID}.key`);
 				await keyStore.saveKey('ecdh_' + userID, privateKeyMaterial.ecdh, true);
 				await keyStore.saveKey('ecdsa_' + userID, privateKeyMaterial.ecdsa, true);
 				pubKeyMaterial = privateKeyMaterial.pubKey().jsonable(true);
