@@ -81,7 +81,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						typeChat: TypeSearch.Dm_Type,
 						type: ChannelType.CHANNEL_TYPE_DM,
 						count_messsage_unread: itemDM.count_mess_unread,
-						lastSeenTimeStamp: Number(itemDM?.last_seen_message?.timestamp_seconds || 0)
+						lastSeenTimeStamp: Number(itemDM?.last_seen_message?.timestamp_seconds || 0),
+						member: itemDM.user_id && itemDM.user_id[0]
 					};
 				})
 			: [];
@@ -105,7 +106,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, Object.values(allUsesInAllClansEntities) as any);
 		return addPropsIntoSearchList;
 	}, [accountId, listDM, listGroup, allUsesInAllClansEntities]);
-
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
 			return {
@@ -129,8 +129,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return list;
 	}, [listChannels]);
 
+	const findFilterDm = (id: string) => {
+		const dm = listDirectSearch.find((item) => item.id === id);
+		return dm ? dm.idDM : undefined;
+	};
+
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
+
 		for (const userId in allUsesInAllClansEntities) {
 			const user = allUsesInAllClansEntities[userId];
 			list.push({
@@ -140,14 +146,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				avatarUser: user?.avatar_url ?? '',
 				displayName: user?.display_name ?? '',
 				lastSentTimeStamp: '0',
-				idDM: undefined,
+				idDM: findFilterDm(user?.id),
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
 			});
 		}
 		return list as SearchItemProps[];
 	}, [allClanUsersEntities, allUsesInAllClansEntities]);
-
 	const normalizeSearchText = useMemo(() => {
 		return normalizeString(searchText);
 	}, [searchText]);
@@ -157,17 +162,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [searchText]);
 
 	const totalLists = useMemo(() => {
-		const list = listMemberSearch.concat(listChannelSearch, listDirectSearch);
-		listDirectSearch.forEach((dm) => {
-			if (
-				dm.type === ChannelType.CHANNEL_TYPE_DM ||
-				(dm.type === ChannelType.CHANNEL_TYPE_GROUP && !allUsesInAllClansEntities[dm?.id || '0'])
-			) {
-				list.push(dm);
-			}
-		});
-		const removeDuplicateList = removeDuplicatesById(list.filter((item) => item?.id !== accountId));
-		const sortedList = removeDuplicateList.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		const filterDmWithoutIdDM = listMemberSearch.filter((item) => item.idDM === undefined);
+		const list = filterDmWithoutIdDM.concat(listChannelSearch, listDirectSearch);
+		const sortedList = list.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listMemberSearch, listChannelSearch, listDirectSearch, allUsesInAllClansEntities, accountId]);
 
