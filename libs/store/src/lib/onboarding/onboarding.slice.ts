@@ -1,4 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
+import { DONE_ONBOARDING_STATUS } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem, ApiOnboardingSteps } from 'mezon-js/api.gen';
@@ -19,6 +20,9 @@ export type OnboardingClanType = {
 	mission: ApiOnboardingItem[];
 };
 
+export interface RuleType extends ApiOnboardingContent {
+	file?: File;
+}
 export interface OnboardingState extends EntityState<ApiOnboardingSteps, string> {
 	onboardingPreviewMode: boolean;
 	missionDone: number;
@@ -27,10 +31,11 @@ export interface OnboardingState extends EntityState<ApiOnboardingSteps, string>
 	listOnboarding: Record<string, OnboardingClanType>;
 	formOnboarding: {
 		greeting: ApiOnboardingContent | null;
-		rules: ApiOnboardingContent[];
+		rules: RuleType[];
 		questions: ApiOnboardingContent[];
 		task: ApiOnboardingContent[];
 	};
+	fileRules: Record<number, File>;
 }
 
 export const onboardingUserAdapter = createEntityAdapter({
@@ -39,7 +44,7 @@ export const onboardingUserAdapter = createEntityAdapter({
 
 const fetchOnboardingCached = memoizee(
 	async (mezon: MezonValueContext, clan_id: string) => {
-		const response = await mezon.client.listOnboarding(mezon.session, clan_id);
+		const response = await mezon.client.listOnboarding(mezon.session, clan_id, undefined, 100);
 		return response.list_onboarding;
 	},
 	{
@@ -51,28 +56,32 @@ const fetchOnboardingCached = memoizee(
 	}
 );
 
-export const fetchOnboarding = createAsyncThunk('onboarding/fetchOnboarding', async ({ clan_id }: { clan_id: string }, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+export const fetchOnboarding = createAsyncThunk(
+	'onboarding/fetchOnboarding',
+	async ({ clan_id, noCache }: { clan_id: string; noCache?: boolean }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchOnboardingCached.clear();
+			}
+			const response = await fetchOnboardingCached(mezon, clan_id);
 
-		const response = await fetchOnboardingCached(mezon, clan_id);
-
-		if (response) {
-			return { response, clan_id };
+			if (response) {
+				return { response, clan_id };
+			}
+			return { response: [], clan_id };
+		} catch (error) {
+			captureSentryError(error, 'onboarding/fetchOnboarding');
+			return thunkAPI.rejectWithValue(error);
 		}
-		return { response: [], clan_id };
-	} catch (error) {
-		captureSentryError(error, 'onboarding/fetchOnboarding');
-		return thunkAPI.rejectWithValue(error);
 	}
-});
+);
 
 export const createOnboardingTask = createAsyncThunk(
 	'onboarding/createOnboarding',
 	async ({ content, clan_id }: { content: ApiOnboardingContent[]; clan_id: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
 			const response = await mezon.client.createOnboarding(mezon.session, {
 				clan_id,
 				contents: [...content]
@@ -80,7 +89,7 @@ export const createOnboardingTask = createAsyncThunk(
 			if (!response) {
 				return false;
 			}
-
+			thunkAPI.dispatch(fetchOnboarding({ clan_id: clan_id, noCache: true }));
 			return { content, clan_id };
 		} catch (error) {
 			captureSentryError(error, 'onboarding/createOnboarding');
@@ -163,7 +172,7 @@ export const doneOnboarding = createAsyncThunk('onboarding/doneOnboarding', asyn
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.updateOnboardingStepByClanId(mezon.session, clan_id, { onboarding_step: 3 });
+		const response = await mezon.client.updateOnboardingStepByClanId(mezon.session, clan_id, { onboarding_step: DONE_ONBOARDING_STATUS });
 		if (!response) {
 			return false;
 		}
@@ -186,7 +195,8 @@ export const initialOnboardingState: OnboardingState = onboardingUserAdapter.get
 		rules: [],
 		questions: [],
 		task: []
-	}
+	},
+	fileRules: []
 });
 
 export enum ETypeMission {
@@ -214,7 +224,7 @@ export const onboardingSlice = createSlice({
 		doneMission: (state, action: PayloadAction<{ clan_id: string }>) => {
 			if (
 				state.missionDone < state.missionSum &&
-				(onboardingUserAdapter.getSelectors().selectById(state, action.payload.clan_id)?.onboarding_step || 0) < 3
+				onboardingUserAdapter.getSelectors().selectById(state, action.payload.clan_id)?.onboarding_step !== DONE_ONBOARDING_STATUS
 			) {
 				state.missionDone = state.missionDone + 1;
 				if (state.missionDone + 1 === state.missionSum) {
@@ -225,7 +235,7 @@ export const onboardingSlice = createSlice({
 		addGreeting: (state, action: PayloadAction<ApiOnboardingContent>) => {
 			state.formOnboarding.greeting = action.payload;
 		},
-		addRules: (state, action: PayloadAction<ApiOnboardingContent>) => {
+		addRules: (state, action: PayloadAction<RuleType>) => {
 			state.formOnboarding.rules.push(action.payload);
 		},
 		addQuestion: (state, action: PayloadAction<ApiOnboardingContent>) => {
@@ -252,6 +262,12 @@ export const onboardingSlice = createSlice({
 				default:
 					break;
 			}
+		},
+		addFileRule: (state, action: PayloadAction<{ index: number; file: File }>) => {
+			state.fileRules[action.payload.index] = action.payload.file;
+		},
+		clearFileRule: (state) => {
+			state.fileRules = [];
 		}
 	},
 	extraReducers: (builder) => {
@@ -293,27 +309,6 @@ export const onboardingSlice = createSlice({
 					questions: [],
 					task: []
 				};
-				if (action.payload && action.payload.clan_id) {
-					const clanId = action.payload.clan_id;
-					action.payload.content.map((onboardingItem) => {
-						switch (onboardingItem.guide_type) {
-							case EGuideType.GREETING:
-								state.listOnboarding[clanId].greeting = onboardingItem;
-								break;
-							case EGuideType.RULE:
-								state.listOnboarding[clanId].rule.push(onboardingItem);
-								break;
-							case EGuideType.QUESTION:
-								state.listOnboarding[clanId].question.push(onboardingItem);
-								break;
-							case EGuideType.TASK:
-								state.listOnboarding[clanId].mission.push(onboardingItem);
-								break;
-							default:
-								break;
-						}
-					});
-				}
 			})
 			.addCase(removeOnboardingTask.fulfilled, (state, action) => {
 				if (action.payload.clan_id) {
@@ -405,3 +400,5 @@ export const selectCurrentMission = createSelector(
 		return null;
 	}
 );
+
+export const selectRuleImages = createSelector(getOnboardingState, (state) => state.fileRules);

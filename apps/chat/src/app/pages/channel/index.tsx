@@ -43,7 +43,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons, Loading } from '@mezon/ui';
-import { EOverriddenPermission, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop, titleMission } from '@mezon/utils';
+import {
+	DONE_ONBOARDING_STATUS,
+	EOverriddenPermission,
+	SubPanelName,
+	TIME_OFFSET,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	titleMission
+} from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -141,7 +149,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 		if (previewMode) {
 			return true;
 		}
-		return (selectUserProcessing?.onboarding_step || 0) < 3 && currentClan?.is_onboarding;
+		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && currentClan?.is_onboarding;
 	}, [selectUserProcessing?.onboarding_step, currentClan?.is_onboarding, previewMode]);
 
 	if (!canSendMessageDelayed) {
