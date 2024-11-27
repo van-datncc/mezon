@@ -32,7 +32,7 @@ import {
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
-	mapMessageChannelToEntity,
+	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,
 	mapReactionToEntity,
 	messagesActions,
@@ -239,7 +239,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
-				const mess = mapMessageChannelToEntity(message);
+				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
@@ -290,6 +290,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
+					if (mess.isMe) {
+						dispatch(channelsActions.updateChannelBadgeCount({ channelId: message.channel_id, count: 0, isReset: true }));
+					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
@@ -785,6 +788,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
 			if (channelUpdated) {
+				//TODO: improve update once item
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
@@ -804,6 +808,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				) {
 					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				}
+
+				if (channelUpdated.clan_id === '0') {
+					dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				}
 			}
 		},

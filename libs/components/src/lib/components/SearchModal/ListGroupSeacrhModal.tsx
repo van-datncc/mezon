@@ -58,8 +58,8 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		if (normalizeSearchText) {
 			return listItemWithoutRecent;
 		}
-		return [...listRecent, ...listItemWithoutRecent];
-	}, [normalizeSearchText, listRecent, listItemWithoutRecent]);
+		return [...listRecent, ...mentionList, ...unreadList];
+	}, [normalizeSearchText, listRecent, mentionList, unreadList, listItemWithoutRecent]);
 
 	const isNoResult = useMemo(() => !allItems?.length, [allItems?.length]);
 
