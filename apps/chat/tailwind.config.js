@@ -212,6 +212,29 @@ module.exports = {
           '0%': { transform: 'translateY(-20px)', opacity: '0.8' },
           '100%': { transform: 'translateY(0)', opacity: '1' }
         },
+        wiggle : {
+          '0%, 7%' : {
+            transform: 'rotateZ(0)'
+          },
+          '15%': {
+            transform: 'rotateZ(-20deg)'
+          },
+          '20%': {
+            transform: 'rotateZ(15deg)'
+          },
+          '25%': {
+            transform: 'rotateZ(-15deg)'
+          },
+          '30%': {
+            transform: 'rotateZ(11deg)'
+          },
+          '35%': {
+            transform: 'rotateZ(-9deg)'
+          },
+          '40%, 100%': {
+            transform: 'rotateZ(0)'
+          }
+        }
       },
       boxShadow: {
         'emoji_item': '0 1px 0 0 #ededef',
@@ -230,6 +253,7 @@ module.exports = {
       slide_in: 'slide_in 0.5s ease-in-out forwards',
       pulse: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       move_down: 'move_down 0.5s forwards',
+      wiggle : 'wiggle 2s linear forwards'
     },
     screens: {
       ssm: "430px",

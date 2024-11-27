@@ -9,6 +9,7 @@ import {
 	selectMissionSum,
 	selectNumberEvent,
 	selectOnboardingByClan,
+	selectOnboardingMode,
 	selectOngoingEvent,
 	selectProcessingByClan,
 	selectShowNumEvent,
@@ -26,7 +27,7 @@ export const Events = memo(() => {
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
-
+	const previewMode = useSelector(selectOnboardingMode);
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
@@ -77,11 +78,16 @@ export const Events = memo(() => {
 		}
 	}, [currentClan?.is_onboarding]);
 
+	const checkPreviewMode = useMemo(() => {
+		if (previewMode) {
+			return true;
+		}
+		return (!selectUserProcessing?.onboarding_step || selectUserProcessing.onboarding_step < 3) && onboardingByClan?.mission.length > 0;
+	}, [selectUserProcessing?.onboarding_step, onboardingByClan?.mission.length, previewMode]);
+
 	return (
 		<>
-			{(!selectUserProcessing?.onboarding_step || selectUserProcessing.onboarding_step < 3) && onboardingByClan?.mission.length > 0 && (
-				<OnboardingGetStart link={serverGuidePath} />
-			)}
+			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} />}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
@@ -193,22 +199,6 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 	const handleNavigate = () => {
 		navigate(link);
 	};
-	const handleClosePreview = () => {
-		dispatch(onboardingActions.closeOnboardingMode());
-	};
-	const [openModalGetStarted, closeModalGetStarted] = useModal(() => {
-		return (
-			<div className="fixed z-50 top-0 left-0 w-screen  bg-black flex px-4 py-2 h-12 items-center justify-center ">
-				<div className="absolute cursor-pointer hover:bg-slate-950 left-6 px-2 flex gap-1 border-2 py-1 items-center justify-center  border-white rounded bg-transparent">
-					<Icons.LeftArrowIcon className="fill-white text-white" />
-					<p className="text-white text-xs font-medium" onClick={handleClosePreview}>
-						Close preview mode
-					</p>
-				</div>
-				<div className="text-base text-white font-semibold">You are viewing the server as a new member. You have no roles.</div>
-			</div>
-		);
-	});
 	const [openCongratulation, closeCongratulation] = useModal(() => {
 		return (
 			<div className="fixed z-[90] top-0 left-0 w-screen h-screen pointer-events-none items-center justify-center flex">
@@ -224,22 +214,6 @@ const OnboardingGetStart = ({ link }: { link: string }) => {
 			</div>
 		);
 	});
-	// useEffect(() => {
-	//   openModalGetStarted();
-	// }, []);
-	// useEffect(() => {
-	//   let timeoutId: NodeJS.Timeout;
-
-	//   if (missionDone === missionSum) {
-	//     openCongratulation();
-	//     timeoutId = setTimeout(() => {
-	//       closeCongratulation();
-	//       clearTimeout(timeoutId);
-	//     }, 2000);
-	//   }
-
-	//   return () => clearTimeout(timeoutId);
-	// }, [missionDone]);
 
 	return (
 		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>

@@ -2,10 +2,10 @@ import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside } from '@mezon/core
 import {
 	notificationActions,
 	selectAllChannelLastSeenTimestampByClanId,
+	selectAllNotificationClan,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
 	selectCurrentClan,
-	selectMentionAndReplyUnreadByClanId,
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
+import NotificationWebhookClan from './NotificationWebhookClan';
 
 export type MemberListProps = { className?: string };
 
@@ -26,13 +27,13 @@ export type NotificationProps = {
 
 const InboxType = {
 	INDIVIDUAL: 'individual',
-	UNREADS: 'unreads',
+	MESSAGES: 'messages',
 	MENTIONS: 'mentions'
 };
 
 const tabDataNotify = [
 	{ title: 'For you', value: InboxType.INDIVIDUAL },
-	{ title: 'Unreads', value: InboxType.UNREADS },
+	{ title: 'Messages', value: InboxType.MESSAGES },
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
@@ -45,8 +46,8 @@ type ListCreatimeMessage = {
 function NotificationList({ rootRef }: NotificationProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
-	const unReadReplyAndMentionList = useSelector(selectMentionAndReplyUnreadByClanId(allLastSeenChannelAllChannelInClan));
 	const dispatch = useAppDispatch();
+	const allNotificationClan = useSelector(selectAllNotificationClan);
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.MENTIONS);
 	const handleChangeTab = (valueTab: string) => {
@@ -60,9 +61,9 @@ function NotificationList({ rootRef }: NotificationProps) {
 		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
 	}, [getNotificationExcludeMentionAndReplyUnread]);
 
-	const getMentionAndReplyUnread = useMemo(() => {
-		return sortNotificationsByDate(unReadReplyAndMentionList);
-	}, [unReadReplyAndMentionList]);
+	const getAllNotificationClan = useMemo(() => {
+		return sortNotificationsByDate(allNotificationClan);
+	}, [allNotificationClan]);
 
 	const getAllMentionAndReply = useMemo(() => {
 		return sortNotificationsByDate(getAllNotificationMentionAndReply);
@@ -73,8 +74,8 @@ function NotificationList({ rootRef }: NotificationProps) {
 	const { handleMarkAsReadClan } = useMarkAsRead();
 
 	const isShowMarkAllAsRead = useMemo(() => {
-		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
-	}, [unReadReplyAndMentionList, currentTabNotify]);
+		return allNotificationClan.length > 0 && currentTabNotify === InboxType.MESSAGES;
+	}, [allNotificationClan, currentTabNotify]);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleHideInbox = useCallback(() => {
@@ -153,12 +154,18 @@ function NotificationList({ rootRef }: NotificationProps) {
 						</div>
 					)}
 
-					{currentTabNotify === InboxType.UNREADS && (
+					{currentTabNotify === InboxType.MESSAGES && (
 						<div>
-							{getMentionAndReplyUnread.length > 0 ? (
-								<NotificationChannel isUnreadTab={true} unreadListConverted={getMentionAndReplyUnread} />
+							{getAllNotificationClan.length > 0 ? (
+								getAllNotificationClan.map((notification: INotification, index: number) => (
+									<NotificationWebhookClan
+										key={`message-${notification?.id}-${index}`}
+										isUnreadTab={true}
+										notification={notification}
+									/>
+								))
 							) : (
-								<EmptyNotification isEmptyUnread />
+								<EmptyNotification isEmptyMessages />
 							)}
 						</div>
 					)}

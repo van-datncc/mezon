@@ -758,7 +758,8 @@ export enum NotificationCode {
 	USER_BANNED = -8,
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
-	USER_REPLIED = -11
+	USER_REPLIED = -11,
+	NOTIFICATION_CLAN = -12
 }
 
 export enum ChannelIsNotThread {
@@ -1184,10 +1185,27 @@ export type IUserItemActivity = {
 	user?: IUserProfileActivity;
 };
 
+export type UserStatus = {
+	user_id: string;
+	status: string;
+};
+
+export type UserStatusUpdate = {
+	status: string;
+	minutes?: number;
+	until_turn_on: boolean;
+};
+
+export enum EUserStatus {
+	ONLINE = 'Online',
+	IDLE = 'Idle',
+	DO_NOT_DISTURB = 'Do Not Disturb',
+	INVISIBLE = 'Invisible'
+}
+
 export type IDmCallInfo = {
-	channel_id?: string;
-	caller_id?: string;
-	callee_id?: string;
+	groupId?: string;
+	isVideo?: boolean;
 };
 
 export type ImageWindowProps = {
@@ -1199,4 +1217,9 @@ export type ImageWindowProps = {
 	currentChannelId: string,
 	currentDmId: string,
 	checkListAttachment: boolean,
+}
+
+export enum ESummaryInfo {
+	CALL = 'Call',
+	STREAM = 'Stream'
 }

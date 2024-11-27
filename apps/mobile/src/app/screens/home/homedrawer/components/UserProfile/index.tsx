@@ -141,7 +141,7 @@ const UserProfile = React.memo(
 						}
 					});
 				},
-				isShow: true
+				isShow: !!targetUser && ![EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state)
 			},
 			{
 				id: 3,
@@ -157,7 +157,7 @@ const UserProfile = React.memo(
 						}
 					});
 				},
-				isShow: true
+				isShow: !!targetUser && ![EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state)
 			},
 			{
 				id: 4,

@@ -147,7 +147,9 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setChannelLabel(channelLabelInit);
 		setAppUrl(appUrlInit);
 		setIsCheckForSystemMsg(false);
-	}, [topicInit, channelLabelInit, appUrlInit]);
+		setIsAgeRestricted(ageRestrictedInit);
+		setIsE2ee(e2eeInit);
+	}, [topicInit, channelLabelInit, appUrlInit, isAgeRestricted, isE2ee]);
 
 	const handleSave = useCallback(async () => {
 		const updatedChannelLabel = channelLabel === channelLabelInit ? '' : channelLabel;
@@ -226,7 +228,21 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 			!checkValidate &&
 			(!appUrl || !checkValidateUrl)
 		);
-	}, [channelLabelInit, channelLabel, appUrlInit, appUrl, topicInit, topic, checkValidate, checkValidateUrl, isCheckForSystemMsg]);
+	}, [
+		channelLabelInit,
+		channelLabel,
+		appUrlInit,
+		appUrl,
+		topicInit,
+		topic,
+		checkValidate,
+		checkValidateUrl,
+		isCheckForSystemMsg,
+		ageRestrictedInit,
+		isAgeRestricted,
+		e2eeInit,
+		isE2ee
+	]);
 
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">

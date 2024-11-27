@@ -187,11 +187,13 @@ export function MemberProfile({
 			if (modalState.current.pannelMember) {
 				closeModal(ModalType.PannelMember);
 			} else {
-				await dispatch(
-					notificationSettingActions.getNotificationSetting({
-						channelId: directMessageValue?.dmID || ''
-					})
-				);
+				if (directMessageValue) {
+					await dispatch(
+						notificationSettingActions.getNotificationSetting({
+							channelId: directMessageValue?.dmID || ''
+						})
+					);
+				}
 				resetModalState();
 				openPanelMember();
 			}

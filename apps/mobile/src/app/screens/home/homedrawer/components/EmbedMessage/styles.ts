@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 			flex: 1
 		},
 		content: {
-			gap: size.s_6
+			gap: size.s_6,
+			flex: 1
 		},
 		sizeColor: {
 			width: size.s_4,
@@ -24,7 +25,8 @@ export const style = (colors: Attributes) =>
 		},
 		valueContainer: {
 			flexDirection: 'row',
-			gap: 6
+			gap: 6,
+			flex: 1
 		},
 		imageWrapper: {
 			marginTop: size.s_6,

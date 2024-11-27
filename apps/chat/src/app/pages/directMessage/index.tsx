@@ -5,10 +5,11 @@ import {
 	selectCloseMenu,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
+	selectIsInCall,
 	selectStatusMenu,
 	selectStatusStream
 } from '@mezon/store';
-import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Setting from '../setting';
@@ -22,6 +23,7 @@ const Direct = () => {
 	const streamPlay = useSelector(selectStatusStream);
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
+	const isInCall = useSelector(selectIsInCall);
 
 	useEffect(() => {
 		dispatch(clansActions.setCurrentClanId('0'));
@@ -38,7 +40,8 @@ const Direct = () => {
 			>
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
-				{streamPlay && <StreamInfo />}
+				{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
+				{streamPlay && <StreamInfo type={ESummaryInfo.STREAM} />}
 				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 				<FooterProfile
 					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}

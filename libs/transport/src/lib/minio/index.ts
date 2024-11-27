@@ -1,3 +1,4 @@
+import { ILinkOnMessage, IStartEndIndex } from '@mezon/utils';
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -193,4 +194,58 @@ export async function uploadFile(
 			reject(new Error(`${error}`));
 		}
 	});
+}
+export async function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
+	if (!isValidUrl(url) || url.length >= 512) {
+		throw new Error('Invalid URL or URL too long.');
+	}
+
+	try {
+		const response = await fetch(url, { method: 'HEAD' });
+		if (!response.ok) {
+			throw new Error('URL not available.');
+		}
+
+		const contentSize = response.headers.get('Content-Length');
+		const contentType = response.headers.get('Content-Type');
+
+		if (!contentType || !contentType.startsWith('image/')) {
+			throw new Error('URL is not an image.');
+		}
+
+		return {
+			filename: `${Date.now()}_${contentType.replace('image/', '')}`,
+			url,
+			filetype: contentType,
+			size: Number(contentSize) || 0,
+			width: 0,
+			height: 0
+		};
+	} catch (error) {
+		throw new Error(error instanceof Error ? error.message : 'Failed to fetch URL.');
+	}
+}
+
+export function extractLinks(text: string, links: ILinkOnMessage[]) {
+	return links.map((link) => text.slice(link.s, link.e));
+}
+
+export function processLinks(content: { t: string; lk: IStartEndIndex[] }) {
+	if (content.lk && content.lk.length > 0) {
+		const extractedLinks = extractLinks(content.t, content.lk);
+
+		return Promise.all(
+			extractedLinks.map((link) =>
+				handleUrlInput(link).catch((error) => {
+					console.warn(`Failed to fetch HEAD for URL ${link}: ${error.message}`);
+					return null;
+				})
+			)
+		).then((results) => {
+			const validLinks = results.filter((result) => result !== null) as ApiMessageAttachment[];
+			return validLinks;
+		});
+	}
+
+	return Promise.resolve([]);
 }

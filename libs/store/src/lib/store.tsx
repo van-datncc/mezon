@@ -67,6 +67,7 @@ import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
+import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
 const persistedReducer = persistReducer(
@@ -362,7 +363,8 @@ const reducer = {
 	clanMembersMeta: clanMembersMetaReducer,
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
-	joinPTT: JoinPTTReducer
+	joinPTT: JoinPTTReducer,
+	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer
 };
 
 let storeInstance = configureStore({

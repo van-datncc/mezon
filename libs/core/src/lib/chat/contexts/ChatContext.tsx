@@ -9,6 +9,7 @@ import {
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
+	audioCallActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -936,6 +937,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TYPE = 0: REMOVE CALL (END CALL)
 		if (event?.data_type === 4 || event?.data_type === 0) {
 			dispatch(DMCallActions.cancelCall({}));
+			dispatch(audioCallActions.startDmCall({}));
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({

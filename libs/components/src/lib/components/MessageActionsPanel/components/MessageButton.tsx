@@ -50,7 +50,8 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 					channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
 					button_id: buttonId,
 					sender_id: senderId,
-					user_id: currentUserId
+					user_id: currentUserId,
+					extra_data: ''
 				})
 			);
 		}

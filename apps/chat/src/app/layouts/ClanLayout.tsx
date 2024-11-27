@@ -11,6 +11,7 @@ import {
 	selectCurrentStreamInfo,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
+	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectStatusMenu,
@@ -19,7 +20,7 @@ import {
 	videoStreamActions,
 	voiceActions
 } from '@mezon/store';
-import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
@@ -112,6 +113,7 @@ const ClanLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id as string));
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
+	const isInCall = useSelector(selectIsInCall);
 
 	return (
 		<>
@@ -121,7 +123,8 @@ const ClanLayout = () => {
 				<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 				<ChannelList />
 				<div id="clan-footer">
-					{streamPlay && <StreamInfo />}
+					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
+					{streamPlay && <StreamInfo type={ESummaryInfo.STREAM} />}
 					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 					<FooterProfile
 						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
