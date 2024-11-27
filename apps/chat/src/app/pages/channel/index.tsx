@@ -19,6 +19,7 @@ import {
 	gifsStickerEmojiActions,
 	listChannelsByUserActions,
 	onboardingActions,
+	selectAllChannelMembers,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
@@ -201,6 +202,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const [isShowAgeRestricted, setIsShowAgeRestricted] = useState(false);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, channelId));
+	const miniAppRef = useRef<HTMLIFrameElement>(null);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -214,6 +217,10 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
 	const appearanceTheme = useSelector(selectTheme);
+
+	const miniAppDataHash = useMemo(() => {
+		return `userChannels=${JSON.stringify(userChannels)}`;
+	}, [userChannels]);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -232,9 +239,27 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	useEffect(() => {
 		if (appChannel?.url) {
+			const compareHost = (url1: string, url2: string) => {
+				try {
+					const parsedURL1 = new URL(url1);
+					const parsedURL2 = new URL(url2);
+					return parsedURL1.hostname === parsedURL2.hostname;
+				} catch (error) {
+					return false;
+				}
+			};
 			const handleMessage = (event: MessageEvent) => {
-				if (event.origin === appChannel?.url) {
-					// implement logic here
+				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
+					const eventData = JSON.parse(event.data ?? '{}');
+					// eslint-disable-next-line no-console
+					console.log('[MEZON] < ', eventData);
+					if (eventData?.eventType === 'PING') {
+						// send event to mini app
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
+							appChannel.url ?? ''
+						);
+					}
 				}
 			};
 			window.addEventListener('message', handleMessage);
@@ -253,7 +278,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	return currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
 		appChannel?.url ? (
-			<iframe title={appChannel?.url} src={appChannel?.url} className={'w-full h-full'}></iframe>
+			<iframe ref={miniAppRef} title={appChannel?.url} src={appChannel?.url + `#${miniAppDataHash}`} className={'w-full h-full'}></iframe>
 		) : (
 			<div className={'w-full h-full flex items-center justify-center'}>
 				<Loading />
