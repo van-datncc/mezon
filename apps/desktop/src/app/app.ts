@@ -334,11 +334,10 @@ export default class App {
 							autoUpdater.checkForUpdates().then((data) => {
 								if (data) return;
 								const appVersion = app.getVersion();
-								new Notification({
+								new Notification('No update', {
 									icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
-									title: 'No update',
 									body: `The current version (${appVersion}) is the latest.`
-								}).show();
+								});
 							})
 					},
 					{ type: 'separator' },
