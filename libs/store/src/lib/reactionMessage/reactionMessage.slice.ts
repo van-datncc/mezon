@@ -386,3 +386,11 @@ export const selectComputedReactionsByMessageId = (channelId: string, messageId:
 		const combinedId = `${channelId}_${messageId}`;
 		return computedMessageReactions[combinedId] || [];
 	});
+
+export const selectReactionsByEmojiIdFromMessage = (channelId: string, messageId: string, emojiId: string) =>
+	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
+		const combinedId = `${channelId}_${messageId}`;
+		const reactionsForMessage = computedMessageReactions[combinedId] || [];
+		const filteredReactions = reactionsForMessage.filter((reaction) => reaction.emojiId === emojiId);
+		return filteredReactions[0];
+	});
