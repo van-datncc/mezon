@@ -284,7 +284,6 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.setIsInCall(false));
-			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(audioCallActions.setIsRingTone(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
 			dispatch(DMCallActions.removeAll());
