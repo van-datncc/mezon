@@ -43,6 +43,7 @@ import { directMetaReducer } from './direct/directmeta.slice';
 import { audioCallReducer } from './dmcall/audioCall.slice';
 import { DMCallReducer } from './dmcall/dmcall.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
+import { E2EE_FEATURE_KEY, e2eeReducer } from './e2ee/e2ee.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
@@ -364,7 +365,8 @@ const reducer = {
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
 	joinPTT: JoinPTTReducer,
-	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer
+	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
+	[E2EE_FEATURE_KEY]: e2eeReducer
 };
 
 let storeInstance = configureStore({
