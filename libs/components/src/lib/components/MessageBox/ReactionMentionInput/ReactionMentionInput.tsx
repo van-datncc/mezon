@@ -44,12 +44,14 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { processLinks } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
 	IMessageSendPayload,
+	IStartEndIndex,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
@@ -673,6 +675,25 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			textarea.removeAttribute('aria-hidden');
 		}
 	}, []);
+
+	useEffect(() => {
+		processLinks({
+			t: request?.content as string,
+			lk: linkList as IStartEndIndex[]
+		})
+			.then((attachmentUrls) => {
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentDmOrChannelId ?? '',
+						files: attachmentUrls
+					})
+				);
+			})
+			.catch((error) => {
+				console.error('Failed to update message:', error);
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [linkList]);
 
 	return (
 		<div className="relative">
