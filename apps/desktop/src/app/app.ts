@@ -7,11 +7,9 @@ import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
-
-import { FINISH_RENDER, SET_ATTACHMENT_DATA } from '@mezon/utils';
 import { ImageWindowProps } from '../main';
 import setupAutoUpdates from './autoUpdates';
-import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
+import { ACTIVE_WINDOW, FINISH_RENDER, SET_ATTACHMENT_DATA, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
 
