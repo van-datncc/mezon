@@ -1,4 +1,4 @@
-import { app, Menu, MenuItem, MenuItemConstructorOptions, Tray } from 'electron';
+import { app, Menu, MenuItem, MenuItemConstructorOptions, Notification, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import App from './app/app';
@@ -27,7 +27,17 @@ export class TrayIcon {
 				{
 					label: 'Check for updates',
 					type: 'normal',
-					click: () => autoUpdater.checkForUpdates()
+					click: () => {
+						autoUpdater.checkForUpdates().then((data) => {
+							if (!data?.updateInfo) return;
+							const appVersion = app.getVersion();
+							new Notification({
+								icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+								title: 'No update',
+								body: `The current version (${appVersion}) is the latest.`
+							}).show();
+						});
+					}
 				},
 				{
 					label: 'Show Mezon',

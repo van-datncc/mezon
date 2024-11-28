@@ -1,5 +1,4 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, ipcMain, screen, shell } from 'electron';
-import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -345,18 +344,18 @@ export default class App {
 				submenu: [
 					{ role: 'about' },
 					{
-						label: 'Check for Updates...',
-						click: () =>
+						label: 'Check for Updates',
+						click: () => {
 							autoUpdater.checkForUpdates().then((data) => {
-								log.info(`checkForUpdates::: ${JSON.stringify(data)}`);
-								if (data) return;
+								if (!data?.updateInfo) return;
 								const appVersion = app.getVersion();
 								new Notification({
 									icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
 									title: 'No update',
 									body: `The current version (${appVersion}) is the latest.`
 								}).show();
-							})
+							});
+						}
 					},
 					{ type: 'separator' },
 					{
