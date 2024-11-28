@@ -3,8 +3,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/store-mobile';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Swing } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
+import ChannelListSkeleton from '../../../components/Skeletons/ChannelListSkeleton';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
@@ -60,7 +60,7 @@ const DrawerContent = React.memo(() => {
 	if (!isReadyForUse)
 		return (
 			<View style={[styles.containerDrawerEmpty, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
-				<Swing color={themeValue.text} />
+				<ChannelListSkeleton numberSkeleton={6} />
 			</View>
 		);
 	return (

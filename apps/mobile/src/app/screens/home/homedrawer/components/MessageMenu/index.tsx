@@ -3,6 +3,7 @@ import { ENotificationActive, ENotificationChannelId, Icons, UserMinus } from '@
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
+	channelsActions,
 	deleteChannel,
 	directActions,
 	fetchDirectMessage,
@@ -16,7 +17,7 @@ import {
 } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelType } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -116,7 +117,24 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 	};
 
+	const handleEnableOrDisableE2EE = async () => {
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: messageInfo.channel_id,
+			channel_label: '',
+			category_id: messageInfo.category_id,
+			app_url: messageInfo.app_url,
+			e2ee: !messageInfo.e2ee ? 1 : 0
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
+		dismiss();
+	};
+
 	const optionsMenu: IMezonMenuItemProps[] = [
+		{
+			onPress: handleEnableOrDisableE2EE,
+			title: messageInfo?.e2ee ? t('menu.disableE2EE') : t('menu.enableE2EE'),
+			icon: messageInfo?.e2ee ? <Icons.LockUnlockedIcon color={themeValue.textStrong} /> : <Icons.LockIcon color={themeValue.text} />
+		},
 		{
 			title: isDmUnmute ? t('menu.muteConversation') : t('menu.unMuteConversation'),
 			onPress: () => {
