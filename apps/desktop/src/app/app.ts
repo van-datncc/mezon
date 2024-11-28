@@ -248,7 +248,7 @@ export default class App {
 			height: 800,
 			show: true,
 			titleBarOverlay: process.platform == 'darwin',
-			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
+			titleBarStyle: 'hidden',
 			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
@@ -263,23 +263,31 @@ export default class App {
 
 		const newWindow = new BrowserWindow(windowOptions);
 
-		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
-		const fullUrl = this.generateFullUrl(baseUrl, params);
+		if (App.application.isPackaged) {
+			const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
+			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-		newWindow.loadURL(
-			format({
-				pathname: fullUrl,
-				protocol: 'file:',
-				slashes: true,
-				query: params
-			})
-		);
+			newWindow.loadURL(
+				format({
+					pathname: fullUrl,
+					protocol: 'file:',
+					slashes: true,
+					query: params
+				})
+			);
+		} else {
+			const baseUrl = `http://localhost:${rendererAppPort}`;
+			const fullUrl = this.generateFullUrl(baseUrl, params);
+			newWindow.loadURL(fullUrl);
+		}
 
 		newWindow.webContents.on('did-finish-load', () => {
 			ipcMain.once('finish-render', (event) => {
 				newWindow.webContents.send('set-attachment-data', props);
 			});
 		});
+
+		return newWindow;
 	}
 
 	/**

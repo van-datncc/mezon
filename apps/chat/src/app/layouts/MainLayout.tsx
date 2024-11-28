@@ -95,9 +95,9 @@ const GlobalEventListener = () => {
 				const { attachmentData, messageId, mode, attachmentUrl, currentClanId, currentChannelId, currentDmId, checkListAttachment } = props;
 				const dmType = mode === ChannelStreamMode.STREAM_MODE_DM ? ChannelType.CHANNEL_TYPE_DM : ChannelType.CHANNEL_TYPE_GROUP;
 				if (currentDmId) {
-					navigate(`/chat/direct/message/${currentDmId}/${dmType}`);
+					navigate(`/chat/direct/message/${currentDmId}/${dmType}?viewMode=image`);
 				} else {
-					navigate(`/chat/clans/${currentClanId}/channels/${currentChannelId}`);
+					navigate(`/chat/clans/${currentClanId}/channels/${currentChannelId}?viewMode=image`);
 				}
 
 				dispatch(attachmentActions.setMode(mode));
