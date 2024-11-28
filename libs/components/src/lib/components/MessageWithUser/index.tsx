@@ -230,40 +230,37 @@ function MessageWithUser({
 
 	const updateAttachments = useCallback(() => {
 		const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
-		const intervalId = setInterval(() => {
+
+		const processNext = () => {
 			processLinks({
 				t: message.content.t as string,
 				lk: message.content.lk as IStartEndIndex[]
 			})
 				.then((attachmentUrls) => {
 					const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
+
 					if (newAttachmentUrls.length === 0 || !newAttachmentUrls) {
-						clearInterval(intervalId);
 						return;
 					}
+
 					if (newAttachmentUrls.length > 0) {
 						editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
-						clearInterval(intervalId);
 					}
+
+					setTimeout(processNext, 1000);
 				})
 				.catch((error) => {
 					console.error('Failed to update message:', error);
-					clearInterval(intervalId);
 				});
-		}, 1000);
+		};
 
-		setTimeout(() => {
-			clearInterval(intervalId);
-		}, 5000);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		processNext();
 	}, [message.id]);
 
 	useEffect(() => {
 		if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
 		updateAttachments();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [message.id]);
-
+	}, [message.id, updateAttachments]);
 	return (
 		<>
 			{showDivider && <MessageDateDivider message={message} />}
