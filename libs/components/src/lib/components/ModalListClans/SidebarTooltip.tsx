@@ -15,9 +15,9 @@ const SidebarTooltip = ({ titleTooltip, clan, children }: SidebarTooltipProps) =
 	return (
 		<Tooltip
 			content={
-				<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate flex gap-1 items-center">
+				<div style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate flex gap-1 items-center">
 					{clan?.is_onboarding && <OnboardingIcon />} <div className="flex-1 truncate"> {titleTooltip} </div>
-				</p>
+				</div>
 			}
 			trigger="hover"
 			animation="duration-500"

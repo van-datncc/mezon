@@ -32,7 +32,7 @@ import {
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
-	mapMessageChannelToEntity,
+	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,
 	mapReactionToEntity,
 	messagesActions,
@@ -239,7 +239,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
-				const mess = mapMessageChannelToEntity(message);
+				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
@@ -290,6 +290,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
+					if (mess.isMe) {
+						dispatch(channelsActions.updateChannelBadgeCount({ channelId: message.channel_id, count: 0, isReset: true }));
+					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
@@ -784,7 +787,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
+
+			if (channelUpdated.clan_id === '0') {
+				return dispatch(directActions.updateOne(channelUpdated));
+			}
+
 			if (channelUpdated) {
+				//TODO: improve update once item
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {

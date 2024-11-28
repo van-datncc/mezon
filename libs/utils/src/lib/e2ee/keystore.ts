@@ -35,7 +35,7 @@ export class KeyStore {
 		this.objectStoreName = objectStoreName;
 	}
 
-	static async open(userID: string): Promise<KeyStore> {
+	static async open(): Promise<KeyStore> {
 		if (navigator.storage && navigator.storage.persist) {
 			await navigator.storage.persist();
 		}
