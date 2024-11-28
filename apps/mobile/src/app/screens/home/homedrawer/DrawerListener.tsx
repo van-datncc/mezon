@@ -1,4 +1,4 @@
-import { useAuth, useSeenMessagePool } from '@mezon/core';
+import { useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import {
 	ChannelsEntity,
@@ -6,10 +6,10 @@ import {
 	channelsActions,
 	clansActions,
 	gifsStickerEmojiActions,
+	listChannelsByUserActions,
 	selectAnyUnreadChannels,
 	selectChannelById,
 	selectFetchChannelStatus,
-	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
 	useAppDispatch,
 	useAppSelector
@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
+	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
@@ -34,19 +34,17 @@ function useChannelSeen(channelId: string) {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch]);
 
-	const { userId } = useAuth();
 	const { markAsReadSeen } = useSeenMessagePool();
-	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {
 		const mode =
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 		if (lastMessage) {
 			markAsReadSeen(lastMessage, mode);
 		}
-	}, [lastMessage, channelId]);
+	}, [lastMessage, channelId, markAsReadSeen, currentChannel?.type]);
 
 	useEffect(() => {
-		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
 			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
 		}
@@ -54,6 +52,7 @@ function useChannelSeen(channelId: string) {
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
+			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
 		const timestamp = Date.now() / 1000;
@@ -61,7 +60,7 @@ function useChannelSeen(channelId: string) {
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [currentChannel?.id, statusFetchChannel]);
+	}, [currentChannel?.id, statusFetchChannel, channelId, currentChannel, dispatch, resetBadgeCount]);
 }
 
 function DrawerListener({ channelId }: { channelId: string }) {
