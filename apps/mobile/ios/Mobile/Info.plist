@@ -29,10 +29,13 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>videocalling</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj</string>
 				<string>mezon.mobile.sharing</string>
+				<string>videocalling</string>
 			</array>
 		</dict>
 	</array>
@@ -100,8 +103,10 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
+		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>

@@ -2,7 +2,7 @@ import { ApiPubKey } from 'mezon-js/api.gen';
 import { KeyStore, KeyStoreError } from './keystore';
 import { arrayBufferEqual, concatArrayBuffers, eqSet } from './utils';
 
-const subtle = window.crypto.subtle;
+const subtle = window?.crypto?.subtle || '';
 
 const CurveName = 'P-256';
 const SignAlgo = { name: 'ECDSA', hash: 'SHA-256' };

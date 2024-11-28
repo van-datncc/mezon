@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/ui';
+import { useLongPress } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -18,6 +19,15 @@ export function PushToTalkBtn({ isLightMode }: IPushToTalkBtnProps) {
 
 	const localAudioRef = useRef<HTMLAudioElement | null>(null);
 	const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+
+	const longPressHandlers = useLongPress<HTMLDivElement>({
+		onStart: () => {
+			setIsTalking(true);
+		},
+		onFinish: () => {
+			setIsTalking(false);
+		}
+	});
 
 	const startJoinPTT = async () => {
 		try {
@@ -63,7 +73,11 @@ export function PushToTalkBtn({ isLightMode }: IPushToTalkBtnProps) {
 
 	return (
 		<div className="relative flex gap-[15px] leading-5 h-5">
-			{isJoined && <MicIcon isTalking={isTalking} onClick={() => setIsTalking((value) => !value)} />}
+			{isJoined && (
+				<div {...longPressHandlers}>
+					<MicIcon isTalking={isTalking} />
+				</div>
+			)}
 
 			<Tooltip
 				className={`w-[140px] flex justify-center items-center`}

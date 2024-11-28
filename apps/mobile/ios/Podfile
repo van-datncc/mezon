@@ -65,6 +65,7 @@ target 'Mobile' do
   pod 'RNFS', :path => '../node_modules/react-native-fs'
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'CodePush', :path => '../node_modules/react-native-code-push'
+  pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
 
   use_react_native!(
     :path => config[:reactNativePath],
