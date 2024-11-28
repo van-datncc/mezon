@@ -57,13 +57,19 @@ const DrawerContent = React.memo(() => {
 			clearTimeout(timer);
 		};
 	}, []);
+	if (!isReadyForUse)
+		return (
+			<View style={[styles.containerDrawerEmpty, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
+				<ChannelListSkeleton numberSkeleton={6} />
+			</View>
+		);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					<ServerList />
 					<BackNativeListener />
-					{isReadyForUse ? <ChannelListWrapper /> : <ChannelListSkeleton numberSkeleton={6} />}
+					<ChannelListWrapper />
 				</View>
 				{isTabletLandscape && <ProfileBar />}
 			</View>
