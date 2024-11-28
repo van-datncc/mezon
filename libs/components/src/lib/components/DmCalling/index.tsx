@@ -56,7 +56,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	useEffect(() => {
 		if (isJoinedCall && !isInCall) {
 			dispatch(DMCallActions.setIsInCall(false));
-			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(audioCallActions.setIsRingTone(false));
 			dispatch(DMCallActions.removeAll());
 		}
@@ -257,6 +256,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					<div className="justify-center items-center gap-4 flex w-full">
 						{avatarImages.map((avatar, index) => (
 							<AvatarImage
+								key={index}
 								height={'75px'}
 								alt={`Avatar ${index + 1}`}
 								userName={`Avatar ${index + 1}`}

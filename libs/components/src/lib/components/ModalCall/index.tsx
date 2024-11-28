@@ -24,7 +24,6 @@ const ModalCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
 	useEffect(() => {
 		if (isJoinedCall && !isInCall) {
 			dispatch(DMCallActions.setIsInCall(false));
-			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(audioCallActions.setIsRingTone(false));
 			dispatch(DMCallActions.removeAll());
 		}
