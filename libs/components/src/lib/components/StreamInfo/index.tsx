@@ -9,6 +9,7 @@ import {
 	selectDirectById,
 	selectDmGroupCurrent,
 	selectGroupCallId,
+	selectJoinedCall,
 	selectStreamMembersByChannelId,
 	selectTheme,
 	useAppDispatch,
@@ -38,6 +39,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(groupCallId ?? ''));
 	const dmUserId = currentDmGroup?.user_id?.[0] || '';
 	const direct = useAppSelector((state) => selectDirectById(state, groupCallId)) || {};
+	const isJoinedCall = useSelector(selectJoinedCall);
 
 	const { handleEndCall, toggleAudio, toggleVideo } = useWebRTCCall(dmUserId, groupCallId as string, userProfile?.user?.id as string);
 
@@ -108,7 +110,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 					<div className="flex items-center gap-1">
 						<Icons.NetworkStatus defaultSize="w-4 h-4 dark:text-channelTextLabel" />
 						<span className="text-green-700 font-bold text-base">
-							{type === ESummaryInfo.CALL ? 'Call Connected' : 'Stream Connected'}
+							{type === ESummaryInfo.CALL ? `${isJoinedCall ? 'Call Connected' : 'Calling...'}` : 'Stream Connected'}
 						</span>
 					</div>
 					<button className="w-fit" onClick={handleClick}>

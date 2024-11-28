@@ -9,6 +9,7 @@ import {
 	selectIsMuteMicrophone,
 	selectIsShowMeetDM,
 	selectIsShowShareScreen,
+	selectJoinedCall,
 	selectRemoteAudio,
 	selectRemoteVideo,
 	selectSignalingDataByUserId,
@@ -50,6 +51,16 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const isRemoteAudio = useSelector(selectRemoteAudio);
 	const isRemoteVideo = useSelector(selectRemoteVideo);
 	const [activeVideo, setActiveVideo] = useState<'local' | 'remote' | null>(null);
+	const isJoinedCall = useSelector(selectJoinedCall);
+
+	useEffect(() => {
+		if (isJoinedCall && !isInCall) {
+			dispatch(DMCallActions.setIsInCall(false));
+			dispatch(audioCallActions.setIsEndTone(true));
+			dispatch(audioCallActions.setIsRingTone(false));
+			dispatch(DMCallActions.removeAll());
+		}
+	}, [dispatch, isInCall, isJoinedCall]);
 
 	const isInChannelCalled = useMemo(() => {
 		return currentDmGroup?.user_id?.some((i) => i === signalingData?.[0]?.callerId);

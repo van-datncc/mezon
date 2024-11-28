@@ -1,9 +1,11 @@
 import { useUserByUserId } from '@mezon/core';
-import { audioCallActions, DMCallActions, useAppDispatch } from '@mezon/store';
+import { audioCallActions, DMCallActions, selectIsInCall, selectJoinedCall, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import { WebrtcSignalingFwd } from 'mezon-js';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 interface ModalCallProps {
@@ -16,6 +18,17 @@ const ModalCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
 	const user = useUserByUserId(dataCall?.caller_id);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
+	const isJoinedCall = useSelector(selectJoinedCall);
+	const isInCall = useSelector(selectIsInCall);
+
+	useEffect(() => {
+		if (isJoinedCall && !isInCall) {
+			dispatch(DMCallActions.setIsInCall(false));
+			dispatch(audioCallActions.setIsEndTone(true));
+			dispatch(audioCallActions.setIsRingTone(false));
+			dispatch(DMCallActions.removeAll());
+		}
+	}, [dispatch, isInCall, isJoinedCall]);
 
 	const handleJoinCall = async () => {
 		triggerCall();
