@@ -1,17 +1,12 @@
 import { useAppParams, useAttachments } from '@mezon/core';
 import { attachmentActions, checkListAttachmentExist, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import {
-	SHOW_POSITION,
-	createImgproxyUrl,
-	notImplementForGifOrStickerSendFromPanel,
-	ImageWindowProps
-} from '@mezon/utils';
+import { ImageWindowProps, SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
-import isElectron from "is-electron";
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment & { create_time?: string };
@@ -33,24 +28,23 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const [showLoader, setShowLoader] = useState(false);
 	const fadeIn = useRef(false);
 	const checkListAttachment = useSelector(checkListAttachmentExist((currentDmGroupId || currentChannelId) as string));
-	
+
 	const handleClick = (url: string) => {
 		if (checkImage) return;
-		
-		if(isElectron()) {
+
+		if (isElectron()) {
 			const props: ImageWindowProps = {
 				attachmentData: attachmentData,
 				messageId: messageId as string,
 				mode: mode as ChannelStreamMode,
 				attachmentUrl: url,
-				currentClanId: currentClanId  as string,
+				currentClanId: currentClanId as string,
 				currentChannelId: currentChannelId as string,
 				currentDmId: currentDmGroupId as string,
 				checkListAttachment: checkListAttachment
-			}
-			
+			};
+
 			window.electron.openNewWindow(props);
-			
 		} else {
 			dispatch(attachmentActions.setMode(mode));
 			setOpenModalAttachment(true);
@@ -62,13 +56,13 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					create_time: attachmentData.create_time
 				})
 			);
-			
+
 			if (((currentClanId && currentChannelId) || currentDmGroupId) && !checkListAttachment) {
 				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
 				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			}
-			
+
 			dispatch(attachmentActions.setMessageId(messageId));
 		}
 	};
