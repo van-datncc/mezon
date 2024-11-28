@@ -132,6 +132,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				dispatch(toastActions.addToast({ message: 'Connection disconnected', type: 'warning', autoClose: 3000 }));
 				dispatch(audioCallActions.setIsJoinedCall(false));
 				handleEndCall();
+				if (callTimeout.current) {
+					clearTimeout(callTimeout.current);
+					callTimeout.current = null;
+				}
 			}
 		};
 
