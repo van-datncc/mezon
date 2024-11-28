@@ -44,14 +44,13 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { processLinks } from '@mezon/transport';
+import { extractLinks, processLinks } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
 	IMessageSendPayload,
-	IStartEndIndex,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
@@ -67,6 +66,7 @@ import {
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
+	processText,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -477,7 +477,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const previousValue = prevValueRef.current;
 		const previousPlainText = prevPlainTextRef.current;
-
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
@@ -548,6 +547,58 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setTitleModalMention('Text channels');
 		} else if (newPlainTextValue.endsWith(':')) {
 			setTitleModalMention('Emoji matching');
+		}
+		const { links } = processText(newPlainTextValue.trim());
+		if (!links || links.length === 0) return;
+		const extractedLinks = extractLinks(newPlainTextValue.trim(), links);
+		const uniqueLinks = [...new Set(extractedLinks)];
+		// console.log('uniqueLinks :', uniqueLinks);
+		//case 1: Only 1 link
+		const onlyLink = (links[0]?.e && links[0]?.e - (links[0]?.s ?? 0)) === newPlainTextValue.trim().length;
+		if (links.length === 1 && onlyLink) {
+			processLinks(uniqueLinks)
+				.then((attachmentUrls) => {
+					dispatch(
+						referencesActions.setAtachmentAfterUpload({
+							channelId: currentDmOrChannelId ?? '',
+							files: attachmentUrls
+						})
+					);
+					setRequestInput(
+						{
+							...request,
+							valueTextInput: '',
+							content: '',
+							mentionRaw: []
+						},
+						props.isThread
+					);
+				})
+				.catch((error) => {
+					console.error('Failed to update message:', error);
+				});
+		} else {
+			processLinks(uniqueLinks)
+				.then((attachmentUrls) => {
+					dispatch(
+						referencesActions.setAtachmentAfterUpload({
+							channelId: currentDmOrChannelId ?? '',
+							files: attachmentUrls
+						})
+					);
+					setRequestInput(
+						{
+							...request,
+							valueTextInput: newValue,
+							content: newPlainTextValue,
+							mentionRaw: mentions
+						},
+						props.isThread
+					);
+				})
+				.catch((error) => {
+					console.error('Failed to update message:', error);
+				});
 		}
 	};
 
@@ -676,24 +727,24 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, []);
 
-	useEffect(() => {
-		processLinks({
-			t: request?.content as string,
-			lk: linkList as IStartEndIndex[]
-		})
-			.then((attachmentUrls) => {
-				dispatch(
-					referencesActions.setAtachmentAfterUpload({
-						channelId: currentDmOrChannelId ?? '',
-						files: attachmentUrls
-					})
-				);
-			})
-			.catch((error) => {
-				console.error('Failed to update message:', error);
-			});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [linkList]);
+	// useEffect(() => {
+	// 	processLinks({
+	// 		t: request?.content as string,
+	// 		lk: linkList as IStartEndIndex[]
+	// 	})
+	// 		.then((attachmentUrls) => {
+	// 			dispatch(
+	// 				referencesActions.setAtachmentAfterUpload({
+	// 					channelId: currentDmOrChannelId ?? '',
+	// 					files: attachmentUrls
+	// 				})
+	// 			);
+	// 		})
+	// 		.catch((error) => {
+	// 			console.error('Failed to update message:', error);
+	// 		});
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [linkList]);
 
 	return (
 		<div className="relative">

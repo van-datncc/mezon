@@ -1,4 +1,4 @@
-import { ILinkOnMessage, IStartEndIndex } from '@mezon/utils';
+import { ILinkOnMessage } from '@mezon/utils';
 import { Buffer as BufferMobile } from 'buffer';
 import memoizee from 'memoizee';
 import { Client, Session } from 'mezon-js';
@@ -237,22 +237,16 @@ const memoizedHandleUrlInput = memoizee(handleUrlInput, {
 	preFetch: true
 });
 
-export function processLinks(content: { t: string; lk: IStartEndIndex[] }) {
-	if (content.lk && content.lk.length > 0) {
-		const extractedLinks = extractLinks(content.t, content.lk);
-
-		return Promise.all(
-			extractedLinks.map((link) =>
-				memoizedHandleUrlInput(link).catch((error) => {
-					console.warn(`Failed to fetch HEAD for URL ${link}: ${error.message}`);
-					return null;
-				})
-			)
-		).then((results) => {
-			const validLinks = results.filter((result) => result !== null) as ApiMessageAttachment[];
-			return validLinks;
-		});
-	}
-
-	return Promise.resolve([]);
+export function processLinks(extractedLinks: string[]) {
+	return Promise.all(
+		extractedLinks.map((link) =>
+			memoizedHandleUrlInput(link).catch((error) => {
+				console.warn(`Failed to fetch HEAD for URL ${link}: ${error.message}`);
+				return null;
+			})
+		)
+	).then((results) => {
+		const validLinks = results.filter((result) => result !== null) as ApiMessageAttachment[];
+		return validLinks;
+	});
 }
