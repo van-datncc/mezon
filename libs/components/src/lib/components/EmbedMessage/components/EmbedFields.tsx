@@ -4,9 +4,10 @@ import { EmbedOptionRatio } from './EmbedOptionRatio';
 
 interface EmbedFieldsProps {
 	fields: IFieldEmbed[];
+	message_id: string;
 }
 
-export function EmbedFields({ fields }: EmbedFieldsProps) {
+export function EmbedFields({ fields, message_id }: EmbedFieldsProps) {
 	const groupedFields = useMemo(() => {
 		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
 			if (!field.inline) {
@@ -33,7 +34,7 @@ export function EmbedFields({ fields }: EmbedFieldsProps) {
 							<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
 							{field.options && (
 								<div className="flex flex-col gap-1">
-									<EmbedOptionRatio key={field.value} options={field.options} />
+									<EmbedOptionRatio key={field.value} options={field.options} message_id={message_id} />
 								</div>
 							)}
 						</div>

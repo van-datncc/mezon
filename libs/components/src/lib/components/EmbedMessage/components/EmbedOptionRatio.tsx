@@ -1,18 +1,22 @@
+import { embedActions } from '@mezon/store';
 import { IMessageRatioOption } from '@mezon/utils';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { MessageRatioButton } from '../../MessageActionsPanel/components/MessageRatio';
 import { EmbedDescription } from './EmbedDescription';
 import { EmbedTitle } from './EmbedTitle';
 
 interface EmbedOptionRatioProps {
 	options: IMessageRatioOption[];
+	message_id: string;
 }
 
-export function EmbedOptionRatio({ options }: EmbedOptionRatioProps) {
+export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps) {
 	const [checked, setChecked] = useState<number[]>([]);
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
 			setChecked([index]);
+			handleAddEmbedRadioValue();
 			return;
 		}
 		if (checked.includes(index)) {
@@ -20,6 +24,21 @@ export function EmbedOptionRatio({ options }: EmbedOptionRatioProps) {
 			return;
 		}
 		setChecked([...checked, index]);
+		handleAddEmbedRadioValue();
+	};
+
+	const dispatch = useDispatch();
+
+	const handleAddEmbedRadioValue = () => {
+		dispatch(
+			embedActions.addEmbedValueInput({
+				message_id: message_id,
+				data: {
+					id: 'This is id',
+					value: 'This is value for testing'
+				}
+			})
+		);
 	};
 	return (
 		<>
