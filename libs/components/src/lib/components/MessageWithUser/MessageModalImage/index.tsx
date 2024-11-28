@@ -193,6 +193,12 @@ const MessageModalImage = () => {
 		e.stopPropagation();
 	};
 
+	const handleClickOutsideImage = () => {
+		if (!isElectron()) {
+			closeModal();
+		}
+	};
+
 	return (
 		<div
 			className={`justify-center items-center flex flex-col fixed z-40 inset-0 outline-none focus:outline-nonebg-black text-colorTextLightMode select-none ${isElectron() ? 'top-[21px]' : ''}`}
@@ -206,7 +212,10 @@ const MessageModalImage = () => {
 				)}
 			</div>
 			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
-				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative" onClick={closeModal}>
+				<div
+					className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative"
+					onClick={handleClickOutsideImage}
+				>
 					<img
 						src={createImgproxyUrl(urlImg ?? '', { width: 0, height: 0, resizeType: 'force' })}
 						alt={urlImg}
