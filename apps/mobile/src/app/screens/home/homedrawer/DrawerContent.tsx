@@ -3,8 +3,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/store-mobile';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Swing } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
+import ChannelListSkeleton from '../../../components/Skeletons/ChannelListSkeleton';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
@@ -57,19 +57,13 @@ const DrawerContent = React.memo(() => {
 			clearTimeout(timer);
 		};
 	}, []);
-	if (!isReadyForUse)
-		return (
-			<View style={[styles.containerDrawerEmpty, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
-				<Swing color={themeValue.text} />
-			</View>
-		);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					<ServerList />
 					<BackNativeListener />
-					<ChannelListWrapper />
+					{isReadyForUse ? <ChannelListWrapper /> : <ChannelListSkeleton numberSkeleton={6} />}
 				</View>
 				{isTabletLandscape && <ProfileBar />}
 			</View>
