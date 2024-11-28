@@ -335,58 +335,44 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 	};
 
 	const toggleVideo = async () => {
-		if (callState.localStream) {
-			const haveCameraPermission = await requestCameraPermission();
-			if (!haveCameraPermission) {
-				Toast.show({
-					type: 'error',
-					text1: 'Camera is not available'
+		if (!callState.localStream) return;
+
+		const haveCameraPermission = await requestCameraPermission();
+		if (!haveCameraPermission) {
+			Toast.show({
+				type: 'error',
+				text1: 'Camera is not available'
+			});
+			return;
+		}
+
+		const videoTracks = callState.localStream.getVideoTracks();
+		const isCameraOn = videoTracks?.length > 0;
+
+		try {
+			if (!isCameraOn) {
+				const videoStream = await mediaDevices.getUserMedia({ video: true });
+				const videoTrack = videoStream.getVideoTracks()[0];
+
+				videoTrack.enabled = !localMediaControl?.camera;
+
+				videoStream.getTracks().forEach((track) => {
+					callState.peerConnection?.addTrack(track, videoStream);
 				});
-				return;
-			}
-			const videoTracks = callState.localStream.getVideoTracks();
-			if (videoTracks?.length === 0) {
-				try {
-					const videoStream = await mediaDevices.getUserMedia({
-						video: true
-					});
-					const videoTrack = videoStream.getVideoTracks()[0];
+				callState.localStream.addTrack(videoTrack);
 
-					videoTrack.enabled = localMediaControl?.camera ? false : true;
-
-					videoStream.getTracks().forEach((track) => {
-						callState.peerConnection?.addTrack(track, videoStream);
-					});
-					callState.localStream.addTrack(videoTrack);
-					try {
-						const offer = await callState?.peerConnection?.createOffer(sessionConstraints);
-						await callState.peerConnection?.setLocalDescription(offer);
-						const compressedOffer = await compress(JSON.stringify(offer));
-						await mezon.socketRef.current?.forwardWebrtcSignaling(
-							dmUserId,
-							WebrtcSignalingType.WEBRTC_SDP_OFFER,
-							compressedOffer,
-							channelId,
-							userId
-						);
-					} catch (error) {
-						console.error(error);
-					}
-				} catch (error) {
-					console.error('Error adding video track:', error);
-				}
+				await updatePeerConnectionOffer();
 			} else {
-				const senders = callState.peerConnection?.getSenders() || [];
-				const videoSender = senders.find((sender) => sender.track?.kind === 'video');
 				videoTracks.forEach((track) => {
 					track.enabled = !track.enabled;
 				});
+
+				const videoSender = callState.peerConnection?.getSenders().find((sender) => sender.track?.kind === 'video');
+
 				if (videoSender && videoTracks[0]) {
 					await videoSender.replaceTrack(videoTracks[0]);
 				} else if (videoTracks[0]) {
 					callState.peerConnection?.addTrack(videoTracks[0], callState.localStream);
-				} else {
-					/* empty */
 				}
 			}
 
@@ -394,6 +380,20 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 				...prev,
 				camera: !prev.camera
 			}));
+		} catch (error) {
+			console.error('Error toggling video:', error);
+		}
+	};
+
+	const updatePeerConnectionOffer = async () => {
+		try {
+			const offer = await callState.peerConnection?.createOffer(sessionConstraints);
+			await callState.peerConnection?.setLocalDescription(offer);
+
+			const compressedOffer = await compress(JSON.stringify(offer));
+			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
+		} catch (error) {
+			console.error('Error creating and forwarding offer:', error);
 		}
 	};
 
