@@ -1,4 +1,4 @@
-import {ImageWindowProps} from "../../types";
+import { ImageWindowProps } from '../../types';
 
 export type ElectronBridgeHandler = (...args: any[]) => void;
 export type MezonElectronAPI = {
@@ -13,9 +13,7 @@ export type MezonElectronAPI = {
 	setBadgeCount: (badgeCount: number | null) => void;
 	onWindowBlurred: (callback: () => void) => void;
 	onWindowFocused: (callback: () => void) => void;
-	openNewWindow: (
-		props: ImageWindowProps
-	) => Promise<ImageWindowProps>;
+	openNewWindow: (props: ImageWindowProps) => Promise<ImageWindowProps>;
 };
 declare global {
 	interface Window {
