@@ -65,6 +65,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
+	const callTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	// Initialize peer connection with proper configuration
 	const initializePeerConnection = useCallback(() => {
@@ -120,10 +121,21 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		pc.oniceconnectionstatechange = () => {
 			if (pc.iceConnectionState === 'connected') {
 				dispatch(toastActions.addToast({ message: 'Connection connected', type: 'success', autoClose: 3000 }));
+				dispatch(audioCallActions.setIsJoinedCall(true));
+				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
+				if (callTimeout.current) {
+					clearTimeout(callTimeout.current);
+					callTimeout.current = null;
+				}
 			}
 			if (pc.iceConnectionState === 'disconnected') {
 				dispatch(toastActions.addToast({ message: 'Connection disconnected', type: 'warning', autoClose: 3000 }));
+				dispatch(audioCallActions.setIsJoinedCall(false));
 				handleEndCall();
+				if (callTimeout.current) {
+					clearTimeout(callTimeout.current);
+					callTimeout.current = null;
+				}
 			}
 		};
 
@@ -198,6 +210,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			const compressedOffer = await compress(JSON.stringify(offer));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 
+			// Start a 30-second timeout to end the call if no answer
+			callTimeout.current = setTimeout(() => {
+				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));
+				handleEndCall();
+			}, 30000);
+
 			if (localVideoRef.current) {
 				localVideoRef.current.srcObject = stream;
 			}
@@ -244,6 +262,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					const decompressedData = await decompress(signalingData.json_data);
 					const answer = JSON.parse(decompressedData || '{}');
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+
+					if (callTimeout.current) {
+						clearTimeout(callTimeout.current);
+						callTimeout.current = null;
+					}
+
 					// Add stored ICE candidates
 					if (callState.storedIceCandidates) {
 						for (const candidate of callState.storedIceCandidates) {
@@ -280,6 +304,11 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	// End call and cleanup
 	const handleEndCall = async () => {
 		try {
+			if (callTimeout.current) {
+				clearTimeout(callTimeout.current);
+				callTimeout.current = null;
+			}
+
 			if (callState.localStream) {
 				callState.localStream.getTracks().forEach((track) => track.stop());
 			}
