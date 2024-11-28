@@ -2,6 +2,7 @@ import {
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentUserId,
+	selectDataFormEmbedByMessageId,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	useAppDispatch
@@ -23,6 +24,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const currentUserId = useSelector(selectCurrentUserId);
+	const embedData = useSelector((state) => selectDataFormEmbedByMessageId(state, messageId));
 	const dispatch = useAppDispatch();
 
 	const buttonColor = useMemo(() => {
@@ -44,6 +46,15 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 
 	const handleClickButton = () => {
 		if (!button.url) {
+			let extra_data = '';
+			embedData.map((data) => {
+				const objectData = `{id: '${data.id}', value: '${data.value}'}`;
+				if (extra_data === '') {
+					extra_data = objectData;
+				} else {
+					extra_data = extra_data + ',' + objectData;
+				}
+			});
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,
@@ -51,7 +62,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 					button_id: buttonId,
 					sender_id: senderId,
 					user_id: currentUserId,
-					extra_data: ''
+					extra_data: extra_data
 				})
 			);
 		}
