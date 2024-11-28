@@ -160,9 +160,9 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			});
 			// Send offer through signaling server
 			const compressedOffer = await compress(JSON.stringify(offer));
-			// if (!isAnswerCall) {
-			// 	await mezon.socketRef.current?.makeCallPush(dmUserId, '', channelId, userId);
-			// }
+			if (!isAnswerCall) {
+				await mezon.socketRef.current?.makeCallPush(dmUserId, '', channelId, userId);
+			}
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 		} catch (error) {
 			console.error('Error starting call:', error);
@@ -204,19 +204,15 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 				}
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
-					if (callState.peerConnection.signalingState === 'have-local-offer') {
-						const decompressedData = await decompress(signalingData.json_data);
-						const answer = JSON.parse(decompressedData || '{}');
-						await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-						// Add stored ICE candidates
-						if (callState.storedIceCandidates) {
-							for (const candidate of callState.storedIceCandidates) {
-								await callState.peerConnection.addIceCandidate(candidate);
-							}
-							callState.storedIceCandidates = [];
+					const decompressedData = await decompress(signalingData.json_data);
+					const answer = JSON.parse(decompressedData || '{}');
+					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+					// Add stored ICE candidates
+					if (callState.storedIceCandidates) {
+						for (const candidate of callState.storedIceCandidates) {
+							await callState.peerConnection.addIceCandidate(candidate);
 						}
-					} else {
-						console.warn('Peer connection is not in the correct state to set remote answer');
+						callState.storedIceCandidates = [];
 					}
 					break;
 				}
