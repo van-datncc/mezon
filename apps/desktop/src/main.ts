@@ -4,7 +4,18 @@ import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import App from './app/app';
-import { DOWNLOAD_FILE, NAVIGATE_TO_URL, OPEN_NEW_WINDOW, SENDER_ID } from './app/events/constants';
+import {
+	CLOSE_APP,
+	DOWNLOAD_FILE,
+	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAXIMIZE_WINDOW,
+	MINIMIZE_WINDOW,
+	NAVIGATE_TO_URL,
+	OPEN_NEW_WINDOW,
+	SENDER_ID,
+	TITLE_BAR_ACTION,
+	UNMAXIMIZE_WINDOW
+} from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -99,24 +110,24 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 	}
 
 	switch (action) {
-		case 'MINIMIZE_WINDOW':
+		case MINIMIZE_WINDOW:
 			window.minimize();
 			break;
-		case 'UNMAXIMIZE_WINDOW':
+		case UNMAXIMIZE_WINDOW:
 			if (window.isMaximized()) {
 				window.unmaximize();
 			} else {
 				window.maximize();
 			}
 			break;
-		case 'MAXIMIZE_WINDOW':
+		case MAXIMIZE_WINDOW:
 			if (window.isMaximized()) {
 				window.restore();
 			} else {
 				window.maximize();
 			}
 			break;
-		case 'CLOSE_APP':
+		case CLOSE_APP:
 			window.close();
 			break;
 	}
@@ -125,12 +136,12 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
 	const newWindow = App.openNewWindow(props, options, params);
 
-	ipcMain.on('IMAGE_WINDOW_TITLE_BAR_ACTION', (event, action, data) => {
+	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
 		handleWindowAction(newWindow, action);
 	});
 });
 
-ipcMain.on('TITLE_BAR_ACTION', (event, action, data) => {
+ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
 	handleWindowAction(App.mainWindow, action);
 });
 

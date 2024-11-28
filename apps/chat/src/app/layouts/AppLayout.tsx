@@ -2,7 +2,17 @@ import { ToastController } from '@mezon/components';
 import { useEscapeKey } from '@mezon/core';
 import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
-import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
+import {
+	CLOSE_APP,
+	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAXIMIZE_WINDOW,
+	MINIMIZE_WINDOW,
+	TITLE_BAR_ACTION,
+	UNMAXIMIZE_WINDOW,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	notificationService
+} from '@mezon/utils';
 import isElectron from 'is-electron';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,22 +26,22 @@ type TitleBarProps = {
 
 const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 	const handleMinimize = () => {
-		window.electron.send(eventName, 'MINIMIZE_WINDOW');
+		window.electron.send(eventName, MINIMIZE_WINDOW);
 	};
 	useEffect(() => {
 		document.body.classList.add('overflow-hidden');
 	}, []);
 
 	const handleMaximize = () => {
-		window.electron.send(eventName, 'MAXIMIZE_WINDOW');
+		window.electron.send(eventName, MAXIMIZE_WINDOW);
 	};
 
 	const handleClose = () => {
-		window.electron.send(eventName, 'CLOSE_APP');
+		window.electron.send(eventName, CLOSE_APP);
 	};
 
 	const handleDoubleClick = () => {
-		window.electron.send(eventName, 'UNMAXIMIZE_WINDOW');
+		window.electron.send(eventName, UNMAXIMIZE_WINDOW);
 	};
 
 	return (
@@ -119,7 +129,7 @@ const AppLayout = () => {
 
 	useEscapeKey(() => {
 		if (isElectron() && viewMode === 'image') {
-			window.electron.send('IMAGE_WINDOW_TITLE_BAR_ACTION', 'CLOSE_APP');
+			window.electron.send(IMAGE_WINDOW_TITLE_BAR_ACTION, CLOSE_APP);
 		}
 	});
 
@@ -127,7 +137,7 @@ const AppLayout = () => {
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">
 				{(isWindowsDesktop || isLinuxDesktop) && (
-					<TitleBar eventName={viewMode === 'image' ? 'IMAGE_WINDOW_TITLE_BAR_ACTION' : 'TITLE_BAR_ACTION'} />
+					<TitleBar eventName={viewMode === 'image' ? IMAGE_WINDOW_TITLE_BAR_ACTION : TITLE_BAR_ACTION} />
 				)}
 				<ToastController />
 				<Outlet />

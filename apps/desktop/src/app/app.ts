@@ -8,6 +8,7 @@ import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 
+import { FINISH_RENDER, SET_ATTACHMENT_DATA } from '@mezon/utils';
 import { ImageWindowProps } from '../main';
 import setupAutoUpdates from './autoUpdates';
 import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
@@ -283,8 +284,8 @@ export default class App {
 		}
 
 		newWindow.webContents.on('did-finish-load', () => {
-			ipcMain.once('finish-render', (event) => {
-				newWindow.webContents.send('set-attachment-data', props);
+			ipcMain.once(FINISH_RENDER, (event) => {
+				newWindow.webContents.send(SET_ATTACHMENT_DATA, props);
 			});
 		});
 

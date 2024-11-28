@@ -8,7 +8,7 @@ import {
 	selectBadgeCountAllClan,
 	useAppDispatch
 } from '@mezon/store';
-import { MessageCrypt } from '@mezon/utils';
+import { FINISH_RENDER, MessageCrypt, SET_ATTACHMENT_DATA } from '@mezon/utils';
 
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
@@ -89,7 +89,7 @@ const GlobalEventListener = () => {
 
 	useEffect(() => {
 		if (isElectron()) {
-			window.electron.send('finish-render');
+			window.electron.send(FINISH_RENDER);
 
 			const handleSetAttachmentData = (props: ImageWindowProps) => {
 				const { attachmentData, messageId, mode, attachmentUrl, currentClanId, currentChannelId, currentDmId, checkListAttachment } = props;
@@ -120,12 +120,12 @@ const GlobalEventListener = () => {
 				dispatch(attachmentActions.setMessageId(messageId));
 			};
 
-			window.electron.on('set-attachment-data', (event, data) => {
+			window.electron.on(SET_ATTACHMENT_DATA, (event, data) => {
 				handleSetAttachmentData(data);
 			});
 
 			return () => {
-				window.electron?.removeListener('set-attachment-data', handleSetAttachmentData);
+				window.electron?.removeListener(SET_ATTACHMENT_DATA, handleSetAttachmentData);
 			};
 		}
 	}, []);
