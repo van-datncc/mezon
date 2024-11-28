@@ -1,18 +1,14 @@
+import { IFieldEmbed } from '@mezon/utils';
 import { useMemo } from 'react';
-
-interface Field {
-	name: string;
-	value: string;
-	inline?: boolean;
-}
+import { EmbedOptionRatio } from './EmbedOptionRatio';
 
 interface EmbedFieldsProps {
-	fields: Field[];
+	fields: IFieldEmbed[];
 }
 
 export function EmbedFields({ fields }: EmbedFieldsProps) {
 	const groupedFields = useMemo(() => {
-		return fields.reduce<Field[][]>((acc, field) => {
+		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
 			if (!field.inline) {
 				acc.push([field]);
 			} else {
@@ -34,8 +30,12 @@ export function EmbedFields({ fields }: EmbedFieldsProps) {
 					{row.map((field, index) => (
 						<div key={index} className={`${field.inline ? `col-span-${3 / row.length}` : 'col-span-3'}`}>
 							<div className="font-semibold text-sm">{field.name}</div>
-
 							<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
+							{field.options && (
+								<div className="flex flex-col gap-1">
+									<EmbedOptionRatio key={field.value} options={field.options} />
+								</div>
+							)}
 						</div>
 					))}
 				</div>
