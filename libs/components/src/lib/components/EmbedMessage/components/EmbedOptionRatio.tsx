@@ -22,7 +22,11 @@ export function EmbedOptionRatio({ options }: EmbedOptionRatioProps) {
 							<EmbedTitle title={option.label} />
 							<EmbedDescription description={option.description || ''} />
 						</div>
-						<MessageRatioButton name="ratio_button" onCheckRatio={() => handleCheckedOption(index)} checked={index === checked} />
+						<MessageRatioButton
+							name={option.name ? option.name : 'ratio_button'}
+							onCheckRatio={() => handleCheckedOption(index)}
+							checked={index === checked}
+						/>
 					</div>
 				))}
 		</>
