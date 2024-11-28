@@ -1,7 +1,9 @@
 import { ToastController } from '@mezon/components';
+import { useEscapeKey } from '@mezon/core';
 import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
+import isElectron from 'is-electron';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
@@ -114,6 +116,12 @@ const AppLayout = () => {
 				console.error(error);
 			});
 	}, [isLogin]);
+
+	useEscapeKey(() => {
+		if (isElectron() && viewMode === 'image') {
+			window.electron.send('IMAGE_WINDOW_TITLE_BAR_ACTION', 'CLOSE_APP');
+		}
+	});
 
 	return (
 		<MezonUiProvider themeName={theme}>
