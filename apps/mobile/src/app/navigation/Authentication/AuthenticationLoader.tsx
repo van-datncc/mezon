@@ -11,13 +11,16 @@ import {
 } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
+import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
+import useIncomingCall from '../../hooks/useIncomingCall';
 import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
@@ -27,6 +30,7 @@ import {
 	navigateToNotification,
 	setupNotificationListeners
 } from '../../utils/pushNotificationHelpers';
+const { WakeLockModule } = NativeModules;
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -40,6 +44,7 @@ export const AuthenticationLoader = () => {
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
+	const IncomingCall = useIncomingCall();
 
 	const loadFRMConfig = useCallback(async () => {
 		try {
@@ -59,9 +64,39 @@ export const AuthenticationLoader = () => {
 		if (userProfile?.user?.username) loadFRMConfig();
 	}, [loadFRMConfig, userProfile?.user?.username]);
 
+	const incomingCallAnswer = () => {
+		// Navigate to your call screen or main app
+	};
+
+	const showIncomingCallUi = () => {
+		if (Platform.OS === 'android') {
+			// TODO: map content call from FCM
+			RNNotificationCall.displayNotification(Snowflake.generate(), null, 30000, {
+				channelId: 'com.mezon.mezon',
+				channelName: 'Incoming call',
+				notificationIcon: 'ic_notification', // mipmap
+				notificationTitle: 'Nguyen Tran',
+				notificationBody: 'Incoming video call',
+				answerText: 'Answer',
+				declineText: 'Decline',
+				notificationColor: 'colorAccent',
+				isVideo: false,
+				notificationSound: 'ringing.mp3'
+			});
+		}
+	};
+
 	useEffect(() => {
+		IncomingCall.configure(incomingCallAnswer, () => {}, showIncomingCallUi);
 		setupNotificationListeners(navigation);
 	}, [navigation]);
+
+	useEffect(() => {
+		RNNotificationCall.addEventListener('answer', (data) => {
+			RNNotificationCall.backToApp();
+			incomingCallAnswer();
+		});
+	}, []);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
@@ -95,6 +130,13 @@ export const AuthenticationLoader = () => {
 			}
 		});
 		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+			// TODO: handle data from FCM
+			IncomingCall.displayIncomingCall('Nguyen Tran');
+			if (Platform.OS === 'android') {
+				WakeLockModule.releaseWakeLock();
+				WakeLockModule.acquireWakeLock();
+				showIncomingCallUi();
+			}
 			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 		});
 

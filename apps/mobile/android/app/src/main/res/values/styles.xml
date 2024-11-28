@@ -13,5 +13,8 @@
         <item name="bootSplashLogo">@drawable/bootsplash_inset</item>
         <item name="postBootSplashTheme">@style/AppTheme</item>
     </style>
-
+    <style name="incomingCall" parent="Theme.AppCompat.Light.NoActionBar">color
+        <!-- Customize status bar color   -->
+        <item name="colorPrimaryDark">#000000</item>
+    </style>
 </resources>
