@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
 import type { UpdateInfo } from 'electron-updater';
 import { autoUpdater, DOWNLOAD_PROGRESS } from 'electron-updater';
 
@@ -17,6 +17,11 @@ export default function setupAutoUpdates() {
 	autoUpdater.autoInstallOnAppQuit = true;
 
 	ipcMain.handle(INSTALL_UPDATE, () => {
+		new Notification({
+			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+			title: 'Mezon Installation',
+			body: `Please wait while Mezon is installing. The app will open automatically.`
+		}).show();
 		forceQuit.enable();
 		return autoUpdater.quitAndInstall();
 	});

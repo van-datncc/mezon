@@ -1,4 +1,5 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, ipcMain, screen, shell } from 'electron';
+import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -340,7 +341,7 @@ export default class App {
 						label: 'Check for Updates...',
 						click: () =>
 							autoUpdater.checkForUpdates().then((data) => {
-								if (data) return;
+								log.info(`checkForUpdates::: ${JSON.stringify(data)}`);
 								if (data) return;
 								const appVersion = app.getVersion();
 								new Notification({
