@@ -45,19 +45,18 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { extractLinks, processLinks } from '@mezon/transport';
+import { processLinks } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
-	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
+	MentionReactInputProps,
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadStatus,
-	ThreadValue,
 	addMention,
 	blankReferenceObj,
 	checkIsThread,
@@ -67,12 +66,13 @@ import {
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
+	handleProcessTextAndLinks,
 	processText,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -107,29 +107,6 @@ type ChannelsMentionProps = {
 	id: string;
 	display: string;
 	subText: string;
-};
-
-export type MentionReactInputProps = {
-	readonly onSend: (
-		content: IMessageSendPayload,
-		mentions?: Array<ApiMessageMention>,
-		attachments?: Array<ApiMessageAttachment>,
-		references?: Array<ApiMessageRef>,
-		value?: ThreadValue,
-		anonymousMessage?: boolean,
-		mentionEveryone?: boolean,
-		displayName?: string,
-		clanNick?: string
-	) => void;
-	readonly onTyping?: () => void;
-	readonly listMentions?: MentionDataProps[] | undefined;
-	readonly isThread?: boolean;
-	readonly handlePaste?: any;
-	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
-	readonly currentClanId?: string;
-	readonly currentChannelId?: string;
-	readonly mode?: number;
-	hasPermissionEdit?: boolean;
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
@@ -545,33 +522,26 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 
 		const { links } = processText(newPlainTextValue.trim());
-		const extractedLinks = extractLinks(newPlainTextValue.trim(), links);
-		const uniqueLinks = [...new Set(extractedLinks)];
-		const onlyLink = (links[0]?.e && links[0]?.e - (links[0]?.s ?? 0)) === newPlainTextValue.trim().length;
-
-		processLinks(uniqueLinks)
-			.then((attachmentUrls) => {
-				dispatch(
-					referencesActions.replaceAttachments({
-						channelId: currentDmOrChannelId ?? '',
-						files: attachmentUrls
-					})
-				);
-				if (links.length === 1 && onlyLink && attachmentUrls.length === 1) {
-					setRequestInput(
-						{
-							...request,
-							valueTextInput: newValue,
-							content: '',
-							mentionRaw: []
-						},
-						props.isThread
-					);
-				}
-			})
-			.catch((error) => {
-				console.error('Cannot get images from link:', error);
+		if (!links || links.length === 0) {
+			dispatch(
+				referencesActions.replaceAttachments({
+					channelId: currentDmOrChannelId ?? '',
+					files: []
+				})
+			);
+		} else {
+			handleProcessTextAndLinks({
+				newPlainTextValue,
+				currentDmOrChannelId,
+				request,
+				props,
+				dispatch,
+				setRequestInput,
+				links,
+				processLinks,
+				referencesActions
 			});
+		}
 	};
 
 	const handleChangeNameThread = (nameThread: string) => {

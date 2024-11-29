@@ -1,4 +1,3 @@
-import { ILinkOnMessage } from '@mezon/utils';
 import { Buffer as BufferMobile } from 'buffer';
 import memoizee from 'memoizee';
 import { Client, Session } from 'mezon-js';
@@ -225,10 +224,6 @@ export async function handleUrlInput(url: string): Promise<ApiMessageAttachment>
 	} catch (error) {
 		throw new Error(error instanceof Error ? error.message : 'Failed to fetch URL.');
 	}
-}
-
-export function extractLinks(text: string, links: ILinkOnMessage[]) {
-	return links.map((link) => text.slice(link.s, link.e));
 }
 
 const memoizedHandleUrlInput = memoizee(handleUrlInput, {
