@@ -184,6 +184,7 @@ export type MenuChannelStackParamList = {
 		receiverId: string;
 		receiverAvatar?: string;
 		isVideoCall?: string;
+		directMessageId?: string;
 	};
 };
 
