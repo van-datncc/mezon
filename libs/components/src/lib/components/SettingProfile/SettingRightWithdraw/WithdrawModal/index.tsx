@@ -143,9 +143,14 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 				requestId: data.data.requestId,
 				chainId: data.data.chainId
 			};
-		} catch (error: any) {
-			toast.error(error.message);
-			console.error('Error getting signature:', error);
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				const errorMessage = (error as any)?.response?.data?.errorMessage || error.message || 'Error getting signature';
+				toast.error(errorMessage);
+				console.error('Error getting signature:', error);
+			} else {
+				console.error('Error details:', error);
+			}
 
 			throw error;
 		}
@@ -296,9 +301,15 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 		setOpenModelConfirm(false);
 	};
 	const openModalConfirm = () => {
-		if (totalToken < formData.amount) toast.error(`Number of tokens you can withdraw:${totalToken} MZT`);
-		else if (0 > formData.amount) toast.error(`Please enter a valid amount.`);
-		else setOpenModelConfirm(true);
+		if (isNaN(totalToken) || totalToken <= 0) {
+			toast.error('Not enough balance to withdraw');
+		} else if (formData.amount <= 0) {
+			toast.error('Please enter a valid amount.');
+		} else if (totalToken < formData.amount) {
+			toast.error(`Number of tokens you can withdraw: ${totalToken} MZT`);
+		} else {
+			setOpenModelConfirm(true);
+		}
 	};
 
 	const handleMaximum = () => {
@@ -326,21 +337,21 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 												{index < steps.length - 1 && (
 													<div
 														className={`absolute left-4 top-4 ${
-															step.id <= currentStep - 1 ? 'bg-white' : 'bg-gray-500'
+															step.id <= currentStep - 1 ? 'dark:bg-white bg-yellow-300' : 'bg-gray-500'
 														} transition-all duration-300 h-[100%] w-1`}
 													/>
 												)}
 
 												<div
 													className={`relative w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors duration-300 z-10
-                          ${step.id <= currentStep - 1 ? 'bg-white' : 'bg-gray-500 text-white'}`}
+                          ${step.id <= currentStep - 1 ? 'dark:bg-white bg-yellow-300 ' : 'bg-gray-500 text-white'}`}
 												>
 													{step.id > currentStep - 1 ? step.id : <Icons.Check />}
 												</div>
 
 												<div className="ml-8 flex-1">
 													<div className="flex flex-col space-y-2 py-2">
-														<span className="text-[14px] font-bold text-white ">{step.title}</span>
+														<span className="text-[14px] font-bold dark:text-white text-black  ">{step.title}</span>
 
 														{step.id === 1 ? (
 															<select
@@ -414,8 +425,8 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 									</div>
 									<div className="flex justify-between mt-3 ml-16">
 										<div className="flex flex-col">
-											<p className="text-[16px] text-white">Amount received</p>
-											<p className="text-[12px] text-white">{formData.amount} : MZT</p>
+											<p className="text-[16px] dark:text-white text-black">Amount received</p>
+											<p className="text-[12px] dark:text-white text-black">{formData.amount} : MZT</p>
 										</div>
 										<button
 											onClick={openModalConfirm}

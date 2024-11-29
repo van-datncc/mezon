@@ -1,14 +1,23 @@
 import { Icons } from '@mezon/ui';
+import { useState } from 'react';
 
 interface IProp {
 	onClose: () => void;
 	onWalletConfirm: () => Promise<JSX.Element | undefined>;
 }
 const WalletConfirm = ({ onClose, onWalletConfirm }: IProp) => {
+	const [showPopup, setShowPopup] = useState(false);
 	const handleWalletConfirm = () => {
 		onWalletConfirm();
 		onClose();
 	};
+	const hanleOpenPopup = () => {
+		setShowPopup(true);
+	};
+	const hanleClosePopup = () => {
+		setShowPopup(false);
+	};
+
 	return (
 		<div
 			id="crypto-modal"
@@ -25,16 +34,7 @@ const WalletConfirm = ({ onClose, onWalletConfirm }: IProp) => {
 							data-modal-toggle="crypto-modal"
 							onClick={onClose}
 						>
-							<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-								<path
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-								/>
-							</svg>
-							<span className="sr-only">Close modal</span>
+							<Icons.Close defaultSize="size-4" />
 						</button>
 					</div>
 
@@ -57,15 +57,21 @@ const WalletConfirm = ({ onClose, onWalletConfirm }: IProp) => {
 								</span>
 							</div>
 						</div>
-						<div className="relative group flex flex-1">
-							<p className="inline-flex items-center text-xs font-normal text-gray-500 hover:underline dark:text-gray-400 flex-1">
+						<div className="relative flex flex-1">
+							<p
+								onMouseEnter={hanleOpenPopup}
+								onMouseLeave={hanleClosePopup}
+								className="inline-flex items-center text-xs font-normal text-gray-500 hover:underline dark:text-gray-400 flex-1"
+							>
 								<Icons.QuestionCircle className="h-3 mr-1" />
 								Why do I need to connect with my wallet?
 							</p>
-							<span className="absolute hidden group-hover:block w-full  p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg top-full mt-2 left-0">
-								Connecting your wallet ensures the system can accurately determine the wallet address for receiving funds or
-								performing secure transactions.
-							</span>
+							{showPopup && (
+								<span className="absolute w-full  p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg top-full mt-2 left-0">
+									Connecting your wallet ensures the system can accurately determine the wallet address for receiving funds or
+									performing secure transactions.
+								</span>
+							)}
 						</div>
 					</div>
 				</div>
