@@ -154,6 +154,7 @@ type HandleProcessTextAndLinksParams = {
 	links: IStartEndIndex[];
 	processLinks: (extractedLinks: string[]) => Promise<ApiMessageAttachment[]>;
 	referencesActions: any;
+	hasAttachment: boolean;
 };
 
 export function extractLinks(text: string, links: IStartEndIndex[]) {
@@ -169,7 +170,8 @@ export const handleProcessTextAndLinks = ({
 	setRequestInput,
 	links,
 	processLinks,
-	referencesActions
+	referencesActions,
+	hasAttachment
 }: HandleProcessTextAndLinksParams): Promise<void> => {
 	const extractedLinks: string[] = extractLinks(newPlainTextValue.trim(), links);
 	const uniqueLinks: string[] = [...new Set(extractedLinks)];
@@ -184,7 +186,7 @@ export const handleProcessTextAndLinks = ({
 				})
 			);
 
-			if (links.length === 1 && onlyLink && attachmentUrls.length === 1) {
+			if (links.length === 1 && onlyLink && attachmentUrls.length === 1 && !hasAttachment) {
 				setRequestInput(
 					{
 						...request,

@@ -530,6 +530,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				})
 			);
 		} else {
+			const hasAttachment = attachmentData.length > 0;
 			handleProcessTextAndLinks({
 				newPlainTextValue,
 				currentDmOrChannelId,
@@ -539,7 +540,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				setRequestInput,
 				links,
 				processLinks,
-				referencesActions
+				referencesActions,
+				hasAttachment
 			});
 		}
 	};

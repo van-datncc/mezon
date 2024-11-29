@@ -131,11 +131,21 @@ export const referencesSlice = createSlice({
 					files: []
 				};
 			}
+			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter(
+				(file) => file.url && !file.url.startsWith('blob:http://')
+			);
+			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith('blob:http://'));
+			const filesAreIdentical =
+				existingFilesExcBlob.length === newFilesExcBlob.length &&
+				existingFilesExcBlob.every((file, index) => file.url === newFilesExcBlob[index].url);
 
-			const existingFiles = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:http://'));
+			if (filesAreIdentical) return;
+
+			///
+			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:http://'));
 
 			state.attachmentAfterUpload[channelId].files = [
-				...existingFiles,
+				...existingFilesBlob,
 				...files.filter((file) => file.url && !file.url.startsWith('blob:http://'))
 			];
 		},
