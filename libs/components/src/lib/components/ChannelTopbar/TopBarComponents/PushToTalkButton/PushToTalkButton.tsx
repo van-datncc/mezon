@@ -23,7 +23,7 @@ export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) =>
 		<div className="relative flex gap-[15px] leading-5 h-5">
 			<Tooltip
 				className={`w-[140px] flex justify-center items-center`}
-				content={isJoined ? 'Stop talking' : 'Push to talk'}
+				content={isJoined ? 'Leave PTT' : 'Join PTT'}
 				trigger="hover"
 				animation="duration-500"
 				style={isLightMode ? 'light' : 'dark'}
