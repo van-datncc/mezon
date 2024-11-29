@@ -100,6 +100,7 @@ export const setChannelPinMessage = createAsyncThunk(
 			const reference = JSON.parse(response.referece ?? '');
 
 			const messageSystem: ChannelMessage = {
+				clan_id: clan_id,
 				id: response.id ?? '',
 				channel_id: channel_id,
 				channel_label: '',

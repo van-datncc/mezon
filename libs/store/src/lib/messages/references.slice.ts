@@ -72,7 +72,6 @@ export const referencesSlice = createSlice({
 		setAtachmentAfterUpload(state, action: PayloadAction<PreSendAttachment>) {
 			const newAttachment = action.payload;
 			const { channelId, files } = newAttachment;
-
 			if (!channelId) {
 				return;
 			}
@@ -84,7 +83,7 @@ export const referencesSlice = createSlice({
 				};
 			} else {
 				// eslint-disable-next-line prettier/prettier
-				if (files && files.length > 0 && (state.attachmentAfterUpload[channelId].files.length + files.length <= 10)) {
+				if (files && files.length > 0 && state.attachmentAfterUpload[channelId].files.length + files.length <= 10) {
 					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
 				}
 			}
@@ -116,6 +115,39 @@ export const referencesSlice = createSlice({
 					}
 				}
 			}
+		},
+
+		replaceAttachments(state, action: PayloadAction<PreSendAttachment>) {
+			const newAttachment = action.payload;
+			const { channelId, files } = newAttachment;
+
+			if (!channelId || !files) {
+				return;
+			}
+
+			if (!state.attachmentAfterUpload[channelId]) {
+				state.attachmentAfterUpload[channelId] = {
+					channelId: channelId,
+					files: []
+				};
+			}
+			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter(
+				(file) => file.url && !file.url.startsWith('blob:http://')
+			);
+			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith('blob:http://'));
+			const filesAreIdentical =
+				existingFilesExcBlob.length === newFilesExcBlob.length &&
+				existingFilesExcBlob.every((file, index) => file.url === newFilesExcBlob[index].url);
+
+			if (filesAreIdentical) return;
+
+			///
+			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:http://'));
+
+			state.attachmentAfterUpload[channelId].files = [
+				...existingFilesBlob,
+				...files.filter((file) => file.url && !file.url.startsWith('blob:http://'))
+			];
 		},
 
 		setIdReferenceMessageReaction(state, action) {

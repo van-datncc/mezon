@@ -43,6 +43,9 @@ module.exports = {
         '3': '3 1 0%',
         '4': '4 1 0%',
       },
+      backgroundImage: {
+        'gradient-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
+      },
       typography: {
         sm: {
           css: {

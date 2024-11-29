@@ -158,5 +158,12 @@ module.exports = {
 	gray400: '#999999',
 	gray500: '#646464',
 	gray600: '#3D3D3D',
-	gray700: '#202020'
+	gray700: '#202020',
+
+	'custom-purple': '#8547c6',
+	'custom-pink': '#ab5d8a',
+	'custom-purple-dark': '#6729a8',
+	'custom-pink-dark': '#8d3f6c',
+	'custom-purple-active': '#4e1f7a',
+	'custom-pink-active': '#6d2f4e'
 };

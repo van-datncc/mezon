@@ -25,13 +25,14 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
-import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
+import { Virtualizer } from './virtual-core/index';
+import { useVirtualizer } from './virtual-core/useVirtualizer';
 
 const SCROLL_THRESHOLD = 500; // 500px
 
@@ -157,7 +158,7 @@ function ChannelMessages({
 						await loadMoreMessage(ELoadMoreDirection.top);
 						setTimeout(() => {
 							isLoadMore.current = false;
-						}, 100);
+						}, 200);
 						return;
 					}
 
@@ -338,10 +339,15 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			if (firsRowCached.current !== firstMessageId) {
 				if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
 					const messageId = firsRowCached.current;
-					rowVirtualizer.scrollToIndex(
-						messages.findIndex((item) => item === messageId),
-						{ align: 'start' }
-					);
+					chatRef.current.style.pointerEvents = 'none';
+					const index = messages.findIndex((item) => item === messageId);
+					if (index !== -1) {
+						rowVirtualizer.scrollToIndex(index, { align: 'start' });
+					}
+					setTimeout(() => {
+						if (!chatRef.current) return;
+						chatRef.current.style.pointerEvents = 'auto';
+					}, 200);
 				}
 				firsRowCached && (firsRowCached.current = messages[1]);
 				lastRowCached.current = messages[messages.length - 1];
@@ -438,7 +444,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						>
 							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 								const messageId = messages[virtualRow.index];
-								const islastIndex = messages.length - 1 === virtualRow.index;
 								const checkMessageTargetToMoved = idMessageToJump === messageId && messageId !== lastMessageId;
 								const messageReplyHighlight =
 									(dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
@@ -460,10 +465,10 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 											checkMessageTargetToMoved={checkMessageTargetToMoved}
 											messageReplyHighlight={messageReplyHighlight}
 										/>
-										{islastIndex && <div className="h-[20px] w-[1px] pointer-events-none"></div>}
 									</div>
 								);
 							})}
+							<div className="h-[20px] w-[1px] pointer-events-none"></div>
 						</div>
 					</div>
 				</div>

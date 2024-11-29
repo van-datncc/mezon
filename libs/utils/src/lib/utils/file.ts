@@ -1,5 +1,7 @@
+import { Dispatch } from '@reduxjs/toolkit';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { MentionItem } from 'react-mentions';
-import { IMentionOnMessage, IRolesClan, MentionDataProps } from '../types';
+import { IMentionOnMessage, IRolesClan, IStartEndIndex, MentionDataProps, MentionReactInputProps, RequestInput } from '../types';
 
 function createFileMetadata<T>(file: File): T {
 	return {
@@ -135,4 +137,68 @@ export const convertMentionOnfile = (roles: IRolesClan[], contentString: string,
 	});
 
 	return mentions;
+};
+
+type ExtractLinksParams = {
+	text: string;
+	links: IStartEndIndex[];
+};
+
+type HandleProcessTextAndLinksParams = {
+	newPlainTextValue: string;
+	currentDmOrChannelId: string | undefined;
+	request: RequestInput;
+	props: MentionReactInputProps;
+	dispatch: Dispatch;
+	setRequestInput: (request: RequestInput, isThread?: boolean) => void;
+	links: IStartEndIndex[];
+	processLinks: (extractedLinks: string[]) => Promise<ApiMessageAttachment[]>;
+	referencesActions: any;
+	hasAttachment: boolean;
+};
+
+export function extractLinks(text: string, links: IStartEndIndex[]) {
+	return links.map((link) => text.slice(link.s, link.e));
+}
+
+export const handleProcessTextAndLinks = ({
+	newPlainTextValue,
+	currentDmOrChannelId,
+	request,
+	props,
+	dispatch,
+	setRequestInput,
+	links,
+	processLinks,
+	referencesActions,
+	hasAttachment
+}: HandleProcessTextAndLinksParams): Promise<void> => {
+	const extractedLinks: string[] = extractLinks(newPlainTextValue.trim(), links);
+	const uniqueLinks: string[] = [...new Set(extractedLinks)];
+	const onlyLink = (links[0]?.e && links[0]?.e - (links[0]?.s ?? 0)) === newPlainTextValue.trim().length;
+
+	return processLinks(uniqueLinks)
+		.then((attachmentUrls: ApiMessageAttachment[]) => {
+			dispatch(
+				referencesActions.replaceAttachments({
+					channelId: currentDmOrChannelId ?? '',
+					files: attachmentUrls
+				})
+			);
+
+			if (links.length === 1 && onlyLink && attachmentUrls.length === 1 && !hasAttachment) {
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: newPlainTextValue,
+						content: '',
+						mentionRaw: []
+					},
+					props.isThread
+				);
+			}
+		})
+		.catch((error) => {
+			console.error('Cannot get images from link:', error);
+		});
 };
