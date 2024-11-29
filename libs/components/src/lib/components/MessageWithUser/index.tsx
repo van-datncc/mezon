@@ -1,5 +1,6 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, useChatSending, useCurrentInbox } from '@mezon/core';
 import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
@@ -11,7 +12,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
@@ -78,6 +79,10 @@ function MessageWithUser({
 	const modalState = useRef({
 		profileItem: false
 	});
+
+	const currentDirectOrChannel = useCurrentInbox();
+
+	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel!, mode });
 
 	// Computed values
 
@@ -218,7 +223,37 @@ function MessageWithUser({
 		);
 	}, [message, avatar]);
 
-	const isMessageSystem = message.code == TypeMessage.Welcome || message.code == TypeMessage.CreateThread || message.code == TypeMessage.CreatePin;
+	const isMessageSystem =
+		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
+	const [forceRender, setForceRender] = useState(false);
+
+	// const triggerReRender = () => {
+	// 	setForceRender((prev) => !prev);
+	// };
+	// useEffect(() => {
+	// 	if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
+	// 	const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
+
+	// 	const updateAttachments = () => {
+	// 		processLinks({
+	// 			t: message.content.t as string,
+	// 			lk: message.content.lk as IStartEndIndex[]
+	// 		})
+	// 			.then((attachmentUrls) => {
+	// 				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
+
+	// 				if (newAttachmentUrls.length > 0) {
+	// 					editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
+	// 					triggerReRender();
+	// 				}
+	// 			})
+	// 			.catch((error) => {
+	// 				console.error('Failed to update message:', error);
+	// 			});
+	// 	};
+
+	// 	updateAttachments();
+	// }, [message.id, forceRender]);
 
 	return (
 		<>
@@ -239,24 +274,42 @@ function MessageWithUser({
 								<div
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
-									{message.references?.length === 0 && isCombine && !isShowFull ? (
-										<div className="w-10 flex items-center justify-center min-w-10">
-											<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">
-												{messageHour}
-											</div>
+									{isMessageSystem ? (
+										<div className="size-10 mt-[2px] flex justify-center rounded-full object-cover min-w-5 min-h-5">
+											{message.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8" />}
+											{message.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6" />}
+											{message.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" />}
 										</div>
 									) : (
-										<MessageAvatar
-											message={message}
-											isEditing={isEditing}
-											mode={mode}
-											onClick={(e) => handleOpenShortUser(e, message.sender_id)}
-										/>
+										<div>
+											{message.references?.length === 0 && isCombine && !isShowFull ? (
+												<div className="w-10 flex items-center justify-center min-w-10">
+													<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">
+														{messageHour}
+													</div>
+												</div>
+											) : (
+												<MessageAvatar
+													message={message}
+													isEditing={isEditing}
+													mode={mode}
+													onClick={(e) => handleOpenShortUser(e, message.sender_id)}
+												/>
+											)}
+										</div>
 									)}
 
 									<div className="w-full relative h-full">
-										{!(isCombine && message.references?.length === 0 && !isShowFull) && (
-											<MessageHead message={message} mode={mode} onClick={(e) => handleOpenShortUser(e, message.sender_id)} />
+										{!isMessageSystem && (
+											<div>
+												{!(isCombine && message.references?.length === 0 && !isShowFull) && (
+													<MessageHead
+														message={message}
+														mode={mode}
+														onClick={(e) => handleOpenShortUser(e, message.sender_id)}
+													/>
+												)}
+											</div>
 										)}
 
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat select-text">
@@ -281,7 +334,9 @@ function MessageWithUser({
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{Array.isArray(message.content?.embed) &&
-													message.content.embed?.map((embed, index) => <EmbedMessage {...embed} key={index} />)}
+													message.content.embed?.map((embed, index) => (
+														<EmbedMessage key={index} embed={embed} message_id={message.id} />
+													))}
 
 												{message.content?.components &&
 													message.content.components.map((actionRow, index) => (
@@ -355,4 +410,4 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	);
 };
 
-export default memo(MessageWithUser);
+export default MessageWithUser;

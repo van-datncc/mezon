@@ -4,14 +4,13 @@ import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-// Configuration constants
 const STUN_SERVERS = [
-	{ urls: 'stun:stun.l.google.com:19302' },
-	{ urls: 'stun:stun1.l.google.com:19302' },
-	{ urls: 'stun:stun2.l.google.com:19302' },
-	{ urls: 'stun:stun1.3.google.com:19302' }
+	{
+		urls: process.env.NX_WEBRTC_ICESERVERS_URL as string,
+		username: process.env.NX_WEBRTC_ICESERVERS_USERNAME,
+		credential: process.env.NX_WEBRTC_ICESERVERS_CREDENTIAL
+	}
 ];
-// const STUN_SERVERS = [{ urls: 'stun:stun.l.google.com:19305' }];
 
 const RTCConfig = {
 	iceServers: STUN_SERVERS,
@@ -66,6 +65,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
+	const callTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	// Initialize peer connection with proper configuration
 	const initializePeerConnection = useCallback(() => {
@@ -88,23 +88,72 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		};
 
 		pc.ontrack = (event) => {
+			const remoteStream = event.streams[0];
 			setCallState((prev) => ({
 				...prev,
-				remoteStream: event.streams[0]
+				remoteStream
 			}));
 
 			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = event.streams[0];
+				remoteVideoRef.current.srcObject = remoteStream;
 			}
+
+			remoteStream.getVideoTracks().forEach((track) => {
+				track.onmute = () => {
+					dispatch(audioCallActions.setIsRemoteVideo(false));
+				};
+
+				track.onunmute = () => {
+					dispatch(audioCallActions.setIsRemoteVideo(true));
+				};
+			});
+
+			remoteStream.getAudioTracks().forEach((track) => {
+				track.onmute = () => {
+					dispatch(audioCallActions.setIsRemoteAudio(false));
+				};
+				track.onunmute = () => {
+					dispatch(audioCallActions.setIsRemoteAudio(true));
+				};
+			});
 		};
 
 		pc.oniceconnectionstatechange = () => {
 			if (pc.iceConnectionState === 'connected') {
 				dispatch(toastActions.addToast({ message: 'Connection connected', type: 'success', autoClose: 3000 }));
+				dispatch(audioCallActions.setIsJoinedCall(true));
+				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
+				if (callTimeout.current) {
+					clearTimeout(callTimeout.current);
+					callTimeout.current = null;
+				}
 			}
 			if (pc.iceConnectionState === 'disconnected') {
 				dispatch(toastActions.addToast({ message: 'Connection disconnected', type: 'warning', autoClose: 3000 }));
+				dispatch(audioCallActions.setIsJoinedCall(false));
 				handleEndCall();
+				if (callTimeout.current) {
+					clearTimeout(callTimeout.current);
+					callTimeout.current = null;
+				}
+			}
+		};
+
+		pc.onnegotiationneeded = async () => {
+			try {
+				const offer = await pc.createOffer();
+				await pc.setLocalDescription(offer);
+
+				const compressedOffer = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
+			} catch (error) {
+				console.error('Error during negotiation:', error);
 			}
 		};
 
@@ -161,6 +210,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			const compressedOffer = await compress(JSON.stringify(offer));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 
+			// Start a 30-second timeout to end the call if no answer
+			callTimeout.current = setTimeout(() => {
+				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));
+				handleEndCall();
+			}, 30000);
+
 			if (localVideoRef.current) {
 				localVideoRef.current.srcObject = stream;
 			}
@@ -207,6 +262,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					const decompressedData = await decompress(signalingData.json_data);
 					const answer = JSON.parse(decompressedData || '{}');
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+
+					if (callTimeout.current) {
+						clearTimeout(callTimeout.current);
+						callTimeout.current = null;
+					}
+
 					// Add stored ICE candidates
 					if (callState.storedIceCandidates) {
 						for (const candidate of callState.storedIceCandidates) {
@@ -220,7 +281,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE: {
 					const candidate = JSON.parse(signalingData?.json_data || '{}');
 					if (candidate) {
-						if (callState.peerConnection.remoteDescription) {
+						if (callState.peerConnection?.remoteDescription?.type) {
 							await callState.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
 						} else {
 							console.warn('Remote description not set yet, storing candidate');
@@ -243,6 +304,11 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	// End call and cleanup
 	const handleEndCall = async () => {
 		try {
+			if (callTimeout.current) {
+				clearTimeout(callTimeout.current);
+				callTimeout.current = null;
+			}
+
 			if (callState.localStream) {
 				callState.localStream.getTracks().forEach((track) => track.stop());
 			}
@@ -260,7 +326,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.setIsInCall(false));
+			dispatch(audioCallActions.setIsEndTone(true));
 			dispatch(audioCallActions.setIsRingTone(false));
+			dispatch(audioCallActions.setIsRemoteAudio(false));
+			dispatch(audioCallActions.setIsRemoteVideo(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
 			dispatch(DMCallActions.removeAll());
 			setCallState({
@@ -274,51 +343,103 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	};
 
 	// Toggle audio/video
-	const toggleAudio = () => {
-		if (callState.localStream) {
-			callState.localStream.getAudioTracks().forEach((track) => {
-				track.enabled = !track.enabled;
+	const toggleAudio = async () => {
+		if (!callState.localStream) return;
+		const audioTracks = callState.localStream.getAudioTracks();
+
+		if (audioTracks.length === 0) {
+			try {
+				const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+				const audioTrack = audioStream.getAudioTracks()[0];
+
+				callState.localStream.addTrack(audioTrack);
+
+				const senders = callState.peerConnection?.getSenders() || [];
+				const audioSender = senders.find((sender) => sender.track?.kind === 'audio');
+
+				if (audioSender) {
+					await audioSender.replaceTrack(audioTrack);
+				} else {
+					callState.peerConnection?.addTrack(audioTrack, callState.localStream);
+				}
+			} catch (error) {
+				console.error('Error adding audio track:', error);
+			}
+		} else {
+			audioTracks.forEach((track) => {
+				if (track.enabled) {
+					track.stop();
+					if (callState.localStream) {
+						callState.localStream.removeTrack(track);
+					}
+
+					const senders = callState.peerConnection?.getSenders() || [];
+					const audioSender = senders.find((sender) => sender.track === track);
+					if (audioSender) {
+						callState.peerConnection?.removeTrack(audioSender);
+					}
+				} else {
+					track.enabled = true;
+				}
 			});
 		}
 	};
 
 	const toggleVideo = async () => {
-		if (callState.localStream) {
-			let permissionCameraGranted;
-			const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
-			if (cameraPermission.state === 'granted') {
-				permissionCameraGranted = true;
-			}
-			if (!isShowMeetDM && !permissionCameraGranted) {
-				dispatch(toastActions.addToast({ message: 'Camera is not available', type: 'warning', autoClose: 1000 }));
-				return;
-			}
-			const videoTracks = callState.localStream.getVideoTracks();
-			if (videoTracks.length === 0) {
-				try {
-					const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-					const videoTrack = videoStream.getVideoTracks()[0];
-					callState.localStream.addTrack(videoTrack);
-					const senders = callState.peerConnection?.getSenders() || [];
-					const videoSender = senders.find((sender) => sender.track?.kind === 'video');
-					if (videoSender) {
-						await videoSender.replaceTrack(videoTrack);
-					} else {
-						callState.peerConnection?.addTrack(videoTrack, callState.localStream);
-					}
-					if (localVideoRef.current) {
-						localVideoRef.current.srcObject = callState.localStream;
-					}
-				} catch (error) {
-					console.error('Error adding video track:', error);
-				}
-			} else {
-				videoTracks.forEach((track) => {
-					track.enabled = !track.enabled;
-				});
-			}
-			dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
+		if (!callState.localStream) return;
+		let permissionCameraGranted = false;
+
+		const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
+		if (cameraPermission.state === 'granted') {
+			permissionCameraGranted = true;
 		}
+
+		if (!isShowMeetDM && !permissionCameraGranted) {
+			dispatch(toastActions.addToast({ message: 'Camera is not available', type: 'warning', autoClose: 1000 }));
+			return;
+		}
+
+		const videoTracks = callState.localStream.getVideoTracks();
+		if (videoTracks.length === 0) {
+			try {
+				const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+				const videoTrack = videoStream.getVideoTracks()[0];
+
+				callState.localStream.addTrack(videoTrack);
+				const senders = callState.peerConnection?.getSenders() || [];
+				const videoSender = senders.find((sender) => sender.track?.kind === 'video');
+				if (videoSender) {
+					await videoSender.replaceTrack(videoTrack);
+				} else {
+					callState.peerConnection?.addTrack(videoTrack, callState.localStream);
+				}
+
+				if (localVideoRef.current) {
+					localVideoRef.current.srcObject = callState.localStream;
+				}
+			} catch (error) {
+				console.error('Error adding video track:', error);
+			}
+		} else {
+			videoTracks.forEach((track) => {
+				if (track.enabled) {
+					track.stop();
+					if (callState.localStream) {
+						callState.localStream.removeTrack(track);
+					}
+
+					const senders = callState.peerConnection?.getSenders() || [];
+					const videoSender = senders.find((sender) => sender.track === track);
+					if (videoSender) {
+						callState.peerConnection?.removeTrack(videoSender);
+					}
+				} else {
+					track.enabled = true;
+				}
+			});
+		}
+
+		dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
 	};
 
 	return {

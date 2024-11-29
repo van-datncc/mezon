@@ -15,7 +15,7 @@ export const GROUP_CHAT_MAXIMUM_MEMBERS = 10;
 export const EVERYONE_ROLE_ID = '1825450696619593728';
 export const EVERYONE_ROLE_TITLE = 'Everyone';
 export const TITLE_MENTION_HERE = '@here';
-
+export const DONE_ONBOARDING_STATUS = 3;
 export const FOR_15_MINUTES = 15 * 60 * 1000;
 export const FOR_1_HOUR = 60 * 60 * 1000;
 export const FOR_3_HOURS = 3 * 60 * 60 * 1000;

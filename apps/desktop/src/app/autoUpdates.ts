@@ -17,6 +17,11 @@ export default function setupAutoUpdates() {
 	autoUpdater.autoInstallOnAppQuit = true;
 
 	ipcMain.handle(INSTALL_UPDATE, () => {
+		new Notification({
+			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
+			title: 'Mezon Installation',
+			body: `Please wait while Mezon is installing. The app will open automatically.`
+		}).show();
 		forceQuit.enable();
 		return autoUpdater.quitAndInstall();
 	});
@@ -45,14 +50,6 @@ export default function setupAutoUpdates() {
 		BrowserWindow.getAllWindows().forEach((window) => {
 			window.webContents.send(DOWNLOAD_PROGRESS, progressObj);
 		});
-	});
-
-	autoUpdater.on('update-not-available', (info: UpdateInfo) => {
-		new Notification({
-			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
-			title: 'No update',
-			body: `The current version (${info.version}) is the latest.`
-		}).show();
 	});
 }
 

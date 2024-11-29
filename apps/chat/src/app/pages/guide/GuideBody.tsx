@@ -11,11 +11,12 @@ import {
 	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
+	selectProcessingByClan,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { titleMission } from '@mezon/utils';
+import { DONE_ONBOARDING_STATUS, titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -28,10 +29,11 @@ function GuideBody() {
 	const formOnboarding = useSelector(selectFormOnboarding);
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClanId as string));
 
 	const handleDoMission = useCallback(
 		(mission: ApiOnboardingItem, index: number) => {
-			if (index === missionDone) {
+			if (index === missionDone || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS) {
 				switch (mission.task_type) {
 					case ETypeMission.SEND_MESSAGE: {
 						const link = toChannelPage(mission.channel_id as string, currentClanId as string);
@@ -41,12 +43,12 @@ function GuideBody() {
 					case ETypeMission.VISIT: {
 						const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
 						navigate(linkChannel);
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
 					case ETypeMission.DOSOMETHING: {
-						dispatch(onboardingActions.doneMission());
+						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
 						doneAllMission(index);
 						break;
 					}
@@ -91,7 +93,11 @@ function GuideBody() {
 									hightLightIcon={true}
 									description={rule.content}
 									icon={<Icons.RuleIcon />}
-									action={<div className="w-[72px] aspect-square bg-black rounded-lg"></div>}
+									action={
+										<div className="w-[72px] aspect-square bg-black rounded-lg flex overflow-hidden">
+											{rule.image_url && <img src={rule.image_url} className="w-full h-full object-cover" />}
+										</div>
+									}
 								/>
 							))
 						) : (
@@ -125,7 +131,7 @@ function GuideBody() {
 									key={mission.id}
 									mission={mission}
 									onClick={() => handleDoMission(mission, index)}
-									tick={missionDone > index}
+									tick={missionDone > index || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS}
 								/>
 							))
 						) : (
@@ -197,7 +203,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 					question.answers.map((answer) => (
 						<GuideItemLayout
 							key={answer.title}
-							icon={answer.answer}
+							icon={answer.emoji}
 							description={answer.description}
 							title={answer.title}
 							className="w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"

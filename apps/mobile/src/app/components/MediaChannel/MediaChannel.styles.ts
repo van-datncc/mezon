@@ -23,5 +23,12 @@ export const style = (colors: Attributes) =>
 			height: '100%',
 			backgroundColor: 'rgba(000,000,000,0.8)'
 		},
-		wrapper: { height: '100%' }
+		wrapper: { height: '100%' },
+		contentContainer: {
+			paddingBottom: size.s_50,
+			justifyContent: 'flex-start',
+			alignItems: 'flex-start',
+			paddingHorizontal: size.s_10,
+			flexGrow: 1
+		}
 	});

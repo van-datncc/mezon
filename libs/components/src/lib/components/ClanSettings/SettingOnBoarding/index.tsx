@@ -1,7 +1,10 @@
 import { MemberProvider } from '@mezon/core';
 import { onboardingActions, selectCurrentClan, selectCurrentClanId, selectFormOnboarding, useAppDispatch } from '@mezon/store';
+import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons, Image } from '@mezon/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { Snowflake } from '@theinternetfolks/snowflake';
+import { ApiOnboardingContent } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
@@ -60,26 +63,55 @@ interface IMainIndexProps {
 
 const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
 	const dispatch = useAppDispatch();
-	const openOnboardingMode = () => {
-		dispatch(onboardingActions.openOnboardingMode());
+	const openOnboardingPreviewMode = () => {
+		dispatch(onboardingActions.openOnboardingPreviewMode());
 		if (onCloseSetting) {
 			onCloseSetting();
 		}
 	};
 	const currentClanId = useSelector(selectCurrentClanId);
 	const formOnboarding = useSelector(selectFormOnboarding);
-	const handleCreateOnboarding = () => {
-		const formOnboardingData = [...formOnboarding.questions, ...formOnboarding.rules, ...formOnboarding.task];
+	const { sessionRef, clientRef } = useMezon();
+	const getRuleData = useCallback(async () => {}, [formOnboarding.rules.length]);
+
+	const handleCreateOnboarding = useCallback(async () => {
+		const uploadImageRule = formOnboarding.rules.map((item) => {
+			if (!item.file) {
+				return undefined;
+			}
+			const id = Snowflake.generate();
+			const path = 'onboarding/' + id + '.webp';
+			if (clientRef.current && sessionRef.current) {
+				return handleUploadEmoticon(clientRef.current, sessionRef.current, path, item.file);
+			}
+		});
+		const imageUrl = await Promise.all(uploadImageRule);
+
+		const formOnboardingRule = formOnboarding.rules.map((rule, index) => {
+			const ruleItem: ApiOnboardingContent = {
+				title: rule.title,
+				content: rule.content,
+				guide_type: rule.guide_type
+			};
+			if (imageUrl[index]) {
+				ruleItem.image_url = imageUrl[index]?.url;
+			}
+			return ruleItem;
+		});
+
+		const formOnboardingData = [...formOnboarding.questions, ...formOnboardingRule, ...formOnboarding.task];
+
 		if (formOnboarding.greeting) {
 			formOnboardingData.unshift(formOnboarding.greeting);
 		}
+
 		dispatch(
 			onboardingActions.createOnboardingTask({
 				clan_id: currentClanId as string,
 				content: formOnboardingData
 			})
 		);
-	};
+	}, [getRuleData]);
 
 	const checkCreateValidate = useMemo(() => {
 		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;
@@ -97,7 +129,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				<div className="flex gap-2 items-center">
 					<div className="cursor-pointer text-blue-500 hover:underline">See examples</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />
-					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingMode}>
+					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingPreviewMode}>
 						Preview
 					</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />

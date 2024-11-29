@@ -41,7 +41,7 @@ function useChannelSeen(channelId: string) {
 		if (lastMessage) {
 			markAsReadSeen(lastMessage, mode);
 		}
-	}, [lastMessage, channelId]);
+	}, [lastMessage, channelId, currentDmGroup?.type, markAsReadSeen]);
 
 	useEffect(() => {
 		if (lastMessage) {

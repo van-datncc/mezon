@@ -28,6 +28,7 @@ import {
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -39,8 +40,10 @@ import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../componentUI';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
+import SharingSuggestItem from './SharingSuggestItem';
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
@@ -69,10 +72,11 @@ export const Sharing = ({ data, onClose }) => {
 	const session = mezon.sessionRef.current;
 	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
 	const { handleReconnect } = useContext(ChatContext);
-
+	const navigation = useNavigation<any>();
 	const dataMedia = useMemo(() => {
-		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
+		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		if (data) {
@@ -117,9 +121,16 @@ export const Sharing = ({ data, onClose }) => {
 	);
 
 	const generateChannelMatch = (data: any, DMList: any, searchText: string) => {
-		return [...DMList, ...data].filter((channel: { channel_label?: string | number }) =>
+		const matchChannels = [...DMList, ...data].filter((channel: { channel_label?: string | number }) =>
 			channel.channel_label?.toString()?.toLowerCase()?.includes(searchText?.toLowerCase())
 		);
+		if (matchChannels.length > 0) {
+			const matchIdList = new Set(matchChannels.map((item) => item.channel_id));
+			const resultList = [...DMList, ...data].filter((item) => matchIdList.has(item.parrent_id));
+
+			return [...matchChannels, ...resultList];
+		}
+		return [];
 	};
 
 	const handleSearchShareTo = async () => {
@@ -127,7 +138,7 @@ export const Sharing = ({ data, onClose }) => {
 		setDataShareTo(matchedChannels || []);
 	};
 
-	const onChooseSuggestion = async (channel: any) => {
+	const onChooseSuggestion = useCallback(async (channel: any) => {
 		// Send to DM message
 		if (channel.type === ChannelStreamMode.STREAM_MODE_DM || channel.type === ChannelStreamMode.STREAM_MODE_GROUP) {
 			const store = await getStoreAsync();
@@ -141,7 +152,7 @@ export const Sharing = ({ data, onClose }) => {
 		}
 
 		setChannelSelected(channel);
-	};
+	}, []);
 
 	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
@@ -168,7 +179,22 @@ export const Sharing = ({ data, onClose }) => {
 			getAttachmentUnique(attachmentUpload) || [],
 			[]
 		);
+		navigation.goBack();
+		timerRef.current = setTimeout(() => {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: channelSelected?.channel_id || '' }
+			});
+		}, 1000);
 	};
+
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+			}
+		};
+	}, []);
 
 	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
@@ -353,19 +379,9 @@ export const Sharing = ({ data, onClose }) => {
 		return attachmentUpload.every((attachment: any) => attachment.url.includes('http'));
 	}, [attachmentUpload]);
 
-	const renderItemSuggest = ({ item }) => {
+	const renderItemSuggest = ({ item, index }) => {
 		return (
-			<TouchableOpacity onPress={() => onChooseSuggestion(item)} style={styles.itemSuggestion}>
-				<MezonAvatar
-					avatarUrl={item?.channel_avatar?.[0] || clans?.[item?.clan_id]?.logo}
-					username={clans?.[item?.clan_id]?.clan_name || item?.channel_label}
-					width={size.s_24}
-					height={size.s_24}
-				/>
-				<Text style={styles.titleSuggestion} numberOfLines={1}>
-					{item?.channel_label}
-				</Text>
-			</TouchableOpacity>
+			<SharingSuggestItem key={`${item?.channel_id}_${index}_share_suggest_item`} item={item} clans={clans} onChooseItem={onChooseSuggestion} />
 		);
 	};
 

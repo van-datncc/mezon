@@ -1,17 +1,18 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
-import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, selectUserStatus, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { EUserStatus } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
+import ItemStatusUpdate from './ItemStatusUpdate';
 
 type StatusProfileProps = {
 	userById: ChannelMembersEntity | null;
 	isDM?: boolean;
 };
-
 const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
 	const user = userById?.user;
@@ -20,6 +21,8 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const getTokenSocket = useSelector(selectUpdateToken(user?.id ?? ''));
+	const userStatus = useSelector(selectUserStatus);
+	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
 		const parse = JSON.parse(userProfile?.wallet ?? '').value;
@@ -29,7 +32,20 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
-
+	const statusIcon = (status: string): ReactNode => {
+		switch (status) {
+			case EUserStatus.ONLINE:
+				return <Icons.OnlineStatus />;
+			case EUserStatus.IDLE:
+				return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />;
+			case EUserStatus.DO_NOT_DISTURB:
+				return <Icons.MinusCircleIcon />;
+			case EUserStatus.INVISIBLE:
+				return <Icons.OnlineStatus />;
+			default:
+				return <Icons.OnlineStatus />;
+		}
+	};
 	return (
 		<>
 			<div>
@@ -52,7 +68,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					dismissOnClick={true}
 					renderTrigger={() => (
 						<div>
-							<ItemStatus children="Online" dropdown startIcon={<Icons.OnlineStatus />} />
+							<ItemStatus children={status} dropdown startIcon={statusIcon(status)} />
 						</div>
 					)}
 					label=""
@@ -61,9 +77,9 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				>
 					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
-					<ItemStatus children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
-					<ItemStatus children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />
-					<ItemStatus children="Invisible" startIcon={<Icons.OfflineStatus />} />
+					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
+					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />
+					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				</Dropdown>
 				<ItemStatus

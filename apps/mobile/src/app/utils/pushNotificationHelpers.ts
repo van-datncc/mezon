@@ -13,6 +13,7 @@ import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationA
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
 import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
+import VoipPushNotification from 'react-native-voip-push-notification';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
@@ -138,6 +139,7 @@ export const handleFCMToken = async () => {
 	});
 
 	const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || messaging.AuthorizationStatus.PROVISIONAL;
+	if (Platform.OS === 'ios') VoipPushNotification.registerVoipToken();
 
 	if (enabled) {
 		const fcmtoken = await messaging().getToken();

@@ -3,6 +3,7 @@ import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MetaMaskProvider } from '@metamask/sdk-react';
 import { useActivities, useSettingFooter } from '@mezon/core';
 import { captureSentryError } from '@mezon/logger';
 import { ACTIVE_WINDOW, DOWNLOAD_PROGRESS, TRIGGER_SHORTCUT, UPDATE_AVAILABLE, UPDATE_ERROR, electronBridge } from '@mezon/utils';
@@ -94,11 +95,22 @@ function AppWrapper() {
 	}, []);
 
 	return (
-		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
-			<MezonContextProvider mezon={mezon} connect={true}>
-				<App />
-			</MezonContextProvider>
-		</GoogleOAuthProvider>
+		<MetaMaskProvider
+			debug={false}
+			sdkOptions={{
+				dappMetadata: {
+					name: 'Mezon',
+					url: window.location.href
+				},
+				headless: true
+			}}
+		>
+			<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
+				<MezonContextProvider mezon={mezon} connect={true}>
+					<App />
+				</MezonContextProvider>
+			</GoogleOAuthProvider>
+		</MetaMaskProvider>
 	);
 }
 

@@ -1,4 +1,15 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
+import {
+	ChannelDescription,
+	ChannelMessage,
+	ChannelStreamMode,
+	ChannelType,
+	HashtagDm,
+	JoinPTTChannel,
+	Notification,
+	NotificationType,
+	TalkPTTChannel,
+	WebrtcSignalingFwd
+} from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -218,10 +229,17 @@ export interface IEmbedProps {
 	};
 	description?: string;
 	thumbnail?: { url: string };
-	fields?: Array<{ name: string; value: string; inline?: boolean }>;
+	fields?: IFieldEmbed[];
 	image?: { url: string };
 	timestamp?: string;
 	footer?: { text: string; icon_url?: string };
+}
+
+export interface IFieldEmbed {
+	name: string;
+	value: string;
+	inline?: boolean;
+	options?: IMessageRatioOption[];
 }
 
 export enum EButtonMessageStyle {
@@ -250,6 +268,13 @@ export interface IMessageSelectOption {
 	value: string;
 	description?: string;
 	default?: boolean;
+}
+export interface IMessageRatioOption {
+	label: string;
+	description?: string;
+	name?: string;
+	value: string;
+	style?: EButtonMessageStyle;
 }
 
 export enum EMessageSelectType {
@@ -293,6 +318,7 @@ export interface IMessageActionRow {
 
 export interface IMessageSendPayload {
 	t?: string;
+	e2ee?: number;
 	hg?: IHashtagOnMessage[];
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];
@@ -350,6 +376,14 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+};
+
+export type IJoinPtt = {
+	joinPttData: JoinPTTChannel;
+};
+
+export type ITalkPtt = {
+	talkPttData: TalkPTTChannel;
 };
 
 export interface CategoryNameProps {
@@ -740,7 +774,8 @@ export enum NotificationCode {
 	USER_BANNED = -8,
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
-	USER_REPLIED = -11
+	USER_REPLIED = -11,
+	NOTIFICATION_CLAN = -12
 }
 
 export enum ChannelIsNotThread {
@@ -1166,8 +1201,41 @@ export type IUserItemActivity = {
 	user?: IUserProfileActivity;
 };
 
-export type IDmCallInfo = {
-	channel_id?: string;
-	caller_id?: string;
-	callee_id?: string;
+export type UserStatus = {
+	user_id: string;
+	status: string;
 };
+
+export type UserStatusUpdate = {
+	status: string;
+	minutes?: number;
+	until_turn_on: boolean;
+};
+
+export enum EUserStatus {
+	ONLINE = 'Online',
+	IDLE = 'Idle',
+	DO_NOT_DISTURB = 'Do Not Disturb',
+	INVISIBLE = 'Invisible'
+}
+
+export type IDmCallInfo = {
+	groupId?: string;
+	isVideo?: boolean;
+};
+
+export type ImageWindowProps = {
+	attachmentData: ApiMessageAttachment & { create_time?: string };
+	messageId: string;
+	mode: ChannelStreamMode;
+	attachmentUrl: string;
+	currentClanId: string;
+	currentChannelId: string;
+	currentDmId: string;
+	checkListAttachment: boolean;
+};
+
+export enum ESummaryInfo {
+	CALL = 'Call',
+	STREAM = 'Stream'
+}

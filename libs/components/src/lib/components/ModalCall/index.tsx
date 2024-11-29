@@ -1,39 +1,42 @@
 import { useUserByUserId } from '@mezon/core';
-import { audioCallActions, directActions, DMCallActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { audioCallActions, DMCallActions, selectIsInCall, selectJoinedCall, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import { WebrtcSignalingFwd } from 'mezon-js';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 interface ModalCallProps {
 	dataCall: WebrtcSignalingFwd;
 	userId: string;
+	triggerCall: () => void;
 }
 
-const ModalCall = ({ dataCall, userId }: ModalCallProps) => {
+const ModalCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
 	const user = useUserByUserId(dataCall?.caller_id);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
-	const direct = useAppSelector((state) => selectDirectById(state, dataCall.channel_id)) || {};
-	const navigate = useNavigate();
+	const isJoinedCall = useSelector(selectJoinedCall);
+	const isInCall = useSelector(selectIsInCall);
+
+	useEffect(() => {
+		if (isJoinedCall && !isInCall) {
+			dispatch(DMCallActions.setIsInCall(false));
+			dispatch(audioCallActions.setIsRingTone(false));
+			dispatch(DMCallActions.removeAll());
+		}
+	}, [dispatch, isInCall, isJoinedCall]);
 
 	const handleJoinCall = async () => {
-		await dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: direct.id,
-				channelName: '',
-				type: direct.type
-			})
-		);
-
-		navigate(`/chat/direct/message/${direct.channel_id}/${direct.type}`);
+		triggerCall();
 	};
 
 	const handleCloseCall = async () => {
 		await mezon.socketRef.current?.forwardWebrtcSignaling(dataCall?.caller_id, 4, '', dataCall.channel_id ?? '', userId ?? '');
 		dispatch(DMCallActions.setIsInCall(false));
+		dispatch(audioCallActions.setIsEndTone(true));
 		dispatch(audioCallActions.setIsRingTone(false));
 		dispatch(DMCallActions.removeAll());
 	};
@@ -67,14 +70,12 @@ const ModalCall = ({ dataCall, userId }: ModalCallProps) => {
 					>
 						<Icons.CloseButton className={`w-[20px]`} />
 					</div>
-					<NavLink to="#" onClick={handleJoinCall}>
-						<div
-							className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-							onClick={handleJoinCall}
-						>
-							<Icons.IconPhoneDM />
-						</div>
-					</NavLink>
+					<div
+						className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
+						onClick={handleJoinCall}
+					>
+						<Icons.IconPhoneDM />
+					</div>
 				</div>
 			</div>
 		</div>
