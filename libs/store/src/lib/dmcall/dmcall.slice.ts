@@ -1,4 +1,4 @@
-import { IDMCall, LoadingStatus } from '@mezon/utils';
+import { IDMCall, IOtherCall, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { WebrtcSignalingFwd } from 'mezon-js';
 
@@ -22,6 +22,7 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	localStream: MediaStream | null;
 	isInCall: boolean;
 	peerConnection: RTCPeerConnection;
+	otherCall: IOtherCall | null;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -42,7 +43,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowMeetDM: false,
 	localStream: null,
 	isInCall: false,
-	peerConnection: new RTCPeerConnection()
+	peerConnection: new RTCPeerConnection(),
+	otherCall: null
 });
 
 export const DMCallSlice = createSlice({
@@ -62,7 +64,10 @@ export const DMCallSlice = createSlice({
 			} else if (!existingEntity && Object.keys(state.entities).length === 0) {
 				DMCallAdapter.addOne(state, action);
 			} else {
-				/* empty */
+				state.otherCall = {
+					caller_id: action.payload.signalingData.caller_id,
+					channel_id: action.payload.signalingData.channel_id
+				};
 			}
 		},
 
@@ -90,6 +95,9 @@ export const DMCallSlice = createSlice({
 		},
 		setPeerConnection: (state, action) => {
 			state.peerConnection = action.payload;
+		},
+		setOtherCall: (state, action: PayloadAction<IOtherCall>) => {
+			state.otherCall = action.payload;
 		}
 		// ...
 	}
@@ -160,3 +168,5 @@ export const selectLocalStream = createSelector(getDMCallState, (state: DMCallSt
 export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
 
 export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);
+
+export const selectOtherCall = createSelector(getDMCallState, (state) => state.otherCall);

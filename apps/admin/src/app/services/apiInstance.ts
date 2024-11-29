@@ -1,21 +1,21 @@
-import axios from 'axios';
 const baseURL = process.env.NX_MEZON_FLOW_URL ?? '';
-const apiInstance = axios.create({
-	baseURL,
-	headers: {
-		'Content-Type': 'application/json'
-	},
-	withCredentials: true
-});
-apiInstance.interceptors.request.use((config) => {
-	return config;
-});
-apiInstance.interceptors.response.use(
-	(response) => {
-		return response.data;
-	},
-	async (error) => {
-		return await Promise.reject(error);
+
+async function apiInstance(url: string, options: RequestInit = {}) {
+	const response = await fetch(`${baseURL}${url}`, {
+		...options,
+		headers: {
+			'Content-Type': 'application/json',
+			...options.headers
+		},
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		const error = await response.json();
+		return Promise.reject(error);
 	}
-);
+
+	return response.json();
+}
+
 export { apiInstance };

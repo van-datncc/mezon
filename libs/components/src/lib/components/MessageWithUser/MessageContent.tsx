@@ -92,6 +92,7 @@ const MessageText = ({
 								isJumMessageEnabled={false}
 								content={content}
 								mode={mode}
+								code={message.code}
 							/>
 						)}
 						{(message.code === TypeMessage.Welcome ||

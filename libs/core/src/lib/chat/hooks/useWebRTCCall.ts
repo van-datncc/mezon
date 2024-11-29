@@ -1,4 +1,4 @@
-import { audioCallActions, DMCallActions, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
+import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
@@ -60,6 +60,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		storedIceCandidates: null
 	});
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
+	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 
@@ -301,6 +302,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		}
 	};
 
+	const handleOtherCall = async (otherCallerId: string, otherChannelId: string) => {
+		await mezon.socketRef.current?.forwardWebrtcSignaling(otherCallerId, 5, '', otherChannelId, userId);
+	};
+
 	// End call and cleanup
 	const handleEndCall = async () => {
 		try {
@@ -326,11 +331,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.setIsInCall(false));
-			dispatch(audioCallActions.setIsEndTone(true));
+			if (!isPlayBusyTone) {
+				dispatch(audioCallActions.setIsEndTone(true));
+			}
 			dispatch(audioCallActions.setIsRingTone(false));
 			dispatch(audioCallActions.setIsRemoteAudio(false));
 			dispatch(audioCallActions.setIsRemoteVideo(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
+			dispatch(audioCallActions.startDmCall({}));
 			dispatch(DMCallActions.removeAll());
 			setCallState({
 				localStream: null,
@@ -449,6 +457,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		toggleAudio,
 		toggleVideo,
 		handleSignalingMessage,
+		handleOtherCall,
 		localVideoRef,
 		remoteVideoRef
 	};
