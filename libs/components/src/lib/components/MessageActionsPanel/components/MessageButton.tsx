@@ -55,6 +55,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 					extra_data = extra_data + ',' + objectData;
 				}
 			});
+
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,
@@ -62,7 +63,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 					button_id: buttonId,
 					sender_id: senderId,
 					user_id: currentUserId,
-					extra_data: extra_data
+					extra_data: embedData[0]?.value || ''
 				})
 			);
 		}
