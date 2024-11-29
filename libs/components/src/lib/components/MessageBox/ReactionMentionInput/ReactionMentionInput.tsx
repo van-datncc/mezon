@@ -548,58 +548,35 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		} else if (newPlainTextValue.endsWith(':')) {
 			setTitleModalMention('Emoji matching');
 		}
+
 		const { links } = processText(newPlainTextValue.trim());
-		if (!links || links.length === 0) return;
 		const extractedLinks = extractLinks(newPlainTextValue.trim(), links);
 		const uniqueLinks = [...new Set(extractedLinks)];
-		// console.log('uniqueLinks :', uniqueLinks);
-		//case 1: Only 1 link
 		const onlyLink = (links[0]?.e && links[0]?.e - (links[0]?.s ?? 0)) === newPlainTextValue.trim().length;
-		if (links.length === 1 && onlyLink) {
-			processLinks(uniqueLinks)
-				.then((attachmentUrls) => {
-					dispatch(
-						referencesActions.setAtachmentAfterUpload({
-							channelId: currentDmOrChannelId ?? '',
-							files: attachmentUrls
-						})
-					);
+
+		processLinks(uniqueLinks)
+			.then((attachmentUrls) => {
+				dispatch(
+					referencesActions.replaceAttachments({
+						channelId: currentDmOrChannelId ?? '',
+						files: attachmentUrls
+					})
+				);
+				if (links.length === 1 && onlyLink) {
 					setRequestInput(
 						{
 							...request,
-							valueTextInput: '',
+							valueTextInput: newValue,
 							content: '',
 							mentionRaw: []
 						},
 						props.isThread
 					);
-				})
-				.catch((error) => {
-					console.error('Failed to update message:', error);
-				});
-		} else {
-			processLinks(uniqueLinks)
-				.then((attachmentUrls) => {
-					dispatch(
-						referencesActions.setAtachmentAfterUpload({
-							channelId: currentDmOrChannelId ?? '',
-							files: attachmentUrls
-						})
-					);
-					setRequestInput(
-						{
-							...request,
-							valueTextInput: newValue,
-							content: newPlainTextValue,
-							mentionRaw: mentions
-						},
-						props.isThread
-					);
-				})
-				.catch((error) => {
-					console.error('Failed to update message:', error);
-				});
-		}
+				}
+			})
+			.catch((error) => {
+				console.error('Cannot get images from link:', error);
+			});
 	};
 
 	const handleChangeNameThread = (nameThread: string) => {
@@ -726,25 +703,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			textarea.removeAttribute('aria-hidden');
 		}
 	}, []);
-
-	// useEffect(() => {
-	// 	processLinks({
-	// 		t: request?.content as string,
-	// 		lk: linkList as IStartEndIndex[]
-	// 	})
-	// 		.then((attachmentUrls) => {
-	// 			dispatch(
-	// 				referencesActions.setAtachmentAfterUpload({
-	// 					channelId: currentDmOrChannelId ?? '',
-	// 					files: attachmentUrls
-	// 				})
-	// 			);
-	// 		})
-	// 		.catch((error) => {
-	// 			console.error('Failed to update message:', error);
-	// 		});
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [linkList]);
 
 	return (
 		<div className="relative">

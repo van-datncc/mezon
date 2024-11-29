@@ -226,39 +226,6 @@ function MessageWithUser({
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
 
-	// const updateAttachments = useCallback(() => {
-	// 	const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
-
-	// 	const processNext = () => {
-	// 		processLinks({
-	// 			t: message.content.t as string,
-	// 			lk: message.content.lk as IStartEndIndex[]
-	// 		})
-	// 			.then((attachmentUrls) => {
-	// 				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
-
-	// 				if (newAttachmentUrls.length === 0 || !newAttachmentUrls) {
-	// 					return;
-	// 				}
-
-	// 				if (newAttachmentUrls.length > 0) {
-	// 					editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
-	// 				}
-
-	// 				setTimeout(processNext, 1000);
-	// 			})
-	// 			.catch((error) => {
-	// 				console.error('Failed to update message:', error);
-	// 			});
-	// 	};
-
-	// 	processNext();
-	// }, [message.id]);
-
-	// useEffect(() => {
-	// 	if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
-	// 	updateAttachments();
-	// }, [message.id, updateAttachments]);
 	return (
 		<>
 			{showDivider && <MessageDateDivider message={message} />}
