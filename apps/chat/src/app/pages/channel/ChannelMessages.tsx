@@ -24,7 +24,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode, TypeMessage, toggleDisableHover } from '@mezon/utils';
+import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
@@ -95,21 +95,6 @@ function ChannelMessages({
 	useEffect(() => {
 		hasMoreBottomRef.current = hasMoreBottom;
 	}, [hasMoreBottom]);
-
-	const handleBuzz = () => {
-		const audio = new Audio('assets/audio/buzz.mp3');
-
-		audio.play().catch((error) => {
-			console.error('Failed to play buzz sound:', error);
-		});
-	};
-
-	useEffect(() => {
-		const nowMinus3Seconds = Date.now() - 3000;
-		if (lastMessage && lastMessage.code === TypeMessage.MessageBuzz && new Date(lastMessage.create_time).getTime() >= nowMinus3Seconds) {
-			handleBuzz();
-		}
-	}, [lastMessage]);
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb?: IBeforeRenderCb) => {

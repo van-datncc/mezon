@@ -1,9 +1,16 @@
 import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
-import { MessagesEntity, selectChannelDraftMessage, selectIdMessageRefEdit, selectOpenEditMessageState, useAppSelector } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectChannelDraftMessage,
+	selectIdMessageRefEdit,
+	selectLastMessageByChannelId,
+	selectOpenEditMessageState,
+	useAppSelector
+} from '@mezon/store';
 import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 export type MessageProps = {
@@ -88,6 +95,23 @@ export const ChannelMessage: ChannelMessageComponent = ({
 			/>
 		);
 	}, [message, handleContextMenu, isCombine, mode]);
+
+	const handleBuzz = () => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
+	};
+
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+
+	useEffect(() => {
+		const nowMinusSeconds = Date.now() - 500;
+		if (lastMessage && lastMessage.code === TypeMessage.MessageBuzz && new Date(lastMessage.create_time).getTime() >= nowMinusSeconds) {
+			handleBuzz();
+		}
+	}, []);
 
 	return (
 		<>
