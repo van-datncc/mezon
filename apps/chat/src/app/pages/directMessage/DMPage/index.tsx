@@ -21,9 +21,11 @@ import {
 } from '@mezon/core';
 import {
 	MessagesEntity,
+	channelsActions,
 	directActions,
 	directMetaActions,
 	gifsStickerEmojiActions,
+	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectDefaultChannelIdByClanId,
@@ -31,15 +33,16 @@ import {
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
-	selectIsUnreadDMById,
 	selectIsUseProfileDM,
 	selectPositionEmojiButtonSmile,
+	selectPreviousChannels,
 	selectReactionTopState,
+	selectSignalingDataByUserId,
 	selectStatusMenu,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, TIME_OFFSET, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -61,8 +64,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId]);
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
+	const previousChannels = useSelector(selectPreviousChannels);
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
@@ -71,11 +73,15 @@ function useChannelSeen(channelId: string) {
 			markAsReadSeen(lastMessage, mode);
 		}
 	}, [lastMessage, channelId]);
-
+	useEffect(() => {
+		if (previousChannels.at(1)) {
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+		}
+	}, [previousChannels]);
 	useEffect(() => {
 		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
@@ -107,6 +113,7 @@ const DirectMessage = () => {
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, directId));
 	const dispatch = useAppDispatch();
+	const { userId } = useAuth();
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
@@ -124,6 +131,11 @@ const DirectMessage = () => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+	const isPlayDialTone = useSelector(selectAudioDialTone);
+	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
+	const isHaveCallInChannel = useMemo(() => {
+		return currentDmGroup?.user_id?.some((i) => i === signalingData?.[0]?.callerId);
+	}, [currentDmGroup?.user_id, signalingData]);
 
 	const HEIGHT_EMOJI_PANEL = 457;
 	const WIDTH_EMOJI_PANEL = 500;
@@ -149,7 +161,7 @@ const DirectMessage = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+	const handleDragEnter = (e: DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (e.dataTransfer?.types.includes('Files')) {
@@ -180,12 +192,11 @@ const DirectMessage = () => {
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-				h-[100%] overflow-visible`}
+				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
-				{' '}
-				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row flex-1 w-full">
+				<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
+				<div className={`flex flex-row flex-1 w-full ${isHaveCallInChannel || isPlayDialTone ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>

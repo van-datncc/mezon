@@ -1,9 +1,9 @@
 import { Avatar } from 'flowbite-react';
 import React, { memo, Ref, useImperativeHandle, useMemo, useRef } from 'react';
-import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
+	clansActions,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
@@ -14,7 +14,6 @@ import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
-import ModalInvite from '../../ListMemberInvite/modalInvite';
 import ThreadListChannel, { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 import { IChannelLinkPermission } from '../CategorizedChannels';
@@ -71,6 +70,7 @@ type ChannelLinkContentProps = {
 };
 
 const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listThreadRef, channelLinkRef, isActive, permissions }) => {
+	const dispatch = useDispatch();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
@@ -81,10 +81,9 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	}, [voiceChannelMembers, streamChannelMembers]);
 	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
 	const unreadMessageCount = channel?.count_mess_unread || 0;
-	const [openInviteModal, closeInviteModal] = useModal(() => <ModalInvite onClose={closeInviteModal} open={true} channelID={channel.id} />);
 
 	const handleOpenInvite = () => {
-		openInviteModal();
+		dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
 	};
 
 	const renderChannelLink = () => {

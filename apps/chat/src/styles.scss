@@ -1033,3 +1033,35 @@ input:-webkit-autofill:active {
 #close-button {
   grid-column: 3;
 }
+
+@keyframes line-extend {
+  from {
+    stroke-dasharray: 0, 40;
+    stroke-dashoffset: 40;
+  }
+
+  to {
+    stroke-dasharray: 40, 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes line-retract {
+  from {
+    stroke-dasharray: 40, 0;
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dasharray: 0, 40;
+    stroke-dashoffset: 40;
+  }
+}
+
+.line-animation {
+  animation: line-extend 1.5s forwards;
+}
+
+.line-retract {
+  animation: line-retract 1.5s forwards;
+}

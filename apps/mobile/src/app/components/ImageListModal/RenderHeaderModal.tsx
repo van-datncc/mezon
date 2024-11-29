@@ -30,7 +30,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			const filetypeParts = filetype.split('/');
 			const filePath = await downloadImage(url, filetypeParts[1]);
 			if (filePath) {
-				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0]);
+				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0], false);
 			}
 			onImageSaved();
 		} catch (error) {

@@ -344,7 +344,7 @@ const ItemInfor = ({
 							placement="left"
 						>
 							<img
-								src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url}
+								src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url || 'assets/avatar-user.svg'}
 								className="w-8 h-8 object-cover rounded-full "
 							/>
 						</Tooltip>
@@ -370,11 +370,11 @@ export const AvatarUserShort = ({
 	const voiceClan = useAppSelector((state) => selectMemberClanByGoogleId(state, id ?? ''));
 	const clanAvatar = voiceClan?.clan_avatar || member?.clan_avatar;
 	const userAvatar = voiceClan?.user?.avatar_url || member?.user?.avatar_url;
-	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
+	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar) || 'assets/avatar-user.svg';
 
 	return (
 		<div className="flex items-center gap-3">
-			<Avatar img={avatarUrl} rounded size={size} />
+			<img src={avatarUrl} className="rounded-full h-6 aspect-square object-cover" />
 			{showName ? (
 				<div className="text-textLightTheme dark:text-channelTextareaLight">
 					{member?.clan_nick || member?.user?.display_name || member?.user?.username}

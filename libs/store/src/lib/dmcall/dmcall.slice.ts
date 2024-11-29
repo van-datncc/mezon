@@ -1,5 +1,5 @@
 import { IDMCall, LoadingStatus } from '@mezon/utils';
-import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { WebrtcSignalingFwd } from 'mezon-js';
 
 export const DMCALL_FEATURE_KEY = 'dmcall';
@@ -14,9 +14,14 @@ export interface DMCallEntity extends IDMCall {
 export interface DMCallState extends EntityState<DMCallEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	callerId: string;
-	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
+	listOfCalls: Record<string, string[]>;
+	isMuteMicrophone: boolean;
+	isShowShareScreen: boolean;
+	isShowMeetDM: boolean;
+	localStream: MediaStream | null;
+	isInCall: boolean;
+	peerConnection: RTCPeerConnection;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
@@ -24,14 +29,20 @@ export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
 export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	callerId: '',
-	calleeId: '',
 	signalingData: {
 		receiver_id: '',
 		data_type: 0,
 		json_data: '',
-		channel_id: ''
-	}
+		channel_id: '',
+		caller_id: ''
+	},
+	listOfCalls: {},
+	isMuteMicrophone: false,
+	isShowShareScreen: false,
+	isShowMeetDM: false,
+	localStream: null,
+	isInCall: false,
+	peerConnection: new RTCPeerConnection()
 });
 
 export const DMCallSlice = createSlice({
@@ -39,8 +50,47 @@ export const DMCallSlice = createSlice({
 	initialState: initialDMCallState,
 	reducers: {
 		add: DMCallAdapter.addOne,
+		update: DMCallAdapter.updateOne,
 		addMany: DMCallAdapter.addMany,
-		remove: DMCallAdapter.removeOne
+		remove: DMCallAdapter.removeOne,
+		removeAll: DMCallAdapter.removeAll,
+
+		addOrUpdate: (state, action: PayloadAction<DMCallEntity>) => {
+			const existingEntity = state.entities[action.payload.id];
+			if (existingEntity) {
+				DMCallAdapter.updateOne(state, { id: action.payload.id, changes: action.payload });
+			} else if (!existingEntity && Object.keys(state.entities).length === 0) {
+				DMCallAdapter.addOne(state, action);
+			} else {
+				/* empty */
+			}
+		},
+
+		cancelCall: (state, action) => {
+			const existingEntity = state.entities[action.payload.id];
+			if (existingEntity) {
+				DMCallActions.setIsInCall(false);
+			}
+		},
+
+		setIsMuteMicrophone: (state, action) => {
+			state.isMuteMicrophone = action.payload;
+		},
+		setIsShowShareScreen: (state, action) => {
+			state.isShowShareScreen = action.payload;
+		},
+		setIsShowMeetDM: (state, action) => {
+			state.isShowMeetDM = action.payload;
+		},
+		setLocalStream: (state, action) => {
+			state.localStream = action.payload;
+		},
+		setIsInCall: (state, action) => {
+			state.isInCall = action.payload;
+		},
+		setPeerConnection: (state, action) => {
+			state.peerConnection = action.payload;
+		}
 		// ...
 	}
 });
@@ -96,5 +146,17 @@ export const selectDMVoiceEntities = createSelector(getDMCallState, selectEntiti
 
 export const selectSignalingDataByUserId = createSelector([selectDMVoiceEntities, (state, userId) => userId], (entities, userId) => {
 	const dmcalls = Object.values(entities);
-	return dmcalls.filter((dmcall) => dmcall && dmcall.signalingData?.receiver_id === userId);
+	return dmcalls.filter((dmcall) => (dmcall && dmcall.signalingData?.receiver_id === userId) || dmcall.calleeId === userId);
 });
+
+export const selectIsMuteMicrophone = createSelector(getDMCallState, (state: DMCallState) => state.isMuteMicrophone);
+
+export const selectIsShowShareScreen = createSelector(getDMCallState, (state: DMCallState) => state.isShowShareScreen);
+
+export const selectIsShowMeetDM = createSelector(getDMCallState, (state: DMCallState) => state.isShowMeetDM);
+
+export const selectLocalStream = createSelector(getDMCallState, (state: DMCallState) => state.localStream);
+
+export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
+
+export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);

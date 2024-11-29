@@ -1,16 +1,8 @@
-import { useAuth, useChatMessages, useSeenMessagePool } from '@mezon/core';
+import { useChatMessages, useSeenMessagePool } from '@mezon/core';
 import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import {
-	MessagesEntity,
-	directActions,
-	gifsStickerEmojiActions,
-	selectDmGroupCurrent,
-	selectIsUnreadDMById,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store-mobile';
-import { SubPanelName, createImgproxyUrl } from '@mezon/utils';
+import { MessagesEntity, directActions, directMetaActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
@@ -33,7 +25,6 @@ interface HeaderProps {
 	directMessageId: string;
 	firstUserId: string;
 }
-
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
@@ -43,8 +34,6 @@ function useChannelSeen(channelId: string) {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
@@ -52,14 +41,13 @@ function useChannelSeen(channelId: string) {
 		if (lastMessage) {
 			markAsReadSeen(lastMessage, mode);
 		}
-	}, [lastMessage, channelId]);
-
-	useEffect(() => {
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	}, [channelId]);
+	}, [lastMessage, channelId, currentDmGroup?.type, markAsReadSeen]);
 
 	useEffect(() => {
 		if (lastMessage) {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, []);
@@ -95,7 +83,8 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
-				receiverId: firstUserId
+				receiverId: firstUserId,
+				receiverAvatar: dmAvatar
 			}
 		});
 	};

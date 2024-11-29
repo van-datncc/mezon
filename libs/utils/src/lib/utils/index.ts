@@ -156,7 +156,7 @@ export const isGreaterOneMonth = (timestamp: number) => {
 };
 
 export const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
-	return senders.reduce((sum: number, item: SenderInfoOptionals) => sum + (item.count ?? 0), 0);
+	return senders?.reduce((sum: number, item: SenderInfoOptionals) => sum + (item.count ?? 0), 0);
 };
 
 export const notImplementForGifOrStickerSendFromPanel = (data: ApiMessageAttachment) => {
@@ -898,8 +898,9 @@ type ImgproxyOptions = {
 };
 
 export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
+	const extension = sourceImageUrl.split('.').pop()?.toLowerCase();
 	if (!sourceImageUrl) return '';
-	if (sourceImageUrl.includes('assets/images/')) {
+	if (extension === 'gif' || !sourceImageUrl.startsWith('https://cdn.mezon.vn')) {
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;
@@ -908,3 +909,27 @@ export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptio
 
 	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
 };
+
+export function copyChannelLink(clanId: string, channelId: string) {
+	const origin = isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin;
+	const link = `${origin}/chat/clans/${clanId}/channels/${channelId}`;
+	if (navigator.clipboard) {
+		navigator.clipboard
+			.writeText(link)
+			.then()
+			.catch((err) => {
+				console.error('Failed to copy the link: ', err);
+			});
+	} else {
+		const textArea = document.createElement('textarea');
+		textArea.value = link;
+		document.body.appendChild(textArea);
+		textArea.select();
+		try {
+			document.execCommand('copy');
+		} catch (err) {
+			console.error('Failed to copy the link: ', err);
+		}
+		document.body.removeChild(textArea);
+	}
+}

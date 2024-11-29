@@ -1,14 +1,10 @@
 import { MemberProvider } from '@mezon/core';
-import {
-	channelSettingActions,
-	onboardingActions,
-	selectCurrentClanId,
-	selectEnableStatusOfOnBoarding,
-	selectFormOnboarding,
-	useAppDispatch
-} from '@mezon/store';
+import { onboardingActions, selectCurrentClan, selectCurrentClanId, selectFormOnboarding, useAppDispatch } from '@mezon/store';
+import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons, Image } from '@mezon/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { Snowflake } from '@theinternetfolks/snowflake';
+import { ApiOnboardingContent } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
@@ -21,23 +17,23 @@ export enum EOnboardingStep {
 }
 const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
-	const toggleEnableStatus = () => {
-		dispatch(channelSettingActions.toggleOnBoarding());
+	const currentClanId = useSelector(selectCurrentClanId);
+	const toggleEnableStatus = (enable: boolean) => {
+		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClanId as string, onboarding: enable }));
 	};
-
-	const isEnableOnBoarding = useSelector(selectEnableStatusOfOnBoarding);
 
 	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
 	const handleGoToPage = (page: EOnboardingStep) => {
 		setCurrentPage(page);
 	};
 
+	const currentClan = useSelector(selectCurrentClan);
 	return (
 		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={isEnableOnBoarding}
+					isEnableOnBoarding={!!currentClan?.is_onboarding}
 					toggleEnableStatus={toggleEnableStatus}
 					onCloseSetting={onClose}
 				/>
@@ -60,33 +56,62 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 interface IMainIndexProps {
 	isEnableOnBoarding: boolean;
-	toggleEnableStatus: () => void;
+	toggleEnableStatus: (enable: boolean) => void;
 	handleGoToPage: (page: EOnboardingStep) => void;
 	onCloseSetting?: () => void;
 }
 
 const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
 	const dispatch = useAppDispatch();
-	const openOnboardingMode = () => {
-		dispatch(onboardingActions.openOnboardingMode());
+	const openOnboardingPreviewMode = () => {
+		dispatch(onboardingActions.openOnboardingPreviewMode());
 		if (onCloseSetting) {
 			onCloseSetting();
 		}
 	};
 	const currentClanId = useSelector(selectCurrentClanId);
 	const formOnboarding = useSelector(selectFormOnboarding);
-	const handleCreateOnboarding = () => {
-		const formOnboardingData = [...formOnboarding.questions, ...formOnboarding.rules, ...formOnboarding.task];
+	const { sessionRef, clientRef } = useMezon();
+	const getRuleData = useCallback(async () => {}, [formOnboarding.rules.length]);
+
+	const handleCreateOnboarding = useCallback(async () => {
+		const uploadImageRule = formOnboarding.rules.map((item) => {
+			if (!item.file) {
+				return undefined;
+			}
+			const id = Snowflake.generate();
+			const path = 'onboarding/' + id + '.webp';
+			if (clientRef.current && sessionRef.current) {
+				return handleUploadEmoticon(clientRef.current, sessionRef.current, path, item.file);
+			}
+		});
+		const imageUrl = await Promise.all(uploadImageRule);
+
+		const formOnboardingRule = formOnboarding.rules.map((rule, index) => {
+			const ruleItem: ApiOnboardingContent = {
+				title: rule.title,
+				content: rule.content,
+				guide_type: rule.guide_type
+			};
+			if (imageUrl[index]) {
+				ruleItem.image_url = imageUrl[index]?.url;
+			}
+			return ruleItem;
+		});
+
+		const formOnboardingData = [...formOnboarding.questions, ...formOnboardingRule, ...formOnboarding.task];
+
 		if (formOnboarding.greeting) {
 			formOnboardingData.unshift(formOnboarding.greeting);
 		}
+
 		dispatch(
 			onboardingActions.createOnboardingTask({
 				clan_id: currentClanId as string,
 				content: formOnboardingData
 			})
 		);
-	};
+	}, [getRuleData]);
 
 	const checkCreateValidate = useMemo(() => {
 		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;
@@ -104,7 +129,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				<div className="flex gap-2 items-center">
 					<div className="cursor-pointer text-blue-500 hover:underline">See examples</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />
-					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingMode}>
+					<div className="cursor-pointer text-blue-500 hover:underline" onClick={openOnboardingPreviewMode}>
 						Preview
 					</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />
@@ -147,7 +172,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 														disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
 								checked={isEnableOnBoarding}
-								onChange={toggleEnableStatus}
+								onChange={() => toggleEnableStatus(!isEnableOnBoarding)}
 							/>
 						</div>
 					}

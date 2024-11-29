@@ -3,16 +3,20 @@ import {
 	EventManagementOnGogoing,
 	eventManagementActions,
 	onboardingActions,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectMissionDone,
 	selectMissionSum,
 	selectNumberEvent,
+	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectOngoingEvent,
-	selectShowNumEvent
+	selectProcessingByClan,
+	selectShowNumEvent,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission } from '@mezon/utils';
+import { DONE_ONBOARDING_STATUS, EPermission } from '@mezon/utils';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,11 +27,12 @@ export const Events = memo(() => {
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
-
+	const previewMode = useSelector(selectOnboardingMode);
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
-	const onboardingMode = useSelector(selectOnboardingMode);
+	const onboardingByClan = useSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
 
 	const closeModal = () => {
@@ -64,25 +69,43 @@ export const Events = memo(() => {
 		);
 	}, []);
 
+	const dispatch = useAppDispatch();
+	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
+	useEffect(() => {
+		if (currentClan?.is_onboarding) {
+			dispatch(onboardingActions.fetchOnboarding({ clan_id: currentClanId as string }));
+			dispatch(onboardingActions.fetchProcessingOnboarding({}));
+		}
+	}, [currentClan?.is_onboarding]);
+
+	const checkPreviewMode = useMemo(() => {
+		if (previewMode) {
+			return true;
+		}
+		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && onboardingByClan?.mission.length > 0;
+	}, [selectUserProcessing?.onboarding_step, onboardingByClan?.mission.length, previewMode]);
+
 	return (
 		<>
-			{onboardingMode && <OnboardingGetStart link={serverGuidePath} />}
+			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} clanId={currentClanId as string} />}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
-			<Link
-				to={serverGuidePath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
-			>
-				<div className="grow w-5 flex-row items-center gap-2 flex">
-					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+			{currentClan && currentClan.is_onboarding && (
+				<Link
+					to={serverGuidePath}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				>
+					<div className="grow w-5 flex-row items-center gap-2 flex">
+						<div className="w-5 h-5 relative flex flex-row items-center">
+							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+								<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+							</div>
 						</div>
+						<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Clan Guide</div>
 					</div>
-					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Clan Guide</div>
-				</div>
-			</Link>
+				</Link>
+			)}
 
 			<div
 				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
@@ -164,65 +187,22 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 	);
 };
 
-const OnboardingGetStart = ({ link }: { link: string }) => {
+const OnboardingGetStart = ({ link, clanId }: { link: string; clanId: string }) => {
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
 
 	const completionPercentage = useMemo(() => {
 		return missionDone ? (missionDone / missionSum) * 100 - 100 : -97;
 	}, [missionDone, missionSum]);
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { navigate } = useAppNavigation();
 	const handleNavigate = () => {
 		navigate(link);
 	};
-	const handleClosePreview = () => {
-		dispatch(onboardingActions.closeOnboardingMode());
-	};
-	const [openModalGetStarted, closeModalGetStarted] = useModal(() => {
-		return (
-			<div className="fixed z-50 top-0 left-0 w-screen  bg-black flex px-4 py-2 h-12 items-center justify-center ">
-				<div className="absolute cursor-pointer hover:bg-slate-950 left-6 px-2 flex gap-1 border-2 py-1 items-center justify-center  border-white rounded bg-transparent">
-					<Icons.LeftArrowIcon className="fill-white text-white" />
-					<p className="text-white text-xs font-medium" onClick={handleClosePreview}>
-						Close preview mode
-					</p>
-				</div>
-				<div className="text-base text-white font-semibold">You are viewing the server as a new member. You have no roles.</div>
-			</div>
-		);
-	});
-	const [openCongratulation, closeCongratulation] = useModal(() => {
-		return (
-			<div className="fixed z-[90] top-0 left-0 w-screen h-screen pointer-events-none items-center justify-center flex">
-				<div className="w-fit h-fit flex text-3xl text-white font-bold">
-					<p
-						style={{
-							textShadow: '1px 1px 5px #000000 '
-						}}
-					>
-						Congratulation Show In Here !
-					</p>
-				</div>
-			</div>
-		);
-	});
+
 	useEffect(() => {
-		openModalGetStarted();
+		dispatch(onboardingActions.fetchOnboarding({ clan_id: clanId }));
 	}, []);
-	useEffect(() => {
-		let timeoutId: NodeJS.Timeout;
-
-		if (missionDone === missionSum) {
-			openCongratulation();
-			timeoutId = setTimeout(() => {
-				closeCongratulation();
-				clearTimeout(timeoutId);
-			}, 2000);
-		}
-
-		return () => clearTimeout(timeoutId);
-	}, [missionDone]);
 
 	return (
 		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>

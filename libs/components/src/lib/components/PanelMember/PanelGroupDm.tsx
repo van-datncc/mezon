@@ -2,6 +2,7 @@ import { useAppNavigation, useAppParams } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
+	channelsActions,
 	deleteChannel,
 	directMetaActions,
 	fetchDirectMessage,
@@ -16,7 +17,7 @@ import {
 import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalConfirm from '../ModalConfirm';
@@ -139,10 +140,28 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 		}
 	};
 
+	const handleEnableE2ee = useCallback(async (directId?: string, e2ee?: number) => {
+		if (!directId) return;
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: directId,
+			channel_label: '',
+			category_id: channel.category_id,
+			app_url: channel.app_url,
+			e2ee: !channel.e2ee ? 1 : 0
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
+	}, []);
+
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
 				<ItemPanelMember onClick={() => handleMarkAsRead(dmGroupId ?? '')} children="Mark as read" />
+			</div>
+			<div className="border-b dark:border-[#2e2f34]">
+				<ItemPanelMember
+					children={!channel?.e2ee ? 'Enable E2EE' : 'Disable E2EE'}
+					onClick={() => handleEnableE2ee(channel?.id, channel?.e2ee)}
+				/>
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
 				{isDmGroupOwner && <ItemPanelMember children="Invites" />}

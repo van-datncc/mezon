@@ -4,9 +4,12 @@ import {
 	ActivitiesEntity,
 	AttachmentEntity,
 	DMCallActions,
+	JoinPTTActions,
+	TalkPTTActions,
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
+	audioCallActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -29,7 +32,7 @@ import {
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
-	mapMessageChannelToEntity,
+	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,
 	mapReactionToEntity,
 	messagesActions,
@@ -76,6 +79,7 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
+	JoinPTTChannel,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
@@ -93,6 +97,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	StreamingStartedEvent,
+	TalkPTTChannel,
 	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -234,7 +239,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
-				const mess = mapMessageChannelToEntity(message);
+				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
@@ -285,6 +290,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
+					if (mess.isMe) {
+						dispatch(channelsActions.updateChannelBadgeCount({ channelId: message.channel_id, count: 0, isReset: true }));
+					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
@@ -779,7 +787,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
+
+			if (channelUpdated.clan_id === '0') {
+				return dispatch(directActions.updateOne(channelUpdated));
+			}
+
 			if (channelUpdated) {
+				//TODO: improve update once item
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
@@ -927,13 +941,43 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
+		// TODO: AND TYPE IN BE
+		// TYPE = 4: USER CANCEL CALL
+		// TYPE = 0: USER JOINED CALL
+		if (event?.data_type === 4) {
+			dispatch(DMCallActions.cancelCall({}));
+			dispatch(audioCallActions.startDmCall({}));
+			dispatch(audioCallActions.setIsJoinedCall(false));
+		}
+		if (event?.data_type === 0) {
+			dispatch(audioCallActions.setIsJoinedCall(true));
+		}
 		dispatch(
-			DMCallActions.add({
+			DMCallActions.addOrUpdate({
 				calleeId: event?.receiver_id,
 				signalingData: event,
+				id: event?.caller_id,
+				callerId: event?.caller_id
+			})
+		);
+	}, []);
+
+	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
+		dispatch(
+			JoinPTTActions.add({
+				joinPttData: event,
 				// todo: refactor this
-				id: Snowflake.generate(),
-				callerId: ''
+				id: Snowflake.generate()
+			})
+		);
+	}, []);
+
+	const ontalkpttchannel = useCallback((event: TalkPTTChannel) => {
+		dispatch(
+			TalkPTTActions.add({
+				talkPttData: event,
+				// todo: refactor this
+				id: Snowflake.generate()
 			})
 		);
 	}, []);
@@ -1023,6 +1067,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
+
+			socket.ontalkpttchannel = ontalkpttchannel;
+
+			socket.onjoinpttchannel = onjoinpttchannel;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1064,7 +1112,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onroleevent,
 			ontokensent,
 			//onmessagebuttonclicked,
-			onwebrtcsignalingfwd
+			onwebrtcsignalingfwd,
+			onjoinpttchannel,
+			ontalkpttchannel
 		]
 	);
 

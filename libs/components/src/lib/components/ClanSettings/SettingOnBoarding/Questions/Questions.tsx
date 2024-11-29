@@ -1,6 +1,14 @@
-import { EGuideType, onboardingActions, selectFormOnboarding, useAppDispatch } from '@mezon/store';
+import {
+	EGuideType,
+	onboardingActions,
+	selectCurrentClanId,
+	selectFormOnboarding,
+	selectOnboardingByClan,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiAnswer, ApiOnboardingContent } from 'mezon-js/api.gen';
+import { ApiOnboardingItem, OnboardingAnswer } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -23,14 +31,23 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 
 	const [preJoinQuestions, setPreJoinQuestion] = useState<number>(formOnboarding.questions.length || 0);
 	const [postJoinQuestions, setPostJoinQuestion] = useState<number>(0);
-
+	const dispatch = useAppDispatch();
 	const handleAddPreJoinQuestion = () => {
-		setPreJoinQuestion(preJoinQuestions + 1);
+		dispatch(
+			onboardingActions.addQuestion({
+				answers: [],
+				title: '',
+				guide_type: EGuideType.QUESTION
+			})
+		);
 	};
 
 	const handleAddPostJoinQuestion = () => {
 		setPostJoinQuestion(postJoinQuestions + 1);
 	};
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -81,11 +98,12 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 							Members will be asked these questions before they join your server. Use them to assign channels and important roles.
 							Pre-join Questions will also be available on the Channels & Roles page.
 						</div>
-						{Array(preJoinQuestions)
-							.fill(1)
-							.map((question, index) => (
-								<QuestionItem key={index} question={formOnboarding.questions[index]} index={index} />
-							))}
+						{onboardingByClan.question.map((question, index) => (
+							<QuestionItem key={question.id} question={question} index={index} />
+						))}
+						{formOnboarding.questions.map((question, index) => (
+							<QuestionItem key={index} question={question} index={index + onboardingByClan.question.length} tempId={index} />
+						))}
 						<div
 							onClick={handleAddPreJoinQuestion}
 							className="rounded-xl text-[#949cf7] justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
@@ -120,9 +138,9 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 	);
 };
 
-const QuestionItem = ({ question, index }: { question: ApiOnboardingContent; index: number }) => {
+const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem; index: number; tempId?: number }) => {
 	const [titleQuestion, setTitleQuestion] = useState(question?.title || '');
-	const [answers, setAnswer] = useState<ApiAnswer[]>(question?.answers || []);
+	const [answers, setAnswer] = useState<OnboardingAnswer[]>(question?.answers || []);
 	const [titleAnswer, setTitleAnswer] = useState('');
 	const [answerDescription, setAnswerDescription] = useState('');
 
@@ -194,13 +212,36 @@ const QuestionItem = ({ question, index }: { question: ApiOnboardingContent; ind
 		toggleExpand();
 	};
 
+	const handleRemoveQuestion = () => {
+		if (tempId !== undefined) {
+			dispatch(
+				onboardingActions.removeTempTask({
+					idTask: tempId,
+					type: EGuideType.QUESTION
+				})
+			);
+			return;
+		}
+		if (question.id) {
+			dispatch(
+				onboardingActions.removeOnboardingTask({
+					idTask: question.id,
+					type: EGuideType.QUESTION,
+					clan_id: question.clan_id as string
+				})
+			);
+		}
+	};
+
 	return (
 		<div className="flex flex-col gap-6 bg-bgSecondary p-4 rounded-lg">
 			<div className="flex flex-col gap-2">
 				<div className="flex justify-between items-center">
 					<div className="uppercase text-xs font-medium">Question {index + 1}</div>
 					<div className="flex gap-2 items-center">
-						<Icons.TrashIcon className="w-4" />
+						<div onClick={handleRemoveQuestion}>
+							<Icons.TrashIcon className="w-4" />
+						</div>
 						<div onClick={toggleExpand}>
 							<Icons.ArrowRight defaultSize={`${isExpanded ? 'rotate-90' : '-rotate-90'} w-4`} />
 						</div>
@@ -226,7 +267,7 @@ const QuestionItem = ({ question, index }: { question: ApiOnboardingContent; ind
 							{answers.map((answer) => (
 								<GuideItemLayout
 									key={answer.title}
-									icon={answer.answer}
+									icon={answer.emoji}
 									description={answer.description}
 									title={answer.title}
 									className="w-[49.5%] rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"

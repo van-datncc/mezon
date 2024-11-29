@@ -1,6 +1,14 @@
 /* eslint-disable no-console */
 import { useInvite } from '@mezon/core';
-import { selectChannelById, selectChannelFirst, selectClanById, selectCurrentClanId, useAppSelector } from '@mezon/store';
+import {
+	fetchSystemMessageByClanId,
+	selectChannelById,
+	selectClanById,
+	selectClanSystemMessage,
+	selectCurrentClanId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,7 +36,6 @@ const ModalInvite = (props: ModalParam) => {
 	const [urlInvite, setUrlInvite] = useState('');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
-	const firstChannel = useSelector(selectChannelFirst);
 	const { onClose, channelID, clanId, setShowClanListMenuContext } = props;
 
 	const effectiveClanId = clanId && clanId !== '0' ? clanId : currentClanId;
@@ -36,10 +43,10 @@ const ModalInvite = (props: ModalParam) => {
 	const clan = useSelector(selectClanById(effectiveClanId ?? ''));
 
 	const channel = useAppSelector((state) => selectChannelById(state, channelID ?? '')) || {};
-
+	const welcomeChannel = useSelector(selectClanSystemMessage);
 	const handleOpenInvite = useCallback(async () => {
 		try {
-			const intiveIdChannel = (channelID ? channelID : firstChannel.channel_id) as string;
+			const intiveIdChannel = (channelID ? channelID : welcomeChannel.channel_id) as string;
 			const res = await createLinkInviteUser(effectiveClanId ?? '', intiveIdChannel, 10);
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
@@ -47,7 +54,7 @@ const ModalInvite = (props: ModalParam) => {
 		} catch {
 			console.log('Error when create invite link');
 		}
-	}, [firstChannel, channelID, effectiveClanId]);
+	}, [welcomeChannel.channel_id, channelID, effectiveClanId]);
 
 	useEffect(() => {
 		handleOpenInvite();
@@ -74,6 +81,16 @@ const ModalInvite = (props: ModalParam) => {
 			unsecuredCopyToClipboard(content);
 		}
 	};
+
+	const dispatch = useAppDispatch();
+	const fetchSystemMessage = async () => {
+		if (!currentClanId) return;
+		await dispatch(fetchSystemMessageByClanId(currentClanId));
+	};
+
+	useEffect(() => {
+		fetchSystemMessage();
+	}, [currentClanId]);
 
 	const closeModalEdit = useCallback(() => setModalEdit(false), []);
 	return !modalEdit ? (

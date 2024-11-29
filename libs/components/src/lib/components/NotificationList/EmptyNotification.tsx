@@ -2,15 +2,15 @@ import { Icons } from '@mezon/ui';
 
 type EmptyNotification = {
 	isEmptyForYou?: boolean;
-	isEmptyUnread?: boolean;
+	isEmptyMessages?: boolean;
 	isEmptyMentions?: boolean;
 };
 
-const EmptyNotification = ({ isEmptyForYou, isEmptyUnread, isEmptyMentions }: EmptyNotification) => {
+const EmptyNotification = ({ isEmptyForYou, isEmptyMessages, isEmptyMentions }: EmptyNotification) => {
 	return (
 		<div className="m-4 flex flex-col justify-center h-[400px] py-[80px] select-none">
 			{isEmptyForYou && <EmptyForYou />}
-			{isEmptyUnread && <EmptyUnread />}
+			{isEmptyMessages && <EmptyMessages />}
 			{isEmptyMentions && <EmptyMentions />}
 		</div>
 	);
@@ -30,7 +30,7 @@ const EmptyForYou = () => {
 	);
 };
 
-const EmptyUnread = () => {
+const EmptyMessages = () => {
 	return (
 		<>
 			<button className="relative mx-auto mb-4 p-[22px] rounded-full dark:bg-bgPrimary bg-bgLightPrimary cursor-default">

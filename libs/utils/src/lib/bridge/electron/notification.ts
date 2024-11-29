@@ -1,6 +1,6 @@
 import isElectron from 'is-electron';
+import { MessageCrypt } from '../../e2ee';
 import { electronBridge } from './electron';
-
 export interface IMessageExtras {
 	link: string; // link for navigating
 }
@@ -15,6 +15,12 @@ export interface NotificationData {
 	date: string;
 	image: string;
 	extras?: IMessageExtras;
+}
+
+export enum NotificationPermissionStatus {
+	DEFAULT = 'default',
+	DENIED = 'denied',
+	GRANTED = 'granted'
 }
 
 const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
@@ -34,6 +40,8 @@ export class MezonNotificationService {
 	private currentChannelId: string | undefined;
 	private pingTimeout: NodeJS.Timeout | null = null;
 	private isFocusOnApp = false;
+	private previousAppId = 0;
+	private currentUserId: string | null = null;
 
 	private constructor() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -60,8 +68,17 @@ export class MezonNotificationService {
 		}
 		return MezonNotificationService.instance;
 	}
+	public setCurrentUserId = async (userId: string) => {
+		this.currentUserId = userId;
+	};
 
-	public connect = (token: string) => {
+	public connect = async (token: string) => {
+		const hasPermission = await this.checkNotificationPermission();
+
+		if (!hasPermission) {
+			return;
+		}
+
 		if (!token || this.wsActive) {
 			return;
 		}
@@ -77,7 +94,7 @@ export class MezonNotificationService {
 			this.startPingMonitoring(token);
 		};
 
-		ws.onmessage = (data: MessageEvent<string>) => {
+		ws.onmessage = async (data: MessageEvent<string>) => {
 			try {
 				if (data.data === 'ping') {
 					this.handlePong();
@@ -89,7 +106,15 @@ export class MezonNotificationService {
 					if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
 						return;
 					}
-					this.pushNotification(title, message, image, link);
+
+					const msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string);
+					this.pushNotification(title, msgContent, image, link);
+
+					//check app update
+					if (isElectron() && msg?.appid && msg.appid !== this.previousAppId) {
+						this.previousAppId = msg.appid;
+						electronBridge.invoke('APP::CHECK_UPDATE');
+					}
 				}
 			} catch (err) {
 				// eslint-disable-next-line no-console
@@ -109,6 +134,26 @@ export class MezonNotificationService {
 		this.ws = ws;
 	};
 
+	private async checkNotificationPermission() {
+		if (!('Notification' in window)) {
+			console.warn('This browser does not support desktop notification');
+			return;
+		}
+
+		switch (Notification.permission) {
+			case NotificationPermissionStatus.GRANTED:
+				return true;
+			case NotificationPermissionStatus.DENIED:
+				return false;
+			case NotificationPermissionStatus.DEFAULT: {
+				const permission = await Notification.requestPermission();
+				return permission === NotificationPermissionStatus.GRANTED;
+			}
+			default:
+				return false;
+		}
+	}
+
 	private pushNotification(title: string, message: string, image: string, link: string | undefined) {
 		if (isElectron()) {
 			electronBridge.pushNotification(title, {
@@ -119,21 +164,29 @@ export class MezonNotificationService {
 				}
 			});
 		} else {
-			const notification = new Notification(title, {
-				body: message,
-				icon: image ?? '',
-				data: {
-					link: link ?? ''
-				}
-			});
-			notification.onclick = (event) => {
-				event.preventDefault();
-				if (!link) {
-					return;
-				}
-				window.open(link);
-			};
+			this.pushNotificationForWeb(title, message, image, link);
 		}
+	}
+
+	private pushNotificationForWeb(title: string, message: string, image: string, link: string | undefined) {
+		if (!('Notification' in window)) {
+			console.warn('This browser does not support desktop notification');
+			return;
+		}
+		const notification = new Notification(title, {
+			body: message,
+			icon: image ?? '',
+			data: {
+				link: link ?? ''
+			}
+		});
+		notification.onclick = (event) => {
+			event.preventDefault();
+			if (!link) {
+				return;
+			}
+			window.open(link);
+		};
 	}
 
 	public get isActive() {

@@ -1,12 +1,35 @@
-import { BrowserWindow, Notification, app, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log/main';
-import { UpdateInfo, autoUpdater } from 'electron-updater';
 import fs from 'fs';
+import { ChannelStreamMode } from 'mezon-js';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import App from './app/app';
-import { DOWNLOAD_FILE, NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
+import {
+	CLOSE_APP,
+	DOWNLOAD_FILE,
+	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAXIMIZE_WINDOW,
+	MINIMIZE_WINDOW,
+	NAVIGATE_TO_URL,
+	OPEN_NEW_WINDOW,
+	SENDER_ID,
+	TITLE_BAR_ACTION,
+	UNMAXIMIZE_WINDOW
+} from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
+
+export type ImageWindowProps = {
+	attachmentData: ApiMessageAttachment & { create_time?: string };
+	messageId: string;
+	mode: ChannelStreamMode;
+	attachmentUrl: string;
+	currentClanId: string;
+	currentChannelId: string;
+	currentDmId: string;
+	checkListAttachment: boolean;
+};
 
 export default class Main {
 	static initialize() {
@@ -32,15 +55,21 @@ export default class Main {
 }
 
 ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
+	let fileExtension = defaultFileName.split('.').pop().toLowerCase();
+	if (!fileExtension || !/^[a-z0-9]+$/.test(fileExtension)) {
+		const match = url.match(/\.(\w+)(\?.*)?$/);
+		fileExtension = match ? match[1].toLowerCase() : '';
+	}
+
+	const fileFilter = fileExtension
+		? [{ name: `${fileExtension.toUpperCase()} Files`, extensions: [fileExtension] }]
+		: [{ name: 'All Files', extensions: ['*'] }];
+
 	const { filePath, canceled } = await dialog.showSaveDialog({
 		title: 'Save File',
 		defaultPath: defaultFileName,
 		buttonLabel: 'Save',
-		filters: [
-			{ name: 'Text Files', extensions: ['txt'] },
-			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif'] },
-			{ name: 'All Files', extensions: ['*'] }
-		]
+		filters: fileFilter
 	});
 
 	if (canceled || !filePath) {
@@ -75,102 +104,45 @@ ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	}
 });
 
-ipcMain.on('TITLE_BAR_ACTION', (event, action, data) => {
+const handleWindowAction = (window: BrowserWindow, action: string) => {
+	if (!window || window.isDestroyed()) {
+		return;
+	}
+
 	switch (action) {
-		case 'MINIMIZE_WINDOW':
-			if (App.mainWindow) {
-				App.mainWindow.minimize();
+		case MINIMIZE_WINDOW:
+			window.minimize();
+			break;
+		case UNMAXIMIZE_WINDOW:
+			if (window.isMaximized()) {
+				window.unmaximize();
+			} else {
+				window.maximize();
 			}
 			break;
-		case 'UNMAXIMIZE_WINDOW':
-			if (App.mainWindow) {
-				if (App.mainWindow.isMaximized()) {
-					App.mainWindow.unmaximize();
-				} else {
-					App.mainWindow.maximize();
-				}
+		case MAXIMIZE_WINDOW:
+			if (window.isMaximized()) {
+				window.restore();
+			} else {
+				window.maximize();
 			}
 			break;
-		case 'MAXIMIZE_WINDOW':
-			if (App.mainWindow) {
-				if (App.mainWindow.isMaximized()) {
-					App.mainWindow.restore();
-				} else {
-					App.mainWindow.maximize();
-				}
-			}
-			break;
-		case 'CLOSE_APP':
-			if (App.mainWindow) {
-				App.mainWindow.close();
-			}
-			break;
-	}
-});
-autoUpdater.autoDownload = false;
-autoUpdater.logger = log;
-
-autoUpdater.on('checking-for-update', () => {
-	// checking for update
-});
-
-autoUpdater.on('update-available', (info: UpdateInfo) => {
-	log.info(`The current version is ${app.getVersion()}. There is a new update for the app ${info.version}. Do you want to download?`);
-	autoUpdater.downloadUpdate();
-});
-
-autoUpdater.on('update-not-available', (info: UpdateInfo) => {
-	new Notification({
-		icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
-		title: 'No update',
-		body: `The current version (${info.version}) is the latest.`
-	}).show();
-});
-
-autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-	log.info(`The current version is ${app.getVersion()}. Install ${info.version} now.`);
-	const windows = App.BrowserWindow.getAllWindows();
-	if (process.platform === 'darwin') {
-		const window = App.BrowserWindow.getFocusedWindow();
-		dialog
-			.showMessageBox(window, {
-				type: 'info',
-				buttons: ['Install now', 'Cancel'],
-				title: 'Mezon install',
-				message: `The current version is ${app.getVersion()}. Install ${info.version} now.`
-			})
-			.then((result) => {
-				if (result.response === 0) {
-					windows.forEach((window) => {
-						window.removeAllListeners('close');
-						window.close();
-					});
-
-					setImmediate(() => {
-						autoUpdater.quitAndInstall();
-					});
-				}
-			});
-	} else {
-		windows.forEach((window) => {
-			window.removeAllListeners('close');
+		case CLOSE_APP:
 			window.close();
-		});
-		autoUpdater.quitAndInstall(true, true);
+			break;
 	}
-});
+};
 
-autoUpdater.on('download-progress', (progressObj) => {
-	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
-	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-	log.info('downloading...', log_message);
-});
+ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+	const newWindow = App.openNewWindow(props, options, params);
 
-autoUpdater.on('error', (error) => {
-	dialog.showMessageBox({
-		message: `Error: ${error.message} !!`
+	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
+		handleWindowAction(newWindow, action);
 	});
+});
+
+ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
+	handleWindowAction(App.mainWindow, action);
 });
 
 // handle setup events as quickly as possible

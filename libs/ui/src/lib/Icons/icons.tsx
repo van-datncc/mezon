@@ -184,9 +184,9 @@ export function Check(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function Tick({ fill = '#155EEF' }: { fill?: string }) {
+export function Tick({ fill = 'fill:[#155EEF]', defaultSize = 'w-5 h-5' }: { fill?: string; defaultSize?: string }) {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg viewBox="0 0 20 20" className={`${defaultSize}`} xmlns="http://www.w3.org/2000/svg">
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
@@ -1178,6 +1178,77 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	);
 };
 
+export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 -4 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="m 8 0 c -1.660156 0 -3 1.339844 -3 3 v 5 c 0 1.660156 1.339844 3 3 3 s 3 -1.339844 3 -3 v -5 c 0 -1.660156 -1.339844 -3 -3 -3 z m -6 6 v 2.011719 c 0 2.964843 2.164062 5.429687 5 5.90625 v 2.082031 h 2 v -2.082031 c 2.835938 -0.476563 5 -2.941407 5 -5.90625 v -2.011719 h -1.5 v 2.011719 c 0 2.5 -1.992188 4.488281 -4.5 4.488281 s -4.5 -1.988281 -4.5 -4.488281 v -2.011719 z m 0 0"
+			/>
+		</svg>
+	);
+};
+
+export const MutePTT: React.FC<IconProps> = ({ isWhite }) => {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="32"
+			height="32"
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			viewBox="0 -4 24 24"
+		>
+			<path d="M12 1C13.6452 1 15.0585 1.99333 15.6728 3.41298L7.99997 11.0858V5C7.99997 2.79086 9.79083 1 12 1Z" fill="currentColor" />
+			<path
+				d="M6.24997 12C6.24997 12.2632 6.26801 12.5245 6.30342 12.7823L4.25194 14.8338C3.92295 13.9344 3.74997 12.9761 3.74997 12V11.8438C3.74997 11.2915 4.19769 10.8438 4.74997 10.8438H5.24997C5.80226 10.8438 6.24997 11.2915 6.24997 11.8438V12Z"
+				fill="#000000"
+			/>
+			<path
+				d="M7.3242 18.7971L3.76773 22.3535C3.3772 22.7441 2.74404 22.7441 2.35352 22.3535L1.64641 21.6464C1.25588 21.2559 1.25588 20.6227 1.64641 20.2322L20.2322 1.64644C20.6227 1.25591 21.2559 1.25591 21.6464 1.64644L22.3535 2.35354C22.744 2.74407 22.744 3.37723 22.3535 3.76776L16 10.1213V12C16 14.2091 14.2091 16 12 16C11.4457 16 10.9177 15.8873 10.4378 15.6835L9.13553 16.9857C9.99969 17.4822 10.986 17.75 12 17.75C13.525 17.75 14.9875 17.1442 16.0658 16.0659C17.1442 14.9875 17.75 13.525 17.75 12V11.8438C17.75 11.2915 18.1977 10.8438 18.75 10.8438H19.25C19.8023 10.8438 20.25 11.2915 20.25 11.8437V12C20.25 14.188 19.3808 16.2865 17.8336 17.8336C16.5842 19.0831 14.9753 19.8903 13.25 20.1548V23H10.75V20.1548C9.51944 19.9662 8.34812 19.5014 7.3242 18.7971Z"
+				fill="#000000"
+			/>
+		</svg>
+	);
+};
+
+export function NotJoinedPTT(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" className="" viewBox="0 0 32 32" {...props}>
+			<path
+				fill="currentColor"
+				d="M20,6a9.9355,9.9355,0,0,0-4,.8418A9.999,9.999,0,1,0,16,25.16,9.998,9.998,0,1,0,20,6ZM12,24A8,8,0,1,1,13.7573,8.2017a9.9734,9.9734,0,0,0,0,15.5986A7.9919,7.9919,0,0,1,12,24Zm8,0a7.9919,7.9919,0,0,1-1.7573-.2,9.9734,9.9734,0,0,0,0-15.5986A7.9972,7.9972,0,1,1,20,24Z"
+			/>
+		</svg>
+	);
+}
+
+export function JoinedPTT(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<circle cx="8" cy="8" r="8" fill="currentColor"></circle>{' '}
+			</g>
+		</svg>
+	);
+}
+
 export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg
@@ -2122,6 +2193,25 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 	);
 };
 
+export function HashtagWarning(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg className="icon_d8bfb3" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M18.09 1.63c.4-.7 1.43-.7 1.82 0l3.96 6.9c.38.66-.12 1.47-.91 1.47h-7.92c-.79 0-1.3-.81-.91-1.48l3.96-6.9Zm.46 1.87h.9c.3 0 .52.26.5.55l-.22 2.02c-.01.16-.17.26-.33.23a1.92 1.92 0 0 0-.8 0c-.16.03-.32-.07-.33-.23l-.21-2.02a.5.5 0 0 1 .5-.55ZM19 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+				clip-rule="evenodd"
+				className=""
+			></path>
+			<path
+				fill="currentColor"
+				d="M11.45 8c.35 0 .6.35.55.7-.02.2-.02.4 0 .6.04.35-.2.7-.55.7h-1.6l-.67 4h4.97l.26-1.55c.05-.27.31-.45.59-.45h.92c.31 0 .55.28.5.58L16.18 14H20a1 1 0 1 1 0 2h-4.15l-.86 5.16a1 1 0 0 1-1.98-.32l.8-4.84H8.86l-.86 5.16A1 1 0 0 1 6 20.84L6.82 16H3a1 1 0 1 1 0-2h4.15l.67-4H4a1 1 0 0 1 0-2h4.15l.86-5.16a1 1 0 1 1 1.98.32L10.19 8h1.26Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
 export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
@@ -2859,10 +2949,9 @@ export function IconClockChannel() {
 	);
 }
 
-export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
+export function IconPhoneDM({ ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2872,6 +2961,7 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
@@ -2882,10 +2972,9 @@ export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
+export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -2895,11 +2984,37 @@ export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
 				d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z"
 			></path>
+			{isShowLine && (
+				<>
+					{' '}
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isShowMeetDM ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
 		</svg>
 	);
 }
@@ -5862,6 +5977,226 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 				clipRule="evenodd"
 				className=""
 			></path>
+		</svg>
+	);
+}
+
+export function StopCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="m 14.234375 11.714844 c -0.382813 0.382812 -1 0.382812 -1.386719 0 l -1.039062 -1.039063 l -1.039063 -1.042969 c -0.386719 -0.382812 -0.386719 -1 0 -1.386718 l 0.492188 -0.492188 c -2.035157 -1.109375 -4.5 -1.109375 -6.535157 0 l 0.492188 0.492188 c 0.386719 0.386718 0.386719 1.003906 0 1.386718 l -1.039062 1.042969 l -1.039063 1.039063 c -0.386719 0.382812 -1.003906 0.382812 -1.386719 0 l -1.042968 -1.039063 c -0.957032 -0.957031 -0.957032 -2.511719 0 -3.46875 l 0.347656 -0.347656 c 3.816406 -3.816406 10.054687 -3.816406 13.871094 0 l 0.347656 0.347656 c 0.957031 0.957031 0.957031 2.511719 0 3.46875 z m 0 0"
+					fill="#ffffff"
+				/>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function StartCall(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g fill="#ffffff">
+					{' '}
+					<path d="m 5.003906 2 c 0.554688 0 1 0.445312 1 1 v 3 c 0 0.554688 -0.445312 1 -1 1 h -0.710937 c 0.671875 2.265625 2.445312 4.042969 4.710937 4.710938 v -0.710938 c 0 -0.554688 0.449219 -1 1 -1 h 3 c 0.554688 0 1 0.445312 1 1 v 1.5 c 0 1.378906 -1.117187 2.5 -2.5 2.5 h -0.5 c -5.503906 0 -10 -4.496094 -10 -10 v -0.5 c 0 -1.378906 1.121094 -2.5 2.5 -2.5 z m 0 0" />{' '}
+					<path d="m 9 1 c -0.550781 0 -1 0.449219 -1 1 v 6 h 6 c 0.550781 0 1 -0.449219 1 -1 s -0.449219 -1 -1 -1 h -2.585938 l 4.292969 -4.292969 c 0.390625 -0.390625 0.390625 -1.023437 0 -1.414062 c -0.1875 -0.1875 -0.441406 -0.292969 -0.707031 -0.292969 s -0.519531 0.105469 -0.707031 0.292969 l -4.292969 4.292969 v -2.585938 c 0 -0.550781 -0.449219 -1 -1 -1 z m 0 0" />{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function Microphone({ isMuteMicrophone = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<path
+				d="M19 10V12C19 15.866 15.866 19 12 19M5 10V12C5 15.866 8.13401 19 12 19M12 19V22M8 22H16M12 15C10.3431 15 9 13.6569 9 12V5C9 3.34315 10.3431 2 12 2C13.6569 2 15 3.34315 15 5V12C15 13.6569 13.6569 15 12 15Z"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+
+			{isShowLine && (
+				<>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="white"
+						strokeLinecap="round"
+						strokeWidth="3.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+					<line
+						x1="4"
+						y1="20"
+						x2="20"
+						y2="4"
+						stroke="black"
+						strokeLinecap="round"
+						strokeWidth="1.5"
+						className={`line-animation ${!isMuteMicrophone ? 'line-retract' : ''}`}
+					/>
+				</>
+			)}
+		</svg>
+	);
+}
+export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...props }) {
+	return (
+		<svg width="32px" height="32px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="🔍-System-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+					{' '}
+					<g id="ic_fluent_share_screen_28_regular" fill="currentColor" fill-rule="nonzero">
+						{' '}
+						<path
+							d="M23.75,4.99939 C24.9926,4.99939 26,6.00675 26,7.24939 L26,20.75 C26,21.9926 24.9926,23 23.75,23 L4.25,23 C3.00736,23 2,21.9927 2,20.75 L2,7.24939 C2,6.00675 3.00736,4.99939 4.25,4.99939 L23.75,4.99939 Z M23.75,6.49939 L4.25,6.49939 C3.83579,6.49939 3.5,6.83518 3.5,7.24939 L3.5,20.75 C3.5,21.1642 3.83579,21.5 4.25,21.5 L23.75,21.5 C24.1642,21.5 24.5,21.1642 24.5,20.75 L24.5,7.24939 C24.5,6.83518 24.1642,6.49939 23.75,6.49939 Z M13.9975,8.62102995 C14.1965,8.62102995 14.3874,8.69998 14.5281,8.8407 L17.7826,12.0952 C18.0755,12.3881 18.0755,12.863 17.7826,13.1559 C17.4897,13.4488 17.0148,13.4488 16.7219,13.1559 L14.7477,11.1817 L14.7477,18.6284 C14.7477,19.0426 14.412,19.3784 13.9977,19.3784 C13.5835,19.3784 13.2477,19.0426 13.2477,18.6284 L13.2477,11.1835 L11.2784,13.1555 C10.9858,13.4486 10.5109,13.4489 10.2178,13.1562 C9.92469,12.8636 9.92436,12.3887 10.217,12.0956 L13.467,8.84107 C13.6077,8.70025 13.7985,8.62102995 13.9975,8.62102995 Z"
+							id="🎨-Color"
+						>
+							{' '}
+						</path>{' '}
+						{isShowLine && (
+							<>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="white"
+									strokeLinecap="round"
+									strokeWidth="3.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+								<line
+									x1="2"
+									y1="23"
+									x2="26"
+									y2="5"
+									stroke="black"
+									strokeLinecap="round"
+									strokeWidth="1.5"
+									className={`line-animation ${!isShowShareScreen ? 'line-retract' : ''}`}
+								/>
+							</>
+						)}
+					</g>{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function MicEnable(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg fill="currentColor" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<path d="M 35.1016 28.0000 L 35.1016 11.2656 C 35.1016 6.9297 32.1719 3.7187 28 3.7187 C 23.8281 3.7187 20.8984 6.9297 20.8984 11.2656 L 20.8984 28.0000 C 20.8984 32.3125 23.8281 35.5469 28 35.5469 C 32.1719 35.5469 35.1016 32.3125 35.1016 28.0000 Z M 17.0547 48.7422 C 16.1172 48.7422 15.2969 49.5859 15.2969 50.5234 C 15.2969 51.4609 16.1172 52.2813 17.0547 52.2813 L 38.9453 52.2813 C 39.8828 52.2813 40.7031 51.4609 40.7031 50.5234 C 40.7031 49.5859 39.8828 48.7422 38.9453 48.7422 L 29.7578 48.7422 L 29.7578 43.6094 C 38.2890 42.8594 43.9375 36.5547 43.9375 27.9766 L 43.9375 22.4687 C 43.9375 21.5547 43.1172 20.7578 42.2031 20.7578 C 41.2890 20.7578 40.4922 21.5547 40.4922 22.4687 L 40.4922 27.9766 C 40.4922 35.125 35.3359 40.375 28 40.375 C 20.6641 40.375 15.5078 35.125 15.5078 27.9766 L 15.5078 22.4687 C 15.5078 21.5547 14.7110 20.7578 13.7969 20.7578 C 12.8828 20.7578 12.0625 21.5547 12.0625 22.4687 L 12.0625 27.9766 C 12.0625 36.5547 17.7110 42.8594 26.2188 43.6094 L 26.2188 48.7422 Z"></path>
+			</g>
+		</svg>
+	);
+}
+
+export function MicDisable(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg fill="currentColor" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<path d="M 33.7891 25.5859 L 33.7891 11.2656 C 33.7891 6.9297 30.8828 3.7187 26.7110 3.7187 C 22.6094 3.7187 19.6094 6.8125 19.6094 11.0078 L 19.6094 11.3828 Z M 46.3281 47.1484 C 47.0313 47.8516 48.1797 47.8516 48.8594 47.1484 C 49.5859 46.4687 49.5859 45.2969 48.8594 44.5937 L 9.6719 5.4062 C 8.9688 4.7031 7.7735 4.7031 7.0938 5.4062 C 6.4141 6.1094 6.4141 7.2813 7.0938 7.9609 Z M 15.7657 48.7422 C 14.8281 48.7422 13.9844 49.5859 13.9844 50.5234 C 13.9844 51.4609 14.8281 52.2813 15.7657 52.2813 L 37.6328 52.2813 C 38.5703 52.2813 39.4141 51.4609 39.4141 50.5234 C 39.4141 49.5859 38.5703 48.7422 37.6328 48.7422 L 28.4688 48.7422 L 28.4688 43.6094 C 31.4453 43.3516 34.0469 42.3906 36.1797 40.8906 L 33.6719 38.3828 C 31.7735 39.6484 29.4062 40.375 26.7110 40.375 C 19.3516 40.375 14.2188 35.125 14.2188 27.9766 L 14.2188 22.5391 C 14.2188 21.4375 13.5157 20.7578 12.4844 20.7578 C 11.4531 20.7578 10.7735 21.4375 10.7735 22.5391 L 10.7735 27.9766 C 10.7735 36.5547 16.3984 42.8594 24.9297 43.6094 L 24.9297 48.7422 Z M 42.6250 22.5391 C 42.6250 21.4375 41.9453 20.7578 40.9141 20.7578 C 39.8828 20.7578 39.1797 21.4375 39.1797 22.5391 L 39.1797 27.9766 C 39.1797 28.9140 39.0859 29.8047 38.8984 30.6953 L 41.7578 33.5313 C 42.3203 31.8203 42.6250 29.9687 42.6250 27.9766 Z M 29.9453 34.6562 L 19.6094 24.3203 L 19.6094 28.0000 C 19.6094 32.3125 22.5157 35.5469 26.7110 35.5469 C 27.9531 35.5469 29.0313 35.2187 29.9453 34.6562 Z"></path>
+			</g>
+		</svg>
+	);
+}
+
+export const WelcomeIcon: React.FC<IconProps> = ({ defaultSize = 'w-12 h-12 min-w-8' }) => {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+			<g id="Live area">
+				<line x1="2" y1="9" x2="10" y2="9" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+				<path
+					id="Vector"
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M10.0893 3.41075C10.4148 3.08531 10.9424 3.08531 11.2679 3.41075L16.2679 8.41075C16.5933 8.73619 16.5933 9.26382 16.2679 9.58926L11.2679 14.5893C10.9424 14.9147 10.4148 14.9147 10.0893 14.5893C9.7639 14.2638 9.7639 13.7362 10.0893 13.4107L14.5 9L10.0893 4.58926C9.7639 4.26382 9.7639 3.73619 10.0893 3.41075Z"
+					fill="#16A34A"
+				/>
+			</g>
+		</svg>
+	);
+};
+
+export function MetaMaskIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" className="" {...props} {...props} viewBox="0 0 40 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M39.0728 0L21.9092 12.6999L25.1009 5.21543L39.0728 0Z" fill="#E17726" />
+			<path d="M0.966797 0.0151367L14.9013 5.21656L17.932 12.7992L0.966797 0.0151367Z" fill="#E27625" />
+			<path d="M32.1656 27.0093L39.7516 27.1537L37.1004 36.1603L27.8438 33.6116L32.1656 27.0093Z" fill="#E27625" />
+			<path d="M7.83409 27.0093L12.1399 33.6116L2.89876 36.1604L0.263672 27.1537L7.83409 27.0093Z" fill="#E27625" />
+			<path d="M17.5203 10.8677L17.8304 20.8807L8.55371 20.4587L11.1924 16.4778L11.2258 16.4394L17.5203 10.8677Z" fill="#E27625" />
+			<path d="M22.3831 10.7559L28.7737 16.4397L28.8067 16.4778L31.4455 20.4586L22.1709 20.8806L22.3831 10.7559Z" fill="#E27625" />
+			<path d="M12.4115 27.0381L17.4768 30.9848L11.5928 33.8257L12.4115 27.0381Z" fill="#E27625" />
+			<path d="M27.5893 27.0376L28.391 33.8258L22.5234 30.9847L27.5893 27.0376Z" fill="#E27625" />
+			<path d="M22.6523 30.6128L28.6066 33.4959L23.0679 36.1282L23.1255 34.3884L22.6523 30.6128Z" fill="#D5BFB2" />
+			<path d="M17.3458 30.6143L16.8913 34.3601L16.9286 36.1263L11.377 33.4961L17.3458 30.6143Z" fill="#D5BFB2" />
+			<path d="M15.6263 22.1875L17.1822 25.4575L11.8848 23.9057L15.6263 22.1875Z" fill="#233447" />
+			<path d="M24.3739 22.1875L28.133 23.9053L22.8184 25.4567L24.3739 22.1875Z" fill="#233447" />
+			<path d="M12.8169 27.0049L11.9606 34.0423L7.37109 27.1587L12.8169 27.0049Z" fill="#CC6228" />
+			<path d="M27.1836 27.0049L32.6296 27.1587L28.0228 34.0425L27.1836 27.0049Z" fill="#CC6228" />
+			<path d="M31.5799 20.0605L27.6165 24.0998L24.5608 22.7034L23.0978 25.779L22.1387 20.4901L31.5799 20.0605Z" fill="#CC6228" />
+			<path d="M8.41797 20.0605L17.8608 20.4902L16.9017 25.779L15.4384 22.7038L12.3988 24.0999L8.41797 20.0605Z" fill="#CC6228" />
+			<path d="M8.15039 19.2314L12.6345 23.7816L12.7899 28.2736L8.15039 19.2314Z" fill="#E27525" />
+			<path d="M31.8538 19.2236L27.2061 28.2819L27.381 23.7819L31.8538 19.2236Z" fill="#E27525" />
+			<path
+				d="M17.6412 19.5088L17.8217 20.6447L18.2676 23.4745L17.9809 32.166L16.6254 25.1841L16.625 25.1119L17.6412 19.5088Z"
+				fill="#E27525"
+			/>
+			<path d="M22.3562 19.4932L23.3751 25.1119L23.3747 25.1841L22.0158 32.1835L21.962 30.4328L21.75 23.4231L22.3562 19.4932Z" fill="#E27525" />
+			<path d="M27.7797 23.6011L27.628 27.5039L22.8977 31.1894L21.9414 30.5138L23.0133 24.9926L27.7797 23.6011Z" fill="#F5841F" />
+			<path d="M12.2373 23.6011L16.9873 24.9926L18.0591 30.5137L17.1029 31.1893L12.3723 27.5035L12.2373 23.6011Z" fill="#F5841F" />
+			<path
+				d="M10.4717 32.6338L16.5236 35.5013L16.4979 34.2768L17.0043 33.8323H22.994L23.5187 34.2753L23.48 35.4989L29.4935 32.641L26.5673 35.0591L23.0289 37.4894H16.9558L13.4197 35.0492L10.4717 32.6338Z"
+				fill="#C0AC9D"
+			/>
+			<path
+				d="M22.2191 30.231L23.0748 30.8354L23.5763 34.8361L22.8506 34.2234H17.1513L16.4395 34.8485L16.9244 30.8357L17.7804 30.231H22.2191Z"
+				fill="#161616"
+			/>
+			<path
+				d="M37.9395 0.351562L39.9998 6.53242L38.7131 12.7819L39.6293 13.4887L38.3895 14.4346L39.3213 15.1542L38.0875 16.2779L38.8449 16.8264L36.8347 19.1742L28.5894 16.7735L28.5179 16.7352L22.5762 11.723L37.9395 0.351562Z"
+				fill="#763E1A"
+			/>
+			<path
+				d="M2.06031 0.351562L17.4237 11.723L11.4819 16.7352L11.4105 16.7735L3.16512 19.1742L1.15488 16.8264L1.91176 16.2783L0.678517 15.1542L1.60852 14.4354L0.350209 13.4868L1.30098 12.7795L0 6.53265L2.06031 0.351562Z"
+				fill="#763E1A"
+			/>
+			<path
+				d="M28.1861 16.2485L36.9226 18.7921L39.7609 27.5398L32.2728 27.5398L27.1133 27.6049L30.8655 20.2912L28.1861 16.2485Z"
+				fill="#F5841F"
+			/>
+			<path d="M11.8139 16.2485L9.13399 20.2912L12.8867 27.6049L7.72971 27.5398H0.254883L3.07728 18.7922L11.8139 16.2485Z" fill="#F5841F" />
+			<path
+				d="M25.5283 5.17383L23.0847 11.7736L22.5661 20.6894L22.3677 23.4839L22.352 30.6225H17.6471L17.6318 23.4973L17.4327 20.6869L16.9139 11.7736L14.4707 5.17383H25.5283Z"
+				fill="#F5841F"
+			/>
 		</svg>
 	);
 }

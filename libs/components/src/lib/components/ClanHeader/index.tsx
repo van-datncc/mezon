@@ -1,10 +1,13 @@
 import { useAuth, useChannelMembersActions, usePermissionChecker } from '@mezon/core';
 import {
 	categoriesActions,
+	clansActions,
 	hasGrandchildModal,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentVoiceChannelId,
+	selectInviteChannelId,
+	selectInvitePeopleStatus,
 	selectIsShowEmptyCategory,
 	settingClanStickerActions,
 	useAppDispatch
@@ -13,7 +16,7 @@ import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
@@ -43,7 +46,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentClan = useSelector(selectCurrentClan);
 	const navigate = useNavigate();
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 
 	const [openCreateCate, setOpenCreateCate] = useState(false);
@@ -98,7 +100,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	};
 
 	const handleShowInviteClanModal = () => {
-		openInviteClanModal();
+		dispatch(clansActions.toggleInvitePeople({ status: true }));
 		setIsShowModalPanelClan(false);
 	};
 
@@ -131,9 +133,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const closeAllModals = useCallback(() => {
 		setOpenServerSettings(false);
 		setOpenCreateCate(false);
-		closeInviteClanModal();
 		closeNotiSettingModal();
-	}, [closeInviteClanModal, closeNotiSettingModal]);
+		dispatch(clansActions.toggleInvitePeople({ status: false }));
+	}, [closeNotiSettingModal]);
 
 	useEffect(() => {
 		if (params?.clanId) {
@@ -187,8 +189,37 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			{openServerSettings && <ClanSetting onClose={closeModalClan} initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.EMOJI} />}
 
 			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />
+			<InviteClanModal />
 		</>
 	);
 }
 
 export default ClanHeader;
+
+const InviteClanModal: React.FC = () => {
+	const dispatch = useDispatch();
+	const invitePeopleStatus = useSelector(selectInvitePeopleStatus);
+	const invitePeopleChannelId = useSelector(selectInviteChannelId);
+	const [openInviteClanModal, closeInviteClanModal] = useModal(
+		() => (
+			<ModalInvite
+				onClose={() => {
+					dispatch(clansActions.toggleInvitePeople({ status: false }));
+				}}
+				channelID={invitePeopleChannelId}
+				open={true}
+			/>
+		),
+		[invitePeopleChannelId]
+	);
+
+	useEffect(() => {
+		if (invitePeopleStatus) {
+			openInviteClanModal();
+		} else {
+			closeInviteClanModal();
+		}
+	}, [invitePeopleStatus, openInviteClanModal, closeInviteClanModal]);
+
+	return null;
+};

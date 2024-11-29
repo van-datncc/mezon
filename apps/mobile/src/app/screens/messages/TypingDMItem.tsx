@@ -12,11 +12,11 @@ export const TypingDmItem = React.memo(({ directMessage }: { directMessage: Dire
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
-	const userStatus = directMessage?.is_online?.some(Boolean);
+
 	return (
 		<View>
 			{typingUsers?.length > 0 ? (
-				<View style={[styles.statusTyping, userStatus ? styles.online : styles.offline]}>
+				<View style={[styles.statusTyping, styles.online]}>
 					<LottieView source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE} autoPlay loop style={styles.lottie} />
 				</View>
 			) : (

@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import { selectAppDetail } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -21,6 +22,7 @@ const FlowChatPopup = () => {
 	const { flowId, applicationId } = useParams();
 	const appDetail = useSelector(selectAppDetail);
 	const [input, setInput] = useState('');
+	const { userProfile } = useAuth();
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -50,7 +52,8 @@ const FlowChatPopup = () => {
 			const response: { message: string; urlImage: string } = await flowService.executionFlow(
 				applicationId ?? '',
 				appDetail.token ?? '',
-				input
+				input,
+				userProfile?.user?.username ?? ''
 			);
 			let urlImage: string[] | undefined = [];
 			try {

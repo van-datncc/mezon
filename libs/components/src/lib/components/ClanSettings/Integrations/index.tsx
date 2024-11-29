@@ -1,8 +1,10 @@
-import { selectAllWebhooks } from '@mezon/store';
+import { selectAllClanWebhooks, selectAllWebhooks } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import ClanWebhooks from './ClanWebhooks';
+import MainClanIntegrations from './MainClanIntegration';
 import MainIntegrations from './MainIntegrations';
 import Webhooks from './Webhooks';
 
@@ -13,17 +15,27 @@ interface IIntegrationsProps {
 
 const Integrations = ({ currentChannel, isClanSetting }: IIntegrationsProps) => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
+	const [isOpenClanWebhooks, setIsOpenClanWebhooks] = useState(false);
 	const allWebhooks = useSelector(selectAllWebhooks);
+	const allClanWebhooks = useSelector(selectAllClanWebhooks);
 	return (
 		<div className="mt-[60px]">
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
 				<div
-					onClick={() => setIsOpenWebhooks(false)}
-					className={`${isOpenWebhooks ? 'text-[#b5bac1] hover:dark:text-textDarkTheme hover:text-textLightTheme cursor-pointer' : ''}`}
+					onClick={() => {
+						setIsOpenWebhooks(false);
+						setIsOpenClanWebhooks(false);
+					}}
+					className={`${isOpenWebhooks || isOpenClanWebhooks ? 'text-[#b5bac1] hover:dark:text-textDarkTheme hover:text-textLightTheme cursor-pointer' : ''}`}
 				>
 					Integrations
 				</div>{' '}
-				{isOpenWebhooks ? (
+				{isOpenClanWebhooks ? (
+					<div className="flex">
+						<Icons.ArrowDown defaultSize="-rotate-90 w-[20px]" />
+						Clan Webhooks
+					</div>
+				) : isOpenWebhooks ? (
 					<div className="flex">
 						<Icons.ArrowDown defaultSize="-rotate-90 w-[20px]" />
 						Webhooks
@@ -35,8 +47,15 @@ const Integrations = ({ currentChannel, isClanSetting }: IIntegrationsProps) => 
 
 			{isOpenWebhooks ? (
 				<Webhooks isClanSetting={isClanSetting} allWebhooks={allWebhooks} currentChannel={currentChannel} />
+			) : isOpenClanWebhooks ? (
+				<ClanWebhooks allClanWebhooks={allClanWebhooks} />
 			) : (
-				<MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />
+				<div>
+					<MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />
+					{isClanSetting && (
+						<MainClanIntegrations allClanWebhooks={allClanWebhooks} setIsOpenClanWebhooks={() => setIsOpenClanWebhooks(true)} />
+					)}
+				</div>
 			)}
 		</div>
 	);

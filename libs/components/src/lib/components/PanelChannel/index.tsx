@@ -1,8 +1,10 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
 	channelsActions,
+	clansActions,
 	hasGrandchildModal,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
@@ -20,6 +22,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import {
+	ChannelStatusEnum,
 	ENotificationTypes,
 	EOverriddenPermission,
 	EPermission,
@@ -28,7 +31,8 @@ import {
 	FOR_24_HOURS,
 	FOR_3_HOURS,
 	FOR_8_HOURS,
-	IChannel
+	IChannel,
+	copyChannelLink
 } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
@@ -38,6 +42,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import ModalConfirm from '../ModalConfirm';
+import PushToTalkPanelChannel from '../PushToTalk/PushToTalkPanelChannel';
 import GroupPanels from './GroupPanels';
 import ItemPanel from './ItemPanel';
 
@@ -95,6 +100,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const isThread = !!channel?.parrent_id && channel?.parrent_id !== '0';
 
 	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
 
@@ -310,8 +316,21 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				</ItemPanel>
 			</GroupPanels>
 			<GroupPanels>
-				<ItemPanel children="Invite People" />
-				<ItemPanel children="Copy link" />
+				<ItemPanel
+					children="Invite People"
+					onClick={() => {
+						dispatch(clansActions.toggleInvitePeople({ status: true }));
+						handClosePannel();
+					}}
+				/>
+				<ItemPanel
+					children="Copy link"
+					onClick={() => {
+						copyChannelLink(currentClan?.id as string, channel.id);
+						handClosePannel();
+					}}
+				/>
+				{channel.channel_private === ChannelStatusEnum.isPrivate ? <PushToTalkPanelChannel channelId={channel.id} /> : <></>}
 			</GroupPanels>
 			{channel.type === typeChannel.voice && (
 				<GroupPanels>
@@ -474,7 +493,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 					{canManageThread && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
-							<ItemPanel children="Create Thread" />
+							{!isThread && <ItemPanel children="Create Thread" />}
 							<ItemPanel onClick={handleDeleteChannel} children="Delete Thread" danger />
 						</GroupPanels>
 					)}

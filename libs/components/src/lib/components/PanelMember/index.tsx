@@ -16,6 +16,7 @@ import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
 	channelUsersActions,
+	channelsActions,
 	directMetaActions,
 	notificationSettingActions,
 	removeChannelUsersPayload,
@@ -29,7 +30,7 @@ import {
 import { ChannelMembersEntity, EPermission, EUserSettings, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -182,6 +183,18 @@ const PanelMember = ({
 		[dispatch]
 	);
 
+	const handleEnableE2ee = useCallback(async (directId?: string, e2ee?: number) => {
+		if (!directId) return;
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: directId,
+			channel_label: '',
+			category_id: currentDmGroup.category_id,
+			app_url: currentDmGroup.app_url,
+			e2ee: !currentDmGroup.e2ee ? 1 : 0
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
+	}, []);
+
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0') {
 			setNameChildren(`Mute @${name}`);
@@ -291,6 +304,10 @@ const PanelMember = ({
 				<>
 					<GroupPanelMember>
 						<ItemPanelMember children="Mark As Read" onClick={() => handleMarkAsRead(directMessageValue?.dmID ?? '')} />
+						<ItemPanelMember
+							children={!directMessageValue?.e2ee ? 'Enable E2EE' : 'Disable E2EE'}
+							onClick={() => handleEnableE2ee(directMessageValue?.dmID, directMessageValue?.e2ee)}
+						/>
 						<ItemPanelMember children="Profile" onClick={handleOpenProfile} />
 						{directMessageValue ? (
 							checkDm && <ItemPanelMember children="Call" />

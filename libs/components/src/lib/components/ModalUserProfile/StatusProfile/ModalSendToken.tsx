@@ -90,7 +90,7 @@ const ModalSendToken = ({
 		const userMap = new Map();
 
 		usersClan.forEach((clan) => {
-			const { id, user } = clan;
+			const { id, user } = clan || {};
 			const userId = Array.isArray(id) ? id[0] : id;
 			const userIdStr = String(userId);
 			if (!userMap.has(userIdStr)) {
@@ -103,14 +103,14 @@ const ModalSendToken = ({
 		});
 
 		directMessages.forEach((message) => {
-			const { user_id, usernames, channel_avatar } = message;
+			const { user_id, usernames, channel_avatar } = message || {};
 			const userId = Array.isArray(user_id) ? user_id[0] : user_id;
 			const userIdStr = String(userId);
 			if (!userMap.has(userIdStr)) {
 				userMap.set(userIdStr, {
 					id: userIdStr,
 					username: usernames,
-					avatar_url: channel_avatar
+					avatar_url: channel_avatar?.[0] ?? ''
 				});
 			}
 		});

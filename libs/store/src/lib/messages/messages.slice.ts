@@ -9,10 +9,13 @@ import {
 	IMessageWithUser,
 	LIMIT_MESSAGE,
 	LoadingStatus,
+	MessageCrypt,
+	PublicKeyMaterial,
 	TypeMessage,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
 	getMobileUploadedAttachments,
+	getPublicKeys,
 	getWebUploadedAttachments
 } from '@mezon/utils';
 import {
@@ -30,10 +33,14 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MessageButtonClicked } from 'mezon-js/socket';
+import { accountActions, selectAllAccount } from '../account/account.slice';
 import { channelMetaActions } from '../channels/channelmeta.slice';
+import { selectCurrentDM } from '../direct/direct.slice';
+import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
+import { RootState } from '../store';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -141,6 +148,29 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 	return thunkAPI.getState() as MessagesRootState;
 }
 
+export const mapMessageChannelToEntityAction = createAsyncThunk(
+	'messages/mapMessageChannelToEntity',
+	async (
+		{ message, lock = false, isSystem = false }: { message: ChannelMessage; lock?: boolean; isSystem?: boolean },
+		thunkAPI: GetThunkAPI<unknown>
+	): Promise<IMessageWithUser> => {
+		const checkEnableE2EE = checkE2EE(message.clan_id as string, message.channel_id, thunkAPI);
+		const currentUser = selectAllAccount(thunkAPI.getState() as RootState);
+		const mapMessage = mapMessageChannelToEntity(message);
+		if (checkEnableE2EE && mapMessage.content?.t) {
+			return {
+				...mapMessage,
+				content: {
+					...(mapMessage.content as object),
+					t: await MessageCrypt.mapE2EEcontent(mapMessage.content.t, currentUser?.user?.id as string, lock),
+					e2ee: 1
+				}
+			} as IMessageWithUser;
+		}
+		return mapMessage;
+	}
+);
+
 export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoizeAndTrack(
@@ -194,6 +224,12 @@ export const fetchMessages = createAsyncThunk(
 	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const state = thunkAPI.getState() as RootState;
+			let currentUser = selectAllAccount(state);
+			if (!currentUser) {
+				currentUser = await thunkAPI.dispatch(accountActions.getUserProfile()).unwrap();
+			}
 			if (noCache) {
 				fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
 			}
@@ -233,9 +269,26 @@ export const fetchMessages = createAsyncThunk(
 			}
 			thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
 
-			const messages = response.messages.map((item) => {
+			let messages = response.messages.map((item) => {
 				return mapMessageChannelToEntity(item, response.last_seen_message?.id);
 			});
+
+			if (clanId === '0' || !clanId) {
+				messages = await Promise.all(
+					messages.map(async (item) => {
+						if (item.content?.e2ee && item.content?.t) {
+							return {
+								...item,
+								content: {
+									...(item.content as object),
+									t: await MessageCrypt.mapE2EEcontent(item.content.t, currentUser?.user?.id as string, true)
+								}
+							} as IMessageWithUser;
+						}
+						return item;
+					})
+				);
+			}
 
 			thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
@@ -447,7 +500,6 @@ type SendMessagePayload = {
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
 	const {
-		content,
 		mentions,
 		attachments,
 		references,
@@ -462,6 +514,10 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		isMobile = false,
 		username
 	} = payload;
+
+	let content = payload.content;
+
+	const checkEnableE2EE = checkE2EE(clanId, channelId, thunkAPI);
 
 	async function doSend() {
 		try {
@@ -482,6 +538,18 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 					uploadedFiles = await getMobileUploadedAttachments({ attachments, channelId, clanId, client, session });
 				} else {
 					uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
+				}
+			}
+
+			if (checkEnableE2EE) {
+				const state = thunkAPI.getState() as RootState;
+				const currentDM = selectCurrentDM(state);
+				const keys = selectE2eeByUserIds(state, currentDM.user_id as string[]);
+				const pubKeys = await getPublicKeys(keys.filter((item) => item?.PK).map((item) => item.PK));
+				const otherUserPublicKeys: PublicKeyMaterial[] = pubKeys;
+				if (content?.t) {
+					const encryptedMessage = await MessageCrypt.encryptMessage(content.t, otherUserPublicKeys, senderId);
+					content = { ...content, t: encryptedMessage, e2ee: 1 };
 				}
 			}
 
@@ -538,8 +606,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			isMe: true,
 			hide_editted: true
 		};
-		const fakeMess = mapMessageChannelToEntity(fakeMessage);
-
+		const fakeMess = await thunkAPI.dispatch(messagesActions.mapMessageChannelToEntityAction({ message: fakeMessage })).unwrap();
 		const state = getMessagesState(getMessagesRootState(thunkAPI));
 		const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
 
@@ -624,10 +691,10 @@ export const sendTypingUser = createAsyncThunk(
 
 export const clickButtonMessage = createAsyncThunk(
 	'messages/clickButtonMessage',
-	async ({ message_id, channel_id, button_id, sender_id, user_id }: MessageButtonClicked, thunkAPI) => {
+	async ({ message_id, channel_id, button_id, sender_id, user_id, extra_data }: MessageButtonClicked, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		try {
-			const response = mezon.socketRef.current?.handleMessageButtonClick(message_id, channel_id, button_id, sender_id, user_id);
+			const response = mezon.socketRef.current?.handleMessageButtonClick(message_id, channel_id, button_id, sender_id, user_id, extra_data);
 		} catch (e) {
 			console.error(e);
 		}
@@ -993,6 +1060,7 @@ export const messagesReducer = messagesSlice.reducer;
  * import React, { useEffect } from 'react';
  * import { useDispatch } from 'react-redux';
 import { channel } from 'process';
+import { selectAllAccount } from '@mezon/store-mobile';
  *
  * // ...
  *
@@ -1015,7 +1083,8 @@ export const messagesActions = {
 	sendTypingUser,
 	loadMoreMessage,
 	jumpToMessage,
-	clickButtonMessage
+	clickButtonMessage,
+	mapMessageChannelToEntityAction
 };
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];

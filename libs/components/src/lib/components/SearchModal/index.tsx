@@ -25,6 +25,7 @@ import {
 	sortFilteredList
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
+import debounce from 'lodash.debounce';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,12 +39,14 @@ export type SearchModalProps = {
 function SearchModal({ open, onClose }: SearchModalProps) {
 	const dispatch = useAppDispatch();
 	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
-	const dmGroupChatList = useAppSelector(selectAllDirectMessages);
-	const listChannels = useAppSelector(selectAllChannelsByUser);
+	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
+	const listChannelsRef = useRef(useAppSelector(selectAllChannelsByUser));
 	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
 	const previousChannelsRef = useRef(useSelector(selectPreviousChannels));
-	const allClanUsersEntities = allClanUsersEntitiesRef.current;
 
+	const allClanUsersEntities = allClanUsersEntitiesRef.current;
+	const dmGroupChatList = dmGroupChatListRef.current;
+	const listChannels = listChannelsRef.current;
 	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 	const previousChannels = previousChannelsRef.current;
 
@@ -54,6 +57,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { createDirectMessageWithUser } = useDirect();
 
 	const [searchText, setSearchText] = useState('');
+
+	const debouncedSetSearchText = useMemo(() => debounce((value) => setSearchText(value), 200), []);
 
 	const listGroup = useMemo(
 		() => dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1),
@@ -81,7 +86,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						typeChat: TypeSearch.Dm_Type,
 						type: ChannelType.CHANNEL_TYPE_DM,
 						count_messsage_unread: itemDM.count_mess_unread,
-						lastSeenTimeStamp: Number(itemDM?.last_seen_message?.timestamp_seconds || 0)
+						lastSeenTimeStamp: Number(itemDM?.last_seen_message?.timestamp_seconds || 0),
+						member: itemDM.user_id && itemDM.user_id[0]
 					};
 				})
 			: [];
@@ -105,7 +111,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, Object.values(allUsesInAllClansEntities) as any);
 		return addPropsIntoSearchList;
 	}, [accountId, listDM, listGroup, allUsesInAllClansEntities]);
-
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
 			return {
@@ -129,8 +134,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return list;
 	}, [listChannels]);
 
+	const findFilterDm = (id: string) => {
+		const dm = listDirectSearch.find((item) => item.id === id);
+		return dm ? dm.idDM : undefined;
+	};
+
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
+
 		for (const userId in allUsesInAllClansEntities) {
 			const user = allUsesInAllClansEntities[userId];
 			list.push({
@@ -140,14 +151,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				avatarUser: user?.avatar_url ?? '',
 				displayName: user?.display_name ?? '',
 				lastSentTimeStamp: '0',
-				idDM: undefined,
+				idDM: findFilterDm(user?.id),
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
 			});
 		}
 		return list as SearchItemProps[];
 	}, [allClanUsersEntities, allUsesInAllClansEntities]);
-
 	const normalizeSearchText = useMemo(() => {
 		return normalizeString(searchText);
 	}, [searchText]);
@@ -157,17 +167,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [searchText]);
 
 	const totalLists = useMemo(() => {
-		const list = listMemberSearch.concat(listChannelSearch, listDirectSearch);
-		listDirectSearch.forEach((dm) => {
-			if (
-				dm.type === ChannelType.CHANNEL_TYPE_DM ||
-				(dm.type === ChannelType.CHANNEL_TYPE_GROUP && !allUsesInAllClansEntities[dm?.id || '0'])
-			) {
-				list.push(dm);
-			}
-		});
-		const removeDuplicateList = removeDuplicatesById(list.filter((item) => item?.id !== accountId));
-		const sortedList = removeDuplicateList.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		const filterDmWithoutIdDM = listMemberSearch.filter((item) => item.idDM === undefined);
+		const list = filterDmWithoutIdDM.concat(listChannelSearch, listDirectSearch);
+		const sortedList = list.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listMemberSearch, listChannelSearch, listDirectSearch, allUsesInAllClansEntities, accountId]);
 
@@ -318,8 +320,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						type="text"
 						placeholder="Where would you like to go?"
 						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
-						value={searchText}
-						onChange={(e) => setSearchText(e.target.value)}
+						onChange={(e) => debouncedSetSearchText(e.target.value)}
 					/>
 				</div>
 				<ListGroupSearchModal

@@ -161,7 +161,7 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	categories: [],
 	error: null,
 	sortChannelByCategoryId: {},
-	showEmptyCategory: false,
+	showEmptyCategory: true,
 	categoryExpandState: {}
 });
 

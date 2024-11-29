@@ -16,7 +16,8 @@ const SettingRightUser = ({
 	avatar,
 	currentDisplayName,
 	aboutMe,
-	isDM
+	isDM,
+	dob
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
@@ -24,6 +25,7 @@ const SettingRightUser = ({
 	currentDisplayName: string;
 	aboutMe: string;
 	isDM: boolean;
+	dob: string;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
@@ -41,8 +43,8 @@ const SettingRightUser = ({
 	const [valueDisplayName, setValueDisplayName] = useState<string>(currentDisplayName || '');
 
 	const handleUpdateUser = async () => {
-		if (name || urlImage || valueDisplayName || editAboutUser) {
-			await updateUser(name, urlImage, valueDisplayName, editAboutUser);
+		if (name || urlImage || valueDisplayName || editAboutUser || dob) {
+			await updateUser(name, urlImage, valueDisplayName, editAboutUser, dob);
 			if (currentChannelId && currentClanId) {
 				await dispatch(
 					channelMembersActions.fetchChannelMembers({

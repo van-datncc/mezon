@@ -1,55 +1,41 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Platform } from 'react-native';
-import { PERMISSIONS, PermissionStatus, RESULTS, check, openSettings, request } from 'react-native-permissions';
+import { PERMISSIONS, PermissionStatus, RESULTS, openSettings, request } from 'react-native-permissions';
 
 const isIOS = Platform.OS === 'ios';
 export const usePermission = () => {
 	const [cameraStatus, setCameraStatus] = useState<PermissionStatus>();
 	const [microphoneStatus, setMicrophoneStatus] = useState<PermissionStatus>();
 
-	const requestCameraPermission = useCallback(() => {
+	const requestCameraPermission = useCallback(async () => {
 		switch (cameraStatus) {
 			case RESULTS.BLOCKED:
+			case RESULTS.DENIED:
 				openSettings();
 				break;
 			default:
-				request(isIOS ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA);
 				break;
 		}
+		const camera = await request(isIOS ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA);
+		setCameraStatus(camera);
+		return camera === RESULTS.GRANTED;
 	}, [cameraStatus]);
 
-	const requestMicrophonePermission = useCallback(() => {
+	const requestMicrophonePermission = useCallback(async () => {
 		switch (microphoneStatus) {
 			case RESULTS.BLOCKED:
+			case RESULTS.DENIED:
 				openSettings();
 				break;
 			default:
-				request(isIOS ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO);
 				break;
 		}
+		const microphone = await request(isIOS ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO);
+		setMicrophoneStatus(microphone);
+		return microphone === RESULTS.GRANTED;
 	}, [microphoneStatus]);
 
-	const checkPermission = useCallback(async () => {
-		const camera = await check(isIOS ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA);
-		const microphone = await check(isIOS ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO);
-		if (camera === RESULTS.DENIED) {
-			requestCameraPermission();
-		}
-		if (microphone === RESULTS.DENIED) {
-			requestMicrophonePermission();
-		}
-		setCameraStatus(camera);
-		setMicrophoneStatus(microphone);
-	}, [requestCameraPermission, requestMicrophonePermission]);
-
-	useEffect(() => {
-		checkPermission();
-	}, [checkPermission]);
-
 	return {
-		cameraPermissionGranted: cameraStatus === RESULTS.GRANTED,
-		microphonePermissionGranted: microphoneStatus === RESULTS.GRANTED,
-		checkPermission,
 		requestCameraPermission,
 		requestMicrophonePermission
 	};

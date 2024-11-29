@@ -1,5 +1,6 @@
+import { captureSentryError } from '@mezon/logger';
 import { IPSystemMessage, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiSystemMessage, ApiSystemMessageRequest, ApiSystemMessagesList, MezonUpdateSystemMessageBody } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -13,6 +14,7 @@ export interface SystemMessageState extends EntityState<SystemMessageEntity, str
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	jumpSystemMessageId: string;
+	currentClanSystemMessage: ApiSystemMessage;
 }
 
 const systemMessageAdapter = createEntityAdapter<SystemMessageEntity>();
@@ -20,7 +22,8 @@ const systemMessageAdapter = createEntityAdapter<SystemMessageEntity>();
 export const initialSystemMessageState: SystemMessageState = systemMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	jumpSystemMessageId: ''
+	jumpSystemMessageId: '',
+	currentClanSystemMessage: {}
 });
 
 export const fetchSystemMessages = createAsyncThunk('systemMessages/fetchSystemMessages', async (_, thunkAPI) => {
@@ -41,12 +44,24 @@ export const createSystemMessage = createAsyncThunk('systemMessages/createSystem
 	return response;
 });
 
+export interface IUpdateSystemMessage {
+	clanId: string;
+	newMessage: MezonUpdateSystemMessageBody;
+}
 export const updateSystemMessage = createAsyncThunk(
 	'systemMessages/updateSystemMessage',
-	async ({ clanId, newMessage }: { clanId: string; newMessage: MezonUpdateSystemMessageBody }, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, newMessage);
-		return response;
+	async ({ clanId, newMessage }: IUpdateSystemMessage, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, newMessage);
+			if (response) {
+				thunkAPI.dispatch(fetchSystemMessageByClanId(clanId));
+			}
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'systemMessages/updateSystemMessage');
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 
@@ -79,6 +94,7 @@ export const systemMessageSlice = createSlice({
 			})
 			.addCase(fetchSystemMessageByClanId.fulfilled, (state: SystemMessageState, action: PayloadAction<any>) => {
 				systemMessageAdapter.upsertOne(state, action.payload);
+				state.currentClanSystemMessage = action.payload;
 			})
 			.addCase(createSystemMessage.fulfilled, (state: SystemMessageState, action: PayloadAction<any>) => {
 				const payload = action.payload;
@@ -98,8 +114,12 @@ export const systemMessageSlice = createSlice({
 	}
 });
 
+export const getSystemMessageState = (rootState: { [SYSTEM_MESSAGE_FEATURE_KEY]: SystemMessageState }): SystemMessageState =>
+	rootState[SYSTEM_MESSAGE_FEATURE_KEY];
 export const systemMessageReducer = systemMessageSlice.reducer;
 
 export const { selectAll: selectAllSystemMessages, selectById: selectSystemMessageById } = systemMessageAdapter.getSelectors(
 	(state: { systemMessages: SystemMessageState }) => state.systemMessages
 );
+
+export const selectClanSystemMessage = createSelector(getSystemMessageState, (state) => state.currentClanSystemMessage);

@@ -1,12 +1,10 @@
-import { useMemberContext } from '@mezon/core';
-import { selectCurrentClan } from '@mezon/store';
+import { selectCurrentClan, selectMemberClanByUserId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import GuideBody from './GuideBody';
 
 function GuideMain() {
-	const { clanOwner } = useMemberContext();
 	const currentClan = useSelector(selectCurrentClan);
-
+	const clanOwner = useSelector(selectMemberClanByUserId(currentClan?.creator_id as string));
 	return (
 		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll  scrollbar-hide flex flex-col items-center">
 			<div className="flex flex-col w-[104%]">

@@ -1,31 +1,47 @@
 import { ToastController } from '@mezon/components';
-import { fcmActions, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { useEscapeKey } from '@mezon/core';
+import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
-import { isLinuxDesktop, isWindowsDesktop, notificationService } from '@mezon/utils';
-import { useEffect } from 'react';
+import {
+	CLOSE_APP,
+	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAXIMIZE_WINDOW,
+	MINIMIZE_WINDOW,
+	TITLE_BAR_ACTION,
+	UNMAXIMIZE_WINDOW,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	notificationService
+} from '@mezon/utils';
+import isElectron from 'is-electron';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
+import { Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { IAppLoaderData } from '../loaders/appLoader';
 const theme = 'dark';
 
-const TitleBar = () => {
+type TitleBarProps = {
+	eventName: string;
+};
+
+const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 	const handleMinimize = () => {
-		window.electron.send('TITLE_BAR_ACTION', 'MINIMIZE_WINDOW');
+		window.electron.send(eventName, MINIMIZE_WINDOW);
 	};
 	useEffect(() => {
 		document.body.classList.add('overflow-hidden');
 	}, []);
 
 	const handleMaximize = () => {
-		window.electron.send('TITLE_BAR_ACTION', 'MAXIMIZE_WINDOW');
+		window.electron.send(eventName, MAXIMIZE_WINDOW);
 	};
 
 	const handleClose = () => {
-		window.electron.send('TITLE_BAR_ACTION', 'CLOSE_APP');
+		window.electron.send(eventName, CLOSE_APP);
 	};
 
 	const handleDoubleClick = () => {
-		window.electron.send('TITLE_BAR_ACTION', 'UNMAXIMIZE_WINDOW');
+		window.electron.send(eventName, UNMAXIMIZE_WINDOW);
 	};
 
 	return (
@@ -72,6 +88,10 @@ const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const isLogin = useSelector(selectIsLogin);
+	const currentUserId = useSelector(selectAllAccount)?.user?.id;
+	const location = useLocation();
+	const urlParams = new URLSearchParams(location.search);
+	const viewMode = urlParams.get('viewMode');
 
 	const { redirectTo } = useLoaderData() as IAppLoaderData;
 	useEffect(() => {
@@ -79,6 +99,10 @@ const AppLayout = () => {
 			navigate(redirectTo);
 		}
 	}, [redirectTo, navigate]);
+
+	useEffect(() => {
+		currentUserId && notificationService.setCurrentUserId(currentUserId);
+	}, [currentUserId]);
 
 	// TODO: move this to a firebase context
 	useEffect(() => {
@@ -103,10 +127,18 @@ const AppLayout = () => {
 			});
 	}, [isLogin]);
 
+	useEscapeKey(() => {
+		if (isElectron() && viewMode === 'image') {
+			window.electron.send(IMAGE_WINDOW_TITLE_BAR_ACTION, CLOSE_APP);
+		}
+	});
+
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">
-				{(isWindowsDesktop || isLinuxDesktop) && <TitleBar />}
+				{(isWindowsDesktop || isLinuxDesktop) && (
+					<TitleBar eventName={viewMode === 'image' ? IMAGE_WINDOW_TITLE_BAR_ACTION : TITLE_BAR_ACTION} />
+				)}
 				<ToastController />
 				<Outlet />
 			</div>

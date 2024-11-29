@@ -4,8 +4,6 @@ import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mo
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
-	channelMetaActions,
-	channelUsersActions,
 	emojiSuggestionActions,
 	referencesActions,
 	selectAllAccount,
@@ -18,7 +16,6 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import {
-	ChannelMembersEntity,
 	IEmojiOnMessage,
 	IHashtagOnMessage,
 	ILinkOnMessage,
@@ -79,12 +76,10 @@ export const ChatMessageSending = memo(
 		const rolesInClan = useSelector(selectAllRolesClan);
 		const currentChannel = useAppSelector((state) => selectChannelById(state, channelId || ''));
 		const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
-		const { membersOfChild, membersOfParent } = useChannelMembers({
+		const { membersOfChild, membersOfParent, addMemberToThread, joinningToThread } = useChannelMembers({
 			channelId: channelId,
 			mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0
 		});
-
-		const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: channelId, mode: mode ?? 0 });
 		const userProfile = useSelector(selectAllAccount);
 
 		const { editSendMessage, sendMessage } = useChatSending({
@@ -123,8 +118,9 @@ export const ChatMessageSending = memo(
 		};
 
 		const getUsersNotExistingInThread = (mentions) => {
-			const userIds = uniqueUsers(mentions, membersOfChild, rolesInClan);
-			const usersNotExistingInThread = userIds?.filter((userId) => membersOfParent?.some((member) => member?.id === userId));
+			const userIds = uniqueUsers(mentions, membersOfChild, rolesInClan, [messageActionNeedToResolve?.targetMessage?.sender_id || '']);
+			const usersNotExistingInThread = userIds?.filter((userId) => membersOfParent?.some((member) => member?.id === userId)) as string[];
+
 			return usersNotExistingInThread || [];
 		};
 
@@ -227,9 +223,6 @@ export const ChatMessageSending = memo(
 						DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT);
 					}
 				}
-				if (currentChannel?.channel_private) {
-					addMemberToPrivateThread(currentChannel, simplifiedMentionList, membersOfChild);
-				}
 			};
 			requestAnimationFrame(async () => {
 				sendMessageAsync().catch((error) => {});
@@ -244,34 +237,6 @@ export const ChatMessageSending = memo(
 			// });
 		};
 
-		const addMemberToPrivateThread = async (
-			currentChannel: ChannelsEntity | null,
-			mentions: IMentionOnMessage[],
-			membersOfChild: ChannelMembersEntity[] | null
-		) => {
-			const timestamp = Date.now() / 1000;
-			const userIds = uniqueUsers(mentions, membersOfChild, rolesInClan);
-			const body = {
-				channelId: currentChannel?.channel_id as string,
-				channelType: currentChannel?.type,
-				userIds: userIds,
-				clanId: currentChannel?.channel_id || ''
-			};
-			if (userIds?.length > 0) {
-				await dispatch(channelUsersActions.addChannelUsers(body));
-				dispatch(
-					channelMetaActions.updateBulkChannelMetadata([
-						{
-							id: currentChannel.channel_id ?? '',
-							lastSeenTimestamp: timestamp,
-							lastSentTimestamp: timestamp,
-							lastSeenPinMessage: '',
-							clanId: currentChannel.clan_id ?? ''
-						}
-					])
-				);
-			}
-		};
 		return (
 			<Block alignItems="center" justifyContent="center">
 				{(isAvailableSending || !!attachmentDataRef?.length) && (

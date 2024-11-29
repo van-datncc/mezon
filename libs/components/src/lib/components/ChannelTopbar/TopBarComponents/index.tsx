@@ -17,7 +17,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../../ChannelLink';
 import PanelCanvas from '../../PanelCanvas';
@@ -62,6 +62,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
 		}
 		if (isShowCanvas) {
+			navigate(toChannelPage(channel?.id ?? '', channel?.clan_id ?? ''));
 			dispatch(appActions.setIsShowCanvas(false));
 		}
 	};
@@ -85,6 +86,10 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	useEscapeKeyClose(panelRef, handClosePannel);
 	useOnClickOutside(panelRef, handClosePannel);
 
+	const isAgeRestrictedChannel = useMemo(() => {
+		return channel?.age_restricted === 1;
+	}, [channel?.age_restricted]);
+
 	return (
 		<div
 			onMouseDown={handleMouseClick}
@@ -99,10 +104,15 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				)}
 
 				{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
-				{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
+				{isAgeRestrictedChannel && isChannelText && (
+					<Icons.HashtagWarning className="w-6 h-6 dark:text-channelTextLabel text-colorTextLightMode" />
+				)}
+				{!isAgeRestrictedChannel && isPrivate === ChannelStatusEnum.isPrivate && isChannelText && (
+					<Icons.HashtagLocked defaultSize="w-6 h-6 " />
+				)}
 				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
 				{isPrivate === undefined && isChannelStream && <Icons.Stream defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
-				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
+				{!isAgeRestrictedChannel && isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
 				{isAppChannel && <Icons.AppChannelIcon className={'w-6 h-6'} fill={theme} />}
 			</div>
 

@@ -65,11 +65,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	};
 
 	const modalRef = useRef<HTMLDivElement>(null);
+	const preventClosePannel = useRef(false);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(
 		modalRef,
 		() => {
-			if (!hasChildModal) {
+			if (!hasChildModal && !preventClosePannel.current) {
 				onClose();
 			}
 		},
@@ -117,7 +118,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							}
 						>
 							{getJoinedThreadsWithinLast30Days.map((thread: ThreadsEntity) => (
-								<ThreadItem thread={thread} key={`${thread.id}-joined-threads`} setIsShowThread={onClose} />
+								<ThreadItem
+									thread={thread}
+									key={`${thread.id}-joined-threads`}
+									setIsShowThread={onClose}
+									preventClosePannel={preventClosePannel}
+								/>
 							))}
 						</GroupThreads>
 					)}
@@ -137,6 +143,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 									key={`${thread.id}-other-active-threads`}
 									setIsShowThread={onClose}
 									isHasContext={false}
+									preventClosePannel={preventClosePannel}
 								/>
 							))}
 						</GroupThreads>
@@ -151,7 +158,13 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							}
 						>
 							{getThreadsOlderThan30Days.map((thread: ThreadsEntity) => (
-								<ThreadItem thread={thread} key={`${thread.id}-older-threads`} setIsShowThread={onClose} isHasContext={false} />
+								<ThreadItem
+									thread={thread}
+									key={`${thread.id}-older-threads`}
+									setIsShowThread={onClose}
+									isHasContext={false}
+									preventClosePannel={preventClosePannel}
+								/>
 							))}
 						</GroupThreads>
 					)}

@@ -51,6 +51,8 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	error?: string | null;
 	currentClanId?: string | null;
 	clanMetadata: EntityState<ClanMeta, string>;
+	invitePeople: boolean;
+	inviteChannelId?: string;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -242,12 +244,13 @@ type UpdateLinkUser = {
 	avatar_url: string;
 	display_name: string;
 	about_me: string;
+	dob: string;
 	noCache?: boolean;
 };
 
 export const updateUser = createAsyncThunk(
 	'clans/updateUser',
-	async ({ user_name, avatar_url, display_name, about_me, noCache = false }: UpdateLinkUser, thunkAPI) => {
+	async ({ user_name, avatar_url, display_name, about_me, noCache = false, dob }: UpdateLinkUser, thunkAPI) => {
 		try {
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
 			const body = {
@@ -257,7 +260,8 @@ export const updateUser = createAsyncThunk(
 				location: '',
 				timezone: '',
 				username: user_name,
-				about_me: about_me
+				about_me: about_me,
+				dob: dob
 			};
 			const response = await mezon.client.updateAccount(mezon.session, body);
 			if (!response) {
@@ -290,7 +294,9 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
-	clanMetadata: clanMetaAdapter.getInitialState()
+	clanMetadata: clanMetaAdapter.getInitialState(),
+	invitePeople: false,
+	inviteChannelId: undefined
 });
 
 export const clansSlice = createSlice({
@@ -302,6 +308,14 @@ export const clansSlice = createSlice({
 		removeAll: clansAdapter.removeAll,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
+		},
+		toggleInvitePeople: (state, action: PayloadAction<{ status: boolean; channelId?: string }>) => {
+			state.invitePeople = action.payload.status;
+			if (action.payload.status) {
+				state.inviteChannelId = action.payload.channelId;
+			} else {
+				state.inviteChannelId = undefined;
+			}
 		},
 		updateBulkClanMetadata: (state, action: PayloadAction<ClanMeta[]>) => {
 			state.clanMetadata = clanMetaAdapter.upsertMany(state.clanMetadata, action.payload);
@@ -333,6 +347,15 @@ export const clansSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
+		},
+		updateOnboardingMode: (state, action: PayloadAction<{ clanId: string; onboarding: boolean }>) => {
+			const { clanId, onboarding } = action.payload;
+			clansAdapter.updateOne(state, {
+				id: clanId,
+				changes: {
+					is_onboarding: onboarding
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {
@@ -457,3 +480,6 @@ export const selectBadgeCountByClanId = (clanId: string) =>
 		const clan = state.entities[clanId];
 		return clan?.badge_count;
 	});
+
+export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
+export const selectInviteChannelId = createSelector(getClansState, (state) => state.inviteChannelId);
