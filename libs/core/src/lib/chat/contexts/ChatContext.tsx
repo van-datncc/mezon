@@ -395,7 +395,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
 			if (pin.operation === 1) {
-				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
+				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: pin.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
 				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
