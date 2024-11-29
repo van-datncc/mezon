@@ -229,10 +229,16 @@ export interface IEmbedProps {
 	};
 	description?: string;
 	thumbnail?: { url: string };
-	fields?: Array<{ name: string; value: string; inline?: boolean }>;
+	fields?: IFieldEmbed[];
 	image?: { url: string };
 	timestamp?: string;
 	footer?: { text: string; icon_url?: string };
+}
+
+export interface IFieldEmbed {
+	name: string;
+	value: string;
+	inline?: boolean;
 	options?: IMessageRatioOption[];
 }
 
@@ -267,7 +273,8 @@ export interface IMessageRatioOption {
 	label: string;
 	description?: string;
 	name?: string;
-	value?: string;
+	value: string;
+	style?: EButtonMessageStyle;
 }
 
 export enum EMessageSelectType {
