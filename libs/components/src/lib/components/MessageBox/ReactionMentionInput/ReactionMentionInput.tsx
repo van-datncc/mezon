@@ -562,7 +562,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						files: attachmentUrls
 					})
 				);
-				if (links.length === 1 && onlyLink) {
+				if (links.length === 1 && onlyLink && attachmentUrls.length === 1) {
 					setRequestInput(
 						{
 							...request,
