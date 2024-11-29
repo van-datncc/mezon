@@ -96,8 +96,6 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		);
 	}, [message, handleContextMenu, isCombine, mode]);
 
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-
 	const handleBuzz = () => {
 		const audio = new Audio('assets/audio/buzz.mp3');
 
@@ -105,9 +103,10 @@ export const ChannelMessage: ChannelMessageComponent = ({
 			console.error('Failed to play buzz sound:', error);
 		});
 	};
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 
 	useEffect(() => {
-		if (lastMessage && lastMessage.code === TypeMessage.MessageBuzz) {
+		if (lastMessage && message.id >= lastMessage.id && message.code === TypeMessage.MessageBuzz) {
 			handleBuzz();
 		}
 	}, []);
