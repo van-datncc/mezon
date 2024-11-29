@@ -1,10 +1,10 @@
 import { Icons } from '@mezon/ui';
 
-interface IMicIconProps {
+interface IMicButtonProps {
 	isTalking: boolean;
 }
 
-export function MicIcon({ isTalking }: IMicIconProps) {
+export function MicButton({ isTalking }: IMicButtonProps) {
 	return (
 		<div className="relative leading-5 h-5">
 			<button className="focus-visible:outline-none" onContextMenu={(e) => e.preventDefault()}>

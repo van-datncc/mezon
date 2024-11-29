@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
@@ -21,6 +22,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import {
+	ChannelStatusEnum,
 	ENotificationTypes,
 	EOverriddenPermission,
 	EPermission,
@@ -40,6 +42,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import ModalConfirm from '../ModalConfirm';
+import PushToTalkPanelChannel from '../PushToTalk/PushToTalkPanelChannel';
 import GroupPanels from './GroupPanels';
 import ItemPanel from './ItemPanel';
 
@@ -327,6 +330,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 						handClosePannel();
 					}}
 				/>
+				{channel.channel_private === ChannelStatusEnum.isPrivate ? <PushToTalkPanelChannel channelId={channel.id} /> : <></>}
 			</GroupPanels>
 			{channel.type === typeChannel.voice && (
 				<GroupPanels>
