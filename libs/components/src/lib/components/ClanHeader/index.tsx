@@ -6,6 +6,7 @@ import {
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentVoiceChannelId,
+	selectInviteChannelId,
 	selectInvitePeopleStatus,
 	selectIsShowEmptyCategory,
 	settingClanStickerActions,
@@ -99,7 +100,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	};
 
 	const handleShowInviteClanModal = () => {
-		dispatch(clansActions.toggleInvitePeople(true));
+		dispatch(clansActions.toggleInvitePeople({ status: true }));
 		setIsShowModalPanelClan(false);
 	};
 
@@ -133,7 +134,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		setOpenServerSettings(false);
 		setOpenCreateCate(false);
 		closeNotiSettingModal();
-		dispatch(clansActions.toggleInvitePeople(false));
+		dispatch(clansActions.toggleInvitePeople({ status: false }));
 	}, [closeNotiSettingModal]);
 
 	useEffect(() => {
@@ -198,14 +199,19 @@ export default ClanHeader;
 const InviteClanModal: React.FC = () => {
 	const dispatch = useDispatch();
 	const invitePeopleStatus = useSelector(selectInvitePeopleStatus);
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite
-			onClose={() => {
-				dispatch(clansActions.toggleInvitePeople(false));
-			}}
-			open={true}
-		/>
-	));
+	const invitePeopleChannelId = useSelector(selectInviteChannelId);
+	const [openInviteClanModal, closeInviteClanModal] = useModal(
+		() => (
+			<ModalInvite
+				onClose={() => {
+					dispatch(clansActions.toggleInvitePeople({ status: false }));
+				}}
+				channelID={invitePeopleChannelId}
+				open={true}
+			/>
+		),
+		[invitePeopleChannelId]
+	);
 
 	useEffect(() => {
 		if (invitePeopleStatus) {
