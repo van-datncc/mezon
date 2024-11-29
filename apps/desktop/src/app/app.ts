@@ -6,10 +6,9 @@ import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
-
 import { ImageWindowProps } from '../main';
 import setupAutoUpdates from './autoUpdates';
-import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
+import { ACTIVE_WINDOW, FINISH_RENDER, SET_ATTACHMENT_DATA, TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
 
@@ -248,7 +247,7 @@ export default class App {
 			height: 800,
 			show: true,
 			titleBarOverlay: process.platform == 'darwin',
-			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
+			titleBarStyle: 'hidden',
 			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
@@ -263,23 +262,31 @@ export default class App {
 
 		const newWindow = new BrowserWindow(windowOptions);
 
-		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
-		const fullUrl = this.generateFullUrl(baseUrl, params);
+		if (App.application.isPackaged) {
+			const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
+			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-		newWindow.loadURL(
-			format({
-				pathname: fullUrl,
-				protocol: 'file:',
-				slashes: true,
-				query: params
-			})
-		);
+			newWindow.loadURL(
+				format({
+					pathname: fullUrl,
+					protocol: 'file:',
+					slashes: true,
+					query: params
+				})
+			);
+		} else {
+			const baseUrl = `http://localhost:${rendererAppPort}`;
+			const fullUrl = this.generateFullUrl(baseUrl, params);
+			newWindow.loadURL(fullUrl);
+		}
 
 		newWindow.webContents.on('did-finish-load', () => {
-			ipcMain.once('finish-render', (event) => {
-				newWindow.webContents.send('set-attachment-data', props);
+			ipcMain.once(FINISH_RENDER, (event) => {
+				newWindow.webContents.send(SET_ATTACHMENT_DATA, props);
 			});
 		});
+
+		return newWindow;
 	}
 
 	/**
@@ -337,18 +344,18 @@ export default class App {
 				submenu: [
 					{ role: 'about' },
 					{
-						label: 'Check for Updates...',
-						click: () =>
+						label: 'Check for Updates',
+						click: () => {
 							autoUpdater.checkForUpdates().then((data) => {
-								if (data) return;
-								if (data) return;
+								if (!data?.updateInfo) return;
 								const appVersion = app.getVersion();
 								new Notification({
 									icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
 									title: 'No update',
 									body: `The current version (${appVersion}) is the latest.`
 								}).show();
-							})
+							});
+						}
 					},
 					{ type: 'separator' },
 					{

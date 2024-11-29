@@ -305,7 +305,9 @@ function MessageWithUser({
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{Array.isArray(message.content?.embed) &&
-													message.content.embed?.map((embed, index) => <EmbedMessage {...embed} key={index} />)}
+													message.content.embed?.map((embed, index) => (
+														<EmbedMessage key={index} embed={embed} message_id={message.id} />
+													))}
 
 												{message.content?.components &&
 													message.content.components.map((actionRow, index) => (

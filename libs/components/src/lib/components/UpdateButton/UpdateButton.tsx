@@ -15,8 +15,7 @@ const UpdateButton: React.FC<UpdateButtonProps> = ({ className = '', isDownloadi
 		<button
 			id="update-process"
 			onClick={handleUpdate}
-			style={{ backgroundImage: 'linear-gradient(to right, rgb(133, 71, 198), rgb(171, 93, 138))' }}
-			className={`w-full flex items-center justify-center text-white py-2 px-4 shadow-md transition-shadow duration-300 ${isDownloading ? 'cursor-not-allowed' : 'hover:shadow-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-green-400'}`}
+			className={`bg-gradient-to-r from-custom-purple to-custom-pink hover:from-custom-purple-dark hover:to-custom-pink-dark active:from-custom-purple-active active:to-custom-pink-active transition duration-300 w-full flex items-center justify-center text-white py-2 px-4 ${isDownloading ? 'cursor-not-allowed' : ''}`}
 			disabled={isDownloading}
 		>
 			<span className={`flex w-4 h-4 rounded-full bg-white justify-center items-center mr-1 ${isDownloading ? 'animate-spin' : ''}`}>

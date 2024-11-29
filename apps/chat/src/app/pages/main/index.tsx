@@ -42,6 +42,7 @@ import {
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
+	selectJoinedCall,
 	selectOnboardingMode,
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
@@ -104,6 +105,7 @@ function MyApp() {
 	const isPlayRingTone = useSelector(selectAudioRingTone);
 	const isPlayEndTone = useSelector(selectAudioEndTone);
 	const groupCallId = useSelector(selectGroupCallId);
+	const isJoinedCall = useSelector(selectJoinedCall);
 	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
 	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
 	const endTone = useRef(new Audio('assets/audio/endcall.mp3'));
@@ -149,7 +151,7 @@ function MyApp() {
 		}
 		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				if (!isPlayDialTone && !isInCall) {
+				if (!isPlayDialTone && !isInCall && !isJoinedCall) {
 					dispatch(audioCallActions.setIsRingTone(true));
 					dispatch(audioCallActions.setIsEndTone(false));
 				} else {

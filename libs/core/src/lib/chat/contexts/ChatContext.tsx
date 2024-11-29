@@ -943,10 +943,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
 		// TODO: AND TYPE IN BE
 		// TYPE = 4: USER CANCEL CALL
-		// TYPE = 0: REMOVE CALL (END CALL)
-		if (event?.data_type === 4 || event?.data_type === 0) {
+		// TYPE = 0: USER JOINED CALL
+		if (event?.data_type === 4) {
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
+			dispatch(audioCallActions.setIsJoinedCall(false));
+		}
+		if (event?.data_type === 0) {
+			dispatch(audioCallActions.setIsJoinedCall(true));
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({
