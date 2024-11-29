@@ -146,7 +146,9 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 
 	const startCall = async (isVideoCall: boolean, isAnswerCall = false) => {
 		try {
-			handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+			if (!isAnswerCall) {
+				handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+			}
 			InCallManager.start({ media: 'audio' });
 			playDialTone();
 			const haveMicrophonePermission = await requestMicrophonePermission();
