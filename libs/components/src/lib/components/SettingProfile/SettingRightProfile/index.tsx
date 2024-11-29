@@ -2,7 +2,6 @@ import { useAuth } from '@mezon/core';
 import { useState } from 'react';
 import SettingRightClan from '../SettingRightClanProfile';
 import SettingRightUser from '../SettingRightUserProfile';
-import SettingRightWithdraw from '../SettingRightWithdraw';
 
 type SettingRightProfileProps = {
 	menuIsOpen: boolean;
@@ -11,8 +10,7 @@ type SettingRightProfileProps = {
 
 enum EActiveType {
 	USER_SETTING = 'USER_SETTING',
-	CLAN_SETTING = 'CLAN_SETTING',
-	WITHDRAW_SETTING = 'WITHDRAW_SETTING'
+	CLAN_SETTING = 'CLAN_SETTING'
 }
 
 const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => {
@@ -25,9 +23,6 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 
 	const handleUserSettingsClick = () => {
 		setActiveType(EActiveType.USER_SETTING);
-	};
-	const handleWithdrawSettingsClick = () => {
-		setActiveType(EActiveType.WITHDRAW_SETTING);
 	};
 
 	return (
@@ -52,12 +47,6 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 							Clan Profiles
 						</button>
 					) : null}
-					<button
-						onClick={handleWithdrawSettingsClick}
-						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.WITHDRAW_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
-					>
-						Withdraw
-					</button>
 				</div>
 			</div>
 
@@ -72,10 +61,8 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 						isDM={isDM}
 						dob={userProfile?.user?.dob || ''}
 					/>
-				) : activeType === EActiveType.CLAN_SETTING ? (
-					<SettingRightClan />
 				) : (
-					<SettingRightWithdraw />
+					<SettingRightClan />
 				)}
 			</div>
 		</div>

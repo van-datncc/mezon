@@ -1,3 +1,4 @@
+import { Icons } from '@mezon/ui';
 import { ChangeEvent, useState } from 'react';
 
 interface IProp {
@@ -26,41 +27,18 @@ const WithdrawConfirm = ({ onClose, onHandelConfirm, isLoading, address, coin }:
 						className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
 						data-modal-hide="popup-modal"
 					>
-						<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-							<path
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-							/>
-						</svg>
-						<span className="sr-only">Close modal</span>
+						<Icons.Close defaultSize="size-4" />
 					</button>
 					<div className="p-4 md:p-5 text-center gap-6 flex flex-col ">
-						<svg
-							className="mx-auto  text-orange-400 w-20 h-20 dark:text-orange-400"
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 20 20"
-						>
-							<path
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-							/>
-						</svg>
+						<Icons.InfoIcon />
 						<div className="flex flex-col gap-4 ">
 							<p className="text-orange-400 font-semibold text-[16px] text-start ">Risk Warning:</p>
 							<div className="flex flex-col justify-start">
-								<p className="text-white text-[14px] text-start">
+								<p className="dark:text-white text-black text-[14px] text-start">
 									1. After you have completed your withdrawal, all ownership of the assets will belong to the owner of the
 									destination address. Please make sure you have entered the correct address.
 								</p>
-								<p className="text-white text-[14px] text-start">
+								<p className="dark:text-white text-black text-[14px] text-start">
 									2. Make sure you fully understand how the assets are used and the possible risks involved, and be on the lookout
 									for any form of pyramid schemes, illegal fundraising, scams, etc.
 								</p>
@@ -68,11 +46,11 @@ const WithdrawConfirm = ({ onClose, onHandelConfirm, isLoading, address, coin }:
 							<div className="flex flex-col justify-start">
 								<p className="text-orange-400 text-[14px] font-semibold text-start">Info Transaction:</p>
 								<div className="flex flex-row mt-2 ">
-									<p className="text-white text-[14px] text-start text-nowrap">Wallet Address :</p>
+									<p className="dark:text-white text-black text-[14px] text-start text-nowrap">Wallet Address :</p>
 									<p className="text-blue-500 text-[14px] text-start text-wrap ml-2 break-all">{address}</p>
 								</div>
 								<div className="flex flex-row ">
-									<p className="text-white text-[14px] text-start">Withdraw :</p>
+									<p className="dark:text-white text-black text-[14px] text-start">Withdraw :</p>
 									<p className="text-blue-500 text-[14px] text-start ml-2">{coin} MZT</p>
 								</div>
 							</div>
@@ -84,7 +62,7 @@ const WithdrawConfirm = ({ onClose, onHandelConfirm, isLoading, address, coin }:
 									checked={isChecked}
 									className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 								/>
-								<p className="text-white text-[14px] text-start ml-2">
+								<p className="dark:text-white text-black text-[14px] text-start ml-2">
 									I fully understand the potential risks involved in withdrawing assets and confirm that I wish to proceed with
 									withdrawing my assets.
 								</p>
