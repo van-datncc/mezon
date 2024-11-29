@@ -1029,7 +1029,8 @@ export enum TypeMessage {
 	Indicator = 4,
 	Welcome = 5,
 	CreateThread = 6,
-	CreatePin = 7
+	CreatePin = 7,
+	MessageBuzz = 8
 }
 
 export enum ServerSettingsMenuValue {

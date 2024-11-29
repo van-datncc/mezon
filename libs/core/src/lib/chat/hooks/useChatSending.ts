@@ -37,7 +37,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			references?: Array<ApiMessageRef>,
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
-			isMobile?: boolean
+			isMobile?: boolean,
+			code?: number
 		) => {
 			await dispatch(
 				messagesActions.sendMessage({
@@ -54,7 +55,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					senderId: currentUserId,
 					avatar: userProfile?.user?.avatar_url,
 					isMobile,
-					username: userProfile?.user?.display_name
+					username: userProfile?.user?.display_name,
+					code: code
 				})
 			);
 		},
