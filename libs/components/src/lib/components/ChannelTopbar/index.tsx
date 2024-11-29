@@ -35,7 +35,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
-import { WebRTCProvider } from '../WebRTC/WebRTCContext';
 import { ChannelLabel } from './TopBarComponents';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
@@ -128,11 +127,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
 								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-								{isNotThread && isPrivateChannel && (
-									<WebRTCProvider>
-										<PushToTalkBtn isLightMode={appearanceTheme === 'light'} />
-									</WebRTCProvider>
-								)}
+								{isNotThread && isPrivateChannel && <PushToTalkBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
