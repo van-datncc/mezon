@@ -395,7 +395,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
 			if (pin.operation === 1) {
-				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
+				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: pin.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
 				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
@@ -944,13 +944,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TODO: AND TYPE IN BE
 		// TYPE = 4: USER CANCEL CALL
 		// TYPE = 0: USER JOINED CALL
+		// TYPE = 5: OTHER CALL
 		if (event?.data_type === 4) {
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setIsJoinedCall(false));
+			dispatch(DMCallActions.setOtherCall({}));
 		}
 		if (event?.data_type === 0) {
 			dispatch(audioCallActions.setIsJoinedCall(true));
+		}
+		if (event?.data_type === 5) {
+			dispatch(audioCallActions.setIsBusyTone(true));
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({

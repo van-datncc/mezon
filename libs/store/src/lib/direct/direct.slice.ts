@@ -201,7 +201,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				const members = fetchChannelMembersResult.payload as members[];
 				const state = thunkAPI.getState() as RootState;
 				const currentUserId = selectAllAccount(state)?.user?.id;
-				const userIds = members.filter((m) => m.user_id && m.user_id !== currentUserId).map((m) => m.user_id) as string[];
+				const userIds = members?.filter((m) => m.user_id && m.user_id !== currentUserId).map((m) => m.user_id) as string[];
 				if (userIds?.length) {
 					await thunkAPI.dispatch(e2eeActions.getPubKeys({ userIds }));
 				}
