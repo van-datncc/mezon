@@ -1,12 +1,5 @@
 import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
-import {
-	MessagesEntity,
-	selectChannelDraftMessage,
-	selectIdMessageRefEdit,
-	selectLastMessageByChannelId,
-	selectOpenEditMessageState,
-	useAppSelector
-} from '@mezon/store';
+import { MessagesEntity, selectChannelDraftMessage, selectIdMessageRefEdit, selectOpenEditMessageState, useAppSelector } from '@mezon/store';
 import { TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
 import { ChannelStreamMode } from 'mezon-js';
@@ -104,11 +97,9 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		});
 	};
 
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-
 	useEffect(() => {
 		const nowMinusSeconds = Date.now() - 500;
-		if (lastMessage && lastMessage.code === TypeMessage.MessageBuzz && new Date(lastMessage.create_time).getTime() >= nowMinusSeconds) {
+		if (message.code === TypeMessage.MessageBuzz && new Date(message.create_time).getTime() >= nowMinusSeconds) {
 			handleBuzz();
 		}
 	}, []);
