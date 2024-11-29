@@ -1263,3 +1263,8 @@ export type MentionReactInputProps = {
 	readonly mode?: number;
 	hasPermissionEdit?: boolean;
 };
+
+export type IOtherCall = {
+	caller_id?: string;
+	channel_id?: string;
+};
