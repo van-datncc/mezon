@@ -44,7 +44,7 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 		<>
 			{options &&
 				options.map((option, index) => (
-					<div className="flex justify-between">
+					<div className="flex justify-between" key={option.id}>
 						<div className="flex flex-col">
 							<EmbedTitle title={option.label} />
 							<EmbedDescription description={option.description || ''} />
