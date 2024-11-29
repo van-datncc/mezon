@@ -208,7 +208,7 @@ const DirectMessage = () => {
 			window.removeEventListener('keydown', handleKeyPress);
 			isListenerAttached.current = false;
 		};
-	}, []);
+	}, [currentDmGroup]);
 
 	return (
 		<>
