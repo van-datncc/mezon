@@ -1239,3 +1239,8 @@ export enum ESummaryInfo {
 	CALL = 'Call',
 	STREAM = 'Stream'
 }
+
+export type IOtherCall = {
+	caller_id?: string;
+	channel_id?: string;
+};

@@ -944,13 +944,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TODO: AND TYPE IN BE
 		// TYPE = 4: USER CANCEL CALL
 		// TYPE = 0: USER JOINED CALL
+		// TYPE = 5: OTHER CALL
 		if (event?.data_type === 4) {
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setIsJoinedCall(false));
+			dispatch(DMCallActions.setOtherCall({}));
 		}
 		if (event?.data_type === 0) {
 			dispatch(audioCallActions.setIsJoinedCall(true));
+		}
+		if (event?.data_type === 5) {
+			dispatch(audioCallActions.setIsBusyTone(true));
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({
