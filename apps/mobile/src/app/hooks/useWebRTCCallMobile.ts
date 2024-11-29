@@ -92,6 +92,9 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 				});
 				stopDialTone();
 			}
+			if (pc.iceConnectionState === 'checking') {
+				stopDialTone();
+			}
 			if (pc.iceConnectionState === 'disconnected') {
 				Toast.show({
 					type: 'error',

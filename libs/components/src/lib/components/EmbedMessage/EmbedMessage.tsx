@@ -4,12 +4,11 @@ import { EmbedDescription } from './components/EmbedDescription';
 import { EmbedFields } from './components/EmbedFields';
 import { EmbedFooter } from './components/EmbedFooter';
 import { EmbedImage } from './components/EmbedImage';
-import { EmbedOptionRatio } from './components/EmbedOptionRatio';
 import { EmbedThumbnail } from './components/EmbedThumbnail';
 import { EmbedTitle } from './components/EmbedTitle';
 
-export default function EmbedMessage(embed: IEmbedProps) {
-	const { color, title, url, author, description, fields, image, timestamp, footer, thumbnail, options } = embed;
+export default function EmbedMessage({ embed, message_id }: { embed: IEmbedProps; message_id: string }) {
+	const { color, title, url, author, description, fields, image, timestamp, footer, thumbnail } = embed;
 	return (
 		<div className="max-w-[520px] w-fit dark:bg-bgSecondary bg-bgLightSecondary rounded-lg overflow-hidden text-left relative mt-2 text-textLightTheme dark:text-textDarkTheme">
 			<div className="flex flex-col px-5 pt-2 pb-4">
@@ -19,8 +18,7 @@ export default function EmbedMessage(embed: IEmbedProps) {
 						{author && <EmbedAuthor {...author} />}
 						{title && <EmbedTitle title={title} url={url} />}
 						{description && <EmbedDescription description={description} />}
-						{fields && <EmbedFields fields={fields} />}
-						{options && <EmbedOptionRatio options={options} />}
+						{fields && <EmbedFields fields={fields} message_id={message_id} />}
 					</div>
 					<div>{thumbnail && <EmbedThumbnail url={thumbnail.url} />}</div>
 				</div>

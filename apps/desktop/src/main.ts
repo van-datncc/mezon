@@ -4,7 +4,18 @@ import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import App from './app/app';
-import { DOWNLOAD_FILE, NAVIGATE_TO_URL, OPEN_NEW_WINDOW, SENDER_ID } from './app/events/constants';
+import {
+	CLOSE_APP,
+	DOWNLOAD_FILE,
+	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAXIMIZE_WINDOW,
+	MINIMIZE_WINDOW,
+	NAVIGATE_TO_URL,
+	OPEN_NEW_WINDOW,
+	SENDER_ID,
+	TITLE_BAR_ACTION,
+	UNMAXIMIZE_WINDOW
+} from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -93,41 +104,45 @@ ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	}
 });
 
-ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
-	App.openNewWindow(props, options, params);
-});
+const handleWindowAction = (window: BrowserWindow, action: string) => {
+	if (!window || window.isDestroyed()) {
+		return;
+	}
 
-ipcMain.on('TITLE_BAR_ACTION', (event, action, data) => {
 	switch (action) {
-		case 'MINIMIZE_WINDOW':
-			if (App.mainWindow) {
-				App.mainWindow.minimize();
+		case MINIMIZE_WINDOW:
+			window.minimize();
+			break;
+		case UNMAXIMIZE_WINDOW:
+			if (window.isMaximized()) {
+				window.unmaximize();
+			} else {
+				window.maximize();
 			}
 			break;
-		case 'UNMAXIMIZE_WINDOW':
-			if (App.mainWindow) {
-				if (App.mainWindow.isMaximized()) {
-					App.mainWindow.unmaximize();
-				} else {
-					App.mainWindow.maximize();
-				}
+		case MAXIMIZE_WINDOW:
+			if (window.isMaximized()) {
+				window.restore();
+			} else {
+				window.maximize();
 			}
 			break;
-		case 'MAXIMIZE_WINDOW':
-			if (App.mainWindow) {
-				if (App.mainWindow.isMaximized()) {
-					App.mainWindow.restore();
-				} else {
-					App.mainWindow.maximize();
-				}
-			}
-			break;
-		case 'CLOSE_APP':
-			if (App.mainWindow) {
-				App.mainWindow.close();
-			}
+		case CLOSE_APP:
+			window.close();
 			break;
 	}
+};
+
+ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+	const newWindow = App.openNewWindow(props, options, params);
+
+	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
+		handleWindowAction(newWindow, action);
+	});
+});
+
+ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
+	handleWindowAction(App.mainWindow, action);
 });
 
 // handle setup events as quickly as possible
