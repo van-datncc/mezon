@@ -225,35 +225,6 @@ function MessageWithUser({
 
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
-	const [forceRender, setForceRender] = useState(false);
-
-	// const triggerReRender = () => {
-	// 	setForceRender((prev) => !prev);
-	// };
-	// useEffect(() => {
-	// 	if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
-	// 	const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
-
-	// 	const updateAttachments = () => {
-	// 		processLinks({
-	// 			t: message.content.t as string,
-	// 			lk: message.content.lk as IStartEndIndex[]
-	// 		})
-	// 			.then((attachmentUrls) => {
-	// 				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
-
-	// 				if (newAttachmentUrls.length > 0) {
-	// 					editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
-	// 					triggerReRender();
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				console.error('Failed to update message:', error);
-	// 			});
-	// 	};
-
-	// 	updateAttachments();
-	// }, [message.id, forceRender]);
 
 	return (
 		<>

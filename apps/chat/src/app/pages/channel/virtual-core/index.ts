@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { approxEqual, debounce, memo, notUndefined } from './utils';
 
 // export * from './utils';
@@ -740,6 +741,7 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 		}
 
 		if (align === 'start') {
+			// eslint-disable-next-line no-self-assign
 			toOffset = toOffset;
 		} else if (align === 'end') {
 			toOffset = toOffset - size;

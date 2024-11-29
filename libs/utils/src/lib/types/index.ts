@@ -1240,3 +1240,26 @@ export enum ESummaryInfo {
 	CALL = 'Call',
 	STREAM = 'Stream'
 }
+
+export type MentionReactInputProps = {
+	readonly onSend: (
+		content: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		references?: Array<ApiMessageRef>,
+		value?: ThreadValue,
+		anonymousMessage?: boolean,
+		mentionEveryone?: boolean,
+		displayName?: string,
+		clanNick?: string
+	) => void;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[] | undefined;
+	readonly isThread?: boolean;
+	readonly handlePaste?: any;
+	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
+	readonly currentClanId?: string;
+	readonly currentChannelId?: string;
+	readonly mode?: number;
+	hasPermissionEdit?: boolean;
+};
