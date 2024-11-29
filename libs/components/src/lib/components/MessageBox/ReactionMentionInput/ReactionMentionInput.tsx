@@ -1,6 +1,7 @@
 import {
 	useChannelMembers,
 	useClickUpToEdit,
+	useCurrentInbox,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
@@ -155,16 +156,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
-
-	const currentDmOrChannelId =
-		props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
-			? currentChannel?.channel_id
-			: currentDmId;
-
+	const currentDmOrChannelId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -605,10 +600,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId:
-						props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
-							? (currentChannelId as string)
-							: (currentDmId as string),
+					channelId: currentDmOrChannelId as string,
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
