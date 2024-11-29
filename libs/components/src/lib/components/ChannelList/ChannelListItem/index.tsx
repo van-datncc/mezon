@@ -83,7 +83,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const unreadMessageCount = channel?.count_mess_unread || 0;
 
 	const handleOpenInvite = () => {
-		dispatch(clansActions.toggleInvitePeople(true));
+		dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
 	};
 
 	const renderChannelLink = () => {

@@ -21,12 +21,15 @@ export const embedSlice = createSlice({
 	name: EMBED_MESSAGE,
 	initialState: initialEmbedState,
 	reducers: {
-		addEmbedValueInput: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed }>) => {
+		addEmbedValueInput: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
 			const { message_id } = action.payload;
 			if (!state.formDataEmbed[message_id]) {
 				state.formDataEmbed[message_id] = [action.payload.data];
 			} else {
-				state.formDataEmbed[message_id].push(action.payload.data);
+				if (action.payload.multiple) {
+					state.formDataEmbed[message_id].push(action.payload.data);
+				}
+				state.formDataEmbed[message_id] = [action.payload.data];
 			}
 		}
 	}
