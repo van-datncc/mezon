@@ -162,6 +162,4 @@ export const selectLocalStream = createSelector(getDMCallState, (state: DMCallSt
 
 export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
 
-export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);
-
 export const selectOtherCall = createSelector(getDMCallState, (state) => state.otherCall);
