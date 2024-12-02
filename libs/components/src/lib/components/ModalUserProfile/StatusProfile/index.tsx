@@ -3,8 +3,9 @@ import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, selectUserS
 import { Icons } from '@mezon/ui';
 import { EUserStatus } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 import ItemStatusUpdate from './ItemStatusUpdate';
@@ -28,9 +29,16 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		const parse = JSON.parse(userProfile?.wallet ?? '').value;
 		return parse;
 	}, [userProfile?.wallet]);
-
+	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
+	};
+
+	const handleOpenWithdrawModal = () => {
+		setIsShowModalWithdraw(true);
+	};
+	const handleCloseWithdrawModal = () => {
+		setIsShowModalWithdraw(false);
 	};
 	const statusIcon = (status: string): ReactNode => {
 		switch (status) {
@@ -62,6 +70,11 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemStatus onClick={handleSendToken} children="Send Token" startIcon={<Icons.SendMoney />} />
+					<ItemStatus
+						onClick={handleOpenWithdrawModal}
+						children="Withdraw Token"
+						startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
+					/>
 				</Dropdown>
 				<Dropdown
 					trigger="click"
@@ -105,6 +118,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				<ItemStatus children="Manage Accounts" />
 			</Dropdown>
+			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 		</>
 	);
 };

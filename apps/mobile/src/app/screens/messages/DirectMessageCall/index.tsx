@@ -1,6 +1,14 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { DMCallActions, selectAllAccount, selectIsInCall, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import {
+	DMCallActions,
+	selectAllAccount,
+	selectIsInCall,
+	selectRemoteVideo,
+	selectSignalingDataByUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import React, { memo, useEffect, useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -21,7 +29,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const styles = style(themeValue);
-	const receiverId = route.params?.receiverId;
+	const { receiverId, directMessageId } = route.params;
 	const receiverAvatar = route.params?.receiverAvatar;
 	const isVideoCall = route.params?.isVideoCall;
 	const isAnswerCall = route.params?.isAnswerCall;
@@ -30,9 +38,17 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const isInCall = useSelector(selectIsInCall);
+	const isRemoteVideo = useSelector(selectRemoteVideo);
 
 	const { callState, localMediaControl, startCall, handleEndCall, toggleSpeaker, toggleAudio, toggleVideo, handleSignalingMessage } =
-		useWebRTCCallMobile(receiverId, '' as string, userProfile?.user?.id as string, isVideoCall);
+		useWebRTCCallMobile({
+			dmUserId: receiverId,
+			userId: userProfile?.user?.id as string,
+			channelId: directMessageId as string,
+			isVideoCall,
+			callerName: userProfile?.user?.username,
+			callerAvatar: userProfile?.user?.avatar_url
+		});
 
 	useEffect(() => {
 		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
@@ -85,7 +101,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 			<TouchableOpacity activeOpacity={1} style={[styles.main, !isShowControl && { marginBottom: size.s_20 }]} onPress={toggleControl}>
 				<Block flex={1}>
-					{callState.remoteStream ? (
+					{callState.remoteStream && isRemoteVideo ? (
 						<Block style={styles.card}>
 							<RTCView streamURL={callState.remoteStream.toURL()} style={{ flex: 1 }} mirror={true} objectFit={'cover'} />
 						</Block>

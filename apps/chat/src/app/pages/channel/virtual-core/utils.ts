@@ -48,6 +48,7 @@ export function memo<TDeps extends ReadonlyArray<any>, TResult>(
 				return str;
 			};
 
+			// eslint-disable-next-line no-console
 			console.info(
 				`%c⏱ ${pad(resultEndTime, 5)} /${pad(depEndTime, 5)} ms`,
 				`

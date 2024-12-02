@@ -496,6 +496,7 @@ type SendMessagePayload = {
 	avatar?: string;
 	isMobile?: boolean;
 	username?: string;
+	code?: number;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -512,7 +513,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		senderId,
 		avatar,
 		isMobile = false,
-		username
+		username,
+		code
 	} = payload;
 
 	let content = payload.content;
@@ -563,7 +565,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				uploadedFiles,
 				references,
 				anonymous,
-				mentionEveryone
+				mentionEveryone,
+				'',
+				code
 			);
 
 			return res;
@@ -591,7 +595,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 	async function fakeItUntilYouMakeIt() {
 		const fakeMessage: ChannelMessage = {
 			id,
-			code: 0, // Add new message
+			code: code || 0, // Add new message
 			channel_id: channelId,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
@@ -779,6 +783,7 @@ export const messagesSlice = createSlice({
 				case TypeMessage.Welcome:
 				case TypeMessage.CreateThread:
 				case TypeMessage.CreatePin:
+				case TypeMessage.MessageBuzz:
 				case TypeMessage.Chat: {
 					handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 

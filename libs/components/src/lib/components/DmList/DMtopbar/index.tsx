@@ -8,12 +8,14 @@ import {
 	audioCallActions,
 	selectCloseMenu,
 	selectDmGroupCurrent,
+	selectIsInCall,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectJoinPTTByChannelId,
 	selectPinMessageByChannelId,
 	selectStatusMenu,
 	selectTheme,
+	toastActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -81,6 +83,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { userProfile } = useAuth();
+	const isInCall = useSelector(selectIsInCall);
 
 	const handleSend = useCallback(
 		(
@@ -113,9 +116,14 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	);
 
 	const handleStartCall = (isVideoCall = false) => {
-		handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
-		dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
-		dispatch(audioCallActions.setGroupCallId(dmGroupId));
+		if (!isInCall) {
+			handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+			dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
+			dispatch(audioCallActions.setGroupCallId(dmGroupId));
+			dispatch(audioCallActions.setIsBusyTone(false));
+		} else {
+			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
+		}
 	};
 
 	return (

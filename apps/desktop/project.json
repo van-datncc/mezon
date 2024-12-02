@@ -108,16 +108,6 @@
             "output": "./assets/"
           },
           {
-            "glob": "**/*",
-            "input": "apps/chat/src/assets/",
-            "output": "./assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "libs/assets/src/assets/",
-            "output": "./assets/"
-          },
-          {
             "glob": "apps/chat/src/assets/favicon.ico",
             "input": "./",
             "output": "./"
