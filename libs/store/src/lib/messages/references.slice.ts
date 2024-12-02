@@ -131,10 +131,8 @@ export const referencesSlice = createSlice({
 					files: []
 				};
 			}
-			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter(
-				(file) => file.url && !file.url.startsWith('blob:http://')
-			);
-			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith('blob:http://'));
+			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && !file.url.startsWith('blob:'));
+			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith('blob:'));
 			const filesAreIdentical =
 				existingFilesExcBlob.length === newFilesExcBlob.length &&
 				existingFilesExcBlob.every((file, index) => file.url === newFilesExcBlob[index].url);
@@ -142,11 +140,11 @@ export const referencesSlice = createSlice({
 			if (filesAreIdentical) return;
 
 			///
-			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:http://'));
+			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:'));
 
 			state.attachmentAfterUpload[channelId].files = [
 				...existingFilesBlob,
-				...files.filter((file) => file.url && !file.url.startsWith('blob:http://'))
+				...files.filter((file) => file.url && !file.url.startsWith('blob:'))
 			];
 		},
 

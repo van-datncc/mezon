@@ -522,7 +522,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 
 		const hasAttachment = attachmentData.length > 0;
-		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith('blob:http://'));
+		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith('blob:'));
 		const { links } = processText(newPlainTextValue.trim());
 		if (!links || links.length === 0) {
 			if (attachmentBlob) {
