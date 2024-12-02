@@ -1,6 +1,6 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { requestCameraPermission, requestMicrophonePermission } from '@mezon/utils';
+import { requestMediaPermission } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -168,14 +168,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			let permissionCameraGranted = false;
 			let permissionMicroGranted = false;
 
-			const microphoneGranted = await requestMicrophonePermission();
+			const microphoneGranted = await requestMediaPermission('audio');
 			if (microphoneGranted !== 'granted') {
 				dispatch(toastActions.addToast({ message: 'Microphone permission is required', type: 'warning', autoClose: 1000 }));
 			} else {
 				permissionMicroGranted = true;
 			}
 			if (isVideoCall) {
-				const cameraGranted = await requestCameraPermission();
+				const cameraGranted = await requestMediaPermission('video');
 				if (cameraGranted !== 'granted') {
 					dispatch(toastActions.addToast({ message: 'Camera permission is required', type: 'warning', autoClose: 1000 }));
 				} else {
