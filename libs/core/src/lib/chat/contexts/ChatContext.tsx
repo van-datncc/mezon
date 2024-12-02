@@ -83,6 +83,7 @@ import {
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
+	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
 	PermissionChangedEvent,
@@ -701,6 +702,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const onmessagebuttonclicked = useCallback((event: MessageButtonClicked) => {
+		//console.error('event', event);
+	}, []);
+
 	const onerror = useCallback(
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -1081,7 +1086,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.ontokensent = ontokensent;
 
-			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
+			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
@@ -1128,7 +1133,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncoffeegiven,
 			onroleevent,
 			ontokensent,
-			//onmessagebuttonclicked,
+			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
 			ontalkpttchannel
