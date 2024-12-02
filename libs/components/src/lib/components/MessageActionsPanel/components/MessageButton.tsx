@@ -9,7 +9,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EButtonMessageStyle, IButtonMessage, ModeResponsive } from '@mezon/utils';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageButtonProps = {
@@ -44,7 +44,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 		}
 	}, [button.style]);
 
-	const handleClickButton = () => {
+	const handleClickButton = useCallback(() => {
 		if (!button.url) {
 			let extra_data = '';
 			embedData.map((data) => {
@@ -67,7 +67,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 				})
 			);
 		}
-	};
+	}, [embedData[0]?.id]);
 
 	const commonClass = `px-5 py-1 rounded ${buttonColor} text-white font-medium hover:bg-opacity-70 active:bg-opacity-80`;
 

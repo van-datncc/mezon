@@ -418,7 +418,7 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
 	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
 		const { channelIdLastFetch, channelMessages } = action.payload || {};
-		
+
 		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
 			// Limit the channelMessages to only include messages for the last fetched channelId
 			action.payload = {
