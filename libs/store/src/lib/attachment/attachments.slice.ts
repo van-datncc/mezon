@@ -54,8 +54,15 @@ const fetchChannelAttachmentsCached = memoizeAndTrack(
 	}
 );
 
+export interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
 export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachment, channelId?: string, clanId?: string) => {
-	return { ...attachmentRes, id: attachmentRes.id || '', channelId, clanId };
+	const attachmentEntity: IAttachmentEntity = { ...attachmentRes, id: attachmentRes.id || '', channelId, clanId };
+	return attachmentEntity;
 };
 
 export const fetchChannelAttachments = createAsyncThunk(

@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ImageWindowProps } from '../../main';
 import { GET_APP_VERSION, GET_DEVICE_ID, OPEN_NEW_WINDOW, SENDER_ID, SET_BADGE_COUNT } from '../events/constants';
 
 contextBridge.exposeInMainWorld('electron', {
@@ -27,7 +26,7 @@ contextBridge.exposeInMainWorld('electron', {
 		ipcRenderer.on('window-focused', callback);
 	},
 	invoke: (channel, data) => ipcRenderer.invoke(channel, data),
-	openNewWindow: (props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
-		return ipcRenderer.send(OPEN_NEW_WINDOW, props, options, params);
+	openNewWindow: (options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+		return ipcRenderer.send(OPEN_NEW_WINDOW, options, params);
 	}
 });

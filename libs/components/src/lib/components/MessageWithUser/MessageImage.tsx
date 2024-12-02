@@ -1,6 +1,18 @@
 import { useAppParams, useAttachments } from '@mezon/core';
-import { attachmentActions, checkListAttachmentExist, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { ImageWindowProps, SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import {
+	IAttachmentEntity,
+	attachmentActions,
+	checkListAttachmentExist,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectCurrentDM,
+	selectEntitesUserClans,
+	selectGroupMembersEntities,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
+import { SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -17,7 +29,7 @@ export type MessageImage = {
 
 const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
 	const imageUrlKey = `${attachmentData.url}?timestamp=${new Date().getTime()}`;
-
+	const { directId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
@@ -28,23 +40,44 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const [showLoader, setShowLoader] = useState(false);
 	const fadeIn = useRef(false);
 	const checkListAttachment = useSelector(checkListAttachmentExist((currentDmGroupId || currentChannelId) as string));
+	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDm = useSelector(selectCurrentDM);
+	const allClanUsers = useSelector(selectEntitesUserClans);
+	const allDmUsers = useAppSelector((state) => selectGroupMembersEntities(state, directId));
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
 
 		if (isElectron()) {
-			const props: ImageWindowProps = {
-				attachmentData: attachmentData,
-				messageId: messageId as string,
-				mode: mode as ChannelStreamMode,
-				attachmentUrl: url,
-				currentClanId: currentClanId as string,
-				currentChannelId: currentChannelId as string,
-				currentDmId: currentDmGroupId as string,
-				checkListAttachment: checkListAttachment
-			};
+			window.electron.openNewWindow();
 
-			window.electron.openNewWindow(props);
+			if (((currentClanId && currentChannelId) || currentDmGroupId) && !checkListAttachment) {
+				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
+				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true })).then((data) => {
+					const imageList = data.payload as IAttachmentEntity[];
+					const imageListWithUploaderInfo = imageList?.map((image) => {
+						if (directId) {
+							const uploader = allDmUsers[image.uploader as string];
+							return {
+								...image,
+								uploaderData: {
+									avatar: uploader.clan_avatar || uploader?.user?.avatar_url,
+									name: uploader.clan_nick || uploader?.user?.display_name || uploader?.user?.username
+								}
+							};
+						}
+						return { ...image, uploaderData: { ...allClanUsers[image.uploader as string] } };
+					});
+
+					const channelImagesData = {
+						channelLabel: directId ? currentDm.channel_label : currentChannel?.channel_label,
+						images: imageListWithUploaderInfo,
+						selectedImageIndex: imageList.findIndex((image) => image.url === attachmentData.url)
+					};
+					window.electron.send('APP::SEND_ATTACHMENT_DATA', { channelImagesData });
+				});
+			}
 		} else {
 			dispatch(attachmentActions.setMode(mode));
 			setOpenModalAttachment(true);

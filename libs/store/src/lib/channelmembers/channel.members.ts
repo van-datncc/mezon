@@ -508,6 +508,14 @@ export const selectGrouplMembers = createSelector(
 	}
 );
 
+export const selectGroupMembersEntities = createSelector([selectGrouplMembers], (groupMembers): Record<string, ChannelMembersEntity> => {
+	const groupMembersEntities = groupMembers.reduce<Record<string, ChannelMembersEntity>>((acc, member) => {
+		acc[member.id as string] = member;
+		return acc;
+	}, {});
+	return groupMembersEntities;
+});
+
 export const selectMembeGroupByUserId = createSelector([selectGrouplMembers, (state, groupId: string, userId: string) => userId], (users, userId) => {
 	return users?.find((item) => item.id === userId);
 });
