@@ -44,6 +44,7 @@ export const baseColor = {
 	black: '#000000',
 	red: '#e67b7c',
 	redStrong: '#E53935',
+	buzzRed: '#EF4444',
 	purple: '#fc74fc',
 	green: '#42a869',
 	gray: '#949AA4',
