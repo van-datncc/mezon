@@ -63,7 +63,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage, sleep } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -234,8 +234,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const handleBuzz = () => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
+	};
+
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			if (message.code === TypeMessage.MessageBuzz) {
+				handleBuzz();
+			}
+
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
