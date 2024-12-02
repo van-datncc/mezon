@@ -45,12 +45,6 @@ export default class App {
 	}
 
 	private static onReady() {
-		autoUpdater.checkForUpdates();
-		const sixHoursInMilliseconds = 6 * 60 * 60 * 1000;
-		setInterval(() => {
-			autoUpdater.checkForUpdates();
-		}, sixHoursInMilliseconds);
-
 		if (rendererAppName) {
 			App.application.setLoginItemSettings({
 				openAtLogin: true
@@ -61,13 +55,20 @@ export default class App {
 			App.setupBadge();
 			tray.init(isQuitting);
 			App.setupWindowManager();
-			if (process.platform === 'win32') {
-				app.setAppUserModelId(app.getName());
-			}
 			App.mainWindow.webContents.once('dom-ready', () => {
 				setupAutoUpdates();
 			});
 		}
+
+		if (process.platform === 'win32') {
+			app.setAppUserModelId(app.getName());
+		}
+
+		autoUpdater.checkForUpdates();
+		const sixHoursInMilliseconds = 6 * 60 * 60 * 1000;
+		setInterval(() => {
+			autoUpdater.checkForUpdates();
+		}, sixHoursInMilliseconds);
 	}
 
 	private static onActivate() {
