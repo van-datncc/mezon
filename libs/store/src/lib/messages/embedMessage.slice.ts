@@ -28,8 +28,9 @@ export const embedSlice = createSlice({
 			} else {
 				if (action.payload.multiple) {
 					state.formDataEmbed[message_id].push(action.payload.data);
+				} else {
+					state.formDataEmbed[message_id] = [action.payload.data];
 				}
-				state.formDataEmbed[message_id] = [action.payload.data];
 			}
 		}
 	}
