@@ -35,6 +35,7 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
+	IPermissonMedia,
 	IRolesClan,
 	MentionDataProps,
 	NotificationEntity,
@@ -933,3 +934,37 @@ export function copyChannelLink(clanId: string, channelId: string) {
 		document.body.removeChild(textArea);
 	}
 }
+
+export const requestMicrophonePermission = async (): Promise<IPermissonMedia> => {
+	try {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		stream.getTracks().forEach((track) => track.stop());
+		await navigator.mediaDevices.getUserMedia({ audio: true });
+		return 'granted';
+	} catch (error: any) {
+		if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+			return 'denied';
+		} else if (error.name === 'NotFoundError') {
+			return 'not_found';
+		} else {
+			return 'denied';
+		}
+	}
+};
+
+export const requestCameraPermission = async (): Promise<IPermissonMedia> => {
+	try {
+		// Request access to the camera
+		const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+		stream.getTracks().forEach((track) => track.stop());
+		return 'granted';
+	} catch (error: any) {
+		if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+			return 'denied';
+		} else if (error.name === 'NotFoundError') {
+			return 'not_found';
+		} else {
+			return 'denied';
+		}
+	}
+};
