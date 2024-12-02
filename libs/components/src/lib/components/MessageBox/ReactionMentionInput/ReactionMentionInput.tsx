@@ -517,40 +517,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		} else if (newPlainTextValue.endsWith(':')) {
 			setTitleModalMention('Emoji matching');
 		}
-
-		// const hasAttachment = attachmentData.length > 0;
-		// const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith(AttachmentTypeUpload.BLOB));
-		// const { links } = processText(newPlainTextValue.trim());
-		// if (!links || links.length === 0) {
-		// 	if (attachmentBlob) {
-		// 		dispatch(
-		// 			referencesActions.replaceAttachments({
-		// 				channelId: currentDmOrChannelId ?? '',
-		// 				files: attachmentBlob
-		// 			})
-		// 		);
-		// 	} else {
-		// 		dispatch(
-		// 			referencesActions.replaceAttachments({
-		// 				channelId: currentDmOrChannelId ?? '',
-		// 				files: []
-		// 			})
-		// 		);
-		// 	}
-		// } else {
-		// 	handleProcessTextAndLinks({
-		// 		newPlainTextValue,
-		// 		currentDmOrChannelId,
-		// 		request,
-		// 		props,
-		// 		dispatch,
-		// 		setRequestInput,
-		// 		links,
-		// 		processLinks,
-		// 		referencesActions,
-		// 		hasAttachment
-		// 	});
-		// }
 	};
 
 	const handleChangeNameThread = (nameThread: string) => {

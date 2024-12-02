@@ -42,6 +42,7 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
+	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
 	selectChannelsByClanId,
@@ -52,6 +53,7 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
+	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
 	toastActions,
@@ -96,6 +98,8 @@ import {
 	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
+	PTTJoinedEvent,
+	PTTLeavedEvent,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
@@ -152,6 +156,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const clanIdActive = useMemo(() => {
@@ -205,6 +210,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstreamingchannelleaved = useCallback(
 		(user: StreamingLeavedEvent) => {
 			dispatch(usersStreamActions.remove(user.id));
+		},
+		[dispatch]
+	);
+
+	const onPTTchannelJoined = useCallback(
+		(user: PTTJoinedEvent) => {
+			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
+			if (existingMember) {
+				dispatch(pttMembersActions.remove(existingMember?.id));
+			}
+			dispatch(pttMembersActions.add(user));
+		},
+		[dispatch, pttMembers]
+	);
+
+	const onPTTchannelLeaved = useCallback(
+		(user: PTTLeavedEvent) => {
+			dispatch(pttMembersActions.remove(user?.id));
 		},
 		[dispatch]
 	);
@@ -1025,6 +1048,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onvoiceleaved = onvoiceleaved;
 
+			socket.onpttchanneljoined = onPTTchannelJoined;
+
+			socket.onpttchannelleaved = onPTTchannelLeaved;
+
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
 
 			socket.onactivityupdated = onactivityupdated;
@@ -1149,7 +1176,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
-			ontalkpttchannel
+			ontalkpttchannel,
+			onPTTchannelJoined,
+			onPTTchannelLeaved
 		]
 	);
 
@@ -1283,7 +1312,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		setCallbackEventFn,
 		oncoffeegiven,
 		onroleevent,
-		ontokensent
+		ontokensent,
+		onPTTchannelJoined,
+		onPTTchannelLeaved
 	]);
 
 	const value = React.useMemo<ChatContextValue>(
