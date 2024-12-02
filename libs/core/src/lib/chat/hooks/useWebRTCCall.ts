@@ -1,5 +1,6 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { requestMediaPermission } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -166,22 +167,20 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		try {
 			let permissionCameraGranted = false;
 			let permissionMicroGranted = false;
-			// Check camera permission
-			const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
-			if (cameraPermission.state === 'granted') {
-				permissionCameraGranted = true;
-			} else if (isVideoCall) {
-				dispatch(toastActions.addToast({ message: 'Camera is not available', type: 'warning', autoClose: 1000 }));
-			} else {
-				/* empty */
-			}
 
-			// Check microphone permission
-			const microphonePermission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-			if (microphonePermission.state === 'granted') {
-				permissionMicroGranted = true;
+			const microphoneGranted = await requestMediaPermission('audio');
+			if (microphoneGranted !== 'granted') {
+				dispatch(toastActions.addToast({ message: 'Microphone permission is required', type: 'warning', autoClose: 1000 }));
 			} else {
-				dispatch(toastActions.addToast({ message: 'Micro is not available', type: 'warning', autoClose: 1000 }));
+				permissionMicroGranted = true;
+			}
+			if (isVideoCall) {
+				const cameraGranted = await requestMediaPermission('video');
+				if (cameraGranted !== 'granted') {
+					dispatch(toastActions.addToast({ message: 'Camera permission is required', type: 'warning', autoClose: 1000 }));
+				} else {
+					permissionCameraGranted = true;
+				}
 			}
 			dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
 			dispatch(DMCallActions.setIsMuteMicrophone(false));
