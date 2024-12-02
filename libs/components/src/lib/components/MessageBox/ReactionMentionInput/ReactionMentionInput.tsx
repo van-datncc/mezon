@@ -48,6 +48,7 @@ import {
 import { processLinks } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
+	AttachmentTypeUpload,
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
@@ -522,7 +523,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 
 		const hasAttachment = attachmentData.length > 0;
-		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith('blob:'));
+		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith(AttachmentTypeUpload.BLOB));
 		const { links } = processText(newPlainTextValue.trim());
 		if (!links || links.length === 0) {
 			if (attachmentBlob) {

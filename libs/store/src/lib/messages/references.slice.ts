@@ -1,4 +1,4 @@
-import { IMessage, PreSendAttachment } from '@mezon/utils';
+import { AttachmentTypeUpload, IMessage, PreSendAttachment } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 
@@ -131,8 +131,10 @@ export const referencesSlice = createSlice({
 					files: []
 				};
 			}
-			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && !file.url.startsWith('blob:'));
-			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith('blob:'));
+			const existingFilesExcBlob = state.attachmentAfterUpload[channelId].files.filter(
+				(file) => file.url && !file.url.startsWith(AttachmentTypeUpload.BLOB)
+			);
+			const newFilesExcBlob = files.filter((file) => file.url && !file.url.startsWith(AttachmentTypeUpload.BLOB));
 			const filesAreIdentical =
 				existingFilesExcBlob.length === newFilesExcBlob.length &&
 				existingFilesExcBlob.every((file, index) => file.url === newFilesExcBlob[index].url);
@@ -140,11 +142,13 @@ export const referencesSlice = createSlice({
 			if (filesAreIdentical) return;
 
 			///
-			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter((file) => file.url && file.url.startsWith('blob:'));
+			const existingFilesBlob = state.attachmentAfterUpload[channelId].files.filter(
+				(file) => file.url && file.url.startsWith(AttachmentTypeUpload.BLOB)
+			);
 
 			state.attachmentAfterUpload[channelId].files = [
 				...existingFilesBlob,
-				...files.filter((file) => file.url && !file.url.startsWith('blob:'))
+				...files.filter((file) => file.url && !file.url.startsWith(AttachmentTypeUpload.BLOB))
 			];
 		},
 

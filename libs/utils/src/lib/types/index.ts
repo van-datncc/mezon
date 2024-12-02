@@ -1271,3 +1271,7 @@ export type IOtherCall = {
 };
 
 export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
+
+export enum AttachmentTypeUpload {
+	BLOB = 'blob:'
+}
