@@ -1269,3 +1269,5 @@ export type IOtherCall = {
 	caller_id?: string;
 	channel_id?: string;
 };
+
+export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
