@@ -45,10 +45,8 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { processLinks } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
-	AttachmentTypeUpload,
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
@@ -67,8 +65,6 @@ import {
 	focusToElement,
 	formatMentionsToString,
 	getDisplayMention,
-	handleProcessTextAndLinks,
-	processText,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -522,39 +518,39 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setTitleModalMention('Emoji matching');
 		}
 
-		const hasAttachment = attachmentData.length > 0;
-		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith(AttachmentTypeUpload.BLOB));
-		const { links } = processText(newPlainTextValue.trim());
-		if (!links || links.length === 0) {
-			if (attachmentBlob) {
-				dispatch(
-					referencesActions.replaceAttachments({
-						channelId: currentDmOrChannelId ?? '',
-						files: attachmentBlob
-					})
-				);
-			} else {
-				dispatch(
-					referencesActions.replaceAttachments({
-						channelId: currentDmOrChannelId ?? '',
-						files: []
-					})
-				);
-			}
-		} else {
-			handleProcessTextAndLinks({
-				newPlainTextValue,
-				currentDmOrChannelId,
-				request,
-				props,
-				dispatch,
-				setRequestInput,
-				links,
-				processLinks,
-				referencesActions,
-				hasAttachment
-			});
-		}
+		// const hasAttachment = attachmentData.length > 0;
+		// const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith(AttachmentTypeUpload.BLOB));
+		// const { links } = processText(newPlainTextValue.trim());
+		// if (!links || links.length === 0) {
+		// 	if (attachmentBlob) {
+		// 		dispatch(
+		// 			referencesActions.replaceAttachments({
+		// 				channelId: currentDmOrChannelId ?? '',
+		// 				files: attachmentBlob
+		// 			})
+		// 		);
+		// 	} else {
+		// 		dispatch(
+		// 			referencesActions.replaceAttachments({
+		// 				channelId: currentDmOrChannelId ?? '',
+		// 				files: []
+		// 			})
+		// 		);
+		// 	}
+		// } else {
+		// 	handleProcessTextAndLinks({
+		// 		newPlainTextValue,
+		// 		currentDmOrChannelId,
+		// 		request,
+		// 		props,
+		// 		dispatch,
+		// 		setRequestInput,
+		// 		links,
+		// 		processLinks,
+		// 		referencesActions,
+		// 		hasAttachment
+		// 	});
+		// }
 	};
 
 	const handleChangeNameThread = (nameThread: string) => {

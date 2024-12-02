@@ -1,6 +1,6 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { requestMediaPermission } from '@mezon/utils';
+import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -222,6 +222,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			// Start a 30-second timeout to end the call if no answer
 			callTimeout.current = setTimeout(() => {
 				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));
+				dispatch(
+					DMCallActions.updateCallLog({
+						channelId,
+						content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
+					})
+				);
 				handleEndCall();
 			}, 30000);
 

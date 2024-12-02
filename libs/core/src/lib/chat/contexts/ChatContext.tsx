@@ -42,6 +42,7 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
+	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
 	selectChannelsByClanId,
@@ -52,6 +53,7 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
+	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
 	toastActions,
@@ -63,7 +65,17 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage, sleep } from '@mezon/utils';
+import {
+	ETypeLinkMedia,
+	IMessageSendPayload,
+	IMessageTypeCallLog,
+	ModeResponsive,
+	NotificationCode,
+	TIME_OFFSET,
+	ThreadStatus,
+	TypeMessage,
+	sleep
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -86,6 +98,8 @@ import {
 	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
+	PTTJoinedEvent,
+	PTTLeavedEvent,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
@@ -142,6 +156,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const clanIdActive = useMemo(() => {
@@ -199,6 +214,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onPTTchannelJoined = useCallback(
+		(user: PTTJoinedEvent) => {
+			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
+			if (existingMember) {
+				dispatch(pttMembersActions.remove(existingMember?.id));
+			}
+			dispatch(pttMembersActions.add(user));
+		},
+		[dispatch, pttMembers]
+	);
+
+	const onPTTchannelLeaved = useCallback(
+		(user: PTTLeavedEvent) => {
+			dispatch(pttMembersActions.remove(user?.id));
+		},
+		[dispatch]
+	);
+
 	const onstreamingchannelstarted = useCallback(
 		(channel: StreamingStartedEvent) => {
 			if (channel) {
@@ -245,6 +278,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
+				dispatch(DMCallActions.setCallMessageId(message?.message_id));
+			}
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz();
 			}
@@ -1012,6 +1048,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onvoiceleaved = onvoiceleaved;
 
+			socket.onpttchanneljoined = onPTTchannelJoined;
+
+			socket.onpttchannelleaved = onPTTchannelLeaved;
+
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
 
 			socket.onactivityupdated = onactivityupdated;
@@ -1136,7 +1176,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
-			ontalkpttchannel
+			ontalkpttchannel,
+			onPTTchannelJoined,
+			onPTTchannelLeaved
 		]
 	);
 
@@ -1270,7 +1312,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		setCallbackEventFn,
 		oncoffeegiven,
 		onroleevent,
-		ontokensent
+		ontokensent,
+		onPTTchannelJoined,
+		onPTTchannelLeaved
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

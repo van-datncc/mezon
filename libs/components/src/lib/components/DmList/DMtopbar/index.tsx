@@ -11,23 +11,21 @@ import {
 	selectIsInCall,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
-	selectJoinPTTByChannelId,
 	selectPinMessageByChannelId,
 	selectStatusMenu,
 	selectTheme,
 	toastActions,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, isMacDesktop } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton } from '../../ChannelTopbar';
@@ -117,7 +115,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 
 	const handleStartCall = (isVideoCall = false) => {
 		if (!isInCall) {
-			handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(dmGroupId));
 			dispatch(audioCallActions.setIsBusyTone(false));
@@ -320,204 +318,6 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 		</div>
 	);
 };
-
-function PTTButton({ isLightMode, channelId }: { isLightMode: boolean; channelId: string }) {
-	const [isShow, setIsShow] = useState<boolean>(false);
-	const [isJoined, setIsJoined] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement>(null);
-	const remoteAudioRef = useRef<HTMLAudioElement>(null);
-	const mezon = useMezon();
-	const { userId } = useAuth();
-	const joinPTTData = useAppSelector((state) => selectJoinPTTByChannelId(state, userId));
-	const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
-	const [audioTrack, setAudioTrack] = useState<MediaStreamTrack | null>(null);
-	const [isTalking, setIsTalking] = useState(false);
-
-	useEffect(() => {
-		if (!peerConnection) return;
-
-		peerConnection.onicecandidate = async (event: any) => {
-			if (event && event.candidate) {
-				if (mezon.socketRef.current?.isOpen() === true) {
-					await mezon.socketRef.current?.joinPTTChannel(
-						channelId,
-						WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-						JSON.stringify(event.candidate)
-					);
-				}
-			}
-		};
-
-		peerConnection.ontrack = (event) => {
-			if (event.track.kind === 'audio') {
-				if (remoteAudioRef.current) {
-					remoteAudioRef.current.srcObject = event.streams[0];
-				}
-			}
-		};
-
-		if (!joinPTTData?.[joinPTTData?.length - 1]) return;
-		const data = joinPTTData?.[joinPTTData?.length - 1]?.joinPttData;
-		switch (data.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				{
-					const processData = async () => {
-						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
-
-						// Get peerConnection from receiver event.receiverId
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(objData));
-						const answer = await peerConnection.createAnswer();
-						await peerConnection.setLocalDescription(answer);
-
-						const answerEnc = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.joinPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_ANSWER, answerEnc);
-					};
-					processData().catch(console.error);
-				}
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				{
-					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
-						if (peerConnection.remoteDescription) {
-							await peerConnection.addIceCandidate(new RTCIceCandidate(objData));
-						}
-					};
-					processData().catch(console.error);
-				}
-				break;
-			default:
-				break;
-		}
-
-		return () => {
-			peerConnection.onicecandidate = null;
-			peerConnection.onconnectionstatechange = null;
-			peerConnection.ontrack = null;
-		};
-	}, [mezon.socketRef, peerConnection, joinPTTData, channelId]);
-
-	const startJoinPTT = async () => {
-		try {
-			if (mezon.socketRef.current) {
-				if (peerConnection) {
-					peerConnection.close();
-					setPeerConnection(null);
-				}
-				const newPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-				setPeerConnection(newPeerConnection);
-				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-				// mute
-				const audioTrack = stream.getAudioTracks()[0];
-				setAudioTrack(audioTrack);
-				audioTrack.enabled = false;
-				stream.getTracks().forEach((track) => {
-					newPeerConnection.addTrack(track, stream);
-				});
-
-				// set peer & call join to server
-				await mezon.socketRef.current?.joinPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_OFFER, '');
-				setIsJoined(true);
-			}
-		} catch (err) {
-			console.error('Failed to get local media:', err);
-		}
-	};
-
-	const startTalking = async () => {
-		if (!peerConnection) {
-			console.error('PeerConnection is not initialized.');
-			return;
-		}
-
-		// not use
-		// await mezon.socketRef.current?.talkPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_OFFER, '', 0);
-		// await sleep(1000);
-
-		if (audioTrack) {
-			audioTrack.enabled = true;
-		}
-		setIsTalking(true);
-	};
-
-	const stopTalking = async () => {
-		if (!peerConnection) {
-			console.error('PeerConnection is not initialized.');
-			return;
-		}
-		if (audioTrack) {
-			audioTrack.enabled = false;
-		}
-		setIsTalking(false);
-	};
-
-	const handleShow = async () => {
-		setIsShow(true);
-	};
-
-	const quitPTT = async () => {
-		setIsShow(false);
-		setIsTalking(false);
-		setIsJoined(false);
-		if (peerConnection) {
-			peerConnection.close();
-			setPeerConnection(null);
-		}
-		await mezon.socketRef.current?.joinPTTChannel(channelId, WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
-	};
-
-	return (
-		<div className="relative leading-5 size-6" ref={threadRef}>
-			<Tooltip content="Start Video Call" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button className="focus-visible:outline-none" onClick={handleShow} onContextMenu={(e) => e.preventDefault()}>
-					{/* <Icons.JoinPTT isWhite={isShow} /> */}
-				</button>
-			</Tooltip>
-			{isShow && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-					{/* Modal nội dung */}
-					<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-[900px] max-h-[90vh] overflow-hidden flex flex-col items-center">
-						<h2 className="text-lg font-semibold text-black dark:text-white mb-4">Video Call</h2>
-						<div className="flex justify-between space-x-4">
-							<audio ref={remoteAudioRef} autoPlay playsInline controls></audio>
-						</div>
-						<div className="flex space-x-4 mt-6">
-							<button
-								onClick={startJoinPTT}
-								disabled={isJoined}
-								className={`px-6 py-2 rounded shadow ${
-									isJoined ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 text-white'
-								}`}
-							>
-								Join
-							</button>
-							<button
-								onClick={isTalking ? stopTalking : startTalking}
-								className={`px-6 py-2 rounded shadow ${
-									isTalking ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
-								}`}
-							>
-								<Tooltip
-									content={isTalking ? 'Mute' : 'Talk'}
-									trigger="hover"
-									animation="duration-500"
-									style={isLightMode ? 'light' : 'dark'}
-								>
-									{isTalking ? <Icons.MutePTT /> : <Icons.TalkPTT />} {}
-								</Tooltip>
-							</button>
-							<button onClick={quitPTT} className="px-6 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600">
-								Quit
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-}
 
 DmTopbar.Skeleton = () => {
 	return (

@@ -6,10 +6,12 @@ import {
 	clansActions,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
+	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId
 } from '@mezon/store';
 
+import { Icons } from '@mezon/ui';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
@@ -74,11 +76,19 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
+	const inPushToTalkMembers = useSelector(selectPttMembersByChannelId(channel.id));
+
+	const channelHasPushToTalkFeature = useMemo(() => {
+		return channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private === 1;
+	}, [channel.channel_private, channel.type]);
+
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
+		if (channelHasPushToTalkFeature) return inPushToTalkMembers;
 		return [];
-	}, [voiceChannelMembers, streamChannelMembers]);
+	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, inPushToTalkMembers]);
+
 	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
 	const unreadMessageCount = channel?.count_mess_unread || 0;
 
@@ -105,16 +115,31 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	};
 
 	const renderChannelContent = useMemo(() => {
-		if (channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (isCategoryExpanded && channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			return (
 				<>
 					{renderChannelLink()}
 					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
+					{channelHasPushToTalkFeature && (
+						<div>
+							<div className="flex flex-col ml-6">
+								<div className="flex flex-row items-center h-[34px] relative">
+									<span className="absolute top-2 left-0">
+										<Icons.ShortCorner />
+									</span>
+									<div className="ml-6 flex flex-row items-center px-2 mx-2 rounded relative p-1 leading-[24px] dark:hover:text-white hover:text-black text-[16px] dark:font-medium font-semibold dark:text-white text-black ">
+										PTT Members
+									</div>
+								</div>
+							</div>
+							<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} memberList={channelMemberList} />
+						</div>
+					)}
 				</>
 			);
 		}
 
-		if (isCategoryExpanded) {
+		if (isCategoryExpanded && !channelHasPushToTalkFeature) {
 			return (
 				<>
 					{renderChannelLink()}
@@ -126,9 +151,21 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		return channelMemberList.length > 0 ? (
 			<>
 				{renderChannelLink()}
+				{channelHasPushToTalkFeature && (
+					<div className="flex flex-col ml-6">
+						<div className="flex flex-row items-center h-[34px] relative">
+							<span className="absolute top-2 left-0">
+								<Icons.ShortCorner />
+							</span>
+							<div className="ml-6 flex flex-row items-center px-2 mx-2 rounded relative p-1 leading-[24px] dark:hover:text-white hover:text-black text-[16px] dark:font-medium font-semibold dark:text-white text-black ">
+								PTT Members
+							</div>
+						</div>
+					</div>
+				)}
 				<Avatar.Group className="flex gap-3 justify-start items-center px-6">
 					{[...channelMemberList].slice(0, 5).map((member, index) => (
-						<AvatarUserShort id={member.user_id} key={member.user_id + index} />
+						<AvatarUserShort id={member.user_id || ''} key={member.user_id || '' + index} />
 					))}
 					{channelMemberList && channelMemberList.length > 5 && (
 						<Avatar.Counter
@@ -139,7 +176,16 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				</Avatar.Group>
 			</>
 		) : null;
-	}, [channel, isCategoryExpanded, channelMemberList, listThreadRef, channelLinkRef, isActive, permissions]);
+	}, [
+		channel.type,
+		channel.threads,
+		channel.channel_id,
+		isCategoryExpanded,
+		channelHasPushToTalkFeature,
+		channelMemberList,
+		renderChannelLink,
+		listThreadRef
+	]);
 
 	return <>{renderChannelContent} </>;
 };
