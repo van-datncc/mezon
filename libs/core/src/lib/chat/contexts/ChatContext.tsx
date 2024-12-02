@@ -703,7 +703,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onmessagebuttonclicked = useCallback((event: MessageButtonClicked) => {
-		console.error('event', event);
+		//console.error('event', event);
 	}, []);
 
 	const onerror = useCallback(
