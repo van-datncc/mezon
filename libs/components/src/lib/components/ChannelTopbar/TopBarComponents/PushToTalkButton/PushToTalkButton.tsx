@@ -1,4 +1,4 @@
-import { selectCurrentChannelId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
 import { useMemo } from 'react';
@@ -16,8 +16,9 @@ export interface IPushToTalkBtnProps {
 
 export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClanId = useSelector(selectCurrentClanId);
 
-	const { setChannelId, channelId } = useWebRTC();
+	const { setClanId, setChannelId, channelId } = useWebRTC();
 	const { isJoined, startJoinPTT, quitPTT } = usePushToTalk();
 
 	const shouldShowPtt = useMemo(() => {
@@ -38,6 +39,7 @@ export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) =>
 						onClick={
 							!isJoined
 								? () => {
+										setClanId(currentClanId || '');
 										setChannelId(currentChannelId || '');
 										startJoinPTT();
 									}
