@@ -82,7 +82,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			fontSize: verticalScale(16)
 		},
 		body: {
-			color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.redStrong : colors.text,
+			color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
 			fontSize: isLastMessage ? size.small : size.medium
 		},
 		paragraph: {

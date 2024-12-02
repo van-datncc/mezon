@@ -131,18 +131,7 @@ export const AuthenticationLoader = () => {
 			}
 			//Payload from FCM need messageType and sound
 			if (remoteMessage.notification.body === 'Buzz!!') {
-				Sound.setCategory('Playback');
-				const sound = new Sound('buzz.mp3', Sound.MAIN_BUNDLE, (error) => {
-					if (error) {
-						console.error('failed to load the sound', error);
-						return;
-					}
-					sound.play((success) => {
-						if (!success) {
-							console.error('Sound playback failed');
-						}
-					});
-				});
+				playBuzzSound();
 			}
 		});
 		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
@@ -164,6 +153,21 @@ export const AuthenticationLoader = () => {
 			unsubscribe();
 		};
 	}, []);
+
+	const playBuzzSound = () => {
+		Sound.setCategory('Playback');
+		const sound = new Sound('buzz.mp3', Sound.MAIN_BUNDLE, (error) => {
+			if (error) {
+				console.error('failed to load the sound', error);
+				return;
+			}
+			sound.play((success) => {
+				if (!success) {
+					console.error('Sound playback failed');
+				}
+			});
+		});
+	};
 
 	const loadFileSharing = () => {
 		try {
