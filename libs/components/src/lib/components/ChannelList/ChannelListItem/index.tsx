@@ -11,7 +11,6 @@ import {
 	selectVoiceChannelMembersByChannelId
 } from '@mezon/store';
 
-import { Icons } from '@mezon/ui';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
@@ -122,16 +121,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
 					{channelHasPushToTalkFeature && (
 						<div>
-							<div className="flex flex-col ml-6">
-								<div className="flex flex-row items-center h-[34px] relative">
-									<span className="absolute top-2 left-0">
-										<Icons.ShortCorner />
-									</span>
-									<div className="ml-6 flex flex-row items-center px-2 mx-2 rounded relative p-1 leading-[24px] dark:hover:text-white hover:text-black text-[16px] dark:font-medium font-semibold dark:text-white text-black ">
-										PTT Members
-									</div>
-								</div>
-							</div>
 							<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} memberList={channelMemberList} />
 						</div>
 					)}
@@ -151,18 +140,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		return channelMemberList.length > 0 ? (
 			<>
 				{renderChannelLink()}
-				{channelHasPushToTalkFeature && (
-					<div className="flex flex-col ml-6">
-						<div className="flex flex-row items-center h-[34px] relative">
-							<span className="absolute top-2 left-0">
-								<Icons.ShortCorner />
-							</span>
-							<div className="ml-6 flex flex-row items-center px-2 mx-2 rounded relative p-1 leading-[24px] dark:hover:text-white hover:text-black text-[16px] dark:font-medium font-semibold dark:text-white text-black ">
-								PTT Members
-							</div>
-						</div>
-					</div>
-				)}
 				<Avatar.Group className="flex gap-3 justify-start items-center px-6">
 					{[...channelMemberList].slice(0, 5).map((member, index) => (
 						<AvatarUserShort id={member.user_id || ''} key={member.user_id || '' + index} />
