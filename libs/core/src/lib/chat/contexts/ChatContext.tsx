@@ -63,7 +63,17 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage, sleep } from '@mezon/utils';
+import {
+	ETypeLinkMedia,
+	IMessageSendPayload,
+	IMessageTypeCallLog,
+	ModeResponsive,
+	NotificationCode,
+	TIME_OFFSET,
+	ThreadStatus,
+	TypeMessage,
+	sleep
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -245,6 +255,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
+				dispatch(DMCallActions.setCallMessageId(message?.message_id));
+			}
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz();
 			}

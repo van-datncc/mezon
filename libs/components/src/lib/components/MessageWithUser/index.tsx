@@ -15,6 +15,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
@@ -308,6 +309,17 @@ function MessageWithUser({
 													message.content.embed?.map((embed, index) => (
 														<EmbedMessage key={index} embed={embed} message_id={message.id} />
 													))}
+
+												{!!message.content?.callLog?.callLogType && (
+													<CallLogMessage
+														userId={userId || ''}
+														userName={userLogin.userProfile?.user?.display_name || ''}
+														channelId={message.channel_id}
+														messageId={message.id}
+														senderId={message.sender_id}
+														callLog={message.content?.callLog}
+													/>
+												)}
 
 												{message.content?.components &&
 													message.content.components.map((actionRow, index) => (
