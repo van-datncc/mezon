@@ -278,6 +278,18 @@ export interface IMessageRatioOption {
 	style?: EButtonMessageStyle;
 }
 
+export enum IMessageTypeCallLog {
+	STARTCALL = 1,
+	TIMEOUTCALL = 2,
+	FINISHCALL = 3,
+	REJECTCALL = 4
+}
+
+export interface IMessageCallLog {
+	isVideo: boolean;
+	callLogType: IMessageTypeCallLog;
+}
+
 export enum EMessageSelectType {
 	TEXT = 1,
 	USER = 2,
@@ -327,6 +339,7 @@ export interface IMessageSendPayload {
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	components?: IMessageActionRow[];
+	callLog?: IMessageCallLog;
 }
 
 export type IUser = {
