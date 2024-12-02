@@ -177,8 +177,8 @@ const ModalSendToken = ({
 														<ItemSelect key={user.id} onClick={() => handleSelectUser(user.id, user.username)}>
 															<div className="flex items-center">
 																<AvatarImage
-																	alt={user?.username}
-																	userName={user?.username}
+																	alt={user?.username ?? ''}
+																	userName={user?.username ?? ''}
 																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
 																		width: 100,
 																		height: 100,
