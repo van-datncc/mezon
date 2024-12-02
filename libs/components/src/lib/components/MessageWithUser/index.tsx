@@ -15,6 +15,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
@@ -225,35 +226,6 @@ function MessageWithUser({
 
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
-	const [forceRender, setForceRender] = useState(false);
-
-	// const triggerReRender = () => {
-	// 	setForceRender((prev) => !prev);
-	// };
-	// useEffect(() => {
-	// 	if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
-	// 	const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
-
-	// 	const updateAttachments = () => {
-	// 		processLinks({
-	// 			t: message.content.t as string,
-	// 			lk: message.content.lk as IStartEndIndex[]
-	// 		})
-	// 			.then((attachmentUrls) => {
-	// 				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
-
-	// 				if (newAttachmentUrls.length > 0) {
-	// 					editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
-	// 					triggerReRender();
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				console.error('Failed to update message:', error);
-	// 			});
-	// 	};
-
-	// 	updateAttachments();
-	// }, [message.id, forceRender]);
 
 	return (
 		<>
@@ -337,6 +309,17 @@ function MessageWithUser({
 													message.content.embed?.map((embed, index) => (
 														<EmbedMessage key={index} embed={embed} message_id={message.id} />
 													))}
+
+												{!!message.content?.callLog?.callLogType && (
+													<CallLogMessage
+														userId={userId || ''}
+														userName={userLogin.userProfile?.user?.display_name || ''}
+														channelId={message.channel_id}
+														messageId={message.id}
+														senderId={message.sender_id}
+														callLog={message.content?.callLog}
+													/>
+												)}
 
 												{message.content?.components &&
 													message.content.components.map((actionRow, index) => (

@@ -16,7 +16,7 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
 			setChecked([index]);
-			handleAddEmbedRadioValue();
+			handleAddEmbedRadioValue(index);
 			return;
 		}
 		if (checked.includes(index)) {
@@ -24,18 +24,18 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 			return;
 		}
 		setChecked([...checked, index]);
-		handleAddEmbedRadioValue();
+		handleAddEmbedRadioValue(index);
 	};
 
 	const dispatch = useDispatch();
 
-	const handleAddEmbedRadioValue = () => {
+	const handleAddEmbedRadioValue = (index: number) => {
 		dispatch(
 			embedActions.addEmbedValueInput({
 				message_id: message_id,
 				data: {
-					id: 'This is id',
-					value: 'This is value for testing'
+					id: options[index].value,
+					value: options[index].value
 				}
 			})
 		);
@@ -44,7 +44,7 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 		<>
 			{options &&
 				options.map((option, index) => (
-					<div className="flex justify-between">
+					<div className="flex justify-between" key={option.id}>
 						<div className="flex flex-col">
 							<EmbedTitle title={option.label} />
 							<EmbedDescription description={option.description || ''} />

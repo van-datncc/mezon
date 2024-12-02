@@ -13,6 +13,7 @@ import {
 	useAppParams,
 	useAuth,
 	useChatMessages,
+	useChatSending,
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useSearchMessages,
@@ -42,7 +43,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, TypeMessage, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -185,6 +186,29 @@ const DirectMessage = () => {
 	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	const handleClose = useCallback(() => {}, []);
+
+	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode });
+	const isListenerAttached = useRef(false);
+
+	useEffect(() => {
+		if (isListenerAttached.current) return;
+		isListenerAttached.current = true;
+
+		const handleKeyPress = (event: KeyboardEvent) => {
+			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
+				event.preventDefault();
+				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyPress);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress);
+			isListenerAttached.current = false;
+		};
+	}, [currentDmGroup]);
 
 	return (
 		<>

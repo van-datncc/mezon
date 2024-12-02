@@ -14,14 +14,16 @@ import {
 	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType } from '@mezon/utils';
+import { MemberProfileType, useLongPress } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { MicButton } from '../ChannelTopbar/TopBarComponents/PushToTalkButton/MicIcon';
 import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
+import { usePushToTalk } from '../PushToTalk/PushToTalkContext';
 import ModalFooterProfile from './ModalFooterProfile';
 
 export type FooterProfileProps = {
@@ -34,6 +36,12 @@ export type FooterProfileProps = {
 };
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
+	const { isJoined, isTalking, toggleTalking } = usePushToTalk();
+
+	const longPressHandlers = useLongPress<HTMLDivElement>({
+		onStart: () => toggleTalking(true),
+		onFinish: () => toggleTalking(false)
+	});
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
@@ -141,6 +149,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						/>
 					)}
 				</div>
+				{isJoined && (
+					<div {...longPressHandlers}>
+						<MicButton isTalking={isTalking} />
+					</div>
+				)}
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />

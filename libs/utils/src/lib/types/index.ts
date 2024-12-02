@@ -270,11 +270,24 @@ export interface IMessageSelectOption {
 	default?: boolean;
 }
 export interface IMessageRatioOption {
+	id: string;
 	label: string;
 	description?: string;
 	name?: string;
 	value: string;
 	style?: EButtonMessageStyle;
+}
+
+export enum IMessageTypeCallLog {
+	STARTCALL = 1,
+	TIMEOUTCALL = 2,
+	FINISHCALL = 3,
+	REJECTCALL = 4
+}
+
+export interface IMessageCallLog {
+	isVideo: boolean;
+	callLogType: IMessageTypeCallLog;
 }
 
 export enum EMessageSelectType {
@@ -326,6 +339,7 @@ export interface IMessageSendPayload {
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	components?: IMessageActionRow[];
+	callLog?: IMessageCallLog;
 }
 
 export type IUser = {
@@ -1029,7 +1043,8 @@ export enum TypeMessage {
 	Indicator = 4,
 	Welcome = 5,
 	CreateThread = 6,
-	CreatePin = 7
+	CreatePin = 7,
+	MessageBuzz = 8
 }
 
 export enum ServerSettingsMenuValue {
@@ -1238,4 +1253,38 @@ export type ImageWindowProps = {
 export enum ESummaryInfo {
 	CALL = 'Call',
 	STREAM = 'Stream'
+}
+
+export type MentionReactInputProps = {
+	readonly onSend: (
+		content: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		references?: Array<ApiMessageRef>,
+		value?: ThreadValue,
+		anonymousMessage?: boolean,
+		mentionEveryone?: boolean,
+		displayName?: string,
+		clanNick?: string
+	) => void;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[] | undefined;
+	readonly isThread?: boolean;
+	readonly handlePaste?: any;
+	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
+	readonly currentClanId?: string;
+	readonly currentChannelId?: string;
+	readonly mode?: number;
+	hasPermissionEdit?: boolean;
+};
+
+export type IOtherCall = {
+	caller_id?: string;
+	channel_id?: string;
+};
+
+export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
+
+export enum AttachmentTypeUpload {
+	BLOB = 'blob:'
 }

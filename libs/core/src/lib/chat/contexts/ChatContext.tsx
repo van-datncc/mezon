@@ -63,7 +63,17 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import {
+	ETypeLinkMedia,
+	IMessageSendPayload,
+	IMessageTypeCallLog,
+	ModeResponsive,
+	NotificationCode,
+	TIME_OFFSET,
+	ThreadStatus,
+	TypeMessage,
+	sleep
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -83,6 +93,7 @@ import {
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
+	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
 	PermissionChangedEvent,
@@ -234,8 +245,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const handleBuzz = () => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
+	};
+
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
+				dispatch(DMCallActions.setCallMessageId(message?.message_id));
+			}
+			if (message.code === TypeMessage.MessageBuzz) {
+				handleBuzz();
+			}
+
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
@@ -395,7 +421,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
 			if (pin.operation === 1) {
-				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
+				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: pin.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
 				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
@@ -689,6 +715,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const onmessagebuttonclicked = useCallback((event: MessageButtonClicked) => {
+		//console.error('event', event);
+	}, []);
+
 	const onerror = useCallback(
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -944,13 +974,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// TODO: AND TYPE IN BE
 		// TYPE = 4: USER CANCEL CALL
 		// TYPE = 0: USER JOINED CALL
+		// TYPE = 5: OTHER CALL
 		if (event?.data_type === 4) {
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setIsJoinedCall(false));
+			dispatch(DMCallActions.setOtherCall({}));
 		}
 		if (event?.data_type === 0) {
 			dispatch(audioCallActions.setIsJoinedCall(true));
+		}
+		if (event?.data_type === 5) {
+			dispatch(audioCallActions.setIsBusyTone(true));
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({
@@ -1064,7 +1099,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.ontokensent = ontokensent;
 
-			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
+			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
@@ -1111,7 +1146,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncoffeegiven,
 			onroleevent,
 			ontokensent,
-			//onmessagebuttonclicked,
+			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
 			ontalkpttchannel

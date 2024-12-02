@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
@@ -316,7 +317,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				<ItemPanel
 					children="Invite People"
 					onClick={() => {
-						dispatch(clansActions.toggleInvitePeople(true));
+						dispatch(clansActions.toggleInvitePeople({ status: true }));
 						handClosePannel();
 					}}
 				/>

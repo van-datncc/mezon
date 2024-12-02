@@ -8,6 +8,7 @@ export interface DmCallState {
 	isDialTone: boolean;
 	isRingTone: boolean;
 	isEndTone: boolean;
+	isBusyTone: boolean;
 	isRemoteAudio: boolean;
 	isRemoteVideo: boolean;
 	isJoinedCall: boolean;
@@ -19,6 +20,7 @@ const initialState: DmCallState = {
 	isDialTone: false,
 	isRingTone: false,
 	isEndTone: false,
+	isBusyTone: false,
 	isRemoteAudio: false,
 	isRemoteVideo: false,
 	isJoinedCall: false,
@@ -40,6 +42,9 @@ const audioCallSlice = createSlice({
 		},
 		setIsEndTone(state, action) {
 			state.isEndTone = action.payload;
+		},
+		setIsBusyTone(state, action) {
+			state.isBusyTone = action.payload;
 		},
 		setIsRemoteAudio(state, action) {
 			state.isRemoteAudio = action.payload;
@@ -71,6 +76,8 @@ export const selectAudioDialTone = createSelector(getAudioCallState, (state) => 
 export const selectAudioRingTone = createSelector(getAudioCallState, (state) => state.isRingTone);
 
 export const selectAudioEndTone = createSelector(getAudioCallState, (state) => state.isEndTone);
+
+export const selectAudioBusyTone = createSelector(getAudioCallState, (state) => state.isBusyTone);
 
 export const selectRemoteAudio = createSelector(getAudioCallState, (state) => state.isRemoteAudio);
 

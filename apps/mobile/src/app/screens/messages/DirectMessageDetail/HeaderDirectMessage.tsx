@@ -84,7 +84,8 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
 				receiverId: firstUserId,
-				receiverAvatar: dmAvatar
+				receiverAvatar: dmAvatar,
+				directMessageId
 			}
 		});
 	};

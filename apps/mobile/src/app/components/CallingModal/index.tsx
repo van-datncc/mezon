@@ -9,6 +9,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -30,6 +31,7 @@ const CallingModal = () => {
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const isInCall = useSelector(selectIsInCall);
 	const usersClan = useSelector(selectAllUserClans);
+	const mezon = useMezon();
 
 	const callerInfo = useMemo(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
@@ -67,7 +69,7 @@ const CallingModal = () => {
 
 	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall) {
+		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && latestSignalingEntry?.signalingData?.data_type !== 4) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 
@@ -86,6 +88,12 @@ const CallingModal = () => {
 				ringtoneRef.current = sound;
 				playVibration();
 			});
+		} else if (latestSignalingEntry?.signalingData?.data_type === 4 || latestSignalingEntry?.signalingData?.data_type === 0 || isInCall) {
+			setIsVisible(false);
+			stopAndReleaseSound();
+			Vibration.cancel();
+		} else {
+			/* empty */
 		}
 
 		// Cleanup function
@@ -120,11 +128,19 @@ const CallingModal = () => {
 		});
 	};
 
-	const onDeniedCall = () => {
+	const onDeniedCall = async () => {
 		dispatch(DMCallActions.removeAll());
 		setIsVisible(false);
 		stopAndReleaseSound();
 		Vibration.cancel();
+		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
+		await mezon.socketRef.current?.forwardWebrtcSignaling(
+			latestSignalingEntry?.callerId,
+			4,
+			'',
+			latestSignalingEntry?.signalingData?.channel_id,
+			''
+		);
 	};
 
 	if (!isVisible) {

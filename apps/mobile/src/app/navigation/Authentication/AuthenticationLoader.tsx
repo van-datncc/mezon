@@ -1,6 +1,7 @@
 import { useAuth } from '@mezon/core';
-import { getAppInfo } from '@mezon/mobile-components';
+import { ActionEmitEvent, getAppInfo } from '@mezon/mobile-components';
 import {
+	DMCallActions,
 	appActions,
 	fcmActions,
 	getStoreAsync,
@@ -11,26 +12,25 @@ import {
 } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { Snowflake } from '@theinternetfolks/snowflake';
+import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { NativeModules, Platform } from 'react-native';
-import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
+import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
-import useIncomingCall from '../../hooks/useIncomingCall';
 import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
-	createLocalNotification,
 	handleFCMToken,
 	isShowNotification,
 	navigateToNotification,
+	setupCallKeep,
 	setupNotificationListeners
 } from '../../utils/pushNotificationHelpers';
-const { WakeLockModule } = NativeModules;
+import { APP_SCREEN } from '../ScreenTypes';
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -44,7 +44,6 @@ export const AuthenticationLoader = () => {
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
-	const IncomingCall = useIncomingCall();
 
 	const loadFRMConfig = useCallback(async () => {
 		try {
@@ -64,39 +63,10 @@ export const AuthenticationLoader = () => {
 		if (userProfile?.user?.username) loadFRMConfig();
 	}, [loadFRMConfig, userProfile?.user?.username]);
 
-	const incomingCallAnswer = () => {
-		// Navigate to your call screen or main app
-	};
-
-	const showIncomingCallUi = () => {
-		if (Platform.OS === 'android') {
-			// TODO: map content call from FCM
-			RNNotificationCall.displayNotification(Snowflake.generate(), null, 30000, {
-				channelId: 'com.mezon.mezon',
-				channelName: 'Incoming call',
-				notificationIcon: 'ic_notification', // mipmap
-				notificationTitle: 'Nguyen Tran',
-				notificationBody: 'Incoming video call',
-				answerText: 'Answer',
-				declineText: 'Decline',
-				notificationColor: 'colorAccent',
-				isVideo: false,
-				notificationSound: 'ringing.mp3'
-			});
-		}
-	};
-
 	useEffect(() => {
-		IncomingCall.configure(incomingCallAnswer, () => {}, showIncomingCallUi);
+		setupCallKeep();
 		setupNotificationListeners(navigation);
 	}, [navigation]);
-
-	useEffect(() => {
-		RNNotificationCall.addEventListener('answer', (data) => {
-			RNNotificationCall.backToApp();
-			incomingCallAnswer();
-		});
-	}, []);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
@@ -107,10 +77,54 @@ export const AuthenticationLoader = () => {
 	}, [currentChannel]);
 
 	useEffect(() => {
+		let timer;
+		const callListener = DeviceEventEmitter.addListener(ActionEmitEvent.GO_TO_CALL_SCREEN, ({ payload }) => {
+			dispatch(appActions.setLoadingMainMobile(true));
+			dispatch(DMCallActions.setIsInCall(true));
+			const signalingData = {
+				channel_id: payload?.channelId,
+				json_data: payload?.offer,
+				data_type: WebrtcSignalingType.WEBRTC_SDP_OFFER,
+				caller_id: payload?.callerId
+			};
+			dispatch(
+				DMCallActions.addOrUpdate({
+					calleeId: userProfile?.user?.id,
+					signalingData: signalingData as WebrtcSignalingFwd,
+					id: payload?.callerId,
+					callerId: payload?.callerId
+				})
+			);
+			timer = setTimeout(() => {
+				dispatch(appActions.setLoadingMainMobile(false));
+				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+					screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+					params: {
+						receiverId: payload?.callerId,
+						receiverAvatar: payload?.callerAvatar,
+						directMessageId: payload?.channelId,
+						isAnswerCall: true
+					}
+				});
+			}, 2000);
+		});
+
+		return () => {
+			timer && clearTimeout(timer);
+			callListener.remove();
+		};
+	}, [dispatch, navigation, userProfile?.user?.id]);
+
+	useEffect(() => {
 		checkNotificationPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
+				// Case: FCM start call
+				const title = remoteMessage?.notification?.title;
+				if (title === 'Incoming call' || (title && (title.includes('started a video call') || title.includes('started a audio call')))) {
+					return;
+				}
 				Toast.show({
 					type: 'notification',
 					topOffset: Platform.OS === 'ios' ? undefined : 10,
@@ -128,18 +142,11 @@ export const AuthenticationLoader = () => {
 					}
 				});
 			}
-		});
-		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-			// TODO: handle data from FCM
-			IncomingCall.displayIncomingCall('Nguyen Tran');
-			if (Platform.OS === 'android') {
-				WakeLockModule.releaseWakeLock();
-				WakeLockModule.acquireWakeLock();
-				showIncomingCallUi();
+			//Payload from FCM need messageType and sound
+			if (remoteMessage.notification.body === 'Buzz!!') {
+				playBuzzSound();
 			}
-			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 		});
-
 		// To get All Received Urls
 		loadFileSharing();
 
@@ -148,6 +155,21 @@ export const AuthenticationLoader = () => {
 			unsubscribe();
 		};
 	}, []);
+
+	const playBuzzSound = () => {
+		Sound.setCategory('Playback');
+		const sound = new Sound('buzz.mp3', Sound.MAIN_BUNDLE, (error) => {
+			if (error) {
+				console.error('failed to load the sound', error);
+				return;
+			}
+			sound.play((success) => {
+				if (!success) {
+					console.error('Sound playback failed');
+				}
+			});
+		});
+	};
 
 	const loadFileSharing = () => {
 		try {

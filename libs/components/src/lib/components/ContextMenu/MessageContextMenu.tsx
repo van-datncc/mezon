@@ -312,14 +312,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.setChannelPinMessage({ clan_id: currentClanId ?? '', channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
-				clanId: activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD) ? '' : (currentClanId ?? ''),
+				clanId:
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
+						? ''
+						: (currentClanId ?? ''),
 				channelId:
-					activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD)
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
 						? currentDmId || ''
 						: (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
 				isPublic:
-					activeMode !== (ChannelStreamMode.STREAM_MODE_CHANNEL && ChannelStreamMode.STREAM_MODE_THREAD)
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
 						? false
 						: currentChannel
 							? !currentChannel.channel_private
