@@ -89,28 +89,27 @@ const ModalSendToken = ({
 	const mergeUniqueUsers = (usersClan: any[], directMessages: any[]) => {
 		const userMap = new Map();
 
-		usersClan.forEach((clan) => {
+		usersClan?.forEach((clan) => {
 			const { id, user } = clan || {};
-			const userId = Array.isArray(id) ? id[0] : id;
-			const userIdStr = String(userId);
-			if (!userMap.has(userIdStr)) {
+			const userIdStr = String(id);
+			if (user && !userMap.has(userIdStr)) {
 				userMap.set(userIdStr, {
 					id: userIdStr,
-					username: user.username,
-					avatar_url: user.avatar_url
+					username: user?.username || '',
+					avatar_url: user?.avatar_url || ''
 				});
 			}
 		});
 
-		directMessages.forEach((message) => {
+		directMessages?.forEach((message) => {
 			const { user_id, usernames, channel_avatar } = message || {};
 			const userId = Array.isArray(user_id) ? user_id[0] : user_id;
 			const userIdStr = String(userId);
-			if (!userMap.has(userIdStr)) {
+			if (userIdStr && !userMap.has(userIdStr)) {
 				userMap.set(userIdStr, {
 					id: userIdStr,
-					username: usernames,
-					avatar_url: channel_avatar?.[0] ?? ''
+					username: usernames || '',
+					avatar_url: Array.isArray(channel_avatar) && channel_avatar.length > 0 ? channel_avatar[0] : ''
 				});
 			}
 		});
