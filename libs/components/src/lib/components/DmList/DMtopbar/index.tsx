@@ -20,7 +20,8 @@ import {
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { IMessageSendPayload, isMacDesktop } from '@mezon/utils';
+import { useMezon } from '@mezon/transport';
+import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -114,7 +115,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 
 	const handleStartCall = (isVideoCall = false) => {
 		if (!isInCall) {
-			handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(dmGroupId));
 			dispatch(audioCallActions.setIsBusyTone(false));

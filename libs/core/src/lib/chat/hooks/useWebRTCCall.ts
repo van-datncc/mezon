@@ -1,5 +1,6 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -52,7 +53,7 @@ const decompress = async (compressedStr: string, encoding = 'gzip' as Compressio
 	return new TextDecoder().decode(arrayBuffer);
 };
 
-export function useWebRTCCall(dmUserId: string, channelId: string, userId: string) {
+export function useWebRTCCall(dmUserId: string, channelId: string, userId: string, callerName: string, callerAvatar: string) {
 	const [callState, setCallState] = useState<CallState>({
 		localStream: null,
 		remoteStream: null,
@@ -162,26 +163,24 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	}, [mezon.socketRef, dmUserId, channelId, userId]);
 
 	// Start a call
-	const startCall = async (isVideoCall: boolean) => {
+	const startCall = async (isVideoCall: boolean, isAnswer: boolean) => {
 		try {
 			let permissionCameraGranted = false;
 			let permissionMicroGranted = false;
-			// Check camera permission
-			const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
-			if (cameraPermission.state === 'granted') {
-				permissionCameraGranted = true;
-			} else if (isVideoCall) {
-				dispatch(toastActions.addToast({ message: 'Camera is not available', type: 'warning', autoClose: 1000 }));
-			} else {
-				/* empty */
-			}
 
-			// Check microphone permission
-			const microphonePermission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-			if (microphonePermission.state === 'granted') {
-				permissionMicroGranted = true;
+			const microphoneGranted = await requestMediaPermission('audio');
+			if (microphoneGranted !== 'granted') {
+				dispatch(toastActions.addToast({ message: 'Microphone permission is required', type: 'warning', autoClose: 1000 }));
 			} else {
-				dispatch(toastActions.addToast({ message: 'Micro is not available', type: 'warning', autoClose: 1000 }));
+				permissionMicroGranted = true;
+			}
+			if (isVideoCall) {
+				const cameraGranted = await requestMediaPermission('video');
+				if (cameraGranted !== 'granted') {
+					dispatch(toastActions.addToast({ message: 'Camera permission is required', type: 'warning', autoClose: 1000 }));
+				} else {
+					permissionCameraGranted = true;
+				}
 			}
 			dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
 			dispatch(DMCallActions.setIsMuteMicrophone(false));
@@ -210,10 +209,25 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			// Send offer through signaling server
 			const compressedOffer = await compress(JSON.stringify(offer));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
-
+			if (!isAnswer) {
+				const bodyFCMMobile = {
+					offer: compressedOffer,
+					callerName,
+					callerAvatar,
+					callerId: userId,
+					channelId
+				};
+				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+			}
 			// Start a 30-second timeout to end the call if no answer
 			callTimeout.current = setTimeout(() => {
 				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));
+				dispatch(
+					DMCallActions.updateCallLog({
+						channelId,
+						content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
+					})
+				);
 				handleEndCall();
 			}, 30000);
 
