@@ -43,6 +43,7 @@ setup_permissions([
   'LocationAlways',
   'LocationWhenInUse',
   'MediaLibrary',
+  'Bluetooth',
   'Microphone',
   'Notifications',
   'PhotoLibrary',
