@@ -1,7 +1,8 @@
-import { useAuth, useMenu } from '@mezon/core';
+import { useMenu } from '@mezon/core';
 import {
 	DMCallActions,
 	audioCallActions,
+	selectAllAccount,
 	selectAudioBusyTone,
 	selectAudioDialTone,
 	selectCloseMenu,
@@ -40,7 +41,8 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const { setStatusMenu } = useMenu();
-	const { userId } = useAuth();
+	const userProfile = useSelector(selectAllAccount);
+	const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const avatarImages = currentDmGroup?.channel_avatar || [];
@@ -59,7 +61,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const otherCall = useSelector(selectOtherCall);
 
 	const { callState, startCall, handleEndCall, toggleAudio, toggleVideo, handleSignalingMessage, handleOtherCall, localVideoRef, remoteVideoRef } =
-		useWebRTCCall(dmUserId, dmGroupId as string, userId as string);
+		useWebRTCCall(
+			dmUserId,
+			dmGroupId as string,
+			userId as string,
+			userProfile?.user?.username as string,
+			userProfile?.user?.avatar_url as string
+		);
 
 	useEffect(() => {
 		if (isJoinedCall && !isInCall) {
@@ -114,15 +122,15 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			dispatch(audioCallActions.setIsDialTone(true));
 			dispatch(audioCallActions.setIsEndTone(false));
 		}
-		onStartCall({ isVideoCall });
+		onStartCall({ isVideoCall, isAnswer });
 	};
 
-	const onStartCall = async ({ isVideoCall = false }) => {
+	const onStartCall = async ({ isVideoCall = false, isAnswer = false }) => {
 		dispatch(DMCallActions.setIsInCall(true));
 		dispatch(audioCallActions.setIsRingTone(false));
 		dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
 		await sleep(1000);
-		await startCall(isVideoCall);
+		await startCall(isVideoCall, isAnswer);
 	};
 
 	const handleCloseCall = async () => {

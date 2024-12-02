@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, ReplyMessageDeleted, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, messagesActions, MessagesEntity, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -11,18 +11,18 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from '@mezon/store-mobile';
-import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
+import { ETypeLinkMedia, isValidEmojiData, TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import RenderMessageBlock from './RenderMessageBlock';
-import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
+import RenderMessageBlock from './RenderMessageBlock';
 import { IMessageActionNeedToResolve } from './types';
+import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -88,6 +88,10 @@ const MessageItem = React.memo(
 			}
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);
+
+		const isBuzzMessage = useMemo(() => {
+			return message?.code === TypeMessage.MessageBuzz;
+		}, [message?.code]);
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 		const swipeableRef = React.useRef(null);
@@ -335,6 +339,7 @@ const MessageItem = React.memo(
 										onChannelMention={onChannelMention}
 										isNumberOfLine={isNumberOfLine}
 										isMessageReply={false}
+										isBuzzMessage={isBuzzMessage}
 										mode={mode}
 										currentChannelId={channelId}
 										isOnlyContainEmoji={isOnlyContainEmoji}

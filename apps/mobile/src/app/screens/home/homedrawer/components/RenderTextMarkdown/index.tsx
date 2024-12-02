@@ -1,5 +1,5 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, size, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, Colors, baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	selectAllChannelMembers,
@@ -55,7 +55,7 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean) =>
+export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean, isBuzzMessage?: boolean) =>
 	StyleSheet.create({
 		heading1: {
 			fontWeight: 'bold',
@@ -82,7 +82,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			fontSize: verticalScale(16)
 		},
 		body: {
-			color: isUnReadChannel ? colors.white : colors.text,
+			color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
 			fontSize: isLastMessage ? size.small : size.medium
 		},
 		paragraph: {
@@ -207,6 +207,7 @@ export type IMarkdownProps = {
 	isOnlyContainEmoji?: boolean;
 	isUnReadChannel?: boolean;
 	isLastMessage?: boolean;
+	isBuzzMessage?: boolean;
 	onLongPress?: () => void;
 };
 
@@ -403,6 +404,7 @@ export const RenderTextMarkdownContent = React.memo(
 		isOnlyContainEmoji,
 		isUnReadChannel = false,
 		isLastMessage = false,
+		isBuzzMessage = false,
 		onLongPress
 	}: IMarkdownProps) => {
 		let customStyle = {};
@@ -508,7 +510,7 @@ export const RenderTextMarkdownContent = React.memo(
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				style={{
-					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}),
+					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage) as StyleSheet.NamedStyles<any>) : {}),
 					...customStyle
 				}}
 				rules={renderRulesCustom(isOnlyContainEmoji, onLongPress)}

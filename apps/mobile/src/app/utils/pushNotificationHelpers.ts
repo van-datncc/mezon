@@ -1,4 +1,5 @@
 import {
+	ActionEmitEvent,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
@@ -12,7 +13,11 @@ import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
-import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
+import { Snowflake } from '@theinternetfolks/snowflake';
+import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
+import RNCallKeep from 'react-native-callkeep';
+import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
+import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
@@ -318,7 +323,7 @@ export const setupNotificationListeners = async (navigation) => {
 		});
 	});
 
-	messaging().setBackgroundMessageHandler(async (remoteMessage) => {});
+	// messaging().setBackgroundMessageHandler(async (remoteMessage) => {});
 
 	return notifee.onForegroundEvent(({ type, detail }) => {
 		switch (type) {
@@ -332,4 +337,93 @@ export const setupNotificationListeners = async (navigation) => {
 				break;
 		}
 	});
+};
+
+export const setupCallKeep = async () => {
+	const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
+	if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return false;
+	try {
+		await RNCallKeep.setup({
+			ios: {
+				appName: 'Mezon',
+				supportsVideo: false,
+				maximumCallGroups: '1',
+				maximumCallsPerCallGroup: '1'
+			},
+			android: {
+				alertTitle: 'Permissions required',
+				alertDescription: 'Mezon needs to access your phone accounts to receive calls from mezon',
+				cancelButton: 'Cancel',
+				okButton: 'ok',
+				selfManaged: true,
+				additionalPermissions: [PERMISSIONS.ANDROID.WRITE_CALL_LOG],
+				foregroundService: {
+					channelId: 'com.mezon.mobile',
+					channelName: 'Incoming Call',
+					notificationTitle: 'Incoming Call',
+					notificationIcon: 'ic_notification'
+				}
+			}
+		});
+		return true;
+	} catch (error) {
+		console.error('initializeCallKeep error:', (error as Error)?.message);
+	}
+};
+
+const showRNNotificationCall = async (bodyData: any) => {
+	try {
+		const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
+		if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return;
+		const answerOption = {
+			channelId: 'com.mezon.mobile',
+			channelName: 'Incoming Call',
+			notificationIcon: 'ic_notification',
+			notificationTitle: 'Incoming Call',
+			notificationBody: `${bodyData?.callerName} is calling you`,
+			answerText: 'Answer',
+			declineText: 'Decline',
+			isVideo: false,
+			displayCallReachabilityTimeout: 30000,
+			notificationColor: 'colorAccent',
+			notificationSound: 'ringing',
+			payload: {
+				offer: bodyData?.offer,
+				callerId: bodyData?.callerId,
+				callerAvatar: bodyData?.callerAvatar,
+				callerName: bodyData?.callerName
+			}
+		};
+		RNNotificationCall.displayNotification(Snowflake.generate(), bodyData?.callerAvatar, 30000, answerOption);
+		RNNotificationCall.addEventListener('endCall', (data: any) => {
+			const { callUUID = '' } = data || {};
+			RNCallKeep.endCall(callUUID);
+			RNNotificationCall.declineCall(callUUID);
+		});
+		RNNotificationCall.addEventListener('answer', (data: any) => {
+			RNNotificationCall.backToApp();
+			RNNotificationCall.hideNotification();
+			const { callUUID = '', payload = {} } = data || {};
+			RNCallKeep.endCall(callUUID);
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: JSON.parse(payload || '{}') });
+			}, 5000);
+		});
+	} catch (error) {
+		/* empty */
+	}
+};
+export const setupIncomingCall = async (body: string) => {
+	try {
+		const bodyData = JSON.parse(body || '{}');
+		const statusSetup = await setupCallKeep();
+		if (!statusSetup) return;
+
+		if (Platform.OS === 'android') {
+			await showRNNotificationCall(bodyData);
+		}
+		RNCallKeep.displayIncomingCall(Snowflake.generate(), Snowflake.generate(), `${bodyData?.callerName} is calling you`, 'number', false, null);
+	} catch (error) {
+		/* empty */
+	}
 };

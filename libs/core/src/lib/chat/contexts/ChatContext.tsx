@@ -71,6 +71,7 @@ import {
 	NotificationCode,
 	TIME_OFFSET,
 	ThreadStatus,
+	TypeMessage,
 	sleep
 } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
@@ -92,6 +93,7 @@ import {
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
+	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
 	PermissionChangedEvent,
@@ -243,11 +245,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const handleBuzz = () => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
+	};
+
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
 				dispatch(DMCallActions.setCallMessageId(message?.message_id));
 			}
+			if (message.code === TypeMessage.MessageBuzz) {
+				handleBuzz();
+			}
+
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
@@ -701,6 +715,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const onmessagebuttonclicked = useCallback((event: MessageButtonClicked) => {
+		//console.error('event', event);
+	}, []);
+
 	const onerror = useCallback(
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -1081,7 +1099,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.ontokensent = ontokensent;
 
-			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
+			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
@@ -1128,7 +1146,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncoffeegiven,
 			onroleevent,
 			ontokensent,
-			//onmessagebuttonclicked,
+			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
 			ontalkpttchannel
