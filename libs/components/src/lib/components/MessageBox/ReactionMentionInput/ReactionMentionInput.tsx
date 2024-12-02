@@ -521,16 +521,26 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setTitleModalMention('Emoji matching');
 		}
 
+		const hasAttachment = attachmentData.length > 0;
+		const attachmentBlob = attachmentData.filter((attachment) => attachment.url?.startsWith('blob:http://'));
 		const { links } = processText(newPlainTextValue.trim());
 		if (!links || links.length === 0) {
-			dispatch(
-				referencesActions.replaceAttachments({
-					channelId: currentDmOrChannelId ?? '',
-					files: []
-				})
-			);
+			if (attachmentBlob) {
+				dispatch(
+					referencesActions.replaceAttachments({
+						channelId: currentDmOrChannelId ?? '',
+						files: attachmentBlob
+					})
+				);
+			} else {
+				dispatch(
+					referencesActions.replaceAttachments({
+						channelId: currentDmOrChannelId ?? '',
+						files: []
+					})
+				);
+			}
 		} else {
-			const hasAttachment = attachmentData.length > 0;
 			handleProcessTextAndLinks({
 				newPlainTextValue,
 				currentDmOrChannelId,

@@ -21,7 +21,7 @@ export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 		isListenerAttached.current = true;
 
 		const handleKeyPress = (event: KeyboardEvent) => {
-			if (event.ctrlKey && event.key === 'b') {
+			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
 				event.preventDefault();
 				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 			}

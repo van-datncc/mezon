@@ -21,7 +21,6 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	isShowMeetDM: boolean;
 	localStream: MediaStream | null;
 	isInCall: boolean;
-	peerConnection: RTCPeerConnection;
 	otherCall: IOtherCall | null;
 }
 
@@ -43,7 +42,6 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowMeetDM: false,
 	localStream: null,
 	isInCall: false,
-	peerConnection: new RTCPeerConnection(),
 	otherCall: null
 });
 
@@ -92,9 +90,6 @@ export const DMCallSlice = createSlice({
 		},
 		setIsInCall: (state, action) => {
 			state.isInCall = action.payload;
-		},
-		setPeerConnection: (state, action) => {
-			state.peerConnection = action.payload;
 		},
 		setOtherCall: (state, action: PayloadAction<IOtherCall>) => {
 			state.otherCall = action.payload;
@@ -166,7 +161,5 @@ export const selectIsShowMeetDM = createSelector(getDMCallState, (state: DMCallS
 export const selectLocalStream = createSelector(getDMCallState, (state: DMCallState) => state.localStream);
 
 export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
-
-export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);
 
 export const selectOtherCall = createSelector(getDMCallState, (state) => state.otherCall);

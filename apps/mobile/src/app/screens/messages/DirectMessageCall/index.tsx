@@ -41,7 +41,14 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const isRemoteVideo = useSelector(selectRemoteVideo);
 
 	const { callState, localMediaControl, startCall, handleEndCall, toggleSpeaker, toggleAudio, toggleVideo, handleSignalingMessage } =
-		useWebRTCCallMobile(receiverId, '' as string, userProfile?.user?.id as string, isVideoCall, directMessageId);
+		useWebRTCCallMobile({
+			dmUserId: receiverId,
+			userId: userProfile?.user?.id as string,
+			channelId: directMessageId as string,
+			isVideoCall,
+			callerName: userProfile?.user?.username,
+			callerAvatar: userProfile?.user?.avatar_url
+		});
 
 	useEffect(() => {
 		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
