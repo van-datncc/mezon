@@ -19,6 +19,7 @@ import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
+import { MessageCallLog } from './components/MessageCallLog';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import RenderMessageBlock from './RenderMessageBlock';
 import { IMessageActionNeedToResolve } from './types';
@@ -54,6 +55,10 @@ const MessageItem = React.memo(
 		const isInviteLink = useMemo(() => {
 			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		}, [contentMessage, lk]);
+
+		const isMessageCallLog = useMemo(() => {
+			return !!message?.content?.callLog;
+		}, [message?.content?.callLog]);
 
 		const isGoogleMapsLink = useMemo(() => {
 			return Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
@@ -325,6 +330,13 @@ const MessageItem = React.memo(
 										isGoogleMapsLink={isGoogleMapsLink}
 										isInviteLink={isInviteLink}
 										contentMessage={contentMessage}
+									/>
+								) : isMessageCallLog ? (
+									<MessageCallLog
+										contentMsg={message?.content?.t}
+										channelId={message?.channel_id}
+										senderId={message?.sender_id}
+										callLog={message?.content?.callLog}
 									/>
 								) : (
 									<RenderTextMarkdownContent
