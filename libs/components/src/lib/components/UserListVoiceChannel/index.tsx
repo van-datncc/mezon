@@ -1,11 +1,11 @@
-import { UsersStreamEntity, VoiceEntity } from '@mezon/store';
+import { IPttUsersEntity, UsersStreamEntity, VoiceEntity } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import UserListItem from './UserListItemVoiceChannel';
 
 export type UserListVoiceChannelProps = {
 	readonly channelID: string;
 	channelType?: number;
-	memberList: VoiceEntity[] | UsersStreamEntity[];
+	memberList: VoiceEntity[] | UsersStreamEntity[] | IPttUsersEntity[];
 };
 
 function UserListVoiceChannel({ channelID, channelType, memberList }: UserListVoiceChannelProps) {
