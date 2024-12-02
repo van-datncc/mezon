@@ -282,7 +282,8 @@ export enum IMessageTypeCallLog {
 	STARTCALL = 1,
 	TIMEOUTCALL = 2,
 	FINISHCALL = 3,
-	REJECTCALL = 4
+	REJECTCALL = 4,
+	CANCELCALL = 5
 }
 
 export interface IMessageCallLog {
