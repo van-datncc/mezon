@@ -52,7 +52,7 @@ const decompress = async (compressedStr: string, encoding = 'gzip' as Compressio
 	return new TextDecoder().decode(arrayBuffer);
 };
 
-export function useWebRTCCall(dmUserId: string, channelId: string, userId: string) {
+export function useWebRTCCall(dmUserId: string, channelId: string, userId: string, callerName: string, callerAvatar: string) {
 	const [callState, setCallState] = useState<CallState>({
 		localStream: null,
 		remoteStream: null,
@@ -162,7 +162,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	}, [mezon.socketRef, dmUserId, channelId, userId]);
 
 	// Start a call
-	const startCall = async (isVideoCall: boolean) => {
+	const startCall = async (isVideoCall: boolean, isAnswer: boolean) => {
 		try {
 			let permissionCameraGranted = false;
 			let permissionMicroGranted = false;
@@ -210,7 +210,16 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			// Send offer through signaling server
 			const compressedOffer = await compress(JSON.stringify(offer));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
-
+			if (!isAnswer) {
+				const bodyFCMMobile = {
+					offer: compressedOffer,
+					callerName,
+					callerAvatar,
+					callerId: userId,
+					channelId
+				};
+				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+			}
 			// Start a 30-second timeout to end the call if no answer
 			callTimeout.current = setTimeout(() => {
 				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));

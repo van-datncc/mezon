@@ -7,7 +7,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
@@ -49,7 +49,9 @@ type MediaControl = {
 	speaker?: boolean;
 };
 
-export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId: string, isVideoCall: boolean, directMessageId: string) {
+type IProps = { dmUserId: string; channelId: string; userId: string; isVideoCall: boolean; callerName: string; callerAvatar: string };
+
+export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, callerName, callerAvatar }: IProps) {
 	const [callState, setCallState] = useState<CallState>({
 		localStream: null,
 		remoteStream: null,
@@ -60,17 +62,24 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
+	const endCallTimeout = useRef<NodeJS.Timeout | null>(null);
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
 		mic: false,
 		camera: !!isVideoCall,
 		speaker: false
 	});
 	const dialToneRef = useRef<Sound | null>(null);
-	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId));
+	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const { userProfile } = useAuth();
 	const sessionUser = useSelector((state: RootState) => state.auth?.session);
+
+	useEffect(() => {
+		return () => {
+			endCallTimeout.current && clearTimeout(endCallTimeout.current);
+		};
+	}, []);
 
 	const handleSend = useCallback(
 		(
@@ -106,6 +115,7 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		pc.addEventListener('track', (event) => {
 			event?.streams[0]?.getVideoTracks()?.forEach((track) => {
 				track.addEventListener('mute', () => {
+					dispatch(audioCallActions.setIsRemoteVideo(true));
 					dispatch(audioCallActions.setIsRemoteVideo(false));
 				});
 				track.addEventListener('unmute', () => {
@@ -126,6 +136,8 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 
 		pc.addEventListener('iceconnectionstatechange', (event) => {
 			if (pc.iceConnectionState === 'connected') {
+				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
+				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
 				Toast.show({
 					type: 'info',
 					text1: 'Connection connected'
@@ -133,6 +145,7 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 				stopDialTone();
 			}
 			if (pc.iceConnectionState === 'checking') {
+				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
 				stopDialTone();
 			}
 			if (pc.iceConnectionState === 'disconnected') {
@@ -151,6 +164,9 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 		try {
 			if (!isAnswerCall) {
 				handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+				endCallTimeout.current = setTimeout(() => {
+					handleEndCall();
+				}, 30000);
 			}
 			InCallManager.start({ media: 'audio' });
 			playDialTone();
@@ -207,7 +223,14 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			// Send offer through signaling server
 			const compressedOffer = await compress(JSON.stringify(offer));
 			if (!isAnswerCall) {
-				await mezon.socketRef.current?.makeCallPush(dmUserId, '', channelId, userId);
+				const bodyFCMMobile = {
+					offer: compressedOffer,
+					callerName,
+					callerAvatar,
+					callerId: userId,
+					channelId
+				};
+				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 			}
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 		} catch (error) {
@@ -288,6 +311,8 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 
 	const handleEndCall = async () => {
 		try {
+			stopDialTone();
+			playEndCall();
 			if (callState.localStream) {
 				callState.localStream?.getVideoTracks().forEach((track) => {
 					track.enabled = false;
@@ -310,9 +335,6 @@ export function useWebRTCCallMobile(dmUserId: string, channelId: string, userId:
 			if (callState.peerConnection) {
 				callState.peerConnection.close();
 			}
-			stopDialTone();
-			playEndCall();
-
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });

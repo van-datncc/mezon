@@ -20,7 +20,7 @@ function QRModal({ uri, onClose, address }: QRModalProps) {
 	}
 
 	return (
-		<div className="fixed top-0 left-0 right-0 bottom-0 flex justify-center bg-black bg-opacity-10 items-center z-60">
+		<div className="fixed top-0 left-0 right-0 bottom-0 flex justify-center bg-black bg-opacity-10 items-center z-[50]">
 			<div className="bg-white rounded-[10] p-[20px] text-center max-w-[90%] w-[400px] shadow-lg flex gap-2 flex-col">
 				<div className="flex justify-end">
 					<button>
