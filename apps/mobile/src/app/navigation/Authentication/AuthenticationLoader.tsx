@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NativeModules, Platform } from 'react-native';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
+import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
@@ -126,6 +127,21 @@ export const AuthenticationLoader = () => {
 							await navigateToNotification(store, remoteMessage, navigation);
 						});
 					}
+				});
+			}
+			//Payload from FCM need messageType and sound
+			if (remoteMessage.notification.body === 'Buzz!!') {
+				Sound.setCategory('Playback');
+				const sound = new Sound('buzz.mp3', Sound.MAIN_BUNDLE, (error) => {
+					if (error) {
+						console.error('failed to load the sound', error);
+						return;
+					}
+					sound.play((success) => {
+						if (!success) {
+							console.error('Sound playback failed');
+						}
+					});
 				});
 			}
 		});
