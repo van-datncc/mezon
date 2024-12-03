@@ -81,7 +81,7 @@ class ContextMenu {
         navigator.clipboard.writeText(this.currentTarget.src);
         break;
       case 'openLink':
-        window.electron?.send('OPEN_EXTERNAL_LINK', this.currentTarget.src);
+        window.electron.shell.openExternal(this.currentTarget.src)
         break;
       case 'copyImage':
         const canvas = document.createElement('canvas');

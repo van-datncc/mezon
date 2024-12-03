@@ -170,19 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.getElementById('toggleListBtn').addEventListener('click', toggleThumbnailList);
 
   document.getElementById('minimize-window').addEventListener('click', () => {
-    console.log('minizie')
-    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MINIMIZE_WINDOW')
+    window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MINIMIZE_WINDOW')
   })
 
   document.getElementById('maximize-window').addEventListener('click', () => {
-    console.log('maximize')
-    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW')
+    window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW')
   })
 
-  console.log(document.getElementById('close-window'))
   document.getElementById('close-window').addEventListener('click', () => {
-    console.log('close')
-    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_WINDOW')
+    window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP')
   })
 
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
