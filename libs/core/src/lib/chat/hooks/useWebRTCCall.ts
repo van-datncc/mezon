@@ -320,6 +320,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					}
 					break;
 				}
+				/// case other call
+				case 5: {
+					if (callTimeout.current) {
+						clearTimeout(callTimeout.current);
+						callTimeout.current = null;
+					}
+					break;
+				}
 			}
 		} catch (error) {
 			console.error('Error handling signaling message:', error);
@@ -386,6 +394,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			dispatch(audioCallActions.setIsRemoteVideo(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
 			dispatch(audioCallActions.startDmCall({}));
+			dispatch(audioCallActions.setUserCallId(''));
 			dispatch(DMCallActions.removeAll());
 			setCallState({
 				localStream: null,

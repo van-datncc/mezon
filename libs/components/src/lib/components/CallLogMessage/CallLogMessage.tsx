@@ -124,6 +124,7 @@ export default function CallLogMessage({ userId, userName, messageId, channelId,
 			handleSend({ t: ``, callLog: { isVideo: callLog.isVideo, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: channelId, isVideo: callLog.isVideo }));
 			dispatch(audioCallActions.setGroupCallId(channelId));
+			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
 			dispatch(audioCallActions.setIsBusyTone(false));
 		} else {
 			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));

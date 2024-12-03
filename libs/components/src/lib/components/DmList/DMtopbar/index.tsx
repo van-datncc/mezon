@@ -116,6 +116,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(dmGroupId));
+			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
 			dispatch(audioCallActions.setIsBusyTone(false));
 		} else {
 			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));

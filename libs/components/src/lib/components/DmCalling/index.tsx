@@ -105,23 +105,31 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [currentDmGroup?.user_id, signalingData]);
 
 	useEffect(() => {
-		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
-			if (!timeStartConnected.current) {
-				dispatch(
-					DMCallActions.updateCallLog({
-						channelId: dmGroupId || '',
-						content: {
-							t: '',
-							callLog: { isVideo: isShowMeetDM, callLogType: IMessageTypeCallLog.REJECTCALL }
-						}
-					})
-				);
+		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;
+
+		if (callState?.peerConnection && lastSignalingData) {
+			const dataType = lastSignalingData?.data_type;
+
+			if ([4, 5].includes(dataType)) {
+				if (!timeStartConnected?.current) {
+					const callLogType = dataType === 5 ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
+
+					dispatch(
+						DMCallActions.updateCallLog({
+							channelId: dmGroupId || '',
+							content: {
+								t: '',
+								callLog: { isVideo: isShowMeetDM, callLogType }
+							}
+						})
+					);
+				}
+				handleEndCall();
 			}
-			handleEndCall();
 		}
-		if (signalingData?.[signalingData?.length - 1] && isInCall && isInChannelCalled) {
-			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-			handleSignalingMessage(data);
+
+		if (lastSignalingData && isInCall && isInChannelCalled) {
+			handleSignalingMessage(lastSignalingData);
 		}
 	}, [callState.peerConnection, isInCall, isInChannelCalled, signalingData, timeStartConnected.current]);
 
@@ -174,6 +182,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		dispatch(DMCallActions.removeAll());
 		handleMuteSound();
 		dispatch(audioCallActions.startDmCall({}));
+		dispatch(audioCallActions.setUserCallId(''));
 	};
 
 	const handleMuteSound = () => {
