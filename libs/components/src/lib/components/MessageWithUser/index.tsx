@@ -295,7 +295,7 @@ function MessageWithUser({
 														message={message}
 													/>
 												)}
-												{!isEditing && (
+												{!isEditing && !message.content?.callLog?.callLogType && (
 													<MessageContent
 														message={message}
 														isSending={message.isSending}
@@ -323,6 +323,7 @@ function MessageWithUser({
 														messageId={message.id}
 														senderId={message.sender_id}
 														callLog={message.content?.callLog}
+														contentMsg={message?.content?.t || ''}
 													/>
 												)}
 
