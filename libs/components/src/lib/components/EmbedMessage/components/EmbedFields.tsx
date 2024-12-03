@@ -1,13 +1,15 @@
-import { IFieldEmbed } from '@mezon/utils';
+import { EMessageComponentType, IFieldEmbed } from '@mezon/utils';
 import { useMemo } from 'react';
+import { MessageInput } from '../../MessageActionsPanel/components/MessageInput';
+import { MessageSelect } from '../../MessageActionsPanel/components/MessageSelect';
 import { EmbedOptionRatio } from './EmbedOptionRatio';
-
 interface EmbedFieldsProps {
 	fields: IFieldEmbed[];
 	message_id: string;
+	senderId: string;
 }
 
-export function EmbedFields({ fields, message_id }: EmbedFieldsProps) {
+export function EmbedFields({ fields, message_id, senderId }: EmbedFieldsProps) {
 	const groupedFields = useMemo(() => {
 		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
 			if (!field.inline) {
@@ -35,6 +37,25 @@ export function EmbedFields({ fields, message_id }: EmbedFieldsProps) {
 							{field.options && (
 								<div className="flex flex-col gap-1">
 									<EmbedOptionRatio key={field.value} options={field.options} message_id={message_id} />
+								</div>
+							)}
+							{field.inputs && (
+								<div className="flex flex-col gap-1">
+									{field.inputs.type === EMessageComponentType.INPUT ? (
+										<MessageInput
+											buttonId={field.inputs.id}
+											messageId={message_id}
+											senderId={senderId}
+											select={field.inputs.component}
+										/>
+									) : (
+										<MessageSelect
+											select={field.inputs.component}
+											messageId={message_id}
+											senderId={senderId}
+											buttonId={field.inputs.id}
+										/>
+									)}
 								</div>
 							)}
 						</div>

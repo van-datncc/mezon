@@ -307,7 +307,12 @@ function MessageWithUser({
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => (
-														<EmbedMessage key={index} embed={embed} message_id={message.id} />
+														<EmbedMessage
+															key={index}
+															embed={embed}
+															senderId={message.sender_id}
+															message_id={message.id}
+														/>
 													))}
 
 												{!!message.content?.callLog?.callLogType && (
