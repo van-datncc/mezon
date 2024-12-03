@@ -1,6 +1,6 @@
 import { DirectEntity, selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { createImgproxyUrl } from '@mezon/utils';
+import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Label, Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -39,6 +39,7 @@ const ModalSendToken = ({
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [tokenNumber, setTokenNumber] = useState('');
 
 	useEffect(() => {
 		if (!openModal) {
@@ -79,7 +80,10 @@ const ModalSendToken = ({
 	};
 
 	const handleChangeSendToken = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
+		const value = e.target.value.replace(/[^0-9]/g, '');
+		console.log(tokenNumber);
+
+		setTokenNumber(formatNumber(Number(value), 'vi-VN', 'VND'));
 		setToken(Number(value));
 	};
 
@@ -209,8 +213,8 @@ const ModalSendToken = ({
 							/>
 						</div>
 						<input
-							type="number"
-							defaultValue={token}
+							type="text"
+							value={tokenNumber}
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
 							placeholder="$"
 							onChange={handleChangeSendToken}

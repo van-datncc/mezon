@@ -950,3 +950,7 @@ export const requestMediaPermission = async (mediaType: 'audio' | 'video'): Prom
 		}
 	}
 };
+
+export function formatNumber(amount: number, locales: string, currency: string): string {
+    return new Intl.NumberFormat(locales, { style: 'currency', currency: currency }).format(amount);
+}
