@@ -3,7 +3,7 @@ import { ActionEmitEvent, sessionConstraints } from '@mezon/mobile-components';
 import { DMCallActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store';
 import { RootState, audioCallActions } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -56,13 +56,14 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		localStream: null,
 		remoteStream: null,
 		peerConnection: null,
-		storedIceCandidates: null
+		storedIceCandidates: null,
 	});
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
 	const endCallTimeout = useRef<NodeJS.Timeout | null>(null);
+	const timeStartConnected = useRef<any>(null);
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
 		mic: false,
 		camera: !!isVideoCall,
@@ -78,6 +79,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	useEffect(() => {
 		return () => {
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
+			endCallTimeout.current = null;
 		};
 	}, []);
 
@@ -136,6 +138,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 		pc.addEventListener('iceconnectionstatechange', (event) => {
 			if (pc.iceConnectionState === 'connected') {
+				timeStartConnected.current = new Date();
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
 				Toast.show({
@@ -163,10 +166,24 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const startCall = async (isVideoCall: boolean, isAnswerCall = false) => {
 		try {
 			if (!isAnswerCall) {
-				handleSend({ t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call` }, [], [], []);
+				handleSend(
+					{
+						t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call`,
+						callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL }
+					},
+					[],
+					[],
+					[]
+				);
 				endCallTimeout.current = setTimeout(() => {
+					dispatch(
+						DMCallActions.updateCallLog({
+							channelId,
+							content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
+						})
+					);
 					handleEndCall();
-				}, 30000);
+				}, 60000);
 			}
 			InCallManager.start({ media: 'audio' });
 			playDialTone();
@@ -338,6 +355,27 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
+			if (timeStartConnected?.current) {
+				let timeCall = '';
+				const startTime = new Date(timeStartConnected.current);
+				const endTime = new Date();
+				const diffMs = endTime.getTime() - startTime.getTime();
+				const diffMins = Math.floor(diffMs / 60000);
+				const diffSecs = Math.floor((diffMs % 60000) / 1000);
+				timeCall = `${diffMins} mins ${diffSecs} secs`;
+				await dispatch(
+					DMCallActions.updateCallLog({
+						channelId: channelId,
+						content: {
+							t: timeCall,
+							callLog: {
+								isVideo: isVideoCall,
+								callLogType: IMessageTypeCallLog.FINISHCALL
+							}
+						}
+					})
+				);
+			}
 			setCallState({
 				localStream: null,
 				remoteStream: null,
@@ -509,6 +547,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	return {
 		callState,
 		localMediaControl,
+		timeStartConnected,
 		startCall,
 		handleEndCall,
 		toggleAudio,

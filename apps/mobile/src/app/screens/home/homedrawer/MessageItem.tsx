@@ -309,6 +309,7 @@ const MessageItem = React.memo(
 						/>
 
 						<Pressable
+							disabled={isMessageCallLog}
 							style={[styles.rowMessageBox]}
 							delayLongPress={300}
 							onPressIn={handlePressIn}

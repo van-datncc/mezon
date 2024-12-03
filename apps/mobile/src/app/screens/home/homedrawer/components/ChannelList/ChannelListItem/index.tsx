@@ -49,6 +49,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 	const [isActive, setIsActive] = useState<boolean>(false);
 	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(props?.data?.clan_id || '', props?.data?.category_id || ''));
+	const isUnReadThreads = useMemo(() => {
+		if (!props?.data?.threads || !props?.data?.threads?.length) return false;
+		return props?.data?.threads?.some((thread) => {
+			return !!thread?.count_mess_unread;
+		});
+	}, [props?.data]);
 
 	const isChannelVoice = useMemo(() => {
 		return props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE || props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING;
@@ -125,8 +131,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		]
 	);
 
-	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
-
+	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive && !isUnReadThreads) return;
 	return (
 		<View>
 			{!isChannelVoice && (

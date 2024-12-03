@@ -16,7 +16,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const { formValue } = route.params;
 	const jsonObject: ApiTokenSentEvent = JSON.parse(formValue || '{}');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
-	const [tokenCount, setTokenCount] = useState('1');
+	const [tokenCount, setTokenCount] = useState(jsonObject?.amount?.toString() || '1');
 	const [note, setNote] = useState(jsonObject?.note || 'send token');
 	const userProfile = useSelector(selectAllAccount);
 
@@ -101,6 +101,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 							value={tokenCount}
 							keyboardType="numeric"
 							placeholderTextColor="#535353"
+							editable={!jsonObject?.amount}
 							onChangeText={(text) => setTokenCount(text)}
 						/>
 					</View>
@@ -115,6 +116,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 							value={note}
 							numberOfLines={5}
 							multiline={true}
+							editable={!jsonObject?.note}
 							textAlignVertical="top"
 							onChangeText={(text) => setNote(text)}
 						/>

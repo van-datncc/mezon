@@ -49,7 +49,8 @@ const style = (colors: Attributes) =>
 			paddingVertical: size.s_20,
 			alignItems: 'center',
 			justifyContent: 'center'
-		}
+		},
+		messageItem: { marginVertical: size.s_10 }
 	});
 
 export default style;
