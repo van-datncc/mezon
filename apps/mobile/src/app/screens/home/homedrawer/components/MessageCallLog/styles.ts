@@ -39,5 +39,10 @@ export const style = (colors: Attributes) =>
 			textTransform: 'uppercase',
 			textAlign: 'center',
 			fontWeight: 'bold'
-		}
+		},
+		wrapperDescription: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_4
+		},
 	});

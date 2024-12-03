@@ -1,8 +1,9 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { CallLogCancelIcon, CallLogIncomingIcon, CallLogMissedIcon, CallLogOutgoingIcon } from '@mezon/mobile-components';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount, selectDmGroupCurrent } from '@mezon/store';
 import { IMessageCallLog, IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { memo, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -45,14 +46,42 @@ export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }
 	const getTitleText = () => {
 		switch (callLogType) {
 			case IMessageTypeCallLog.TIMEOUTCALL:
-				return isMe ? t('callLog.cancel') : t('callLog.missed');
+				return isMe ? t('callLog.outGoingCall') : t('callLog.missed');
 			case IMessageTypeCallLog.REJECTCALL:
 				return isMe ? t('callLog.receiverRejected') : t('callLog.youRejected');
 			case IMessageTypeCallLog.CANCELCALL:
-				return isMe ? t('callLog.cancel') : t('callLog.youRejected');
+				return isMe ? t('callLog.cancel') : t('callLog.missed');
 			case IMessageTypeCallLog.FINISHCALL:
 			case IMessageTypeCallLog.STARTCALL:
 				return isMe ? t('callLog.outGoingCall') : t('callLog.incomingCall');
+			default:
+				return '';
+		}
+	};
+
+	const getIcon = () => {
+		switch (callLogType) {
+			case IMessageTypeCallLog.TIMEOUTCALL:
+				return isMe ? (
+					<CallLogOutgoingIcon width={size.s_17} height={size.s_17} color={themeValue.textDisabled} />
+				) : (
+					<CallLogMissedIcon width={size.s_17} height={size.s_17} color={baseColor.redStrong} />
+				);
+			case IMessageTypeCallLog.REJECTCALL:
+				return <CallLogCancelIcon width={size.s_17} height={size.s_17} color={baseColor.redStrong} />;
+			case IMessageTypeCallLog.CANCELCALL:
+				return isMe ? (
+					<CallLogCancelIcon width={size.s_17} height={size.s_17} color={baseColor.redStrong} />
+				) : (
+					<CallLogMissedIcon width={size.s_17} height={size.s_17} color={baseColor.redStrong} />
+				);
+			case IMessageTypeCallLog.FINISHCALL:
+			case IMessageTypeCallLog.STARTCALL:
+				return isMe ? (
+					<CallLogOutgoingIcon width={size.s_17} height={size.s_17} color={themeValue.textDisabled} />
+				) : (
+					<CallLogIncomingIcon width={size.s_17} height={size.s_17} color={themeValue.textDisabled} />
+				);
 			default:
 				return '';
 		}
@@ -80,7 +109,10 @@ export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }
 					</Text>
 				) : null}
 
-				<Text style={styles.description}>{getDescriptionText()}</Text>
+				<View style={styles.wrapperDescription}>
+					<View style={{ top: size.s_2 }}>{getIcon()}</View>
+					<Text style={styles.description}>{getDescriptionText()}</Text>
+				</View>
 			</View>
 
 			{shouldShowCallBackButton() && (
