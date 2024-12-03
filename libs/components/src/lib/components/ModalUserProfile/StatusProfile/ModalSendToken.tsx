@@ -11,7 +11,6 @@ import { AvatarImage } from '../../../components';
 type ModalSendTokenProps = {
 	openModal: boolean;
 	onClose?: () => void;
-	token?: number;
 	setToken: (token: number) => void;
 	handleSaveSendToken?: () => void;
 	setSelectedUserId: (id: string) => void;
@@ -23,7 +22,6 @@ type ModalSendTokenProps = {
 
 const ModalSendToken = ({
 	openModal,
-	token,
 	onClose,
 	setToken,
 	handleSaveSendToken,
@@ -81,9 +79,7 @@ const ModalSendToken = ({
 
 	const handleChangeSendToken = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/[^0-9]/g, '');
-		console.log(tokenNumber);
-
-		setTokenNumber(formatNumber(Number(value), 'vi-VN', 'VND'));
+		setTokenNumber(formatNumber(Number(value), 'vi-VN'));
 		setToken(Number(value));
 	};
 
@@ -216,7 +212,7 @@ const ModalSendToken = ({
 							type="text"
 							value={tokenNumber}
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
-							placeholder="$"
+							placeholder="VND"
 							onChange={handleChangeSendToken}
 						/>
 						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
@@ -236,7 +232,6 @@ const ModalSendToken = ({
 							placeholder="send token"
 							onChange={handleChangeNote}
 						/>
-						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 					</div>
 					<div className="flex justify-end p-4 rounded-b dark:bg-[#2B2D31] bg-[#dedede]">
 						<Button

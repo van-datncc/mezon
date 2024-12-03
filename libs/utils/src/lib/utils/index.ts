@@ -951,6 +951,11 @@ export const requestMediaPermission = async (mediaType: 'audio' | 'video'): Prom
 	}
 };
 
-export function formatNumber(amount: number, locales: string, currency: string): string {
-    return new Intl.NumberFormat(locales, { style: 'currency', currency: currency }).format(amount);
+export function formatNumber(amount: number, locales: string, currency = ''): string {
+	const formattedAmount = new Intl.NumberFormat(locales, {
+		style: currency ? 'currency' : undefined,
+		currency: currency || undefined
+	}).format(amount);
+
+	return formattedAmount;
 }
