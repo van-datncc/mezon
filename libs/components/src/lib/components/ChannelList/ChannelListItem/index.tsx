@@ -114,7 +114,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	};
 
 	const renderChannelContent = useMemo(() => {
-		if (isCategoryExpanded && channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			return (
 				<>
 					{renderChannelLink()}
