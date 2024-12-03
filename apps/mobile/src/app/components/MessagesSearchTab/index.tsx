@@ -1,19 +1,29 @@
-import { ETypeSearch, GroupedMessages } from '@mezon/mobile-components';
+import { ETypeSearch, getUpdateOrAddClanChannelCache, GroupedMessages, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, selectAllMessageSearch, selectMessageSearchByChannelId } from '@mezon/store';
-import { ISearchMessage, searchMessagesActions, selectCurrentPage, useAppDispatch } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	ChannelUsersEntity,
+	messagesActions,
+	MessagesEntity,
+	selectAllMessageSearch,
+	selectMessageSearchByChannelId
+} from '@mezon/store';
+import { getStoreAsync, ISearchMessage, searchMessagesActions, selectCurrentPage, useAppDispatch } from '@mezon/store-mobile';
 import { SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useContext, useMemo, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
 import { EmptySearchPage } from '../EmptySearchPage';
 import { SearchMessageChannelContext } from '../ThreadDetail/SearchMessageChannel';
 import style from './MessagesSearchTab.styles';
 
-const MessagesSearchTab = React.memo(({ typeSearch, currentChannelId }: { typeSearch: ETypeSearch; currentChannelId: string }) => {
+const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSearch: ETypeSearch; currentChannel?: ChannelUsersEntity }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const filtersSearch = useContext(SearchMessageChannelContext);
@@ -22,10 +32,13 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannelId }: { typeSe
 	const dispatch = useAppDispatch();
 	const [pageSearch, setPageSearch] = useState(1);
 	const currentPage = useSelector(selectCurrentPage);
+	const navigation = useNavigation<any>();
 
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannelId));
+	const isDmOrGroup = useMemo(() => {
+		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
+	}, [currentChannel]);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id));
 	const searchMessages = useSelector(selectAllMessageSearch);
-
 	const ViewLoadMore = () => {
 		return (
 			<View style={styles.loadMoreChannelMessage}>
@@ -90,10 +103,42 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannelId }: { typeSe
 		}
 	};
 
+	const handleJumpMessage = (message: MessagesEntity) => {
+		if (currentChannel?.channel_id !== message?.channel_id) {
+			handleJoinChannel(message?.clan_id, message?.channel_id);
+		}
+		if (message?.message_id && message?.channel_id) {
+			dispatch(
+				messagesActions.jumpToMessage({
+					clanId: message?.clan_id,
+					messageId: message?.message_id ?? '',
+					channelId: message?.channel_id ?? ''
+				})
+			);
+		}
+		if (isDmOrGroup) {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: message?.channel_id }
+			});
+		} else {
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+		}
+	};
+
+	const handleJoinChannel = async (clanId: string, channelId: string) => {
+		const store = await getStoreAsync();
+		requestAnimationFrame(async () => {
+			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		});
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+	};
+
 	const renderMessageItem = (message: MessagesEntity, index: number) => (
-		<Block key={`${message?.id}_${index}`} marginVertical={size.s_10}>
+		<TouchableOpacity onPress={() => handleJumpMessage(message)} key={`${message?.id}_${index}`} style={{ marginVertical: size.s_10 }}>
 			<MessageItem message={message} messageId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} preventAction />
-		</Block>
+		</TouchableOpacity>
 	);
 
 	const renderGroupItem = ({ item }) => (
