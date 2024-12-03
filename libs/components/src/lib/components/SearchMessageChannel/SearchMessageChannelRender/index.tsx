@@ -13,6 +13,7 @@ import { Pagination } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import MessageWithUser from '../../MessageWithUser';
 import EmptySearch from './EmptySearch';
 
@@ -70,17 +71,6 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 			<div className="flex flex-col w-[420px] h-full">
 				<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
 					<h3 className="select-none">{`${totalResult < 1 ? 'No Results' : `${totalResult} Results`}`}</h3>
-					<div className="flex flex-row gap-2">
-						<button className="px-1 h-8 min-w-12 text-base text-textLightTheme dark:text-textPrimary font-medium rounded bg-buttonLightTertiary dark:bg-buttonSearch hover:bg-buttonLightTertiaryHover dark:hover:bg-buttonSearchHover">
-							New
-						</button>
-						<button className="px-1 h-8 min-w-12 text-base text-textLightTheme dark:text-textPrimary font-medium rounded bg-transparent hover:bg-buttonLightTertiaryHover dark:hover:bg-buttonSearchHover">
-							Old
-						</button>
-						<button className="px-1 h-8 min-w-12 text-base text-textLightTheme dark:text-textPrimary font-medium rounded bg-transparent hover:bg-buttonLightTertiaryHover dark:hover:bg-buttonSearchHover">
-							Relevant
-						</button>
-					</div>
 				</div>
 				{groupedMessages.length > 0 ? (
 					<div
@@ -152,6 +142,7 @@ interface ISearchedItemProps {
 
 const SearchedItem = ({ searchMessage, searchChannel }: ISearchedItemProps) => {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 
 	const handleClickJump = () => {
 		if (!searchMessage) return;
@@ -159,7 +150,8 @@ const SearchedItem = ({ searchMessage, searchChannel }: ISearchedItemProps) => {
 			messagesActions.jumpToMessage({
 				clanId: searchMessage?.clan_id || '',
 				messageId: searchMessage.id,
-				channelId: searchMessage?.channel_id as string
+				channelId: searchMessage?.channel_id as string,
+				navigate
 			})
 		);
 	};

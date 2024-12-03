@@ -163,9 +163,11 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
 			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
 
+			const state = thunkAPI.getState() as RootState;
+
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
-			} else {
+			} else if (!state.messages.idMessageToJump) {
 				thunkAPI.dispatch(
 					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
 				);

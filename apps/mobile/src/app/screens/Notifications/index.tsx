@@ -6,6 +6,7 @@ import {
 	appActions,
 	channelsActions,
 	clansActions,
+	directActions,
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
@@ -16,6 +17,7 @@ import {
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
@@ -146,28 +148,39 @@ const Notifications = () => {
 		return new Promise<void>((resolve) => {
 			requestAnimationFrame(async () => {
 				const promises = [];
-				if (notify?.content?.clan_id !== currentClanId) {
-					promises.push(store.dispatch(clansActions.joinClan({ clanId: notify?.content?.clan_id })));
-					promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
-				}
+				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					promises.push(store.dispatch(directActions.fetchDirectMessage({ noCache: true })));
+					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
+				} else {
+					if (notify?.content?.clan_id !== currentClanId) {
+						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
+					}
 
-				promises.push(
-					store.dispatch(
-						channelsActions.joinChannel({
-							clanId: notify?.content?.clan_id ?? '',
-							channelId: notify?.content?.channel_id,
-							noFetchMembers: false
-						})
-					)
-				);
+					promises.push(
+						store.dispatch(
+							channelsActions.joinChannel({
+								clanId: notify?.content?.clan_id ?? '',
+								channelId: notify?.content?.channel_id,
+								noFetchMembers: false
+							})
+						)
+					);
+				}
 
 				await Promise.all(promises);
 
-				const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
-				save(STORAGE_CLAN_ID, notify?.content?.clan_id);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				navigation.navigate(APP_SCREEN.HOME as never);
-				navigation.dispatch(DrawerActions.closeDrawer());
+				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+						params: { directMessageId: notify?.content?.channel_id }
+					});
+				} else {
+					const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
+					save(STORAGE_CLAN_ID, notify?.content?.clan_id);
+					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+					navigation.navigate(APP_SCREEN.HOME as never);
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
 				timeoutRef.current = setTimeout(() => {
 					store.dispatch(
 						messagesActions.jumpToMessage({

@@ -122,7 +122,8 @@ export const AuthenticationLoader = () => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 				// Case: FCM start call
 				const title = remoteMessage?.notification?.title;
-				if (title === 'Incoming call' || (title && (title.includes('started a video call') || title.includes('started a audio call')))) {
+				const body = remoteMessage?.notification?.body;
+				if (title === 'Incoming call' || (body && (body?.includes('started a video call') || body?.includes('started a audio call')))) {
 					return;
 				}
 				Toast.show({

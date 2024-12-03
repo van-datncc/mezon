@@ -11,7 +11,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.secondaryLight
 		},
 		wrapper: {
-			padding: size.s_10,
+			padding: size.s_10
 		},
 		titleRed: {
 			color: baseColor.redStrong,
@@ -39,5 +39,10 @@ export const style = (colors: Attributes) =>
 			textTransform: 'uppercase',
 			textAlign: 'center',
 			fontWeight: 'bold'
+		},
+		wrapperDescription: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_4
 		}
 	});

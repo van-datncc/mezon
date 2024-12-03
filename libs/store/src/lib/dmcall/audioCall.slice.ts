@@ -13,6 +13,7 @@ export interface DmCallState {
 	isRemoteVideo: boolean;
 	isJoinedCall: boolean;
 	groupCallId: string;
+	userCallId: string;
 }
 
 const initialState: DmCallState = {
@@ -24,7 +25,8 @@ const initialState: DmCallState = {
 	isRemoteAudio: false,
 	isRemoteVideo: false,
 	isJoinedCall: false,
-	groupCallId: ''
+	groupCallId: '',
+	userCallId: ''
 };
 
 const audioCallSlice = createSlice({
@@ -57,6 +59,9 @@ const audioCallSlice = createSlice({
 		},
 		setGroupCallId(state, action) {
 			state.groupCallId = action.payload;
+		},
+		setUserCallId(state, action) {
+			state.userCallId = action.payload;
 		}
 	}
 });
@@ -86,3 +91,5 @@ export const selectRemoteVideo = createSelector(getAudioCallState, (state) => st
 export const selectJoinedCall = createSelector(getAudioCallState, (state) => state.isJoinedCall);
 
 export const selectGroupCallId = createSelector(getAudioCallState, (state) => state.groupCallId);
+
+export const selectUserCallId = createSelector(getAudioCallState, (state) => state.userCallId);

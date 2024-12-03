@@ -62,7 +62,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 	useEffect(() => {
 		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
-			if (!callState.isConnected) {
+			if (!timeStartConnected?.current) {
 				dispatch(
 					DMCallActions.updateCallLog({
 						channelId: directMessageId,
@@ -77,7 +77,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
 			handleSignalingMessage(data);
 		}
-	}, [callState.peerConnection, callState.isConnected, isInCall, signalingData]);
+	}, [callState.peerConnection, timeStartConnected?.current, isInCall, signalingData]);
 
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
@@ -95,30 +95,23 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		setIsShowControl(!isShowControl);
 	};
 
-	const onCancelCall = async (isConnected: boolean) => {
+	const onCancelCall = async () => {
 		try {
 			await handleEndCall();
-			let timeCall = '';
-			if (timeStartConnected?.current && isConnected) {
-				const startTime = new Date(timeStartConnected.current);
-				const endTime = new Date();
-				const diffMs = endTime.getTime() - startTime.getTime();
-				const diffMins = Math.floor(diffMs / 60000);
-				const diffSecs = Math.floor((diffMs % 60000) / 1000);
-				timeCall = `${diffMins} mins ${diffSecs} secs`;
-			}
-			await dispatch(
-				DMCallActions.updateCallLog({
-					channelId: directMessageId,
-					content: {
-						t: timeCall,
-						callLog: {
-							isVideo: isVideoCall,
-							callLogType: isConnected ? IMessageTypeCallLog.FINISHCALL : IMessageTypeCallLog.CANCELCALL
+			if (!timeStartConnected?.current) {
+				await dispatch(
+					DMCallActions.updateCallLog({
+						channelId: directMessageId,
+						content: {
+							t: '',
+							callLog: {
+								isVideo: isVideoCall,
+								callLogType: IMessageTypeCallLog.CANCELCALL
+							}
 						}
-					}
-				})
-			);
+					})
+				);
+			}
 		} catch (err) {
 			/* empty */
 		}
@@ -191,10 +184,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 								<Icons.ChatIcon />
 							</TouchableOpacity>
 
-							<TouchableOpacity
-								onPress={() => onCancelCall(callState.isConnected)}
-								style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}
-							>
+							<TouchableOpacity onPress={onCancelCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 								<Icons.PhoneCallIcon />
 							</TouchableOpacity>
 						</Block>
@@ -205,7 +195,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			<MezonConfirm
 				visible={showModalConfirm}
 				onVisibleChange={setShowModalConfirm}
-				onConfirm={handleEndCall}
+				onConfirm={onCancelCall}
 				title="End Call"
 				confirmText="Yes, End Call"
 				hasBackdrop={true}

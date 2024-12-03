@@ -3,6 +3,7 @@ import { MessageCrypt } from '../../e2ee';
 import { electronBridge } from './electron';
 export interface IMessageExtras {
 	link: string; // link for navigating
+	e2eemess: string;
 }
 
 export interface NotificationData {
@@ -102,12 +103,15 @@ export class MezonNotificationService {
 				} else {
 					const msg = JSON.parse(data.data) as NotificationData;
 					const { title, message, image } = msg ?? {};
-					const { link } = msg?.extras ?? {};
+
+					const { link, e2eemess } = msg?.extras ?? {};
 					if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
 						return;
 					}
-
-					const msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string);
+					let msgContent = message;
+					if (e2eemess === 'true') {
+						msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string, true);
+					}
 					this.pushNotification(title, msgContent, image, link);
 
 					//check app update
@@ -185,7 +189,11 @@ export class MezonNotificationService {
 			if (!link) {
 				return;
 			}
-			window.open(link);
+			const existingWindow = window.open('', '_self');
+			if (existingWindow) {
+				existingWindow.focus();
+				window.location.href = link;
+			}
 		};
 	}
 
