@@ -185,7 +185,11 @@ export class MezonNotificationService {
 			if (!link) {
 				return;
 			}
-			window.open(link);
+			const existingWindow = window.open('', '_self');
+			if (existingWindow) {
+				existingWindow.focus();
+				window.location.href = link;
+			}
 		};
 	}
 
