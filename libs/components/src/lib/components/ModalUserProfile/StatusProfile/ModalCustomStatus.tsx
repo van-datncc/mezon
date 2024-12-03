@@ -22,7 +22,8 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 	}, [dispatch, openModal]);
 
 	const handleChangeCustomStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCustomStatus(e.target.value.slice(0, 128));
+		const updatedStatus = e.target.value.slice(0, 128).replace(/\\/g, '\\\\');
+		setCustomStatus(updatedStatus);
 	};
 
 	return (
