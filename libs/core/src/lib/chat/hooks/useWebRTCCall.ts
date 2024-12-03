@@ -2,7 +2,7 @@ import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetD
 import { useMezon } from '@mezon/transport';
 import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const STUN_SERVERS = [
@@ -64,10 +64,19 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
-
+	const timeStartConnected = useRef<Date | null>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const callTimeout = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (callState.localStream) {
+				callState.localStream.getTracks().forEach((track) => track.stop());
+			}
+			timeStartConnected.current = null;
+		};
+	}, [callState.localStream]);
 
 	// Initialize peer connection with proper configuration
 	const initializePeerConnection = useCallback(() => {
@@ -122,6 +131,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 		pc.oniceconnectionstatechange = () => {
 			if (pc.iceConnectionState === 'connected') {
+				timeStartConnected.current = new Date();
 				dispatch(toastActions.addToast({ message: 'Connection connected', type: 'success', autoClose: 3000 }));
 				dispatch(audioCallActions.setIsJoinedCall(true));
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
@@ -322,6 +332,29 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	// End call and cleanup
 	const handleEndCall = async () => {
+		if (timeStartConnected?.current) {
+			let timeCall = '';
+			const startTime = new Date(timeStartConnected.current);
+			const endTime = new Date();
+			const diffMs = endTime.getTime() - startTime.getTime();
+			const diffMins = Math.floor(diffMs / 60000);
+			const diffSecs = Math.floor((diffMs % 60000) / 1000);
+			timeCall = `${diffMins} mins ${diffSecs} secs`;
+
+			dispatch(
+				DMCallActions.updateCallLog({
+					channelId: channelId,
+					content: {
+						t: timeCall,
+						callLog: {
+							isVideo: isShowMeetDM,
+							callLogType: IMessageTypeCallLog.FINISHCALL
+						}
+					}
+				})
+			);
+		}
+
 		try {
 			if (callTimeout.current) {
 				clearTimeout(callTimeout.current);
@@ -466,6 +499,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	return {
 		callState,
+		timeStartConnected,
 		startCall,
 		handleEndCall,
 		toggleAudio,

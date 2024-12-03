@@ -278,9 +278,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
-				dispatch(DMCallActions.setCallMessageId(message?.message_id));
-			}
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz();
 			}
@@ -290,6 +287,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
+				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
+					dispatch(DMCallActions.setCallMessageId(message?.message_id));
+				}
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 

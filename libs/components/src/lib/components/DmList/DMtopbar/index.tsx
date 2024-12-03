@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useAuth, useChatSending, useMenu } from '@mezon/core';
+import { useAppParams, useChatSending, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
@@ -20,7 +20,6 @@ import {
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -80,7 +79,6 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
-	const { userProfile } = useAuth();
 	const isInCall = useSelector(selectIsInCall);
 
 	const handleSend = useCallback(

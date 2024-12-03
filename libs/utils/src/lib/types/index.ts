@@ -1295,3 +1295,16 @@ export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
 export enum AttachmentTypeUpload {
 	BLOB = 'blob:'
 }
+
+export enum CallLog {
+	MISSED = 'Bạn bị nhỡ',
+	RECIPIENT_DECLINED = 'Nguời nhận từ chối',
+	YOU_DECLINED = 'Bạn đã từ chối',
+	VOICE_CALL = 'Cuộc gọi thoại',
+	VIDEO_CALL = 'Cuộc gọi video',
+	CALL_BACK = 'Gọi lại',
+	INCOMING_CALL = 'Cuộc gọi đến',
+	OUTGOING_CALL = 'Cuộc gọi đi',
+	YOU_CANCELED = 'Bạn đã hủy',
+	TIME_DEFAULT = '0 mins 0 secs'
+}

@@ -26,7 +26,7 @@ import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
-import { createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
+import { IMessageTypeCallLog, createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -60,14 +60,24 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const otherCall = useSelector(selectOtherCall);
 
-	const { callState, startCall, handleEndCall, toggleAudio, toggleVideo, handleSignalingMessage, handleOtherCall, localVideoRef, remoteVideoRef } =
-		useWebRTCCall(
-			dmUserId,
-			dmGroupId as string,
-			userId as string,
-			userProfile?.user?.username as string,
-			userProfile?.user?.avatar_url as string
-		);
+	const {
+		callState,
+		timeStartConnected,
+		startCall,
+		handleEndCall,
+		toggleAudio,
+		toggleVideo,
+		handleSignalingMessage,
+		handleOtherCall,
+		localVideoRef,
+		remoteVideoRef
+	} = useWebRTCCall(
+		dmUserId,
+		dmGroupId as string,
+		userId as string,
+		userProfile?.user?.username as string,
+		userProfile?.user?.avatar_url as string
+	);
 
 	useEffect(() => {
 		if (isJoinedCall && !isInCall) {
@@ -96,13 +106,24 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 
 	useEffect(() => {
 		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
+			if (!timeStartConnected.current) {
+				dispatch(
+					DMCallActions.updateCallLog({
+						channelId: dmGroupId || '',
+						content: {
+							t: '',
+							callLog: { isVideo: isShowMeetDM, callLogType: IMessageTypeCallLog.REJECTCALL }
+						}
+					})
+				);
+			}
 			handleEndCall();
 		}
 		if (signalingData?.[signalingData?.length - 1] && isInCall && isInChannelCalled) {
 			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
 			handleSignalingMessage(data);
 		}
-	}, [callState.peerConnection, isInCall, isInChannelCalled, signalingData]);
+	}, [callState.peerConnection, isInCall, isInChannelCalled, signalingData, timeStartConnected.current]);
 
 	useImperativeHandle(ref, () => ({
 		triggerCall
@@ -134,6 +155,20 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	};
 
 	const handleCloseCall = async () => {
+		if (!timeStartConnected.current) {
+			await dispatch(
+				DMCallActions.updateCallLog({
+					channelId: dmGroupId || '',
+					content: {
+						t: '',
+						callLog: {
+							isVideo: isShowMeetDM,
+							callLogType: IMessageTypeCallLog.CANCELCALL
+						}
+					}
+				})
+			);
+		}
 		await handleEndCall();
 		dispatch(DMCallActions.setIsInCall(false));
 		dispatch(DMCallActions.removeAll());
