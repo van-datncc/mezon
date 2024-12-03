@@ -247,7 +247,7 @@ export default class App {
 			height: 800,
 			show: true,
 			titleBarOverlay: process.platform == 'darwin',
-			// titleBarStyle: 'hidden',
+			titleBarStyle: 'hidden',
 			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
@@ -275,7 +275,7 @@ export default class App {
 		);
 
 		newWindow.webContents.on('did-finish-load', () => {
-			ipcMain.on('APP::SEND_ATTACHMENT_DATA', (event, data) => {
+			ipcMain.once('APP::SEND_ATTACHMENT_DATA', (event, data) => {
 				newWindow.webContents.send(SET_ATTACHMENT_DATA, data);
 				// newWindow.webContents.openDevTools();
 			});

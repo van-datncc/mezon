@@ -10,6 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		return new Date(dateString).toLocaleDateString();
 	}
 
+  function formatDateTime(dateString) {
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
+    return new Date(dateString).toLocaleString('vi-VN', options);
+  }
+
 	function updateImageTransform() {
 		const selectedImage = document.getElementById('selectedImage');
 		selectedImage.style.transform = `rotate(${currentRotation}deg) scale(${currentZoom})`;
@@ -30,23 +42,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		selectedImage.src = image.url;
 		userAvatar.src = image.uploaderData.avatar;
 		username.textContent = image.uploaderData.name;
-		timestamp.textContent = formatDate(image.create_time);
+		timestamp.textContent = formatDateTime(image.create_time);
 
 		currentIndex = index;
 		resetImageTransform();
 
 		// Update active thumbnail
-		const thumbnails = document.querySelectorAll('.thumbnail');
-		thumbnails.forEach((thumb, idx) => {
-			if (idx === index) {
-				thumb.classList.add('active');
-				setTimeout(() => {
-					thumb.scrollIntoView({ behavior: 'auto', block: 'center' });
-				}, 0);
-			} else {
-				thumb.classList.remove('active');
-			}
-		});
+    const thumbnailContainer = document.getElementById('thumbnails');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach((thumb, idx) => {
+      if (idx === index) {
+        thumb.classList.add('active');
+        setTimeout(() => {
+          thumb.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }, 0);
+      } else {
+        thumb.classList.remove('active');
+      }
+    });
 	}
 
 	function navigateImage(direction) {
@@ -79,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function handleAttachmentData(data) {
 		currentData = data;
-		const thumbnailContainer = document.getElementById('thumbnails');
+		const thumbnailContainer = document.getElementById('thumbnails-content');
 		thumbnailContainer.innerHTML = '';
 
 		data.channelImagesData.images.forEach((image, index) => {
@@ -153,7 +169,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	document.getElementById('toggleListBtn').addEventListener('click', toggleThumbnailList);
 
+  document.getElementById('minimize-window').addEventListener('click', () => {
+    console.log('minizie')
+    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MINIMIZE_WINDOW')
+  })
+
+  document.getElementById('maximize-window').addEventListener('click', () => {
+    console.log('maximize')
+    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW')
+  })
+
+  console.log(document.getElementById('close-window'))
+  document.getElementById('close-window').addEventListener('click', () => {
+    console.log('close')
+    // window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_WINDOW')
+  })
+
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
 		handleAttachmentData(data);
 	});
+
+  // window.addEventListener('unload', () => {
+  //   window.electron.removeListener('APP::SET_ATTACHMENT_DATA', (event, data) => {
+  //     handleAttachmentData(data);
+  //   });
+  // })
 });

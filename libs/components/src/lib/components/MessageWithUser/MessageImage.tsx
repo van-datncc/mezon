@@ -47,10 +47,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
-
+		window.electron.openNewWindow();
 		if (isElectron()) {
-			window.electron.openNewWindow();
-
 			if (((currentClanId && currentChannelId) || currentDmGroupId) && !checkListAttachment) {
 				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
@@ -69,12 +67,15 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						}
 						return { ...image, uploaderData: { ...allClanUsers[image.uploader as string] } };
 					});
-
+					
+					return imageListWithUploaderInfo
+				}).then((imageListWithUploaderInfo) => {
 					const channelImagesData = {
 						channelLabel: directId ? currentDm.channel_label : currentChannel?.channel_label,
 						images: imageListWithUploaderInfo,
-						selectedImageIndex: imageList.findIndex((image) => image.url === attachmentData.url)
+						selectedImageIndex: imageListWithUploaderInfo.findIndex((image) => image.url === attachmentData.url)
 					};
+					
 					window.electron.send('APP::SEND_ATTACHMENT_DATA', { channelImagesData });
 				});
 			}
