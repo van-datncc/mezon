@@ -148,7 +148,7 @@ export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) =
 });
 
 export const selectIsUnreadDMById = createSelector([getDirectMetaState, (state, channelId) => channelId], (state, channelId) => {
-	const channel = state.entities[channelId];
+	const channel = state?.entities?.[channelId];
 	return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 });
 
