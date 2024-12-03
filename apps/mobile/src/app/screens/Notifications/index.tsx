@@ -153,7 +153,6 @@ const Notifications = () => {
 					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
 				} else {
 					if (notify?.content?.clan_id !== currentClanId) {
-						promises.push(store.dispatch(clansActions.joinClan({ clanId: notify?.content?.clan_id })));
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
 					}
 
