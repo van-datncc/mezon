@@ -18,7 +18,7 @@ interface MessageCallLogProps {
 }
 
 export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }: MessageCallLogProps) => {
-	const { callLogType } = callLog || {};
+	const { callLogType, isVideo = false } = callLog || {};
 	const { themeValue } = useTheme();
 	const navigation = useNavigation<any>();
 	const styles = style(themeValue);
@@ -87,7 +87,7 @@ export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }
 		}
 	};
 	const getDescriptionText = () => {
-		return callLogType === IMessageTypeCallLog.FINISHCALL ? contentMsg : t('callLog.audioCall');
+		return callLogType === IMessageTypeCallLog.FINISHCALL ? contentMsg : isVideo ? t('callLog.videoCall') : t('callLog.audioCall');
 	};
 
 	const shouldShowCallBackButton = () => {
