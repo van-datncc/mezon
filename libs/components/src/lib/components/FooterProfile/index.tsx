@@ -180,7 +180,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{showModalSendToken && (
 				<ModalSendToken
 					setToken={setToken}
-					token={token || 0}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
 					onClose={handleCloseModalSendToken}
