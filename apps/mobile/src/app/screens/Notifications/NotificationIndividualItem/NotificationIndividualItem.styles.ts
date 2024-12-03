@@ -20,7 +20,8 @@ export const style = (colors: Attributes) =>
 			color: colors.textStrong,
 			fontSize: size.medium,
 			fontWeight: '400',
-			marginBottom: 5
+			marginBottom: 5,
+			flex: 1
 		},
 		notifyDuration: {
 			color: colors?.textStrong

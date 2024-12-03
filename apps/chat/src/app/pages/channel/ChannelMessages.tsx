@@ -25,6 +25,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
+import { Action } from '@reduxjs/toolkit';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
@@ -61,7 +62,6 @@ function ChannelMessages({
 	const appearanceTheme = useSelector(selectTheme);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
-	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
 	const isViewOlderMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
 	const isFetching = useSelector(selectMessageIsLoading);
@@ -231,7 +231,6 @@ function ChannelMessages({
 				chatRef={chatRef}
 				userActiveScroll={userActiveScroll}
 				appearanceTheme={appearanceTheme}
-				idMessageToJump={idMessageToJump}
 				lastMessageId={lastMessageId as string}
 				dataReferences={dataReferences}
 				idMessageNotified={idMessageNotified}
@@ -271,7 +270,6 @@ type ChatMessageListProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
 	userActiveScroll: React.MutableRefObject<boolean>;
 	appearanceTheme: string;
-	idMessageToJump: string;
 	lastMessageId: string;
 	dataReferences: ApiMessageRef;
 	idMessageNotified: string;
@@ -294,7 +292,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		chatRef,
 		userActiveScroll,
 		appearanceTheme,
-		idMessageToJump,
 		lastMessageId,
 		dataReferences,
 		idMessageNotified,
@@ -311,9 +308,11 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		currentScrollDirection
 	}) => {
 		const dispatch = useAppDispatch();
+		const idMessageToJump = useSelector(selectIdMessageToJump);
+
 		const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
-		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
+		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
 
 		const rowVirtualizer = useVirtualizer({
@@ -368,39 +367,59 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const timerRef = useRef<number | null>(null);
 		useEffect(() => {
-			const handleScrollToIndex = (messageId: string) => {
-				const index = messages.findIndex((item) => item === messageId);
+			if (!rowVirtualizer.measurementsCache.length) return;
+
+			let index = -1;
+
+			const handleScrollToIndex = () => {
 				if (index >= 0) {
 					userActiveScroll.current = true;
 					rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
 				}
 			};
 
-			if (timerRef.current) {
-				clearTimeout(timerRef.current);
-				timerRef.current = null;
-			}
-
-			if (jumpPinMessageId && isPinMessageExist) {
-				userActiveScroll.current = true;
-				handleScrollToIndex(jumpPinMessageId);
-				timerRef.current = window.setTimeout(() => {
-					dispatch(pinMessageActions.setJumpPinMessageId(null));
-				}, 1000);
-			} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
-				handleScrollToIndex(idMessageToJump);
-				timerRef.current = window.setTimeout(() => {
-					dispatch(messagesActions.setIdMessageToJump(null));
-				}, 1000);
-			}
-
-			return () => {
+			const clearTimer = () => {
 				if (timerRef.current) {
 					clearTimeout(timerRef.current);
 					timerRef.current = null;
 				}
 			};
+
+			clearTimer();
+
+			const setTimer = (action: Action) => {
+				timerRef.current = window.setTimeout(() => {
+					dispatch(action);
+				}, 1000);
+			};
+
+			if (jumpPinMessageId && isPinMessageExist) {
+				index = messages.findIndex((item) => item === jumpPinMessageId);
+				handleScrollToIndex();
+				setTimer(pinMessageActions.setJumpPinMessageId(null));
+			} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
+				index = messages.findIndex((item) => item === idMessageToJump?.id);
+				if (idMessageToJump?.navigate) {
+					setTimeout(() => {
+						handleScrollToIndex();
+						setTimer(messagesActions.setIdMessageToJump(null));
+					});
+				} else {
+					handleScrollToIndex();
+					setTimer(messagesActions.setIdMessageToJump(null));
+				}
+			}
+
+			return clearTimer;
 		}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages, rowVirtualizer]);
+
+		// RESET COMPONENT UNMOUNT
+		useEffect(() => {
+			return () => {
+				messagesActions.setIdMessageToJump(null);
+				pinMessageActions.setJumpPinMessageId(null);
+			};
+		}, []);
 
 		return (
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
@@ -444,7 +463,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						>
 							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 								const messageId = messages[virtualRow.index];
-								const checkMessageTargetToMoved = idMessageToJump === messageId && messageId !== lastMessageId;
+								const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
 								const messageReplyHighlight =
 									(dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
 								return (
@@ -478,7 +497,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 	(prev, curr) => {
 		return (
 			prev.messages === curr.messages &&
-			prev.idMessageToJump === curr.idMessageToJump &&
 			prev.lastMessageId === curr.lastMessageId &&
 			prev.dataReferences === curr.dataReferences &&
 			prev.idMessageNotified === curr.idMessageNotified &&

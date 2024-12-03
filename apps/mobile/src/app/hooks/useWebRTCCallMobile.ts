@@ -33,7 +33,6 @@ interface CallState {
 	remoteStream: MediaStream | null;
 	peerConnection: RTCPeerConnection | null;
 	storedIceCandidates?: RTCIceCandidate[] | null;
-	isConnected?: boolean;
 }
 
 const compress = async (str: string) => {
@@ -58,7 +57,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		remoteStream: null,
 		peerConnection: null,
 		storedIceCandidates: null,
-		isConnected: false
 	});
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
@@ -141,10 +139,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		pc.addEventListener('iceconnectionstatechange', (event) => {
 			if (pc.iceConnectionState === 'connected') {
 				timeStartConnected.current = new Date();
-				setCallState((prev) => ({
-					...prev,
-					isConnected: true
-				}));
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
 				Toast.show({
@@ -361,6 +355,27 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
+			if (timeStartConnected?.current) {
+				let timeCall = '';
+				const startTime = new Date(timeStartConnected.current);
+				const endTime = new Date();
+				const diffMs = endTime.getTime() - startTime.getTime();
+				const diffMins = Math.floor(diffMs / 60000);
+				const diffSecs = Math.floor((diffMs % 60000) / 1000);
+				timeCall = `${diffMins} mins ${diffSecs} secs`;
+				await dispatch(
+					DMCallActions.updateCallLog({
+						channelId: channelId,
+						content: {
+							t: timeCall,
+							callLog: {
+								isVideo: isVideoCall,
+								callLogType: IMessageTypeCallLog.FINISHCALL
+							}
+						}
+					})
+				);
+			}
 			setCallState({
 				localStream: null,
 				remoteStream: null,

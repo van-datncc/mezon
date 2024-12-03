@@ -240,16 +240,19 @@ export const directSlice = createSlice({
 	reducers: {
 		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
-		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent>>) => {
+		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
-			const existingDirect = state.entities[action.payload?.channel_id];
-			if (existingDirect && existingDirect.e2ee !== action.payload.e2ee) {
-				toast.info(existingDirect.usernames + (action.payload.e2ee === 1 ? ' enabled E2EE' : ' disabled E2EE'), {
+			const { creator_id, channel_id, e2ee } = action.payload;
+			const notCurrentUser = action.payload?.currentUserId !== creator_id;
+			const existingDirect = state.entities[channel_id];
+			const showE2EEToast = existingDirect && existingDirect.e2ee !== e2ee && notCurrentUser;
+			if (showE2EEToast) {
+				toast.info(existingDirect.usernames + (e2ee === 1 ? ' enabled E2EE' : ' disabled E2EE'), {
 					closeButton: true
 				});
 			}
 			directAdapter.updateOne(state, {
-				id: action.payload.channel_id,
+				id: channel_id,
 				changes: {
 					...action.payload
 				}

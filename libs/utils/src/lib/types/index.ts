@@ -1295,3 +1295,16 @@ export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
 export enum AttachmentTypeUpload {
 	BLOB = 'blob:'
 }
+
+export enum CallLog {
+	MISSED = 'You Missed',
+	RECIPIENT_DECLINED = 'Receiver Rejected',
+	YOU_DECLINED = 'You Rejected',
+	VOICE_CALL = 'Audio call',
+	VIDEO_CALL = 'Video call',
+	CALL_BACK = 'Call back',
+	INCOMING_CALL = 'Incoming call',
+	OUTGOING_CALL = 'Outgoing call',
+	YOU_CANCELED = 'You canceled',
+	TIME_DEFAULT = '0 mins 0 secs'
+}
