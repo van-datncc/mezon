@@ -71,6 +71,10 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	};
 };
 
+type BuzzArgs = {
+	channelId?: string;
+	isReset?: boolean;
+};
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
@@ -87,6 +91,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
 	favoriteChannels: string[];
+	buzzState: Record<string, BuzzArgs>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -547,7 +552,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	previousChannels: [],
 	appChannelsList: {},
 	fetchChannelSuccess: false,
-	favoriteChannels: []
+	favoriteChannels: [],
+	buzzState: {}
 });
 
 export const channelsSlice = createSlice({
@@ -684,6 +690,25 @@ export const channelsSlice = createSlice({
 							count_mess_unread: newCountMessUnread
 						}
 					});
+				}
+			}
+		},
+		setBuzzState: (state, action: PayloadAction<BuzzArgs>) => {
+			const { channelId, isReset } = action.payload;
+
+			if (channelId) {
+				if (state.buzzState[channelId]) {
+					state.buzzState[channelId] = { ...state.buzzState[channelId], ...action.payload };
+				} else {
+					state.buzzState[channelId] = action.payload;
+				}
+			} else if (isReset) {
+				state.buzzState = {};
+			}
+
+			for (const key in state.buzzState) {
+				if (state.buzzState[key].isReset === false) {
+					delete state.buzzState[key];
 				}
 			}
 		}
@@ -981,3 +1006,10 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 	});
 	return channelThread as ChannelThreads[];
 });
+
+export const selectBuzzStateByChannelId = createSelector(
+	[(state: RootState, channelId: string) => state.channels.buzzState, (state: RootState, channelId: string) => channelId],
+	(buzzState, channelId) => {
+		return buzzState.channelId === channelId ? buzzState : null;
+	}
+);

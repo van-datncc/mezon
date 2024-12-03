@@ -6,11 +6,13 @@ import {
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
+	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
+	useAppSelector,
 	videoStreamActions,
 	voiceActions
 } from '@mezon/store';
@@ -18,9 +20,9 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
 import SettingChannel from '../ChannelSetting';
@@ -75,6 +77,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		});
 		const theme = useSelector(selectTheme);
 
+		const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
 		const handleOpenCreate = () => {
 			openSettingModal();
 			closeProfileItem();
@@ -269,6 +272,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 									: channel?.channel_label}
 							</p>
 						</span>
+						{buzzState?.isReset && <CountdownBuzz channelId={channel?.channel_id as string} />}
 					</Link>
 				)}
 
@@ -344,3 +348,38 @@ const ModalConfirmComponent: React.FC<ModalConfirmComponentProps> = ({ handleCan
 
 	return <ModalConfirm handleCancel={handleCancel} handleConfirm={handleDeleteChannel} title="delete" modalName={modalName} />;
 };
+
+type CountdownBuzzProps = {
+	channelId: string;
+};
+
+const CountdownBuzz = ({ channelId }: CountdownBuzzProps) => {
+	const [timeLeft, setTimeLeft] = useState(10);
+	const [isReset, setIsReset] = useState(true);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		if (isReset && timeLeft > 0) {
+			const timer = setInterval(() => {
+				setTimeLeft((prevTime) => prevTime - 1);
+			}, 1000);
+
+			return () => clearInterval(timer);
+		} else if (timeLeft === 0) {
+			setIsReset(false);
+			dispatch(channelsActions.setBuzzState({ channelId, isReset: false }));
+		}
+	}, [isReset, timeLeft, channelId, dispatch]);
+
+	return (
+		<div>
+			{isReset && (
+				<div className="bg-red-500  text-xs absolute top-1.5 right-9 text-white rounded-sm p-0.5 text-center font-medium ">
+					Buzz!! - {timeLeft}
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default CountdownBuzz;

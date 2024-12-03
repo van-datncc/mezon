@@ -268,12 +268,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const handleBuzz = () => {
+	const handleBuzz = (channelId: string) => {
 		const audio = new Audio('assets/audio/buzz.mp3');
-
 		audio.play().catch((error) => {
 			console.error('Failed to play buzz sound:', error);
 		});
+		dispatch(channelsActions.setBuzzState({ channelId: channelId, isReset: true }));
 	};
 
 	const onchannelmessage = useCallback(
@@ -282,7 +282,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(DMCallActions.setCallMessageId(message?.message_id));
 			}
 			if (message.code === TypeMessage.MessageBuzz) {
-				handleBuzz();
+				handleBuzz(message.channel_id);
 			}
 
 			try {
