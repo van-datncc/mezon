@@ -23,6 +23,7 @@ import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
 export const checkNotificationPermission = async () => {
+	await notifee.requestPermission();
 	if (Platform.OS === 'android' && Platform.Version >= 33) {
 		const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {

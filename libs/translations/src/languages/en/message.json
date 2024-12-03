@@ -88,5 +88,16 @@
       "send": "Send",
       "cancel": "Cancel",
       "coordinate": "Coordinate"
+    },
+    "callLog": {
+        "cancel": "You canceled",
+        "missed": "You Missed",
+        "receiverRejected": "Receiver Rejected",
+        "youRejected": "You Rejected",
+        "audioCall": "Audio call",
+        "videoCall": "Video call",
+        "callBack": "Call back",
+        "incomingCall": "Incoming call",
+        "outGoingCall": "Outgoing call"
     }
 }

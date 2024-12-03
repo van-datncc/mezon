@@ -61,7 +61,6 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowMeetDM: false,
 	localStream: null,
 	isInCall: false,
-	peerConnection: new RTCPeerConnection(),
 	otherCall: null,
 	callMessageId: ''
 });

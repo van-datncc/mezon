@@ -14,7 +14,6 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
-import com.mezon.mobile.WakeLockPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -24,9 +23,9 @@ class MainApplication : Application(), ReactApplication {
           return CodePush.getJSBundleFile()
         }
         override fun getPackages(): List<ReactPackage> {
-         val packages = PackageList(this).packages.toMutableList()
-         packages.add(WakeLockPackage())
-          return packages
+          // Packages that cannot be autolinked yet can be added manually here, for example:
+          // packages.add(new MyReactNativePackage());
+          return PackageList(this).packages
         }
 
         override fun getJSMainModuleName(): String = "src/main"

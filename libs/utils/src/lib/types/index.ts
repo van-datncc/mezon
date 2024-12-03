@@ -36,6 +36,7 @@ import {
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import { ApiNotifiReactMessage, ApiNotificationChannelCategorySetting, ApiPermissionRoleChannel } from 'mezon-js/dist/api.gen';
+import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
@@ -240,6 +241,7 @@ export interface IFieldEmbed {
 	value: string;
 	inline?: boolean;
 	options?: IMessageRatioOption[];
+	inputs?: SelectComponent | InputComponent;
 }
 
 export enum EButtonMessageStyle {
@@ -278,11 +280,21 @@ export interface IMessageRatioOption {
 	style?: EButtonMessageStyle;
 }
 
+export interface IMessageInput {
+	id: string;
+	placeholder?: string;
+	type?: HTMLInputTypeAttribute;
+	required?: boolean;
+	textarea?: boolean;
+	style?: EButtonMessageStyle;
+}
+
 export enum IMessageTypeCallLog {
 	STARTCALL = 1,
 	TIMEOUTCALL = 2,
 	FINISHCALL = 3,
-	REJECTCALL = 4
+	REJECTCALL = 4,
+	CANCELCALL = 5
 }
 
 export interface IMessageCallLog {
@@ -308,11 +320,6 @@ export interface IMessageSelect {
 	// Maximum number of items that can be chosen (defaults to 1)
 	max_options?: number;
 	disabled?: boolean;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IMessageInput {
-	// some input specific properties
 }
 
 export interface IMessageComponent<T> {
