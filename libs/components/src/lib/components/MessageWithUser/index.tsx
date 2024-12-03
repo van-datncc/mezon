@@ -1,4 +1,4 @@
-import { useAuth, useChatSending, useCurrentInbox } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
@@ -80,12 +80,6 @@ function MessageWithUser({
 	const modalState = useRef({
 		profileItem: false
 	});
-
-	const currentDirectOrChannel = useCurrentInbox();
-
-	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel!, mode });
-
-	// Computed values
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 

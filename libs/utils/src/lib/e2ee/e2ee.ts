@@ -1,4 +1,5 @@
 import { ApiPubKey } from 'mezon-js/api.gen';
+import { IMessageWithUser } from '../types';
 import { KeyStore, KeyStoreError } from './keystore';
 import { arrayBufferEqual, concatArrayBuffers, eqSet } from './utils';
 
@@ -528,7 +529,6 @@ export class MessageCrypt {
 
 	static async decryptMessage(encryptedString: string, userID: string): Promise<string> {
 		const keyStore = await KeyStore.open();
-
 		try {
 			const ecdhKey = await keyStore.loadKey('ecdh_' + userID);
 			const ecdsaKey = await keyStore.loadKey('ecdsa_' + userID);
@@ -540,7 +540,6 @@ export class MessageCrypt {
 			return new TextDecoder().decode(decryptedBuffer);
 		} finally {
 			await keyStore.close();
-			// check close
 		}
 	}
 
@@ -554,5 +553,56 @@ export class MessageCrypt {
 			}
 		}
 		return content;
+	}
+
+	static async decryptMessageWithKeyStore(encryptedString: string, userID: string, keyStore: KeyStore): Promise<string> {
+		let content = '';
+		try {
+			const ecdhKey = await keyStore.loadKey('ecdh_' + userID);
+			const ecdsaKey = await keyStore.loadKey('ecdsa_' + userID);
+			const privateKeyMaterial = new PrivateKeyMaterial(ecdhKey, ecdsaKey);
+			const publicKeyMaterial = privateKeyMaterial.pubKey();
+			const encryptedJson = JSON.parse(atob(encryptedString));
+			const encryptedMessage = await EncryptedP2PMessage.fromJsonable(encryptedJson);
+			const decryptedBuffer = await encryptedMessage.verifyAndDecrypt(publicKeyMaterial, privateKeyMaterial);
+			content = new TextDecoder().decode(decryptedBuffer);
+		} catch {
+			content = '🔒';
+		}
+		return content;
+	}
+
+	static async processBatch(messages: IMessageWithUser[], userId: string, keyStore: KeyStore): Promise<IMessageWithUser[]> {
+		return Promise.all(
+			messages.map(async (item) => {
+				if (item.content?.e2ee && item.content?.t) {
+					const decryptedContent = await MessageCrypt.decryptMessageWithKeyStore(item.content.t, userId, keyStore);
+					return {
+						...item,
+						content: {
+							...(item.content as object),
+							t: decryptedContent
+						}
+					} as IMessageWithUser;
+				}
+				return item;
+			})
+		);
+	}
+
+	static async decryptMessages(messages: IMessageWithUser[], userId: string): Promise<IMessageWithUser[]> {
+		const keyStore = await KeyStore.open();
+		try {
+			const batchSize = 10;
+			const results: IMessageWithUser[] = [];
+			for (let i = 0; i < messages.length; i += batchSize) {
+				const batch = messages.slice(i, i + batchSize);
+				const processedBatch = await MessageCrypt.processBatch(batch, userId, keyStore);
+				results.push(...processedBatch);
+			}
+			return results;
+		} finally {
+			await keyStore.close();
+		}
 	}
 }

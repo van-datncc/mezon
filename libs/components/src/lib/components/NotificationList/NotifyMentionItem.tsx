@@ -3,6 +3,7 @@ import { messagesActions, useAppDispatch } from '@mezon/store';
 import { IMentionOnMessage, IMessageWithUser, INotification, addMention, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
@@ -35,6 +36,7 @@ function convertContentToObject(notify: any) {
 	return notify;
 }
 function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
+	const navigate = useNavigate();
 	const parseNotify = convertContentToObject(notify);
 	const dispatch = useAppDispatch();
 	const messageId = useMemo(() => {
@@ -60,7 +62,9 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 			messagesActions.jumpToMessage({
 				clanId: clanId || '',
 				messageId: messageId,
-				channelId: channelId
+				channelId: channelId,
+				mode: parseNotify?.content?.mode - 1,
+				navigate
 			})
 		);
 	}, [dispatch, messageId, notify.id]);

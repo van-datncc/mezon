@@ -842,7 +842,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (channelUpdated.clan_id === '0') {
-				return dispatch(directActions.updateOne(channelUpdated));
+				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
 
 			if (channelUpdated) {
