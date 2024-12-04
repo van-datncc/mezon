@@ -56,7 +56,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		localStream: null,
 		remoteStream: null,
 		peerConnection: null,
-		storedIceCandidates: null,
+		storedIceCandidates: null
 	});
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
@@ -76,12 +76,35 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const { userProfile } = useAuth();
 	const sessionUser = useSelector((state: RootState) => state.auth?.session);
 
+	const stopAllTracks = useCallback(() => {
+		if (callState.localStream) {
+			callState.localStream?.getVideoTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			callState.localStream?.getAudioTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			callState.localStream.getTracks().forEach((track) => track.stop());
+		}
+		if (callState.remoteStream) {
+			callState.remoteStream?.getVideoTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			callState.remoteStream?.getAudioTracks().forEach((track) => {
+				track.enabled = false;
+			});
+			callState.remoteStream.getTracks().forEach((track) => track.stop());
+		}
+	}, [callState.localStream, callState.remoteStream]);
+
 	useEffect(() => {
 		return () => {
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
 			endCallTimeout.current = null;
+			timeStartConnected.current = null;
+			stopAllTracks();
 		};
-	}, []);
+	}, [stopAllTracks]);
 
 	const handleSend = useCallback(
 		(
@@ -201,6 +224,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					mic: true
 				}));
 			}
+			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
 			let haveCameraPermission;
 			if (isVideoCall) {
 				haveCameraPermission = await requestCameraPermission();
@@ -220,7 +244,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				audio: true,
 				video: isVideoCall && haveCameraPermission
 			});
-
 			const pc = initializePeerConnection();
 
 			// Add tracks to peer connection
@@ -330,30 +353,14 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		try {
 			stopDialTone();
 			playEndCall();
-			if (callState.localStream) {
-				callState.localStream?.getVideoTracks().forEach((track) => {
-					track.enabled = false;
-				});
-				callState.localStream?.getAudioTracks().forEach((track) => {
-					track.enabled = false;
-				});
-				callState.localStream.getTracks().forEach((track) => track.stop());
-			}
-			if (callState.remoteStream) {
-				callState.remoteStream?.getVideoTracks().forEach((track) => {
-					track.enabled = false;
-				});
-				callState.remoteStream?.getAudioTracks().forEach((track) => {
-					track.enabled = false;
-				});
-				callState.remoteStream.getTracks().forEach((track) => track.stop());
-			}
+			stopAllTracks();
 
 			if (callState.peerConnection) {
 				callState.peerConnection.close();
 			}
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
+			dispatch(audioCallActions.setUserCallId(''));
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
 			if (timeStartConnected?.current) {
 				let timeCall = '';

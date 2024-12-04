@@ -416,6 +416,23 @@ const showRNNotificationCall = async (bodyData: any) => {
 		/* empty */
 	}
 };
+
+const listRNCallKeep = async (bodyData: any) => {
+	try {
+		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+			RNCallKeep.backToForeground();
+			RNCallKeep.endCall(callUUID);
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
+			}, 5000);
+			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+				RNCallKeep.endCall(callUUID);
+			});
+		});
+	} catch (error) {
+		/* empty */
+	}
+};
 export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = JSON.parse(body || '{}');
@@ -424,6 +441,8 @@ export const setupIncomingCall = async (body: string) => {
 
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData);
+		} else {
+			await listRNCallKeep(bodyData);
 		}
 		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {

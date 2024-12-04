@@ -69,7 +69,7 @@ const CallingModal = () => {
 
 	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && latestSignalingEntry?.signalingData?.data_type !== 4) {
+		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && ![4, 5]?.includes(latestSignalingEntry?.signalingData?.data_type)) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 
@@ -88,7 +88,7 @@ const CallingModal = () => {
 				ringtoneRef.current = sound;
 				playVibration();
 			});
-		} else if (latestSignalingEntry?.signalingData?.data_type === 4 || latestSignalingEntry?.signalingData?.data_type === 0 || isInCall) {
+		} else if ([0, 4, 5]?.includes?.(latestSignalingEntry?.signalingData?.data_type) || isInCall) {
 			setIsVisible(false);
 			stopAndReleaseSound();
 			Vibration.cancel();
