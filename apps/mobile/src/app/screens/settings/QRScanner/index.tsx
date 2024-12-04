@@ -2,6 +2,7 @@ import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, size } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { getStoreAsync } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
