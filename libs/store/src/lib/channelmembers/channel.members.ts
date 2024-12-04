@@ -409,7 +409,11 @@ export const selectMemberCustomStatusById = createSelector(
 		if (index === -1) {
 			return false;
 		}
-		return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+		try {
+			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+		} catch (e) {
+			return '';
+		}
 	}
 );
 
