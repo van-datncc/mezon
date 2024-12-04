@@ -139,28 +139,34 @@ const SettingRightUser = ({
 	const appearanceTheme = useSelector(selectTheme);
 
 	const handleChangeLogo = (e: ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files) {
-			const session = sessionRef.current;
-			const client = clientRef.current;
-
-			if (!client || !session) {
-				throw new Error('Client or file is not initialized');
-			}
-			handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', e.target.files[0].name || '', e.target.files[0]).then(
-				(attachment) => {
-					dispatch(
-						clansActions.updateUser({
-							user_name: name,
-							avatar_url: urlImage,
-							display_name: valueDisplayName,
-							about_me: editAboutUser,
-							dob: dob,
-							logo: attachment.url
-						})
-					);
-				}
-			);
+		if (!e.target.files || e.target.files.length === 0) {
+			return;
 		}
+		const allowedTypes = fileTypeImage;
+		if (!allowedTypes.includes(e.target.files[0].type)) {
+			return;
+		}
+		const session = sessionRef.current;
+		const client = clientRef.current;
+
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+
+		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', e.target.files[0].name || '', e.target.files[0]).then(
+			(attachment) => {
+				dispatch(
+					clansActions.updateUser({
+						user_name: name,
+						avatar_url: urlImage,
+						display_name: valueDisplayName,
+						about_me: editAboutUser,
+						dob: dob,
+						logo: attachment.url
+					})
+				);
+			}
+		);
 	};
 
 	return (
