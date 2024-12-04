@@ -410,7 +410,7 @@ export const selectMemberCustomStatusById = createSelector(
 			return false;
 		}
 		try {
-			return safeJSONParse(userGroup?.metadata?.[index] || '{}')?.status || '';
+			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
 		} catch (e) {
 			const unescapedJSON = userGroup?.metadata?.[index].replace(/\\./g, (match) => {
 				switch (match) {
