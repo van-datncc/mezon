@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import {
 	ApiChannelMessageHeaderWithChannel,
+	BuzzArgs,
 	ChannelThreads,
 	checkIsThread,
 	ICategory,
@@ -87,6 +88,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
 	favoriteChannels: string[];
+	buzzState: Record<string, BuzzArgs | null>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -547,7 +549,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	previousChannels: [],
 	appChannelsList: {},
 	fetchChannelSuccess: false,
-	favoriteChannels: []
+	favoriteChannels: [],
+	buzzState: {}
 });
 
 export const channelsSlice = createSlice({
@@ -686,6 +689,10 @@ export const channelsSlice = createSlice({
 					});
 				}
 			}
+		},
+
+		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
+			state.buzzState[action.payload.channelId] = action.payload.buzzState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -981,3 +988,8 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 	});
 	return channelThread as ChannelThreads[];
 });
+
+export const selectBuzzStateByChannelId = createSelector(
+	[getChannelsState, (state, channelId: string) => channelId],
+	(state, channelId) => state.buzzState?.[channelId]
+);

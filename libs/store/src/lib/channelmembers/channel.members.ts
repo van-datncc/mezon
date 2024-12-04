@@ -410,9 +410,18 @@ export const selectMemberCustomStatusById = createSelector(
 			return false;
 		}
 		try {
-			return safeJSONParse(userGroup?.metadata?.[index] || '{}')?.status || '';
+			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
 		} catch (e) {
-			return '';
+			const unescapedJSON = userGroup?.metadata?.[index].replace(/\\./g, (match) => {
+				switch (match) {
+					case '\\"':
+						return '"';
+					// Add more escape sequences as needed
+					default:
+						return match[1]; // Remove the backslash
+				}
+			});
+			return safeJSONParse(unescapedJSON || '{}')?.status;
 		}
 	}
 );
