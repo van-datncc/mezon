@@ -11,6 +11,8 @@ import { AvatarImage } from '../../../components';
 type ModalSendTokenProps = {
 	openModal: boolean;
 	onClose?: () => void;
+	token: number;
+	selectedUserId: string;
 	setToken: (token: number) => void;
 	handleSaveSendToken?: () => void;
 	setSelectedUserId: (id: string) => void;
@@ -22,6 +24,8 @@ type ModalSendTokenProps = {
 
 const ModalSendToken = ({
 	openModal,
+	token,
+	selectedUserId,
 	onClose,
 	setToken,
 	handleSaveSendToken,
@@ -38,6 +42,7 @@ const ModalSendToken = ({
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [tokenNumber, setTokenNumber] = useState('');
+	const [userIds, setUserId] = useState('');
 
 	useEffect(() => {
 		if (!openModal) {
@@ -125,6 +130,17 @@ const ModalSendToken = ({
 		estimateSize: () => 48,
 		overscan: 5
 	});
+	console.log(selectedUserId);
+
+	useEffect(() => {
+		setTokenNumber(formatNumber(Number(token), 'vi-VN'));
+		const user = filteredUsers.find((user) => user.id === selectedUserId);
+		console.log(filteredUsers, 'filteredUsers');
+		console.log(selectedUserId, 'selectedUserId');
+		console.log(user, 'user');
+
+		handleSelectUser(userIds, 'filteredUsers.find((user) => user.id === selectedUserId).username');
+	}, [token, selectedUserId]);
 
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>

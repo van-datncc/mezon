@@ -17,7 +17,7 @@ import { Icons } from '@mezon/ui';
 import { MemberProfileType, useLongPress } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MicButton } from '../ChannelTopbar/TopBarComponents/PushToTalkButton/MicIcon';
 import { MemberProfile } from '../MemberProfile';
@@ -91,6 +91,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const handleSaveSendToken = () => {
+		console.log(selectedUserId, 'save token');
 		if (!selectedUserId) {
 			setUserSearchError('Please select a user');
 			return;
@@ -115,6 +116,25 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
 		handleCloseModalSendToken();
 	};
+	const loadParamsFromURL = () => {
+		const params = new URLSearchParams(window.location.search);
+		const tokenParam = params.get('token');
+		const selectedUserIdParam = params.get('selectedUserId');
+		const noteParam = params.get('note');
+
+		if (tokenParam) setToken(Number(tokenParam));
+		if (selectedUserIdParam) setSelectedUserId(selectedUserIdParam);
+		if (noteParam) setNote(noteParam);
+
+		if (tokenParam || selectedUserIdParam || noteParam) {
+			dispatch(giveCoffeeActions.setShowModalSendToken(true));
+		}
+	};
+
+	useEffect(() => {
+		loadParamsFromURL();
+	}, []);
+
 	const rootRef = useRef<HTMLButtonElement>(null);
 
 	return (
@@ -177,9 +197,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					onClose={handleCloseModalCustomStatus}
 				/>
 			)}
+			<a href={`${window.location.origin}${window.location.pathname}?token=1000000&selectedUserId=1840651459012595712&note=aaaaaaaaaaaaaaaaa`}>
+				Open Send Token Modal
+			</a>
 			{showModalSendToken && (
 				<ModalSendToken
 					setToken={setToken}
+					token={token}
+					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
 					onClose={handleCloseModalSendToken}
