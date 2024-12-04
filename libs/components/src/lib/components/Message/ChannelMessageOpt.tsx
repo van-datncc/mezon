@@ -319,7 +319,7 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 	}, [dispatch, message, messageId]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId === message.sender_id, (builder) => {
+		builder.when(userId === message.sender_id && !message?.content?.callLog?.callLogType, (builder) => {
 			builder.addMenuItem(
 				'edit',
 				'edit',

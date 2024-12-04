@@ -107,7 +107,10 @@ export interface MessagesState {
 	lastMessageByChannel: Record<string, ApiChannelMessageHeaderWithChannel>;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
 	isFocused: boolean;
-	idMessageToJump: string;
+	idMessageToJump?: {
+		id: string;
+		navigate?: boolean;
+	} | null;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
 	isJumpingToPresent: Record<string, boolean>;
 	channelMessages: Record<
@@ -157,8 +160,9 @@ export const mapMessageChannelToEntityAction = createAsyncThunk(
 		const checkEnableE2EE = checkE2EE(message.clan_id as string, message.channel_id, thunkAPI);
 		const currentUser = selectAllAccount(thunkAPI.getState() as RootState);
 		const mapMessage = mapMessageChannelToEntity(message);
+
 		if (checkEnableE2EE && mapMessage.content?.t) {
-			return {
+			const data = {
 				...mapMessage,
 				content: {
 					...(mapMessage.content as object),
@@ -166,6 +170,8 @@ export const mapMessageChannelToEntityAction = createAsyncThunk(
 					e2ee: 1
 				}
 			} as IMessageWithUser;
+
+			return data;
 		}
 		return mapMessage;
 	}
@@ -274,20 +280,7 @@ export const fetchMessages = createAsyncThunk(
 			});
 
 			if (clanId === '0' || !clanId) {
-				messages = await Promise.all(
-					messages.map(async (item) => {
-						if (item.content?.e2ee && item.content?.t) {
-							return {
-								...item,
-								content: {
-									...(item.content as object),
-									t: await MessageCrypt.mapE2EEcontent(item.content.t, currentUser?.user?.id as string, true)
-								}
-							} as IMessageWithUser;
-						}
-						return item;
-					})
-				);
+				messages = await MessageCrypt.decryptMessages(messages, currentUser.user?.id as string);
 			}
 
 			thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
@@ -409,6 +402,8 @@ type JumpToMessageArgs = {
 	messageId: string;
 	noCache?: boolean;
 	isFetchingLatestMessages?: boolean;
+	mode?: number;
+	navigate?: (path: string) => void;
 };
 /**
  * Jump to message by message id
@@ -421,7 +416,7 @@ type JumpToMessageArgs = {
  */
 export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
-	async ({ clanId, messageId, channelId, noCache = true, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
+	async ({ clanId, messageId, channelId, noCache = true, isFetchingLatestMessages = false, navigate, mode }: JumpToMessageArgs, thunkAPI) => {
 		try {
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const isMessageExist = channelMessages.includes(messageId);
@@ -439,7 +434,18 @@ export const jumpToMessage = createAsyncThunk(
 					})
 				);
 			}
-			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
+
+			const state = thunkAPI.getState() as RootState;
+			if (clanId && state.channels.currentChannelId !== channelId) {
+				let channelPath = `/chat/clans/${clanId}/channels/${channelId}`;
+				if (clanId === '0') {
+					channelPath = `/chat/direct/message/${channelId}/${mode}`;
+				}
+				thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: true }));
+				navigate && navigate(channelPath);
+			} else {
+				thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: false }));
+			}
 		} catch (e) {
 			captureSentryError(e, 'messages/jumpToMessage');
 			return thunkAPI.rejectWithValue(e);
@@ -737,7 +743,7 @@ export const initialMessagesState: MessagesState = {
 	isFocused: false,
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: {},
-	idMessageToJump: '',
+	idMessageToJump: null,
 	channelIdLastFetch: '',
 	directMessageUnread: {}
 };

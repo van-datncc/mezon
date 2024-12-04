@@ -142,7 +142,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				{renderChannelLink()}
 				<Avatar.Group className="flex gap-3 justify-start items-center px-6">
 					{[...channelMemberList].slice(0, 5).map((member, index) => (
-						<AvatarUserShort id={member.user_id || ''} key={member.user_id || '' + index} />
+						<AvatarUserShort id={member.user_id || ''} key={(member.user_id || '') + index} />
 					))}
 					{channelMemberList && channelMemberList.length > 5 && (
 						<Avatar.Counter

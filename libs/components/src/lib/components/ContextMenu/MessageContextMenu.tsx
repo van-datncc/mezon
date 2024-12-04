@@ -107,8 +107,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { reactionMessageDispatch } = useChatReaction();
 
 	const isMyMessage = useMemo(() => {
-		return message?.sender_id === userId;
-	}, [message?.sender_id, userId]);
+		return message?.sender_id === userId && !message?.content?.callLog?.callLogType;
+	}, [message?.sender_id, userId, message?.content?.callLog?.callLogType]);
 	const mode = useMemo(() => {
 		if (modeResponsive === ModeResponsive.MODE_CLAN) {
 			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
