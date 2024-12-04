@@ -162,9 +162,7 @@ export const joinChannel = createAsyncThunk(
 
 			const state = thunkAPI.getState() as RootState;
 
-			if (messageId) {
-				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
-			} else if (!state.messages.idMessageToJump) {
+			if (!state.messages?.idMessageToJump?.id) {
 				thunkAPI.dispatch(
 					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
 				);

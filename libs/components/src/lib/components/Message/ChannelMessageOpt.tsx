@@ -284,7 +284,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, messageId]);
 
@@ -315,7 +315,7 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 	}, [dispatch, message, messageId]);
 
 	return useMenuBuilderPlugin((builder) => {

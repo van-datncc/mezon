@@ -1,7 +1,7 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
 import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, selectUserStatus, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EUserStatus } from '@mezon/utils';
+import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -63,7 +63,11 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					dismissOnClick={true}
 					renderTrigger={() => (
 						<div>
-							<ItemStatus children={`Token: ${Number(tokenInWallet) + Number(getTokenSocket)}`} dropdown startIcon={<Icons.Check />} />
+							<ItemStatus
+								children={`Token: ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}
+								dropdown
+								startIcon={<Icons.Check />}
+							/>
 						</div>
 					)}
 					placement="right-start"
