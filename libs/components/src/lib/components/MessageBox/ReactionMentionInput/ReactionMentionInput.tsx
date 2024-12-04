@@ -539,7 +539,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !request?.valueTextInput) {
-			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
