@@ -27,7 +27,11 @@ const BuzzBadge = ({ channelId, isReset, senderId, mode }: BuzzBadgeProps) => {
 	return (
 		<div>
 			{isReset && (
-				<div className="bg-red-500 text-xs absolute top-1.5 right-12 text-white rounded-sm p-0.5 text-center font-medium">Buzz!!</div>
+				<div
+					className={`bg-red-500 text-xs absolute ${isPosDmOrGr ? 'top-3.5 right-6' : 'top-1.5 right-12'}  text-white rounded-sm p-0.5 text-center font-medium`}
+				>
+					Buzz!!
+				</div>
 			)}
 		</div>
 	);

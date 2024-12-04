@@ -277,6 +277,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		});
 		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId } }));
+		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId } }));
 		}
 	};
 
