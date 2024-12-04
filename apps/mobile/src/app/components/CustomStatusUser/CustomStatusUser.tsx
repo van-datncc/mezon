@@ -16,7 +16,7 @@ interface ICustomStatusUserProps {
 	handleCustomUserStatus?: (customStatus: string, type: ETypeCustomUserStatus) => void;
 }
 
-enum EUserStatus {
+export enum EUserStatus {
 	ONLINE = 'active',
 	IDLE = 'Idle',
 	DO_NOT_DISTURB = 'Do Not Disturb',
