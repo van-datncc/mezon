@@ -6,22 +6,25 @@ import {
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
+	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
+	useAppSelector,
 	videoStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import BuzzBadge from '../BuzzBadge';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
 import SettingChannel from '../ChannelSetting';
 import ModalConfirm from '../ModalConfirm';
@@ -75,6 +78,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		});
 		const theme = useSelector(selectTheme);
 
+		const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
 		const handleOpenCreate = () => {
 			openSettingModal();
 			closeProfileItem();
@@ -269,6 +273,15 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 									: channel?.channel_label}
 							</p>
 						</span>
+						{buzzState?.isReset ? (
+							<BuzzBadge
+								timestamp={buzzState?.timestamp as number}
+								isReset={buzzState?.isReset}
+								channelId={channel.channel_id as string}
+								senderId={buzzState.senderId as string}
+								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							/>
+						) : null}
 					</Link>
 				)}
 

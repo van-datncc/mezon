@@ -11,7 +11,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.secondaryLight
 		},
 		wrapper: {
-			padding: size.s_10,
+			padding: size.s_10
 		},
 		titleRed: {
 			color: baseColor.redStrong,
@@ -44,5 +44,5 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_4
-		},
+		}
 	});

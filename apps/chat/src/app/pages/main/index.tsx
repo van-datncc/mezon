@@ -44,6 +44,7 @@ import {
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectJoinedCall,
+	selectLogoCustom,
 	selectOnboardingMode,
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
@@ -348,6 +349,8 @@ const SidebarMenu = memo(
 		const currentClanId = useSelector(selectCurrentClanId);
 		const closeMenu = useSelector(selectCloseMenu);
 		const statusMenu = useSelector(selectStatusMenu);
+		const logoCustom = useSelector(selectLogoCustom);
+
 		const setModeResponsive = useCallback(
 			(value: string) => {
 				dispatch(channelsActions.setModeResponsive(value));
@@ -427,7 +430,11 @@ const SidebarMenu = memo(
 								<NavLinkComponent active={!isClanView}>
 									<div>
 										<Image
-											src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+											src={
+												logoCustom
+													? logoCustom
+													: `assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`
+											}
 											alt={'logoMezon'}
 											width={48}
 											height={48}
