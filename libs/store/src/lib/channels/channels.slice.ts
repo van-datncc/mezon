@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import {
 	ApiChannelMessageHeaderWithChannel,
+	BuzzArgs,
 	ChannelThreads,
 	checkIsThread,
 	ICategory,
@@ -71,10 +72,6 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	};
 };
 
-type BuzzArgs = {
-	channelId?: string;
-	isReset?: boolean;
-};
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
@@ -695,24 +692,9 @@ export const channelsSlice = createSlice({
 				}
 			}
 		},
-		setBuzzState: (state, action: PayloadAction<BuzzArgs>) => {
-			const { channelId, isReset } = action.payload;
 
-			if (channelId) {
-				if (state.buzzState[channelId]) {
-					state.buzzState[channelId] = { ...state.buzzState[channelId], ...action.payload };
-				} else {
-					state.buzzState[channelId] = action.payload;
-				}
-			} else if (isReset) {
-				state.buzzState = {};
-			}
-
-			for (const key in state.buzzState) {
-				if (state.buzzState[key].isReset === false) {
-					delete state.buzzState[key];
-				}
-			}
+		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs }>) => {
+			state.buzzState[action.payload.channelId] = action.payload.buzzState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -1010,8 +992,6 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 });
 
 export const selectBuzzStateByChannelId = createSelector(
-	[(state: RootState, channelId: string) => state.channels.buzzState, (state: RootState, channelId: string) => channelId],
-	(buzzState, channelId) => {
-		return buzzState.channelId === channelId ? buzzState : null;
-	}
+	[getChannelsState, (state, channelId: string) => channelId],
+	(state, channelId) => state.buzzState?.[channelId]
 );

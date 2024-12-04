@@ -270,18 +270,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const handleBuzz = (channelId: string) => {
+	const handleBuzz = (channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
 		const audio = new Audio('assets/audio/buzz.mp3');
 		audio.play().catch((error) => {
 			console.error('Failed to play buzz sound:', error);
 		});
-		dispatch(channelsActions.setBuzzState({ channelId: channelId, isReset: true }));
+		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId } }));
+		}
 	};
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			if (message.code === TypeMessage.MessageBuzz) {
-				handleBuzz(message.channel_id);
+				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
 
 			try {
