@@ -13,7 +13,7 @@ function ApplicationsPage() {
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
-	const deepLinkUrl = JSON.parse(localStorage.getItem('deepLinkUrl') as string);
+	const deepLinkUrl = safeJSONParse(localStorage.getItem('deepLinkUrl') as string);
 
 	const [isShowCreatePopup, setIsShowCreatePopup] = useState(false);
 	const toggleCreatePopup = () => {
@@ -22,7 +22,7 @@ function ApplicationsPage() {
 
 	useEffect(() => {
 		if (deepLinkUrl && isElectron()) {
-			const data = JSON.parse(decodeURIComponent(deepLinkUrl));
+			const data = safeJSONParse(decodeURIComponent(deepLinkUrl));
 			dispatch(authActions.setSession(data));
 			localStorage.removeItem('deepLinkUrl');
 		}

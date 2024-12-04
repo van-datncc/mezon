@@ -1,5 +1,6 @@
 import { useAppParams } from '@mezon/core';
 import { PinMessageEntity, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { UnpinMessageObject } from '.';
@@ -40,7 +41,7 @@ const ListPinMessage = ({
 						let contentString = pinMessage.content;
 						if (typeof contentString === 'string') {
 							try {
-								const contentObject = JSON.parse(contentString);
+								const contentObject = safeJSONParse(contentString);
 								contentString = contentObject.t;
 							} catch (e) {
 								console.error('Failed to parse content JSON:', e);

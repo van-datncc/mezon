@@ -2,7 +2,6 @@ import {
 	messagesActions,
 	referencesActions,
 	selectAttachmentByChannelId,
-	selectIdMessageToJump,
 	selectOpenOptionMessageState,
 	selectOpenThreadMessageState,
 	threadsActions,
@@ -15,19 +14,11 @@ export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
-	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
 
 	const checkAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId?.files?.length > 0;
 	}, [attachmentFilteredByChannelId]);
-
-	const setIdMessageToJump = useCallback(
-		(idMessageToJump: string) => {
-			dispatch(messagesActions.setIdMessageToJump(idMessageToJump));
-		},
-		[dispatch]
-	);
 
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
@@ -57,22 +48,18 @@ export function useReference(channelId?: string) {
 
 	return useMemo(
 		() => ({
-			setIdMessageToJump,
 			setOpenThreadMessageState,
 			openThreadMessageState,
 			openOptionMessageState,
-			idMessageToJump,
 			setOpenOptionMessageState,
 			removeAttachmentByIndex,
 			attachmentFilteredByChannelId,
 			checkAttachment
 		}),
 		[
-			setIdMessageToJump,
 			setOpenThreadMessageState,
 			openThreadMessageState,
 			openOptionMessageState,
-			idMessageToJump,
 			setOpenOptionMessageState,
 			removeAttachmentByIndex,
 			attachmentFilteredByChannelId,

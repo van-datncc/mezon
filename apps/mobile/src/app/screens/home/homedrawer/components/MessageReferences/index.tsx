@@ -1,6 +1,7 @@
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
+import { safeJSONParse } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +70,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 						</Text>
 					) : (
 						<DmListItemLastMessage
-							content={JSON.parse(messageReferences?.content || '{}')}
+							content={safeJSONParse(messageReferences?.content || '{}')}
 							styleText={{
 								fontSize: size.small
 							}}

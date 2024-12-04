@@ -73,5 +73,5 @@ export function cloneDeep<T>(value: T): T {
 		return value;
 	}
 
-	return JSON.parse(JSON.stringify(value)) as T;
+	return safeJSONParse(JSON.stringify(value)) as T;
 }

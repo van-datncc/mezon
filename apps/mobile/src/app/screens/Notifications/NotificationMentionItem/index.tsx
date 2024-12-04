@@ -2,6 +2,7 @@ import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectClanById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { createImgproxyUrl, getNameForPrioritize } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -19,28 +20,28 @@ function parseObject(obj: any) {
 	let references;
 	let content;
 	try {
-		attachments = obj?.attachments && JSON.parse(obj?.attachments || '{}');
+		attachments = obj?.attachments && safeJSONParse(obj?.attachments || '{}');
 	} catch (err) {
 		attachments = {};
 	}
 	try {
-		mentions = obj?.mentions && JSON.parse(obj?.mentions || '{}');
+		mentions = obj?.mentions && safeJSONParse(obj?.mentions || '{}');
 	} catch (err) {
 		mentions = {};
 	}
 	try {
-		references = obj?.references && JSON.parse(obj?.references || '{}');
+		references = obj?.references && safeJSONParse(obj?.references || '{}');
 	} catch (err) {
 		references = {};
 	}
 	try {
-		reactions = obj?.reactions && JSON.parse(obj?.reactions || '{}');
+		reactions = obj?.reactions && safeJSONParse(obj?.reactions || '{}');
 	} catch (err) {
 		reactions = {};
 	}
 
 	try {
-		content = obj?.content && JSON.parse(obj?.content || '{}');
+		content = obj?.content && safeJSONParse(obj?.content || '{}');
 	} catch (err) {
 		content = {};
 	}

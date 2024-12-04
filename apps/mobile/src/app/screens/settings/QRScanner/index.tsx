@@ -4,6 +4,7 @@ import { baseColor, Block, size } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -106,7 +107,7 @@ export const QRScanner = () => {
 		const store = await getStoreAsync();
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
-			const valueObj = JSON.parse(value || '{}');
+			const valueObj = safeJSONParse(value || '{}');
 			// case send token
 			if (valueObj?.receiver_id) {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {

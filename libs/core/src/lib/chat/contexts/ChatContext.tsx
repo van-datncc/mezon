@@ -55,6 +55,7 @@ import {
 	selectModeResponsive,
 	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
+	selectUserCallId,
 	stickerSettingActions,
 	toastActions,
 	useAppDispatch,
@@ -158,6 +159,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const userCallId = useSelector(selectUserCallId);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -268,21 +270,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const handleBuzz = () => {
+	const handleBuzz = (channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
 		const audio = new Audio('assets/audio/buzz.mp3');
-
 		audio.play().catch((error) => {
 			console.error('Failed to play buzz sound:', error);
 		});
+		const timestamp = Math.round(Date.now() / 1000);
+		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
+		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
+		}
 	};
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL) {
-				dispatch(DMCallActions.setCallMessageId(message?.message_id));
-			}
 			if (message.code === TypeMessage.MessageBuzz) {
-				handleBuzz();
+				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
 
 			try {
@@ -290,6 +294,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
+				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
+					dispatch(DMCallActions.setCallMessageId(message?.message_id));
+				}
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
@@ -842,7 +849,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (channelUpdated.clan_id === '0') {
-				return dispatch(directActions.updateOne(channelUpdated));
+				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
 
 			if (channelUpdated) {
@@ -993,32 +1000,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		handleRoleEvent();
 	}, []);
 
-	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
-		// TODO: AND TYPE IN BE
-		// TYPE = 4: USER CANCEL CALL
-		// TYPE = 0: USER JOINED CALL
-		// TYPE = 5: OTHER CALL
-		if (event?.data_type === 4) {
-			dispatch(DMCallActions.cancelCall({}));
-			dispatch(audioCallActions.startDmCall({}));
-			dispatch(audioCallActions.setIsJoinedCall(false));
-			dispatch(DMCallActions.setOtherCall({}));
-		}
-		if (event?.data_type === 0) {
-			dispatch(audioCallActions.setIsJoinedCall(true));
-		}
-		if (event?.data_type === 5) {
-			dispatch(audioCallActions.setIsBusyTone(true));
-		}
-		dispatch(
-			DMCallActions.addOrUpdate({
-				calleeId: event?.receiver_id,
-				signalingData: event,
-				id: event?.caller_id,
-				callerId: event?.caller_id
-			})
-		);
-	}, []);
+	const onwebrtcsignalingfwd = useCallback(
+		(event: WebrtcSignalingFwd) => {
+			// TODO: AND TYPE IN BE
+			// TYPE = 4: USER CANCEL CALL
+			// TYPE = 0: USER JOINED CALL
+			// TYPE = 5: OTHER CALL
+			if (userCallId && userCallId !== event?.caller_id) {
+				socketRef.current?.forwardWebrtcSignaling(event?.caller_id, 5, '', event?.channel_id, userId || '');
+				return;
+			}
+			if (event?.data_type === 4) {
+				dispatch(DMCallActions.cancelCall({}));
+				dispatch(audioCallActions.startDmCall({}));
+				dispatch(audioCallActions.setUserCallId(''));
+				dispatch(audioCallActions.setIsJoinedCall(false));
+				dispatch(DMCallActions.setOtherCall({}));
+			}
+			if (event?.data_type === 0) {
+				dispatch(audioCallActions.setIsJoinedCall(true));
+			}
+			if (event?.data_type === 5) {
+				dispatch(audioCallActions.setIsBusyTone(true));
+			}
+			dispatch(
+				DMCallActions.addOrUpdate({
+					calleeId: event?.receiver_id,
+					signalingData: event,
+					id: event?.caller_id,
+					callerId: event?.caller_id
+				})
+			);
+		},
+		[userCallId]
+	);
 
 	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
 		dispatch(

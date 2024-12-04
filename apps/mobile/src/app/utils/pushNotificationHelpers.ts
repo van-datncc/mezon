@@ -13,6 +13,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
+import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
@@ -409,8 +410,25 @@ const showRNNotificationCall = async (bodyData: any) => {
 			const { callUUID = '', payload = {} } = data || {};
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: JSON.parse(payload || '{}') });
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
 			}, 5000);
+		});
+	} catch (error) {
+		/* empty */
+	}
+};
+
+const listRNCallKeep = async (bodyData: any) => {
+	try {
+		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+			RNCallKeep.backToForeground();
+			RNCallKeep.endCall(callUUID);
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
+			}, 5000);
+			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+				RNCallKeep.endCall(callUUID);
+			});
 		});
 	} catch (error) {
 		/* empty */
@@ -418,12 +436,14 @@ const showRNNotificationCall = async (bodyData: any) => {
 };
 export const setupIncomingCall = async (body: string) => {
 	try {
-		const bodyData = JSON.parse(body || '{}');
+		const bodyData = safeJSONParse(body || '{}');
 		const statusSetup = await setupCallKeep();
 		if (!statusSetup) return;
 
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData);
+		} else {
+			await listRNCallKeep(bodyData);
 		}
 		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {

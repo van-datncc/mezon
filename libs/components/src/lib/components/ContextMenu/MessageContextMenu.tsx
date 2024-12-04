@@ -48,7 +48,7 @@ import {
 	handleSaveImage,
 	isPublicChannel
 } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -97,18 +97,23 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
+	const dispatch = useAppDispatch();
+
+	const handleItemClick = useCallback(() => {
+		dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT));
+	}, [dispatch]);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
-	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
 	const { reactionMessageDispatch } = useChatReaction();
 
 	const isMyMessage = useMemo(() => {
-		return message?.sender_id === userId;
-	}, [message?.sender_id, userId]);
+		return message?.sender_id === userId && !message?.content?.callLog?.callLogType;
+	}, [message?.sender_id, userId, message?.content?.callLog?.callLogType]);
 	const mode = useMemo(() => {
 		if (modeResponsive === ModeResponsive.MODE_CLAN) {
 			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
@@ -210,7 +215,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			}
 			formattedString = JSON.stringify(jsonObject);
 		} else {
-			const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+			const jsonObject: JsonObject = safeJSONParse(defaultCanvas.content as string);
 
 			if (message.attachments?.length) {
 				const newImageUrl = message.attachments[0].url;
@@ -268,7 +273,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, message]);
 
@@ -287,7 +292,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 	}, [dispatch, message]);
 
 	const handleForwardMessage = useCallback(() => {
@@ -471,7 +476,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem(
 				'addReaction', // id
 				'Add Reaction', // label
-				() => console.log('add reaction'),
+				handleItemClick,
 				<Icons.RightArrowRightClick />
 			);
 		});
@@ -727,7 +732,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		handleCreateThread,
 		handleForwardMessage,
 		handleForwardAllMessage,
-		urlImage
+		urlImage,
+		handleItemClick
 	]);
 	/* eslint-disable no-console */
 

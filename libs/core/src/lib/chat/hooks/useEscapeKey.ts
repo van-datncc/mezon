@@ -8,7 +8,7 @@ export const useEscapeKey = (handler: () => void, options: Partial<{ preventEven
 		const { preventEvent } = options;
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				dispatch(messagesActions.setIdMessageToJump(''));
+				dispatch(messagesActions.setIdMessageToJump(null));
 				dispatch(messagesActions.setOpenOptionMessageState(false));
 				dispatch(
 					referencesActions.setDataReferences({

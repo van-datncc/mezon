@@ -11,6 +11,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +49,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const userStatus = useMemberStatus(user?.userId || '');
 
 	const tokenInWallet = useMemo(() => {
-		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet || '{}')?.value : 0;
+		return user?.userProfile?.wallet ? safeJSONParse(user?.userProfile?.wallet || '{}')?.value : 0;
 	}, [user?.userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {

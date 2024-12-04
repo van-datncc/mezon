@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useAuth, useChatSending, useMenu } from '@mezon/core';
+import { useAppParams, useChatSending, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
@@ -20,7 +20,6 @@ import {
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -80,7 +79,6 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
-	const { userProfile } = useAuth();
 	const isInCall = useSelector(selectIsInCall);
 
 	const handleSend = useCallback(
@@ -118,6 +116,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: dmGroupId, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(dmGroupId));
+			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
 			dispatch(audioCallActions.setIsBusyTone(false));
 		} else {
 			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
@@ -131,7 +130,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 				className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
 			>
 				<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
-					<div className="flex flex-row gap-1 items-center flex-1">
+					<div className={`flex flex-row gap-1 items-center flex-1 ${isMacDesktop ? 'app-region-drag' : ''}`}>
 						<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 							<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 						</div>

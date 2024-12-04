@@ -1,8 +1,9 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { IMentionOnMessage, IMessageWithUser, INotification, addMention, createImgproxyUrl } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
@@ -17,11 +18,11 @@ function convertContentToObject(notify: any) {
 		try {
 			const parsedContent = {
 				...notify.content,
-				content: notify.content.content ? JSON.parse(notify.content.content) : null,
-				mentions: notify.content.mentions ? JSON.parse(notify.content.mentions) : null,
-				reactions: notify.content.reactions ? JSON.parse(notify.content.reactions) : null,
-				references: notify.content.references ? JSON.parse(notify.content.references) : null,
-				attachments: notify.content.attachments ? JSON.parse(notify.content.attachments) : null
+				content: notify.content.content ? safeJSONParse(notify.content.content) : null,
+				mentions: notify.content.mentions ? safeJSONParse(notify.content.mentions) : null,
+				reactions: notify.content.reactions ? safeJSONParse(notify.content.reactions) : null,
+				references: notify.content.references ? safeJSONParse(notify.content.references) : null,
+				attachments: notify.content.attachments ? safeJSONParse(notify.content.attachments) : null
 			};
 
 			return {
@@ -35,6 +36,7 @@ function convertContentToObject(notify: any) {
 	return notify;
 }
 function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
+	const navigate = useNavigate();
 	const parseNotify = convertContentToObject(notify);
 	const dispatch = useAppDispatch();
 	const messageId = useMemo(() => {
@@ -60,7 +62,9 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 			messagesActions.jumpToMessage({
 				clanId: clanId || '',
 				messageId: messageId,
-				channelId: channelId
+				channelId: channelId,
+				mode: parseNotify?.content?.mode - 1,
+				navigate
 			})
 		);
 	}, [dispatch, messageId, notify.id]);
