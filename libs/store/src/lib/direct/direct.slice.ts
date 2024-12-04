@@ -418,7 +418,13 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 						id: userId,
 						username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						online: dm?.is_online ? dm?.is_online[index] : false,
-						metadata: dm?.metadata ? JSON.parse(dm?.metadata[index]) : {}
+						metadata: (() => {
+							try {
+								return dm?.metadata ? JSON.parse(dm?.metadata[index]) : {};
+							} catch (e) {
+								return {};
+							}
+						})()
 					};
 
 					acc.push({
