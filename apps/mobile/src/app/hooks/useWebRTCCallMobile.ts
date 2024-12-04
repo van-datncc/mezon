@@ -56,7 +56,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		localStream: null,
 		remoteStream: null,
 		peerConnection: null,
-		storedIceCandidates: null,
+		storedIceCandidates: null
 	});
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
@@ -264,7 +264,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			switch (signalingData.data_type) {
 				case WebrtcSignalingType.WEBRTC_SDP_OFFER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const offer = JSON.parse(decompressedData || '{}');
+					const offer = safeJSONParse(decompressedData || '{}');
 
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 					const answer = await callState.peerConnection.createAnswer();
@@ -291,7 +291,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const answer = JSON.parse(decompressedData || '{}');
+					const answer = safeJSONParse(decompressedData || '{}');
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 					// Add stored ICE candidates
 					if (callState.storedIceCandidates) {
@@ -304,7 +304,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				}
 
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE: {
-					const candidate = JSON.parse(signalingData?.json_data || '{}');
+					const candidate = safeJSONParse(signalingData?.json_data || '{}');
 					if (candidate) {
 						if (callState.peerConnection.remoteDescription) {
 							await callState.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));

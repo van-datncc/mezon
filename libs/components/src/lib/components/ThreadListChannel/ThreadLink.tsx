@@ -1,9 +1,11 @@
-import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { selectBuzzStateByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { Link } from 'react-router-dom';
+import BuzzBadge from '../BuzzBadge';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
@@ -32,6 +34,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	});
 
 	const channelPath = `/chat/clans/${thread.clan_id}/channels/${thread.channel_id}`;
+	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, thread?.channel_id ?? ''));
 
 	const state = isActive ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
 
@@ -111,6 +114,15 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					{numberNotification}
 				</div>
 			)}
+			{buzzState?.isReset ? (
+				<BuzzBadge
+					timestamp={buzzState?.timestamp as number}
+					isReset={buzzState?.isReset}
+					channelId={thread.channel_id as string}
+					senderId={buzzState.senderId as string}
+					mode={ChannelStreamMode.STREAM_MODE_THREAD}
+				/>
+			) : null}
 		</div>
 	);
 });

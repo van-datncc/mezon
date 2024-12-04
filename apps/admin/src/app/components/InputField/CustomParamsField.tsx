@@ -13,7 +13,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 		if (value) {
 			let data: { [key: string]: string } = {};
 			try {
-				data = typeof value === 'string' ? JSON.parse(value) : value;
+				data = typeof value === 'string' ? safeJSONParse(value) : value;
 			} catch (e) {
 				data = {};
 			}

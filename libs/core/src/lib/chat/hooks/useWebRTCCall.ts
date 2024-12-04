@@ -1,7 +1,7 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
-import { WebrtcSignalingType } from 'mezon-js';
+import { safeJSONParse, WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -258,7 +258,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			switch (signalingData.data_type) {
 				case WebrtcSignalingType.WEBRTC_SDP_OFFER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const offer = JSON.parse(decompressedData || '{}');
+					const offer = safeJSONParse(decompressedData || '{}');
 
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 					const answer = await callState.peerConnection.createAnswer();
@@ -285,7 +285,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const answer = JSON.parse(decompressedData || '{}');
+					const answer = safeJSONParse(decompressedData || '{}');
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 
 					if (callTimeout.current) {
@@ -304,7 +304,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				}
 
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE: {
-					const candidate = JSON.parse(signalingData?.json_data || '{}');
+					const candidate = safeJSONParse(signalingData?.json_data || '{}');
 					if (candidate) {
 						if (callState.peerConnection?.remoteDescription?.type) {
 							await callState.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));

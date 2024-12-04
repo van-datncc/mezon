@@ -14,7 +14,7 @@ const AppearanceContext = createContext<AppearanceContextProps | undefined>(unde
 export const AppearanceProvider: React.FC<AppearanceProviderProps> = ({ children }) => {
 	const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
 		const storedMode = localStorage.getItem('isDarkMode');
-		return storedMode ? JSON.parse(storedMode) : false;
+		return storedMode ? safeJSONParse(storedMode) : false;
 	});
 
 	const toggleDarkMode = () => {

@@ -1,8 +1,17 @@
-import { directActions, directMetaActions, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	directActions,
+	directMetaActions,
+	selectBuzzStateByDirectId,
+	selectDirectById,
+	selectIsUnreadDMById,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useRef } from 'react';
+import BuzzBadge from '../../BuzzBadge';
 import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
@@ -23,6 +32,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const dispatch = useAppDispatch();
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
+	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, directMessage?.channel_id ?? ''));
 
 	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
 		e.stopPropagation();
@@ -77,6 +87,15 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				isMute={directMessage?.is_mute}
 				isDM
 			/>
+			{buzzStateDM?.isReset ? (
+				<BuzzBadge
+					timestamp={buzzStateDM?.timestamp as number}
+					isReset={buzzStateDM?.isReset}
+					channelId={directMessage.channel_id as string}
+					senderId={buzzStateDM.senderId as string}
+					mode={directMessage.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+				/>
+			) : null}
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}
 				onClick={(e) => handleCloseClick(e, directMessage.channel_id as string)}
