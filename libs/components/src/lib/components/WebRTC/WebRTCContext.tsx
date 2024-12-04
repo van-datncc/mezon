@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { selectJoinPTTByChannelId, useAppSelector } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { compress, decompress } from '../DmList/DMtopbar';
 
@@ -164,7 +164,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				{
 					const processData = async () => {
 						const dataDec = await decompress(data?.json_data);
-						const objData = JSON.parse(dataDec || '{}');
+						const objData = safeJSONParse(dataDec || '{}');
 
 						// Get peerConnection from receiver event.receiverId
 						await peerConnection.current?.setRemoteDescription(new RTCSessionDescription(objData));
@@ -185,7 +185,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				{
 					const processData = async () => {
-						const objData = JSON.parse(data?.json_data || '{}');
+						const objData = safeJSONParse(data?.json_data || '{}');
 						if (peerConnection.current?.remoteDescription) {
 							await peerConnection.current?.addIceCandidate(new RTCIceCandidate(objData));
 						}

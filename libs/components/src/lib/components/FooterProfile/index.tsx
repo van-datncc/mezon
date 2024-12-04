@@ -16,6 +16,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, useLongPress } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -62,7 +63,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		return userId === myProfile.userId;
 	}, [myProfile.userId, userId]);
 	const tokenInWallet = useMemo(() => {
-		return myProfile?.userProfile?.wallet ? JSON.parse(myProfile?.userProfile?.wallet)?.value : 0;
+		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
 	}, [myProfile?.userProfile?.wallet]);
 	const getTokenSocket = useSelector(selectUpdateToken(myProfile.userId ?? ''));
 

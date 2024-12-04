@@ -48,7 +48,7 @@ import {
 	handleSaveImage,
 	isPublicChannel
 } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -210,7 +210,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			}
 			formattedString = JSON.stringify(jsonObject);
 		} else {
-			const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+			const jsonObject: JsonObject = safeJSONParse(defaultCanvas.content as string);
 
 			if (message.attachments?.length) {
 				const newImageUrl = message.attachments[0].url;

@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent, safeJSONParse } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import { ChannelsEntity } from '../channels/channels.slice';
@@ -410,7 +410,7 @@ export const selectMemberCustomStatusById = createSelector(
 			return false;
 		}
 		try {
-			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+			return safeJSONParse(userGroup?.metadata?.[index] || '{}')?.status || '';
 		} catch (e) {
 			return '';
 		}

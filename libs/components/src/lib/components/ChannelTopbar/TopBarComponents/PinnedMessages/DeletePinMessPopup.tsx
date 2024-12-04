@@ -1,4 +1,5 @@
 import { PinMessageEntity, selectMemberClanByUserId } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../../../MemberProfile';
@@ -48,7 +49,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 										isEditted={false}
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
-										content={JSON.parse(pinMessage.content || '{}')}
+										content={safeJSONParse(pinMessage.content || '{}')}
 										isInPinMsg={true}
 									/>
 								</span>

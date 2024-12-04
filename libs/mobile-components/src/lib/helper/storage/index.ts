@@ -45,7 +45,7 @@ export function saveString(key: string, value: string) {
 export function load(key: string) {
 	try {
 		const almostThere = AppStorage.getString(key);
-		return typeof almostThere === 'string' ? JSON.parse(almostThere) : null;
+		return typeof almostThere === 'string' ? safeJSONParse(almostThere) : null;
 	} catch {
 		return null;
 	}

@@ -1,4 +1,5 @@
 import { AppDispatch, appActions, authActions, userStatusActions } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
 export interface IAppLoaderData {
@@ -33,7 +34,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 		redirectTo = '/desktop/login?deepLinkUrl=' + deepLinkUrl;
 		try {
 			const session = deepLinkUrl.split('#')[0];
-			await dispatch(authActions.setSession(JSON.parse(decodeURIComponent(session))));
+			await dispatch(authActions.setSession(safeJSONParse(decodeURIComponent(session))));
 			window.history.replaceState({}, document.title, pathname);
 		} catch (error) {
 			console.error('Invalid JSON in deepLinkUrl:', error);

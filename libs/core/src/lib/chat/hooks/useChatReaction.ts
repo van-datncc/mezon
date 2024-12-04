@@ -13,7 +13,7 @@ import {
 } from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -160,7 +160,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 
 function saveRecentEmojiMobile(emojiLastest: EmojiStorage) {
 	AsyncStorage.getItem('recentEmojis').then((storedEmojis) => {
-		const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
+		const emojisRecentParse = storedEmojis ? safeJSONParse(storedEmojis) : [];
 
 		const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
 			return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;

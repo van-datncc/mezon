@@ -10,6 +10,7 @@ import {
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -54,7 +55,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 
 	const emojisRecentDataParse = useMemo(() => {
 		if (!emojiRecentData) return [];
-		const parsedData = JSON.parse(emojiRecentData);
+		const parsedData = safeJSONParse(emojiRecentData);
 		return parsedData.filter((emojiItem: EmojiStorage) => emojiItem.senderId === userId.userId);
 	}, [emojiRecentData, userId.userId]);
 

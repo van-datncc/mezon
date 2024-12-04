@@ -12,7 +12,7 @@ import {
 } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, GetThunkAPI, PayloadAction } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
 import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
@@ -541,7 +541,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentCategory: null,
 	currentVoiceChannelId: '',
 	request: {},
-	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	idChannelSelected: safeJSONParse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 	previousChannels: [],
@@ -902,7 +902,7 @@ export const selectChannelsByClanId = (clainId: string) =>
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
 	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
 		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
 			const selectedChannel = channels.find((channel) => channel.channel_id === idsSelectedChannel[clanId]);
 			if (selectedChannel) {

@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { safeJSONParse } from 'mezon-js';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -267,7 +268,7 @@ export const reactionSlice = createSlice({
 });
 function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	const storedEmojis = localStorage.getItem('recentEmojis');
-	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
+	const emojisRecentParse = storedEmojis ? safeJSONParse(storedEmojis) : [];
 
 	if (emojisRecentParse.length > 0) {
 		const lastEmoji = emojisRecentParse[emojisRecentParse.length - 1];
