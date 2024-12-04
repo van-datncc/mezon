@@ -1,5 +1,6 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import { safeJSONParse } from 'mezon-js';
 export type FormalError = {
 	message: string;
 	name: string;
@@ -69,7 +70,7 @@ export function extractActionError(action: any): FormalError {
 			message: '',
 			name: '',
 			stack: '',
-			...JSON.parse(JSON.stringify(error)),
+			...safeJSONParse(JSON.stringify(error)),
 			action: action
 		};
 	}

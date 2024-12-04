@@ -1,6 +1,7 @@
 import { useAccount, useAppNavigation, useAuth } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { Modal } from 'flowbite-react';
+import { safeJSONParse } from 'mezon-js';
 import 'quill/dist/quill.snow.css';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -29,7 +30,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 	};
 
 	const handleSaveChannelId = () => {
-		const channelIds = JSON.parse(localStorage.getItem('agerestrictedchannelIds') || '[]');
+		const channelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
 		if (!channelIds.includes(currentChannelId) && currentChannelId) {
 			channelIds.push(currentChannelId);
 		}

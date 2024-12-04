@@ -69,7 +69,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 						</Text>
 					) : (
 						<DmListItemLastMessage
-							content={JSON.parse(messageReferences?.content || '{}')}
+							content={safeJSONParse(messageReferences?.content || '{}')}
 							styleText={{
 								fontSize: size.small
 							}}

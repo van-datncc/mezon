@@ -1,5 +1,6 @@
 import { IUserAccount, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { safeJSONParse } from 'mezon-js';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -57,7 +58,7 @@ export const accountSlice = createSlice({
 		},
 		setCustomStatus(state, action: PayloadAction<string>) {
 			if (state?.userProfile?.user) {
-				const userMetadata = JSON.parse(state.userProfile.user.metadata || '{}');
+				const userMetadata = safeJSONParse(state.userProfile.user.metadata || '{}');
 				const updatedUserMetadata = { ...userMetadata, status: action.payload };
 				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
 			}
@@ -65,7 +66,7 @@ export const accountSlice = createSlice({
 		setWalletValue(state, action: PayloadAction<number>) {
 			if (state.userProfile?.wallet) {
 				try {
-					const walletData = JSON.parse(state.userProfile.wallet);
+					const walletData = safeJSONParse(state.userProfile.wallet);
 					walletData.value = action.payload;
 					state.userProfile.wallet = JSON.stringify(walletData);
 				} catch (error) {
@@ -105,6 +106,8 @@ export const selectCurrentUserId = createSelector(getAccountState, (state: Accou
 
 export const selectAnonymousMode = createSelector(getAccountState, (state: AccountState) => state.anonymousMode);
 
-export const selectAccountMetadata = createSelector(getAccountState, (state: AccountState) => JSON.parse(state.userProfile?.user?.metadata || '{}'));
+export const selectAccountMetadata = createSelector(getAccountState, (state: AccountState) =>
+	safeJSONParse(state.userProfile?.user?.metadata || '{}')
+);
 
 export const selectAccountCustomStatus = createSelector(selectAccountMetadata, (metadata) => metadata?.status || '');

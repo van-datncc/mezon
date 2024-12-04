@@ -517,7 +517,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	useEffect(() => {
 		if (type === EMessageBSToShow?.MessageAction) {
 			AsyncStorage.getItem('recentEmojis')
-				.then((emojis) => JSON.parse(emojis || '[]'))
+				.then((emojis) => safeJSONParse(emojis || '[]'))
 				.then((parsedEmojis) => {
 					const recentEmojis = parsedEmojis
 						?.reverse()

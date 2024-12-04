@@ -33,7 +33,7 @@ const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => 
 						let contentString = pinMessage?.content;
 						if (typeof contentString === 'string') {
 							try {
-								contentString = JSON.parse(contentString);
+								contentString = safeJSONParse(contentString);
 							} catch (e) {
 								console.error('Failed to parse content JSON:', e);
 							}

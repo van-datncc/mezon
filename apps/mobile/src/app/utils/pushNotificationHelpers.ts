@@ -409,7 +409,7 @@ const showRNNotificationCall = async (bodyData: any) => {
 			const { callUUID = '', payload = {} } = data || {};
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: JSON.parse(payload || '{}') });
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
 			}, 5000);
 		});
 	} catch (error) {
@@ -418,7 +418,7 @@ const showRNNotificationCall = async (bodyData: any) => {
 };
 export const setupIncomingCall = async (body: string) => {
 	try {
-		const bodyData = JSON.parse(body || '{}');
+		const bodyData = safeJSONParse(body || '{}');
 		const statusSetup = await setupCallKeep();
 		if (!statusSetup) return;
 

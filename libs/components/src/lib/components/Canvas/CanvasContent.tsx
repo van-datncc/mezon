@@ -1,5 +1,6 @@
 import { canvasActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { safeJSONParse } from 'mezon-js';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import React, { useEffect, useRef, useState } from 'react';
@@ -84,7 +85,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	useEffect(() => {
 		if (content && quillRef.current) {
 			const selection = quillRef.current.getSelection();
-			quillRef.current.setContents(JSON.parse(content));
+			quillRef.current.setContents(safeJSONParse(content));
 			if (selection) {
 				quillRef.current.setSelection(selection.index, selection.length);
 			}
@@ -116,7 +117,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		});
 
 		if (content && quillRef.current) {
-			quillRef.current.setContents(JSON.parse(content));
+			quillRef.current.setContents(safeJSONParse(content));
 		}
 
 		if (!isEditAndDelCanvas) {
