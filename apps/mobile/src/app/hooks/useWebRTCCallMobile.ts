@@ -56,7 +56,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		localStream: null,
 		remoteStream: null,
 		peerConnection: null,
-		storedIceCandidates: null,
+		storedIceCandidates: null
 	});
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
@@ -117,7 +117,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		pc.addEventListener('track', (event) => {
 			event?.streams[0]?.getVideoTracks()?.forEach((track) => {
 				track.addEventListener('mute', () => {
-					dispatch(audioCallActions.setIsRemoteVideo(true));
 					dispatch(audioCallActions.setIsRemoteVideo(false));
 				});
 				track.addEventListener('unmute', () => {
