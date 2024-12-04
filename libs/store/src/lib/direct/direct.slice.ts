@@ -28,7 +28,7 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	currentDirectMessageId?: string | null;
 	currentDirectMessageType?: number;
 	statusDMChannelUnread: Record<string, boolean>;
-	buzzStateDirect: Record<string, BuzzArgs>;
+	buzzStateDirect: Record<string, BuzzArgs | null>;
 }
 
 export interface DirectRootState {
@@ -317,7 +317,7 @@ export const directSlice = createSlice({
 				}
 			}
 		},
-		setBuzzStateDirect: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs }>) => {
+		setBuzzStateDirect: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
 			state.buzzStateDirect[action.payload.channelId] = action.payload.buzzState;
 		}
 	},

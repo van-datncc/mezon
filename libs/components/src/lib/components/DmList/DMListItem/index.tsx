@@ -89,6 +89,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			/>
 			{buzzStateDM?.isReset ? (
 				<BuzzBadge
+					timestamp={buzzStateDM?.timestamp as number}
 					isReset={buzzStateDM?.isReset}
 					channelId={directMessage.channel_id as string}
 					senderId={buzzStateDM.senderId as string}

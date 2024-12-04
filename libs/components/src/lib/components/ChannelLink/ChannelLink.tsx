@@ -275,6 +275,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						</span>
 						{buzzState?.isReset ? (
 							<BuzzBadge
+								timestamp={buzzState?.timestamp as number}
 								isReset={buzzState?.isReset}
 								channelId={channel.channel_id as string}
 								senderId={buzzState.senderId as string}

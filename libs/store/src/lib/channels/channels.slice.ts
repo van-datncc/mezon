@@ -88,7 +88,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
 	favoriteChannels: string[];
-	buzzState: Record<string, BuzzArgs>;
+	buzzState: Record<string, BuzzArgs | null>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -691,7 +691,7 @@ export const channelsSlice = createSlice({
 			}
 		},
 
-		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs }>) => {
+		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
 			state.buzzState[action.payload.channelId] = action.payload.buzzState;
 		}
 	},

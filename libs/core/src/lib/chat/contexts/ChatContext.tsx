@@ -275,10 +275,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		audio.play().catch((error) => {
 			console.error('Failed to play buzz sound:', error);
 		});
+		const timestamp = Math.round(Date.now() / 1000);
 		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId } }));
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
 		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId } }));
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
 		}
 	};
 

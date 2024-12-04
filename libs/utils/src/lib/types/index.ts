@@ -922,6 +922,7 @@ export type RequestInput = {
 export type BuzzArgs = {
 	isReset?: boolean;
 	senderId?: string;
+	timestamp?: number;
 };
 
 export enum EUserSettings {
