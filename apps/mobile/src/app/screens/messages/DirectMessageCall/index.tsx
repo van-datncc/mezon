@@ -88,7 +88,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 						})
 					);
 				}
-				handleEndCall();
+				handleEndCall({ isCancelGoBack: dataType === 5 });
 			}
 		}
 
@@ -115,7 +115,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 	const onCancelCall = async () => {
 		try {
-			await handleEndCall();
+			await handleEndCall({ isCancelGoBack: false });
 			if (!timeStartConnected?.current) {
 				await dispatch(
 					DMCallActions.updateCallLog({

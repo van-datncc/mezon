@@ -179,7 +179,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					type: 'error',
 					text1: 'Connection disconnected'
 				});
-				handleEndCall();
+				handleEndCall({ isCancelGoBack: false });
 			}
 		});
 
@@ -205,7 +205,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 							content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
 						})
 					);
-					handleEndCall();
+					handleEndCall({ isCancelGoBack: false });
 				}, 60000);
 			}
 			InCallManager.start({ media: 'audio' });
@@ -275,7 +275,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 		} catch (error) {
 			console.error('Error starting call:', error);
-			handleEndCall();
+			handleEndCall({ isCancelGoBack: false });
 		}
 	};
 
@@ -349,7 +349,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
-	const handleEndCall = async () => {
+	const handleEndCall = async ({ isCancelGoBack = false }: { isCancelGoBack?: boolean }) => {
 		try {
 			stopDialTone();
 			playEndCall();
@@ -388,7 +388,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				remoteStream: null,
 				peerConnection: null
 			});
-			navigation.goBack();
+			if (!isCancelGoBack) {
+				navigation.goBack();
+			}
 		} catch (error) {
 			console.error('Error ending call:', error);
 		}
