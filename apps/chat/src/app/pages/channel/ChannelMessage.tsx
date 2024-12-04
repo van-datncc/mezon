@@ -71,7 +71,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	);
 
 	const mess = (() => {
-		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
+		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>)?.id === 'string') {
 			return message.content;
 		}
 		return message;
