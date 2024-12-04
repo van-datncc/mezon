@@ -5,7 +5,7 @@ import { RootState, audioCallActions } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelStreamMode, ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';

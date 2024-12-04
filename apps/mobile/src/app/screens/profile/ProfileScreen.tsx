@@ -11,6 +11,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

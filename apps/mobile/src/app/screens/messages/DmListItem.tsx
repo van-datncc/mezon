@@ -3,7 +3,7 @@ import { Colors, useTheme } from '@mezon/mobile-ui';
 import { selectLastMessageByChannelId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
