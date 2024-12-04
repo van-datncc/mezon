@@ -8,6 +8,7 @@ import { Coords } from '../ChannelLink';
 import { notificationTypesList } from '../PanelChannel';
 import GroupPanels from '../PanelChannel/GroupPanels';
 import ItemPanel from '../PanelChannel/ItemPanel';
+import { EActiveType } from '../SettingProfile/SettingRightProfile';
 
 interface IPanelCLanProps {
 	coords: Coords;
@@ -64,10 +65,13 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		dispatch(clansActions.toggleInvitePeople({ status: true }));
 		setIsOnClickOutsideActive(false);
 	};
-	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile, setIsShowSettingProfileInitTab, setClanIdSettingProfile } =
+		useSettingFooter();
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
+		setIsShowSettingProfileInitTab(EActiveType.CLAN_SETTING);
+		setClanIdSettingProfile(clan?.clan_id || '');
 		setIsShowSettingFooterStatus(true);
 		if (setShowClanListMenuContext) {
 			setShowClanListMenuContext();
