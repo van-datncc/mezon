@@ -6,7 +6,7 @@ import { createLocalNotification, setupIncomingCall } from './app/utils/pushNoti
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const title = remoteMessage?.notification?.title;
-	if (title === 'Incoming call' || (title && (title.includes('started a video call') || title.includes('started a audio call')))) {
+	if (title === 'Incoming call') {
 		await setupIncomingCall(remoteMessage?.notification?.body);
 	} else {
 		await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);

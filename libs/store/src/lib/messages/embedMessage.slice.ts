@@ -9,12 +9,14 @@ export interface FormDataEmbed {
 }
 export interface EmbedState {
 	loadingStatus: LoadingStatus;
-	formDataEmbed: Record<string, FormDataEmbed[]>;
+	formDataEmbed: Record<string, { [key: string]: string }>;
+	optionsForm: Record<string, FormDataEmbed[]>;
 }
 
 export const initialEmbedState: EmbedState = {
 	loadingStatus: 'not loaded',
-	formDataEmbed: {}
+	formDataEmbed: {},
+	optionsForm: {}
 };
 
 export const embedSlice = createSlice({
@@ -22,16 +24,15 @@ export const embedSlice = createSlice({
 	initialState: initialEmbedState,
 	reducers: {
 		addEmbedValueInput: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
-			const { message_id } = action.payload;
-			if (!state.formDataEmbed[message_id]) {
-				state.formDataEmbed[message_id] = [action.payload.data];
-			} else {
-				if (action.payload.multiple) {
-					state.formDataEmbed[message_id].push(action.payload.data);
-				} else {
-					state.formDataEmbed[message_id] = [action.payload.data];
-				}
-			}
+			const { message_id, data } = action.payload;
+			state.formDataEmbed = {
+				...state.formDataEmbed,
+				[message_id]: { ...state.formDataEmbed[message_id], [data.id]: data.value }
+			};
+		},
+		addEmbedValueOptions: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
+			const { message_id, data } = action.payload;
+			state.optionsForm[message_id] = [data];
 		}
 	}
 });
@@ -44,7 +45,14 @@ export const embedActions = {
 
 export const getEmbedState = (rootState: { [EMBED_MESSAGE]: EmbedState }): EmbedState => rootState[EMBED_MESSAGE];
 
-export const selectDataFormEmbedByMessageId = createSelector(
-	[getEmbedState, (state, message_id: string) => message_id],
-	(state, message_id) => state.formDataEmbed[message_id] || []
-);
+export const selectDataFormEmbedByMessageId = createSelector([getEmbedState, (state, message_id: string) => message_id], (state, message_id) => {
+	if (state.optionsForm[message_id]) {
+		return {
+			dataInputs: state.formDataEmbed[message_id],
+			dataOptions: state.optionsForm[message_id]
+		};
+	}
+	return {
+		dataInputs: state.formDataEmbed[message_id]
+	};
+});

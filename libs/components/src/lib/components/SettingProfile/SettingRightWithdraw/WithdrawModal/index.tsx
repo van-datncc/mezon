@@ -4,6 +4,7 @@ import { MezonContext } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { BrowserProvider, Contract, ethers } from 'ethers';
 import isElectron from 'is-electron';
+import { safeJSONParse } from 'mezon-js';
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -261,7 +262,7 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 				const res = await contract.withdraw(requestId, amount, signature);
 
 				postHash(res.hash, requestId);
-				const currentWallet = JSON.parse(userProfile?.wallet ?? '{}');
+				const currentWallet = safeJSONParse(userProfile?.wallet ?? '{}');
 				const newWalletValue = (currentWallet.value || 0) - parseFloat(formData.amount.toString());
 				dispatch(accountActions.setWalletValue(newWalletValue));
 				onClose();
@@ -373,10 +374,10 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 																	onChange={(e) => handleInputChange('address', e.target.value)}
 																	placeholder="Enter address or Connect Wallet"
 																	className={`text-gray-700 flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-200
-                                   										 
-                                                           
+
+
                                                        border-gray-200
-                                                       
+
                                    										 ${step.id < currentStep && formData.address ? 'bg-gray-50' : ''}`}
 																/>
 																<button
@@ -431,8 +432,8 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 										<button
 											onClick={openModalConfirm}
 											disabled={!isStepComplete(3)}
-											className="px-4 py-2 text-sm font-medium text-white bg-blue-500 
-            rounded-md hover:bg-blue-600 
+											className="px-4 py-2 text-sm font-medium text-white bg-blue-500
+            rounded-md hover:bg-blue-600
             disabled:opacity-50 disabled:cursor-not-allowed"
 										>
 											Withdraw

@@ -31,7 +31,7 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 
 	const handleAddEmbedRadioValue = (index: number) => {
 		dispatch(
-			embedActions.addEmbedValueInput({
+			embedActions.addEmbedValueOptions({
 				message_id: message_id,
 				data: {
 					id: options[index].value,

@@ -3,7 +3,7 @@ import { Colors, useTheme } from '@mezon/mobile-ui';
 import { selectLastMessageByChannelId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
@@ -56,7 +56,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		if (!content) return null;
-		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content) || '{}')?.t;
+		const text = typeof content === 'string' ? safeJSONParse(content)?.t : safeJSONParse(JSON.stringify(content) || '{}')?.t;
 		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
 		if (!text) {
@@ -83,7 +83,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 				</Text>
 				{!!content && (
 					<DmListItemLastMessage
-						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+						content={typeof content === 'object' ? content : safeJSONParse(content || '{}')}
 						styleText={{ color: isUnReadChannel ? themeValue.white : themeValue.textNormal }}
 					/>
 				)}

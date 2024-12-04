@@ -26,7 +26,7 @@ import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
-import { createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
+import { IMessageTypeCallLog, createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -60,14 +60,24 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const otherCall = useSelector(selectOtherCall);
 
-	const { callState, startCall, handleEndCall, toggleAudio, toggleVideo, handleSignalingMessage, handleOtherCall, localVideoRef, remoteVideoRef } =
-		useWebRTCCall(
-			dmUserId,
-			dmGroupId as string,
-			userId as string,
-			userProfile?.user?.username as string,
-			userProfile?.user?.avatar_url as string
-		);
+	const {
+		callState,
+		timeStartConnected,
+		startCall,
+		handleEndCall,
+		toggleAudio,
+		toggleVideo,
+		handleSignalingMessage,
+		handleOtherCall,
+		localVideoRef,
+		remoteVideoRef
+	} = useWebRTCCall(
+		dmUserId,
+		dmGroupId as string,
+		userId as string,
+		userProfile?.user?.username as string,
+		userProfile?.user?.avatar_url as string
+	);
 
 	useEffect(() => {
 		if (isJoinedCall && !isInCall) {
@@ -95,14 +105,33 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [currentDmGroup?.user_id, signalingData]);
 
 	useEffect(() => {
-		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
-			handleEndCall();
+		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;
+
+		if (callState?.peerConnection && lastSignalingData) {
+			const dataType = lastSignalingData?.data_type;
+
+			if ([4, 5].includes(dataType)) {
+				if (!timeStartConnected?.current) {
+					const callLogType = dataType === 5 ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
+
+					dispatch(
+						DMCallActions.updateCallLog({
+							channelId: dmGroupId || '',
+							content: {
+								t: '',
+								callLog: { isVideo: isShowMeetDM, callLogType }
+							}
+						})
+					);
+				}
+				handleEndCall();
+			}
 		}
-		if (signalingData?.[signalingData?.length - 1] && isInCall && isInChannelCalled) {
-			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-			handleSignalingMessage(data);
+
+		if (lastSignalingData && isInCall && isInChannelCalled) {
+			handleSignalingMessage(lastSignalingData);
 		}
-	}, [callState.peerConnection, isInCall, isInChannelCalled, signalingData]);
+	}, [callState.peerConnection, isInCall, isInChannelCalled, signalingData, timeStartConnected.current]);
 
 	useImperativeHandle(ref, () => ({
 		triggerCall
@@ -134,11 +163,26 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	};
 
 	const handleCloseCall = async () => {
+		if (!timeStartConnected.current) {
+			await dispatch(
+				DMCallActions.updateCallLog({
+					channelId: dmGroupId || '',
+					content: {
+						t: '',
+						callLog: {
+							isVideo: isShowMeetDM,
+							callLogType: IMessageTypeCallLog.CANCELCALL
+						}
+					}
+				})
+			);
+		}
 		await handleEndCall();
 		dispatch(DMCallActions.setIsInCall(false));
 		dispatch(DMCallActions.removeAll());
 		handleMuteSound();
 		dispatch(audioCallActions.startDmCall({}));
+		dispatch(audioCallActions.setUserCallId(''));
 	};
 
 	const handleMuteSound = () => {
@@ -147,12 +191,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	};
 
 	useEffect(() => {
-		if (!isRemoteVideo) {
-			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = null;
-			}
+		if (!isInCall || (!isShowMeetDM && !isRemoteVideo)) {
+			setActiveVideo(null);
 		}
-	}, [isRemoteVideo, remoteVideoRef]);
+	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
 
@@ -190,7 +232,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			>
 				{/* Local Video */}
 				<div
-					className={`${activeVideo === 'remote' ? 'absolute right-0 bottom-0' : `${activeVideo === 'local' ? 'relative w-fit' : 'relative w-full'}`} `}
+					className={`${activeVideo === 'remote' ? 'absolute z-10 right-0 bottom-0' : `${activeVideo === 'local' ? 'relative w-fit' : 'relative w-full'}`} `}
 				>
 					<video
 						ref={localVideoRef}
@@ -206,7 +248,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 							display: !isShowMeetDM && !isRemoteVideo ? 'none' : 'block'
 						}}
 					/>
-					<div className="flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+
+					<div
+						className={`flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${!isShowMeetDM ? 'w-full h-full bg-black rounded-lg' : ''} `}
+					>
 						{!isShowMeetDM && (
 							<div className=" flex flex-col items-center">
 								<Icons.IconMeetDM
@@ -230,7 +275,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 				</div>
 				{/* Remote Video */}
 				<div
-					className={`${activeVideo === 'local' ? 'absolute right-0 bottom-0' : `${activeVideo === 'remote' ? 'relative w-fit' : 'relative w-full'}`}`}
+					className={`${activeVideo === 'local' ? 'absolute z-10 right-0 bottom-0' : `${activeVideo === 'remote' ? 'relative w-fit' : 'relative w-full'}`}`}
 				>
 					<div className="relative w-full h-full">
 						<video
@@ -247,7 +292,9 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 							}}
 						/>
 
-						<div className="flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+						<div
+							className={`flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${!isRemoteVideo ? 'w-full h-full bg-black rounded-lg' : ''} `}
+						>
 							{!isRemoteVideo && (
 								<div className="flex flex-col items-center">
 									<Icons.IconMeetDM

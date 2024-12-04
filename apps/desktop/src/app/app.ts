@@ -60,7 +60,7 @@ export default class App {
 		}
 
 		if (process.platform === 'win32') {
-			app.setAppUserModelId(app.getName());
+			app.setAppUserModelId('app.mezon.ai');
 		}
 
 		autoUpdater.checkForUpdates();

@@ -1,8 +1,8 @@
 import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
-import { WebrtcSignalingType } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
+import { safeJSONParse, WebrtcSignalingType } from 'mezon-js';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const STUN_SERVERS = [
@@ -64,10 +64,19 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
-
+	const timeStartConnected = useRef<Date | null>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const callTimeout = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (callState.localStream) {
+				callState.localStream.getTracks().forEach((track) => track.stop());
+			}
+			timeStartConnected.current = null;
+		};
+	}, [callState.localStream]);
 
 	// Initialize peer connection with proper configuration
 	const initializePeerConnection = useCallback(() => {
@@ -122,6 +131,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 		pc.oniceconnectionstatechange = () => {
 			if (pc.iceConnectionState === 'connected') {
+				timeStartConnected.current = new Date();
 				dispatch(toastActions.addToast({ message: 'Connection connected', type: 'success', autoClose: 3000 }));
 				dispatch(audioCallActions.setIsJoinedCall(true));
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
@@ -248,7 +258,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			switch (signalingData.data_type) {
 				case WebrtcSignalingType.WEBRTC_SDP_OFFER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const offer = JSON.parse(decompressedData || '{}');
+					const offer = safeJSONParse(decompressedData || '{}');
 
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 					const answer = await callState.peerConnection.createAnswer();
@@ -275,7 +285,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
 					const decompressedData = await decompress(signalingData.json_data);
-					const answer = JSON.parse(decompressedData || '{}');
+					const answer = safeJSONParse(decompressedData || '{}');
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 
 					if (callTimeout.current) {
@@ -294,7 +304,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				}
 
 				case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE: {
-					const candidate = JSON.parse(signalingData?.json_data || '{}');
+					const candidate = safeJSONParse(signalingData?.json_data || '{}');
 					if (candidate) {
 						if (callState.peerConnection?.remoteDescription?.type) {
 							await callState.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
@@ -310,6 +320,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					}
 					break;
 				}
+				/// case other call
+				case 5: {
+					if (callTimeout.current) {
+						clearTimeout(callTimeout.current);
+						callTimeout.current = null;
+					}
+					break;
+				}
 			}
 		} catch (error) {
 			console.error('Error handling signaling message:', error);
@@ -322,6 +340,29 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	// End call and cleanup
 	const handleEndCall = async () => {
+		if (timeStartConnected?.current) {
+			let timeCall = '';
+			const startTime = new Date(timeStartConnected.current);
+			const endTime = new Date();
+			const diffMs = endTime.getTime() - startTime.getTime();
+			const diffMins = Math.floor(diffMs / 60000);
+			const diffSecs = Math.floor((diffMs % 60000) / 1000);
+			timeCall = `${diffMins} mins ${diffSecs} secs`;
+
+			dispatch(
+				DMCallActions.updateCallLog({
+					channelId: channelId,
+					content: {
+						t: timeCall,
+						callLog: {
+							isVideo: isShowMeetDM,
+							callLogType: IMessageTypeCallLog.FINISHCALL
+						}
+					}
+				})
+			);
+		}
+
 		try {
 			if (callTimeout.current) {
 				clearTimeout(callTimeout.current);
@@ -353,6 +394,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			dispatch(audioCallActions.setIsRemoteVideo(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
 			dispatch(audioCallActions.startDmCall({}));
+			dispatch(audioCallActions.setUserCallId(''));
 			dispatch(DMCallActions.removeAll());
 			setCallState({
 				localStream: null,
@@ -466,6 +508,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	return {
 		callState,
+		timeStartConnected,
 		startCall,
 		handleEndCall,
 		toggleAudio,

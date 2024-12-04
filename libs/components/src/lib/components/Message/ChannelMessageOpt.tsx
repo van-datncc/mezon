@@ -28,7 +28,7 @@ import {
 } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ReactionPart from '../ContextMenu/ReactionPart';
@@ -221,7 +221,7 @@ function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPI
 				}
 				formattedString = JSON.stringify(jsonObject);
 			} else {
-				const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+				const jsonObject: JsonObject = safeJSONParse(defaultCanvas.content as string);
 
 				if (message.attachments?.length) {
 					const newImageUrl = message.attachments[0].url;
@@ -284,7 +284,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, messageId]);
 
@@ -315,11 +315,11 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 	}, [dispatch, message, messageId]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId === message.sender_id, (builder) => {
+		builder.when(userId === message.sender_id && !message?.content?.callLog?.callLogType, (builder) => {
 			builder.addMenuItem(
 				'edit',
 				'edit',

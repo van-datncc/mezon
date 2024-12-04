@@ -57,6 +57,7 @@ export * from './lib/policies/overriddenPolicies.slice';
 export * from './lib/policies/policies.slice';
 export * from './lib/ptt/ptt.channel.slice';
 export * from './lib/ptt/ptt.join.slice';
+export * from './lib/pushToTalkMembers/pushToTalkMembers.slice';
 export * from './lib/reactionMessage/reactionMessage.slice';
 export * from './lib/roleclan/roleclan.slice';
 export * from './lib/searchmessages/searchmessage.slice';

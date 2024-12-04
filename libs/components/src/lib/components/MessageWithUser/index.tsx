@@ -1,4 +1,4 @@
-import { useAuth, useChatSending, useCurrentInbox } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
@@ -80,12 +80,6 @@ function MessageWithUser({
 	const modalState = useRef({
 		profileItem: false
 	});
-
-	const currentDirectOrChannel = useCurrentInbox();
-
-	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel!, mode });
-
-	// Computed values
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 
@@ -295,7 +289,7 @@ function MessageWithUser({
 														message={message}
 													/>
 												)}
-												{!isEditing && (
+												{!isEditing && !message.content?.callLog?.callLogType && (
 													<MessageContent
 														message={message}
 														isSending={message.isSending}
@@ -307,7 +301,12 @@ function MessageWithUser({
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => (
-														<EmbedMessage key={index} embed={embed} message_id={message.id} />
+														<EmbedMessage
+															key={index}
+															embed={embed}
+															senderId={message.sender_id}
+															message_id={message.id}
+														/>
 													))}
 
 												{!!message.content?.callLog?.callLogType && (
@@ -318,6 +317,7 @@ function MessageWithUser({
 														messageId={message.id}
 														senderId={message.sender_id}
 														callLog={message.content?.callLog}
+														contentMsg={message?.content?.t || ''}
 													/>
 												)}
 

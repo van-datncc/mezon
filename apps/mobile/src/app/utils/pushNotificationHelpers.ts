@@ -13,16 +13,18 @@ import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
-import { Snowflake } from '@theinternetfolks/snowflake';
+import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
+import uuid from 'react-native-uuid';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
 export const checkNotificationPermission = async () => {
+	await notifee.requestPermission();
 	if (Platform.OS === 'android' && Platform.Version >= 33) {
 		const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
@@ -341,14 +343,16 @@ export const setupNotificationListeners = async (navigation) => {
 
 export const setupCallKeep = async () => {
 	const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
-	if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return false;
+	if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED && Platform.OS === 'android') return false;
 	try {
 		await RNCallKeep.setup({
 			ios: {
 				appName: 'Mezon',
 				supportsVideo: false,
 				maximumCallGroups: '1',
-				maximumCallsPerCallGroup: '1'
+				maximumCallsPerCallGroup: '1',
+				includesCallsInRecents: false,
+				ringtoneSound: 'ringing'
 			},
 			android: {
 				alertTitle: 'Permissions required',
@@ -394,7 +398,7 @@ const showRNNotificationCall = async (bodyData: any) => {
 				callerName: bodyData?.callerName
 			}
 		};
-		RNNotificationCall.displayNotification(Snowflake.generate(), bodyData?.callerAvatar, 30000, answerOption);
+		RNNotificationCall.displayNotification(uuid.v4(), bodyData?.callerAvatar, 30000, answerOption);
 		RNNotificationCall.addEventListener('endCall', (data: any) => {
 			const { callUUID = '' } = data || {};
 			RNCallKeep.endCall(callUUID);
@@ -406,8 +410,25 @@ const showRNNotificationCall = async (bodyData: any) => {
 			const { callUUID = '', payload = {} } = data || {};
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: JSON.parse(payload || '{}') });
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
 			}, 5000);
+		});
+	} catch (error) {
+		/* empty */
+	}
+};
+
+const listRNCallKeep = async (bodyData: any) => {
+	try {
+		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+			RNCallKeep.backToForeground();
+			RNCallKeep.endCall(callUUID);
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
+			}, 5000);
+			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+				RNCallKeep.endCall(callUUID);
+			});
 		});
 	} catch (error) {
 		/* empty */
@@ -415,14 +436,16 @@ const showRNNotificationCall = async (bodyData: any) => {
 };
 export const setupIncomingCall = async (body: string) => {
 	try {
-		const bodyData = JSON.parse(body || '{}');
+		const bodyData = safeJSONParse(body || '{}');
 		const statusSetup = await setupCallKeep();
 		if (!statusSetup) return;
 
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData);
+		} else {
+			await listRNCallKeep(bodyData);
 		}
-		RNCallKeep.displayIncomingCall(Snowflake.generate(), Snowflake.generate(), `${bodyData?.callerName} is calling you`, 'number', false, null);
+		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {
 		/* empty */
 	}

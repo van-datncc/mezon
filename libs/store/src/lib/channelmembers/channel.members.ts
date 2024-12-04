@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent, safeJSONParse } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import { ChannelsEntity } from '../channels/channels.slice';
@@ -409,7 +409,20 @@ export const selectMemberCustomStatusById = createSelector(
 		if (index === -1) {
 			return false;
 		}
-		return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+		try {
+			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+		} catch (e) {
+			const unescapedJSON = userGroup?.metadata?.[index].replace(/\\./g, (match) => {
+				switch (match) {
+					case '\\"':
+						return '"';
+					// Add more escape sequences as needed
+					default:
+						return match[1]; // Remove the backslash
+				}
+			});
+			return safeJSONParse(unescapedJSON || '{}')?.status;
+		}
 	}
 );
 

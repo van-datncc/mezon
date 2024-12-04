@@ -25,6 +25,11 @@ export default function SearchMessageDm({ navigation, route }: any) {
 	const { currentChannel } = route?.params || {};
 	const dispatch = useAppDispatch();
 
+	useEffect(() => {
+		setFiltersSearch([]);
+		handleSearchMessageDm('');
+	}, []);
+
 	const TabList = useMemo(
 		() =>
 			[
@@ -66,7 +71,7 @@ export default function SearchMessageDm({ navigation, route }: any) {
 	const renderSearchPage = () => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab typeSearch={ETypeSearch.SearchChannel} currentChannelId={currentChannel?.channel_id} />;
+				return <MessagesSearchTab typeSearch={ETypeSearch.SearchChannel} currentChannel={currentChannel} />;
 			default:
 				return <EmptySearchPage />;
 		}

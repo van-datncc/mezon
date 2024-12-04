@@ -1,6 +1,7 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, Text } from 'react-native';
 import { Grid } from 'react-native-animated-spinkit';
@@ -19,7 +20,7 @@ export const MyQRCode = () => {
 	const isTabletLandscape = useTabletLandscape();
 
 	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? JSON.parse(userProfile?.wallet || '{}')?.value : 0;
+		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
 	}, [userProfile?.wallet]);
 	const getTokenSocket = useSelector(selectUpdateToken(userProfile?.user?.id ?? ''));
 

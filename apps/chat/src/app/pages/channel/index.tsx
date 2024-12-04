@@ -55,7 +55,7 @@ import {
 	isWindowsDesktop,
 	titleMission
 } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -255,7 +255,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			};
 			const handleMessage = (event: MessageEvent) => {
 				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
-					const eventData = JSON.parse(event.data ?? '{}');
+					const eventData = safeJSONParse(event.data ?? '{}');
 					// eslint-disable-next-line no-console
 					console.log('[MEZON] < ', eventData);
 					if (eventData?.eventType === 'PING') {
@@ -273,7 +273,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [appChannel?.url]);
 
 	useEffect(() => {
-		const savedChannelIds = JSON.parse(localStorage.getItem('agerestrictedchannelIds') || '[]');
+		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
 		if (!savedChannelIds.includes(currentChannel.channel_id) && currentChannel.age_restricted === 1) {
 			setIsShowAgeRestricted(true);
 		} else {

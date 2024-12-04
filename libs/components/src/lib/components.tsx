@@ -88,6 +88,7 @@ export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
 
 export { default as AgeRestricted } from './components/AgeRestricted';
+export { default as BuzzBadge } from './components/BuzzBadge';
 export { default as Canvas } from './components/Canvas';
 export { default as GuideItemLayout } from './components/ClanSettings/SettingOnBoarding/GuideItemLayout';
 export * from './components/ClanSettings/SettingOnBoarding/ModalControlRule';
