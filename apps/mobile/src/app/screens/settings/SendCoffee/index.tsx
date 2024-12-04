@@ -14,14 +14,14 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { formValue } = route.params;
-	const jsonObject: ApiTokenSentEvent = JSON.parse(formValue || '{}');
+	const jsonObject: ApiTokenSentEvent = safeJSONParse(formValue || '{}');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState(jsonObject?.amount?.toString() || '1');
 	const [note, setNote] = useState(jsonObject?.note || 'send token');
 	const userProfile = useSelector(selectAllAccount);
 
 	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? JSON.parse(userProfile?.wallet || '{}')?.value : 0;
+		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
 	}, [userProfile?.wallet]);
 	const getTokenSocket = useSelector(selectUpdateToken(userProfile?.user?.id ?? ''));
 

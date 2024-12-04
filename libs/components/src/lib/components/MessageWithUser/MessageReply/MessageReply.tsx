@@ -6,6 +6,7 @@ import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
 import { useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
+import { safeJSONParse } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { MessageLine } from '../MessageLine';
 type MessageReplyProps = {
@@ -95,7 +96,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 										isTokenClickAble={false}
 										isJumMessageEnabled={true}
 										onClickToMessage={getIdMessageToJump}
-										content={JSON.parse(message?.references?.[0]?.content ?? '{}')}
+										content={safeJSONParse(message?.references?.[0]?.content ?? '{}')}
 									/>
 								</div>
 							)}

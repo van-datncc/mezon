@@ -3,6 +3,7 @@ import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, selectUserS
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import { safeJSONParse } from 'mezon-js';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
@@ -26,7 +27,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
-		const parse = JSON.parse(userProfile?.wallet ?? '').value;
+		const parse = safeJSONParse(userProfile?.wallet ?? '').value;
 		return parse;
 	}, [userProfile?.wallet]);
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);

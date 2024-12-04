@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { safeJSONParse } from 'mezon-js';
 import { MessageCrypt } from '../../e2ee';
 import { electronBridge } from './electron';
 export interface IMessageExtras {
@@ -101,7 +102,7 @@ export class MezonNotificationService {
 					this.handlePong();
 					this.startPingMonitoring(token);
 				} else {
-					const msg = JSON.parse(data.data) as NotificationData;
+					const msg = safeJSONParse(data.data) as NotificationData;
 					const { title, message, image } = msg ?? {};
 
 					const { link, e2eemess } = msg?.extras ?? {};

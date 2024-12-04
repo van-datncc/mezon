@@ -106,7 +106,7 @@ export const QRScanner = () => {
 		const store = await getStoreAsync();
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
-			const valueObj = JSON.parse(value || '{}');
+			const valueObj = safeJSONParse(value || '{}');
 			// case send token
 			if (valueObj?.receiver_id) {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {

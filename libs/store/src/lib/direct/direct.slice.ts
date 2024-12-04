@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
@@ -425,7 +425,7 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 						online: dm?.is_online ? dm?.is_online[index] : false,
 						metadata: (() => {
 							try {
-								return dm?.metadata ? JSON.parse(dm?.metadata[index]) : {};
+								return dm?.metadata ? safeJSONParse(dm?.metadata[index]) : {};
 							} catch (e) {
 								return {};
 							}
