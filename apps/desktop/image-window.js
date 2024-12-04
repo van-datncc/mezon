@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function navigateImage(direction) {
 		if (!currentData) return;
 
-		const images = currentData.channelImagesData.images;
+		const images = currentData?.images;
 		let newIndex = currentIndex + direction;
 
 		if (newIndex >= images.length) newIndex = 0;
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function downloadImage() {
 		if (!currentData) return;
 
-		const image = currentData.channelImagesData.images[currentIndex];
+		const image = currentData?.images[currentIndex];
 		const link = document.createElement('a');
 		link.href = image.url;
 		link.download = image.filename || 'image';
@@ -97,13 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		currentData = data;
 		const thumbnailContainer = document.getElementById('thumbnails-content');
 		thumbnailContainer.innerHTML = '';
+    console.log(data)
 
-		data.channelImagesData.images.forEach((image, index) => {
+    const channelLabel = document.getElementById('channel-label');
+    channelLabel.innerHTML = data.channelLabel;
+
+		data?.images.forEach((image, index) => {
+      console.log('here')
 			const wrapper = document.createElement('div');
 			wrapper.className = 'thumbnail-wrapper';
 
 			const currentDate = formatDate(image.create_time);
-			const prevDate = index > 0 ? formatDate(data.channelImagesData.images[index - 1].create_time) : null;
+			const prevDate = index > 0 ? formatDate(data?.images[index - 1].create_time) : null;
 
 			if (currentDate !== prevDate) {
 				const dateLabel = document.createElement('div');
@@ -121,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			wrapper.appendChild(thumbnail);
 			thumbnailContainer.appendChild(wrapper);
 
-			if (index === data.channelImagesData.selectedImageIndex) {
+			if (index === data.selectedImageIndex) {
 				updateSelectedImage(image, index);
 			}
 		});
@@ -182,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
+    console.log(data)
 		handleAttachmentData(data);
 	});
 

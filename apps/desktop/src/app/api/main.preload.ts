@@ -18,7 +18,6 @@ contextBridge.exposeInMainWorld('electron', {
 	setBadgeCount: (badgeCount: number) => {
 		ipcRenderer.send(SET_BADGE_COUNT, badgeCount);
 	},
-
 	onWindowBlurred: (callback: () => void) => {
 		ipcRenderer.on('window-blurred', callback);
 	},
@@ -26,7 +25,7 @@ contextBridge.exposeInMainWorld('electron', {
 		ipcRenderer.on('window-focused', callback);
 	},
 	invoke: (channel, data) => ipcRenderer.invoke(channel, data),
-	openNewWindow: (options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
-		return ipcRenderer.send(OPEN_NEW_WINDOW, options, params);
+	openNewWindow: (props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+		return ipcRenderer.send(OPEN_NEW_WINDOW, props, options, params);
 	}
 });

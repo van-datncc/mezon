@@ -1288,3 +1288,22 @@ export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
 export enum AttachmentTypeUpload {
 	BLOB = 'blob:'
 }
+
+export interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
+export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
+	uploaderData: {
+		avatar: string;
+		name: string;
+	}
+}
+
+export interface IImageWindowProps {
+	channelLabel: string;
+	selectedImageIndex: number;
+	images: Array<IAttachmentEntityWithUploader>
+}

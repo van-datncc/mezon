@@ -241,7 +241,7 @@ export default class App {
 		App.application.on('activate', App.onActivate);
 	}
 
-	static openNewWindow(options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
+	static openNewWindow(props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
 		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
 			width: 1000,
 			height: 800,
@@ -275,10 +275,8 @@ export default class App {
 		);
 
 		newWindow.webContents.on('did-finish-load', () => {
-			ipcMain.once('APP::SEND_ATTACHMENT_DATA', (event, data) => {
-				newWindow.webContents.send(SET_ATTACHMENT_DATA, data);
-				// newWindow.webContents.openDevTools();
-			});
+			console.log ('check props: ', props)
+			newWindow.webContents.send(SET_ATTACHMENT_DATA, props)
 		});
 
 		return newWindow;
