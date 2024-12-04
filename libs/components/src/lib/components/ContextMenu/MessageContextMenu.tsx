@@ -268,7 +268,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, message]);
 
@@ -287,7 +287,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				}
 			})
 		);
-		dispatch(messagesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(null));
 	}, [dispatch, message]);
 
 	const handleForwardMessage = useCallback(() => {
