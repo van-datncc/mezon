@@ -1,6 +1,6 @@
-import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone, useSettingFooter } from '@mezon/core';
 import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
-import { EPermission, IClan } from '@mezon/utils';
+import { EPermission, EUserSettings, IClan } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -64,6 +64,16 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		dispatch(clansActions.toggleInvitePeople({ status: true }));
 		setIsOnClickOutsideActive(false);
 	};
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
+	const handleOpenClanProfileSetting = () => {
+		setIsUserProfile(false);
+		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
+		setIsShowSettingFooterStatus(true);
+		if (setShowClanListMenuContext) {
+			setShowClanListMenuContext();
+		}
+	};
+
 	return (
 		<div
 			ref={panelRef}
@@ -132,7 +142,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 					</Dropdown>
 				</UserRestrictionZone> */}
 				<ItemPanel children={'Privacy Settings'} />
-				<ItemPanel children={'Edit Clan Profile'} />
+				<ItemPanel children={'Edit Clan Profile'} onClick={handleOpenClanProfileSetting} />
 			</GroupPanels>
 
 			<UserRestrictionZone policy={!canManageCLan}>

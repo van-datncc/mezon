@@ -1,6 +1,7 @@
 import { useAppParams, useAuth, useUserById } from '@mezon/core';
 import { ChannelMembersEntity, selectDmGroupCurrent, selectUpdateToken } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { safeJSONParse } from 'mezon-js';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import HistoriesWithdraw from './HistoriesWithdraw';
@@ -22,7 +23,7 @@ const SettingRightWithdraw = ({ onClose }: IWithdrawProp) => {
 	const [refreshHistory, setRefreshHistory] = useState(false);
 	const tokenInWallet = useMemo(() => {
 		try {
-			return JSON.parse(userProfile?.wallet ?? '{}').value;
+			return safeJSONParse(userProfile?.wallet ?? '{}').value;
 		} catch (error) {
 			console.error('Error parsing wallet JSON:', error);
 			return null;

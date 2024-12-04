@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
-import { ActiveDm, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
+import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
@@ -28,6 +28,7 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	currentDirectMessageId?: string | null;
 	currentDirectMessageType?: number;
 	statusDMChannelUnread: Record<string, boolean>;
+	buzzStateDirect: Record<string, BuzzArgs | null>;
 }
 
 export interface DirectRootState {
@@ -231,7 +232,8 @@ export const initialDirectState: DirectState = directAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
 	error: null,
-	statusDMChannelUnread: {}
+	statusDMChannelUnread: {},
+	buzzStateDirect: {}
 });
 
 export const directSlice = createSlice({
@@ -314,6 +316,9 @@ export const directSlice = createSlice({
 					});
 				}
 			}
+		},
+		setBuzzStateDirect: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
+			state.buzzStateDirect[action.payload.channelId] = action.payload.buzzState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -418,7 +423,25 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 						id: userId,
 						username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						online: dm?.is_online ? dm?.is_online[index] : false,
-						metadata: dm?.metadata ? JSON.parse(dm?.metadata[index]) : {}
+						metadata: (() => {
+							if (!dm?.metadata) {
+								return {};
+							}
+							try {
+								return JSON.parse(dm?.metadata[index]);
+							} catch (e) {
+								const unescapedJSON = dm?.metadata[index].replace(/\\./g, (match) => {
+									switch (match) {
+										case '\\"':
+											return '"';
+										// Add more escape sequences as needed
+										default:
+											return match[1]; // Remove the backslash
+									}
+								});
+								return safeJSONParse(unescapedJSON);
+							}
+						})()
 					};
 
 					acc.push({
@@ -435,3 +458,8 @@ export const selectAllUserDM = createSelector(selectAllDirectMessages, (directMe
 export const selectMemberDMByUserId = createSelector([selectAllUserDM, (state, userId: string) => userId], (entities, userId) => {
 	return entities.find((item) => item?.user?.id === userId);
 });
+
+export const selectBuzzStateByDirectId = createSelector(
+	[getDirectState, (state, channelId: string) => channelId],
+	(state, channelId) => state.buzzStateDirect?.[channelId]
+);

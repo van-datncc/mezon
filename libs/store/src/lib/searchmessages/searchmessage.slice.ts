@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus, SearchFilter } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
+import { safeJSONParse } from 'mezon-js';
 import { ApiSearchMessageDocument } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const SEARCH_MESSAGES_FEATURE_KEY = 'searchMessages';
@@ -20,7 +21,7 @@ export const mapSearchMessageToEntity = (searchMessage: ApiSearchMessageDocument
 		...searchMessage,
 		avatar: searchMessage.avatar_url,
 		id: searchMessage.message_id || Snowflake.generate(),
-		content: searchMessage.content ? JSON.parse(searchMessage.content) : null
+		content: searchMessage.content ? safeJSONParse(searchMessage.content) : null
 	};
 };
 

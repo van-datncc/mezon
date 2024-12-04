@@ -409,8 +409,25 @@ const showRNNotificationCall = async (bodyData: any) => {
 			const { callUUID = '', payload = {} } = data || {};
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: JSON.parse(payload || '{}') });
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
 			}, 5000);
+		});
+	} catch (error) {
+		/* empty */
+	}
+};
+
+const listRNCallKeep = async (bodyData: any) => {
+	try {
+		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+			RNCallKeep.backToForeground();
+			RNCallKeep.endCall(callUUID);
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
+			}, 5000);
+			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+				RNCallKeep.endCall(callUUID);
+			});
 		});
 	} catch (error) {
 		/* empty */
@@ -418,12 +435,14 @@ const showRNNotificationCall = async (bodyData: any) => {
 };
 export const setupIncomingCall = async (body: string) => {
 	try {
-		const bodyData = JSON.parse(body || '{}');
+		const bodyData = safeJSONParse(body || '{}');
 		const statusSetup = await setupCallKeep();
 		if (!statusSetup) return;
 
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData);
+		} else {
+			await listRNCallKeep(bodyData);
 		}
 		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {

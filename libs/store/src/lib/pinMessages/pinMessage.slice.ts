@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { IPinMessage, LoadingStatus, TypeMessage } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelMessage } from 'mezon-js';
+import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention, ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -91,13 +91,13 @@ export const setChannelPinMessage = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			const content = JSON.parse(response.content ?? '');
-			const originalMentions = JSON.parse(response.mention ?? '') as ApiMessageMention[];
+			const content = safeJSONParse(response.content ?? '');
+			const originalMentions = safeJSONParse(response.mention ?? '') as ApiMessageMention[];
 			const mentions = originalMentions.map((item) => ({
 				user_id: item.user_id,
 				e: item.e
 			}));
-			const reference = JSON.parse(response.referece ?? '');
+			const reference = safeJSONParse(response.referece ?? '');
 
 			const messageSystem: ChannelMessage = {
 				clan_id: clan_id,

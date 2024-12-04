@@ -1,4 +1,5 @@
 import { ChannelsEntity, MessagesEntity } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 
 type ThreadModalContentProps = {
@@ -18,7 +19,7 @@ const ThreadModalContent = ({ message, thread }: ThreadModalContentProps) => {
 			<p className="text-base font-normal dark:text-textThreadPrimary text-bgPrimary whitespace-nowrap overflow-x-hidden">
 				{(message?.content?.t as string) ??
 					(thread.last_sent_message && checkType
-						? JSON.parse(thread.last_sent_message.content || '{}').t
+						? safeJSONParse(thread.last_sent_message.content || '{}').t
 						: (thread.last_sent_message?.content as unknown as ContentProps)?.t || '')}
 			</p>
 		</div>

@@ -1,5 +1,6 @@
 import { IPermissionRoleChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { safeJSONParse } from 'mezon-js';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import { ApiPermissionRoleChannelListEventResponse } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -119,7 +120,7 @@ export const permissionRoleChannelSlice = createSlice({
 			const { roleId, channelId, permissionRole } = action.payload;
 			let permission;
 			if (typeof state.permission === 'string') {
-				permission = JSON.parse(state.permission);
+				permission = safeJSONParse(state.permission);
 			} else {
 				permission = state.permission;
 			}

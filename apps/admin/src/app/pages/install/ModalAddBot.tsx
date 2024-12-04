@@ -145,7 +145,7 @@ export const SelectClan = memo((props: SelectClanProps) => {
 				defaultValue=""
 				className="block w-full mt-1 dark:bg-black bg-bgLightTertiary rounded p-2 font-normal text-base tracking-wide outline-none"
 				onChange={(event) => {
-					const selectedValue = JSON.parse(event.target.value);
+					const selectedValue = safeJSONParse(event.target.value);
 					setSelectClan({
 						isEmpty: false,
 						clanId: selectedValue.id,

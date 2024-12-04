@@ -8,6 +8,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -45,7 +46,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessage?.channel_id, pinMessage?.message_id as string));
 	const messageContentObject = useMemo(() => {
 		try {
-			return JSON.parse(pinMessage.content || '{}');
+			return safeJSONParse(pinMessage.content || '{}');
 		} catch (e) {
 			console.error({ e });
 		}

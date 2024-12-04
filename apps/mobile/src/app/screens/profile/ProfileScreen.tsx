@@ -76,7 +76,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	}, [isTabletLandscape, memberStatus, userStatus]);
 
 	const tokenInWallet = useMemo(() => {
-		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet || '{}')?.value : 0;
+		return user?.userProfile?.wallet ? safeJSONParse(user?.userProfile?.wallet || '{}')?.value : 0;
 	}, [user?.userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
