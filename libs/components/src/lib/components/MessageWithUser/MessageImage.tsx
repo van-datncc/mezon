@@ -78,7 +78,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					
 					return imageListWithUploaderInfo
 				}).then((imageListWithUploaderInfo) => {
-					// @ts-ignore
 					const channelImagesData: IImageWindowProps = {
 						channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
 						images: imageListWithUploaderInfo,

@@ -97,13 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		currentData = data;
 		const thumbnailContainer = document.getElementById('thumbnails-content');
 		thumbnailContainer.innerHTML = '';
-    console.log(data)
 
     const channelLabel = document.getElementById('channel-label');
     channelLabel.innerHTML = data.channelLabel;
 
 		data?.images.forEach((image, index) => {
-      console.log('here')
 			const wrapper = document.createElement('div');
 			wrapper.className = 'thumbnail-wrapper';
 
@@ -187,13 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
-    console.log(data)
 		handleAttachmentData(data);
 	});
-
-  // window.addEventListener('unload', () => {
-  //   window.electron.removeListener('APP::SET_ATTACHMENT_DATA', (event, data) => {
-  //     handleAttachmentData(data);
-  //   });
-  // })
 });
