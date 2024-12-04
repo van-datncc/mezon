@@ -144,6 +144,12 @@ const SettingRightUser = ({
 		}
 		const allowedTypes = fileTypeImage;
 		if (!allowedTypes.includes(e.target.files[0].type)) {
+			setOpenModalType(true);
+			return;
+		}
+
+		if (e.target.files[0].size > 1000000) {
+			setOpenModal(true);
 			return;
 		}
 		const session = sessionRef.current;
