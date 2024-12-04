@@ -919,6 +919,12 @@ export type RequestInput = {
 	mentionRaw: MentionItem[];
 };
 
+export type BuzzArgs = {
+	isReset?: boolean;
+	senderId?: string;
+	timestamp?: number;
+};
+
 export enum EUserSettings {
 	ACCOUNT = 'Account',
 	PROFILES = 'Profiles',
