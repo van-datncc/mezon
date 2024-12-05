@@ -1321,3 +1321,22 @@ export enum CallLog {
 	YOU_CANCELED = 'You canceled',
 	TIME_DEFAULT = '0 mins 0 secs'
 }
+
+export interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
+export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
+	uploaderData: {
+		avatar: string;
+		name: string;
+	}
+}
+
+export interface IImageWindowProps {
+	channelLabel: string;
+	selectedImageIndex: number;
+	images: Array<IAttachmentEntityWithUploader>
+}
