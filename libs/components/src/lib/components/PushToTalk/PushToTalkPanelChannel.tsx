@@ -8,14 +8,14 @@ const PushToTalkPanelChannel: React.FC<{ channelId: string }> = ({ channelId }) 
 
 	return isJoined ? (
 		<ItemPanel
-			children="Stop talking"
+			children="Disable PTT"
 			onClick={() => {
 				quitPTT();
 			}}
 		/>
 	) : (
 		<ItemPanel
-			children="Push to talk"
+			children="Enable PTT"
 			onClick={() => {
 				setChannelId(channelId);
 				startJoinPTT();
