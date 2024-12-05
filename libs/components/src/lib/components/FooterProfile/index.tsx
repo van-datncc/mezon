@@ -91,7 +91,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const handleSaveSendToken = () => {
-		console.log(selectedUserId, 'save token');
 		if (!selectedUserId) {
 			setUserSearchError('Please select a user');
 			return;
