@@ -116,23 +116,25 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
 		handleCloseModalSendToken();
 	};
-	const loadParamsFromURL = () => {
+
+	const loadParamsSendTokenFromURL = () => {
 		const params = new URLSearchParams(window.location.search);
+		const openPopup = params.get('openPopup') === 'true';
+		if (!openPopup) return;
+
 		const tokenParam = params.get('token');
-		const selectedUserIdParam = params.get('selectedUserId');
+		const userIdParam = params.get('userId');
 		const noteParam = params.get('note');
 
 		if (tokenParam) setToken(Number(tokenParam));
-		if (selectedUserIdParam) setSelectedUserId(selectedUserIdParam);
+		if (userIdParam) setSelectedUserId(userIdParam);
 		if (noteParam) setNote(noteParam);
 
-		if (tokenParam || selectedUserIdParam || noteParam) {
-			dispatch(giveCoffeeActions.setShowModalSendToken(true));
-		}
+		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
 
 	useEffect(() => {
-		loadParamsFromURL();
+		loadParamsSendTokenFromURL();
 	}, []);
 
 	const rootRef = useRef<HTMLButtonElement>(null);
@@ -197,9 +199,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					onClose={handleCloseModalCustomStatus}
 				/>
 			)}
-			<a href={`${window.location.origin}${window.location.pathname}?token=1000000&selectedUserId=1840651459012595712&note=aaaaaaaaaaaaaaaaa`}>
-				Open Send Token Modal
-			</a>
 			{showModalSendToken && (
 				<ModalSendToken
 					setToken={setToken}
@@ -213,6 +212,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					error={error}
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
+					note={note}
 				/>
 			)}
 		</>
