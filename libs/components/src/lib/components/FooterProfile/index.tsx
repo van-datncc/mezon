@@ -87,6 +87,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const handleCloseModalSendToken = () => {
 		setToken(0);
 		setSelectedUserId('');
+		setNote('send token');
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
 	};
 
