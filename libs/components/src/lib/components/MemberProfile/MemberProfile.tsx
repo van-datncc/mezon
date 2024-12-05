@@ -23,7 +23,7 @@ import {
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_PANEL_PROFILE
 } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -329,7 +329,7 @@ export function MemberProfile({
 
 	const userStatus = useMemo(() => {
 		if (isFooter && userProfile?.user?.metadata) {
-			const metadata = JSON.parse(userProfile?.user?.metadata);
+			const metadata = safeJSONParse(userProfile?.user?.metadata);
 			return metadata;
 		}
 		if (user?.user?.metadata) {
