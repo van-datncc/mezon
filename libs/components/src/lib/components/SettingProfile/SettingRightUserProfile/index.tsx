@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons, InputField } from '@mezon/ui';
-import { fetchAndCreateFiles, fileTypeImage } from '@mezon/utils';
+import { createImgproxyUrl, fetchAndCreateFiles, fileTypeImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
 import { ChangeEvent, useState } from 'react';
@@ -233,13 +233,20 @@ const SettingRightUser = ({
 					</div>
 
 					<div className="mt-8 flex items-center bg-bgTertiary p-4 rounded justify-between">
-						<p className="font-semibold tracking-wide text-sm">LOGO</p>
+						<p className="font-semibold tracking-wide text-sm">Direct Message Icon</p>
 						<div className="flex gap-x-5">
 							<label
 								htmlFor="logo"
 								className="text-white relative font-medium flex items-center w-11 aspect-square justify-center bg-bgSecondary600 rounded cursor-pointer text-[14px]"
 							>
-								{logoCustom ? <img src={logoCustom} className="w-11 aspect-square object-cover rounded" /> : <Icons.AddIcon />}
+								{logoCustom ? (
+									<img
+										src={createImgproxyUrl(logoCustom, { width: 44, height: 44, resizeType: 'fit' })}
+										className="w-11 aspect-square object-cover rounded"
+									/>
+								) : (
+									<Icons.AddIcon />
+								)}
 
 								<input
 									accept="image/*"

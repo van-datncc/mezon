@@ -62,6 +62,7 @@ import {
 	ModeResponsive,
 	Platform,
 	TIME_OF_SHOWING_FIRST_POPUP,
+	createImgproxyUrl,
 	getPlatform,
 	isLinuxDesktop,
 	isMacDesktop,
@@ -432,7 +433,7 @@ const SidebarMenu = memo(
 										<Image
 											src={
 												logoCustom
-													? logoCustom
+													? createImgproxyUrl(logoCustom, { width: 44, height: 44, resizeType: 'fit' })
 													: `assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`
 											}
 											alt={'logoMezon'}
