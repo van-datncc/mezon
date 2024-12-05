@@ -24,7 +24,8 @@ import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
 export const checkNotificationPermission = async () => {
-	await notifee.requestPermission();
+	if (Platform.OS === 'ios') await notifee.requestPermission();
+
 	if (Platform.OS === 'android' && Platform.Version >= 33) {
 		const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
@@ -411,7 +412,7 @@ const showRNNotificationCall = async (bodyData: any) => {
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
-			}, 5000);
+			}, 3000);
 		});
 	} catch (error) {
 		/* empty */
@@ -425,7 +426,7 @@ const listRNCallKeep = async (bodyData: any) => {
 			RNCallKeep.endCall(callUUID);
 			setTimeout(() => {
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
-			}, 5000);
+			}, 3000);
 			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
 				RNCallKeep.endCall(callUUID);
 			});
@@ -447,6 +448,7 @@ export const setupIncomingCall = async (body: string) => {
 		}
 		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {
+		console.error('log  => setupIncomingCall', error);
 		/* empty */
 	}
 };
