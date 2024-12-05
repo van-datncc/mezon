@@ -735,6 +735,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
 								emojiId=""
+								color={suggestion.color}
 							/>
 						);
 					}}
