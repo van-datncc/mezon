@@ -18,7 +18,7 @@ import { MemberProfileType, useLongPress } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MicButton } from '../ChannelTopbar/TopBarComponents/PushToTalkButton/MicIcon';
 import { MemberProfile } from '../MemberProfile';
@@ -117,6 +117,27 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
 		handleCloseModalSendToken();
 	};
+
+	const loadParamsSendTokenFromURL = () => {
+		const params = new URLSearchParams(window.location.search);
+		const openPopup = params.get('openPopup') === 'true';
+		if (!openPopup) return;
+
+		const tokenParam = params.get('token');
+		const userIdParam = params.get('userId');
+		const noteParam = params.get('note');
+
+		if (tokenParam) setToken(Number(tokenParam));
+		if (userIdParam) setSelectedUserId(userIdParam);
+		if (noteParam) setNote(noteParam);
+
+		dispatch(giveCoffeeActions.setShowModalSendToken(true));
+	};
+
+	useEffect(() => {
+		loadParamsSendTokenFromURL();
+	}, []);
+
 	const rootRef = useRef<HTMLButtonElement>(null);
 
 	return (
@@ -182,6 +203,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{showModalSendToken && (
 				<ModalSendToken
 					setToken={setToken}
+					token={token}
+					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
 					onClose={handleCloseModalSendToken}
@@ -190,6 +213,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					error={error}
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
+					note={note}
 				/>
 			)}
 		</>
