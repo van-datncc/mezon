@@ -261,8 +261,12 @@ export default class App {
 		const windowOptions = { ...defaultOptions, ...options };
 
 		const newWindow = new BrowserWindow(windowOptions);
+
+		const filePath = App.application.isPackaged
+			? '../../apps/desktop/assets/image-window/image-window.html'
+			: 'apps/desktop/src/assets/image-window/image-window.html';
 		if (App.application.isPackaged) {
-			const baseUrl = join(__dirname, '..', '..', '..', '../../apps/desktop/assets/image-window/image-window.html');
+			const baseUrl = join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
 			newWindow.loadURL(
@@ -274,7 +278,7 @@ export default class App {
 				})
 			);
 		} else {
-			const baseUrl = join(__dirname, '..', '..', '..', 'apps/desktop/src/assets/image-window/image-window.html');
+			const baseUrl = join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
 			newWindow.loadURL(
