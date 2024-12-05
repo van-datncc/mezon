@@ -9,7 +9,7 @@
       "outputs": [
         "{options.outputPath}"
       ],
-      "appId": "mezon.ai",
+      "appId": "app.mezon.ai",
       "publish": [
         {
           "provider": "generic",
@@ -51,7 +51,7 @@
           "nsis",
           "portable"
         ],
-        "appId": "mezon.ai",
+        "appId": "app.mezon.ai",
         "publish": [
           {
             "provider": "generic",
@@ -89,7 +89,7 @@
         "desktop": {
           "exec": "mezonapp %U"
         },
-        "appId": "mezon.ai",
+        "appId": "app.mezon.ai",
         "publish": [
           {
             "provider": "generic",
@@ -105,16 +105,6 @@
           {
             "glob": "**/*",
             "input": "apps/desktop/src/assets/",
-            "output": "./assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "apps/chat/src/assets/",
-            "output": "./assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "libs/assets/src/assets/",
             "output": "./assets/"
           },
           {
@@ -193,7 +183,7 @@
             "nsis",
             "portable"
           ],
-          "appId": "mezon.ai",
+          "appId": "app.mezon.ai",
           "publish": [
             {
               "provider": "generic",
@@ -231,7 +221,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "mezon.ai",
+          "appId": "app.mezon.ai",
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "publish": [
             {
@@ -280,7 +270,7 @@
             "nsis",
             "portable"
           ],
-          "appId": "mezon.ai",
+          "appId": "app.mezon.ai",
           "publish": [
             {
               "provider": "generic",
@@ -317,7 +307,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "mezon.ai",
+          "appId": "app.mezon.ai",
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "publish": [
             {

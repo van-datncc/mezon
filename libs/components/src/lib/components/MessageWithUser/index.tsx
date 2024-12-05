@@ -1,4 +1,4 @@
-import { useAuth, useChatSending, useCurrentInbox } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
@@ -15,6 +15,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
@@ -79,12 +80,6 @@ function MessageWithUser({
 	const modalState = useRef({
 		profileItem: false
 	});
-
-	const currentDirectOrChannel = useCurrentInbox();
-
-	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel!, mode });
-
-	// Computed values
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 
@@ -225,35 +220,6 @@ function MessageWithUser({
 
 	const isMessageSystem =
 		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
-	const [forceRender, setForceRender] = useState(false);
-
-	// const triggerReRender = () => {
-	// 	setForceRender((prev) => !prev);
-	// };
-	// useEffect(() => {
-	// 	if (message.isSending || !message.message_id || !message.content.lk || message.content.lk.length === 0) return;
-	// 	const existingAttachmentUrls = message.attachments?.map((item) => item.url).filter(Boolean) || [];
-
-	// 	const updateAttachments = () => {
-	// 		processLinks({
-	// 			t: message.content.t as string,
-	// 			lk: message.content.lk as IStartEndIndex[]
-	// 		})
-	// 			.then((attachmentUrls) => {
-	// 				const newAttachmentUrls = attachmentUrls.filter((attachment) => !existingAttachmentUrls.includes(attachment.url));
-
-	// 				if (newAttachmentUrls.length > 0) {
-	// 					editSendMessage(message.content, message.message_id ?? '', message.mentions || [], newAttachmentUrls, true);
-	// 					triggerReRender();
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				console.error('Failed to update message:', error);
-	// 			});
-	// 	};
-
-	// 	updateAttachments();
-	// }, [message.id, forceRender]);
 
 	return (
 		<>
@@ -323,7 +289,7 @@ function MessageWithUser({
 														message={message}
 													/>
 												)}
-												{!isEditing && (
+												{!isEditing && !message.content?.callLog?.callLogType && (
 													<MessageContent
 														message={message}
 														isSending={message.isSending}
@@ -335,8 +301,25 @@ function MessageWithUser({
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => (
-														<EmbedMessage key={index} embed={embed} message_id={message.id} />
+														<EmbedMessage
+															key={index}
+															embed={embed}
+															senderId={message.sender_id}
+															message_id={message.id}
+														/>
 													))}
+
+												{!!message.content?.callLog?.callLogType && (
+													<CallLogMessage
+														userId={userId || ''}
+														userName={userLogin.userProfile?.user?.display_name || ''}
+														channelId={message.channel_id}
+														messageId={message.id}
+														senderId={message.sender_id}
+														callLog={message.content?.callLog}
+														contentMsg={message?.content?.t || ''}
+													/>
+												)}
 
 												{message.content?.components &&
 													message.content.components.map((actionRow, index) => (

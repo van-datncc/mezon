@@ -1,4 +1,5 @@
 import { addMention, convertTimeString, ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData, TypeMessage } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
 
@@ -21,7 +22,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 
 	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
-			return JSON.parse(message.content).t;
+			return safeJSONParse(message.content).t;
 		} else {
 			return lines;
 		}
@@ -92,6 +93,7 @@ const MessageText = ({
 								isJumMessageEnabled={false}
 								content={content}
 								mode={mode}
+								code={message.code}
 							/>
 						)}
 						{(message.code === TypeMessage.Welcome ||

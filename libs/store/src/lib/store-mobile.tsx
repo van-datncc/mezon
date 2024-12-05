@@ -13,7 +13,6 @@ import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { directReducer } from './direct/direct.slice';
-import { DMCallReducer } from './dmcall/dmcall.slice';
 import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice';
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
@@ -38,8 +37,11 @@ import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
+import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
+import { audioCallReducer } from './dmcall/audioCall.slice';
+import { DMCallReducer } from './dmcall/dmcall.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { E2EE_FEATURE_KEY, e2eeReducer } from './e2ee/e2ee.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -47,13 +49,17 @@ import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
+import { EMBED_MESSAGE, embedReducer } from './messages/embedMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboarding.slice';
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
+import { JoinPTTReducer } from './ptt/ptt.join.slice';
+import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
@@ -64,6 +70,7 @@ import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
+import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
 const persistedReducer = persistReducer(
@@ -78,7 +85,8 @@ const persistedReducer = persistReducer(
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage
+		storage,
+		blacklist: ['invitePeople']
 	},
 	clansReducer
 );
@@ -366,12 +374,14 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
+	pushToTalkUsers: pushToTalkMembersReducer,
 	channelsstream: channelsStreamReducer,
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
 	auditlog: auditLogReducer,
+	audiocall: audioCallReducer,
 	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
@@ -382,13 +392,18 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
+	integrationClanWebhook: integrationClanWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
 	clanMembersMeta: clanMembersMetaReducer,
+	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
-	[E2EE_FEATURE_KEY]: e2eeReducer
+	joinPTT: JoinPTTReducer,
+	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
+	[E2EE_FEATURE_KEY]: e2eeReducer,
+	[EMBED_MESSAGE]: embedReducer
 };
 
 let storeInstance = configureStore({

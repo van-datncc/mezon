@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import {
 	ApiChannelMessageHeaderWithChannel,
+	BuzzArgs,
 	ChannelThreads,
 	checkIsThread,
 	ICategory,
@@ -12,7 +13,7 @@ import {
 } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, GetThunkAPI, PayloadAction } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
 import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
@@ -87,6 +88,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
 	favoriteChannels: string[];
+	buzzState: Record<string, BuzzArgs | null>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -158,9 +160,9 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
 			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
 
-			if (messageId) {
-				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
-			} else {
+			const state = thunkAPI.getState() as RootState;
+
+			if (!state.messages?.idMessageToJump?.id) {
 				thunkAPI.dispatch(
 					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
 				);
@@ -541,13 +543,14 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentCategory: null,
 	currentVoiceChannelId: '',
 	request: {},
-	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	idChannelSelected: safeJSONParse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 	previousChannels: [],
 	appChannelsList: {},
 	fetchChannelSuccess: false,
-	favoriteChannels: []
+	favoriteChannels: [],
+	buzzState: {}
 });
 
 export const channelsSlice = createSlice({
@@ -686,6 +689,10 @@ export const channelsSlice = createSlice({
 					});
 				}
 			}
+		},
+
+		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
+			state.buzzState[action.payload.channelId] = action.payload.buzzState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -902,7 +909,7 @@ export const selectChannelsByClanId = (clainId: string) =>
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
 	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
 		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
 			const selectedChannel = channels.find((channel) => channel.channel_id === idsSelectedChannel[clanId]);
 			if (selectedChannel) {
@@ -981,3 +988,8 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 	});
 	return channelThread as ChannelThreads[];
 });
+
+export const selectBuzzStateByChannelId = createSelector(
+	[getChannelsState, (state, channelId: string) => channelId],
+	(state, channelId) => state.buzzState?.[channelId]
+);

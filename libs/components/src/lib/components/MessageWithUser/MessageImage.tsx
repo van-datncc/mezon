@@ -1,7 +1,6 @@
 import { useAppParams, useAttachments } from '@mezon/core';
 import { attachmentActions, checkListAttachmentExist, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { ImageWindowProps, SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -31,8 +30,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
-
-		if (isElectron()) {
+		const skipDesktop = true;
+		if (!skipDesktop) {
 			const props: ImageWindowProps = {
 				attachmentData: attachmentData,
 				messageId: messageId as string,

@@ -42,6 +42,7 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
+	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
 	selectChannelsByClanId,
@@ -52,7 +53,9 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
+	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
+	selectUserCallId,
 	stickerSettingActions,
 	toastActions,
 	useAppDispatch,
@@ -63,7 +66,17 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, sleep } from '@mezon/utils';
+import {
+	ETypeLinkMedia,
+	IMessageSendPayload,
+	IMessageTypeCallLog,
+	ModeResponsive,
+	NotificationCode,
+	TIME_OFFSET,
+	ThreadStatus,
+	TypeMessage,
+	sleep
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -83,8 +96,11 @@ import {
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
+	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
+	PTTJoinedEvent,
+	PTTLeavedEvent,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
@@ -141,7 +157,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const userCallId = useSelector(selectUserCallId);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -198,6 +216,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onPTTchannelJoined = useCallback(
+		(user: PTTJoinedEvent) => {
+			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
+			if (existingMember) {
+				dispatch(pttMembersActions.remove(existingMember?.id));
+			}
+			dispatch(pttMembersActions.add(user));
+		},
+		[dispatch, pttMembers]
+	);
+
+	const onPTTchannelLeaved = useCallback(
+		(user: PTTLeavedEvent) => {
+			dispatch(pttMembersActions.remove(user?.id));
+		},
+		[dispatch]
+	);
+
 	const onstreamingchannelstarted = useCallback(
 		(channel: StreamingStartedEvent) => {
 			if (channel) {
@@ -234,13 +270,33 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const handleBuzz = (channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
+		const timestamp = Math.round(Date.now() / 1000);
+		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
+		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
+		}
+	};
+
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			if (message.code === TypeMessage.MessageBuzz) {
+				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
+			}
+
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
+				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
+					dispatch(DMCallActions.setCallMessageId(message?.message_id));
+				}
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
@@ -395,7 +451,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
 			if (pin.operation === 1) {
-				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
+				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: pin.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
 				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
@@ -689,6 +745,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const onmessagebuttonclicked = useCallback((event: MessageButtonClicked) => {
+		//console.error('event', event);
+	}, []);
+
 	const onerror = useCallback(
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -789,7 +849,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (channelUpdated.clan_id === '0') {
-				return dispatch(directActions.updateOne(channelUpdated));
+				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
 
 			if (channelUpdated) {
@@ -940,27 +1000,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		handleRoleEvent();
 	}, []);
 
-	const onwebrtcsignalingfwd = useCallback((event: WebrtcSignalingFwd) => {
-		// TODO: AND TYPE IN BE
-		// TYPE = 4: USER CANCEL CALL
-		// TYPE = 0: USER JOINED CALL
-		if (event?.data_type === 4) {
-			dispatch(DMCallActions.cancelCall({}));
-			dispatch(audioCallActions.startDmCall({}));
-			dispatch(audioCallActions.setIsJoinedCall(false));
-		}
-		if (event?.data_type === 0) {
-			dispatch(audioCallActions.setIsJoinedCall(true));
-		}
-		dispatch(
-			DMCallActions.addOrUpdate({
-				calleeId: event?.receiver_id,
-				signalingData: event,
-				id: event?.caller_id,
-				callerId: event?.caller_id
-			})
-		);
-	}, []);
+	const onwebrtcsignalingfwd = useCallback(
+		(event: WebrtcSignalingFwd) => {
+			// TODO: AND TYPE IN BE
+			// TYPE = 4: USER CANCEL CALL
+			// TYPE = 0: USER JOINED CALL
+			// TYPE = 5: OTHER CALL
+			if (userCallId && userCallId !== event?.caller_id) {
+				socketRef.current?.forwardWebrtcSignaling(event?.caller_id, 5, '', event?.channel_id, userId || '');
+				return;
+			}
+			if (event?.data_type === 4) {
+				dispatch(DMCallActions.cancelCall({}));
+				dispatch(audioCallActions.startDmCall({}));
+				dispatch(audioCallActions.setUserCallId(''));
+				dispatch(audioCallActions.setIsJoinedCall(false));
+				dispatch(DMCallActions.setOtherCall({}));
+			}
+			if (event?.data_type === 0) {
+				dispatch(audioCallActions.setIsJoinedCall(true));
+			}
+			if (event?.data_type === 5) {
+				dispatch(audioCallActions.setIsBusyTone(true));
+			}
+			dispatch(
+				DMCallActions.addOrUpdate({
+					calleeId: event?.receiver_id,
+					signalingData: event,
+					id: event?.caller_id,
+					callerId: event?.caller_id
+				})
+			);
+		},
+		[userCallId]
+	);
 
 	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
 		dispatch(
@@ -989,6 +1062,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onvoiceended = onvoiceended;
 
 			socket.onvoiceleaved = onvoiceleaved;
+
+			socket.onpttchanneljoined = onPTTchannelJoined;
+
+			socket.onpttchannelleaved = onPTTchannelLeaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
 
@@ -1064,7 +1141,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.ontokensent = ontokensent;
 
-			//socket.onmessagebuttonclicked = onmessagebuttonclicked;
+			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
@@ -1111,10 +1188,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncoffeegiven,
 			onroleevent,
 			ontokensent,
-			//onmessagebuttonclicked,
+			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
 			onjoinpttchannel,
-			ontalkpttchannel
+			ontalkpttchannel,
+			onPTTchannelJoined,
+			onPTTchannelLeaved
 		]
 	);
 
@@ -1248,7 +1327,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		setCallbackEventFn,
 		oncoffeegiven,
 		onroleevent,
-		ontokensent
+		ontokensent,
+		onPTTchannelJoined,
+		onPTTchannelLeaved
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

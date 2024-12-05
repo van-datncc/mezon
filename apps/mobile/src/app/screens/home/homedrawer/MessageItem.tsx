@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, ReplyMessageDeleted, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, MessagesEntity, messagesActions, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, messagesActions, MessagesEntity, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -11,18 +11,19 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from '@mezon/store-mobile';
-import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
+import { ETypeLinkMedia, isValidEmojiData, TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import RenderMessageBlock from './RenderMessageBlock';
-import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
+import { MessageCallLog } from './components/MessageCallLog';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
+import RenderMessageBlock from './RenderMessageBlock';
 import { IMessageActionNeedToResolve } from './types';
+import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -54,6 +55,10 @@ const MessageItem = React.memo(
 		const isInviteLink = useMemo(() => {
 			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		}, [contentMessage, lk]);
+
+		const isMessageCallLog = useMemo(() => {
+			return !!message?.content?.callLog;
+		}, [message?.content?.callLog]);
 
 		const isGoogleMapsLink = useMemo(() => {
 			return Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
@@ -88,6 +93,10 @@ const MessageItem = React.memo(
 			}
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);
+
+		const isBuzzMessage = useMemo(() => {
+			return message?.code === TypeMessage.MessageBuzz;
+		}, [message?.code]);
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 		const swipeableRef = React.useRef(null);
@@ -133,7 +142,7 @@ const MessageItem = React.memo(
 					setShowHighlightReply(true);
 					timeoutRef.current = setTimeout(() => {
 						setShowHighlightReply(false);
-						dispatch(messagesActions.setIdMessageToJump(''));
+						dispatch(messagesActions.setIdMessageToJump(null));
 					}, 2000);
 				} else {
 					setShowHighlightReply(false);
@@ -300,6 +309,7 @@ const MessageItem = React.memo(
 						/>
 
 						<Pressable
+							disabled={isMessageCallLog}
 							style={[styles.rowMessageBox]}
 							delayLongPress={300}
 							onPressIn={handlePressIn}
@@ -322,6 +332,13 @@ const MessageItem = React.memo(
 										isInviteLink={isInviteLink}
 										contentMessage={contentMessage}
 									/>
+								) : isMessageCallLog ? (
+									<MessageCallLog
+										contentMsg={message?.content?.t}
+										channelId={message?.channel_id}
+										senderId={message?.sender_id}
+										callLog={message?.content?.callLog}
+									/>
 								) : (
 									<RenderTextMarkdownContent
 										content={{
@@ -335,6 +352,7 @@ const MessageItem = React.memo(
 										onChannelMention={onChannelMention}
 										isNumberOfLine={isNumberOfLine}
 										isMessageReply={false}
+										isBuzzMessage={isBuzzMessage}
 										mode={mode}
 										currentChannelId={channelId}
 										isOnlyContainEmoji={isOnlyContainEmoji}
@@ -343,7 +361,7 @@ const MessageItem = React.memo(
 								)}
 								{!!message?.content?.embed?.length &&
 									message?.content?.embed?.map((embed, index) => (
-										<EmbedMessage {...embed} key={`message_embed_${message?.id}_${index}`} />
+										<EmbedMessage message_id={message?.id} embed={embed} key={`message_embed_${message?.id}_${index}`} />
 									))}
 								{!!message?.content?.components?.length &&
 									message?.content.components?.map((component, index) => (

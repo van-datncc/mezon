@@ -13,6 +13,7 @@ import {
 } from '@mezon/store-mobile';
 import { convertTimeMessage, IChannelMember } from '@mezon/utils';
 import { DrawerActions, NavigationProp, useNavigation } from '@react-navigation/native';
+import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useMessageSender } from '../../../hooks/useMessageSender';
@@ -72,7 +73,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		return (
 			(message?.content?.t as string) ??
 			(thread.last_sent_message && checkType
-				? JSON.parse(thread.last_sent_message.content || '{}').t
+				? safeJSONParse(thread.last_sent_message.content || '{}').t
 				: (thread.last_sent_message?.content as any)?.t || '')
 		);
 	}, [message, thread]);

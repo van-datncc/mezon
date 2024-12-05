@@ -41,8 +41,13 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 	const direct = useAppSelector((state) => selectDirectById(state, groupCallId)) || {};
 	const isJoinedCall = useSelector(selectJoinedCall);
 
-	const { handleEndCall, toggleAudio, toggleVideo } = useWebRTCCall(dmUserId, groupCallId as string, userProfile?.user?.id as string);
-
+	const { handleEndCall, toggleAudio, toggleVideo } = useWebRTCCall(
+		dmUserId,
+		groupCallId as string,
+		userProfile?.user?.id as string,
+		userProfile?.user?.username as string,
+		userProfile?.user?.avatar_url as string
+	);
 	const redirectToCall = async () => {
 		await dispatch(
 			directActions.joinDirectMessage({
@@ -74,6 +79,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 			dispatch(DMCallActions.removeAll());
 			muteSound();
 			dispatch(audioCallActions.startDmCall({}));
+			dispatch(audioCallActions.setUserCallId(''));
 		} else if (type === ESummaryInfo.STREAM && currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 			const userStreamId = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;

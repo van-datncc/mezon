@@ -985,7 +985,8 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
-.draggable-area {
+.draggable-area,
+.draggable-area .app-region-drag {
   -webkit-app-region: drag;
 }
 

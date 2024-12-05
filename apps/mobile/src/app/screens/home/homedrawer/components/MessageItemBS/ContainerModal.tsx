@@ -23,7 +23,7 @@ import {
 import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
@@ -517,7 +517,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	useEffect(() => {
 		if (type === EMessageBSToShow?.MessageAction) {
 			AsyncStorage.getItem('recentEmojis')
-				.then((emojis) => JSON.parse(emojis || '[]'))
+				.then((emojis) => safeJSONParse(emojis || '[]'))
 				.then((parsedEmojis) => {
 					const recentEmojis = parsedEmojis
 						?.reverse()

@@ -1,8 +1,9 @@
-import { selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
+import { DirectEntity, selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { createImgproxyUrl } from '@mezon/utils';
+import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Label, Modal } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../components';
@@ -10,7 +11,6 @@ import { AvatarImage } from '../../../components';
 type ModalSendTokenProps = {
 	openModal: boolean;
 	onClose?: () => void;
-	token?: number;
 	setToken: (token: number) => void;
 	handleSaveSendToken?: () => void;
 	setSelectedUserId: (id: string) => void;
@@ -22,7 +22,6 @@ type ModalSendTokenProps = {
 
 const ModalSendToken = ({
 	openModal,
-	token,
 	onClose,
 	setToken,
 	handleSaveSendToken,
@@ -33,10 +32,12 @@ const ModalSendToken = ({
 	userId
 }: ModalSendTokenProps) => {
 	const usersClan = useSelector(selectAllUserClans);
-	const directMessages = useSelector(selectAllDirectMessages);
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [tokenNumber, setTokenNumber] = useState('');
 
 	useEffect(() => {
 		if (!openModal) {
@@ -77,7 +78,8 @@ const ModalSendToken = ({
 	};
 
 	const handleChangeSendToken = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
+		const value = e.target.value.replace(/[^0-9]/g, '');
+		setTokenNumber(formatNumber(Number(value), 'vi-VN'));
 		setToken(Number(value));
 	};
 
@@ -89,35 +91,31 @@ const ModalSendToken = ({
 	const mergeUniqueUsers = (usersClan: any[], directMessages: any[]) => {
 		const userMap = new Map();
 
-		usersClan.forEach((clan) => {
-			const { id, user } = clan || {};
-			const userId = Array.isArray(id) ? id[0] : id;
-			const userIdStr = String(userId);
-			if (!userMap.has(userIdStr)) {
-				userMap.set(userIdStr, {
-					id: userIdStr,
-					username: user.username,
-					avatar_url: user.avatar_url
+		usersClan.forEach((itemUserClan) => {
+			const userId = itemUserClan?.id ?? '';
+			if (userId && !userMap.has(userId)) {
+				userMap.set(userId, {
+					id: userId,
+					username: itemUserClan?.user?.username ?? '',
+					avatar_url: itemUserClan?.user?.avatar_url ?? ''
 				});
 			}
 		});
 
-		directMessages.forEach((message) => {
-			const { user_id, usernames, channel_avatar } = message || {};
-			const userId = Array.isArray(user_id) ? user_id[0] : user_id;
-			const userIdStr = String(userId);
-			if (!userMap.has(userIdStr)) {
-				userMap.set(userIdStr, {
-					id: userIdStr,
-					username: usernames,
-					avatar_url: channel_avatar?.[0] ?? ''
+		directMessages.forEach((itemDM: DirectEntity) => {
+			const userId = itemDM?.user_id?.[0] ?? '';
+			if (userId && !userMap.has(userId)) {
+				userMap.set(userId, {
+					id: userId,
+					username: itemDM?.usernames ?? '',
+					avatar_url: itemDM?.channel_avatar?.[0] ?? ''
 				});
 			}
 		});
 
 		return Array.from(userMap.values());
 	};
-	const mergedUsers = mergeUniqueUsers(usersClan, directMessages);
+	const mergedUsers = mergeUniqueUsers(usersClan, listDM);
 
 	const filteredUsers = mergedUsers.filter((user: any) => user.username?.toLowerCase().includes(searchTerm.toLowerCase()) && user.id !== userId);
 
@@ -179,8 +177,8 @@ const ModalSendToken = ({
 														<ItemSelect key={user.id} onClick={() => handleSelectUser(user.id, user.username)}>
 															<div className="flex items-center">
 																<AvatarImage
-																	alt={user.username || ''}
-																	userName={user.username}
+																	alt={user?.username ?? ''}
+																	userName={user?.username ?? ''}
 																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
 																		width: 100,
 																		height: 100,
@@ -211,10 +209,10 @@ const ModalSendToken = ({
 							/>
 						</div>
 						<input
-							type="number"
-							defaultValue={token}
+							type="text"
+							value={tokenNumber}
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
-							placeholder="$"
+							placeholder="VND"
 							onChange={handleChangeSendToken}
 						/>
 						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
@@ -234,7 +232,6 @@ const ModalSendToken = ({
 							placeholder="send token"
 							onChange={handleChangeNote}
 						/>
-						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 					</div>
 					<div className="flex justify-end p-4 rounded-b dark:bg-[#2B2D31] bg-[#dedede]">
 						<Button

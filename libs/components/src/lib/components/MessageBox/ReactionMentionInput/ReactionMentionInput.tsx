@@ -1,6 +1,7 @@
 import {
 	useChannelMembers,
 	useClickUpToEdit,
+	useCurrentInbox,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
@@ -49,13 +50,12 @@ import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
-	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
+	MentionReactInputProps,
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadStatus,
-	ThreadValue,
 	addMention,
 	blankReferenceObj,
 	checkIsThread,
@@ -69,7 +69,7 @@ import {
 	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -106,29 +106,6 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
-export type MentionReactInputProps = {
-	readonly onSend: (
-		content: IMessageSendPayload,
-		mentions?: Array<ApiMessageMention>,
-		attachments?: Array<ApiMessageAttachment>,
-		references?: Array<ApiMessageRef>,
-		value?: ThreadValue,
-		anonymousMessage?: boolean,
-		mentionEveryone?: boolean,
-		displayName?: string,
-		clanNick?: string
-	) => void;
-	readonly onTyping?: () => void;
-	readonly listMentions?: MentionDataProps[] | undefined;
-	readonly isThread?: boolean;
-	readonly handlePaste?: any;
-	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
-	readonly currentClanId?: string;
-	readonly currentChannelId?: string;
-	readonly mode?: number;
-	hasPermissionEdit?: boolean;
-};
-
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
@@ -153,16 +130,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
-
-	const currentDmOrChannelId =
-		props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
-			? currentChannel?.channel_id
-			: currentDmId;
-
+	const currentDmOrChannelId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -475,7 +446,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const previousValue = prevValueRef.current;
 		const previousPlainText = prevPlainTextRef.current;
-
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
 		setRedoHistory([]);
@@ -569,16 +539,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !request?.valueTextInput) {
-			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId:
-						props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
-							? (currentChannelId as string)
-							: (currentDmId as string),
+					channelId: currentDmOrChannelId as string,
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,

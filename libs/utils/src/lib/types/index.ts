@@ -36,6 +36,7 @@ import {
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import { ApiNotifiReactMessage, ApiNotificationChannelCategorySetting, ApiPermissionRoleChannel } from 'mezon-js/dist/api.gen';
+import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
@@ -240,6 +241,7 @@ export interface IFieldEmbed {
 	value: string;
 	inline?: boolean;
 	options?: IMessageRatioOption[];
+	inputs?: SelectComponent | InputComponent;
 }
 
 export enum EButtonMessageStyle {
@@ -278,6 +280,28 @@ export interface IMessageRatioOption {
 	style?: EButtonMessageStyle;
 }
 
+export interface IMessageInput {
+	id: string;
+	placeholder?: string;
+	type?: HTMLInputTypeAttribute;
+	required?: boolean;
+	textarea?: boolean;
+	style?: EButtonMessageStyle;
+}
+
+export enum IMessageTypeCallLog {
+	STARTCALL = 1,
+	TIMEOUTCALL = 2,
+	FINISHCALL = 3,
+	REJECTCALL = 4,
+	CANCELCALL = 5
+}
+
+export interface IMessageCallLog {
+	isVideo: boolean;
+	callLogType: IMessageTypeCallLog;
+}
+
 export enum EMessageSelectType {
 	TEXT = 1,
 	USER = 2,
@@ -296,11 +320,6 @@ export interface IMessageSelect {
 	// Maximum number of items that can be chosen (defaults to 1)
 	max_options?: number;
 	disabled?: boolean;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IMessageInput {
-	// some input specific properties
 }
 
 export interface IMessageComponent<T> {
@@ -327,6 +346,7 @@ export interface IMessageSendPayload {
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	components?: IMessageActionRow[];
+	callLog?: IMessageCallLog;
 }
 
 export type IUser = {
@@ -899,6 +919,12 @@ export type RequestInput = {
 	mentionRaw: MentionItem[];
 };
 
+export type BuzzArgs = {
+	isReset?: boolean;
+	senderId?: string;
+	timestamp?: number;
+};
+
 export enum EUserSettings {
 	ACCOUNT = 'Account',
 	PROFILES = 'Profiles',
@@ -1030,7 +1056,8 @@ export enum TypeMessage {
 	Indicator = 4,
 	Welcome = 5,
 	CreateThread = 6,
-	CreatePin = 7
+	CreatePin = 7,
+	MessageBuzz = 8
 }
 
 export enum ServerSettingsMenuValue {
@@ -1239,4 +1266,51 @@ export type ImageWindowProps = {
 export enum ESummaryInfo {
 	CALL = 'Call',
 	STREAM = 'Stream'
+}
+
+export type MentionReactInputProps = {
+	readonly onSend: (
+		content: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		references?: Array<ApiMessageRef>,
+		value?: ThreadValue,
+		anonymousMessage?: boolean,
+		mentionEveryone?: boolean,
+		displayName?: string,
+		clanNick?: string
+	) => void;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[] | undefined;
+	readonly isThread?: boolean;
+	readonly handlePaste?: any;
+	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
+	readonly currentClanId?: string;
+	readonly currentChannelId?: string;
+	readonly mode?: number;
+	hasPermissionEdit?: boolean;
+};
+
+export type IOtherCall = {
+	caller_id?: string;
+	channel_id?: string;
+};
+
+export type IPermissonMedia = 'granted' | 'denied' | 'not_found';
+
+export enum AttachmentTypeUpload {
+	BLOB = 'blob:'
+}
+
+export enum CallLog {
+	MISSED = 'You Missed',
+	RECIPIENT_DECLINED = 'Receiver Rejected',
+	YOU_DECLINED = 'You Rejected',
+	VOICE_CALL = 'Audio call',
+	VIDEO_CALL = 'Video call',
+	CALL_BACK = 'Call back',
+	INCOMING_CALL = 'Incoming call',
+	OUTGOING_CALL = 'Outgoing call',
+	YOU_CANCELED = 'You canceled',
+	TIME_DEFAULT = '0 mins 0 secs'
 }

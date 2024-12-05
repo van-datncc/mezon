@@ -1,18 +1,19 @@
-import { UsersStreamEntity, VoiceEntity } from '@mezon/store';
+import { IPttUsersEntity, UsersStreamEntity, VoiceEntity } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import UserListItem from './UserListItemVoiceChannel';
 
 export type UserListVoiceChannelProps = {
 	readonly channelID: string;
 	channelType?: number;
-	memberList: VoiceEntity[] | UsersStreamEntity[];
+	memberList: VoiceEntity[] | UsersStreamEntity[] | IPttUsersEntity[];
+	isPttList?: boolean;
 };
 
-function UserListVoiceChannel({ channelID, channelType, memberList }: UserListVoiceChannelProps) {
+function UserListVoiceChannel({ channelID, channelType, memberList, isPttList }: UserListVoiceChannelProps) {
 	return memberList?.map((item: IChannelMember, index: number) => {
 		return (
-			<div key={item.id}>
-				<UserListItem user={item} channelID={channelID} />
+			<div key={item.id} className={isPttList ? 'w-full' : ''}>
+				<UserListItem isPttList={isPttList} user={item} channelID={channelID} />
 			</div>
 		);
 	});

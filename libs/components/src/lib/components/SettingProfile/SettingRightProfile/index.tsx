@@ -1,24 +1,26 @@
 import { useAuth } from '@mezon/core';
-import { useState } from 'react';
+import { selectCurrentClanId, selectIsShowSettingFooter } from '@mezon/store';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import SettingRightClan from '../SettingRightClanProfile';
 import SettingRightUser from '../SettingRightUserProfile';
-import SettingRightWithdraw from '../SettingRightWithdraw';
 
 type SettingRightProfileProps = {
 	menuIsOpen: boolean;
 	isDM: boolean;
 };
 
-enum EActiveType {
+export enum EActiveType {
 	USER_SETTING = 'USER_SETTING',
-	CLAN_SETTING = 'CLAN_SETTING',
-	WITHDRAW_SETTING = 'WITHDRAW_SETTING'
+	CLAN_SETTING = 'CLAN_SETTING'
 }
 
 const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => {
 	const { userProfile } = useAuth();
-	const [activeType, setActiveType] = useState<EActiveType>(EActiveType.USER_SETTING);
-
+	const [activeType, setActiveType] = useState<string>(EActiveType.USER_SETTING);
+	const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const [clanId, setClanId] = useState<string | undefined>(currentClanId as string);
 	const handleClanProfileClick = () => {
 		setActiveType(EActiveType.CLAN_SETTING);
 	};
@@ -26,9 +28,11 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 	const handleUserSettingsClick = () => {
 		setActiveType(EActiveType.USER_SETTING);
 	};
-	const handleWithdrawSettingsClick = () => {
-		setActiveType(EActiveType.WITHDRAW_SETTING);
-	};
+
+	useEffect(() => {
+		setActiveType(isShowSettingFooter?.profileInitTab || EActiveType.USER_SETTING);
+		setClanId(isShowSettingFooter.clanId !== '' ? isShowSettingFooter.clanId || '' : currentClanId || '');
+	}, [isShowSettingFooter?.profileInitTab, isShowSettingFooter.clanId]);
 
 	return (
 		<div
@@ -52,12 +56,6 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 							Clan Profiles
 						</button>
 					) : null}
-					<button
-						onClick={handleWithdrawSettingsClick}
-						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.WITHDRAW_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
-					>
-						Withdraw
-					</button>
 				</div>
 			</div>
 
@@ -72,10 +70,8 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 						isDM={isDM}
 						dob={userProfile?.user?.dob || ''}
 					/>
-				) : activeType === EActiveType.CLAN_SETTING ? (
-					<SettingRightClan />
 				) : (
-					<SettingRightWithdraw />
+					<SettingRightClan clanId={clanId || ''} />
 				)}
 			</div>
 		</div>

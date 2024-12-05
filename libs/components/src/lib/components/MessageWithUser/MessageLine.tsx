@@ -1,6 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { EBacktickType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ type MessageLineProps = {
 	isTokenClickAble: boolean;
 	isEditted: boolean;
 	isInPinMsg?: boolean;
+	code?: number;
 };
 
 const MessageLineComponent = ({
@@ -29,7 +30,8 @@ const MessageLineComponent = ({
 	isTokenClickAble,
 	isHideLinkOneImage,
 	isEditted,
-	isInPinMsg
+	isInPinMsg,
+	code
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -55,6 +57,7 @@ const MessageLineComponent = ({
 				isSearchMessage={isSearchMessage}
 				isEditted={isEditted}
 				isInPinMsg={isInPinMsg}
+				code={code}
 			/>
 		</div>
 	);
@@ -74,6 +77,7 @@ interface RenderContentProps {
 	parentWidth?: number;
 	isEditted: boolean;
 	isInPinMsg?: boolean;
+	code?: number;
 }
 
 export interface ElementToken {
@@ -99,7 +103,8 @@ const RenderContent = memo(
 		isTokenClickAble,
 		isHideLinkOneImage,
 		isEditted,
-		isInPinMsg
+		isInPinMsg,
+		code
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -297,7 +302,7 @@ const RenderContent = memo(
 				}
 				className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
 			>
-				{content}
+				{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content}</span> : <span>{content}</span>}
 			</div>
 		);
 	}

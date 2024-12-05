@@ -11,7 +11,9 @@
         "favorite": "Favorite",
         "muteConversation": "Mute Conversation",
         "unMuteConversation": "UnMute Conversation",
-        "notificationSettings": "Notification Settings"
+        "notificationSettings": "Notification Settings",
+        "disableE2EE": "Disable E2EE",
+        "enableE2EE": "Enable E2EE"
     },
     "confirm": {
         "title": "Leave '{{groupName}}'",

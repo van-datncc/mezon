@@ -8,10 +8,12 @@ export interface DmCallState {
 	isDialTone: boolean;
 	isRingTone: boolean;
 	isEndTone: boolean;
+	isBusyTone: boolean;
 	isRemoteAudio: boolean;
 	isRemoteVideo: boolean;
 	isJoinedCall: boolean;
 	groupCallId: string;
+	userCallId: string;
 }
 
 const initialState: DmCallState = {
@@ -19,10 +21,12 @@ const initialState: DmCallState = {
 	isDialTone: false,
 	isRingTone: false,
 	isEndTone: false,
+	isBusyTone: false,
 	isRemoteAudio: false,
 	isRemoteVideo: false,
 	isJoinedCall: false,
-	groupCallId: ''
+	groupCallId: '',
+	userCallId: ''
 };
 
 const audioCallSlice = createSlice({
@@ -41,6 +45,9 @@ const audioCallSlice = createSlice({
 		setIsEndTone(state, action) {
 			state.isEndTone = action.payload;
 		},
+		setIsBusyTone(state, action) {
+			state.isBusyTone = action.payload;
+		},
 		setIsRemoteAudio(state, action) {
 			state.isRemoteAudio = action.payload;
 		},
@@ -52,6 +59,9 @@ const audioCallSlice = createSlice({
 		},
 		setGroupCallId(state, action) {
 			state.groupCallId = action.payload;
+		},
+		setUserCallId(state, action) {
+			state.userCallId = action.payload;
 		}
 	}
 });
@@ -72,6 +82,8 @@ export const selectAudioRingTone = createSelector(getAudioCallState, (state) => 
 
 export const selectAudioEndTone = createSelector(getAudioCallState, (state) => state.isEndTone);
 
+export const selectAudioBusyTone = createSelector(getAudioCallState, (state) => state.isBusyTone);
+
 export const selectRemoteAudio = createSelector(getAudioCallState, (state) => state.isRemoteAudio);
 
 export const selectRemoteVideo = createSelector(getAudioCallState, (state) => state.isRemoteVideo);
@@ -79,3 +91,5 @@ export const selectRemoteVideo = createSelector(getAudioCallState, (state) => st
 export const selectJoinedCall = createSelector(getAudioCallState, (state) => state.isJoinedCall);
 
 export const selectGroupCallId = createSelector(getAudioCallState, (state) => state.groupCallId);
+
+export const selectUserCallId = createSelector(getAudioCallState, (state) => state.userCallId);

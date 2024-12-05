@@ -1,11 +1,22 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { DMCallActions, selectAllAccount, selectIsInCall, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import {
+	DMCallActions,
+	selectAllAccount,
+	selectIsInCall,
+	selectRemoteVideo,
+	selectSignalingDataByUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
+import { IMessageTypeCallLog } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import React, { memo, useEffect, useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { RTCView } from 'react-native-webrtc';
 import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
@@ -21,7 +32,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const styles = style(themeValue);
-	const receiverId = route.params?.receiverId;
+	const { receiverId, directMessageId } = route.params;
 	const receiverAvatar = route.params?.receiverAvatar;
 	const isVideoCall = route.params?.isVideoCall;
 	const isAnswerCall = route.params?.isAnswerCall;
@@ -30,19 +41,61 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const isInCall = useSelector(selectIsInCall);
+	const isRemoteVideo = useSelector(selectRemoteVideo);
+	const navigation = useNavigation<any>();
 
-	const { callState, localMediaControl, startCall, handleEndCall, toggleSpeaker, toggleAudio, toggleVideo, handleSignalingMessage } =
-		useWebRTCCallMobile(receiverId, '' as string, userProfile?.user?.id as string, isVideoCall);
+	const {
+		callState,
+		localMediaControl,
+		timeStartConnected,
+		startCall,
+		handleEndCall,
+		toggleSpeaker,
+		toggleAudio,
+		toggleVideo,
+		handleSignalingMessage
+	} = useWebRTCCallMobile({
+		dmUserId: receiverId,
+		userId: userProfile?.user?.id as string,
+		channelId: directMessageId as string,
+		isVideoCall,
+		callerName: userProfile?.user?.username,
+		callerAvatar: userProfile?.user?.avatar_url
+	});
 
 	useEffect(() => {
-		if (callState.peerConnection && signalingData?.[signalingData?.length - 1]?.signalingData?.data_type === 4) {
-			handleEndCall();
+		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;
+		if (callState?.peerConnection && lastSignalingData) {
+			const dataType = lastSignalingData?.data_type;
+
+			if ([4, 5].includes(dataType)) {
+				if (!timeStartConnected?.current) {
+					const callLogType = dataType === 5 ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
+
+					if (dataType === 5) {
+						Toast.show({
+							type: 'error',
+							text1: 'User is currently on another call. Please call back later!'
+						});
+					}
+					dispatch(
+						DMCallActions.updateCallLog({
+							channelId: directMessageId || '',
+							content: {
+								t: '',
+								callLog: { isVideo: isVideoCall, callLogType }
+							}
+						})
+					);
+				}
+				handleEndCall({ isCancelGoBack: dataType === 5 });
+			}
 		}
-		if (signalingData?.[signalingData?.length - 1] && isInCall) {
-			const data = signalingData?.[signalingData?.length - 1]?.signalingData;
-			handleSignalingMessage(data);
+
+		if (lastSignalingData && isInCall) {
+			handleSignalingMessage(lastSignalingData);
 		}
-	}, [callState.peerConnection, isInCall, signalingData]);
+	}, [callState.peerConnection, isInCall, signalingData, timeStartConnected.current]);
 
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
@@ -58,6 +111,29 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 	const toggleControl = async () => {
 		setIsShowControl(!isShowControl);
+	};
+
+	const onCancelCall = async () => {
+		try {
+			await handleEndCall({ isCancelGoBack: false });
+			if (!timeStartConnected?.current) {
+				await dispatch(
+					DMCallActions.updateCallLog({
+						channelId: directMessageId,
+						content: {
+							t: '',
+							callLog: {
+								isVideo: isVideoCall,
+								callLogType: IMessageTypeCallLog.CANCELCALL
+							}
+						}
+					})
+				);
+			}
+			navigation.goBack();
+		} catch (err) {
+			/* empty */
+		}
 	};
 
 	return (
@@ -85,7 +161,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 			<TouchableOpacity activeOpacity={1} style={[styles.main, !isShowControl && { marginBottom: size.s_20 }]} onPress={toggleControl}>
 				<Block flex={1}>
-					{callState.remoteStream ? (
+					{callState.remoteStream && isRemoteVideo ? (
 						<Block style={styles.card}>
 							<RTCView streamURL={callState.remoteStream.toURL()} style={{ flex: 1 }} mirror={true} objectFit={'cover'} />
 						</Block>
@@ -127,7 +203,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 								<Icons.ChatIcon />
 							</TouchableOpacity>
 
-							<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
+							<TouchableOpacity onPress={onCancelCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 								<Icons.PhoneCallIcon />
 							</TouchableOpacity>
 						</Block>
@@ -138,7 +214,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			<MezonConfirm
 				visible={showModalConfirm}
 				onVisibleChange={setShowModalConfirm}
-				onConfirm={handleEndCall}
+				onConfirm={onCancelCall}
 				title="End Call"
 				confirmText="Yes, End Call"
 				hasBackdrop={true}

@@ -1,6 +1,8 @@
-import { IDMCall, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { IDMCall, IMessageSendPayload, IOtherCall, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { WebrtcSignalingFwd } from 'mezon-js';
+import { ensureSession, getMezonCtx } from '../helpers';
+import { RootState } from '../store';
 
 export const DMCALL_FEATURE_KEY = 'dmcall';
 
@@ -21,10 +23,27 @@ export interface DMCallState extends EntityState<DMCallEntity, string> {
 	isShowMeetDM: boolean;
 	localStream: MediaStream | null;
 	isInCall: boolean;
-	peerConnection: RTCPeerConnection;
+	otherCall: IOtherCall | null;
+	callMessageId: string;
 }
 
 export const DMCallAdapter = createEntityAdapter<DMCallEntity>();
+
+export const updateCallLog = createAsyncThunk(
+	'update/callLog',
+	async ({ channelId, content }: { channelId: string; content: IMessageSendPayload }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const state = thunkAPI.getState() as RootState;
+			const messageId = selectCallMessageId(state);
+			if (messageId) {
+				mezon.socketRef.current?.updateChatMessage('0', channelId ?? '', 4, false, messageId, content, [], [], true);
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
 
 export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -42,7 +61,8 @@ export const initialDMCallState: DMCallState = DMCallAdapter.getInitialState({
 	isShowMeetDM: false,
 	localStream: null,
 	isInCall: false,
-	peerConnection: new RTCPeerConnection()
+	otherCall: null,
+	callMessageId: ''
 });
 
 export const DMCallSlice = createSlice({
@@ -62,7 +82,10 @@ export const DMCallSlice = createSlice({
 			} else if (!existingEntity && Object.keys(state.entities).length === 0) {
 				DMCallAdapter.addOne(state, action);
 			} else {
-				/* empty */
+				state.otherCall = {
+					caller_id: action.payload.signalingData.caller_id,
+					channel_id: action.payload.signalingData.channel_id
+				};
 			}
 		},
 
@@ -88,8 +111,11 @@ export const DMCallSlice = createSlice({
 		setIsInCall: (state, action) => {
 			state.isInCall = action.payload;
 		},
-		setPeerConnection: (state, action) => {
-			state.peerConnection = action.payload;
+		setOtherCall: (state, action: PayloadAction<IOtherCall>) => {
+			state.otherCall = action.payload;
+		},
+		setCallMessageId: (state, action) => {
+			state.callMessageId = action.payload;
 		}
 		// ...
 	}
@@ -119,7 +145,8 @@ export const DMCallReducer = DMCallSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 export const DMCallActions = {
-	...DMCallSlice.actions
+	...DMCallSlice.actions,
+	updateCallLog
 };
 
 /*
@@ -159,4 +186,6 @@ export const selectLocalStream = createSelector(getDMCallState, (state: DMCallSt
 
 export const selectIsInCall = createSelector(getDMCallState, (state) => state.isInCall);
 
-export const selectPeerConnection = createSelector(getDMCallState, (state) => state.peerConnection);
+export const selectOtherCall = createSelector(getDMCallState, (state) => state.otherCall);
+
+export const selectCallMessageId = createSelector(getDMCallState, (state) => state.callMessageId);

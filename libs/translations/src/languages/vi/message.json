@@ -88,5 +88,16 @@
       "send": "Gửi",
       "cancel": "Hủy",
       "coordinate": "Tọa độ"
+  },
+  "callLog": {
+    "cancel": "Bạn đã từ chối",
+    "missed": "Bạn bị nhỡ",
+    "receiverRejected": "Nguời nhận từ chối",
+    "youRejected": "Bạn đã từ chối",
+    "audioCall": "Cuộc gọi thoại",
+    "videoCall": "Cuộc gọi video",
+    "callBack": "Gọi lại",
+    "incomingCall": "Cuộc gọi đến",
+    "outGoingCall": "Cuộc gọi đi"
   }
 }
