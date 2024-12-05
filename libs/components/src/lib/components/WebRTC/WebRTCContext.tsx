@@ -76,35 +76,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 					clanId.current || '',
 					channelId.current || '',
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					false
+					JSON.stringify(event.candidate)
 				);
-			}
-		};
-		return peerConnection.current;
-	}, [mezon.socketRef, servers]);
-
-	const initializePeerConnectionTalk = useCallback(() => {
-		peerConnection.current = new RTCPeerConnection(servers);
-		peerConnection.current.onicecandidate = async (event) => {
-			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
-				await mezon.socketRef.current?.joinPTTChannel(
-					clanId.current || '',
-					channelId.current || '',
-					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					true
-				);
-			}
-		};
-		peerConnection.current.oniceconnectionstatechange = (event) => {
-			if (peerConnection.current?.iceConnectionState === 'closed' || peerConnection.current?.iceConnectionState === 'disconnected') {
-				localStream?.getTracks().forEach((track) => track.stop());
-				setLocalStream(null);
-				peerConnection.current?.close();
-				peerConnection.current = null;
-			} else if (peerConnection.current?.iceConnectionState === 'connected') {
-				//
 			}
 		};
 		return peerConnection.current;
@@ -125,8 +98,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				clanId.current || '',
 				channelId.current || '',
 				WebrtcSignalingType.WEBRTC_SDP_OFFER,
-				offerEnc,
-				false
+				offerEnc
 			);
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
@@ -149,23 +121,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		async (value: boolean) => {
 			if (!peerConnection.current && channelId) {
 				if (value === true) {
-					const connection = initializePeerConnectionTalk();
-					connection.addTransceiver('audio', { direction: 'sendonly' });
 					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					setLocalStream(stream);
-					stream.getTracks().forEach((track) => {
-						connection.addTrack(track, stream);
-					});
-					const offer = await connection.createOffer();
-					await connection.setLocalDescription(offer);
-					const offerEnc = await compress(JSON.stringify(offer));
-					await mezon.socketRef.current?.joinPTTChannel(
-						clanId.current || '',
-						channelId.current || '',
-						WebrtcSignalingType.WEBRTC_SDP_OFFER,
-						offerEnc,
-						true
-					);
+					stream.getTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
 				}
 			}
 			if (localStream) {
