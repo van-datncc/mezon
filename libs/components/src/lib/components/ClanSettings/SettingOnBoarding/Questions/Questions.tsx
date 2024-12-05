@@ -256,7 +256,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 						onChange={handleQuestionOnchange}
 					/>
 				) : (
-					<div className="text-white text-xl font-semibold">{titleQuestion}</div>
+					<div className="text-white text-xl font-semibold truncate">{titleQuestion}</div>
 				)}
 			</div>
 			{isExpanded && (
