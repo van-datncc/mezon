@@ -61,7 +61,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 			embedActions.addEmbedValueOptions({
 				message_id: message_id,
 				data: {
-					id: option?.id,
+					id: option?.value,
 					value: option?.value
 				}
 			})
@@ -85,6 +85,10 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 		handleChangeDataInput(text, id);
 	}, 300);
 
+	const handleChangeSelect = (value: string, id: string) => {
+		handleChangeDataInput(value, id);
+	};
+
 	return (
 		<View>
 			{!!groupedFields?.length &&
@@ -92,13 +96,9 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 					<View key={`fieldGroup${index}`}>
 						{!!field.length &&
 							field.map((fieldItem, fieldIndex) => (
-								<View key={`field${index}-${fieldIndex}`}>
-									{!!fieldItem?.name && (
-										<View>
-											<Text style={styles.name}>{fieldItem?.name}:</Text>
-											<Text style={styles.value}>{fieldItem?.value}</Text>
-										</View>
-									)}
+								<View key={`field${index}-${fieldIndex}`} style={styles.field}>
+									{!!fieldItem?.name && <Text style={styles.name}>{fieldItem?.name}:</Text>}
+									{!!fieldItem?.value && <Text style={styles.value}>{fieldItem?.value}</Text>}
 									{!!fieldItem?.options?.length &&
 										fieldItem?.options?.map((optionItem, optionIndex) => (
 											<EmbedRadioButton
@@ -117,9 +117,10 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 												/>
 											) : (
 												<MezonSelect
-													data={fieldItem?.inputs?.component?.options.map((item) => {
+													data={fieldItem?.inputs?.component?.options?.map((item) => {
 														return { title: item?.label, value: item?.value };
 													})}
+													onChange={(value) => handleChangeSelect(value as string, fieldItem?.inputs?.id)}
 												/>
 											)}
 										</View>
