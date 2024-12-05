@@ -12216,7 +12216,7 @@ mezon-js-protobuf@^1.6.39:
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@^2.10.1:
+mezon-js@^2.9.100:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.10.1.tgz#22029c4565cb309da263e24301c1f1a3433b509c"
   integrity sha512-SA2GaxpX2bZGlXKNW0OJ8sBZ+e7yENhuJQBZ2RoYIoZL4jRUOpPaob0rFgQv/psK8GF5/fLICmNHuh1tTwDiJA==

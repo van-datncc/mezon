@@ -1,8 +1,9 @@
 import { useAuth } from '@mezon/core';
-import { selectJoinPTTByChannelId, useAppSelector } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId, selectJoinPTTByChannelId, useAppSelector } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { compress, decompress } from '../DmList/DMtopbar';
 
 // Define the context value type
@@ -34,8 +35,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	const pushToTalkData = useAppSelector((state) => selectJoinPTTByChannelId(state, userId));
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-	const channelId = useRef<string | null>(null);
-	const clanId = useRef<string | null>(null);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const channelId = useRef<string | null>(currentChannelId || null);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const clanId = useRef<string | null>(currentClanId || null);
 	const peerConnectionJoin = useRef<RTCPeerConnection | null>(null);
 	const peerConnectionTalk = useRef<RTCPeerConnection | null>(null);
 
