@@ -39,7 +39,6 @@ import { ChannelLabel } from './TopBarComponents';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
-import { PushToTalkBtn } from './TopBarComponents/PushToTalkButton/PushToTalkButton';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
@@ -127,7 +126,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
 								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-								{isNotThread && isPrivateChannel && <PushToTalkBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
