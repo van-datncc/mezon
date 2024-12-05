@@ -261,18 +261,31 @@ export default class App {
 		const windowOptions = { ...defaultOptions, ...options };
 
 		const newWindow = new BrowserWindow(windowOptions);
+		if (App.application.isPackaged) {
+			const baseUrl = join(__dirname, '..', '..', '..', '../../apps/desktop/assets/image-window/image-window.html');
+			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-		const baseUrl = join(__dirname, '..', '..', '..', 'apps/desktop/image-window.html');
-		const fullUrl = this.generateFullUrl(baseUrl, params);
+			newWindow.loadURL(
+				format({
+					pathname: fullUrl,
+					protocol: 'file:',
+					slashes: true,
+					query: params
+				})
+			);
+		} else {
+			const baseUrl = join(__dirname, '..', '..', '..', 'apps/desktop/src/assets/image-window/image-window.html');
+			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-		newWindow.loadURL(
-			format({
-				pathname: fullUrl,
-				protocol: 'file:',
-				slashes: true,
-				query: params
-			})
-		);
+			newWindow.loadURL(
+				format({
+					pathname: fullUrl,
+					protocol: 'file:',
+					slashes: true,
+					query: params
+				})
+			);
+		}
 
 		newWindow.webContents.on('did-finish-load', () => {
 			newWindow.webContents.send(SET_ATTACHMENT_DATA, props);
