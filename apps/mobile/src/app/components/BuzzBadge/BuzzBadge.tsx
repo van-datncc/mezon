@@ -1,5 +1,5 @@
 import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, directActions } from '@mezon/store-mobile';
+import { channelsActions, directActions, selectBuzzStateByChannelId, selectBuzzStateByDirectId, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Text, TextStyle } from 'react-native';
@@ -8,18 +8,17 @@ import { style } from './styles';
 
 type BuzzBadgeProps = {
 	channelId: string;
-	isReset: boolean;
-	senderId: string;
 	mode: ChannelStreamMode;
-	timestamp: number;
 	customStyles?: TextStyle;
 };
 
-function BuzzBadge({ channelId, isReset, senderId, mode, timestamp, customStyles }: BuzzBadgeProps) {
+function BuzzBadge({ channelId, mode, customStyles }: BuzzBadgeProps) {
 	const dispatch = useDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-
+	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, channelId ?? ''));
+	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channelId ?? ''));
+	const isReset = useMemo(() => buzzStateDM?.isReset || buzzState?.isReset, [buzzStateDM?.isReset, buzzState?.isReset]);
 	const isPosDmOrGr = useMemo(() => mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP, [mode]);
 	const isChannelOrThread = useMemo(() => mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD, [mode]);
 
@@ -36,7 +35,7 @@ function BuzzBadge({ channelId, isReset, senderId, mode, timestamp, customStyles
 			const timer = setTimeout(resetBuzzState, 10000);
 			return () => clearTimeout(timer);
 		}
-	}, [isReset, resetBuzzState, senderId, timestamp]);
+	}, [isReset, resetBuzzState, buzzStateDM, buzzState]);
 
 	if (!isReset) return null;
 

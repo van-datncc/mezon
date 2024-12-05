@@ -1,14 +1,7 @@
 import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
-import {
-	directActions,
-	selectBuzzStateByDirectId,
-	selectDirectById,
-	selectDmGroupCurrentId,
-	selectIsUnreadDMById,
-	selectLastMessageByChannelId
-} from '@mezon/store-mobile';
+import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById, selectLastMessageByChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -29,7 +22,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, id));
-	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, directMessage?.channel_id ?? ''));
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
@@ -167,19 +159,14 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					>
 						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 					</Text>
-					{buzzStateDM?.isReset && (
-						<BuzzBadge
-							timestamp={buzzStateDM?.timestamp}
-							isReset={buzzStateDM?.isReset}
-							channelId={directMessage?.channel_id}
-							senderId={buzzStateDM?.senderId}
-							mode={
-								directMessage?.type === ChannelType.CHANNEL_TYPE_DM
-									? ChannelStreamMode.STREAM_MODE_DM
-									: ChannelStreamMode.STREAM_MODE_GROUP
-							}
-						/>
-					)}
+					<BuzzBadge
+						channelId={directMessage?.channel_id}
+						mode={
+							directMessage?.type === ChannelType.CHANNEL_TYPE_DM
+								? ChannelStreamMode.STREAM_MODE_DM
+								: ChannelStreamMode.STREAM_MODE_GROUP
+						}
+					/>
 					{lastMessageTime ? (
 						<Text style={[styles.defaultText, styles.dateTime, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}>
 							{lastMessageTime}

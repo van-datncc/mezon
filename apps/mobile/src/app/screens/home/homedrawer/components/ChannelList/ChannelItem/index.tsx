@@ -1,5 +1,4 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectBuzzStateByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
@@ -21,7 +20,6 @@ interface IChannelItemProps {
 function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChannelItemProps) {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, data?.channel_id ?? ''));
 	const numberNotification = useMemo(() => {
 		return data?.count_mess_unread ? data?.count_mess_unread : 0;
 	}, [data?.count_mess_unread]);
@@ -49,15 +47,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 				<ActivityIndicator color={themeValue.white} />
 			)}
 
-			{buzzState?.isReset && (
-				<BuzzBadge
-					timestamp={buzzState?.timestamp as number}
-					isReset={buzzState?.isReset}
-					channelId={data?.channel_id as string}
-					senderId={buzzState?.senderId as string}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
-			)}
+			<BuzzBadge channelId={data?.channel_id as string} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 
 			{Number(numberNotification || 0) > 0 && <ChannelBadgeUnread countMessageUnread={Number(numberNotification || 0)} />}
 		</TouchableOpacity>

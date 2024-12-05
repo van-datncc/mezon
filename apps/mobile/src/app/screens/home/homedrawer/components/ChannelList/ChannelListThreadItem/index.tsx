@@ -1,5 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectBuzzStateByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
@@ -20,7 +20,6 @@ interface IChannelListThreadItemProps {
 const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, thread?.id ?? ''));
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 
@@ -70,16 +69,7 @@ const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, is
 						{thread?.channel_label}
 					</Text>
 				</TouchableOpacity>
-				{buzzState?.isReset && (
-					<BuzzBadge
-						timestamp={buzzState?.timestamp as number}
-						isReset={buzzState?.isReset}
-						channelId={thread?.channel_id as string}
-						senderId={buzzState?.senderId as string}
-						mode={ChannelStreamMode.STREAM_MODE_THREAD}
-						customStyles={styles.buzzBadge}
-					/>
-				)}
+				<BuzzBadge channelId={thread?.channel_id as string} mode={ChannelStreamMode.STREAM_MODE_THREAD} customStyles={styles.buzzBadge} />
 			</View>
 
 			{Number(numberNotification || 0) > 0 && isUnReadChannel && (
