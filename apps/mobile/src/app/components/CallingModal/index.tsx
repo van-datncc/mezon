@@ -12,6 +12,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
+import { WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
@@ -136,7 +137,7 @@ const CallingModal = () => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 		await mezon.socketRef.current?.forwardWebrtcSignaling(
 			latestSignalingEntry?.callerId,
-			4,
+			WebrtcSignalingType.WEBRTC_SDP_QUIT,
 			'',
 			latestSignalingEntry?.signalingData?.channel_id,
 			''
