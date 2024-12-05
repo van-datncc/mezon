@@ -242,6 +242,7 @@ export interface IFieldEmbed {
 	inline?: boolean;
 	options?: IMessageRatioOption[];
 	inputs?: SelectComponent | InputComponent;
+	button?: ButtonComponent[];
 }
 
 export enum EButtonMessageStyle {
@@ -258,11 +259,16 @@ export enum EMessageComponentType {
 	INPUT = 3
 }
 
+export enum EIconEmbedButtonMessage {
+	PLAY = 'PLAY',
+	PAUSE = 'PAUSE'
+}
 export interface IButtonMessage {
 	label: string;
 	disable?: boolean;
 	style?: EButtonMessageStyle;
 	url?: string;
+	icon?: EIconEmbedButtonMessage;
 }
 
 export interface IMessageSelectOption {
@@ -644,6 +650,7 @@ export type MentionDataProps = {
 	user?: ApiUser;
 	username?: string | undefined;
 	isRoleUser?: boolean;
+	color?: string | undefined;
 };
 
 export type UserSearchDataProps = {
@@ -1313,4 +1320,23 @@ export enum CallLog {
 	OUTGOING_CALL = 'Outgoing call',
 	YOU_CANCELED = 'You canceled',
 	TIME_DEFAULT = '0 mins 0 secs'
+}
+
+export interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
+export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
+	uploaderData: {
+		avatar: string;
+		name: string;
+	}
+}
+
+export interface IImageWindowProps {
+	channelLabel: string;
+	selectedImageIndex: number;
+	images: Array<IAttachmentEntityWithUploader>
 }

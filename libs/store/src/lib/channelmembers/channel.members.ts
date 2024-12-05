@@ -490,7 +490,6 @@ export const selectGrouplMembers = createSelector(
 		if (!group?.user_id) {
 			return [];
 		}
-		const groupLabels = group.channel_label?.split(',');
 		const groupDisplayNames = group.usernames?.split(',');
 		const users = group?.user_id?.map((userId, index) => {
 			return {
@@ -502,7 +501,7 @@ export const selectGrouplMembers = createSelector(
 					user_id: [userId],
 					avatar_url: group.channel_avatar?.[index],
 					username: groupDisplayNames?.[index],
-					display_name: groupLabels?.[index],
+					display_name: groupDisplayNames?.[index],
 					online: group.is_online?.[index]
 				},
 				id: userId
@@ -520,6 +519,14 @@ export const selectGrouplMembers = createSelector(
 		return users;
 	}
 );
+
+export const selectGroupMembersEntities = createSelector([selectGrouplMembers], (groupMembers): Record<string, ChannelMembersEntity> => {
+	const groupMembersEntities = groupMembers.reduce<Record<string, ChannelMembersEntity>>((acc, member) => {
+		acc[member.id as string] = member;
+		return acc;
+	}, {});
+	return groupMembersEntities;
+});
 
 export const selectMembeGroupByUserId = createSelector([selectGrouplMembers, (state, groupId: string, userId: string) => userId], (users, userId) => {
 	return users?.find((item) => item.id === userId);
