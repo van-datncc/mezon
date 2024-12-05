@@ -3,7 +3,7 @@ import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import { format } from 'url';
-import { rendererAppName, rendererAppPort } from './constants';
+import {electronAppName, rendererAppName, rendererAppPort} from './constants';
 
 import tray from '../Tray';
 import setupAutoUpdates from './autoUpdates';
@@ -263,10 +263,10 @@ export default class App {
 		const newWindow = new BrowserWindow(windowOptions);
 
 		const filePath = App.application.isPackaged
-			? '../../apps/desktop/assets/image-window/image-window.html'
+			? 'assets/image-window/image-window.html'
 			: 'apps/desktop/src/assets/image-window/image-window.html';
 		if (App.application.isPackaged) {
-			const baseUrl = join(__dirname, '..', '..', '..', filePath);
+			const baseUrl = join(__dirname, '..', electronAppName, filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
 			newWindow.loadURL(
