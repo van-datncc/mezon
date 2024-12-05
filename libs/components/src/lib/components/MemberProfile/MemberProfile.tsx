@@ -358,7 +358,7 @@ export function MemberProfile({
 						<span
 							className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode rounded-full right-[-4px]`}
 						>
-							<UserStatusIcon status={userStatus?.user_status} user={user?.user} />
+							<UserStatusIcon status={userStatus?.user_status} />
 						</span>
 					)}
 					{!isFooter && !isHideIconStatus && (
@@ -457,7 +457,7 @@ export function MemberProfile({
 	);
 }
 
-export const UserStatusIcon = ({ status, user }: { status?: EUserStatus; user?: any }) => {
+export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
 	switch (status) {
 		case EUserStatus.ONLINE:
 			return <Icons.OnlineStatus />;
