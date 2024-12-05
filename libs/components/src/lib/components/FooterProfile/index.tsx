@@ -37,7 +37,7 @@ export type FooterProfileProps = {
 };
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
-	const { isJoined, isTalking, toggleTalking } = usePushToTalk();
+	const { isJoined, isTalking, toggleTalking, quitPTT } = usePushToTalk();
 
 	const longPressHandlers = useLongPress<HTMLDivElement>({
 		onStart: () => toggleTalking(true),
@@ -173,9 +173,18 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					)}
 				</div>
 				{isJoined && (
-					<div {...longPressHandlers}>
-						<MicButton isTalking={isTalking} />
-					</div>
+					<>
+						<Tooltip content="Quit PTT" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+							<Icons.JoinedPTT
+								onClick={quitPTT}
+								className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
+							/>
+						</Tooltip>
+
+						<div {...longPressHandlers}>
+							<MicButton isTalking={isTalking} />
+						</div>
+					</>
 				)}
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
