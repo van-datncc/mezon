@@ -335,7 +335,7 @@ export function MemberProfile({
 		if (user?.user?.metadata) {
 			return user?.user?.metadata;
 		}
-	}, [user?.user?.metadata, userProfile]);
+	}, [user?.user?.id, userProfile?.user?.id]);
 
 	return (
 		<div className="relative group">
