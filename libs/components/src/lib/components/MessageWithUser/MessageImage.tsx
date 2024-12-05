@@ -61,8 +61,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 								return {
 									...image,
 									uploaderData: {
-										avatar: (uploader.clan_avatar || uploader?.user?.avatar_url) as string,
-										name: uploader.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
+										avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
+										name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
 									},
 									url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
 								};
