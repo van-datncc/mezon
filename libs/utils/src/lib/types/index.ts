@@ -644,6 +644,7 @@ export type MentionDataProps = {
 	user?: ApiUser;
 	username?: string | undefined;
 	isRoleUser?: boolean;
+	color?: string | undefined;
 };
 
 export type UserSearchDataProps = {
