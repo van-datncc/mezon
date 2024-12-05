@@ -11,12 +11,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import {
-	SHOW_POSITION,
-	createImgproxyUrl,
-	notImplementForGifOrStickerSendFromPanel,
-	IImageWindowProps, IAttachmentEntity
-} from '@mezon/utils';
+import { IAttachmentEntity, IImageWindowProps, SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -51,41 +46,38 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
-		
+
 		if (isElectron()) {
-			if (((currentClanId && currentChannelId) || currentDmGroupId)) {
+			if ((currentClanId && currentChannelId) || currentDmGroupId) {
 				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true })).then((data) => {
-					const imageList = data.payload as IAttachmentEntity[];
-					const imageListWithUploaderInfo = imageList?.filter(image => image.filetype?.includes("image")).map((image) => {
-						if (directId) {
-							const uploader = allDmUsers[image.uploader as string];
-							return {
-								...image,
-								uploaderData: {
-									avatar: (uploader.clan_avatar || uploader?.user?.avatar_url) as string,
-									name: uploader.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-								}
-							};
-						}
-						const uploader = allClanUsers[image.uploader as string];
-						return { ...image, uploaderData: {
-								avatar: (uploader.clan_avatar || uploader?.user?.avatar_url) as string,
-								name: uploader.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-							} };
+				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
+					.then((data) => {
+						const imageList = data.payload as IAttachmentEntity[];
+						const imageListWithUploaderInfo = imageList
+							?.filter((image) => image.filetype?.includes('image'))
+							.map((image) => {
+								const uploader = directId ? allDmUsers[image.uploader as string] : allClanUsers[image.uploader as string];
+								return {
+									...image,
+									uploaderData: {
+										avatar: (uploader.clan_avatar || uploader?.user?.avatar_url) as string,
+										name: uploader.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
+									},
+									url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
+								};
+							});
+						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
+						return { imageListWithUploaderInfo, selectedImageIndex };
+					})
+					.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
+						const channelImagesData: IImageWindowProps = {
+							channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+							images: imageListWithUploaderInfo,
+							selectedImageIndex: selectedImageIndex
+						};
+						window.electron.openNewWindow(channelImagesData);
 					});
-					
-					return imageListWithUploaderInfo
-				}).then((imageListWithUploaderInfo) => {
-					const channelImagesData: IImageWindowProps = {
-						channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
-						images: imageListWithUploaderInfo,
-						selectedImageIndex: imageListWithUploaderInfo.findIndex((image) => image.url === attachmentData.url)
-					};
-					window.electron.openNewWindow(channelImagesData);
-					window.electron.send('APP::SEND_ATTACHMENT_DATA', { channelImagesData });
-				});
 			}
 		} else {
 			dispatch(attachmentActions.setMode(mode));
