@@ -16,13 +16,13 @@ import { Text, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { RTCView } from 'react-native-webrtc';
 import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
 import { MezonConfirm } from '../../../componentUI';
 import { useWebRTCCallMobile } from '../../../hooks/useWebRTCCallMobile';
 import { style } from './styles';
-import Toast from "react-native-toast-message";
 
 interface IDirectMessageCallProps {
 	route: any;
