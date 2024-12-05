@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, ipcMain, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -275,8 +275,7 @@ export default class App {
 		);
 
 		newWindow.webContents.on('did-finish-load', () => {
-			console.log ('check props: ', props)
-			newWindow.webContents.send(SET_ATTACHMENT_DATA, props)
+			newWindow.webContents.send(SET_ATTACHMENT_DATA, props);
 		});
 
 		return newWindow;
