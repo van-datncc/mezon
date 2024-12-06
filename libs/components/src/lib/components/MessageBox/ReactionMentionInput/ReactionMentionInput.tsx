@@ -824,6 +824,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	);
 });
 
+MentionReactInput.displayName = 'MentionReactInput';
+
 const useEnterPressTracker = () => {
 	const [enterCount, setEnterCount] = useState(0);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);

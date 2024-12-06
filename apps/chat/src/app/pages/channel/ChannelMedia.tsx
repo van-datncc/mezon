@@ -12,8 +12,35 @@ type ChannelMediaProps = {
 export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
-	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
+	if (
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+	) {
+		return (
+			<>
+				<KeyPressListener currentChannel={currentChannel} mode={mode} />
+				<ChannelMessages
+					key={currentChannel.id}
+					clanId={currentChannel?.clan_id || ''}
+					channelId={currentChannel?.id}
+					channelLabel={currentChannel.channel_label}
+					type={currentChannel?.type}
+					mode={mode}
+				/>
+			</>
+		);
+	}
+	return <ChannelMessages.Skeleton />;
+};
 
+type KeyPressListenerProps = {
+	currentChannel: ChannelsEntity | null;
+	mode: ChannelStreamMode;
+};
+
+const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
+	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
 	const isListenerAttached = useRef(false);
 
 	useEffect(() => {
@@ -33,23 +60,7 @@ export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 			window.removeEventListener('keydown', handleKeyPress);
 			isListenerAttached.current = false;
 		};
-	}, []);
+	}, [sendMessage]);
 
-	if (
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ||
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
-	) {
-		return (
-			<ChannelMessages
-				key={currentChannel.id}
-				clanId={currentChannel?.clan_id || ''}
-				channelId={currentChannel?.id}
-				channelLabel={currentChannel.channel_label}
-				type={currentChannel?.type}
-				mode={mode}
-			/>
-		);
-	}
-	return <ChannelMessages.Skeleton />;
+	return null;
 };

@@ -1,7 +1,7 @@
 import { useNotification } from '@mezon/core';
 import { channelMetaActions, selectClanById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { INotification, TIME_OFFSET } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import NotificationWebhookClanItem from './NotificationWebhookClanItem';
@@ -80,15 +80,14 @@ const NotificationClanHeader = ({ isUnreadTab, clan_id, notification, onDeleteNo
 
 			<div className="flex flex-row items-center gap-3 relative">
 				{isUnreadTab && (
-					<Tooltip
+					<Tippy
+						className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
+						arrow={false}
 						content={
 							<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
 								{'Clear'}
 							</p>
 						}
-						trigger="hover"
-						animation="duration-500"
-						style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						placement="top"
 					>
 						<button
@@ -97,7 +96,7 @@ const NotificationClanHeader = ({ isUnreadTab, clan_id, notification, onDeleteNo
 						>
 							✕
 						</button>
-					</Tooltip>
+					</Tippy>
 				)}
 			</div>
 		</div>
