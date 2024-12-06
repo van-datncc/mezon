@@ -49,6 +49,7 @@ import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
+import { walletLedgerReducer } from './giveCoffee/historyTransaction.slice';
 import { EMBED_MESSAGE, embedReducer } from './messages/embedMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
@@ -73,6 +74,7 @@ import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -370,7 +372,8 @@ const reducer = {
 	joinPTT: JoinPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
-	[EMBED_MESSAGE]: embedReducer
+	[EMBED_MESSAGE]: embedReducer,
+	walletLedger: walletLedgerReducer
 };
 
 let storeInstance = configureStore({

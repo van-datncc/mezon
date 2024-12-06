@@ -6372,6 +6372,21 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function History(props: React.HTMLAttributes<SVGAElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<path
+				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
 export function CalendarIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" id="calendar" {...props}>
