@@ -130,13 +130,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
+	const closeImageWindow = () => {
+		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
+	};
+
 	document.addEventListener('keydown', (e) => {
 		switch (e.key) {
 			case 'ArrowUp':
 				navigateImage(-1);
 				break;
+			case 'ArrowLeft':
+				navigateImage(-1);
+				break;
 			case 'ArrowDown':
 				navigateImage(1);
+				break;
+			case 'ArrowRight':
+				navigateImage(1);
+				break;
+			case 'Escape':
+				closeImageWindow();
 				break;
 		}
 	});
@@ -181,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	document.getElementById('close-window').addEventListener('click', () => {
-		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
+		closeImageWindow();
 	});
 
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
