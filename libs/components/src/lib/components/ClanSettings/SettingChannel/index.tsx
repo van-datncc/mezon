@@ -10,8 +10,9 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { formatDistance } from 'date-fns';
-import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
+import { Avatar, AvatarSizes, Dropdown, Pagination } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useMemo, useRef, useState } from 'react';
@@ -204,7 +205,7 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize,
 								userIds={thread?.user_ids || []}
 								channelId={thread?.id as string}
 								messageCount={thread?.message_count || 0}
-								lastMessage={channelParrent.last_sent_message}
+								lastMessage={thread.last_sent_message}
 							/>
 						))
 					) : (
@@ -311,14 +312,14 @@ const ItemInfor = ({
 					<span className="truncate pr-8">{label}</span>
 				</div>
 				<div className="flex-1 flex " onClick={handleShowAllMemberList}>
-					{privateChannel ? (
+					{privateChannel || isThread ? (
 						<Avatar.Group className={`flex flex-1 items-center gap-3 ${isThread ? '-ml-8' : ''}`}>
-							{userIds.slice(0, 2).map((member) => (
+							{userIds.slice(0, 3).map((member) => (
 								<AvatarUserShort id={member} key={member} hiddenTooltip={true} />
 							))}
 							{userIds.length > 3 && (
 								<Avatar.Counter
-									total={userIds.length - 1}
+									total={userIds.length - 3}
 									className="h-4 w-6 dark:text-textPrimary text-textPrimaryLight ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
 								/>
 							)}
@@ -339,15 +340,18 @@ const ItemInfor = ({
 
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					{(creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url) && (
-						<Tooltip
-							content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username}
+						<Tippy
+							content={
+								<span>{creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username} </span>
+							}
 							placement="left"
+							arrow={false}
 						>
 							<img
 								src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url || 'assets/avatar-user.svg'}
 								className="w-8 h-8 object-cover rounded-full "
 							/>
-						</Tooltip>
+						</Tippy>
 					)}
 				</div>
 			</div>

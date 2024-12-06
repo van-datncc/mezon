@@ -18,9 +18,10 @@ type MessageSelectProps = {
 	messageId: string;
 	senderId: string;
 	buttonId: string;
+	inside?: boolean;
 };
 
-export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId }) => {
+export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId, inside }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
@@ -33,16 +34,18 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 		if (selectedOptions.length < (select?.max_options || 1)) {
 			setSelectedOptions((prev) => [...prev, option]);
 			setAvailableOptions((prev) => prev.filter((o) => o.value !== option.value));
-			dispatch(
-				messagesActions.clickButtonMessage({
-					message_id: messageId,
-					channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
-					button_id: buttonId,
-					sender_id: senderId,
-					user_id: currentUserId,
-					extra_data: option.value
-				})
-			);
+			if (!inside) {
+				dispatch(
+					messagesActions.clickButtonMessage({
+						message_id: messageId,
+						channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
+						button_id: buttonId,
+						sender_id: senderId,
+						user_id: currentUserId,
+						extra_data: option.value
+					})
+				);
+			}
 		}
 	};
 

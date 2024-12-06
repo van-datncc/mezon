@@ -12,22 +12,14 @@ export type UseChatSendingOptions = {
 
 // TODO: separate this hook into 2 hooks for send and edit message
 export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions) {
-	const getClanId = useMemo(() => {
-		return channelOrDirect?.clan_id;
-	}, [channelOrDirect?.clan_id]);
-
-	const isPublic = useMemo(() => {
-		return !channelOrDirect?.channel_private;
-	}, [channelOrDirect]);
-
-	const channelIdOrDirectId = useMemo(() => {
-		return channelOrDirect?.channel_id;
-	}, [channelOrDirect?.channel_id]);
+	const dispatch = useAppDispatch();
+	const getClanId = channelOrDirect?.clan_id;
+	const isPublic = !channelOrDirect?.channel_private;
+	const channelIdOrDirectId = channelOrDirect?.channel_id;
 
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector(selectAnonymousMode);
-	const dispatch = useAppDispatch();
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const sendMessage = React.useCallback(
 		async (
