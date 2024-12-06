@@ -1,7 +1,7 @@
 import { useChatMessages, useSeenMessagePool } from '@mezon/core';
 import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { MessagesEntity, directActions, directMetaActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import { MessagesEntity, channelsActions, directActions, directMetaActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -48,6 +48,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId || '', count: 0, isReset: true }));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, []);
