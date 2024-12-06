@@ -3,6 +3,8 @@ import { ActionEmitEvent, getAppInfo } from '@mezon/mobile-components';
 import {
 	DMCallActions,
 	appActions,
+	channelsActions,
+	directActions,
 	fcmActions,
 	getStoreAsync,
 	selectCurrentChannel,
@@ -22,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
+import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import {
 	checkNotificationPermission,
 	handleFCMToken,
@@ -146,6 +149,7 @@ export const AuthenticationLoader = () => {
 			//Payload from FCM need messageType and sound
 			if (remoteMessage.notification.body === 'Buzz!!') {
 				playBuzzSound();
+				handleBuzz(remoteMessage);
 			}
 		});
 		// To get All Received Urls
@@ -170,6 +174,21 @@ export const AuthenticationLoader = () => {
 				}
 			});
 		});
+	};
+
+	const handleBuzz = (notification) => {
+		const link = notification?.data?.link;
+		if (!link) return;
+		const linkMatch = link.match(clanAndChannelIdLinkRegex);
+		const timestamp = Math.round(Date.now() / 1000);
+		if (linkMatch) {
+			const channelId = linkMatch?.[2];
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId: '', timestamp } }));
+		} else {
+			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
+			const channelId = linkDirectMessageMatch[1];
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId: '', timestamp } }));
+		}
 	};
 
 	const loadFileSharing = () => {
