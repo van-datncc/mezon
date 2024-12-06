@@ -241,7 +241,7 @@ export interface IFieldEmbed {
 	value: string;
 	inline?: boolean;
 	options?: IMessageRatioOption[];
-	inputs?: SelectComponent | InputComponent;
+	inputs?: SelectComponent | InputComponent | DatePickerComponent;
 	button?: ButtonComponent[];
 }
 
@@ -256,7 +256,8 @@ export enum EButtonMessageStyle {
 export enum EMessageComponentType {
 	BUTTON = 1,
 	SELECT = 2,
-	INPUT = 3
+	INPUT = 3,
+	DATEPICKER = 4
 }
 
 export enum EIconEmbedButtonMessage {
@@ -293,6 +294,11 @@ export interface IMessageInput {
 	required?: boolean;
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
+}
+
+export interface IMessageDatePicker {
+	id: string;
+	value: string | Date;
 }
 
 export enum IMessageTypeCallLog {
@@ -337,6 +343,7 @@ export interface IMessageComponent<T> {
 export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
 export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
 export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessageComponentType.INPUT };
+export type DatePickerComponent = IMessageComponent<IMessageDatePicker> & { type: EMessageComponentType.DATEPICKER };
 
 export interface IMessageActionRow {
 	components: Array<ButtonComponent | SelectComponent | InputComponent>;
@@ -1332,11 +1339,11 @@ export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
 	uploaderData: {
 		avatar: string;
 		name: string;
-	}
+	};
 }
 
 export interface IImageWindowProps {
 	channelLabel: string;
 	selectedImageIndex: number;
-	images: Array<IAttachmentEntityWithUploader>
+	images: Array<IAttachmentEntityWithUploader>;
 }
