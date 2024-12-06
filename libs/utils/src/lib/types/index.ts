@@ -38,8 +38,10 @@ import {
 import { ApiNotifiReactMessage, ApiNotificationChannelCategorySetting, ApiPermissionRoleChannel } from 'mezon-js/dist/api.gen';
 import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
+import { CanvasDataResponse } from './htmlCanvas';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
+export * from './htmlCanvas';
 export * from './messageLine';
 export * from './mimeTypes';
 export * from './permissions';
@@ -358,6 +360,7 @@ export interface IMessageSendPayload {
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
+	canvas?: CanvasDataResponse;
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
 }
