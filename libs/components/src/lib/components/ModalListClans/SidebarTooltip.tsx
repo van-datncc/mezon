@@ -1,11 +1,11 @@
 import { selectTheme } from '@mezon/store';
 import { IClan } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { useSelector } from 'react-redux';
 
 export type SidebarTooltipProps = {
 	titleTooltip?: string;
-	readonly children?: React.ReactElement | string;
+	readonly children: React.ReactElement;
 	clan?: IClan;
 };
 
@@ -13,19 +13,18 @@ const SidebarTooltip = ({ titleTooltip, clan, children }: SidebarTooltipProps) =
 	const appearanceTheme = useSelector(selectTheme);
 
 	return (
-		<Tooltip
+		<Tippy
+			arrow={false}
 			content={
-				<div style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate flex gap-1 items-center">
+				<div style={{ whiteSpace: 'nowrap' }} className={`max-w-60 truncate flex gap-1 items-center`}>
 					{clan?.is_onboarding && <OnboardingIcon />} <div className="flex-1 truncate"> {titleTooltip} </div>
 				</div>
 			}
-			trigger="hover"
-			animation="duration-500"
-			style={appearanceTheme === 'light' ? 'light' : 'dark'}
 			placement="right"
+			className={`!left-12  ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
 		>
-			{children}
-		</Tooltip>
+			<div>{children}</div>
+		</Tippy>
 	);
 };
 

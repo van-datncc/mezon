@@ -511,3 +511,5 @@ const MemoizedChannelMessages = memo(ChannelMessages, (prev, cur) => prev.channe
 };
 
 export default MemoizedChannelMessages;
+
+(MemoizedChannelMessages as any).displayName = 'MemoizedChannelMessages';

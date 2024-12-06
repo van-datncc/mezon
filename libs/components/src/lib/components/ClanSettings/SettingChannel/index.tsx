@@ -10,8 +10,9 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { formatDistance } from 'date-fns';
-import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
+import { Avatar, AvatarSizes, Dropdown, Pagination } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useMemo, useRef, useState } from 'react';
@@ -339,15 +340,18 @@ const ItemInfor = ({
 
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					{(creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url) && (
-						<Tooltip
-							content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username}
+						<Tippy
+							content={
+								<span>{creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username} </span>
+							}
 							placement="left"
+							arrow={false}
 						>
 							<img
 								src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url || 'assets/avatar-user.svg'}
 								className="w-8 h-8 object-cover rounded-full "
 							/>
-						</Tooltip>
+						</Tippy>
 					)}
 				</div>
 			</div>

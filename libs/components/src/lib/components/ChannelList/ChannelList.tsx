@@ -286,4 +286,9 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 		</div>
 	);
 };
-export default memo(ChannelList, () => true);
+
+const ChannelListMem = memo(ChannelList, () => true);
+
+ChannelListMem.displayName = 'ChannelListMem';
+
+export default ChannelListMem;
