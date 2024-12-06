@@ -204,7 +204,7 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize,
 								userIds={thread?.user_ids || []}
 								channelId={thread?.id as string}
 								messageCount={thread?.message_count || 0}
-								lastMessage={channelParrent.last_sent_message}
+								lastMessage={thread.last_sent_message}
 							/>
 						))
 					) : (
@@ -311,14 +311,14 @@ const ItemInfor = ({
 					<span className="truncate pr-8">{label}</span>
 				</div>
 				<div className="flex-1 flex " onClick={handleShowAllMemberList}>
-					{privateChannel ? (
+					{privateChannel || isThread ? (
 						<Avatar.Group className={`flex flex-1 items-center gap-3 ${isThread ? '-ml-8' : ''}`}>
-							{userIds.slice(0, 2).map((member) => (
+							{userIds.slice(0, 3).map((member) => (
 								<AvatarUserShort id={member} key={member} hiddenTooltip={true} />
 							))}
 							{userIds.length > 3 && (
 								<Avatar.Counter
-									total={userIds.length - 1}
+									total={userIds.length - 3}
 									className="h-4 w-6 dark:text-textPrimary text-textPrimaryLight ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
 								/>
 							)}
