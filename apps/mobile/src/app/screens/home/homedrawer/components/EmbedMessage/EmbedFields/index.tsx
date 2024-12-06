@@ -1,11 +1,13 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
-import { EMessageComponentType, IMessageRatioOption, InputComponent, SelectComponent } from '@mezon/utils';
+import { DatePickerComponent, EMessageComponentType, IMessageRatioOption, InputComponent, SelectComponent } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import { memo, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import { MezonInput, MezonSelect } from '../../../../../../componentUI';
+import { MezonDateTimePicker } from '../../../../../../componentUI';
+import { EmbedInput } from './EmbedInput';
 import { EmbedRadioButton } from './EmbedRadioItem';
+import { EmbedSelect } from './EmbedSelect';
 import { style } from './styles';
 
 interface Field {
@@ -13,7 +15,7 @@ interface Field {
 	value: string;
 	inline?: boolean;
 	options?: IMessageRatioOption[];
-	inputs?: SelectComponent | InputComponent;
+	inputs?: SelectComponent | InputComponent | DatePickerComponent;
 }
 
 interface EmbedFieldsProps {
@@ -45,7 +47,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 	const handleCheckRadioButton = (index: number, option: IMessageRatioOption) => {
 		if (!option?.name) {
 			setChecked([index]);
-			handleRadioValue(option);
+			handleRadioValue(option?.value);
 			return;
 		}
 		if (checked.includes(index)) {
@@ -53,16 +55,16 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 			return;
 		}
 		setChecked([...checked, index]);
-		handleRadioValue(option);
+		handleRadioValue(option?.value);
 	};
 
-	const handleRadioValue = (option: IMessageRatioOption) => {
+	const handleRadioValue = (value: string) => {
 		dispatch(
 			embedActions.addEmbedValueOptions({
 				message_id: message_id,
 				data: {
-					id: option?.value,
-					value: option?.value
+					id: value,
+					value: value
 				}
 			})
 		);
@@ -85,12 +87,8 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 		handleChangeDataInput(text, id);
 	}, 300);
 
-	const handleChangeSelect = (value: string, id: string) => {
-		handleChangeDataInput(value, id);
-	};
-
 	return (
-		<View>
+		<View style={styles.container}>
 			{!!groupedFields?.length &&
 				groupedFields.map((field, index) => (
 					<View key={`fieldGroup${index}`}>
@@ -108,20 +106,16 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 												onCheck={() => handleCheckRadioButton(optionIndex, optionItem)}
 											/>
 										))}
-									{!!fieldItem?.inputs && (
+									{!fieldItem?.inputs && (
 										<View>
-											{fieldItem?.inputs?.type === EMessageComponentType.INPUT ? (
-												<MezonInput
-													placeHolder={fieldItem?.inputs?.component?.placeholder}
-													onTextChange={(text) => handleChangeText(text, fieldItem?.inputs?.id)}
-												/>
-											) : (
-												<MezonSelect
-													data={fieldItem?.inputs?.component?.options?.map((item) => {
-														return { title: item?.label, value: item?.value };
-													})}
-													onChange={(value) => handleChangeSelect(value as string, fieldItem?.inputs?.id)}
-												/>
+											{fieldItem?.inputs?.type === EMessageComponentType.INPUT && (
+												<EmbedInput input={fieldItem?.inputs?.component} onSelectionChanged={handleChangeText} />
+											)}
+											{fieldItem?.inputs?.type === EMessageComponentType.SELECT && (
+												<EmbedSelect options={fieldItem?.inputs?.component?.options} onSelectionChanged={handleRadioValue} />
+											)}
+											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
+												<MezonDateTimePicker value={new Date(fieldItem?.inputs?.component?.value)} />
 											)}
 										</View>
 									)}
