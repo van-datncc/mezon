@@ -9,12 +9,6 @@ type SelectOptionsProps = {
 };
 
 export const SelectOptions: React.FC<SelectOptionsProps> = ({ options, onSelectOption, onSubmitSelection }) => {
-	// useEffect(() => {
-	// 	return () => {
-	// 		onSubmitSelection();
-	// 	};
-	// }, []);
-
 	return (
 		<>
 			{options.map((option) => (

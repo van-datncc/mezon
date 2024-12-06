@@ -57,11 +57,5 @@ export const embedActions = {
 export const getEmbedState = (rootState: { [EMBED_MESSAGE]: EmbedState }): EmbedState => rootState[EMBED_MESSAGE];
 
 export const selectDataFormEmbedByMessageId = createSelector([getEmbedState, (state, message_id: string) => message_id], (state, message_id) => {
-	// if (state.optionsForm[message_id]) {
-	// 	return {
-	// 		dataInputs: state.formDataEmbed[message_id],
-	// 		dataOptions: state.optionsForm[message_id]
-	// 	};
-	// }
 	return state.formDataEmbed[message_id];
 });
