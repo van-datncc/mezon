@@ -84,3 +84,5 @@ export const usePushToTalk = () => {
 	}
 	return context;
 };
+
+PushToTalkContext.displayName = 'PushToTalkContext';

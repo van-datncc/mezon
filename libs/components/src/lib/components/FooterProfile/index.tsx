@@ -15,7 +15,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, useLongPress } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -174,12 +174,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				</div>
 				{isJoined && (
 					<>
-						<Tooltip content="Quit PTT" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-							<Icons.JoinedPTT
-								onClick={quitPTT}
-								className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
-							/>
-						</Tooltip>
+						<Tippy content="Quit PTT" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+							<span>
+								<Icons.JoinedPTT
+									onClick={quitPTT}
+									className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
+								/>
+							</span>
+						</Tippy>
 
 						<div {...longPressHandlers}>
 							<MicButton isTalking={isTalking} />
@@ -189,14 +191,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+					<Tippy content="Settings" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
 						<div
 							onClick={openSetting}
 							className="ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
 						>
 							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
 						</div>
-					</Tooltip>
+					</Tippy>
 				</div>
 			</button>
 			{showModalCustomStatus && (

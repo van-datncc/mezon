@@ -364,11 +364,8 @@ interface HoverStateWrapperProps {
 const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage }) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
-	const isScrolling = useRef(false);
 
 	const handleMouseEnter = () => {
-		if (isScrolling.current) return;
-
 		if (hoverTimeout.current) {
 			clearTimeout(hoverTimeout.current);
 		}

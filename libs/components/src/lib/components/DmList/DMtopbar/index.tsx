@@ -21,7 +21,7 @@ import {
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useRef, useState } from 'react';
@@ -123,6 +123,8 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 		}
 	};
 
+	const isLightMode = appearanceTheme === 'light';
+
 	return (
 		<>
 			{/* {!isHaveCallInChannel && ( */}
@@ -155,55 +157,43 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 						<div className=" items-center gap-2 flex">
 							<div className="justify-start items-center gap-[15px] flex">
 								<button onClick={() => handleStartCall()}>
-									<Tooltip
-										content="Start voice call"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.IconPhoneDM
-											className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
-										/>
-									</Tooltip>
+									<Tippy content="Start voice call" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+										<span>
+											<Icons.IconPhoneDM
+												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+											/>
+										</span>
+									</Tippy>
 								</button>
 								<button onClick={() => handleStartCall(true)}>
-									<Tooltip
-										content="Start Video Call"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.IconMeetDM
-											className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
-										/>
-									</Tooltip>
+									<Tippy content="Start Video Call" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+										<span>
+											<Icons.IconMeetDM
+												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+											/>
+										</span>
+									</Tippy>
 								</button>
 								<div>
-									<PinButton isLightMode={appearanceTheme === 'light'} />
+									<PinButton isLightMode={isLightMode} />
 								</div>
 								<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
 								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
 									<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
-										<Tooltip
-											content="Show Member List"
-											trigger="hover"
-											animation="duration-500"
-											style={appearanceTheme === 'light' ? 'light' : 'dark'}
-										>
-											<Icons.MemberList isWhite={isShowMemberListDM} />
-										</Tooltip>
+										<Tippy content="Show Member List" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+											<span>
+												<Icons.MemberList isWhite={isShowMemberListDM} />
+											</span>
+										</Tippy>
 									</button>
 								)}
 								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 									<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
-										<Tooltip
-											content="Show User Profile"
-											trigger="hover"
-											animation="duration-500"
-											style={appearanceTheme === 'light' ? 'light' : 'dark'}
-										>
-											<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-										</Tooltip>
+										<Tippy content="Show User Profile" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+											<span>
+												<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+											</span>
+										</Tippy>
 									</button>
 								)}
 							</div>
@@ -225,26 +215,20 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 					</div>
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
 						<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
-							<Tooltip
-								content="Show Member List"
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							>
-								<Icons.MemberList isWhite={isShowMemberListDM} />
-							</Tooltip>
+							<Tippy content="Show Member List" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+								<span>
+									<Icons.MemberList isWhite={isShowMemberListDM} />
+								</span>
+							</Tippy>
 						</button>
 					)}
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 						<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
-							<Tooltip
-								content="Show User Profile"
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							>
-								<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-							</Tooltip>
+							<Tippy content="Show User Profile" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+								<span>
+									<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+								</span>
+							</Tippy>
 						</button>
 					)}
 				</div>
@@ -273,20 +257,16 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
-			<Tooltip
-				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
-				content="Pinned Messages"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-			>
-				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.PinRight isWhite={isShowPinMessage} />
-				</button>
-				{pinMsgs?.length > 0 && (
-					<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
-				)}
-			</Tooltip>
+			<Tippy className={`${isShowPinMessage && 'hidden'} w-[142px] ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Pinned Messages">
+				<div>
+					<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+						<Icons.PinRight isWhite={isShowPinMessage} />
+					</button>
+					{pinMsgs?.length > 0 && (
+						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
+					)}
+				</div>
+			</Tippy>
 			{isShowPinMessage && <PinnedMessages onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
@@ -298,6 +278,7 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 		setOpenAddToGroup(!openAddToGroup);
 	};
 	const rootRef = useRef<HTMLDivElement>(null);
+	const isLightMode = appearanceTheme === 'light';
 	return (
 		<div onClick={handleOpenAddToGroupModal} ref={rootRef} className="cursor-pointer">
 			{openAddToGroup && (
@@ -311,9 +292,11 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 					/>
 				</div>
 			)}
-			<Tooltip content="Add friends to DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-				<Icons.IconAddFriendDM />
-			</Tooltip>
+			<Tippy content="Add friends to DM" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+				<span>
+					<Icons.IconAddFriendDM />
+				</span>
+			</Tippy>
 		</div>
 	);
 };
