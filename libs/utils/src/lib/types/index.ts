@@ -1219,7 +1219,11 @@ export enum ActionLog {
 	DELETE_CANVAS_ACTION_AUDIT = 'Delete Canvas',
 	CREATE_CATEGORY_ACTION_AUDIT = 'Create Category',
 	UPDATE_CATEGORY_ACTION_AUDIT = 'Update Category',
-	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category'
+	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category',
+	ADD_MEMBER_CHANNEL_ACTION_AUDIT = 'Add Member Channel',
+	REMOVE_MEMBER_CHANNEL_ACTION_AUDIT = 'Remove Member Channel',
+	ADD_ROLE_CHANNEL_ACTION_AUDIT = 'Add Role Channel',
+	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel'
 }
 
 export enum UserAuditLog {
