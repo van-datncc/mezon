@@ -64,6 +64,18 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const initializePeerConnection = useCallback(() => {
 		peerConnection.current = new RTCPeerConnection(servers);
+		peerConnection.current.onnegotiationneeded = async (event) => {
+			const offer = await peerConnection.current?.createOffer();
+			await peerConnection.current?.setLocalDescription(offer);
+			const offerEnc = await compress(JSON.stringify(offer));
+			await mezon.socketRef.current?.joinPTTChannel(
+				clanId.current || '',
+				channelId.current || '',
+				WebrtcSignalingType.WEBRTC_SDP_OFFER,
+				offerEnc
+			);
+		};
+
 		peerConnection.current.ontrack = (event) => {
 			if (event?.streams?.[0]) {
 				setRemoteStream(event.streams[0]);
@@ -91,15 +103,6 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 			const connection = initializePeerConnection();
 			connection.addTransceiver('audio', { direction: 'recvonly' });
-			const offer = await connection.createOffer();
-			await connection.setLocalDescription(offer);
-			const offerEnc = await compress(JSON.stringify(offer));
-			await mezon.socketRef.current?.joinPTTChannel(
-				clanId.current || '',
-				channelId.current || '',
-				WebrtcSignalingType.WEBRTC_SDP_OFFER,
-				offerEnc
-			);
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -114,21 +117,20 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		// Reset state
 		setLocalStream(null);
 		setRemoteStream(null);
-		// mezon.socketRef.current?.joinPTTChannel(clanId.current || '', channelId.current || '', WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
 	}, [localStream]);
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
-			if (!peerConnection.current && channelId) {
+			if (peerConnection.current && channelId) {
 				if (value === true) {
 					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 					stream.getTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
+					peerConnection.current.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendonly' });
+				} else {
+					peerConnection.current.removeTrack(peerConnection.current.getSenders()[0]);
 				}
 			}
 			if (localStream) {
-				// if (value == true) {
-				// await mezon.socketRef.current?.talkPTTChannel(channelId.current || '', 5, JSON.stringify({}), value === true ? 0 : -1);
-				// }
 				localStream?.getAudioTracks().forEach((track) => {
 					track.enabled = value;
 				});
