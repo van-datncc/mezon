@@ -1,4 +1,4 @@
-import { DatePickerComponent, EMessageComponentType, IFieldEmbed, InputComponent, SelectComponent } from '@mezon/utils';
+import { DatePickerComponent, EMessageComponentType, IFieldEmbed, InputComponent, RadioComponent, SelectComponent } from '@mezon/utils';
 import { useMemo } from 'react';
 import { MessageButton } from '../../MessageActionsPanel/components/MessageButton';
 import { MessageDatePicker } from '../../MessageActionsPanel/components/MessageDatePicker';
@@ -41,11 +41,6 @@ export function EmbedFields({ fields, message_id, senderId }: EmbedFieldsProps) 
 								<div className="font-semibold text-sm">{field.name}</div>
 								<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
 							</div>
-							{field.options && (
-								<div className="flex flex-col gap-1">
-									<EmbedOptionRatio key={field.value} options={field.options} message_id={message_id} />
-								</div>
-							)}
 							{field.inputs && (
 								<div className="flex flex-col gap-1">
 									<InputEmbedByType component={field.inputs} messageId={message_id} senderId={senderId} />
@@ -75,7 +70,7 @@ export function EmbedFields({ fields, message_id, senderId }: EmbedFieldsProps) 
 type InputEmbedByType = {
 	messageId: string;
 	senderId: string;
-	component: SelectComponent | InputComponent | DatePickerComponent;
+	component: SelectComponent | InputComponent | DatePickerComponent | RadioComponent;
 };
 
 const InputEmbedByType = ({ messageId, senderId, component }: InputEmbedByType) => {
@@ -83,9 +78,11 @@ const InputEmbedByType = ({ messageId, senderId, component }: InputEmbedByType) 
 		case EMessageComponentType.INPUT:
 			return <MessageInput buttonId={component.id} messageId={messageId} senderId={senderId} input={component.component} />;
 		case EMessageComponentType.SELECT:
-			return <MessageSelect buttonId={component.id} messageId={messageId} senderId={senderId} select={component.component} />;
+			return <MessageSelect buttonId={component.id} messageId={messageId} senderId={senderId} select={component.component} inside={true} />;
 		case EMessageComponentType.DATEPICKER:
 			return <MessageDatePicker buttonId={component.id} messageId={messageId} senderId={senderId} datepicker={component.component} />;
+		case EMessageComponentType.RADIO:
+			return <EmbedOptionRatio key={component.id} options={component.component} message_id={messageId} />;
 		default:
 			return;
 	}

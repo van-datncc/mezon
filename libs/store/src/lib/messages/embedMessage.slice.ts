@@ -9,7 +9,7 @@ export interface FormDataEmbed {
 }
 export interface EmbedState {
 	loadingStatus: LoadingStatus;
-	formDataEmbed: Record<string, { [key: string]: string }>;
+	formDataEmbed: Record<string, { [key: string]: string | string[] }>;
 	optionsForm: Record<string, FormDataEmbed[]>;
 }
 
@@ -23,16 +23,27 @@ export const embedSlice = createSlice({
 	name: EMBED_MESSAGE,
 	initialState: initialEmbedState,
 	reducers: {
-		addEmbedValueInput: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
-			const { message_id, data } = action.payload;
-			state.formDataEmbed = {
-				...state.formDataEmbed,
-				[message_id]: { ...state.formDataEmbed[message_id], [data.id]: data.value }
-			};
-		},
-		addEmbedValueOptions: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
-			const { message_id, data } = action.payload;
-			state.optionsForm[message_id] = [data];
+		addEmbedValue: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
+			const { message_id, data, multiple } = action.payload;
+			if (!multiple) {
+				state.formDataEmbed[message_id] = {
+					...state.formDataEmbed[message_id],
+					[data.id]: data.value
+				};
+				return;
+			}
+			if (!state.formDataEmbed[message_id]) {
+				state.formDataEmbed[message_id] = {
+					...state.formDataEmbed[message_id],
+					[data.id]: [data.value]
+				};
+				return;
+			}
+			if (state.formDataEmbed[message_id][data.id]) {
+				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id], data.value];
+				return;
+			}
+			state.formDataEmbed[message_id][data.id] = [data.value];
 		}
 	}
 });
@@ -46,13 +57,5 @@ export const embedActions = {
 export const getEmbedState = (rootState: { [EMBED_MESSAGE]: EmbedState }): EmbedState => rootState[EMBED_MESSAGE];
 
 export const selectDataFormEmbedByMessageId = createSelector([getEmbedState, (state, message_id: string) => message_id], (state, message_id) => {
-	if (state.optionsForm[message_id]) {
-		return {
-			dataInputs: state.formDataEmbed[message_id],
-			dataOptions: state.optionsForm[message_id]
-		};
-	}
-	return {
-		dataInputs: state.formDataEmbed[message_id]
-	};
+	return state.formDataEmbed[message_id];
 });

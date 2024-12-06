@@ -1,4 +1,5 @@
 import {
+	embedActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentUserId,
@@ -43,6 +44,17 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 						sender_id: senderId,
 						user_id: currentUserId,
 						extra_data: option.value
+					})
+				);
+			} else {
+				dispatch(
+					embedActions.addEmbedValue({
+						message_id: messageId,
+						data: {
+							id: buttonId,
+							value: option.value
+						},
+						multiple: true
 					})
 				);
 			}
