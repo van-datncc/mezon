@@ -240,8 +240,7 @@ export interface IFieldEmbed {
 	name: string;
 	value: string;
 	inline?: boolean;
-	options?: IMessageRatioOption[];
-	inputs?: SelectComponent | InputComponent | DatePickerComponent;
+	inputs?: SelectComponent | InputComponent | DatePickerComponent | RadioComponent;
 	button?: ButtonComponent[];
 }
 
@@ -257,7 +256,8 @@ export enum EMessageComponentType {
 	BUTTON = 1,
 	SELECT = 2,
 	INPUT = 3,
-	DATEPICKER = 4
+	DATEPICKER = 4,
+	RADIO = 5
 }
 
 export enum EIconEmbedButtonMessage {
@@ -288,7 +288,6 @@ export interface IMessageRatioOption {
 }
 
 export interface IMessageInput {
-	id: string;
 	placeholder?: string;
 	type?: HTMLInputTypeAttribute;
 	required?: boolean;
@@ -297,7 +296,6 @@ export interface IMessageInput {
 }
 
 export interface IMessageDatePicker {
-	id: string;
 	value: string | Date;
 }
 
@@ -344,6 +342,7 @@ export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessa
 export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
 export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessageComponentType.INPUT };
 export type DatePickerComponent = IMessageComponent<IMessageDatePicker> & { type: EMessageComponentType.DATEPICKER };
+export type RadioComponent = IMessageComponent<IMessageRatioOption[]> & { type: EMessageComponentType.RADIO };
 
 export interface IMessageActionRow {
 	components: Array<ButtonComponent | SelectComponent | InputComponent>;

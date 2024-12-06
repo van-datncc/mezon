@@ -58,7 +58,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 
 	const handleRadioValue = (option: IMessageRatioOption) => {
 		dispatch(
-			embedActions.addEmbedValueOptions({
+			embedActions.addEmbedValue({
 				message_id: message_id,
 				data: {
 					id: option?.value,
@@ -70,7 +70,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 
 	const handleChangeDataInput = (value: string, id?: string) => {
 		dispatch(
-			embedActions.addEmbedValueInput({
+			embedActions.addEmbedValue({
 				message_id: message_id,
 				data: {
 					id: id,

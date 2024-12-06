@@ -11,7 +11,7 @@ type MessageRatioButtonProps = {
 	buttonId: string;
 };
 
-export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, messageId }) => {
+export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, messageId, buttonId }) => {
 	const { placeholder, required, textarea, type = 'text' } = input;
 	const dispatch = useDispatch();
 
@@ -21,13 +21,12 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 
 	const debouncedChangeInput = useDebouncedCallback(async (value: string) => {
 		dispatch(
-			embedActions.addEmbedValueInput({
+			embedActions.addEmbedValue({
 				message_id: messageId,
 				data: {
-					id: input.id,
+					id: buttonId,
 					value: value
-				},
-				multiple: true
+				}
 			})
 		);
 	}, 300);
