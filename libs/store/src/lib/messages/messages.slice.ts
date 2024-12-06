@@ -12,8 +12,6 @@ import {
 	MessageCrypt,
 	PublicKeyMaterial,
 	TypeMessage,
-	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime,
 	getMobileUploadedAttachments,
 	getPublicKeys,
 	getWebUploadedAttachments
@@ -1102,14 +1100,6 @@ export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesSt
 
 export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
 
-export const selectAllMessages = createSelector(getMessagesState, (messageState) => {
-	const res: MessagesEntity[] = [];
-	Object.values(messageState.channelMessages || {}).forEach((item) => {
-		res.concat(Object.values(item?.entities || {}));
-	});
-	return res;
-});
-
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.create_time_seconds && b.create_time_seconds) {
 		return +b.create_time_seconds - +a.create_time_seconds;
@@ -1239,14 +1229,6 @@ export const selectMessageEntitiesByChannelId = createCachedSelector([getMessage
 	return messagesState.channelMessages[channelId]?.entities || emptyObject;
 });
 
-export const selectAllMessagesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
-	const channelMessages = messagesState.channelMessages[channelId];
-	if (!channelMessages) {
-		return [];
-	}
-	return channelMessagesAdapter.getSelectors().selectAll(channelMessages);
-});
-
 export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState?.channelMessages[channelId]?.ids || emptyArray;
 });
@@ -1356,53 +1338,6 @@ const handleSetManyMessages = ({
 	} else {
 		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 	}
-
-	// state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 200, direction);
-
-	// update is viewing older messages
-	// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
-
-	// const channelEntity = state.channelMessages[channelId];
-	// const startSlicePosition = isFetchingLatestMessages ? channelEntity.ids.length - adapterPayload.length : 0;
-	// handleUpdateIsCombineMessage(channelEntity, channelEntity.ids);
-};
-
-const handleUpdateIsCombineMessage = (
-	channelEntity: EntityState<MessagesEntity, string> & {
-		id: string;
-	},
-	messageIds: string[],
-	needUpdateFirstMessage = true
-) => {
-	if (!messageIds?.length) return channelEntity;
-	const entities = channelEntity.entities;
-
-	const firstMessage = entities[messageIds[0]];
-	let prevMessageSenderId = firstMessage.sender_id || '';
-	let prevMessageCreateTime = firstMessage.create_time || '';
-	let prevMessageCreationTimeMs = firstMessage.create_time_seconds || 0;
-
-	if (needUpdateFirstMessage) {
-		firstMessage.isStartedMessageGroup = true;
-		firstMessage.isStartedMessageOfTheDay = true;
-	}
-
-	messageIds.slice(1, messageIds.length).forEach((id) => {
-		const { sender_id, create_time_seconds, create_time } = entities[id];
-		const isSameDay = checkSameDayByCreateTime(create_time, prevMessageCreateTime);
-		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(create_time_seconds || 0, prevMessageCreationTimeMs);
-
-		const isStartedMessageGroup = Boolean(sender_id !== prevMessageSenderId || !isSameDay || !isContinuousMessages);
-
-		entities[id].isStartedMessageGroup = isStartedMessageGroup;
-		entities[id].isStartedMessageOfTheDay = !isSameDay;
-
-		prevMessageSenderId = sender_id;
-		prevMessageCreateTime = create_time;
-		prevMessageCreationTimeMs = create_time_seconds || 0;
-	});
-
-	return channelEntity;
 };
 
 const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
@@ -1442,62 +1377,7 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 };
 
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
-	const messageId = adapterPayload.id;
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
-	// const channelEntity = state.channelMessages[channelId];
-	// const index = channelEntity.ids.indexOf(messageId);
-	// if (index === -1) return channelEntity;
-
-	// const startIndex = Math.max(index - 1, 0);
-
-	// const itemCount = channelEntity.ids.length;
-
-	// return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), itemCount > 2 ? false : true);
-};
-
-const handleLimitMessage = (
-	channelEntity: EntityState<MessagesEntity, string> & { id: string },
-	limit: number,
-	direction: Direction_Mode = Direction_Mode.AFTER_TIMESTAMP
-) => {
-	const ids = channelEntity.ids;
-
-	const length = ids.length;
-
-	if (length <= limit) return channelEntity;
-
-	const startSlicePosition = direction === Direction_Mode.AFTER_TIMESTAMP ? length - limit : 0;
-	const idToRemove = direction === Direction_Mode.AFTER_TIMESTAMP ? ids.slice(0, startSlicePosition) : ids.slice(limit, length);
-
-	return channelMessagesAdapter.removeMany(channelEntity, idToRemove);
-};
-
-const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelId: string) => {
-	const channelLastMessage = state.lastMessageByChannel[channelId];
-	if (!channelLastMessage) {
-		return false;
-	}
-
-	const lastMessageId = channelLastMessage.id;
-
-	if (!lastMessageId) {
-		return false;
-	}
-
-	const channelEntity = state.channelMessages[channelId]?.entities;
-
-	if (!channelEntity || typeof channelEntity !== 'object') {
-		return false;
-	}
-
-	const lengthChannelEntity = Object.keys(channelEntity || {}).length;
-	const isLastMessageExist = channelEntity?.[lastMessageId];
-
-	if (!isLastMessageExist && lengthChannelEntity >= LIMIT_MESSAGE * 4) {
-		return true;
-	}
-
-	return false;
 };
 
 const handleUpdateReplyMessage = (channelEntity: EntityState<MessagesEntity, string> & { id: string }, message_ref_id: string) => {

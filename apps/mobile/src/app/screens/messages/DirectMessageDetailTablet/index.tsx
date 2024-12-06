@@ -1,4 +1,4 @@
-import { useAuth, useChatMessages, useMemberStatus, useSeenMessagePool } from '@mezon/core';
+import { useChatMessages, useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -13,9 +13,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
-	selectIsUnreadDMById,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { SubPanelName } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -38,8 +36,6 @@ function useChannelSeen(channelId: string) {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {

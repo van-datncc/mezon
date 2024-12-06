@@ -123,6 +123,7 @@ body {
 
 .selected-image-wrapper {
     flex: 1;
+    box-sizing: border-box;
     padding: 20px;
     width: 100%;
     display: flex;
@@ -143,7 +144,7 @@ body {
     height: 100%;
     background-color: #0B0B0B;
     padding:  0 10px;
-    display: flex;s
+    display: flex;
     flex-direction: column;
     gap: 20px;
     overflow-y: hidden;

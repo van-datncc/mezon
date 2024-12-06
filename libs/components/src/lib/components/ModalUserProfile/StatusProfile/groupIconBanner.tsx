@@ -2,7 +2,7 @@ import { useFriends } from '@mezon/core';
 import { ChannelMembersEntity, EStateFriend, selectCurrentUserId, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IUser } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { OpenModalProps } from '..';
@@ -112,15 +112,12 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 							onClick={(e) => handleOnClickButtonFriend(e, index)}
 							key={button.title}
 						>
-							<Tooltip
+							<Tippy
+								className={`whitespace-nowrap ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
 								content={button.title}
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								className="whitespace-nowrap"
 							>
-								{button.icon}
-							</Tooltip>
+								<span>{button.icon}</span>
+							</Tippy>
 							{openModal.openFriend && checkAddFriend === EStateFriend.FRIEND && (
 								<PopupFriend user={user} showPopupLeft={showPopupLeft} />
 							)}
@@ -136,15 +133,11 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 					setOpenModal({ openFriend: false, openOption: !openModal.openOption });
 				}}
 			>
-				<Tooltip
-					content="More"
-					trigger="hover"
-					animation="duration-500"
-					style={appearanceTheme === 'light' ? 'light' : 'dark'}
-					className="whitespace-nowrap"
-				>
-					<Icons.ThreeDot defaultSize="size-4 iconWhiteImportant" />
-				</Tooltip>
+				<Tippy content="More" className={`whitespace-nowrap ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+					<span>
+						<Icons.ThreeDot defaultSize="size-4 iconWhiteImportant" />
+					</span>
+				</Tippy>
 				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isSelf={isSelf} />}
 			</div>
 		</>

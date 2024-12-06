@@ -17,6 +17,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
+import { HtmlCanvasView } from '../HtmlCanvas';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
@@ -299,6 +300,10 @@ function MessageWithUser({
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+
+												{/* show html canvas */}
+												{message?.content?.canvas && <HtmlCanvasView response={message?.content?.canvas} />}
+
 												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => (
 														<EmbedMessage
@@ -364,11 +369,8 @@ interface HoverStateWrapperProps {
 const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage }) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
-	const isScrolling = useRef(false);
 
 	const handleMouseEnter = () => {
-		if (isScrolling.current) return;
-
 		if (hoverTimeout.current) {
 			clearTimeout(hoverTimeout.current);
 		}

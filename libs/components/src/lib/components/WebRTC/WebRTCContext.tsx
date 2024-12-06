@@ -150,7 +150,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				{
 					const processData = async () => {
 						const dataDec = await decompress(data?.json_data);
-						const answer = safeJSONParse(dataDec || '{}');
+						const answer = safeJSONParse(dataDec);
 						await peerConnection.current?.setRemoteDescription(new RTCSessionDescription(answer));
 					};
 					processData().catch(console.error);
@@ -159,8 +159,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				{
 					const processData = async () => {
-						const candidate = safeJSONParse(data?.json_data || '{}');
-						if (peerConnection.current) {
+						const candidate = safeJSONParse(data?.json_data);
+						if (peerConnection.current && candidate != null) {
 							await peerConnection.current?.addIceCandidate(new RTCIceCandidate(candidate));
 						}
 					};

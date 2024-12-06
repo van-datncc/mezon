@@ -1,17 +1,15 @@
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside } from '@mezon/core';
 import {
 	notificationActions,
-	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationClan,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
-	selectCurrentClan,
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, sortNotificationsByDate } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
@@ -37,15 +35,7 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
-type ListCreatimeMessage = {
-	channelId: string;
-	messageId: string;
-	createdTime: number;
-};
-
 function NotificationList({ rootRef }: NotificationProps) {
-	const currentClan = useSelector(selectCurrentClan);
-	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
 	const dispatch = useAppDispatch();
 	const allNotificationClan = useSelector(selectAllNotificationClan);
 
@@ -100,15 +90,14 @@ function NotificationList({ rootRef }: NotificationProps) {
 						</div>
 
 						{isShowMarkAllAsRead && (
-							<Tooltip
+							<Tippy
+								className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
+								arrow={false}
 								content={
 									<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
 										{'Mark all as read'}
 									</p>
 								}
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
 								placement="top"
 							>
 								<button
@@ -116,8 +105,8 @@ function NotificationList({ rootRef }: NotificationProps) {
 									className="flex items-center p-1 rounded-sm justify-center dark:bg-bgTertiary bg-bgLightModeButton"
 								>
 									<Icons.MarkAllAsRead className="w-5 h-5" />
-								</button>{' '}
-							</Tooltip>
+								</button>
+							</Tippy>
 						)}
 					</div>
 					<div className="flex flex-row border-b-[1px] border-b-gray-300">

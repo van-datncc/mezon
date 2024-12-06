@@ -1,14 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import {
-	useAppNavigation,
-	useAuth,
-	useDragAndDrop,
-	usePermissionChecker,
-	useSearchMessages,
-	useSeenMessagePool,
-	useWindowFocusState
-} from '@mezon/core';
+import { useAppNavigation, useDragAndDrop, usePermissionChecker, useSearchMessages, useSeenMessagePool, useWindowFocusState } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ETypeMission,
@@ -74,7 +66,6 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
-	const { userId } = useAuth();
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {

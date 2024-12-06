@@ -25,7 +25,6 @@ import PanelCanvas from '../../PanelCanvas';
 export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
 	const type = Number(channel?.type);
 	const { setStatusMenu } = useMenu();
-	const { navigate, toChannelPage } = useAppNavigation();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
@@ -35,8 +34,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isAppChannel = type === ChannelType.CHANNEL_TYPE_APP;
 
-	const channelParent =
-		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
+	const channelParent = useAppSelector((state) => selectChannelById(state, channel?.parrent_id as string));
 
 	const isPrivate = channelParent?.id ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
@@ -55,17 +53,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 		distanceToBottom: 0
 	});
 	const [isShowPanelCanvas, setIsShowPanelCanvas] = useState<boolean>(false);
-	const dispatch = useAppDispatch();
 
-	const handleRedirect = () => {
-		if (channelParent?.id) {
-			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
-		}
-		if (isShowCanvas) {
-			navigate(toChannelPage(channel?.id ?? '', channel?.clan_id ?? ''));
-			dispatch(appActions.setIsShowCanvas(false));
-		}
-	};
 	const title = useSelector(selectTitle);
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -116,27 +104,16 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				{isAppChannel && <Icons.AppChannelIcon className={'w-6 h-6'} fill={theme} />}
 			</div>
 
-			<p
-				className={`mr-2 text-base font-semibold mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '} ${isActive ? 'dark:text-white text-colorTextLightMode cursor-default' : 'dark:text-textSecondary text-colorTextLightMode cursor-pointer'} ${isChannelVoice && 'text-white'}`}
-				onClick={handleRedirect}
-			>
-				{channelParent?.channel_label ? channelParent?.channel_label : channel?.channel_label}
-			</p>
-			{channelParent?.channel_label && channel && !isShowCanvas && (
-				<div className="flex flex-row items-center gap-2">
-					<Icons.ArrowRight />
-					{channelParent?.channel_label && channel.channel_private === ChannelStatusEnum.isPrivate ? (
-						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode min-w-6" />
-					) : (
-						<Icons.ThreadIcon defaultSize="w-6 h-6 min-w-6" />
-					)}
-					<p
-						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
-					>
-						{channel.channel_label}
-					</p>
-				</div>
-			)}
+			<ChannelLabelContent
+				channel={channel}
+				currentChannel={currentChannel}
+				channelParent={channelParent}
+				isActive={isActive}
+				isChannelVoice={isChannelVoice}
+				isShowCanvas={isShowCanvas}
+				closeMenu={closeMenu}
+				statusMenu={statusMenu}
+			/>
 			{isShowCanvas && (
 				<div role={'button'}>
 					<div className="flex flex-row items-center gap-2">
@@ -161,6 +138,67 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 		</div>
 	);
 };
+
+interface ChannelLabelContentProps {
+	channel: IChannel | null | undefined;
+	currentChannel: IChannel | null | undefined;
+	channelParent: IChannel | null | undefined;
+	isActive: boolean;
+	isChannelVoice: boolean;
+	isShowCanvas: boolean;
+	closeMenu: boolean;
+	statusMenu: boolean;
+}
+
+const ChannelLabelContent: React.FC<ChannelLabelContentProps> = ({
+	channel,
+	channelParent,
+	isActive,
+	isChannelVoice,
+	currentChannel,
+	isShowCanvas,
+	closeMenu,
+	statusMenu
+}) => {
+	const dispatch = useAppDispatch();
+	const { navigate, toChannelPage } = useAppNavigation();
+	const handleRedirect = () => {
+		if (channelParent?.id) {
+			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
+		}
+		if (isShowCanvas) {
+			navigate(toChannelPage(channel?.id ?? '', channel?.clan_id ?? ''));
+			dispatch(appActions.setIsShowCanvas(false));
+		}
+	};
+	return (
+		<>
+			<p
+				className={`mr-2 text-base font-semibold mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '} ${isActive ? 'dark:text-white text-colorTextLightMode cursor-default' : 'dark:text-textSecondary text-colorTextLightMode cursor-pointer'} ${isChannelVoice && 'text-white'}`}
+				onClick={handleRedirect}
+			>
+				{channelParent?.channel_label ? channelParent?.channel_label : channel?.channel_label}
+			</p>
+			{channelParent?.channel_label && channel && !isShowCanvas && (
+				<div className="flex flex-row items-center gap-2">
+					<Icons.ArrowRight />
+					{channelParent?.channel_label && channel.channel_private === ChannelStatusEnum.isPrivate ? (
+						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode min-w-6" />
+					) : (
+						<Icons.ThreadIcon defaultSize="w-6 h-6 min-w-6" />
+					)}
+					<p
+						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
+					>
+						{channel.channel_label}
+					</p>
+				</div>
+			)}
+		</>
+	);
+};
+
+ChannelLabel.displayName = 'ChannelLabel';
 
 export const ThreadLable: React.FC<ThreadNameProps> = ({ name }) => {
 	return (
