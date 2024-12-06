@@ -1080,6 +1080,12 @@ input:-webkit-autofill:active {
 	animation: line-retract 1.5s forwards;
 }
 
+.custom-datepicker {
+	&::-webkit-calendar-picker-indicator {
+		opacity: 0;
+	}
+}
+
 .contexify_itemContent{
 	width: 100%;
 }
