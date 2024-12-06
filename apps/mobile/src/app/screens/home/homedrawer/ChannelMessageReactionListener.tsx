@@ -18,7 +18,7 @@ const ChannelMessageReactionListener = React.memo(() => {
 			if (!socketRef?.current?.isOpen()) {
 				handleReconnect('');
 			}
-			reactionMessageDispatch(
+			await reactionMessageDispatch(
 				data?.id ?? '',
 				data?.messageId ?? '',
 				data?.emojiId ?? '',
