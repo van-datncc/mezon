@@ -111,45 +111,34 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 						className="dark:bg-black bg-white border-none"
 					>
 						{firstFourElements.map((item, index) => (
-							<div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-								<Item key={index} onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}>
+							<div className="w-[320px]" key={index}>
+								<Item
+									className="flex justify-between items-center w-full px-2 py-1"
+									key={index}
+									onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}
+								>
 									<div
-										style={{
-											display: 'flex',
-											justifyContent: 'space-between',
-											alignItems: 'center',
-											width: '100%',
-											fontFamily: `'gg sans', 'Noto Sans', sans-serif`,
-											fontSize: '14px',
-											fontWeight: 500
-										}}
-										className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+										className={`flex truncate justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
 									>
-										<span>{item.shortname}</span>
+										{item.shortname}
+									</div>
+									<div className="p-1">
+										<ReactionItem
+											emojiShortCode={item.shortname || ''}
+											emojiId={item.id || ''}
+											activeMode={mode}
+											messageId={messageId}
+											isOption={false}
+											isAddReactionPanel
+										/>
 									</div>
 								</Item>
-								<ReactionItem
-									emojiShortCode={item.shortname || ''}
-									emojiId={item.id || ''}
-									activeMode={mode}
-									messageId={messageId}
-									isOption={false}
-								/>
 							</div>
 						))}
-						<hr />
-						<Item key={index} onClick={item.handleItemClick} disabled={item.disabled}>
+						<hr className="border-t dark:border-gray-600" />
+						<Item className="w-full px-2 py-1" key={index} onClick={item.handleItemClick} disabled={item.disabled}>
 							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									alignItems: 'center',
-									width: '100%',
-									fontFamily: `'gg sans', 'Noto Sans', sans-serif`,
-									fontSize: '14px',
-									fontWeight: 500
-								}}
-								className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
 							>
 								<span>View Move</span>
 							</div>
@@ -204,7 +193,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 				);
 		}
 		return elements;
-	}, [items, checkPos, firstFourElements]);
+	}, [items, checkPos, firstFourElements, mode, messageId, handleClickEmoji]);
 
 	return (
 		<Menu onVisibilityChange={onVisibilityChange} id={menuId} style={className} className="z-50">
