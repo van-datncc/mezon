@@ -58,7 +58,11 @@ const iconMap: { [key in ActionLog]: string } = {
 	[ActionLog.DELETE_CANVAS_ACTION_AUDIT]: '-',
 	[ActionLog.CREATE_CATEGORY_ACTION_AUDIT]: '-',
 	[ActionLog.UPDATE_CATEGORY_ACTION_AUDIT]: '-',
-	[ActionLog.DELETE_CATEGORY_ACTION_AUDIT]: '-'
+	[ActionLog.DELETE_CATEGORY_ACTION_AUDIT]: '-',
+	[ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT]: '-',
+	[ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT]: '-',
+	[ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT]: '-',
+	[ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT]: '-'
 };
 
 const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchActionAuditLogProps) => {
