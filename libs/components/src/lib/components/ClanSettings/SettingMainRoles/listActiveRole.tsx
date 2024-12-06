@@ -2,7 +2,7 @@ import { useClanOwner } from '@mezon/core';
 import { RolesClanEntity, selectTheme, selectUserMaxPermissionLevel } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, RoleEveryOne, SlugPermission } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { ApiPermission } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 
@@ -18,6 +18,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 	const isClanOwner = useClanOwner();
 	const appearanceTheme = useSelector(selectTheme);
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const isLightMode = appearanceTheme === 'light';
 
 	return activeRoles
 		.filter((role) => role.creator_id !== RoleEveryOne.TRUE)
@@ -53,23 +54,17 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								}}
 							>
 								{hasPermissionEdit ? (
-									<Tooltip
-										content="Edit"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.PenEdit className="size-5" />
-									</Tooltip>
+									<Tippy content="Edit" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+										<span>
+											<Icons.PenEdit className="size-5" />
+										</span>
+									</Tippy>
 								) : (
-									<Tooltip
-										content="View"
-										trigger="hover"
-										animation="duration-500"
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									>
-										<Icons.ViewRole defaultSize="size-5" />
-									</Tooltip>
+									<Tippy content="View" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+										<span>
+											<Icons.ViewRole defaultSize="size-5" />
+										</span>
+									</Tippy>
 								)}
 							</div>
 							<div
@@ -84,14 +79,11 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 											() => {}
 								}
 							>
-								<Tooltip
-									content="Delete"
-									trigger="hover"
-									animation="duration-500"
-									style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								>
-									<Icons.DeleteMessageRightClick defaultSize="size-5" />
-								</Tooltip>
+								<Tippy content="Delete" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+									<span>
+										<Icons.DeleteMessageRightClick defaultSize="size-5" />
+									</span>
+								</Tippy>
 							</div>
 						</div>
 					</td>

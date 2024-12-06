@@ -1,7 +1,7 @@
 import { useAuth, useChatReaction } from '@mezon/core';
 import { selectCurrentChannel, selectTheme } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { forwardRef, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
@@ -49,26 +49,9 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const isLightMode = appearanceTheme === 'light';
 
 	return (
-		<Tooltip
+		<Tippy
 			content={<UserReactionPanel message={message} emojiShowPanel={emoji} mode={mode} />}
-			trigger="hover"
-			animation="duration-500"
-			className={`flex justify-center items-center bg-blackA`}
-			theme={{
-				arrow: {
-					style: {
-						dark: 'bg-white dark:bg-[#28272b]',
-						light: 'bg-white'
-					}
-				},
-				style: {
-					dark: 'bg-white dark:bg-[#28272b]',
-					light: 'bg-white'
-				},
-				base: 'absolute z-10 inline-block rounded-lg text-sm font-medium shadow-md',
-				hidden: 'invisible opacity-100'
-			}}
-			style={`${isLightMode ? 'light' : 'dark'}`}
+			className={`flex justify-center items-center bg-blackA ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 		>
 			<ItemDetail
 				ref={emojiItemRef}
@@ -88,7 +71,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 				getUrlItem={getUrlItem}
 				totalCount={count}
 			/>
-		</Tooltip>
+		</Tippy>
 	);
 }
 

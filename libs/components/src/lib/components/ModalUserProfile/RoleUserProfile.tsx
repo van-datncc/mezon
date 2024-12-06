@@ -14,6 +14,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -84,6 +85,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		);
 	};
 	const appearanceTheme = useSelector(selectTheme);
+	const isLightMode = appearanceTheme === 'light';
 	return (
 		<div className="flex flex-col">
 			{/* {userRolesClan.length > 0 && <div className="font-bold tracking-wider text-sm pt-2">ROLES</div>} */}
@@ -100,7 +102,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 				))}
 				{userRolesClan.length > 6 && (
 					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
-						<Tooltip
+						<Tippy
 							content={
 								<div className={'flex flex-col items-start gap-1'}>
 									{userRolesClan.slice(6, userRolesClan.length).map((userRole, index) => (
@@ -115,14 +117,12 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 									))}
 								</div>
 							}
-							trigger={'hover'}
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							className="dark:!text-white !text-black"
+							className={`dark:!text-white !text-black ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 						>
 							<span className="text-xs font-medium px-1 cursor-pointer" style={{ lineHeight: '15px' }}>
 								+ {userRolesClan.length - 6}
 							</span>
-						</Tooltip>
+						</Tippy>
 					</span>
 				)}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
@@ -133,18 +133,12 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						arrow={false}
 						className="dark:bg-transparent bg-transparent p-0 h-60 w-[300px]"
 					>
-						<Tooltip
-							content="Add roles"
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							className="dark:text-white text-black"
-						>
+						<Tippy content="Add roles" className={`dark:!text-white !text-black ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-800 bg-slate-300 items-center">
 								<Icons.Plus className="size-5 select-none" />
 								<p className="text-xs m-0 font-medium select-none">Add Role</p>
 							</button>
-						</Tooltip>
+						</Tippy>
 					</Tooltip>
 				</UserRestrictionZone>
 			</div>
@@ -214,6 +208,7 @@ const RoleClanItem = ({
 	appearanceTheme: string;
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
+	const isLightMode = appearanceTheme === 'light';
 	return (
 		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
@@ -224,15 +219,11 @@ const RoleClanItem = ({
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}
 				>
-					<Tooltip
-						content="Remove role"
-						trigger="hover"
-						animation="duration-500"
-						style={appearanceTheme === 'light' ? 'light' : 'dark'}
-						className="dark:!text-white !text-black"
-					>
-						<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
-					</Tooltip>
+					<Tippy content="Remove role" className={`dark:!text-white !text-black ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+						<span>
+							<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
+						</span>
+					</Tippy>
 				</button>
 			) : (
 				<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>

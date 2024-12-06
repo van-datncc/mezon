@@ -39,8 +39,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	const channelId = useRef<string | null>(currentChannelId || null);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const clanId = useRef<string | null>(currentClanId || null);
-	const peerConnectionJoin = useRef<RTCPeerConnection | null>(null);
-	const peerConnectionTalk = useRef<RTCPeerConnection | null>(null);
+	const peerConnection = useRef<RTCPeerConnection | null>(null);
 
 	const servers: RTCConfiguration = useMemo(
 		() => ({
@@ -64,51 +63,24 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	};
 
 	const initializePeerConnection = useCallback(() => {
-		peerConnectionJoin.current = new RTCPeerConnection(servers);
-		peerConnectionJoin.current.ontrack = (event) => {
+		peerConnection.current = new RTCPeerConnection(servers);
+		peerConnection.current.ontrack = (event) => {
 			if (event?.streams?.[0]) {
 				setRemoteStream(event.streams[0]);
 			}
 		};
 
-		peerConnectionJoin.current.onicecandidate = async (event) => {
+		peerConnection.current.onicecandidate = async (event) => {
 			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
 				await mezon.socketRef.current?.joinPTTChannel(
 					clanId.current || '',
 					channelId.current || '',
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					false
+					JSON.stringify(event.candidate)
 				);
 			}
 		};
-		return peerConnectionJoin.current;
-	}, [mezon.socketRef, servers]);
-
-	const initializePeerConnectionTalk = useCallback(() => {
-		peerConnectionTalk.current = new RTCPeerConnection(servers);
-		peerConnectionTalk.current.onicecandidate = async (event) => {
-			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
-				await mezon.socketRef.current?.joinPTTChannel(
-					clanId.current || '',
-					channelId.current || '',
-					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-					JSON.stringify(event.candidate),
-					true
-				);
-			}
-		};
-		peerConnectionTalk.current.oniceconnectionstatechange = (event) => {
-			if (peerConnectionTalk.current?.iceConnectionState === 'closed' || peerConnectionTalk.current?.iceConnectionState === 'disconnected') {
-				localStream?.getTracks().forEach((track) => track.stop());
-				setLocalStream(null);
-				peerConnectionTalk.current?.close();
-				peerConnectionTalk.current = null;
-			} else if (peerConnectionTalk.current?.iceConnectionState === 'connected') {
-				//
-			}
-		};
-		return peerConnectionTalk.current;
+		return peerConnection.current;
 	}, [mezon.socketRef, servers]);
 
 	const startLocalStream = async () => {
@@ -126,8 +98,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				clanId.current || '',
 				channelId.current || '',
 				WebrtcSignalingType.WEBRTC_SDP_OFFER,
-				offerEnc,
-				false
+				offerEnc
 			);
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
@@ -136,14 +107,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const stopSession = useCallback(async () => {
 		// Close the peer connection
-		peerConnectionJoin.current?.close();
-		peerConnectionJoin.current = null;
-		if (peerConnectionTalk.current) {
-			// Stop all tracks in the local stream
-			localStream?.getTracks().forEach((track) => track.stop());
-			peerConnectionTalk.current?.close();
-			peerConnectionTalk.current = null;
-		}
+		peerConnection.current?.close();
+		peerConnection.current = null;
+		localStream?.getTracks().forEach((track) => track.stop());
+
 		// Reset state
 		setLocalStream(null);
 		setRemoteStream(null);
@@ -152,25 +119,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
-			if (!peerConnectionTalk.current && channelId) {
+			if (!peerConnection.current && channelId) {
 				if (value === true) {
-					const connection = initializePeerConnectionTalk();
-					connection.addTransceiver('audio', { direction: 'sendonly' });
 					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					setLocalStream(stream);
-					stream.getTracks().forEach((track) => {
-						connection.addTrack(track, stream);
-					});
-					const offer = await connection.createOffer();
-					await connection.setLocalDescription(offer);
-					const offerEnc = await compress(JSON.stringify(offer));
-					await mezon.socketRef.current?.joinPTTChannel(
-						clanId.current || '',
-						channelId.current || '',
-						WebrtcSignalingType.WEBRTC_SDP_OFFER,
-						offerEnc,
-						true
-					);
+					stream.getTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
 				}
 			}
 			if (localStream) {
@@ -186,7 +138,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	);
 
 	useEffect(() => {
-		if (!peerConnectionJoin.current) {
+		if (!peerConnection.current) {
 			return;
 		}
 
@@ -198,13 +150,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				{
 					const processData = async () => {
 						const dataDec = await decompress(data?.json_data);
-						const answer = safeJSONParse(dataDec || '{}');
-						if (data.is_talk) {
-							await peerConnectionTalk.current?.setRemoteDescription(new RTCSessionDescription(answer));
-						} else {
-							// Get peerConnection from receiver event.receiverId
-							await peerConnectionJoin.current?.setRemoteDescription(new RTCSessionDescription(answer));
-						}
+						const answer = safeJSONParse(dataDec);
+						await peerConnection.current?.setRemoteDescription(new RTCSessionDescription(answer));
 					};
 					processData().catch(console.error);
 				}
@@ -212,16 +159,9 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
 				{
 					const processData = async () => {
-						const candidate = safeJSONParse(data?.json_data || '{}');
-
-						if (data.is_talk) {
-							if (peerConnectionTalk.current && peerConnectionTalk.current?.remoteDescription) {
-								await peerConnectionTalk.current?.addIceCandidate(new RTCIceCandidate(candidate));
-							}
-						} else {
-							if (peerConnectionJoin.current?.remoteDescription) {
-								await peerConnectionJoin.current?.addIceCandidate(new RTCIceCandidate(candidate));
-							}
+						const candidate = safeJSONParse(data?.json_data);
+						if (peerConnection.current && candidate != null) {
+							await peerConnection.current?.addIceCandidate(new RTCIceCandidate(candidate));
 						}
 					};
 					processData().catch(console.error);

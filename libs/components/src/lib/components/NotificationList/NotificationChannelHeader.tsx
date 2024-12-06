@@ -2,7 +2,7 @@ import { useMarkAsRead } from '@mezon/core';
 import { selectChannelById, selectClanById, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -58,31 +58,29 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 			<div className="flex flex-row items-center gap-3 relative">
 				{isUnreadTab ? (
 					<>
-						<Tooltip
+						<Tippy
+							className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
+							arrow={false}
 							content={
 								<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
 									{'Notification Settings'}
 								</p>
 							}
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 							placement="top"
 						>
 							<button className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]">
 								<Icons.UnMuteBell defaultSize="w-4 h-4" />
 							</button>
-						</Tooltip>
+						</Tippy>
 
-						<Tooltip
+						<Tippy
+							className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
+							arrow={false}
 							content={
 								<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
 									{'Mark as read'}
 								</p>
 							}
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 							placement="top"
 						>
 							<button
@@ -90,19 +88,18 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 								onClick={() => handleMarkAsReadChannel(getChannel)}
 							>
 								✔
-							</button>{' '}
-						</Tooltip>
+							</button>
+						</Tippy>
 					</>
 				) : (
-					<Tooltip
+					<Tippy
+						className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
+						arrow={false}
 						content={
 							<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
 								{'Close'}
 							</p>
 						}
-						trigger="hover"
-						animation="duration-500"
-						style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						placement="top"
 					>
 						<button
@@ -111,7 +108,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 						>
 							✕
 						</button>
-					</Tooltip>
+					</Tippy>
 				)}
 			</div>
 		</div>

@@ -129,3 +129,5 @@ export const MemorizedChannelMessage = memo(
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved
 );
+
+MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

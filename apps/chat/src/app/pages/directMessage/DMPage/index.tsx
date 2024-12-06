@@ -21,6 +21,7 @@ import {
 	useWindowFocusState
 } from '@mezon/core';
 import {
+	DirectEntity,
 	MessagesEntity,
 	channelsActions,
 	directActions,
@@ -99,7 +100,8 @@ function useChannelSeen(channelId: string) {
 	}, [dispatch, channelId, lastMessage]);
 }
 
-function DirectSeenListener({ channelId }: { channelId: string }) {
+function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: string; mode: number; currentChannel: DirectEntity }) {
+	KeyPressListener({ currentChannel, mode });
 	useChannelSeen(channelId);
 	return null;
 }
@@ -188,28 +190,6 @@ const DirectMessage = () => {
 	const handleClose = useCallback(() => {}, []);
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode });
-	const isListenerAttached = useRef(false);
-
-	useEffect(() => {
-		if (isListenerAttached.current) return;
-		isListenerAttached.current = true;
-
-		const handleKeyPress = (event: KeyboardEvent) => {
-			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
-				event.preventDefault();
-				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-			}
-		};
-
-		window.addEventListener('keydown', handleKeyPress);
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyPress);
-			isListenerAttached.current = false;
-		};
-	}, [currentDmGroup]);
-
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
@@ -337,7 +317,7 @@ const DirectMessage = () => {
 					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
-			<DirectSeenListener channelId={directId as string} />
+			<DirectSeenListener channelId={directId as string} mode={mode} currentChannel={currentDmGroup} />
 		</>
 	);
 };
@@ -353,6 +333,37 @@ const SearchMessageChannel = () => {
 			channelId={currentChannelId || ''}
 		/>
 	);
+};
+
+type KeyPressListenerProps = {
+	currentChannel: DirectEntity | null;
+	mode: ChannelStreamMode;
+};
+
+const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
+	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
+	const isListenerAttached = useRef(false);
+
+	useEffect(() => {
+		if (isListenerAttached.current) return;
+		isListenerAttached.current = true;
+
+		const handleKeyPress = (event: KeyboardEvent) => {
+			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
+				event.preventDefault();
+				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyPress);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress);
+			isListenerAttached.current = false;
+		};
+	}, [sendMessage]);
+
+	return null;
 };
 
 export default memo(DirectMessage);

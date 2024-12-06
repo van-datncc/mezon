@@ -37,9 +37,10 @@ export const JoinPTTSlice = createSlice({
 	initialState: initialJoinPTTState,
 	reducers: {
 		add: JoinPTTAdapter.addOne,
-		addMany: JoinPTTAdapter.addMany,
-		remove: JoinPTTAdapter.removeOne,
-		clear: JoinPTTAdapter.removeAll
+		clear: (state) => {
+			if (JoinPTTAdapter.getSelectors().selectIds(state).length === 0) return;
+			JoinPTTAdapter.removeAll(state);
+		}
 	}
 });
 
@@ -84,17 +85,16 @@ export const JoinPTTActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = JoinPTTAdapter.getSelectors();
+const { selectEntities } = JoinPTTAdapter.getSelectors();
 
 export const getJoinPTTState = (rootState: { [JOIN_PTT_FEATURE_KEY]: JoinPTTState }): JoinPTTState => {
 	return rootState[JOIN_PTT_FEATURE_KEY];
 };
 
-export const selectAllJoinPTT = createSelector(getJoinPTTState, selectAll);
-
 export const selectJoinPTTEntities = createSelector(getJoinPTTState, selectEntities);
 
 export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, userId) => userId], (entities, userId) => {
 	const joins = Object.values(entities);
+	if (!joins?.length) return null;
 	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.receiver_id === userId);
 });

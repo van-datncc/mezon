@@ -2,7 +2,7 @@ import { useMenu } from '@mezon/core';
 import {
 	appActions,
 	referencesActions,
-	selectChannelMetaEntities,
+	selectChannelMetaById,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	threadsActions,
@@ -10,7 +10,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import React, { memo, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, memo, useImperativeHandle, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ThreadLink, { ThreadLinkRef } from './ThreadLink';
 
@@ -26,7 +26,6 @@ export type ListThreadChannelRef = {
 const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChannelProps>(({ threads, isCollapsed }: ThreadListChannelProps, ref) => {
 	const dispatch = useAppDispatch();
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
-	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 
@@ -54,32 +53,19 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		dispatch(appActions.setIsShowCanvas(false));
 	};
 
-	const isShowThread = (thread: IChannel) => {
-		const threadId = thread.id;
-		return (
-			(allChannelMetaEntities[threadId]?.isMute !== true &&
-				allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp) ||
-			(thread?.count_mess_unread ?? 0) > 0 ||
-			threadId === currentChannelId
-		);
-	};
-
-	const filteredThreads = threads.filter((thread) => {
-		return !isCollapsed ? thread?.active === 1 : isShowThread(thread);
-	});
-
 	return (
 		<div className="flex flex-col ml-6">
-			{filteredThreads.map((thread) => {
-				const isFirstThread = filteredThreads.indexOf(thread) === 0;
+			{threads.map((thread) => {
+				const isFirstThread = threads.indexOf(thread) === 0;
 				return (
-					<ThreadLink
+					<ThreadLinkWrapper
+						key={thread.id}
 						ref={(node) => (threadLinkRefs.current[thread.id] = node)}
 						isActive={currentChannelId === thread.id}
-						key={thread.id}
 						thread={thread}
 						isFirstThread={isFirstThread}
 						handleClick={handleClickLink}
+						isCollapsed={isCollapsed}
 					/>
 				);
 			})}
@@ -88,3 +74,31 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 });
 
 export default memo(ThreadListChannel);
+type ThreadLinkWrapperProps = {
+	thread: IChannel;
+	isFirstThread: boolean;
+	handleClick: (thread: IChannel) => void;
+	isActive: boolean;
+	isCollapsed: boolean;
+};
+
+const ThreadLinkWrapper = forwardRef<ThreadLinkRef, ThreadLinkWrapperProps>(({ thread, isFirstThread, handleClick, isActive, isCollapsed }, ref) => {
+	const currentChannelId = useAppSelector(selectCurrentChannelId);
+	const threadMeta = useAppSelector((state) => selectChannelMetaById(state, thread?.id));
+
+	const isShowThread = (thread: IChannel) => {
+		const threadId = thread.id;
+		return (
+			(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
+			(thread?.count_mess_unread ?? 0) > 0 ||
+			threadId === currentChannelId
+		);
+	};
+
+	const shouldShow = !isCollapsed ? thread?.active === 1 : isShowThread(thread);
+	if (!shouldShow) {
+		return null;
+	}
+
+	return <ThreadLink ref={ref} isActive={isActive} thread={thread} isFirstThread={isFirstThread} handleClick={handleClick} />;
+});

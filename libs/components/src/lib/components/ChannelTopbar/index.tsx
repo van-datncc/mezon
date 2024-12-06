@@ -27,9 +27,9 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, checkIsThread, isMacDesktop } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -108,14 +108,9 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	const channelParent =
 		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
 
-	const isNotThread = useMemo(() => {
-		return channel?.parrent_id === '0';
-	}, [channel?.parrent_id]);
+	const isNotThread = channel?.parrent_id === '0';
 
-	const isPrivateChannel = useMemo(() => {
-		return channel?.channel_private === ChannelStatusEnum.isPrivate;
-	}, [channel?.channel_private]);
-
+	const isPrivateChannel = channel?.channel_private === ChannelStatusEnum.isPrivate;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -192,17 +187,14 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
-			<Tooltip
-				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Canvas"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
 	);
@@ -245,17 +237,14 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<Tooltip
-				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowThread && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Threads"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
@@ -305,12 +294,9 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={notiRef}>
-			<Tooltip
-				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center`}
+			<Tippy
+				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Notification Settings"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
 					{isMuteBell ? (
@@ -319,7 +305,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 						<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
 					)}
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
@@ -340,12 +326,9 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
-			<Tooltip
-				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Pinned Messages"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
@@ -353,7 +336,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
 					)}
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
 		</div>
 	);
@@ -377,12 +360,12 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy content={isShowInbox ? '' : 'Inbox'} className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
 					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
@@ -402,11 +385,11 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 	const { navigate } = useAppNavigation();
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip content="Help" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy content="Help" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button onClick={() => navigate('help')}>
 					<Icons.Help />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }
@@ -421,17 +404,11 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip
-				content="Members"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-				className={'flex justify-center items-center'}
-			>
+			<Tippy content="Members" className={`flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }
@@ -443,11 +420,11 @@ function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip className="w-max" content="Show Chat" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy className={`w-max ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Show Chat">
 				<button onClick={handleClick}>
 					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }

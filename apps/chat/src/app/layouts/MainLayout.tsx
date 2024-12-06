@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, useAttachments, useFriends } from '@mezon/core';
+import { ChatContext, ChatContextProvider, useFriends } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -23,7 +23,6 @@ const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
-	const { setOpenModalAttachment, setAttachment } = useAttachments();
 
 	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);
 
