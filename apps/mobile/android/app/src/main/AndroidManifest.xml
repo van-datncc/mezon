@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -100,7 +101,7 @@
         android:windowSoftInputMode="adjustResize"
         android:requestLegacyExternalStorage="true"
         android:screenOrientation="unspecified"
-        android:showWhenLocked="true"
+        android:showWhenLocked="false"
         android:turnScreenOn="true"
         android:exported="true">
         <intent-filter>
@@ -171,6 +172,6 @@
       />
       <meta-data
       android:name="com.google.android.geo.API_KEY"
-      android:value=""/>
+      android:value="AIzaSyDYY_IWJQEc42Dx1Ly0-YfvDNNAQtQ1t2s"/>
     </application>
 </manifest>
