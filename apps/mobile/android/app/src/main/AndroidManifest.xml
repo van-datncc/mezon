@@ -172,6 +172,6 @@
       />
       <meta-data
       android:name="com.google.android.geo.API_KEY"
-      android:value="AIzaSyDYY_IWJQEc42Dx1Ly0-YfvDNNAQtQ1t2s"/>
+      android:value=""/>
     </application>
 </manifest>
