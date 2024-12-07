@@ -71,13 +71,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			if ([4, 5].includes(dataType)) {
 				if (!timeStartConnected?.current) {
 					const callLogType = dataType === 5 ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
-
-					if (dataType === 5) {
-						Toast.show({
-							type: 'error',
-							text1: 'User is currently on another call. Please call back later!'
-						});
-					}
 					dispatch(
 						DMCallActions.updateCallLog({
 							channelId: directMessageId || '',
@@ -89,6 +82,14 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					);
 				}
 				handleEndCall({ isCancelGoBack: dataType === 5 });
+				if (dataType === 5) {
+					Toast.show({
+						type: 'error',
+						text1: 'User is currently on another call',
+						text2: 'Please call back later!'
+					});
+					navigation.goBack();
+				}
 			}
 		}
 
@@ -99,6 +100,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
+		InCallManager.start({ media: 'audio' });
 		const timer = setTimeout(() => {
 			startCall(isVideoCall, isAnswerCall);
 		}, 2000);
@@ -108,6 +110,10 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			InCallManager.stop();
 		};
 	}, [isAnswerCall, isVideoCall]);
+
+	useEffect(() => {
+		InCallManager.setSpeakerphoneOn(localMediaControl.speaker);
+	}, [localMediaControl.speaker]);
 
 	const toggleControl = async () => {
 		setIsShowControl(!isShowControl);
@@ -130,7 +136,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					})
 				);
 			}
-			navigation.goBack();
 		} catch (err) {
 			/* empty */
 		}
