@@ -83,7 +83,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		const pc = new RTCPeerConnection(RTCConfig);
 
 		pc.onicecandidate = async (event) => {
-			if (event.candidate) {
+			if (event.candidate && pc?.signalingState !== 'have-local-offer') {
 				try {
 					await mezon.socketRef.current?.forwardWebrtcSignaling(
 						dmUserId,
@@ -134,6 +134,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				timeStartConnected.current = new Date();
 				dispatch(toastActions.addToast({ message: 'Connection connected', type: 'success', autoClose: 3000 }));
 				dispatch(audioCallActions.setIsJoinedCall(true));
+				dispatch(audioCallActions.setIsDialTone(false));
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 0, '', channelId, userId);
 				if (callTimeout.current) {
 					clearTimeout(callTimeout.current);
@@ -151,23 +152,24 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			}
 		};
 
-		pc.onnegotiationneeded = async () => {
-			try {
-				const offer = await pc.createOffer();
-				await pc.setLocalDescription(offer);
-
-				const compressedOffer = await compress(JSON.stringify(offer));
-				await mezon.socketRef.current?.forwardWebrtcSignaling(
-					dmUserId,
-					WebrtcSignalingType.WEBRTC_SDP_OFFER,
-					compressedOffer,
-					channelId,
-					userId
-				);
-			} catch (error) {
-				console.error('Error during negotiation:', error);
-			}
-		};
+		// no need to handle negotiationneeded event
+		// pc.onnegotiationneeded = async () => {
+		// 	try {
+		// 		const offer = await pc.createOffer();
+		// 		await pc.setLocalDescription(offer);
+		//
+		// 		const compressedOffer = await compress(JSON.stringify(offer));
+		// 		await mezon.socketRef.current?.forwardWebrtcSignaling(
+		// 			dmUserId,
+		// 			WebrtcSignalingType.WEBRTC_SDP_OFFER,
+		// 			compressedOffer,
+		// 			channelId,
+		// 			userId
+		// 		);
+		// 	} catch (error) {
+		// 		console.error('Error during negotiation:', error);
+		// 	}
+		// };
 
 		return pc;
 	}, [mezon.socketRef, dmUserId, channelId, userId]);
@@ -180,7 +182,13 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 			const microphoneGranted = await requestMediaPermission('audio');
 			if (microphoneGranted !== 'granted') {
-				dispatch(toastActions.addToast({ message: 'Microphone permission is required', type: 'warning', autoClose: 1000 }));
+				dispatch(
+					toastActions.addToast({
+						message: 'Microphone permission is required',
+						type: 'warning',
+						autoClose: 1000
+					})
+				);
 			} else {
 				permissionMicroGranted = true;
 			}
@@ -206,20 +214,19 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			stream.getTracks().forEach((track) => {
 				pc.addTrack(track, stream);
 			});
-			// Create and set local description
-			const offer = await pc.createOffer();
-			await pc.setLocalDescription(offer);
-
-			// Update state
-			setCallState({
-				localStream: stream,
-				remoteStream: null,
-				peerConnection: pc
-			});
-			// Send offer through signaling server
-			const compressedOffer = await compress(JSON.stringify(offer));
-			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 			if (!isAnswer) {
+				// Create and set local description
+				const offer = await pc.createOffer();
+				await pc.setLocalDescription(offer);
+				// Send offer through signaling server
+				const compressedOffer = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
 				const bodyFCMMobile = {
 					offer: compressedOffer,
 					callerName,
@@ -231,7 +238,13 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			}
 			// Start a 30-second timeout to end the call if no answer
 			callTimeout.current = setTimeout(() => {
-				dispatch(toastActions.addToast({ message: 'The recipient did not answer the call.', type: 'warning', autoClose: 3000 }));
+				dispatch(
+					toastActions.addToast({
+						message: 'The recipient did not answer the call.',
+						type: 'warning',
+						autoClose: 3000
+					})
+				);
 				dispatch(
 					DMCallActions.updateCallLog({
 						channelId,
@@ -244,6 +257,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			if (localVideoRef.current) {
 				localVideoRef.current.srcObject = stream;
 			}
+			// Update state
+			setCallState({
+				localStream: stream,
+				remoteStream: null,
+				peerConnection: pc
+			});
 		} catch (error) {
 			console.error('Error starting call:', error);
 			handleEndCall();
@@ -286,6 +305,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
 					const decompressedData = await decompress(signalingData.json_data);
 					const answer = safeJSONParse(decompressedData || '{}');
+					if (callState.peerConnection.signalingState !== 'have-local-offer') {
+						console.warn('PeerConnection is not in the correct state to set remote answer');
+						return;
+					}
 					await callState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 
 					if (callTimeout.current) {
@@ -314,8 +337,6 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 								callState.storedIceCandidates = [];
 							}
 							callState.storedIceCandidates.push(new RTCIceCandidate(candidate));
-							// Store the candidate to be added later
-							// You can implement a mechanism to store and add candidates later
 						}
 					}
 					break;
