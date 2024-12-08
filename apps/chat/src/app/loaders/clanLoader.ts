@@ -1,6 +1,5 @@
-import { channelsActions, clansActions, emojiSuggestionActions, fetchSystemMessageByClanId, getAllPttMembersInChannel } from '@mezon/store';
+import { channelsActions, clansActions, emojiSuggestionActions, fetchSystemMessageByClanId } from '@mezon/store';
 import { ModeResponsive } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -19,7 +18,6 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 	dispatch(channelsActions.fetchListFavoriteChannel({ clanId: clanId }));
 	dispatch(fetchSystemMessageByClanId(clanId));
-	dispatch(getAllPttMembersInChannel({ channelId: '', channelType: ChannelType.CHANNEL_TYPE_TEXT, clanId: clanId ?? '' }));
 	return {
 		clanId
 	} as ClanLoaderData;
