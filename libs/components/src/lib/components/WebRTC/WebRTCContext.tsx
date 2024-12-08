@@ -103,10 +103,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 			const connection = initializePeerConnection();
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			stream.getTracks().forEach((track) => {
-				return peerConnection.current?.addTrack(track, stream);
-			});
 			connection.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendrecv' });
+			stream.getAudioTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
