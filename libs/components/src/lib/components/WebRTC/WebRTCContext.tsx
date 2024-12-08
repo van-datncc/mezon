@@ -102,7 +102,11 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			}
 
 			const connection = initializePeerConnection();
-			connection.addTransceiver('audio', { direction: 'recvonly' });
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			stream.getTracks().forEach((track) => {
+				return peerConnection.current?.addTrack(track, stream);
+			});
+			connection.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendrecv' });
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -121,13 +125,11 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
-			if (peerConnection.current && channelId) {
+			if (peerConnection.current && channelId.current) {
 				if (value === true) {
-					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					stream.getTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
-					peerConnection.current.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendonly' });
+					await mezon.socketRef.current?.talkPTTChannel(channelId.current, true);
 				} else {
-					peerConnection.current.removeTrack(peerConnection.current.getSenders()[0]);
+					await mezon.socketRef.current?.talkPTTChannel(channelId.current, false);
 				}
 			}
 			if (localStream) {
