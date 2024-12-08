@@ -121,6 +121,15 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
+			if (!mezon.socketRef.current) {
+				return;
+			}
+
+			const talking = await mezon.socketRef.current.talkPTTChannel(channelId.current || '');
+			if (talking.channel_id === '') {
+				return;
+			}
+
 			if (peerConnection.current && channelId) {
 				if (value === true) {
 					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
