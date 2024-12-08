@@ -1,14 +1,12 @@
-import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType } from 'mezon-js';
-import { ApiPTTChannelUser } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const PTT_USERS_FEATURES_KEY = 'pushToTalkUsers';
 
-export interface IPttUsersEntity extends ApiPTTChannelUser {
+export interface IPttUsersEntity {
 	id: string;
+	user_id: string;
+	channel_id: string;
 }
 
 export interface IPttUsersState extends EntityState<IPttUsersEntity, string> {
@@ -27,26 +25,6 @@ const initialState: IPttUsersState = pttUsersAdapter.getInitialState({
 	usersInPTT: []
 });
 
-export interface IFetchPttMembersInChannelRequest {
-	clanId: string;
-	channelId: string;
-	channelType: ChannelType;
-}
-
-export const getAllPttMembersInChannel = createAsyncThunk(
-	'pushToTalk/getAllPttMembersInChannel',
-	async ({ clanId, channelId, channelType }: IFetchPttMembersInChannelRequest, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.listPTTChannelUsers(mezon.session, clanId, channelId, channelType);
-			return response.ptt_channel_users;
-		} catch (err) {
-			captureSentryError(err, 'pushToTalk/getAllPttMembersInChannel');
-			return thunkAPI.rejectWithValue(err);
-		}
-	}
-);
-
 export const pushToTalkMembersSlice = createSlice({
 	name: PTT_USERS_FEATURES_KEY,
 	initialState: initialState,
@@ -56,18 +34,7 @@ export const pushToTalkMembersSlice = createSlice({
 		remove: pttUsersAdapter.removeOne
 	},
 	extraReducers: (builder) => {
-		builder
-			.addCase(getAllPttMembersInChannel.pending, (state: IPttUsersState) => {
-				state.loadingStatus = 'loading';
-			})
-			.addCase(getAllPttMembersInChannel.fulfilled, (state: IPttUsersState, action: PayloadAction<any>) => {
-				pttUsersAdapter.setAll(state, action.payload);
-				state.loadingStatus = 'loaded';
-			})
-			.addCase(getAllPttMembersInChannel.rejected, (state: IPttUsersState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
+		//
 	}
 });
 
