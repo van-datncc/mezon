@@ -1,3 +1,5 @@
+import { safeJSONParse } from 'mezon-js';
+
 export function isEqual(value: any, other: any): boolean {
 	if (value === other) {
 		return true;

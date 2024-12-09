@@ -5,14 +5,14 @@ import { useDispatch } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 
 type MessageRatioButtonProps = {
-	select: IMessageInput;
+	input: IMessageInput;
 	messageId: string;
 	senderId: string;
 	buttonId: string;
 };
 
-export const MessageInput: React.FC<MessageRatioButtonProps> = ({ select, messageId }) => {
-	const { placeholder, required, textarea, type = 'text' } = select;
+export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, messageId, buttonId }) => {
+	const { placeholder, required, textarea, type = 'text' } = input;
 	const dispatch = useDispatch();
 
 	const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -21,13 +21,12 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ select, messag
 
 	const debouncedChangeInput = useDebouncedCallback(async (value: string) => {
 		dispatch(
-			embedActions.addEmbedValueInput({
+			embedActions.addEmbedValue({
 				message_id: messageId,
 				data: {
-					id: select.id,
+					id: buttonId,
 					value: value
-				},
-				multiple: true
+				}
 			})
 		);
 	}, 300);

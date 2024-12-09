@@ -347,13 +347,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 						<div className="justify-center items-center gap-4 flex w-full">
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-								onClick={() => onStartCall({ isVideoCall: true })}
+								onClick={() => onStartCall({ isVideoCall: true, isAnswer: true })}
 							>
 								<Icons.IconMeetDM />
 							</div>
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
-								onClick={() => onStartCall({ isVideoCall: false })}
+								onClick={() => onStartCall({ isVideoCall: false, isAnswer: true })}
 							>
 								<Icons.IconPhoneDM />
 							</div>

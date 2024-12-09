@@ -138,11 +138,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		loadParamsSendTokenFromURL();
 	}, []);
 
-	const rootRef = useRef<HTMLButtonElement>(null);
+	const rootRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<>
-			<button
+			<div
 				ref={rootRef}
 				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
@@ -150,7 +150,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`} onClick={handleClickFooterProfile}>
-					<div className="pointer-events-none">
+					<div className="cursor-pointer">
 						<MemberProfile
 							name={name}
 							status={{ status: isMe ? true : status, isMobile: false }}
@@ -176,9 +176,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					<>
 						<Tippy content="Quit PTT" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
 							<span>
-								<Icons.JoinedPTT
+								<Icons.LeavePtt
 									onClick={quitPTT}
-									className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
+									className="cursor-pointer size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
 								/>
 							</span>
 						</Tippy>
@@ -191,16 +191,16 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Tippy content="Settings" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+					<Tippy content="Settings" className={` ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
 						<div
 							onClick={openSetting}
-							className="ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
+							className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
 						>
 							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
 						</div>
 					</Tippy>
 				</div>
-			</button>
+			</div>
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}

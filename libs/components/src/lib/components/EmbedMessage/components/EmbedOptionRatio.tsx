@@ -1,6 +1,6 @@
 import { embedActions } from '@mezon/store';
 import { IMessageRatioOption } from '@mezon/utils';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { MessageRatioButton } from '../../MessageActionsPanel/components/MessageRatio';
 import { EmbedDescription } from './EmbedDescription';
@@ -9,9 +9,10 @@ import { EmbedTitle } from './EmbedTitle';
 interface EmbedOptionRatioProps {
 	options: IMessageRatioOption[];
 	message_id: string;
+	idRadio: string;
 }
 
-export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps) {
+export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRatioProps) {
 	const [checked, setChecked] = useState<number[]>([]);
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
@@ -29,14 +30,22 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 
 	const dispatch = useDispatch();
 
+	const checkMultiple = useMemo(() => {
+		if (options.length > 1 && options[0].name) {
+			return options[0].name === options[1].name;
+		}
+		return false;
+	}, [options]);
+
 	const handleAddEmbedRadioValue = (index: number) => {
 		dispatch(
-			embedActions.addEmbedValueOptions({
+			embedActions.addEmbedValue({
 				message_id: message_id,
 				data: {
-					id: options[index].value,
+					id: idRadio,
 					value: options[index].value
-				}
+				},
+				multiple: checkMultiple
 			})
 		);
 	};
@@ -44,7 +53,7 @@ export function EmbedOptionRatio({ options, message_id }: EmbedOptionRatioProps)
 		<>
 			{options &&
 				options.map((option, index) => (
-					<div className="flex justify-between" key={option.id}>
+					<div className="flex justify-between" key={option.value}>
 						<div className="flex flex-col">
 							<EmbedTitle title={option.label} />
 							<EmbedDescription description={option.description || ''} />

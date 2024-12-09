@@ -98,3 +98,5 @@ export { default as ModalCall } from './components/ModalCall';
 
 export { PushToTalkProvider } from './components/PushToTalk/PushToTalkContext';
 export { WebRTCProvider } from './components/WebRTC/WebRTCContext';
+
+export * from './components/HtmlCanvas';

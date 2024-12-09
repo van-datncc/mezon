@@ -64,6 +64,18 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const initializePeerConnection = useCallback(() => {
 		peerConnection.current = new RTCPeerConnection(servers);
+		peerConnection.current.onnegotiationneeded = async (event) => {
+			const offer = await peerConnection.current?.createOffer();
+			await peerConnection.current?.setLocalDescription(offer);
+			const offerEnc = await compress(JSON.stringify(offer));
+			await mezon.socketRef.current?.joinPTTChannel(
+				clanId.current || '',
+				channelId.current || '',
+				WebrtcSignalingType.WEBRTC_SDP_OFFER,
+				offerEnc
+			);
+		};
+
 		peerConnection.current.ontrack = (event) => {
 			if (event?.streams?.[0]) {
 				setRemoteStream(event.streams[0]);
@@ -90,16 +102,15 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			}
 
 			const connection = initializePeerConnection();
-			connection.addTransceiver('audio', { direction: 'recvonly' });
-			const offer = await connection.createOffer();
-			await connection.setLocalDescription(offer);
-			const offerEnc = await compress(JSON.stringify(offer));
-			await mezon.socketRef.current?.joinPTTChannel(
-				clanId.current || '',
-				channelId.current || '',
-				WebrtcSignalingType.WEBRTC_SDP_OFFER,
-				offerEnc
-			);
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			connection.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendrecv' });
+			stream.getAudioTracks().forEach((track) => {
+				try {
+					peerConnection.current?.addTrack(track, stream);
+				} catch (e) {
+					// do nothing
+				}
+			});
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -114,27 +125,24 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		// Reset state
 		setLocalStream(null);
 		setRemoteStream(null);
-		// mezon.socketRef.current?.joinPTTChannel(clanId.current || '', channelId.current || '', WebrtcSignalingType.WEBRTC_SDP_QUIT, '{}');
 	}, [localStream]);
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
-			if (!peerConnection.current && channelId) {
+			if (peerConnection.current && channelId.current) {
 				if (value === true) {
-					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					stream.getTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
+					await mezon.socketRef.current?.talkPTTChannel(channelId.current, true);
+				} else {
+					await mezon.socketRef.current?.talkPTTChannel(channelId.current, false);
 				}
 			}
 			if (localStream) {
-				// if (value == true) {
-				// await mezon.socketRef.current?.talkPTTChannel(channelId.current || '', 5, JSON.stringify({}), value === true ? 0 : -1);
-				// }
 				localStream?.getAudioTracks().forEach((track) => {
 					track.enabled = value;
 				});
 			}
 		},
-		[localStream]
+		[localStream, mezon.socketRef]
 	);
 
 	useEffect(() => {

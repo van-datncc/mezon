@@ -1,4 +1,5 @@
 import {
+	embedActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentUserId,
@@ -18,9 +19,10 @@ type MessageSelectProps = {
 	messageId: string;
 	senderId: string;
 	buttonId: string;
+	inside?: boolean;
 };
 
-export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId }) => {
+export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId, inside }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
@@ -33,16 +35,42 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 		if (selectedOptions.length < (select?.max_options || 1)) {
 			setSelectedOptions((prev) => [...prev, option]);
 			setAvailableOptions((prev) => prev.filter((o) => o.value !== option.value));
-			dispatch(
-				messagesActions.clickButtonMessage({
-					message_id: messageId,
-					channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
-					button_id: buttonId,
-					sender_id: senderId,
-					user_id: currentUserId,
-					extra_data: option.value
-				})
-			);
+			if (!inside) {
+				dispatch(
+					messagesActions.clickButtonMessage({
+						message_id: messageId,
+						channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
+						button_id: buttonId,
+						sender_id: senderId,
+						user_id: currentUserId,
+						extra_data: option.value
+					})
+				);
+			} else {
+				if (selectedOptions.filter((item) => item.value === option.value).length > 0) {
+					dispatch(
+						embedActions.removeEmbedValuel({
+							message_id: messageId,
+							data: {
+								id: buttonId,
+								value: option.value
+							},
+							multiple: true
+						})
+					);
+					return;
+				}
+				dispatch(
+					embedActions.addEmbedValue({
+						message_id: messageId,
+						data: {
+							id: buttonId,
+							value: option.value
+						},
+						multiple: true
+					})
+				);
+			}
 		}
 	};
 
@@ -57,6 +85,16 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 				(a, b) => select.options.findIndex((opt) => opt.value === a.value) - select.options.findIndex((opt) => opt.value === b.value)
 			);
 		});
+		dispatch(
+			embedActions.removeEmbedValuel({
+				message_id: messageId,
+				data: {
+					id: buttonId,
+					value: option.value
+				},
+				multiple: true
+			})
+		);
 	};
 
 	const handleClearSelection = () => {

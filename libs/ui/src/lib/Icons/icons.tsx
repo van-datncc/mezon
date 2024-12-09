@@ -1283,6 +1283,23 @@ export function JoinedPTT(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function LeavePtt(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g fill="currentColor">
+					{' '}
+					<path d="M1 8a6 6 0 018.514-5.45.75.75 0 01-.629 1.363 4.5 4.5 0 100 8.175.75.75 0 11.63 1.361A6 6 0 011 8z"></path>{' '}
+					<path d="M11.245 4.695a.75.75 0 00-.05 1.06l1.36 1.495H6.75a.75.75 0 000 1.5h5.805l-1.36 1.495a.75.75 0 001.11 1.01l2.5-2.75a.748.748 0 00-.002-1.012l-2.498-2.748a.75.75 0 00-1.06-.05z"></path>{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
 export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg
@@ -6385,6 +6402,32 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 					</g>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+
+export function History(props: React.HTMLAttributes<SVGAElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<path
+				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
+export function CalendarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" id="calendar" {...props}>
+			<path
+				fill="currentColor"
+				d="M14.262,4.441h-.771V3.653a.5.5,0,1,0-1,0v.788H7.509V3.653a.5.5,0,0,0-1,0v.788H5.738a2.5,2.5,0,0,0-2.5,2.5v7.406a2.5,2.5,0,0,0,2.5,2.5h8.524a2.5,2.5,0,0,0,2.5-2.5V6.941A2.5,2.5,0,0,0,14.262,4.441Zm-8.524,1h8.524a1.5,1.5,0,0,1,1.5,1.5v.376H4.238V6.941A1.5,1.5,0,0,1,5.738,5.441Zm8.524,10.406H5.738a1.5,1.5,0,0,1-1.5-1.5V8.317H15.762v6.03A1.5,1.5,0,0,1,14.262,15.847ZM6.821,10.49a.5.5,0,1,1-.707,0A.5.5,0,0,1,6.821,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,9.176,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,11.531,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,13.886,10.49ZM6.821,12.968a.5.5,0,1,1-.707,0A.5.5,0,0,1,6.821,12.968Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,9.176,12.968Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,11.531,12.968Z"
+			></path>
 		</svg>
 	);
 }

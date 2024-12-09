@@ -1,6 +1,6 @@
 import { IMessageSelectOption } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 type SelectOptionsProps = {
 	options: IMessageSelectOption[];
@@ -9,12 +9,6 @@ type SelectOptionsProps = {
 };
 
 export const SelectOptions: React.FC<SelectOptionsProps> = ({ options, onSelectOption, onSubmitSelection }) => {
-	useEffect(() => {
-		return () => {
-			onSubmitSelection();
-		};
-	}, []);
-
 	return (
 		<>
 			{options.map((option) => (
