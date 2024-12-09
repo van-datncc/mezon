@@ -4,6 +4,7 @@ import {
 	ETypeMission,
 	fetchOnboarding,
 	onboardingActions,
+	selectAnswerByQuestionId,
 	selectChannelById,
 	selectCurrentClanId,
 	selectFormOnboarding,
@@ -195,18 +196,39 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 };
 
 const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
+	const dispatch = useAppDispatch();
+	const selectAnswer = useSelector((state) => selectAnswerByQuestionId(state, question.id as string));
+	const handleOnClickQuestion = (index: number) => {
+		dispatch(
+			onboardingActions.doAnswer({
+				answer: index,
+				idQuestion: question.id as string
+			})
+		);
+	};
+	const hightLight = useCallback(
+		(index: number) => {
+			if (selectAnswer.includes(index)) {
+				return 'bg-bgSurface text-primary hover:border-white border-channelActiveColor';
+			}
+			return;
+		},
+		[selectAnswer.length]
+	);
 	return (
 		<div className="w-full p-4 flex flex-col gap-2">
 			<p className="text-channelActiveColor font-semibold">{question.title} ?</p>
-			<div className="flex flex-wrap gap-2">
+			<div className="flex flex-wrap gap-2 flex-1">
 				{question.answers &&
-					question.answers.map((answer) => (
+					question.answers.map((answer, index) => (
 						<GuideItemLayout
 							key={answer.title}
 							icon={answer.emoji}
 							description={answer.description}
 							title={answer.title}
-							className="w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+							height={'h-auto'}
+							onClick={() => handleOnClickQuestion(index)}
+							className={` w-fit h-fit rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${hightLight(index)}`}
 						/>
 					))}
 			</div>

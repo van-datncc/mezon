@@ -11,7 +11,6 @@ import { hashtagDmActions } from '../channels/hashtagDm.slice';
 import { e2eeActions } from '../e2ee/e2ee.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
-import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { RootState } from '../store';
 import { directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
 
@@ -211,7 +210,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 					const userIds = members.map((member) => member?.user_id as string);
 					thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 				}
-				thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			}
 			thunkAPI.dispatch(
 				channelsActions.joinChat({
@@ -242,6 +240,7 @@ export const directSlice = createSlice({
 	reducers: {
 		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
+		upsertMany: directAdapter.upsertMany,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
@@ -259,6 +258,45 @@ export const directSlice = createSlice({
 					...action.payload
 				}
 			});
+		},
+		removeByUserId: (state, action: PayloadAction<{ userId: string; currentUserId: string }>) => {
+			const { userId, currentUserId } = action.payload;
+			const { ids, entities } = state;
+
+			for (const id of ids) {
+				const item = entities[id];
+				if (!item || !item.user_id) continue;
+
+				const userIndex = item.user_id.indexOf(userId);
+
+				if (userIndex !== -1) {
+					const newUserIds = item.user_id.filter((_, index) => index !== userIndex);
+
+					if (newUserIds.length === 0 || newUserIds.includes(currentUserId)) {
+						directAdapter.removeOne(state, id);
+					} else {
+						const newUsernames = item.usernames
+							?.split(',')
+							.filter((_, index) => index !== userIndex)
+							.join(',');
+						const newChannelAvatars = item.channel_avatar?.filter((_, index) => index !== userIndex);
+						const newIsOnline = item.is_online?.filter((_, index) => index !== userIndex);
+						const newMetadata = item.metadata?.filter((_, index) => index !== userIndex);
+						const newAboutMe = item.about_me?.filter((_, index) => index !== userIndex);
+						directAdapter.updateOne(state, {
+							id,
+							changes: {
+								user_id: newUserIds,
+								usernames: newUsernames,
+								channel_avatar: newChannelAvatars,
+								is_online: newIsOnline,
+								metadata: newMetadata,
+								about_me: newAboutMe
+							}
+						});
+					}
+				}
+			}
 		},
 		changeE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent>>) => {
 			if (!action.payload?.channel_id) return;

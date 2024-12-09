@@ -9,7 +9,6 @@ export interface ChannelMetaEntity {
 	id: string; // Primary ID
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
-	lastSeenPinMessage: string;
 	clanId: string;
 	isMute: boolean;
 }
@@ -46,12 +45,6 @@ export const channelMetaSlice = createSlice({
 			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
-			}
-		},
-		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
-			const channel = state?.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
 			}
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
@@ -114,12 +107,6 @@ export const selectChannelMetaEntities = createSelector(getChannelMetaState, sel
 export const selectChannelMetaById = createSelector([selectChannelMetaEntities, (state, channelId) => channelId], (entities, channelId) => {
 	return entities[channelId];
 });
-
-export const selectLastSeenPinMessageChannelById = (channelId: string) =>
-	createSelector(getChannelMetaState, (state) => {
-		const channel = state?.entities[channelId];
-		return channel?.lastSeenPinMessage || '';
-	});
 
 export const selectIsUnreadChannelById = createSelector(
 	[getChannelMetaState, selectChannelMetaEntities, (state, channelId) => channelId],

@@ -65,6 +65,7 @@ export const userChannelsSlice = createSlice({
 	initialState: initialUserChannelState,
 	reducers: {
 		add: UserChannelAdapter.addOne,
+		upsertMany: UserChannelAdapter.upsertMany,
 		remove: UserChannelAdapter.removeOne,
 		update: UserChannelAdapter.updateOne,
 		removeMany: UserChannelAdapter.removeMany
