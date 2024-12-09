@@ -32,6 +32,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
+		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
 	};
 
 	return (

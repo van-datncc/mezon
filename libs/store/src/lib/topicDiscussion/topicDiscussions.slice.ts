@@ -26,7 +26,7 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 	nameValueTopic?: Record<string, string>;
 	valueTopic: IMessageWithUser | null;
 	openTopicMessageState: boolean;
-	currentTopic?: ApiChannelDescription;
+	currentTopicId?: string;
 }
 
 export const topicsAdapter = createEntityAdapter({ selectId: (topic: TopicDiscussionsEntity) => topic.id || '' });
@@ -140,8 +140,8 @@ export const topicsSlice = createSlice({
 		setOpenTopicMessageState(state, action) {
 			state.openTopicMessageState = action.payload;
 		},
-		setCurrentTopic: (state, action: PayloadAction<ApiChannelDescription>) => {
-			state.currentTopic = action.payload;
+		setCurrentTopicId: (state, action: PayloadAction<string>) => {
+			state.currentTopicId = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -220,7 +220,7 @@ export const selectValueTopic = createSelector(getTopicsState, (state) => state.
 
 export const selectOpenTopicMessageState = createSelector(getTopicsState, (state: TopicDiscussionsState) => state.openTopicMessageState);
 
-export const selectCurrentTopic = createSelector(getTopicsState, (state: TopicDiscussionsState) => state.currentTopic);
+export const selectCurrentTopicId = createSelector(getTopicsState, (state: TopicDiscussionsState) => state.currentTopicId);
 
 export const selectNameValueTopic = (channelId: string) =>
 	createSelector(getTopicsState, (state) => {
