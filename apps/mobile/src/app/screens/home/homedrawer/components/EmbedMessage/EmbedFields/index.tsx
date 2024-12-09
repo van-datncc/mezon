@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
-import { DatePickerComponent, EMessageComponentType, IMessageRatioOption, InputComponent, SelectComponent } from '@mezon/utils';
+import { EMessageComponentType, IFieldEmbed, IMessageRatioOption } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import { memo, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -10,17 +10,9 @@ import { EmbedRadioButton } from './EmbedRadioItem';
 import { EmbedSelect } from './EmbedSelect';
 import { style } from './styles';
 
-interface Field {
-	name: string;
-	value: string;
-	inline?: boolean;
-	options?: IMessageRatioOption[];
-	inputs?: SelectComponent | InputComponent | DatePickerComponent;
-}
-
 interface EmbedFieldsProps {
 	message_id: string;
-	fields: Field[];
+	fields: IFieldEmbed[];
 }
 
 export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
@@ -29,12 +21,12 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 	const [checked, setChecked] = useState<number[]>([]);
 	const dispatch = useAppDispatch();
 	const groupedFields = useMemo(() => {
-		return fields.reduce<Field[][]>((acc, field) => {
-			if (!field.inline) {
+		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
+			if (!field?.inline) {
 				acc.push([field]);
 			} else {
 				const lastRow = acc[acc.length - 1];
-				if (lastRow && lastRow[0].inline && lastRow.length < 3) {
+				if (lastRow && lastRow?.[0]?.inline && lastRow?.length < 3) {
 					lastRow.push(field);
 				} else {
 					acc.push([field]);
@@ -97,15 +89,6 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 								<View key={`field${index}-${fieldIndex}`} style={styles.field}>
 									{!!fieldItem?.name && <Text style={styles.name}>{fieldItem?.name}:</Text>}
 									{!!fieldItem?.value && <Text style={styles.value}>{fieldItem?.value}</Text>}
-									{!!fieldItem?.options?.length &&
-										fieldItem?.options?.map((optionItem, optionIndex) => (
-											<EmbedRadioButton
-												key={`Embed_field_option_${optionItem}_${optionIndex}`}
-												option={optionItem}
-												checked={checked?.includes(optionIndex)}
-												onCheck={() => handleCheckRadioButton(optionIndex, optionItem)}
-											/>
-										))}
 									{!fieldItem?.inputs && (
 										<View>
 											{fieldItem?.inputs?.type === EMessageComponentType.INPUT && (
@@ -117,6 +100,16 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
 												<MezonDateTimePicker value={new Date(fieldItem?.inputs?.component?.value)} />
 											)}
+											{fieldItem?.inputs?.type === EMessageComponentType.RADIO &&
+												fieldItem?.inputs?.component?.length &&
+												fieldItem?.inputs?.component?.map((optionItem, optionIndex) => (
+													<EmbedRadioButton
+														key={`Embed_field_option_${optionItem}_${optionIndex}`}
+														option={optionItem}
+														checked={checked?.includes(optionIndex)}
+														onCheck={() => handleCheckRadioButton(optionIndex, optionItem)}
+													/>
+												))}
 										</View>
 									)}
 								</View>
