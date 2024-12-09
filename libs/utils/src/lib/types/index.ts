@@ -166,6 +166,22 @@ export type IThread = {
 	last_sent_message?: ApiChannelMessageHeader;
 };
 
+export type ITopicDiscussion = {
+	id?: string | undefined;
+	/// new update
+	clan_id?: string | undefined;
+	parrent_id?: string | undefined;
+	channel_id?: string | undefined;
+	category_id?: string | undefined;
+	type?: number;
+	creator_id?: string | undefined;
+	channel_label?: string | undefined;
+	active?: number;
+	create_time_seconds?: number | string | undefined;
+	update_time_seconds?: number | string | undefined;
+	last_sent_message?: ApiChannelMessageHeader;
+};
+
 export type IContextMenuItemAction = 'REST';
 
 export type IContextMenuItemMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -1302,6 +1318,7 @@ export type MentionReactInputProps = {
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
+	readonly isTopic?: boolean;
 	readonly handlePaste?: any;
 	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
