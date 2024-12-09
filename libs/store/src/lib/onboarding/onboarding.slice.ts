@@ -105,7 +105,7 @@ export const editOnboarding = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateOnboarding(mezon.session, idOnboarding, {
 				clan_id,
-				title: '123456789'
+				...content
 			});
 			if (!response) {
 				return false;
