@@ -31,7 +31,7 @@ export const initialAuthState: AuthState = {
 };
 
 function normalizeSession(session: Session): ISession {
-	return JSON.parse(JSON.stringify(session));
+	return session;
 }
 
 export const authenticateGoogle = createAsyncThunk('auth/authenticateGoogle', async (token: string, thunkAPI) => {
