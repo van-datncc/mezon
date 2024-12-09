@@ -36,6 +36,7 @@ export interface OnboardingState extends EntityState<ApiOnboardingSteps, string>
 		task: ApiOnboardingContent[];
 	};
 	fileRules: Record<number, File>;
+	keepAnswers: Record<string, number[]>;
 }
 
 export const onboardingUserAdapter = createEntityAdapter({
@@ -231,7 +232,8 @@ export const initialOnboardingState: OnboardingState = onboardingUserAdapter.get
 		questions: [],
 		task: []
 	},
-	fileRules: []
+	fileRules: [],
+	keepAnswers: {}
 });
 
 export enum ETypeMission {
@@ -308,6 +310,14 @@ export const onboardingSlice = createSlice({
 		},
 		clearFileRule: (state) => {
 			state.fileRules = [];
+		},
+		doAnswer: (state, action: PayloadAction<{ idQuestion: string; answer: number }>) => {
+			const { idQuestion, answer } = action.payload;
+			if (state.keepAnswers[idQuestion] && state.keepAnswers[idQuestion].includes(answer)) {
+				state.keepAnswers[idQuestion] = state.keepAnswers[idQuestion].filter((value) => value !== answer);
+				return;
+			}
+			state.keepAnswers[idQuestion] = [answer];
 		}
 	},
 	extraReducers: (builder) => {
@@ -443,3 +453,7 @@ export const selectCurrentMission = createSelector(
 );
 
 export const selectRuleImages = createSelector(getOnboardingState, (state) => state.fileRules);
+
+export const selectAnswerByQuestionId = createSelector([getOnboardingState, (state, questionId: string) => questionId], (state, questionId) => {
+	return state.keepAnswers[questionId] || [];
+});
