@@ -773,7 +773,7 @@ export const messagesSlice = createSlice({
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel, mode } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, topic_id } = action.payload;
 
 			if (!channelId || !messageId) return state;
 
@@ -822,6 +822,28 @@ export const messagesSlice = createSlice({
 						}
 					}
 
+					if (topic_id) {
+						handleAddOneMessage({ state, channelId: topic_id, adapterPayload: action.payload });
+						// update last message
+						state.lastMessageByChannel[topic_id] = action.payload;
+						if (!isSending && (isMe || isAnonymous)) {
+							const newContent = content;
+
+							const sendingMessages = state.channelMessages[topic_id].ids.filter(
+								(id) => state.channelMessages[topic_id].entities[id].isSending
+							);
+							if (sendingMessages && sendingMessages.length) {
+								for (const mid of sendingMessages) {
+									const message = state.channelMessages[channelId].entities[mid];
+									if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
+										state.channelMessages[topic_id] = handleRemoveOneMessage({ state, channelId: topic_id, messageId: mid });
+										break;
+									}
+								}
+							}
+						}
+					}
+
 					break;
 				}
 				case TypeMessage.ChatUpdate: {
@@ -854,6 +876,46 @@ export const messagesSlice = createSlice({
 				}
 				case TypeMessage.ChatRemove: {
 					handleRemoveOneMessage({ state, channelId, messageId });
+					break;
+				}
+				case TypeMessage.Topic: {
+					handleAddOneMessage({ state, channelId: topic_id || '', adapterPayload: action.payload });
+
+					// update last message
+					state.lastMessageByChannel[topic_id || ''] = action.payload;
+
+					// update is viewing older messages
+					// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
+
+					// remove sending message when receive new message by the same user
+					// potential bug: if the user send the same message multiple times
+					// or the sending message is the same as the received message from the server
+					if (!isSending && (isMe || isAnonymous)) {
+						const newContent = content;
+
+						const sendingMessages = state.channelMessages[topic_id || ''].ids.filter(
+							(id) => state.channelMessages[topic_id || ''].entities[id].isSending
+						);
+						if (sendingMessages && sendingMessages.length) {
+							for (const mid of sendingMessages) {
+								const message = state.channelMessages[topic_id || ''].entities[mid];
+								// temporary remove sending message that has the same content
+								// for later update, we could use some kind of id to identify the message
+								if ((message?.content?.t === newContent?.t && message?.topic_id === topic_id) || '') {
+									state.channelMessages[topic_id || ''] = handleRemoveOneMessage({
+										state,
+										channelId: topic_id || '',
+										messageId: mid
+									});
+
+									// remove the first one and break
+									// prevent removing all sending messages with the same content
+									break;
+								}
+							}
+						}
+					}
+
 					break;
 				}
 				default:

@@ -168,16 +168,8 @@ export type ITopicDiscussion = {
 	id?: string | undefined;
 	/// new update
 	clan_id?: string | undefined;
-	parrent_id?: string | undefined;
 	channel_id?: string | undefined;
-	category_id?: string | undefined;
-	type?: number;
-	creator_id?: string | undefined;
-	channel_label?: string | undefined;
-	active?: number;
-	create_time_seconds?: number | string | undefined;
-	update_time_seconds?: number | string | undefined;
-	last_sent_message?: ApiChannelMessageHeader;
+	message_id?: string | undefined;
 };
 
 export type IContextMenuItemAction = 'REST';
@@ -369,6 +361,7 @@ export interface IMessageSendPayload {
 	embed?: IEmbedProps[];
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
+	tp?: string;
 }
 
 export type IUser = {
@@ -1080,7 +1073,8 @@ export enum TypeMessage {
 	Welcome = 5,
 	CreateThread = 6,
 	CreatePin = 7,
-	MessageBuzz = 8
+	MessageBuzz = 8,
+	Topic = 9
 }
 
 export enum ServerSettingsMenuValue {

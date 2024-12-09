@@ -1,12 +1,20 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useTopics } from '@mezon/core';
-import { RootState, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, topicsActions, useAppDispatch } from '@mezon/store';
+import {
+	RootState,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectCurrentTopicId,
+	topicsActions,
+	useAppDispatch
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -18,6 +26,8 @@ const TopicDiscussionBox = () => {
 	const { valueTopic } = useTopics();
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { clientRef, sessionRef, socketRef } = useMezon();
+	const [isTopicCreated, setIsTopicCreated] = useState(false);
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const createTopic = useCallback(async () => {
 		const body: ApiSdTopicRequest = {
 			clan_id: currentClanId?.toString(),
@@ -25,9 +35,10 @@ const TopicDiscussionBox = () => {
 			message_id: valueTopic?.id
 		};
 
-		const topic = await dispatch(topicsActions.createTopic(body));
-		return topic.payload;
-	}, [currentChannel, currentChannelId, currentClanId, dispatch]);
+		const topic = (await dispatch(topicsActions.createTopic(body))).payload as ApiSdTopic;
+		dispatch(topicsActions.setCurrentTopicId(topic.id || ''));
+		return topic;
+	}, [currentChannelId, currentClanId, dispatch, valueTopic?.id]);
 
 	const sendMessageTopic = React.useCallback(
 		async (
@@ -76,17 +87,21 @@ const TopicDiscussionBox = () => {
 		) => {
 			if (sessionUser) {
 				// 	if (value?.nameValueThread) {
-				const topic = (await createTopic()) as ApiSdTopic;
-
-				if (topic) {
-					await sleep(10);
-					await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
+				if (isTopicCreated) {
+					await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
+				} else {
+					const topic = (await createTopic()) as ApiSdTopic;
+					if (topic) {
+						await sleep(10);
+						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
+						setIsTopicCreated(true);
+					}
 				}
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[]
+		[createTopic, currentTopicId, isTopicCreated, sendMessageTopic, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
