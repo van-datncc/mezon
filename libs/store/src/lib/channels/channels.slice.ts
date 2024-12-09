@@ -32,7 +32,6 @@ import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
-import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
@@ -57,7 +56,6 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds) ?? 0,
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		lastSeenPinMessage: channel.last_pin_message || '',
 		clanId: channel.clan_id ?? '',
 		isMute: channel.is_mute ?? false
 	};
@@ -163,9 +161,7 @@ export const joinChannel = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 
 			if (!state.messages?.idMessageToJump?.id) {
-				thunkAPI.dispatch(
-					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
-				);
+				thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage }));
 			}
 
 			const channel = selectChannelById(getChannelsRootState(thunkAPI), channelId);
@@ -181,7 +177,6 @@ export const joinChannel = createAsyncThunk(
 				}
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
-			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
@@ -335,7 +330,7 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchListFavoriteChannelCache.clear(mezon, clanId);
+			fetchListFavoriteChannelCache.delete(mezon, clanId);
 		}
 
 		const response = await fetchListFavoriteChannelCache(mezon, clanId);
@@ -427,7 +422,7 @@ export const fetchChannels = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				await fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
+				await fetchChannelsCached.delete(mezon, 500, 1, clanId, channelType);
 			}
 			const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 			if (!response.channeldesc) {
@@ -502,7 +497,7 @@ export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			await fetchAppChannelCached.clear(mezon, clanId);
+			await fetchAppChannelCached.delete(mezon, clanId);
 		}
 
 		const response = await fetchAppChannelCached(mezon, clanId);
@@ -625,10 +620,7 @@ export const channelsSlice = createSlice({
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
 				changes: {
-					channel_label: payload.channel_label,
-					app_url: payload.app_url,
-					status: payload.status,
-					meeting_code: payload.meeting_code
+					...action.payload
 				}
 			});
 		},
@@ -688,6 +680,16 @@ export const channelsSlice = createSlice({
 						}
 					});
 				}
+			}
+		},
+
+		updateAppChannel: (state, action: PayloadAction<{ channelId: string; changes: Partial<ApiChannelAppResponse> }>) => {
+			const { channelId, changes } = action.payload;
+			if (state.appChannelsList[channelId]) {
+				state.appChannelsList[channelId] = {
+					...state.appChannelsList[channelId],
+					...changes
+				};
 			}
 		},
 

@@ -4,6 +4,7 @@ import {
 	appActions,
 	canvasAPIActions,
 	notificationActions,
+	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
@@ -17,8 +18,6 @@ import {
 	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
-	selectLastPinMessageByChannelId,
-	selectLastSeenPinMessageChannelById,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
@@ -312,18 +311,20 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
+	const dispatch = useAppDispatch();
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const pinRef = useRef<HTMLDivElement | null>(null);
-	const handleShowPinMessage = () => {
+	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
+
+	const handleShowPinMessage = async () => {
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
 		setIsShowPinMessage(!isShowPinMessage);
 	};
+
 	const handleClose = useCallback(() => {
 		setIsShowPinMessage(false);
 	}, []);
-	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
-	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
-	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
-	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
+
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
 			<Tippy
@@ -332,9 +333,6 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 			>
 				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
-					{shouldShowPinIndicator && (
-						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
-					)}
 				</button>
 			</Tippy>
 			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}

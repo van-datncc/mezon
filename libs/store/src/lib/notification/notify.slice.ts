@@ -52,7 +52,7 @@ export const fetchListNotification = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchListNotificationCached.clear(mezon, clanId);
+				fetchListNotificationCached.delete(mezon, clanId);
 			}
 			const response = await fetchListNotificationCached(mezon, clanId);
 			if (!response.notifications) {
