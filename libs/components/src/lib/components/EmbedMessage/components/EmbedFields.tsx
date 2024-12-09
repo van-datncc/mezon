@@ -82,7 +82,7 @@ const InputEmbedByType = ({ messageId, senderId, component }: InputEmbedByType) 
 		case EMessageComponentType.DATEPICKER:
 			return <MessageDatePicker buttonId={component.id} messageId={messageId} senderId={senderId} datepicker={component.component} />;
 		case EMessageComponentType.RADIO:
-			return <EmbedOptionRatio key={component.id} options={component.component} message_id={messageId} />;
+			return <EmbedOptionRatio key={component.id} idRadio={component.id} options={component.component} message_id={messageId} />;
 		default:
 			return;
 	}

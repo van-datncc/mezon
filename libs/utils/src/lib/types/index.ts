@@ -279,7 +279,6 @@ export interface IMessageSelectOption {
 	default?: boolean;
 }
 export interface IMessageRatioOption {
-	id: string;
 	label: string;
 	description?: string;
 	name?: string;
