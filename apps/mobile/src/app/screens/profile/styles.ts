@@ -38,6 +38,10 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			fontSize: isTabletLandscape ? size.label : size.medium
 		},
 
+		token: {
+			paddingVertical: size.s_4
+		},
+
 		whiteText: {
 			color: Colors.white,
 			marginLeft: 10,
