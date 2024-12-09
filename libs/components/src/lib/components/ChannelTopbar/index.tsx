@@ -2,6 +2,7 @@ import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
 	ChannelsEntity,
 	appActions,
+	attachmentActions,
 	canvasAPIActions,
 	notificationActions,
 	searchMessagesActions,
@@ -37,6 +38,7 @@ import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import { ChannelLabel } from './TopBarComponents';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
+import FileModal from './TopBarComponents/FilesModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import { PushToTalkBtn } from './TopBarComponents/PushToTalkButton/PushToTalkButton';
@@ -121,6 +123,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
 								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
 								{isNotThread && isPrivateChannel && <PushToTalkBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
@@ -150,6 +153,51 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 		</>
 	);
 });
+
+function FileButton({ isLightMode }: { isLightMode: boolean }) {
+	const dispatch = useAppDispatch();
+	const [isShowFile, setIsShowFile] = useState<boolean>(false);
+
+	const fileRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowFile = () => {
+		setIsShowFile(!isShowFile);
+	};
+
+	const handleClose = useCallback(() => {
+		setIsShowFile(false);
+	}, []);
+
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	useEffect(() => {
+		if (currentChannel?.channel_id || isShowFile) {
+			const fetchCanvas = async () => {
+				const channelId = currentChannel?.channel_id ?? '';
+				const clanId = currentChannel?.clan_id ?? '';
+
+				if (channelId && clanId) {
+					await dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
+				}
+			};
+			fetchCanvas();
+		}
+	}, [currentChannel?.channel_id, currentChannel?.clan_id, dispatch, isShowFile]);
+
+	return (
+		<div className="relative leading-5 h-5" ref={fileRef}>
+			<Tippy
+				className={`${isShowFile && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
+				content="Files"
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowFile} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.FileIcon isWhite={isShowFile} defaultSize="size-6" />
+				</button>
+			</Tippy>
+			{isShowFile && <FileModal onClose={handleClose} rootRef={fileRef} />}
+		</div>
+	);
+}
 
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();

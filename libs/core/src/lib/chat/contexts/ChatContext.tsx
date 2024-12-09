@@ -67,7 +67,6 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
-	ETypeLinkMedia,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
 	ModeResponsive,
@@ -305,18 +304,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
-				if (mess.attachments?.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))) {
-					const attachmentList: AttachmentEntity[] = mess.attachments?.map((attachment) => {
-						const dateTime = new Date();
+				const attachmentList: AttachmentEntity[] = (mess.attachments || [])?.map((attachment) => {
+					const dateTime = new Date();
+					return {
+						...attachment,
+						id: attachment.url as string,
+						create_time: dateTime.toISOString(),
+						uploader: mess.sender_id
+					};
+				});
 
-						return {
-							...attachment,
-							id: attachment.url as string,
-							create_time: dateTime.toISOString()
-						};
-					});
-					dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
-				}
+				dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
