@@ -98,6 +98,27 @@ export const createOnboardingTask = createAsyncThunk(
 	}
 );
 
+export const editOnboarding = createAsyncThunk(
+	'onboarding/editOnboarding',
+	async ({ content, idOnboarding, clan_id }: { content: ApiOnboardingContent; idOnboarding: string; clan_id: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateOnboarding(mezon.session, idOnboarding, {
+				clan_id,
+				title: '123456789'
+			});
+			if (!response) {
+				return false;
+			}
+			thunkAPI.dispatch(fetchOnboarding({ clan_id: clan_id, noCache: true }));
+			return { content, clan_id };
+		} catch (error) {
+			captureSentryError(error, 'onboarding/createOnboarding');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
 export const removeOnboardingTask = createAsyncThunk(
 	'onboarding/removeOnboardingTask',
 	async ({ idTask, clan_id, type }: { idTask: string; clan_id: string; type: EGuideType }, thunkAPI) => {
@@ -252,8 +273,13 @@ export const onboardingSlice = createSlice({
 		addRules: (state, action: PayloadAction<RuleType>) => {
 			state.formOnboarding.rules.push(action.payload);
 		},
-		addQuestion: (state, action: PayloadAction<ApiOnboardingContent>) => {
-			state.formOnboarding.questions.push(action.payload);
+		addQuestion: (state, action: PayloadAction<{ data: ApiOnboardingContent; update?: number }>) => {
+			const { data, update } = action.payload;
+			if (update !== undefined) {
+				state.formOnboarding.questions[update] = data;
+				return;
+			}
+			state.formOnboarding.questions.push(data);
 		},
 		addMission: (state, action: PayloadAction<ApiOnboardingContent>) => {
 			state.formOnboarding.task.push(action.payload);
@@ -377,7 +403,8 @@ export const onboardingActions = {
 	removeOnboardingTask,
 	enableOnboarding,
 	fetchProcessingOnboarding,
-	doneOnboarding
+	doneOnboarding,
+	editOnboarding
 };
 
 const { selectAll, selectEntities, selectById } = onboardingUserAdapter.getSelectors();
