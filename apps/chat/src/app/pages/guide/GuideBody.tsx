@@ -218,7 +218,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 	return (
 		<div className="w-full p-4 flex flex-col gap-2">
 			<p className="text-channelActiveColor font-semibold">{question.title} ?</p>
-			<div className="flex flex-wrap gap-2">
+			<div className="flex flex-wrap gap-2 flex-1">
 				{question.answers &&
 					question.answers.map((answer, index) => (
 						<GuideItemLayout
@@ -226,8 +226,9 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 							icon={answer.emoji}
 							description={answer.description}
 							title={answer.title}
+							height={'h-auto'}
 							onClick={() => handleOnClickQuestion(index)}
-							className={` w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${hightLight(index)}`}
+							className={` w-fit h-fit rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${hightLight(index)}`}
 						/>
 					))}
 			</div>
