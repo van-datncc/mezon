@@ -62,7 +62,7 @@ export const fetchOnboarding = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchOnboardingCached.clear();
+				fetchOnboardingCached.delete(mezon, clan_id);
 			}
 			const response = await fetchOnboardingCached(mezon, clan_id);
 
