@@ -104,7 +104,13 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			const connection = initializePeerConnection();
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			connection.addTransceiver(stream.getAudioTracks()[0], { direction: 'sendrecv' });
-			stream.getAudioTracks().forEach((track) => peerConnection.current?.addTrack(track, stream));
+			stream.getAudioTracks().forEach((track) => {
+				try {
+					peerConnection.current?.addTrack(track, stream);
+				} catch (e) {
+					// do nothing
+				}
+			});
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -136,7 +142,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				});
 			}
 		},
-		[localStream]
+		[localStream, mezon.socketRef]
 	);
 
 	useEffect(() => {
