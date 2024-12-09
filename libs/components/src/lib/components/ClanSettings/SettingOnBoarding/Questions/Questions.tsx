@@ -117,8 +117,7 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem; index: number; tempId?: number }) => {
 	const [titleQuestion, setTitleQuestion] = useState(question?.title || '');
 	const [answers, setAnswer] = useState<OnboardingAnswer[]>(question?.answers || []);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
+
 	const dispatch = useAppDispatch();
 
 	const handleAddAnswers = (answer: OnboardingAnswer) => {
@@ -142,7 +141,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 
 	const handleAddQuestion = () => {
 		toggleExpand();
-		if (tempId) {
+		if (tempId !== undefined) {
 			dispatch(
 				onboardingActions.addQuestion({
 					data: {
@@ -150,7 +149,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 						answers: answers,
 						guide_type: EGuideType.QUESTION
 					},
-					update: index
+					update: tempId
 				})
 			);
 			return;
