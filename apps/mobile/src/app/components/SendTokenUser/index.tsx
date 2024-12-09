@@ -25,7 +25,7 @@ export const SendTokenUser = forwardRef((props, ref: Ref<BottomSheetModalMethods
 			},
 			{
 				onPress: () => dismiss(),
-				title: t('settingStack.withDrawToken'),
+				title: t('settingStack.withdrawToken'),
 				isShow: true,
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} rotate={-1} color={baseColor.gray} />
 			},
