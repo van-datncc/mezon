@@ -44,6 +44,12 @@ export const embedSlice = createSlice({
 				return;
 			}
 			state.formDataEmbed[message_id][data.id] = [data.value];
+		},
+		removeEmbedValuel: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
+			const { message_id, data, multiple } = action.payload;
+			if (state.formDataEmbed[message_id][data.id] && multiple) {
+				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id]].filter((item) => item !== data.value);
+			}
 		}
 	}
 });

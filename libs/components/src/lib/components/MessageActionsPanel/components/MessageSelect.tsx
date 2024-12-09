@@ -47,6 +47,19 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					})
 				);
 			} else {
+				if (selectedOptions.filter((item) => item.value === option.value).length > 0) {
+					dispatch(
+						embedActions.removeEmbedValuel({
+							message_id: messageId,
+							data: {
+								id: buttonId,
+								value: option.value
+							},
+							multiple: true
+						})
+					);
+					return;
+				}
 				dispatch(
 					embedActions.addEmbedValue({
 						message_id: messageId,
@@ -72,6 +85,16 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 				(a, b) => select.options.findIndex((opt) => opt.value === a.value) - select.options.findIndex((opt) => opt.value === b.value)
 			);
 		});
+		dispatch(
+			embedActions.removeEmbedValuel({
+				message_id: messageId,
+				data: {
+					id: buttonId,
+					value: option.value
+				},
+				multiple: true
+			})
+		);
 	};
 
 	const handleClearSelection = () => {
