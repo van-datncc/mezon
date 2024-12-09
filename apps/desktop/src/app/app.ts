@@ -3,7 +3,7 @@ import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import { format } from 'url';
-import {electronAppName, rendererAppName, rendererAppPort} from './constants';
+import { electronAppName, rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 import setupAutoUpdates from './autoUpdates';
@@ -241,6 +241,8 @@ export default class App {
 		App.application.on('activate', App.onActivate);
 	}
 
+	static currentWindow: Electron.BrowserWindow | null = null;
+
 	static openNewWindow(props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
 		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
 			width: 1000,
@@ -260,7 +262,13 @@ export default class App {
 
 		const windowOptions = { ...defaultOptions, ...options };
 
-		const newWindow = new BrowserWindow(windowOptions);
+		if (this.currentWindow && !this.currentWindow.isDestroyed()) {
+			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
+			this.currentWindow.show();
+			return;
+		}
+
+		this.currentWindow = new BrowserWindow(windowOptions);
 
 		const filePath = App.application.isPackaged
 			? 'assets/image-window/image-window.html'
@@ -269,7 +277,7 @@ export default class App {
 			const baseUrl = join(__dirname, '..', electronAppName, filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			newWindow.loadURL(
+			this.currentWindow.loadURL(
 				format({
 					pathname: fullUrl,
 					protocol: 'file:',
@@ -281,7 +289,7 @@ export default class App {
 			const baseUrl = join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			newWindow.loadURL(
+			this.currentWindow.loadURL(
 				format({
 					pathname: fullUrl,
 					protocol: 'file:',
@@ -291,11 +299,11 @@ export default class App {
 			);
 		}
 
-		newWindow.webContents.on('did-finish-load', () => {
-			newWindow.webContents.send(SET_ATTACHMENT_DATA, props);
+		this.currentWindow.webContents.on('did-finish-load', () => {
+			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
 		});
 
-		return newWindow;
+		return this.currentWindow;
 	}
 
 	/**

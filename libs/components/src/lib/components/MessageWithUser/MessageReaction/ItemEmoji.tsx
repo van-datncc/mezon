@@ -52,6 +52,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		<Tippy
 			content={<UserReactionPanel message={message} emojiShowPanel={emoji} mode={mode} />}
 			className={`flex justify-center items-center bg-blackA ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
+			interactive={true}
+			hideOnClick={false}
 		>
 			<ItemDetail
 				ref={emojiItemRef}
