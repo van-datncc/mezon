@@ -94,7 +94,7 @@ export const getChannelCanvasList = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchCanvasCached.clear(mezon, channel_id, clan_id, limit, page);
+				fetchCanvasCached.delete(mezon, channel_id, clan_id, limit, page);
 			}
 			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
 			return response;
