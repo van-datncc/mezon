@@ -82,5 +82,8 @@ export const style = (colors: Attributes) =>
 		userName: {
 			color: colors.text,
 			paddingHorizontal: size.s_10
+		},
+		searchText: {
+			paddingHorizontal: size.s_10
 		}
 	});
