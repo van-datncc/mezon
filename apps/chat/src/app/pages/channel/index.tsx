@@ -73,7 +73,7 @@ function useChannelSeen(channelId: string) {
 			return;
 		}
 		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || ChannelType.CHANNEL_TYPE_STREAMING
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
 		markAsReadSeen(lastMessage, mode);
@@ -119,7 +119,7 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const mode =
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || ChannelType.CHANNEL_TYPE_STREAMING
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 			? ChannelStreamMode.STREAM_MODE_CHANNEL
 			: ChannelStreamMode.STREAM_MODE_THREAD;
 
