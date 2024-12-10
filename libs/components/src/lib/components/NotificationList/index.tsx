@@ -1,4 +1,4 @@
-import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	fetchListNotification,
 	notificationActions,
@@ -8,12 +8,10 @@ import {
 	selectAllNotificationMentionAndReply,
 	selectCurrentClan,
 	selectLastNotificationId,
-	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, sortNotificationsByDate } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AllNotification from './AllNotification';
@@ -67,14 +65,6 @@ function NotificationList({ rootRef }: NotificationProps) {
 		return sortNotificationsByDate(getAllNotificationMentionAndReply);
 	}, [getAllNotificationMentionAndReply]);
 
-	const appearanceTheme = useSelector(selectTheme);
-
-	const { handleMarkAsReadClan } = useMarkAsRead();
-
-	const isShowMarkAllAsRead = useMemo(() => {
-		return allNotificationClan.length > 0 && currentTabNotify === InboxType.MESSAGES;
-	}, [allNotificationClan, currentTabNotify]);
-
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleHideInbox = useCallback(() => {
 		dispatch(notificationActions.setIsShowInbox(false));
@@ -115,25 +105,6 @@ function NotificationList({ rootRef }: NotificationProps) {
 						<div className="flex flex-row items-center justify-start">
 							<InboxButton />
 							<div>Inbox </div>
-							{isShowMarkAllAsRead && (
-								<Tippy
-									className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
-									arrow={false}
-									content={
-										<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
-											{'Mark all as read'}
-										</p>
-									}
-									placement="top"
-								>
-									<button
-										onClick={() => handleMarkAsReadClan}
-										className="flex items-center p-1 rounded-sm justify-center dark:bg-bgTertiary bg-bgLightModeButton"
-									>
-										<Icons.MarkAllAsRead className="w-5 h-5" />
-									</button>
-								</Tippy>
-							)}
 						</div>
 					</div>
 					<div className="flex flex-row border-b-[1px] border-b-gray-300">
