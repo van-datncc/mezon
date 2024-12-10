@@ -48,6 +48,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	message,
 	previousMessage
 }: Readonly<MessageProps>) => {
+	console.log('ChannelMessage message: ', message);
+
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();

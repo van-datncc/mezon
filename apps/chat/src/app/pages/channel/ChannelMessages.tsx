@@ -47,6 +47,7 @@ type ChannelMessagesProps = {
 	userName?: string;
 	userIdsFromThreadBox?: string[];
 	isThreadBox?: boolean;
+	isTopicBox?: boolean;
 };
 
 function ChannelMessages({
@@ -57,7 +58,8 @@ function ChannelMessages({
 	userName,
 	mode,
 	userIdsFromThreadBox,
-	isThreadBox = false
+	isThreadBox = false,
+	isTopicBox
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
@@ -223,6 +225,7 @@ function ChannelMessages({
 			return;
 		}
 	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
+	console.log('isTopicBox: ', isTopicBox);
 
 	return (
 		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
@@ -314,6 +317,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
+		console.log('ChatMessageList messages: ', messages);
 
 		const rowVirtualizer = useVirtualizer({
 			count: messages.length,
@@ -421,6 +425,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			};
 		}, []);
 
+		console.log(1123123);
+
 		return (
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
@@ -466,8 +472,11 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 								const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
 								const messageReplyHighlight =
 									(dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
+								console.log('entities[messageId]: ', entities[messageId]);
+
 								return (
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={rowVirtualizer.measureElement}>
+										sdsasdasdasd123123123
 										<MemorizedChannelMessage
 											index={virtualRow.index}
 											message={entities[messageId]}

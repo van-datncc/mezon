@@ -2,6 +2,7 @@ import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useTopics } from '@mezon/core';
 import {
 	RootState,
+	fetchMessages,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -14,9 +15,10 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import MemoizedChannelMessages from '../channel/ChannelMessages';
 
 const TopicDiscussionBox = () => {
 	const dispatch = useAppDispatch();
@@ -26,8 +28,19 @@ const TopicDiscussionBox = () => {
 	const { valueTopic } = useTopics();
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { clientRef, sessionRef, socketRef } = useMezon();
-	const [isTopicCreated, setIsTopicCreated] = useState(false);
+	const [isTopicCreated, setIsTopicCreated] = useState(true);
 	const currentTopicId = useSelector(selectCurrentTopicId);
+	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
+	useEffect(() => {
+		// const fetchMsgResult = dispatch(fetchMessages({ channelId: currentTopicId as string, clanId: currentClanId as string }));
+		const fetchMsgResult = async () => {
+			await dispatch(fetchMessages({ channelId: currentTopicId as string, clanId: currentClanId as string }));
+			setIsFetchMessageDone(true);
+			console.log('isFetchMessageDone: ', isFetchMessageDone);
+		};
+		fetchMsgResult();
+	}, [currentClanId, currentTopicId]);
+
 	const createTopic = useCallback(async () => {
 		const body: ApiSdTopicRequest = {
 			clan_id: currentClanId?.toString(),
@@ -68,8 +81,8 @@ const TopicDiscussionBox = () => {
 				false,
 				false,
 				'',
-				0,
-				topicId
+				0
+				// topicId
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,6 +117,7 @@ const TopicDiscussionBox = () => {
 		[createTopic, currentTopicId, isTopicCreated, sendMessageTopic, sessionUser]
 	);
 
+	console.log('currentTopicId: ', currentTopicId);
 	const handleTyping = useCallback(() => {
 		// sendMessageTyping();
 	}, []);
@@ -111,9 +125,23 @@ const TopicDiscussionBox = () => {
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
+
+	console.log('isFetchMessageDone: ', isFetchMessageDone);
 	return (
 		<div className="flex flex-col flex-1 justify-end">
 			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+				{isFetchMessageDone && (
+					<div>
+						asdads vao con me m di
+						<MemoizedChannelMessages
+							channelId={currentTopicId as string}
+							clanId={currentClanId as string}
+							type={ChannelType.CHANNEL_TYPE_TEXT}
+							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							isTopicBox
+						/>
+					</div>
+				)}
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}

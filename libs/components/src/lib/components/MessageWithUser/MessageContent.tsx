@@ -1,6 +1,7 @@
-import { topicsActions, useAppDispatch } from '@mezon/store';
+import { fetchMessages, selectCurrentClanId, topicsActions, useAppDispatch } from '@mezon/store';
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
+import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
 
@@ -19,7 +20,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 	const dispatch = useAppDispatch();
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
-
+	const currentClanId = useSelector(selectCurrentClanId);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
 
 	const lineValue = (() => {
@@ -33,6 +34,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
 		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
+		fetchMessages({ channelId: message?.content?.tp as string, clanId: currentClanId as string, noCache: true });
 	};
 
 	return (
