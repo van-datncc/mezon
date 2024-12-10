@@ -48,7 +48,6 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 	const handleClickButton = useCallback(() => {
 		if (!button.url) {
 			const data = JSON.stringify(embedData);
-
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,

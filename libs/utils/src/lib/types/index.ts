@@ -294,6 +294,7 @@ export interface IMessageInput {
 	required?: boolean;
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
+	defaultValue?: string;
 }
 
 export interface IMessageDatePicker {
@@ -331,6 +332,7 @@ export interface IMessageSelect {
 	// Maximum number of items that can be chosen (defaults to 1)
 	max_options?: number;
 	disabled?: boolean;
+	valueSelected?: IMessageSelectOption;
 }
 
 export interface IMessageComponent<T> {

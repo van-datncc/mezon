@@ -10,7 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { IMessageSelect, IMessageSelectOption, ModeResponsive } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { SelectOptions } from './SelectOptions';
 
@@ -27,8 +27,8 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const currentUserId = useSelector(selectCurrentUserId);
-
 	const [selectedOptions, setSelectedOptions] = useState<Array<IMessageSelectOption>>([]);
+
 	const [availableOptions, setAvailableOptions] = useState(select?.options || []);
 	const dispatch = useAppDispatch();
 	const handleOptionSelect = (option: { value: string; label: string }) => {
@@ -73,6 +73,12 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (select.valueSelected) {
+			handleOptionSelect(select.valueSelected);
+		}
+	}, []);
 
 	const handleRemoveOption = (e: React.MouseEvent<HTMLButtonElement>, option: { value: string; label: string }) => {
 		e.stopPropagation();
