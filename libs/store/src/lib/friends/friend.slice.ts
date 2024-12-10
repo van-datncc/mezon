@@ -63,7 +63,7 @@ type fetchListFriendsArgs = {
 export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', async ({ noCache }: fetchListFriendsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
-		fetchListFriendsCached.clear(mezon, -1, 100, '');
+		fetchListFriendsCached.delete(mezon, -1, 100, '');
 	}
 	const response = await fetchListFriendsCached(mezon, -1, 100, '');
 	if (!response.friends) {
@@ -141,6 +141,7 @@ export const friendsSlice = createSlice({
 	reducers: {
 		add: friendsAdapter.addOne,
 		remove: friendsAdapter.removeOne,
+		upsertMany: friendsAdapter.upsertMany,
 		changeCurrentStatusTab: (state, action: PayloadAction<string>) => {
 			state.currentTabStatus = action.payload;
 		},
