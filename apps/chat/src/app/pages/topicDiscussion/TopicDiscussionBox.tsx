@@ -29,7 +29,6 @@ const TopicDiscussionBox = () => {
 	const { valueTopic } = useTopics();
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { clientRef, sessionRef, socketRef } = useMezon();
-	const [isTopicCreated, setIsTopicCreated] = useState(true);
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
 	useEffect(() => {
@@ -72,7 +71,7 @@ const TopicDiscussionBox = () => {
 				currentClanId,
 				currentChannel?.channel_id as string,
 				ChannelStreamMode.STREAM_MODE_CHANNEL,
-				currentChannel?.channel_private === 0,
+				currentChannel?.channel_private !== 1,
 				content,
 				mentions,
 				attachments,
@@ -80,8 +79,8 @@ const TopicDiscussionBox = () => {
 				false,
 				false,
 				'',
-				0
-				// topicId
+				0,
+				topicId?.toString()
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,22 +97,20 @@ const TopicDiscussionBox = () => {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
-				// 	if (value?.nameValueThread) {
-				if (isTopicCreated) {
+				if (currentTopicId !== '') {
 					await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
 				} else {
 					const topic = (await createTopic()) as ApiSdTopic;
 					if (topic) {
 						await sleep(10);
 						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
-						setIsTopicCreated(true);
 					}
 				}
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[createTopic, currentTopicId, isTopicCreated, sendMessageTopic, sessionUser]
+		[createTopic, currentTopicId, currentTopicId, sendMessageTopic, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {

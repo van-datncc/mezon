@@ -789,54 +789,54 @@ export const messagesSlice = createSlice({
 				case TypeMessage.CreatePin:
 				case TypeMessage.MessageBuzz:
 				case TypeMessage.Chat: {
-					handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
-
-					// update last message
-					state.lastMessageByChannel[channelId] = action.payload;
-
-					// update is viewing older messages
-					// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
-
-					// remove sending message when receive new message by the same user
-					// potential bug: if the user send the same message multiple times
-					// or the sending message is the same as the received message from the server
-					if (!isSending && (isMe || isAnonymous)) {
-						const newContent = content;
-
-						const sendingMessages = state.channelMessages[channelId].ids.filter(
-							(id) => state.channelMessages[channelId].entities[id].isSending
-						);
-						if (sendingMessages && sendingMessages.length) {
-							for (const mid of sendingMessages) {
-								const message = state.channelMessages[channelId].entities[mid];
-								// temporary remove sending message that has the same content
-								// for later update, we could use some kind of id to identify the message
-								if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
-									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
-
-									// remove the first one and break
-									// prevent removing all sending messages with the same content
-									break;
-								}
-							}
-						}
-					}
-
-					if (topic_id) {
+					if (topic_id !== '0' && topic_id) {
 						handleAddOneMessage({ state, channelId: topic_id, adapterPayload: action.payload });
-						// update last message
-						state.lastMessageByChannel[topic_id] = action.payload;
+
+						state.lastMessageByChannel[channelId] = action.payload;
 						if (!isSending && (isMe || isAnonymous)) {
 							const newContent = content;
 
-							const sendingMessages = state.channelMessages[topic_id].ids.filter(
+							const sendingMessages = state.channelMessages[topic_id]?.ids.filter(
 								(id) => state.channelMessages[topic_id].entities[id].isSending
 							);
 							if (sendingMessages && sendingMessages.length) {
 								for (const mid of sendingMessages) {
-									const message = state.channelMessages[channelId].entities[mid];
+									const message = state.channelMessages[topic_id].entities[mid];
 									if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
 										state.channelMessages[topic_id] = handleRemoveOneMessage({ state, channelId: topic_id, messageId: mid });
+										break;
+									}
+								}
+							}
+						}
+					} else {
+						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+
+						// update last message
+						state.lastMessageByChannel[channelId] = action.payload;
+
+						// update is viewing older messages
+						// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
+
+						// remove sending message when receive new message by the same user
+						// potential bug: if the user send the same message multiple times
+						// or the sending message is the same as the received message from the server
+						if (!isSending && (isMe || isAnonymous)) {
+							const newContent = content;
+
+							const sendingMessages = state.channelMessages[channelId].ids.filter(
+								(id) => state.channelMessages[channelId].entities[id].isSending
+							);
+							if (sendingMessages && sendingMessages.length) {
+								for (const mid of sendingMessages) {
+									const message = state.channelMessages[channelId].entities[mid];
+									// temporary remove sending message that has the same content
+									// for later update, we could use some kind of id to identify the message
+									if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
+										state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
+
+										// remove the first one and break
+										// prevent removing all sending messages with the same content
 										break;
 									}
 								}
@@ -876,46 +876,6 @@ export const messagesSlice = createSlice({
 				}
 				case TypeMessage.ChatRemove: {
 					handleRemoveOneMessage({ state, channelId, messageId });
-					break;
-				}
-				case TypeMessage.Topic: {
-					handleAddOneMessage({ state, channelId: topic_id || '', adapterPayload: action.payload });
-
-					// update last message
-					state.lastMessageByChannel[topic_id || ''] = action.payload;
-
-					// update is viewing older messages
-					// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
-
-					// remove sending message when receive new message by the same user
-					// potential bug: if the user send the same message multiple times
-					// or the sending message is the same as the received message from the server
-					if (!isSending && (isMe || isAnonymous)) {
-						const newContent = content;
-
-						const sendingMessages = state.channelMessages[topic_id || ''].ids.filter(
-							(id) => state.channelMessages[topic_id || ''].entities[id].isSending
-						);
-						if (sendingMessages && sendingMessages.length) {
-							for (const mid of sendingMessages) {
-								const message = state.channelMessages[topic_id || ''].entities[mid];
-								// temporary remove sending message that has the same content
-								// for later update, we could use some kind of id to identify the message
-								if ((message?.content?.t === newContent?.t && message?.topic_id === topic_id) || '') {
-									state.channelMessages[topic_id || ''] = handleRemoveOneMessage({
-										state,
-										channelId: topic_id || '',
-										messageId: mid
-									});
-
-									// remove the first one and break
-									// prevent removing all sending messages with the same content
-									break;
-								}
-							}
-						}
-					}
-
 					break;
 				}
 				default:
