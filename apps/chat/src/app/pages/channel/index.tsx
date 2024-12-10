@@ -343,8 +343,19 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 };
 
-export default function ChannelMain() {
+interface IChannelMainProps {
+	topicChannelId?: string;
+}
+
+export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
+
+	const channelIdForChildren = useMemo(() => {
+		if (topicChannelId) {
+			return topicChannelId;
+		}
+		return currentChannel?.id || '';
+	}, [topicChannelId, currentChannel?.id]);
 
 	if (!currentChannel) {
 		return null;
@@ -352,8 +363,8 @@ export default function ChannelMain() {
 
 	return (
 		<>
-			<ChannelMainContent channelId={currentChannel?.id} />
-			<ChannelSeenListener channelId={currentChannel?.id || ''} />
+			<ChannelMainContent channelId={channelIdForChildren} />
+			<ChannelSeenListener channelId={channelIdForChildren} />
 		</>
 	);
 }
