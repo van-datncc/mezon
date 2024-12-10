@@ -3,6 +3,7 @@ import { useTopics } from '@mezon/core';
 import {
 	RootState,
 	fetchMessages,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -102,6 +103,13 @@ const TopicDiscussionBox = () => {
 				} else {
 					const topic = (await createTopic()) as ApiSdTopic;
 					if (topic) {
+						dispatch(
+							messagesActions.updateToBeTopicMessage({
+								channelId: currentChannelId as string,
+								messageId: valueTopic?.id as string,
+								topicId: currentTopicId as string
+							})
+						);
 						await sleep(10);
 						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
 					}

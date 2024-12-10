@@ -1,4 +1,12 @@
-import { fetchMessages, selectCurrentClanId, topicsActions, useAppDispatch } from '@mezon/store';
+import {
+	fetchMessages,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectMessageByMessageId,
+	topicsActions,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -22,7 +30,8 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, message.id || ''));
 	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return safeJSONParse(message.content).t;
@@ -47,7 +56,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 				lines={lineValue as string}
 				mode={mode}
 			/>
-			{message.code === 9 && (
+			{currentMessage?.code === 9 && (
 				<div className="border border-black rounded-md p-2 w-[100px] flex justify-center items-center" onClick={handleOpenTopic}>
 					view topic
 				</div>
