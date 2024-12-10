@@ -111,10 +111,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		};
 	}, [isAnswerCall, isVideoCall]);
 
-	useEffect(() => {
-		InCallManager.setSpeakerphoneOn(localMediaControl.speaker);
-	}, [localMediaControl.speaker]);
-
 	const toggleControl = async () => {
 		setIsShowControl(!isShowControl);
 	};
