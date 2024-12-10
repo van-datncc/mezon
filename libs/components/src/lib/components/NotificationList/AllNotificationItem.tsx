@@ -1,5 +1,5 @@
 import { useGetPriorityNameFromUserClan, useNotification } from '@mezon/core';
-import { messagesActions, selectClanById, selectMemberClanByUserId, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import { messagesActions, selectClanById, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { IMentionOnMessage, IMessageWithUser, INotification, NotificationCode, addMention, convertTimeString, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
@@ -75,8 +75,6 @@ function AllNotificationItem({ notify, onDeleteNotification }: NotifyMentionProp
 		event.stopPropagation();
 		deleteNotify(notificationId, clanId ?? '0');
 	};
-
-	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
@@ -158,9 +156,13 @@ function MentionTabContent({ message, subject, code, senderId }: IMentionTabCont
 					<div>
 						<div className="text-[12px] font-bold uppercase">
 							{code === NotificationCode.USER_MENTIONED || code === NotificationCode.USER_REPLIED ? (
-								<>
-									{clan?.clan_name} {'>'} {message.channel_label}
-								</>
+								clan?.clan_name ? (
+									<>
+										{clan.clan_name} {'>'} {message.channel_label}
+									</>
+								) : (
+									'direct message'
+								)
 							) : code === NotificationCode.NOTIFICATION_CLAN ? (
 								clan?.clan_name
 							) : (

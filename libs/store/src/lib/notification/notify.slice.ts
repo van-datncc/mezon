@@ -3,6 +3,7 @@ import { Direction_Mode, INotification, LoadingStatus, NotificationCode, Notific
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { Notification } from 'mezon-js';
+import { ChannelMetaEntity } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 const LIST_NOTIFICATION_CACHED_TIME = 1000 * 60 * 3;
@@ -206,3 +207,38 @@ export const selectAllNotificationMentionAndReply = createSelector(selectAllNoti
 export const selectAllNotificationClan = createSelector(selectAllNotification, (notifications) =>
 	notifications.filter((notification) => notification.code === NotificationCode.NOTIFICATION_CLAN)
 );
+
+export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSeenStamp: number) =>
+	createSelector(selectAllNotificationMentionAndReply, (notifications) => {
+		const result = notifications.filter((notification) => {
+			if (!notification.create_time) {
+				return false;
+			}
+			const timeCreate = new Date(notification.create_time).getTime() / 1000;
+
+			return notification.content.channel_id === channelId && lastSeenStamp < timeCreate;
+		});
+
+		return result;
+	});
+
+export const selectMentionAndReplyUnreadByClanId = (listLastSeen: ChannelMetaEntity[]) =>
+	createSelector(selectAllNotificationMentionAndReply, (notifications) => {
+		const lastSeenMap = new Map<string, number>();
+		listLastSeen.forEach((channel) => {
+			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
+		});
+
+		return notifications.filter((notification) => {
+			if (!notification.create_time) {
+				return false;
+			}
+
+			const notificationTimestamp = new Date(notification.create_time).getTime() / 1000;
+			const channelId = notification.content.channel_id;
+
+			const lastSeen = lastSeenMap.get(channelId) ?? 0;
+
+			return notificationTimestamp > lastSeen;
+		});
+	});
