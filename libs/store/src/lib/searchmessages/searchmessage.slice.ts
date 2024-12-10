@@ -131,15 +131,24 @@ export const searchMessagesActions = {
 	fetchListSearchMessage
 };
 
-const { selectAll } = SearchMessageAdapter.getSelectors();
+const { selectAll, selectEntities, selectIds } = SearchMessageAdapter.getSelectors();
 
 export const getSearchMessageState = (rootState: { [SEARCH_MESSAGES_FEATURE_KEY]: SearchMessageState }): SearchMessageState =>
 	rootState[SEARCH_MESSAGES_FEATURE_KEY];
 
 export const selectAllMessageSearch = createSelector(getSearchMessageState, selectAll);
 
-export const selectMessageSearchByChannelId = (channelId: string) =>
-	createSelector(selectAllMessageSearch, (state) => state.filter((message) => message.channel_id === channelId));
+export const selectEntitesMessageSearch = createSelector(getSearchMessageState, selectEntities);
+export const selectAllMessageIds = createSelector(getSearchMessageState, selectIds);
+
+export const selectMessageSearchByChannelId = createSelector(
+	[selectEntitesMessageSearch, selectAllMessageIds, (_, channelId: string) => channelId],
+	(entities, ids, channelId) => {
+		return ids
+			.map((id) => entities[id])
+			.filter((message): message is SearchMessageEntity => message !== undefined && message.channel_id === channelId);
+	}
+);
 
 export const selectTotalResultSearchMessage = createSelector(getSearchMessageState, (state) => state.totalResult);
 export const selectCurrentPage = createSelector(getSearchMessageState, (state) => state.currentPage);
