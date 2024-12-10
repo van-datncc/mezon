@@ -120,7 +120,14 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 	const [indexEditAnswer, setIndexEditAnswer] = useState<number | undefined>(undefined);
 	const dispatch = useAppDispatch();
 
-	const handleAddAnswers = (answer: OnboardingAnswer) => {
+	const handleAddAnswers = (answer: OnboardingAnswer, edit?: number) => {
+		if (indexEditAnswer !== undefined) {
+			const listAnswers = [...answers];
+			listAnswers[indexEditAnswer] = answer;
+			setAnswer(listAnswers);
+			handleCloseEditAnswer();
+			return;
+		}
 		setAnswer([...answers, answer]);
 	};
 
@@ -142,9 +149,13 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 				})
 			);
 		}
-		closeAnswerPopup();
+		handleCloseEditAnswer();
 	};
 
+	const handleCloseEditAnswer = () => {
+		closeAnswerPopup();
+		setIndexEditAnswer(undefined);
+	};
 	const [openAnswerPopup, closeAnswerPopup] = useModal(
 		() => (
 			<ModalAddAnswer
@@ -266,7 +277,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 									icon={answer.emoji}
 									description={answer.description}
 									title={answer.title}
-									className="w-fit min-h-6 rounded-xl hover:bg-transparent text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+									className={`w-fit min-h-6 rounded-xl hover:bg-transparent text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${answer.description ? 'py-2' : ''}`}
 								/>
 							))}
 							<GuideItemLayout
@@ -304,7 +315,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 export default Questions;
 type ModalAddAnswerProp = {
 	closeAnswerPopup: () => void;
-	setAnswer: (answers: OnboardingAnswer) => void;
+	setAnswer: (answers: OnboardingAnswer, edit?: number) => void;
 	titleQuestion: string;
 	index: number;
 	editValue?: OnboardingAnswer;
@@ -323,7 +334,7 @@ const ModalAddAnswer = ({ closeAnswerPopup, index, setAnswer, titleQuestion, edi
 	};
 
 	const handleSaveAnswer = () => {
-		setAnswer({ title: titleAnswer, description: answerDescription });
+		setAnswer({ title: titleAnswer, description: answerDescription }, editValue ? index : undefined);
 		setTitleAnswer('');
 		setAnswerDescription('');
 		closeAnswerPopup();
