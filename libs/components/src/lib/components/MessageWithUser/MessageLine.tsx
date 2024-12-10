@@ -2,7 +2,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
@@ -18,6 +18,7 @@ type MessageLineProps = {
 	isEditted: boolean;
 	isInPinMsg?: boolean;
 	code?: number;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 };
 
 const MessageLineComponent = ({
@@ -31,7 +32,8 @@ const MessageLineComponent = ({
 	isHideLinkOneImage,
 	isEditted,
 	isInPinMsg,
-	code
+	code,
+	onCopy
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -58,6 +60,7 @@ const MessageLineComponent = ({
 				isEditted={isEditted}
 				isInPinMsg={isInPinMsg}
 				code={code}
+				onCopy={onCopy}
 			/>
 		</div>
 	);
@@ -78,6 +81,7 @@ interface RenderContentProps {
 	isEditted: boolean;
 	isInPinMsg?: boolean;
 	code?: number;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }
 
 export interface ElementToken {
@@ -104,7 +108,8 @@ const RenderContent = memo(
 		isHideLinkOneImage,
 		isEditted,
 		isInPinMsg,
-		code
+		code,
+		onCopy
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -286,8 +291,69 @@ const RenderContent = memo(
 			return formattedContent;
 		}, [elements, t, mode]);
 
+		const divRef = useRef<HTMLDivElement>(null);
+		const [selectionIndex, setSelectionIndex] = useState({ startIndex: 0, endIndex: 0 });
+
+		// Calculate the index position within the div
+		const getIndex = (node: Node, offset: number) => {
+			let currentNode = node;
+			let totalOffset = offset;
+
+			// Traverse up the DOM tree to calculate the index
+			while (currentNode && currentNode !== divRef.current) {
+				// Traverse previous siblings to account for their text content
+				while (currentNode.previousSibling) {
+					currentNode = currentNode.previousSibling;
+					totalOffset += currentNode.textContent?.length ?? 0;
+				}
+				currentNode = currentNode.parentNode as Node;
+			}
+			return totalOffset;
+		};
+
+		// Determine the selection's start and end index
+		const handleMouseUp = () => {
+			const selection = window.getSelection();
+
+			// Ensure selection exists and is within the div
+			if (selection && selection.rangeCount > 0 && divRef.current) {
+				const range = selection.getRangeAt(0);
+				const { startContainer, endContainer, startOffset, endOffset } = range;
+
+				// Check if selection is within the target div
+				if (divRef.current.contains(startContainer) && divRef.current.contains(endContainer)) {
+					const startIndex = getIndex(startContainer, startOffset);
+					const endIndex = getIndex(endContainer, endOffset);
+					setSelectionIndex({ startIndex, endIndex });
+				}
+			}
+		};
+
+		const handleMouseLeave = () => {
+			const selection = window.getSelection();
+			if (selection && selection.rangeCount > 0 && divRef.current && selection.toString().length) {
+				handleMouseUp();
+			}
+		};
+
+		const handleCopy = (event: React.ClipboardEvent<HTMLDivElement>) => {
+			const isSelectionHasMention = mentions.find((mention) => {
+				return (mention.s || 0) >= selectionIndex.startIndex && (mention.e as number) <= selectionIndex.endIndex;
+			});
+			if (isSelectionHasMention) {
+				if (onCopy) {
+					onCopy(event, selectionIndex.startIndex, selectionIndex.endIndex);
+				}
+				return;
+			}
+		};
+
 		return (
 			<div
+				ref={divRef}
+				onMouseUp={handleMouseUp}
+				onMouseLeave={handleMouseLeave}
+				onCopy={handleCopy}
 				style={
 					isJumMessageEnabled
 						? {

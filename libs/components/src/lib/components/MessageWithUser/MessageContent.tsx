@@ -28,6 +28,22 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 		}
 	})();
 
+	const handleCopyMessage = (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => {
+		if (message?.content && message?.mentions) {
+			const key = 'text/mezon-mentions';
+			const copyData = {
+				message: message,
+				startIndex: startIndex,
+				endIndex: endIndex
+			};
+			const value = JSON.stringify(copyData);
+
+			event.preventDefault();
+
+			event.clipboardData.setData(key, value);
+		}
+	};
+
 	return (
 		<MessageText
 			isOnlyContainEmoji={isOnlyContainEmoji}
@@ -36,6 +52,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			message={message}
 			lines={lineValue as string}
 			mode={mode}
+			onCopy={handleCopyMessage}
 		/>
 	);
 };
@@ -48,7 +65,8 @@ const MessageText = ({
 	mode,
 	content,
 	isOnlyContainEmoji,
-	isSearchMessage
+	isSearchMessage,
+	onCopy
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -56,6 +74,7 @@ const MessageText = ({
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }) => {
 	const attachmentOnMessage = message.attachments;
 
@@ -94,6 +113,7 @@ const MessageText = ({
 								content={content}
 								mode={mode}
 								code={message.code}
+								onCopy={onCopy}
 							/>
 						)}
 						{(message.code === TypeMessage.Welcome ||

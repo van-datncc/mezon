@@ -1290,7 +1290,7 @@ export type MentionReactInputProps = {
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
-	readonly handlePaste?: any;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
 	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
@@ -1332,11 +1332,11 @@ export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
 	uploaderData: {
 		avatar: string;
 		name: string;
-	}
+	};
 }
 
 export interface IImageWindowProps {
 	channelLabel: string;
 	selectedImageIndex: number;
-	images: Array<IAttachmentEntityWithUploader>
+	images: Array<IAttachmentEntityWithUploader>;
 }
