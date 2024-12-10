@@ -311,6 +311,14 @@ const persistedStreamReducer = persistReducer(
 	videoStreamReducer
 );
 
+const persistedOnboardingReducer = persistReducer(
+	{
+		key: ONBOARDING_FEATURE_KEY,
+		storage,
+		whitelist: ['keepAnswers']
+	},
+	onboardingReducer
+);
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -378,7 +386,7 @@ const reducer = {
 	giveCoffee: giveCoffeeReducer,
 	settingClanChannel: settingChannelReducer,
 	clanMembersMeta: clanMembersMetaReducer,
-	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
+	[ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
 	dmcall: DMCallReducer,
 	joinPTT: JoinPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,

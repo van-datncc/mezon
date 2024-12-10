@@ -235,7 +235,7 @@ export const fetchMessages = createAsyncThunk(
 				currentUser = await thunkAPI.dispatch(accountActions.getUserProfile()).unwrap();
 			}
 			if (noCache) {
-				fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
+				fetchMessagesCached.delete(mezon, clanId, channelId, messageId, direction);
 			}
 			const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
 			if (!response.messages) {

@@ -86,7 +86,7 @@ export const fetchChannelMembers = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchChannelMembersCached.clear(mezon, clanId, channelId, channelType);
+				fetchChannelMembersCached.delete(mezon, clanId, channelId, channelType);
 			}
 
 			const state = thunkAPI.getState() as RootState;
