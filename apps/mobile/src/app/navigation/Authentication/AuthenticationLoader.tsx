@@ -12,6 +12,7 @@ import {
 	selectDmGroupCurrentId,
 	selectLoadingMainMobile
 } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
@@ -39,6 +40,7 @@ export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
+	const mezon = useMezon();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
@@ -81,7 +83,17 @@ export const AuthenticationLoader = () => {
 
 	useEffect(() => {
 		let timer;
-		const callListener = DeviceEventEmitter.addListener(ActionEmitEvent.GO_TO_CALL_SCREEN, ({ payload }) => {
+		const callListener = DeviceEventEmitter.addListener(ActionEmitEvent.GO_TO_CALL_SCREEN, async ({ payload, isDecline = false }) => {
+			if (isDecline) {
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					payload?.callerId,
+					WebrtcSignalingType.WEBRTC_SDP_QUIT,
+					'',
+					payload?.channelId,
+					''
+				);
+				return;
+			}
 			dispatch(appActions.setLoadingMainMobile(true));
 			dispatch(DMCallActions.setIsInCall(true));
 			const signalingData = {

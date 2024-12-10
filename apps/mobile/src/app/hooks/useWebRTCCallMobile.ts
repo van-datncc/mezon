@@ -10,6 +10,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { deflate, inflate } from 'react-native-gzip';
+import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription, mediaDevices } from 'react-native-webrtc';
@@ -66,7 +67,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const [localMediaControl, setLocalMediaControl] = useState<MediaControl>({
 		mic: false,
 		camera: !!isVideoCall,
-		speaker: true
+		speaker: false
 	});
 	const dialToneRef = useRef<Sound | null>(null);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
@@ -546,6 +547,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 	const toggleSpeaker = () => {
 		try {
+			InCallManager.setSpeakerphoneOn(!localMediaControl.speaker);
 			setLocalMediaControl((prev) => ({
 				...prev,
 				speaker: !prev.speaker
