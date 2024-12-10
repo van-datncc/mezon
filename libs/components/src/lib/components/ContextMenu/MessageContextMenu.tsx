@@ -381,6 +381,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		setIsShowCreateTopic(true);
 		dispatch(topicsActions.setOpenTopicMessageState(true));
 		setValueTopic(message);
+		dispatch(topicsActions.setCurrentTopicId(''));
 	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
 
 	const checkPos = useMemo(() => {
@@ -628,10 +629,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
 			);
 		});
-
-		builder.when(checkPos, (builder) => {
-			builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
-		});
+		message.code !== 9 &&
+			builder.when(checkPos, (builder) => {
+				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
+			});
 
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);

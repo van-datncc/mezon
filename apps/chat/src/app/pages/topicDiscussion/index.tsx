@@ -18,7 +18,10 @@ const TopicDiscussionMain = () => {
 		[currentChannelId, dispatch]
 	);
 
-	useEscapeKey(() => setIsShowCreateTopic(false));
+	useEscapeKey(() => {
+		setIsShowCreateTopic(false);
+		dispatch(topicsActions.setCurrentTopicId(''));
+	});
 
 	return (
 		<div className="flex flex-col h-full">

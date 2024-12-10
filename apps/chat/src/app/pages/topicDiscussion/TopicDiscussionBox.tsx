@@ -37,7 +37,9 @@ const TopicDiscussionBox = () => {
 			await dispatch(fetchMessages({ channelId: currentTopicId as string, clanId: currentClanId as string }));
 			setIsFetchMessageDone(true);
 		};
-		fetchMsgResult();
+		if (currentTopicId !== '') {
+			fetchMsgResult();
+		}
 	}, [currentClanId, currentTopicId]);
 
 	const createTopic = useCallback(async () => {

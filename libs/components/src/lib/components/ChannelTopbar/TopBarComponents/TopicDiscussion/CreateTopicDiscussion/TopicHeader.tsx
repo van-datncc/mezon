@@ -30,6 +30,7 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 	const handleCloseModal = () => {
 		setTurnOffThreadMessage();
 		setIsShowCreateTopic(false);
+		dispatch(topicsActions.setCurrentTopicId(''));
 		setRequestInput({ ...request, valueTextInput: '' }, true);
 	};
 
