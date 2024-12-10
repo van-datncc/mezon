@@ -1,6 +1,6 @@
-import { selectAllAuditLogData, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { selectAllAuditLogData, selectChannelById, selectMemberClanByUserId, selectRoleByRoleId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { ActionLog, convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { ApiAuditLog } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -33,8 +33,12 @@ type AuditLogItemProps = {
 
 const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 	const auditLogTime = convertTimeString(logItem?.time_log as string);
-	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem.user_id ?? ''));
+	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem?.user_id ?? ''));
 	const userName = userAuditLogItem?.user?.username;
+	const userMention = useAppSelector(selectMemberClanByUserId(logItem?.entity_id ?? ''));
+	const clanRole = useSelector(selectRoleByRoleId(logItem?.entity_id ?? ''));
+	const userNameMention = userMention?.user?.username;
+	const channel = useAppSelector((state) => selectChannelById(state, logItem?.channel_id || ''));
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
 
 	return (
@@ -56,8 +60,38 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 			</div>
 			<div>
 				<div className="one-line">
-					<span>{userName}</span> <span className="lowercase">{logItem.action_log}</span>
-					<strong className="dark:text-white text-black font-medium"> #{logItem.entity_name || logItem.entity_id}</strong>
+					{(logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT) &&
+					logItem?.channel_id !== '0' ? (
+						<span>
+							<span>{userName}</span>{' '}
+							<span className="lowercase">
+								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT
+									? 'add'
+									: 'remove'}{' '}
+								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT
+									? userNameMention
+									: clanRole?.title}{' '}
+								({logItem?.entity_id}) to channel
+							</span>
+							<strong className="dark:text-white text-black font-medium">
+								{' '}
+								#{channel?.channel_label} ({channel?.channel_id})
+							</strong>
+						</span>
+					) : (
+						<span>
+							<span>{userName}</span> <span className="lowercase">{logItem?.action_log}</span>
+							<strong className="dark:text-white text-black font-medium">
+								{' '}
+								#{logItem?.entity_name || logItem?.entity_id} {logItem?.entity_name && `(${logItem?.entity_id})`}
+							</strong>
+						</span>
+					)}
 				</div>
 				<div className="text-sm text-gray-500">{auditLogTime}</div>
 			</div>

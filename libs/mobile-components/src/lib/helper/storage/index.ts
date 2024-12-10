@@ -1,3 +1,4 @@
+import { safeJSONParse } from 'mezon-js';
 import { MMKV } from 'react-native-mmkv';
 
 const appName = 'Mezon';

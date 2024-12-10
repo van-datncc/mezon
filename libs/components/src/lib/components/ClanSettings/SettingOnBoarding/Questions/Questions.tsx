@@ -9,7 +9,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiOnboardingItem, OnboardingAnswer } from 'mezon-js/api.gen';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { EOnboardingStep } from '..';
@@ -29,21 +29,17 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 
 	const formOnboarding = useSelector(selectFormOnboarding);
 
-	const [preJoinQuestions, setPreJoinQuestion] = useState<number>(formOnboarding.questions.length || 0);
-	const [postJoinQuestions, setPostJoinQuestion] = useState<number>(0);
 	const dispatch = useAppDispatch();
 	const handleAddPreJoinQuestion = () => {
 		dispatch(
 			onboardingActions.addQuestion({
-				answers: [],
-				title: '',
-				guide_type: EGuideType.QUESTION
+				data: {
+					answers: [],
+					title: '',
+					guide_type: EGuideType.QUESTION
+				}
 			})
 		);
-	};
-
-	const handleAddPostJoinQuestion = () => {
-		setPostJoinQuestion(postJoinQuestions + 1);
 	};
 
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -112,26 +108,6 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 							<div>Add a Question</div>
 						</div>
 					</div>
-					<div className="border-t border-[#4e5058]" />
-					<div className="flex flex-col gap-2 cursor-pointer">
-						<div className="text-[16px] text-white font-bold">Post-join Questions</div>
-						<div>
-							Members will be asked these questions after they join your server, on the Channels & Roles page. Use them to assign roles
-							that members can pick later, like vanity roles.
-						</div>
-						{Array(postJoinQuestions)
-							.fill(1)
-							.map((question, index) => (
-								<QuestionItem key={index} question={formOnboarding.questions[index]} index={index} />
-							))}
-						<div
-							onClick={handleAddPostJoinQuestion}
-							className="rounded-xl text-[#949cf7] justify-center items-center p-4 border-2 border-[#4e5058] border-dashed font-medium flex gap-2"
-						>
-							<Icons.CirclePlusFill className="w-5" />
-							<div>Add a Question</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -141,16 +117,68 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem; index: number; tempId?: number }) => {
 	const [titleQuestion, setTitleQuestion] = useState(question?.title || '');
 	const [answers, setAnswer] = useState<OnboardingAnswer[]>(question?.answers || []);
-
+	const [indexEditAnswer, setIndexEditAnswer] = useState<number | undefined>(undefined);
 	const dispatch = useAppDispatch();
 
+	const handleAddAnswers = (answer: OnboardingAnswer, edit?: number) => {
+		if (indexEditAnswer !== undefined) {
+			const listAnswers = [...answers];
+			listAnswers[indexEditAnswer] = answer;
+			setAnswer(listAnswers);
+			handleCloseEditAnswer();
+			return;
+		}
+		setAnswer([...answers, answer]);
+	};
+
+	const handleRemoveAnswer = () => {
+		if (indexEditAnswer !== undefined) {
+			const newAnswers = [...answers];
+			newAnswers.splice(indexEditAnswer, 1);
+			setAnswer(newAnswers);
+			dispatch(
+				onboardingActions.editOnboarding({
+					clan_id: question.clan_id as string,
+					idOnboarding: question.id as string,
+					content: {
+						...question,
+						title: titleQuestion,
+						answers: newAnswers,
+						task_type: EGuideType.QUESTION
+					}
+				})
+			);
+		}
+		handleCloseEditAnswer();
+	};
+
+	const handleCloseEditAnswer = () => {
+		closeAnswerPopup();
+		setIndexEditAnswer(undefined);
+	};
 	const [openAnswerPopup, closeAnswerPopup] = useModal(
 		() => (
-			<ModalAddAnswer closeAnswerPopup={closeAnswerPopup} answers={answers} setAnswer={setAnswer} titleQuestion={titleQuestion} index={index} />
+			<ModalAddAnswer
+				closeAnswerPopup={closeAnswerPopup}
+				handleRemove={handleRemoveAnswer}
+				editValue={indexEditAnswer !== undefined ? answers[indexEditAnswer] : undefined}
+				setAnswer={handleAddAnswers}
+				titleQuestion={titleQuestion}
+				index={index}
+			/>
 		),
-		[titleQuestion]
+		[titleQuestion, answers.length, indexEditAnswer]
 	);
 
+	useEffect(() => {
+		if (indexEditAnswer !== undefined) {
+			openAnswerPopup();
+		}
+	}, [indexEditAnswer]);
+
+	const handleOpenEditAnswer = (index: number) => {
+		setIndexEditAnswer(index);
+	};
 	const [isExpanded, setIsExpanded] = useState(question ? false : true);
 
 	const handleQuestionOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,14 +190,32 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 	};
 
 	const handleAddQuestion = () => {
+		toggleExpand();
+		if (tempId !== undefined) {
+			dispatch(
+				onboardingActions.addQuestion({
+					data: {
+						title: titleQuestion,
+						answers: answers,
+						guide_type: EGuideType.QUESTION
+					},
+					update: tempId
+				})
+			);
+			return;
+		}
 		dispatch(
-			onboardingActions.addQuestion({
-				title: titleQuestion,
-				answers: answers,
-				guide_type: EGuideType.QUESTION
+			onboardingActions.editOnboarding({
+				clan_id: question.clan_id as string,
+				idOnboarding: question.id as string,
+				content: {
+					...question,
+					title: titleQuestion,
+					answers: answers,
+					task_type: EGuideType.QUESTION
+				}
 			})
 		);
-		toggleExpand();
 	};
 
 	const handleRemoveQuestion = () => {
@@ -223,21 +269,22 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 				<>
 					<div className="flex flex-col gap-2">
 						<div>Available answers - 0 of 50</div>
-						<div className="flex gap-[1%] gap-y-2 flex-wrap">
-							{answers.map((answer) => (
+						<div className="flex gap-1 gap-y-2 flex-wrap">
+							{answers.map((answer, index) => (
 								<GuideItemLayout
+									onClick={() => handleOpenEditAnswer(index)}
 									key={answer.title}
 									icon={answer.emoji}
 									description={answer.description}
 									title={answer.title}
-									className="w-[49.5%] rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+									className={`w-fit min-h-6 rounded-xl hover:bg-transparent text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${answer.description ? 'py-2' : ''}`}
 								/>
 							))}
 							<GuideItemLayout
 								onClick={openAnswerPopup}
 								icon={<Icons.CirclePlusFill className="w-5" />}
 								title={'Add an Answer'}
-								className="w-[49.5%] hover:bg-transparent rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c] border-dashed font-medium flex gap-2"
+								className="w-fit hover:bg-transparent rounded-xl text-white justify-center items-center p-4 border-2 border-[#4e5058] hover:border-[#7d808c] border-dashed font-medium flex gap-2"
 							/>
 						</div>
 					</div>
@@ -268,14 +315,15 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 export default Questions;
 type ModalAddAnswerProp = {
 	closeAnswerPopup: () => void;
-	setAnswer: React.Dispatch<React.SetStateAction<OnboardingAnswer[]>>;
-	answers: OnboardingAnswer[];
+	setAnswer: (answers: OnboardingAnswer, edit?: number) => void;
 	titleQuestion: string;
 	index: number;
+	editValue?: OnboardingAnswer;
+	handleRemove?: () => void;
 };
-const ModalAddAnswer = ({ closeAnswerPopup, index, answers, setAnswer, titleQuestion }: ModalAddAnswerProp) => {
-	const [titleAnswer, setTitleAnswer] = useState('');
-	const [answerDescription, setAnswerDescription] = useState('');
+const ModalAddAnswer = ({ closeAnswerPopup, index, setAnswer, titleQuestion, editValue, handleRemove }: ModalAddAnswerProp) => {
+	const [titleAnswer, setTitleAnswer] = useState(editValue?.title || '');
+	const [answerDescription, setAnswerDescription] = useState(editValue?.description || '');
 
 	const handleChangeTitleAnswer = (e: ChangeEvent<HTMLInputElement>) => {
 		setTitleAnswer(e.target.value);
@@ -286,13 +334,18 @@ const ModalAddAnswer = ({ closeAnswerPopup, index, answers, setAnswer, titleQues
 	};
 
 	const handleSaveAnswer = () => {
-		setAnswer([...answers, { title: titleAnswer, description: answerDescription }]);
+		setAnswer({ title: titleAnswer, description: answerDescription }, editValue ? index : undefined);
 		setTitleAnswer('');
 		setAnswerDescription('');
 		closeAnswerPopup();
 	};
+	const handleRemoveAnswer = () => {
+		if (handleRemove) {
+			handleRemove();
+		}
+	};
 	return (
-		<ModalControlRule bottomLeftBtn="Remove" onClose={closeAnswerPopup} onSave={handleSaveAnswer}>
+		<ModalControlRule bottomLeftBtn="Remove" bottomLeftBtnFunction={handleRemoveAnswer} onClose={closeAnswerPopup} onSave={handleSaveAnswer}>
 			<>
 				<div className="absolute top-5 flex flex-col gap-2">
 					<div className="uppercase text-xs font-medium">Question {index + 1}</div>

@@ -376,8 +376,9 @@ export const setupCallKeep = async () => {
 	}
 };
 
-const showRNNotificationCall = async (bodyData: any) => {
+const showRNNotificationCall = async (bodyData: any, callID: string) => {
 	try {
+		await notifee.cancelAllNotifications();
 		const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
 		if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return;
 		const answerOption = {
@@ -399,17 +400,17 @@ const showRNNotificationCall = async (bodyData: any) => {
 				callerName: bodyData?.callerName
 			}
 		};
-		RNNotificationCall.displayNotification(uuid.v4(), bodyData?.callerAvatar, 30000, answerOption);
+		RNNotificationCall.displayNotification(callID, bodyData?.callerAvatar, 30000, answerOption);
 		RNNotificationCall.addEventListener('endCall', (data: any) => {
-			const { callUUID = '' } = data || {};
-			RNCallKeep.endCall(callUUID);
-			RNNotificationCall.declineCall(callUUID);
+			const { payload = {} } = data || {};
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}'), isDecline: true });
+			}, 3000);
 		});
 		RNNotificationCall.addEventListener('answer', (data: any) => {
-			RNNotificationCall.backToApp();
 			RNNotificationCall.hideNotification();
-			const { callUUID = '', payload = {} } = data || {};
-			RNCallKeep.endCall(callUUID);
+			RNNotificationCall.backToApp();
+			const { payload = {} } = data || {};
 			setTimeout(() => {
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
 			}, 3000);
@@ -438,15 +439,21 @@ const listRNCallKeep = async (bodyData: any) => {
 export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = safeJSONParse(body || '{}');
-		const statusSetup = await setupCallKeep();
-		if (!statusSetup) return;
-
+		// const statusSetup = await setupCallKeep();
+		// if (!statusSetup) return;
+		const options = {
+			playSound: true,
+			vibration: true,
+			sound: 'ringing',
+			vibrationPattern: [0, 500, 1000]
+		};
+		const callID = uuid.v4()?.toString();
+		RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', false, options);
 		if (Platform.OS === 'android') {
-			await showRNNotificationCall(bodyData);
+			await showRNNotificationCall(bodyData, callID);
 		} else {
 			await listRNCallKeep(bodyData);
 		}
-		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {
 		console.error('log  => setupIncomingCall', error);
 		/* empty */

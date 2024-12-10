@@ -32,6 +32,9 @@
         "language": "Language Settings",
         "profile": "Profile Settings",
         "account": "Account",
-        "blockedUsers": "Blocked Users"
+        "blockedUsers": "Blocked Users",
+        "sendToken": "Send Token",
+        "withdrawToken": "Withdraw Token",
+        "historyTransaction": "History Transaction"
     }
 }

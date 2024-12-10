@@ -123,6 +123,7 @@ body {
 
 .selected-image-wrapper {
     flex: 1;
+    box-sizing: border-box;
     padding: 20px;
     width: 100%;
     display: flex;
@@ -143,7 +144,7 @@ body {
     height: 100%;
     background-color: #0B0B0B;
     padding:  0 10px;
-    display: flex;s
+    display: flex;
     flex-direction: column;
     gap: 20px;
     overflow-y: hidden;
@@ -192,6 +193,9 @@ body {
 
 .thumbnail {
     width: 88px;
+    max-width: 88px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
     height: 88px;
     object-fit: cover;
     border-radius: 6px;

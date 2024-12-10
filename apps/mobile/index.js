@@ -7,9 +7,9 @@ import { createLocalNotification, setupIncomingCall } from './src/app/utils/push
 notifee.onBackgroundEvent(async () => {});
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-	const title = remoteMessage?.notification?.title;
-	if (title === 'Incoming call') {
-		await setupIncomingCall(remoteMessage?.notification?.body);
+	const offer = remoteMessage?.data?.offer;
+	if (offer) {
+		await setupIncomingCall(offer);
 	} else {
 		await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 	}

@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonButton } from '../../componentUI';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
 import { CustomStatusUser, EUserStatus } from '../../components/CustomStatusUser';
+import { SendTokenUser } from '../../components/SendTokenUser';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -42,6 +43,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation('profile');
 	const [isVisibleAddStatusUserModal, setIsVisibleAddStatusUserModal] = useState<boolean>(false);
 	const userStatusBottomSheetRef = useRef<BottomSheetModal>(null);
+	const userSendTokenBottomSheetRef = useRef<BottomSheetModal>(null);
 	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
@@ -124,6 +126,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		userStatusBottomSheetRef?.current?.present();
 	};
 
+	const showSendTokenBottomSheet = () => {
+		userSendTokenBottomSheetRef?.current?.present();
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
@@ -196,7 +202,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
 					<Block flexDirection="row" alignItems="center" gap={size.s_10} marginTop={size.s_10}>
 						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
-						<Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
+						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
+							<Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
+						</TouchableOpacity>
 					</Block>
 					{userCustomStatus ? (
 						<Block flexDirection="row" alignItems="center" justifyContent="space-between">
@@ -271,6 +279,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				ref={userStatusBottomSheetRef}
 				handleCustomUserStatus={handleCustomUserStatus}
 			/>
+			<SendTokenUser ref={userSendTokenBottomSheetRef} />
 		</View>
 	);
 };

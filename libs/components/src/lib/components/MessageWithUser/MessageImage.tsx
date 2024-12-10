@@ -53,20 +53,19 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
 				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
 					.then((data) => {
-						const imageList = data.payload as IAttachmentEntity[];
-						const imageListWithUploaderInfo = imageList
-							?.filter((image) => image.filetype?.includes('image'))
-							.map((image) => {
-								const uploader = directId ? allDmUsers[image.uploader as string] : allClanUsers[image.uploader as string];
-								return {
-									...image,
-									uploaderData: {
-										avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
-										name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-									},
-									url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
-								};
-							});
+						const attachmentList = data.payload as IAttachmentEntity[];
+						const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
+						const imageListWithUploaderInfo = imageList.map((image) => {
+							const uploader = directId ? allDmUsers[image.uploader as string] : allClanUsers[image.uploader as string];
+							return {
+								...image,
+								uploaderData: {
+									avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
+									name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
+								},
+								url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
+							};
+						});
 						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
 						return { imageListWithUploaderInfo, selectedImageIndex };
 					})

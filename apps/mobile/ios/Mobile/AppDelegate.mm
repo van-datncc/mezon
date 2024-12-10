@@ -8,6 +8,7 @@
 #import "RNCallKeep.h"
 #import <PushKit/PushKit.h>
 #import "RNVoipPushNotificationManager.h"
+#import <AVFoundation/AVFoundation.h>
 
 @implementation AppDelegate
 
@@ -47,6 +48,7 @@
     [self.window makeKeyAndVisible];
 
   self.initialProps = @{};
+  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
