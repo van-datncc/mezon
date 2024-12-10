@@ -8,5 +8,9 @@
 		<true/>
 	<key>com.apple.application-identifier</key>
 		<string>E9Y2J54ZH3.app.mezon.ai</string>
+    <key>com.apple.security.device.camera</key>
+        <true/>
+    <key>com.apple.security.device.microphone</key>
+        <true/>
 </dict>
 </plist>
