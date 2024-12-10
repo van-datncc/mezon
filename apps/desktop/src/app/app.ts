@@ -8,6 +8,7 @@ import { electronAppName, rendererAppName, rendererAppPort } from './constants';
 import tray from '../Tray';
 import setupAutoUpdates from './autoUpdates';
 import { ACTIVE_WINDOW, SET_ATTACHMENT_DATA, TRIGGER_SHORTCUT } from './events/constants';
+import setupRequestPermission from './requestPermission';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
 
@@ -56,6 +57,7 @@ export default class App {
 			App.setupWindowManager();
 			App.mainWindow.webContents.once('dom-ready', () => {
 				setupAutoUpdates();
+				setupRequestPermission();
 			});
 		}
 
