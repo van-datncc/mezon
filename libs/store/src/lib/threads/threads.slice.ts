@@ -83,7 +83,7 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchThreadsCached.clear(mezon, channelId, clanId);
+			fetchThreadsCached.delete(mezon, channelId, clanId);
 		}
 		const response = await fetchThreadsCached(mezon, channelId, clanId);
 		if (!response.channeldesc) {
@@ -102,7 +102,7 @@ export const fetchThread = createAsyncThunk('threads/fetchThreads', async ({ cha
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchThreadsCached.clear(mezon, channelId, clanId, threadId);
+			fetchThreadsCached.delete(mezon, channelId, clanId, threadId);
 		}
 		const response = await fetchThreadsCached(mezon, channelId, clanId, threadId);
 		if (!response.channeldesc) {

@@ -78,6 +78,12 @@ export const listChannelsByUserSlice = createSlice({
 		removeAll: listChannelsByUserAdapter.removeAll,
 		remove: listChannelsByUserAdapter.removeOne,
 		update: listChannelsByUserAdapter.updateOne,
+		upsertOne: listChannelsByUserAdapter.upsertOne,
+		removeByClanId: (state, action: PayloadAction<{ clanId: string }>) => {
+			const channels = listChannelsByUserAdapter.getSelectors().selectAll(state);
+			const channelsToRemove = channels.filter((channel) => channel.clan_id === action.payload.clanId).map((channel) => channel.id);
+			listChannelsByUserAdapter.removeMany(state, channelsToRemove);
+		},
 		updateLastSentTime: (state, action: PayloadAction<{ channelId: string }>) => {
 			const payload = action.payload;
 			const timestamp = Date.now() / 1000;

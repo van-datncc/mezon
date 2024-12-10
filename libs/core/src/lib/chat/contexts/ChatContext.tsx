@@ -25,10 +25,7 @@ import {
 	directSlice,
 	emojiSuggestionActions,
 	eventManagementActions,
-	fetchChannelMembers,
 	fetchDirectMessage,
-	fetchListFriends,
-	fetchMessages,
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
@@ -66,17 +63,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import {
-	ETypeLinkMedia,
-	IMessageSendPayload,
-	IMessageTypeCallLog,
-	ModeResponsive,
-	NotificationCode,
-	TIME_OFFSET,
-	ThreadStatus,
-	TypeMessage,
-	sleep
-} from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -305,18 +292,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
-				if (mess.attachments?.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))) {
-					const attachmentList: AttachmentEntity[] = mess.attachments?.map((attachment) => {
-						const dateTime = new Date();
+				const attachmentList: AttachmentEntity[] = (mess.attachments || [])?.map((attachment) => {
+					const dateTime = new Date();
+					return {
+						...attachment,
+						id: attachment.url as string,
+						create_time: dateTime.toISOString(),
+						uploader: mess.sender_id
+					};
+				});
 
-						return {
-							...attachment,
-							id: attachment.url as string,
-							create_time: dateTime.toISOString()
-						};
-					});
-					dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
-				}
+				dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
@@ -351,6 +337,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
+				// check
 				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
 				captureSentryError(message, 'onchannelmessage');
@@ -442,6 +429,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			if (notification.code === NotificationCode.FRIEND_REQUEST || notification.code === NotificationCode.FRIEND_ACCEPT) {
 				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
+				// Fecth 2 API
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
@@ -450,11 +438,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
+			if (!pin?.channel_id) return;
 			if (pin.operation === 1) {
-				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: pin.channel_id ?? '', noCache: true }));
-			}
-			if (pin.operation === 0) {
-				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
+				dispatch(pinMessageActions.clearPinMessagesCacheThunk(pin.channel_id));
 			}
 		},
 		[currentChannel?.channel_id, dispatch]
@@ -470,7 +456,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchannelremoved = useCallback(
 		(user: UserChannelRemovedEvent) => {
-			user?.user_ids.forEach((userID: any) => {
+			user?.user_ids.forEach((userID: string) => {
 				if (userID === userId) {
 					if (channelId === user.channel_id) {
 						navigate(`/chat/clans/${clanId}`);
@@ -480,19 +466,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+					dispatch(listChannelsByUserActions.remove(userID));
 				} else {
 					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-						dispatch(fetchDirectMessage({ noCache: true }));
-						dispatch(
-							fetchChannelMembers({
-								clanId: '',
-								channelId: directId || '',
-								noCache: true,
-								channelType: ChannelType.CHANNEL_TYPE_GROUP
-							})
-						);
+						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string }));
 					}
 				}
 			});
@@ -507,7 +485,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						navigate(`/chat/direct/friends`);
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+					dispatch(listChannelsByUserActions.remove(id));
 				} else {
 					dispatch(
 						channelMembers.actions.removeUserByUserIdAndClan({
@@ -526,13 +504,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchanneladded = useCallback(
 		async (userAdds: UserChannelAddedEvent) => {
+			if (!userAdds?.users?.length) return;
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					await dispatch(fetchDirectMessage({ noCache: true }));
-					dispatch(
-						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: true, isFetchingLatestMessages: false })
-					);
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT || userAdds.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
@@ -576,21 +552,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						}));
 					dispatch(usersClanActions.upsertMany(members));
 				}
-				await sleep(500);
-				dispatch(
-					channelMembersActions.fetchChannelMembers({
-						clanId: userAdds.clan_id || '',
-						channelId: userAdds.channel_id,
-						noCache: true,
-						channelType: userAdds.channel_type
-					})
-				);
-				dispatch(userChannelsActions.fetchUserChannels({ channelId: userAdds.channel_id, noCache: true }));
 
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					await dispatch(fetchDirectMessage({ noCache: true }));
-					dispatch(fetchListFriends({ noCache: true }));
-				}
+				const userIds = userAdds.users.map((item) => item.user_id);
+				dispatch(channelMembersActions.addNewMember({ channel_id: userAdds.channel_id, user_ids: userIds }));
+				dispatch(userChannelsActions.upsertMany(userIds));
+
+				// if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				// 	dispatch(fetchDirectMessage({ noCache: true }));
+				// 	dispatch(fetchListFriends({ noCache: true }));
+				// }
 			}
 		},
 		[userId, dispatch]
@@ -780,9 +750,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
+			if (channelCreated.creator_id === userId) return;
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
 
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
@@ -807,7 +778,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								id: extendChannelCreated.channel_id,
 								lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
 								lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
-								lastSeenPinMessage: '',
 								clanId: extendChannelCreated.clan_id ?? '',
 								isMute: false
 							}
@@ -821,12 +791,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
-			dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+			if (!clanDelete?.clan_id) return;
+			dispatch(listChannelsByUserActions.removeByClanId({ clanId: clanDelete.clan_id }));
 			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -834,9 +804,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchanneldeleted = useCallback(
 		(channelDeleted: ChannelDeletedEvent) => {
+			if (channelDeleted?.deletor === userId) return;
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
 			}
 		},
 		[dispatch]
@@ -857,22 +828,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
-						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
-						dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+						dispatch(channelsActions.update({ id: channelUpdated.channel_id, changes: { ...channelUpdated } }));
+						dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 				if (channelUpdated.app_url) {
-					dispatch(channelsActions.fetchAppChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					dispatch(channelsActions.updateAppChannel({ channelId: channelUpdated.channel_id, changes: { ...channelUpdated } }));
 				}
 				if (
 					channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD &&
 					channelUpdated.status === ThreadStatus.joined &&
 					channelUpdated.creator_id !== userId
 				) {
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+					dispatch(channelsActions.update({ id: channelUpdated.channel_id, changes: { ...channelUpdated } }));
+					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 				}
 			}
 		},

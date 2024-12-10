@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import {ETypeLinkMedia, IAttachmentEntity, IChannelAttachment, LoadingStatus} from '@mezon/utils';
+import { ETypeLinkMedia, IAttachmentEntity, IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
@@ -121,11 +121,14 @@ export const attachmentSlice = createSlice({
 		},
 		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
 			const currentChannelId = action?.payload?.channelId;
-			if (state.listAttachmentsByChannel[currentChannelId]) {
-				action?.payload?.listAttachments.map((attachment) => {
-					state.listAttachmentsByChannel?.[currentChannelId]?.unshift?.(attachment);
-				});
+
+			if (!state.listAttachmentsByChannel[currentChannelId]) {
+				state.listAttachmentsByChannel[currentChannelId] = [];
 			}
+
+			action?.payload?.listAttachments?.forEach((attachment) => {
+				state?.listAttachmentsByChannel[currentChannelId]?.unshift(attachment);
+			});
 		}
 	},
 	extraReducers: (builder) => {
@@ -217,6 +220,16 @@ export const selectAllListAttachmentByChannel = (channelId: string) =>
 			return [];
 		}
 		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
+	});
+
+export const selectAllListDocumentByChannel = (channelId: string) =>
+	createSelector(getAttachmentState, (state) => {
+		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
+			return [];
+		}
+		return state.listAttachmentsByChannel[channelId].filter(
+			(att) => !att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) && !att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
+		);
 	});
 
 export const checkListAttachmentExist = (channelId: string) =>

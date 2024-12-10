@@ -6,12 +6,12 @@ import {
 	RootState,
 	appActions,
 	audioCallActions,
+	pinMessageActions,
 	selectCloseMenu,
 	selectDmGroupCurrent,
 	selectIsInCall,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
-	selectPinMessageByChannelId,
 	selectStatusMenu,
 	selectTheme,
 	toastActions,
@@ -241,10 +241,13 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 }
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
+	const dispatch = useAppDispatch();
+
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
 
-	const handleShowPinMessage = () => {
+	const handleShowPinMessage = async () => {
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directId as string }));
 		setIsShowPinMessage(!isShowPinMessage);
 	};
 
@@ -253,7 +256,6 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const { directId } = useAppParams();
-	const pinMsgs = useSelector(selectPinMessageByChannelId(directId));
 
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
@@ -262,9 +264,6 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 						<Icons.PinRight isWhite={isShowPinMessage} />
 					</button>
-					{pinMsgs?.length > 0 && (
-						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
-					)}
 				</div>
 			</Tippy>
 			{isShowPinMessage && <PinnedMessages onClose={handleClose} rootRef={threadRef} />}

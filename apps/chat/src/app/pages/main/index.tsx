@@ -218,8 +218,8 @@ function MyApp() {
 			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
-				dispatch(fetchDirectMessage({ noCache: true }));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				dispatch(fetchDirectMessage({}));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 				openSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
