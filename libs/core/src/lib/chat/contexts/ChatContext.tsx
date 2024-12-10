@@ -63,15 +63,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import {
-	IMessageSendPayload,
-	IMessageTypeCallLog,
-	ModeResponsive,
-	NotificationCode,
-	TIME_OFFSET,
-	ThreadStatus,
-	TypeMessage
-} from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -479,6 +471,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string }));
+						// add members to group
 					}
 				}
 			});
@@ -512,6 +505,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchanneladded = useCallback(
 		async (userAdds: UserChannelAddedEvent) => {
+			//TODO: update payload backend add channel, list user ids by channel
 			if (!userAdds?.users?.length) return;
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
@@ -519,16 +513,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					await dispatch(fetchDirectMessage({ noCache: true }));
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT || userAdds.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
-					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
-					dispatch(
-						channelMembersActions.fetchChannelMembers({
-							clanId: userAdds.clan_id || '',
-							channelId: userAdds.channel_id,
-							noCache: true,
-							channelType: userAdds.channel_type
-						})
-					);
+					// dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
+					// dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
@@ -561,15 +547,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(usersClanActions.upsertMany(members));
 				}
 
-				const userIds = userAdds.users.map((item) => item.user_id);
-				dispatch(channelMembersActions.addNewMember({ channel_id: userAdds.channel_id, user_ids: userIds }));
-				dispatch(userChannelsActions.upsertMany(userIds));
-
 				// if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 				// 	dispatch(fetchDirectMessage({ noCache: true }));
 				// 	dispatch(fetchListFriends({ noCache: true }));
 				// }
 			}
+
+			const userIds = userAdds.users.map((item) => item.user_id);
+			dispatch(channelMembersActions.addNewMember({ channel_id: userAdds.channel_id, user_ids: userIds }));
+			dispatch(userChannelsActions.upsertMany(userIds));
 		},
 		[userId, dispatch]
 	);
@@ -750,7 +736,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
 			if (e.count > 0) {
-				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
+				const reactionEntity = mapReactionToEntity(e);
+				dispatch(reactionActions.setReactionDataSocket(reactionEntity));
+				dispatch(messagesActions.updateMessageReactions(reactionEntity));
 			}
 		},
 		[dispatch]
@@ -883,6 +871,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpermissionchanged = useCallback(
 		(userPermission: PermissionChangedEvent) => {
 			if (userId === userPermission.user_id && channelId === userPermission.channel_id) {
+				// update backend payload -> not use fetch
 				dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId || '', channelId, noCache: true }));
 			}
 		},
@@ -942,24 +931,42 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						})
 					);
 					if (roleEvent?.role?.role_user_list?.role_users) {
-						const userExists = roleEvent.role.role_user_list.role_users.some((user) => user.id === userId);
-						if (userExists) {
-							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						const { id, title } = roleEvent?.role || {};
+						const users = roleEvent.role.role_user_list.role_users;
+						const userExists = users.some((user) => user.id === userId);
+						if (userExists && id) {
+							dispatch(policiesActions.addOne({ id, title }));
 						}
-						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+						dispatch(
+							usersClanActions.updateManyRoleIds(
+								users.map((item) => ({
+									userId: item.id as string,
+									roleId: roleEvent.role.id as string
+								}))
+							)
+						);
 					}
 				}
 			} else if (roleEvent?.status === 1) {
 				if (userId !== roleEvent.user_id) {
 					if (roleEvent?.role?.role_user_list?.role_users) {
-						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+						const users = roleEvent.role.role_user_list.role_users;
+						dispatch(
+							usersClanActions.updateManyRoleIds(
+								users.map((item) => ({
+									userId: item.id as string,
+									roleId: roleEvent.role.id as string
+								}))
+							)
+						);
 					}
 					if (roleEvent.role.permission_list?.permissions || roleEvent.role.role_user_list?.role_users) {
 						const isUserResult = await dispatch(
 							rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
 						).unwrap();
 						if (isUserResult) {
-							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+							//TODO: check assign and unassign role
+							dispatch(policiesActions.updateOne({ id: roleEvent.role.id as string, changes: { title: roleEvent.role.title } }));
 						}
 					}
 					dispatch(rolesClanActions.update(roleEvent.role));
@@ -970,7 +977,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
 					).unwrap();
 					if (isUserResult) {
-						dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						dispatch(policiesActions.removeOne(roleEvent.role.id as string));
 					}
 					dispatch(rolesClanActions.remove(roleEvent.role.id || ''));
 				}
