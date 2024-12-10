@@ -156,12 +156,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 
 	return useMenuBuilderPlugin((builder) => {
 		builder.when(userId !== message.sender_id, (builder) => {
-			builder.addMenuItem(
-				'giveacoffee',
-				'Give a coffee',
-				handleItemClick,
-				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
-			);
+			builder.addMenuItem('giveacoffee', 'Give a coffee', handleItemClick, <Icons.DollarIcon defaultSize="w-5 h-5" />);
 		});
 	});
 }
@@ -251,7 +246,7 @@ function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPI
 		builder.when(
 			userId === currentChannel?.creator_id && mode !== ChannelStreamMode.STREAM_MODE_DM && mode !== ChannelStreamMode.STREAM_MODE_GROUP,
 			(builder) => {
-				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5 pointer-events-none " />);
+				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5" />);
 			}
 		);
 	});
