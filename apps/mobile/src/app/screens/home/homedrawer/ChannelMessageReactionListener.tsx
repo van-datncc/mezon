@@ -8,7 +8,7 @@ import { DeviceEventEmitter, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { IReactionMessageProps } from './components';
 
-const maxRetries = 20;
+const maxRetries = 10;
 const ChannelMessageReactionListener = React.memo(() => {
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
