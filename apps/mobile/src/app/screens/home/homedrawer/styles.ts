@@ -748,11 +748,12 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.s_14
 		},
-		messageTime: { fontSize: size.s_12, color: colors.text },
+		messageTime: { fontSize: size.s_10, color: colors.textDisabled },
 		textMention: {
 			fontSize: size.small,
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue
+			backgroundColor: colors.midnightBlue,
+			fontWeight: 'bold'
 		},
 		textPinMessage: {
 			fontSize: size.small,

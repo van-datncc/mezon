@@ -1,8 +1,9 @@
-import { Icons } from '@mezon/mobile-components';
-import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, MessagesEntity, selectAllChannelMemberIds, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { convertTimeString, ETokenMessage, TypeMessage } from '@mezon/utils';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
+import { MessagesEntity, messagesActions, selectAllChannelMemberIds, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { ETokenMessage, TypeMessage, convertTimeString } from '@mezon/utils';
 import React, { memo, useCallback, useMemo } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { style } from './styles';
 
 export const MessageLineSystem = memo(({ message }: { message: MessagesEntity }) => {
@@ -63,6 +64,10 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 		return elements;
 	}, [mentions, t]);
 
+	const onMention = useCallback((mentionedUser: string) => {
+		if (mentionedUser?.length) DeviceEventEmitter.emit(ActionEmitEvent.ON_MENTION_USER_MESSAGE_ITEM, mentionedUser);
+	}, []);
+
 	const dispatch = useAppDispatch();
 	const allUserIdsInChannel = getMemberIds;
 	const handleJumpToPinMessage = useCallback(
@@ -89,7 +94,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 					if (element.user_id) {
 						formattedContent.push(
 							allUserIdsInChannel?.includes(element?.user_id) || contentInElement === '@here' ? (
-								<Text style={styles.textMention} key={`mention-${index}`}>
+								<Text style={styles.textMention} key={`mention-${index}`} onPress={() => onMention(contentInElement)}>
 									{contentInElement}
 								</Text>
 							) : (
@@ -142,7 +147,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 		}
 
 		return formattedContent;
-	}, [elements, t, allUserIdsInChannel, styles, handleJumpToPinMessage]);
+	}, [elements, t, allUserIdsInChannel, styles, handleJumpToPinMessage, onMention]);
 
 	return (
 		<Block style={styles.wrapperMessageBox} marginVertical={size.s_10}>
@@ -154,7 +159,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 			<Block style={styles.messageSystemBox}>
 				<Text style={styles.messageText}>
 					{content}
-					<Text style={styles.messageTime}>{` ${messageTime}`}</Text>
+					<Text style={styles.messageTime}>{`   ${messageTime}`}</Text>
 				</Text>
 			</Block>
 		</Block>
