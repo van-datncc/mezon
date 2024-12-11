@@ -21,7 +21,10 @@ export const EmbedSelect = memo(({ select, messageId, buttonId, onSelectionChang
 	const [selectedOptions, setSelectedOptions] = useState<IMessageSelectOption[]>([]);
 
 	const handleSelectChanged = (option) => {
-		if (!selectedOptions.some((opt) => opt?.value === option?.value) && selectedOptions?.length < (select?.max_options || 1)) {
+		if ((!select?.max_options || select?.max_options === 1) && selectedOptions?.length === 1) {
+			setSelectedOptions([]);
+			setSelectedOptions((prev) => [...prev, option]);
+		} else if (!selectedOptions.some((opt) => opt?.value === option?.value) && selectedOptions?.length < (select?.max_options || 1)) {
 			setSelectedOptions((prev) => [...prev, option]);
 		}
 		if (selectedOptions?.filter((item) => item?.value === option?.value)?.length > 0) {

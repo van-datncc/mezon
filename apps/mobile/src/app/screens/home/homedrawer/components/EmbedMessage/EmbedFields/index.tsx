@@ -1,7 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
 import { EMessageComponentType, IFieldEmbed, IMessageRatioOption } from '@mezon/utils';
-import debounce from 'lodash.debounce';
 import { memo, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { MezonDateTimePicker } from '../../../../../../componentUI';
@@ -75,10 +74,6 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 		);
 	};
 
-	const handleChangeText = debounce((text: string, id: string) => {
-		handleChangeDataInput(text, id);
-	}, 500);
-
 	return (
 		<View style={styles.container}>
 			{!!groupedFields?.length &&
@@ -93,9 +88,9 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 										<View>
 											{fieldItem?.inputs?.type === EMessageComponentType.INPUT && (
 												<EmbedInput
+													messageId={message_id}
 													input={fieldItem?.inputs?.component}
 													buttonId={fieldItem?.inputs?.id}
-													onSelectionChanged={handleChangeText}
 												/>
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.SELECT && (

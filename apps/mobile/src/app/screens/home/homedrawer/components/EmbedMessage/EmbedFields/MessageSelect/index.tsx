@@ -2,9 +2,9 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../../../../../../componentUI';
-import MezonFakeInputBox, { IMezonFakeBoxProps } from '../../../../../../../componentUI/MezonFakeBox';
+import { IMezonFakeBoxProps } from '../../../../../../../componentUI/MezonFakeBox';
 import { style } from './styles';
 
 type ISelectItem = {
@@ -23,7 +23,7 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [currentValue, setCurrentValue] = useState(defaultValue);
-	const [currentContent, setCurrentContent] = useState(defaultValue?.value || placeholder);
+	const [currentContent, setCurrentContent] = useState(defaultValue?.title || placeholder);
 	const bottomSheetRef = useRef<BottomSheetModalMethods>();
 
 	function handleChange(item: ISelectItem) {
@@ -34,6 +34,7 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 	}
 
 	function handlePress() {
+		Keyboard.dismiss();
 		bottomSheetRef?.current?.present();
 	}
 
@@ -55,12 +56,12 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 	return (
 		<View>
 			<View style={styles.input}>
-				<MezonFakeInputBox
-					{...props}
-					postfixIcon={<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
-					value={currentContent as string}
-					onPress={handlePress}
-				/>
+				<TouchableOpacity onPress={handlePress}>
+					<View style={styles.fakeBox}>
+						<Text style={styles.text}>{currentContent as string}</Text>
+						<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+					</View>
+				</TouchableOpacity>
 			</View>
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={props.title}>
 				<View style={styles.bsContainer}>
