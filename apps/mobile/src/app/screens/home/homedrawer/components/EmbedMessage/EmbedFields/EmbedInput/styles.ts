@@ -12,6 +12,7 @@ export const style = (colors: Attributes) =>
 			marginBottom: size.s_10,
 			color: colors.textStrong,
 			fontSize: size.medium,
-			flexGrow: 1
+			flexGrow: 1,
+			backgroundColor: colors.secondary
 		}
 	});

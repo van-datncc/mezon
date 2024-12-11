@@ -1,3 +1,4 @@
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
 import { EMessageComponentType, IFieldEmbed, IMessageRatioOption } from '@mezon/utils';
@@ -19,6 +20,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 	const styles = style(themeValue);
 	const [checked, setChecked] = useState<number[]>([]);
 	const dispatch = useAppDispatch();
+	const { dismiss } = useBottomSheetModal();
 	const groupedFields = useMemo(() => {
 		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
 			if (!field?.inline) {
@@ -74,6 +76,11 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 		);
 	};
 
+	const handleDatePicked = (value, id) => {
+		dismiss();
+		handleChangeDataInput(value?.getTime()?.toString(), id);
+	};
+
 	return (
 		<View style={styles.container}>
 			{!!groupedFields?.length &&
@@ -102,9 +109,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 												/>
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
-												<MezonDateTimePicker
-													onChange={(value) => handleChangeDataInput(value?.getTime()?.toString(), fieldItem?.inputs?.id)}
-												/>
+												<MezonDateTimePicker onChange={(value) => handleDatePicked(value, fieldItem?.inputs?.id)} />
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.RADIO &&
 												fieldItem?.inputs?.component?.length &&

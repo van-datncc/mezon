@@ -30,7 +30,7 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 				message_id: messageId,
 				data: {
 					id: buttonId,
-					value: value
+					value: value.toString()
 				}
 			})
 		);
@@ -40,6 +40,7 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 		<TextInput
 			style={styles.TextInput}
 			placeholder={input?.placeholder}
+			placeholderTextColor={themeValue.text}
 			onChange={handleChange}
 			multiline={!!input?.textarea}
 			keyboardType={input.type === 'number' ? 'numeric' : 'default'}

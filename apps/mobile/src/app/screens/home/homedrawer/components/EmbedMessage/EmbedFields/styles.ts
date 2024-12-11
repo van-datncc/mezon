@@ -8,7 +8,8 @@ export const style = (colors: Attributes) =>
 			marginBottom: size.s_10
 		},
 		field: {
-			gap: size.s_6
+			gap: size.s_6,
+			marginTop: size.s_8
 		},
 		name: {
 			color: colors.white,
