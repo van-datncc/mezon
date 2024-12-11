@@ -90,7 +90,6 @@ export const deleteNotify = createAsyncThunk('notification/deleteNotify', async 
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId, noCache: true }));
 		return { ids };
 	} catch (error) {
 		captureSentryError(error, 'notification/deleteNotify');
