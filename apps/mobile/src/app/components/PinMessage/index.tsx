@@ -2,7 +2,7 @@ import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { AppDispatch, PinMessageEntity, pinMessageActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,12 +14,14 @@ const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => 
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
-
 	const dispatch = useDispatch<AppDispatch>();
 
+	useEffect(() => {
+		dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
+	}, [currentChannelId, dispatch]);
+
 	const handleUnpinMessage = (message: PinMessageEntity) => {
-		const channelId = currentChannelId;
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId, message_id: message.id }));
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId, message_id: message.id }));
 	};
 
 	return (
