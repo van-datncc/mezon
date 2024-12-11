@@ -10,7 +10,7 @@ export const ItemImageModal = React.memo(({ item, setImageDimensions }: RenderIt
 
 	return (
 		<FastImage
-			source={{ uri: isLoadFailProxy ? (item?.url ?? '') : createImgproxyUrl(item?.url ?? '', { width: 900, height: 900, resizeType: 'fit' }) }}
+			source={{ uri: isLoadFailProxy ? (item?.url ?? '') : createImgproxyUrl(item?.url ?? '', { width: 700, height: 700, resizeType: 'fit' }) }}
 			style={StyleSheet.absoluteFillObject}
 			resizeMode="contain"
 			onLoad={(e) => {

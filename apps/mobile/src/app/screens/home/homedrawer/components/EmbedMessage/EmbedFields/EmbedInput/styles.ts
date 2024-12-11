@@ -1,5 +1,5 @@
 import { Attributes, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -13,6 +13,8 @@ export const style = (colors: Attributes) =>
 			color: colors.textStrong,
 			fontSize: size.medium,
 			flexGrow: 1,
-			backgroundColor: colors.secondary
+			backgroundColor: colors.secondary,
+			minHeight: size.s_40,
+			paddingTop: Platform.OS === 'ios' ? size.s_10 : size.s_8
 		}
 	});

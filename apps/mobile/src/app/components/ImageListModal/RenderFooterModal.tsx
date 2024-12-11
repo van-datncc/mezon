@@ -51,7 +51,7 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 				<Block style={[styles.imageWrapper, isSelected && [styles.imageSelected, { width: imageSize.width }]]}>
 					<FastImage
 						source={{
-							uri: createImgproxyUrl(item?.url ?? '', { width: 100, height: 100, resizeType: 'fit' })
+							uri: createImgproxyUrl(item?.url ?? '', { width: 50, height: 50, resizeType: 'fit' })
 						}}
 						style={[styles.image]}
 						resizeMode={imageSelected ? 'cover' : 'contain'}
