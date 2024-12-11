@@ -2,7 +2,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
@@ -292,10 +292,9 @@ const RenderContent = memo(
 		}, [elements, t, mode]);
 
 		const divRef = useRef<HTMLDivElement>(null);
-		const [selectionIndex, setSelectionIndex] = useState({ startIndex: 0, endIndex: 0 });
 
 		// Calculate the index position within the div
-		const getIndex = (node: Node, offset: number) => {
+		const getSelectionIndex = (node: Node, offset: number) => {
 			let currentNode = node;
 			let totalOffset = offset;
 
@@ -312,37 +311,35 @@ const RenderContent = memo(
 		};
 
 		// Determine the selection's start and end index
-		const handleMouseUp = () => {
+		const getSelectionRange = () => {
 			const selection = window.getSelection();
 
 			// Ensure selection exists and is within the div
 			if (selection && selection.rangeCount > 0 && divRef.current) {
-				const range = selection.getRangeAt(0);
+				const range = selection?.getRangeAt(0);
 				const { startContainer, endContainer, startOffset, endOffset } = range;
 
-				// Check if selection is within the target div
+				// // Check if selection is within the target div
 				if (divRef.current.contains(startContainer) && divRef.current.contains(endContainer)) {
-					const startIndex = getIndex(startContainer, startOffset);
-					const endIndex = getIndex(endContainer, endOffset);
-					setSelectionIndex({ startIndex, endIndex });
+					const startIndex = getSelectionIndex(startContainer, startOffset);
+					const endIndex = getSelectionIndex(endContainer, endOffset);
+					return { startIndex, endIndex };
 				}
 			}
-		};
 
-		const handleMouseLeave = () => {
-			const selection = window.getSelection();
-			if (selection && selection.rangeCount > 0 && divRef.current && selection.toString().length) {
-				handleMouseUp();
-			}
+			return { startIndex: 0, endIndex: 0 };
 		};
 
 		const handleCopy = (event: React.ClipboardEvent<HTMLDivElement>) => {
+			const { startIndex, endIndex } = getSelectionRange();
+
 			const isSelectionHasMention = mentions.find((mention) => {
-				return (mention.s || 0) >= selectionIndex.startIndex && (mention.e as number) <= selectionIndex.endIndex;
+				return (mention.s || 0) >= startIndex && (mention.e as number) <= endIndex;
 			});
+
 			if (isSelectionHasMention) {
 				if (onCopy) {
-					onCopy(event, selectionIndex.startIndex, selectionIndex.endIndex);
+					onCopy(event, startIndex, endIndex);
 				}
 				return;
 			}
@@ -351,8 +348,6 @@ const RenderContent = memo(
 		return (
 			<div
 				ref={divRef}
-				onMouseUp={handleMouseUp}
-				onMouseLeave={handleMouseLeave}
 				onCopy={handleCopy}
 				style={
 					isJumMessageEnabled

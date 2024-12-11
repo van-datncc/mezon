@@ -12,11 +12,12 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { ChannelType, Client, Session } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
+import { ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import { MentionItem } from 'react-mentions';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import { Platform, getPlatform } from '../hooks/platform';
 import {
@@ -40,7 +41,8 @@ import {
 	MentionDataProps,
 	NotificationEntity,
 	SearchItemProps,
-	SenderInfoOptionals
+	SenderInfoOptionals,
+	UsersClanEntity
 } from '../types';
 export * from './file';
 export * from './mergeRefs';
@@ -959,3 +961,69 @@ export function formatNumber(amount: number, locales: string, currency = ''): st
 
 	return formattedAmount;
 }
+
+export const insertStringAt = (original: string, toInsert: string, index: number): string => {
+	if (index < 0 || index > original.length) {
+		throw new Error('Index out of bounds');
+	}
+
+	return original.slice(0, index) + toInsert + original.slice(index);
+};
+
+export const parsePastedMentionData = (data: string): { message: IMessageWithUser; startIndex: number; endIndex: number } | null => {
+	try {
+		return safeJSONParse(data);
+	} catch {
+		return null;
+	}
+};
+
+export const transformTextWithMentions = (
+	text: string,
+	mentions: ApiMessageMention[],
+	usersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>
+): string => {
+	let offsetAdjustment = 0;
+
+	for (const mention of mentions) {
+		const { s, e, user_id } = mention;
+		const start = (s || 0) + offsetAdjustment;
+		const end = (e as number) + offsetAdjustment;
+
+		const user = usersEntities?.[user_id as string];
+		if (user) {
+			const name = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
+			const replacement = `@[${name}](${user_id})`;
+			text = text.slice(0, start) + replacement + text.slice(end);
+			offsetAdjustment += replacement.length - (end - start);
+		}
+	}
+
+	return text;
+};
+
+export const generateMentionItems = (
+	mentions: ApiMessageMention[],
+	transformedText: string,
+	usersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>,
+	inputLength: number
+): MentionItem[] => {
+	return mentions
+		.map((mention) => {
+			const user = usersEntities?.[mention.user_id as string];
+			if (user) {
+				const name = user.clan_nick || user.user?.display_name || user.user?.username || '';
+				const mentionText = `@[${name}](${mention.user_id})`;
+				const index = transformedText.indexOf(mentionText);
+				return {
+					display: name,
+					id: user.id,
+					childIndex: 0,
+					index: ((index !== -1 ? index : (mention.s ?? 0)) as number) + inputLength,
+					plainTextIndex: (mention.s ?? 0) + inputLength
+				};
+			}
+			return null;
+		})
+		.filter((item): item is MentionItem => item !== null);
+};

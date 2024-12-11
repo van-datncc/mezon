@@ -1,8 +1,7 @@
 import {
-	useAppParams,
 	useChannelMembers,
 	useClickUpToEdit,
-	useCurrentInbox,
+	useCurrentChat,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
@@ -28,8 +27,6 @@ import {
 	selectCurrentChannelId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
-	selectEntitesUserClans,
-	selectGroupMembersEntities,
 	selectIdMessageRefEdit,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -53,7 +50,6 @@ import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	IMentionOnMessage,
-	IMessageWithUser,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	MentionReactInputProps,
@@ -68,9 +64,13 @@ import {
 	filterMentionsWithAtSign,
 	focusToElement,
 	formatMentionsToString,
+	generateMentionItems,
 	getDisplayMention,
+	insertStringAt,
+	parsePastedMentionData,
 	searchMentionsHashtag,
-	threadError
+	threadError,
+	transformTextWithMentions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -117,7 +117,6 @@ type HistoryItem = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const { directId } = useAppParams();
 	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -141,12 +140,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const allClanUsersEntities = useSelector(selectEntitesUserClans);
-	const allDmUsersEntities = useAppSelector((state) => selectGroupMembersEntities(state, directId));
+	const { currentChatUsersEntities, currentChat } = useCurrentChat();
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
-	const currentDmOrChannelId = useCurrentInbox()?.channel_id;
+	const currentDmOrChannelId = currentChat?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -676,93 +674,51 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, []);
 
-	const insertStringAt = (original: string, toInsert: string, index: number): string => {
-		if (index < 0 || index > original.length) {
-			throw new Error('Index out of bounds');
-		}
+	const onPasteMentions = useCallback(
+		(event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+			const pastedData = event.clipboardData.getData('text/mezon-mentions');
 
-		return original.slice(0, index) + toInsert + original.slice(index);
-	};
+			if (!pastedData) return;
 
-	const onPasteMentions = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-		const pastedData = event.clipboardData.getData('text/mezon-mentions');
+			const parsedData = parsePastedMentionData(pastedData);
+			if (!parsedData) return;
 
-		if (pastedData) {
-			const {
-				message: pastedContent,
-				startIndex,
-				endIndex
-			} = JSON.parse(pastedData) as {
-				message: IMessageWithUser;
-				startIndex: number;
-				endIndex: number;
-			};
-			const currentInputValueLength: number = (request?.valueTextInput ?? '').length;
+			const { message: pastedContent, startIndex, endIndex } = parsedData;
+			const currentInputValueLength = (request?.valueTextInput ?? '').length;
 			const currentFocusIndex = editorRef.current?.selectionStart as number;
 
-			// Transform plain text to mention markup
-			const transformedText = (() => {
-				if (!pastedContent?.content?.t || !pastedContent?.mentions) return pastedContent?.content?.t;
+			const transformedText =
+				pastedContent?.content?.t && pastedContent?.mentions
+					? transformTextWithMentions(pastedContent.content.t, pastedContent.mentions, currentChatUsersEntities)
+					: pastedContent?.content?.t || '';
 
-				let text = pastedContent.content.t;
-				let offsetAdjustment = 0; // Tracks changes in length after each replacement
-
-				for (const mention of pastedContent.mentions) {
-					const { s, e, user_id } = mention;
-
-					const start = (s || 0) + offsetAdjustment;
-					const end = (e as number) + offsetAdjustment;
-
-					const user = directId ? allDmUsersEntities?.[user_id as string] : allClanUsersEntities?.[user_id as string];
-
-					if (user) {
-						const name = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
-						const replacement = `@[${name}](${user_id})`;
-
-						text = text.slice(0, start) + replacement + text.slice(end);
-						offsetAdjustment += replacement.length - (end - start);
-					}
-				}
-
-				return text;
-			})();
-
-			const mentionRaw: MentionItem[] = pastedContent?.mentions?.map((mention) => {
-				const user = directId ? allDmUsersEntities?.[mention.user_id as string] : allClanUsersEntities?.[mention.user_id as string];
-				if (user) {
-					const name = user.clan_nick || user.user?.display_name || user.user?.username || '';
-					const mentionText = `@[${name}](${mention.user_id})`;
-					const index = transformedText?.indexOf(mentionText);
-					const mentionItem: MentionItem = {
-						display: name,
-						id: user.id,
-						childIndex: 0,
-						index: ((index !== -1 ? index : (mention.s ?? 0)) as number) + currentInputValueLength,
-						plainTextIndex: (mention.s ?? 0) + currentInputValueLength
-					};
-					return mentionItem;
-				}
-			}) as MentionItem[];
+			const mentionRaw = generateMentionItems(
+				pastedContent?.mentions || [],
+				transformedText,
+				currentChatUsersEntities,
+				currentInputValueLength
+			);
 
 			setRequestInput(
 				{
 					...request,
 					valueTextInput: insertStringAt(request?.valueTextInput || '', transformedText || '', currentFocusIndex),
-					content: insertStringAt(request?.content || '', pastedContent.content.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
+					content: insertStringAt(request?.content || '', pastedContent?.content?.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
 					mentionRaw: [...(request?.mentionRaw || []), ...mentionRaw]
 				},
 				props.isThread
 			);
 
-			const newFocusIndex = currentFocusIndex + (pastedContent.content.t?.slice(startIndex, endIndex) || '').length;
+			const newFocusIndex = currentFocusIndex + (pastedContent?.content?.t?.slice(startIndex, endIndex) || '').length;
 			setTimeout(() => {
 				editorRef.current?.focus();
 				editorRef.current?.setSelectionRange(newFocusIndex, newFocusIndex);
 			}, 0);
 
 			event.preventDefault();
-		}
-	};
+		},
+		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
+	);
 
 	return (
 		<div className="relative">

@@ -1354,3 +1354,7 @@ export interface IImageWindowProps {
 	selectedImageIndex: number;
 	images: Array<IAttachmentEntityWithUploader>;
 }
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
+}
