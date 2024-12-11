@@ -1,9 +1,10 @@
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
 import { EMessageComponentType, IFieldEmbed, IMessageRatioOption } from '@mezon/utils';
 import { memo, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import { MezonDateTimePicker } from '../../../../../../componentUI';
+import { EmbedDatePicker } from './EmbedDatePicker';
 import { EmbedInput } from './EmbedInput';
 import { EmbedRadioButton } from './EmbedRadioItem';
 import { EmbedSelect } from './EmbedSelect';
@@ -19,6 +20,7 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 	const styles = style(themeValue);
 	const [checked, setChecked] = useState<number[]>([]);
 	const dispatch = useAppDispatch();
+	const { dismiss } = useBottomSheetModal();
 	const groupedFields = useMemo(() => {
 		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
 			if (!field?.inline) {
@@ -101,9 +103,12 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 													onSelectionChanged={handleChangeDataInput}
 												/>
 											)}
+
 											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
-												<MezonDateTimePicker
-													onChange={(value) => handleChangeDataInput(value?.getTime()?.toString(), fieldItem?.inputs?.id)}
+												<EmbedDatePicker
+													input={fieldItem?.inputs?.component}
+													messageId={message_id}
+													buttonId={fieldItem?.inputs?.id}
 												/>
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.RADIO &&

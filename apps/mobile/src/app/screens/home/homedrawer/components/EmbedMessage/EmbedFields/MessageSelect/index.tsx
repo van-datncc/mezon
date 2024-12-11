@@ -28,7 +28,7 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 
 	function handleChange(item: ISelectItem) {
 		setCurrentValue(item);
-		setCurrentContent(data?.filter((item) => item.value === item?.value)?.[0]?.title || placeholder);
+		setCurrentContent(item?.title || placeholder);
 		bottomSheetRef?.current?.dismiss();
 		onChange && onChange(item);
 	}
