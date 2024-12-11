@@ -17,6 +17,8 @@ import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } fr
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import { electronBridge } from '../bridge';
+import { REQUEST_PERMISSION_CAMERA, REQUEST_PERMISSION_MICROPHONE } from '../bridge/electron/constants';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import { Platform, getPlatform } from '../hooks/platform';
 import {
@@ -937,6 +939,14 @@ export function copyChannelLink(clanId: string, channelId: string) {
 
 export const requestMediaPermission = async (mediaType: 'audio' | 'video'): Promise<IPermissonMedia> => {
 	try {
+		if (isMacDesktop) {
+			if (mediaType === 'audio') {
+				await electronBridge.invoke(REQUEST_PERMISSION_MICROPHONE);
+			}
+			if (mediaType === 'video') {
+				await electronBridge.invoke(REQUEST_PERMISSION_CAMERA);
+			}
+		}
 		const stream = await navigator.mediaDevices.getUserMedia({ [mediaType]: true });
 		stream.getTracks().forEach((track) => track.stop());
 		return 'granted';

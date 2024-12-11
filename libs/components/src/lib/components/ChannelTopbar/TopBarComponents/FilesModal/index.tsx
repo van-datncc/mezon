@@ -1,7 +1,7 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { selectAllListDocumentByChannel, selectCurrentChannel, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { RefObject, useRef } from 'react';
+import { RefObject, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyFile from './EmptyFile';
 import FileItem from './FileItem';
@@ -14,11 +14,16 @@ type FileModalProps = {
 
 const FileModal = ({ onClose, rootRef }: FileModalProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
+	const [keywordSearch, setKeywordSearch] = useState('');
 
 	const appearanceTheme = useSelector(selectTheme);
-	const attachments = useSelector(selectAllListDocumentByChannel((currentChannel?.channel_id ?? '') as string));
-
+	const allAttachments = useSelector(selectAllListDocumentByChannel((currentChannel?.channel_id ?? '') as string));
 	const modalRef = useRef<HTMLDivElement>(null);
+
+	const filteredAttachments = allAttachments.filter(
+		(attachment) => attachment.filename && attachment.filename.toLowerCase().includes(keywordSearch.toLowerCase())
+	);
+
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
 
@@ -34,7 +39,7 @@ const FileModal = ({ onClose, rootRef }: FileModalProps) => {
 						<Icons.FileIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">File</span>
 					</div>
-					<SearchFile />
+					<SearchFile setKeywordSearch={setKeywordSearch} />
 					<div className="flex flex-row items-center gap-4">
 						<button onClick={onClose}>
 							<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
@@ -42,13 +47,15 @@ const FileModal = ({ onClose, rootRef }: FileModalProps) => {
 					</div>
 				</div>
 				<div
-					className={`flex flex-col gap-2 py-2 dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+					className={`flex flex-col gap-2 py-2 dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${
+						appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'
+					}`}
 				>
-					{attachments?.map((attachment) => {
-						return <FileItem key={attachment?.id} attachmentData={attachment} />;
-					})}
+					{filteredAttachments.map((attachment) => (
+						<FileItem key={attachment.id} attachmentData={attachment} />
+					))}
 
-					{!attachments?.length && <EmptyFile />}
+					{!filteredAttachments.length && <EmptyFile />}
 				</div>
 			</div>
 		</div>

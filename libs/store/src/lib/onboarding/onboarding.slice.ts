@@ -317,6 +317,10 @@ export const onboardingSlice = createSlice({
 				state.keepAnswers[idQuestion] = state.keepAnswers[idQuestion].filter((value) => value !== answer);
 				return;
 			}
+			if (state.keepAnswers[idQuestion]) {
+				state.keepAnswers[idQuestion].push(answer);
+				return;
+			}
 			state.keepAnswers[idQuestion] = [answer];
 		}
 	},

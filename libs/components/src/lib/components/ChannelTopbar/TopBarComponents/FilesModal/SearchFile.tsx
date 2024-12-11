@@ -1,7 +1,9 @@
 import { Icons } from '@mezon/ui';
 
-const SearchFile = () => {
-	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {};
+const SearchFile = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<React.SetStateAction<string>> }) => {
+	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setKeywordSearch(event.target.value);
+	};
 
 	return (
 		<div className="relative">
