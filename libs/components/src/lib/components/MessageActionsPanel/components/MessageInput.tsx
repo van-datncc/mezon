@@ -37,12 +37,12 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 		);
 	}, 300);
 	return (
-		<div className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm text-sm text-left">
+		<div className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm text-sm text-left w-auto min-w-[300px]">
 			{textarea ? (
 				<textarea
 					onChange={handleChangeInput}
 					placeholder={placeholder + (required ? '*' : '')}
-					className={`outline-none p-4 py-2 bg-bgTertiary text-channelTextLabel rounded max-h-40`}
+					className={`outline-none p-4 py-2  dark:bg-bgTertiary bg-bgLightModeThird text-textSecondary800 dark:text-textSecondary rounded max-h-40 w-full hide-scrollbar`}
 					required={required}
 					defaultValue={input.defaultValue}
 				/>
@@ -52,7 +52,7 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 					min={type === 'number' ? 1 : undefined}
 					placeholder={placeholder + (required ? '*' : '')}
 					type={type}
-					className={`outline-none p-4 py-2 bg-bgTertiary text-channelTextLabel rounded`}
+					className={`outline-none p-4 py-2 dark:bg-bgTertiary bg-bgLightModeThird text-textSecondary800 dark:text-textSecondary rounded w-full hide-scrollbar`}
 					required={required}
 					defaultValue={input.defaultValue}
 					step={type === 'number' ? 0.5 : undefined}
