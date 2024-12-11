@@ -18,9 +18,11 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	const isEditing = useSelector(selectOpenEditMessageState);
 	const [isInitialRender, setIsInitialRender] = useState(isEditing);
+	const hasAttachment = !!mess?.attachments?.length;
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
-		mode: mode
+		mode: mode,
+		hasAttachment: hasAttachment
 	});
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 
