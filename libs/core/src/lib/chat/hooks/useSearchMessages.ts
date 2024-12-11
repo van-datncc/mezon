@@ -8,7 +8,8 @@ import {
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage,
 	selectValueInputSearchMessage,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
@@ -22,7 +23,9 @@ export function useSearchMessages() {
 	const currentChannelId = useSelector(selectCurrentChannelId) as string;
 	const currentDirectId = useSelector(selectDmGroupCurrentId) as string;
 	const isClanView = useSelector(selectClanView);
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(isClanView ? currentChannelId : currentDirectId));
+	const messageSearchByChannelId = useAppSelector((state) =>
+		selectMessageSearchByChannelId(state, isClanView ? currentChannelId : currentDirectId)
+	);
 	const valueSearchMessage = useSelector(selectValueInputSearchMessage((isClanView ? currentChannelId : currentDirectId) ?? ''));
 
 	const fetchSearchMessages = useCallback(

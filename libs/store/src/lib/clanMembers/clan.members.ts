@@ -50,6 +50,7 @@ export const UsersClanSlice = createSlice({
 		setAll: UsersClanAdapter.setAll,
 		add: UsersClanAdapter.addOne,
 		upsertMany: UsersClanAdapter.upsertMany,
+		updateMany: UsersClanAdapter.updateMany,
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanNick, clanAvt } = action.payload;
@@ -60,6 +61,15 @@ export const UsersClanSlice = createSlice({
 					clan_avatar: clanAvt
 				}
 			});
+		},
+		updateManyRoleIds: (state, action: PayloadAction<Array<{ userId: string; roleId: string }>>) => {
+			const updates = action.payload.map(({ userId, roleId }) => ({
+				id: userId,
+				changes: {
+					role_id: state.entities[userId]?.role_id ? [...new Set([...(state.entities[userId].role_id || []), roleId])] : [roleId]
+				}
+			}));
+			UsersClanAdapter.updateMany(state, updates);
 		},
 		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;

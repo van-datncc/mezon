@@ -43,7 +43,11 @@
         "notarize": {
           "teamId": "E9Y2J54ZH3"
         },
-        "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
+        "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile",
+        "extendInfo": {
+          "NSMicrophoneUsageDescription": "Mezon requires microphone access to enable audio call",
+          "NSCameraUsageDescription": "Mezon needs camera access to enable video call"
+        }
       },
       "win": {
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -175,7 +179,11 @@
           "notarize": {
             "teamId": "E9Y2J54ZH3"
           },
-          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
+          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile",
+          "extendInfo": {
+            "NSMicrophoneUsageDescription": "Mezon requires microphone access to enable audio call",
+            "NSCameraUsageDescription": "Mezon needs camera access to enable video call"
+          }
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -262,7 +270,11 @@
           "notarize": {
             "teamId": "E9Y2J54ZH3"
           },
-          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
+          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile",
+          "extendInfo": {
+            "NSMicrophoneUsageDescription": "Mezon requires microphone access to enable audio call",
+            "NSCameraUsageDescription": "Mezon needs camera access to enable video call"
+          }
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
