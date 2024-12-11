@@ -56,7 +56,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 				lines={lineValue as string}
 				mode={mode}
 			/>
-			{currentMessage?.code === 9 && (
+			{currentMessage?.code === TypeMessage.Topic && (
 				<div className="border border-black rounded-md p-2 w-[100px] flex justify-center items-center" onClick={handleOpenTopic}>
 					view topic
 				</div>

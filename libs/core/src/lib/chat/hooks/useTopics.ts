@@ -54,7 +54,6 @@ export function useTopics() {
 			nameValueTopic,
 			valueTopic,
 			setIsShowCreateTopic,
-			// setNameValueTopic,
 			setValueTopic,
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage
@@ -65,7 +64,6 @@ export function useTopics() {
 			nameTopicError,
 			nameValueTopic,
 			valueTopic,
-			// setNameValueTopic,
 			setIsShowCreateTopic,
 			setValueTopic,
 			setOpenTopicMessageState,
