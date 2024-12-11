@@ -112,6 +112,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+		const creatorId = currentEvent?.creator_id;
 
 		await updateEventManagement(
 			eventId || '',
@@ -122,7 +123,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 			timeValueStart,
 			timeValueEnd,
 			contentSubmit.description,
-			contentSubmit.logo
+			contentSubmit.logo,
+			creatorId || ''
 		);
 
 		hanldeCloseModal();

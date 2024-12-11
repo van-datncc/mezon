@@ -1234,7 +1234,11 @@ export enum ActionLog {
 	ADD_MEMBER_CHANNEL_ACTION_AUDIT = 'Add Member Channel',
 	REMOVE_MEMBER_CHANNEL_ACTION_AUDIT = 'Remove Member Channel',
 	ADD_ROLE_CHANNEL_ACTION_AUDIT = 'Add Role Channel',
-	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel'
+	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel',
+	ADD_MEMBER_THREAD_ACTION_AUDIT = 'Add Member Thread',
+	REMOVE_MEMBER_THREAD_ACTION_AUDIT = 'Remove Member Thread',
+	ADD_ROLE_THREAD_ACTION_AUDIT = 'Add Role Thread',
+	REMOVE_ROLE_THREAD_ACTION_AUDIT = 'Remove Role Thread'
 }
 
 export enum UserAuditLog {

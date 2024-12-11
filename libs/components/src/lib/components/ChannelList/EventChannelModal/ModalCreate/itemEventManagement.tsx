@@ -106,10 +106,10 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const checkTimeLocation = useMemo(() => differenceTime(end || '') < 0, [end]);
 	useEffect(() => {
 		if (checkTimeVoice && checkOptionVoice) {
-			deleteEventManagement(event?.clan_id || '', event?.id || '');
+			deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '');
 		}
 		if (checkTimeLocation && checkOptionLocation && !isReviewEvent) {
-			deleteEventManagement(event?.clan_id || '', event?.id || '');
+			deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '');
 		}
 	}, []);
 
