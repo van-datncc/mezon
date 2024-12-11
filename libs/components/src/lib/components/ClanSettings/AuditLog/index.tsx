@@ -18,6 +18,8 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 	const [isShowSearchMemberModal, setIsShowSearchMemberModal] = useState(false);
 	const actionModalRef = useRef<HTMLDivElement | null>(null);
 	const memberModalRef = useRef<HTMLDivElement | null>(null);
+	const [pageSize, setPageSize] = useState(10);
+	const [currentPage, setCurrentPage] = useState(1);
 
 	const handleSearchActionClick = useCallback(() => {
 		setIsShowSearchActionModal((prev) => !prev);
@@ -76,6 +78,8 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 									actionFilter={actionFilter}
 									userFilter={userFilter}
 									closeModal={closeModal}
+									pageSize={pageSize}
+									currentPage={currentPage}
 								/>
 							</div>
 						)}
@@ -98,6 +102,8 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 									currentClanId={currentClanId}
 									actionFilter={actionFilter}
 									closeModal={closeModal}
+									pageSize={pageSize}
+									currentPage={currentPage}
 								/>
 							</div>
 						)}
@@ -105,7 +111,7 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 				</div>
 			</div>
 
-			<MainAuditLog />
+			<MainAuditLog pageSize={pageSize} setPageSize={setPageSize} currentPage={currentPage} setCurrentPage={setCurrentPage} />
 		</div>
 	);
 };

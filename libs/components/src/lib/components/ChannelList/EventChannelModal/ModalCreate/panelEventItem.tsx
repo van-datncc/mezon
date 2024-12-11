@@ -19,11 +19,15 @@ type PanelEventItemProps = {
 function PanelEventItem(props: PanelEventItemProps) {
 	const { coords, event, onHandle, setOpenModalDelEvent, setOpenModalUpdateEvent, onClose, onTrigerEventUpdateId } = props;
 	const { userProfile } = useAuth();
-	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
+	const [isClanOwner, hasClanPermission, hasAdminPermission] = usePermissionChecker([
+		EPermission.clanOwner,
+		EPermission.manageClan,
+		EPermission.administrator
+	]);
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 
 	const canModifyEvent = useMemo(() => {
-		if (isClanOwner) {
+		if (isClanOwner || hasClanPermission || hasAdminPermission) {
 			return true;
 		}
 		const isEventICreated = event?.creator_id === userProfile?.user?.id;
@@ -32,7 +36,7 @@ function PanelEventItem(props: PanelEventItemProps) {
 		}
 
 		return Number(userMaxPermissionLevel) > Number(event?.max_permission);
-	}, [event?.creator_id, event?.max_permission, isClanOwner, userMaxPermissionLevel, userProfile?.user?.id]);
+	}, [event?.creator_id, event?.max_permission, hasAdminPermission, hasClanPermission, isClanOwner, userMaxPermissionLevel, userProfile?.user?.id]);
 
 	const handleDeleteEvent = async () => {
 		if (setOpenModalDelEvent) {

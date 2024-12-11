@@ -14,6 +14,8 @@ type SearchActionAuditLogProps = {
 	actionFilter: string;
 	userFilter?: IUserAuditLog | null;
 	closeModal: () => void;
+	pageSize: number;
+	currentPage: number;
 };
 
 const iconMap: { [key in ActionLog]: string } = {
@@ -62,10 +64,14 @@ const iconMap: { [key in ActionLog]: string } = {
 	[ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT]: '-',
 	[ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT]: '-',
 	[ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT]: '-',
-	[ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT]: '-'
+	[ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT]: '-',
+	[ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT]: '-',
+	[ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT]: '-',
+	[ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT]: '-',
+	[ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT]: '-'
 };
 
-const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchActionAuditLogProps) => {
+const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal, pageSize, currentPage }: SearchActionAuditLogProps) => {
 	const dispatch = useAppDispatch();
 	const appearanceTheme = useSelector(selectTheme);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -84,8 +90,8 @@ const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, cl
 				actionLog: action?.name === ActionLog.ALL_ACTION_AUDIT ? '' : action?.name,
 				userId: userFilter?.userId ?? '',
 				clanId: currentClanId ?? '',
-				page: 1,
-				pageSize: 10000
+				page: currentPage,
+				pageSize: pageSize
 			};
 			dispatch(auditLogList(body));
 		}
