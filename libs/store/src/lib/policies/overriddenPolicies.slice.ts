@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import { EOverriddenPermission } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ApiPermission } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -22,10 +22,41 @@ const initialState: OverriddenPermissionState = {
 	channelPermissions: overriddenPermissionAdapter.getInitialState()
 };
 
+interface UpdateChannelPermissionsPayload {
+	channelId: string;
+	permissions: Array<{
+		id: string;
+		slug: EOverriddenPermission;
+		active: number;
+	}>;
+}
+
 const overriddenPoliciesSlice = createSlice({
 	name: OVERRIDDEN_POLICIES_FEATURE_KEY,
 	initialState,
-	reducers: {},
+	reducers: {
+		updateChannelPermissions: (state, action: PayloadAction<UpdateChannelPermissionsPayload>) => {
+			const { channelId, permissions } = action.payload;
+			const maxPermissions = permissions.reduce<Record<EOverriddenPermission, ApiPermission>>(
+				(acc, perm) => {
+					if (perm.slug) {
+						acc[perm.slug] = {
+							id: perm.id,
+							slug: perm.slug,
+							active: perm.active
+						};
+					}
+					return acc;
+				},
+				{} as Record<EOverriddenPermission, ApiPermission>
+			);
+
+			overriddenPermissionAdapter.upsertOne(state.channelPermissions, {
+				channelId,
+				maxPermissions
+			});
+		}
+	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchMaxChannelPermission.fulfilled, (state, action) => {
 			overriddenPermissionAdapter.upsertOne(state?.channelPermissions, action.payload);
