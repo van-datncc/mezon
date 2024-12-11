@@ -37,7 +37,7 @@ import { selectCurrentDM } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
-import { reactionActions } from '../reactionMessage/reactionMessage.slice';
+import { ReactionEntity, reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -250,7 +250,11 @@ export const fetchMessages = createAsyncThunk(
 				};
 			}
 
-			if (Date.now() - response.time > 1000) {
+			if (!response.messages || Date.now() - response.time > 1000) {
+				const messages = channelMessagesAdapter
+					.getSelectors()
+					.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
+				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 				return {
 					messages: []
 				};
@@ -287,13 +291,12 @@ export const fetchMessages = createAsyncThunk(
 				messages = await MessageCrypt.decryptMessages(messages, currentUser.user?.id as string);
 			}
 
-			thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-
 			const lastLoadMessage = messages[messages.length - 1];
 			const hasMore = lastLoadMessage?.isFirst === false ? false : true;
 
 			if (messages.length > 0) {
 				thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
+				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 			}
 
 			if (response.last_seen_message?.id) {
@@ -776,6 +779,21 @@ export const messagesSlice = createSlice({
 		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
+		},
+
+		updateMessageReactions: (state, action: PayloadAction<ReactionEntity>) => {
+			const { channel_id, message_id, emoji_id, sender_id } = action.payload;
+			if (!state.channelMessages[channel_id]?.entities[message_id]) return;
+			const message = state.channelMessages[channel_id].entities[message_id];
+			if (!message.reactions) {
+				message.reactions = [];
+			}
+			const existingReactionIndex = message.reactions.findIndex((r) => r.emoji_id === emoji_id && r.sender_id === sender_id);
+			if (existingReactionIndex !== -1) {
+				message.reactions[existingReactionIndex].count++;
+			} else {
+				message.reactions.push(action.payload);
+			}
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
@@ -1369,6 +1387,7 @@ const handleSetManyMessages = ({
 	if (isClearMessage) {
 		state.channelMessages[channelId] = channelMessagesAdapter.setAll(state.channelMessages[channelId], adapterPayload);
 	} else {
+		if (!adapterPayload.length) return;
 		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 	}
 };

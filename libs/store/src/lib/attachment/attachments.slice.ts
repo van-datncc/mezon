@@ -227,9 +227,18 @@ export const selectAllListDocumentByChannel = (channelId: string) =>
 		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
 			return [];
 		}
-		return state.listAttachmentsByChannel[channelId].filter(
-			(att) => !att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) && !att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
-		);
+
+		return state.listAttachmentsByChannel[channelId].reduce<AttachmentEntity[]>((result, att) => {
+			const { filetype, filename } = att || {};
+			if (!filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) && !filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)) {
+				result.push({
+					...att,
+					filename: filename ?? 'File',
+					filetype: filetype ?? 'File'
+				});
+			}
+			return result;
+		}, []);
 	});
 
 export const checkListAttachmentExist = (channelId: string) =>

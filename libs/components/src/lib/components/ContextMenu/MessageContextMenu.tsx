@@ -536,7 +536,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 						console.error('Failed to give cofffee message', error);
 					}
 				},
-				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
+				<Icons.DollarIconRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -577,7 +577,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				activeMode !== ChannelStreamMode.STREAM_MODE_DM &&
 				activeMode !== ChannelStreamMode.STREAM_MODE_GROUP,
 			(builder) => {
-				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
+				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIconRightClick defaultSize="w-4 h-4" />);
 			}
 		);
 
