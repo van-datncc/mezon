@@ -80,17 +80,18 @@ function NotificationList({ rootRef }: NotificationProps) {
 	}, [notifications]);
 	const lastNotificationId = useSelector(selectLastNotificationId);
 	const handleScroll = () => {
-		if (listRef.current && lastNotificationId) {
-			const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-			if (scrollHeight - scrollTop === clientHeight) {
-				dispatch(
-					fetchListNotification({
-						clanId: currentClan?.id || '',
-						notificationId: lastNotificationId
-					})
-				);
-			}
-		}
+		if (!listRef.current || !lastNotificationId) return;
+
+		const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+
+		if (scrollHeight - scrollTop !== clientHeight) return;
+
+		dispatch(
+			fetchListNotification({
+				clanId: currentClan?.id || '',
+				notificationId: lastNotificationId
+			})
+		);
 	};
 
 	return (

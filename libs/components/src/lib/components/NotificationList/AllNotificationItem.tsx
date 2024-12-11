@@ -12,7 +12,6 @@ import { MessageLine } from '../MessageWithUser/MessageLine';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
-	onDeleteNotification?: () => void;
 };
 function convertContentToObject(notify: any) {
 	if (notify && notify.content && typeof notify.content === 'object') {
@@ -36,27 +35,14 @@ function convertContentToObject(notify: any) {
 	}
 	return notify;
 }
-function AllNotificationItem({ notify, onDeleteNotification }: NotifyMentionProps) {
+function AllNotificationItem({ notify }: NotifyMentionProps) {
 	const navigate = useNavigate();
-	const parseNotify = convertContentToObject(notify);
+	const parseNotify = useMemo(() => convertContentToObject(notify), [notify]);
 	const dispatch = useAppDispatch();
-	const messageId = useMemo(() => {
-		if (parseNotify.content) {
-			return parseNotify.content.message_id;
-		}
-	}, [parseNotify.content.message_id]);
-
-	const channelId = useMemo(() => {
-		if (parseNotify.content) {
-			return parseNotify.content.channel_id;
-		}
-	}, [parseNotify.content.channel_id]);
-
-	const clanId = useMemo(() => {
-		if (parseNotify.content) {
-			return parseNotify.content.clan_id;
-		}
-	}, [parseNotify.content.clan_id]);
+	const messageId = parseNotify.content.message_id;
+	const channelId = parseNotify.content.channel_id;
+	const clanId = parseNotify.content.clan_id;
+	const mode = parseNotify?.content?.mode - 1;
 
 	const handleClickJump = useCallback(() => {
 		dispatch(
@@ -64,7 +50,7 @@ function AllNotificationItem({ notify, onDeleteNotification }: NotifyMentionProp
 				clanId: clanId || '',
 				messageId: messageId,
 				channelId: channelId,
-				mode: parseNotify?.content?.mode - 1,
+				mode: mode,
 				navigate
 			})
 		);
@@ -74,6 +60,13 @@ function AllNotificationItem({ notify, onDeleteNotification }: NotifyMentionProp
 	const handleDeleteNotification = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, notificationId: string) => {
 		event.stopPropagation();
 		deleteNotify(notificationId, clanId ?? '0');
+	};
+
+	const allTabProps = {
+		message: parseNotify.content,
+		subject: parseNotify.subject,
+		code: parseNotify.code,
+		senderId: parseNotify.sender_id
 	};
 
 	return (
@@ -92,14 +85,7 @@ function AllNotificationItem({ notify, onDeleteNotification }: NotifyMentionProp
 					Jump
 				</button>
 			)}
-			{
-				<MentionTabContent
-					message={parseNotify.content}
-					subject={parseNotify.subject}
-					code={parseNotify.code}
-					senderId={parseNotify.sender_id}
-				/>
-			}
+			{<AllTabContent {...allTabProps} />}
 		</div>
 	);
 }
@@ -113,7 +99,7 @@ interface IMentionTabContent {
 	senderId?: string;
 }
 
-function MentionTabContent({ message, subject, code, senderId }: IMentionTabContent) {
+function AllTabContent({ message, subject, code, senderId }: IMentionTabContent) {
 	const contentUpdatedMention = addMention(message?.content, message?.mentions as IMentionOnMessage[]);
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 	const checkMessageHasReply = useMemo(() => {
