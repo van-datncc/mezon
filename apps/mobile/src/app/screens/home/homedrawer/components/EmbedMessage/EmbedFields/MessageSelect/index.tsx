@@ -54,13 +54,14 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 
 	return (
 		<View>
-			<MezonFakeInputBox
-				{...props}
-				postfixIcon={<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
-				value={currentContent as string}
-				onPress={handlePress}
-			/>
-
+			<View style={styles.input}>
+				<MezonFakeInputBox
+					{...props}
+					postfixIcon={<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
+					value={currentContent as string}
+					onPress={handlePress}
+				/>
+			</View>
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={props.title}>
 				<View style={styles.bsContainer}>
 					<MezonMenu menu={menu} />
