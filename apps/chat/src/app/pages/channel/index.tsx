@@ -350,12 +350,10 @@ interface IChannelMainProps {
 export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	const channelIdForChildren = useMemo(() => {
-		if (topicChannelId) {
-			return topicChannelId;
-		}
-		return currentChannel?.id || '';
-	}, [topicChannelId, currentChannel?.id]);
+	let chlId = currentChannel?.id || '';
+	if (topicChannelId) {
+		chlId = topicChannelId;
+	}
 
 	if (!currentChannel) {
 		return null;
@@ -363,8 +361,8 @@ export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 
 	return (
 		<>
-			<ChannelMainContent channelId={channelIdForChildren} />
-			<ChannelSeenListener channelId={channelIdForChildren} />
+			<ChannelMainContent channelId={chlId} />
+			<ChannelSeenListener channelId={chlId} />
 		</>
 	);
 }

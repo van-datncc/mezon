@@ -13,7 +13,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, sleep } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
@@ -90,8 +90,6 @@ const TopicDiscussionBox = () => {
 		[sessionRef, clientRef, socketRef, currentClanId, dispatch]
 	);
 
-	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -99,25 +97,22 @@ const TopicDiscussionBox = () => {
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
-			if (sessionUser) {
-				if (currentTopicId !== '') {
-					await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
-				} else {
-					const topic = (await createTopic()) as ApiSdTopic;
-					if (topic) {
-						dispatch(
-							messagesActions.updateToBeTopicMessage({
-								channelId: currentChannelId as string,
-								messageId: valueTopic?.id as string,
-								topicId: currentTopicId as string
-							})
-						);
-						await sleep(10);
-						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
-					}
-				}
+			if (!sessionUser) return;
+			if (currentTopicId !== '') {
+				await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
 			} else {
-				console.error('Session is not available');
+				const topic = (await createTopic()) as ApiSdTopic;
+				if (topic) {
+					dispatch(
+						messagesActions.updateToBeTopicMessage({
+							channelId: currentChannelId as string,
+							messageId: valueTopic?.id as string,
+							topicId: currentTopicId as string
+						})
+					);
+					await sleep(10);
+					await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
+				}
 			}
 		},
 		[createTopic, currentTopicId, currentTopicId, sendMessageTopic, sessionUser]

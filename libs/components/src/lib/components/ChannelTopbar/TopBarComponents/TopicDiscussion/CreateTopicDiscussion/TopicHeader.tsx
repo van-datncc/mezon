@@ -27,12 +27,12 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 
 	const { setRequestInput, request } = useMessageValue();
 
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setTurnOffThreadMessage();
 		setIsShowCreateTopic(false);
 		dispatch(topicsActions.setCurrentTopicId(''));
 		setRequestInput({ ...request, valueTextInput: '' }, true);
-	};
+	}, [dispatch]);
 
 	return (
 		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[60px] border-b-[1px] dark:border-bgTertiary border-bgLightTertiary">

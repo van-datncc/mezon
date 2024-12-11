@@ -222,11 +222,6 @@ export const selectOpenTopicMessageState = createSelector(getTopicsState, (state
 
 export const selectCurrentTopicId = createSelector(getTopicsState, (state: TopicDiscussionsState) => state.currentTopicId);
 
-export const selectNameValueTopic = (channelId: string) =>
-	createSelector(getTopicsState, (state) => {
-		return state.nameValueTopic?.[channelId] as string;
-	});
-
 export const selectIsShowCreateTopic = createSelector([getTopicsState, (_, channelId: string) => channelId], (state, channelId) => {
 	return !!state.isShowCreateTopic?.[channelId];
 });

@@ -3,7 +3,6 @@ import {
 	selectIsShowCreateTopic,
 	selectMessageTopicError,
 	selectNameTopicError,
-	selectNameValueTopic,
 	selectValueTopic,
 	topicsActions,
 	useAppDispatch
@@ -18,7 +17,6 @@ export function useTopics() {
 	const nameTopicError = useSelector(selectNameTopicError);
 	const messageTopicError = useSelector(selectMessageTopicError);
 	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannelId as string));
-	const nameValueTopic = useSelector(selectNameValueTopic(currentChannelId as string));
 	const valueTopic = useSelector(selectValueTopic);
 
 	const setTurnOffTopicMessage = useCallback(() => {
@@ -51,7 +49,6 @@ export function useTopics() {
 			isShowCreateTopic,
 			nameTopicError,
 			messageTopicError,
-			nameValueTopic,
 			valueTopic,
 			setIsShowCreateTopic,
 			setValueTopic,
@@ -62,7 +59,6 @@ export function useTopics() {
 			isShowCreateTopic,
 			messageTopicError,
 			nameTopicError,
-			nameValueTopic,
 			valueTopic,
 			setIsShowCreateTopic,
 			setValueTopic,
