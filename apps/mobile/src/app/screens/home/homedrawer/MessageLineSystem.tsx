@@ -91,10 +91,10 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 		const renderElement = (element, contentInElement, index) => {
 			switch (element.kindOf) {
 				case ETokenMessage.MENTIONS:
-					if (element.user_id) {
+					if (element?.user_id) {
 						formattedContent.push(
 							allUserIdsInChannel?.includes(element?.user_id) || contentInElement === '@here' ? (
-								<Text style={styles.textMention} key={`mention-${index}`} onPress={() => onMention(contentInElement)}>
+								<Text style={styles.textMention} key={`mention-${index}`} onPress={() => onMention(`@${element?.username}`)}>
 									{contentInElement}
 								</Text>
 							) : (
