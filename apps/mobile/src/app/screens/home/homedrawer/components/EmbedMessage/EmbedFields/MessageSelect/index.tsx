@@ -37,12 +37,14 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 		bottomSheetRef?.current?.present();
 	}
 
-	const menuOptions: IMezonMenuItemProps[] = data.map((item) => {
-		return {
-			title: item?.title,
-			onPress: () => handleChange(item)
-		};
-	});
+	const menuOptions: IMezonMenuItemProps[] = data?.length
+		? data.map((item) => {
+				return {
+					title: item?.title,
+					onPress: () => handleChange(item)
+				};
+			})
+		: [];
 
 	const menu: IMezonMenuSectionProps[] = [
 		{

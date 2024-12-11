@@ -89,12 +89,12 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 								<View key={`field${index}-${fieldIndex}`} style={styles.field}>
 									{!!fieldItem?.name && <Text style={styles.name}>{fieldItem?.name}</Text>}
 									{!!fieldItem?.value && <Text style={styles.value}>{fieldItem?.value}</Text>}
-									{fieldItem?.inputs && (
+									{!!fieldItem?.inputs && (
 										<View>
 											{fieldItem?.inputs?.type === EMessageComponentType.INPUT && (
 												<EmbedInput
 													input={fieldItem?.inputs?.component}
-													buttonId={fieldItem.inputs.id}
+													buttonId={fieldItem?.inputs?.id}
 													onSelectionChanged={handleChangeText}
 												/>
 											)}
@@ -102,13 +102,12 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 												<EmbedSelect
 													select={fieldItem?.inputs?.component}
 													messageId={message_id}
-													buttonId={fieldItem.inputs.id}
+													buttonId={fieldItem?.inputs?.id}
 													onSelectionChanged={handleChangeDataInput}
 												/>
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
 												<MezonDateTimePicker
-													value={new Date(fieldItem?.inputs?.component?.value)}
 													onChange={(value) => handleChangeDataInput(value?.getTime()?.toString(), fieldItem?.inputs?.id)}
 												/>
 											)}
