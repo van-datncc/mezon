@@ -78,6 +78,7 @@ export type UpdateEventManagementPayload = {
 	end_time: string;
 	description: string;
 	logo: string;
+	creator_id: string;
 };
 
 export type EventManagementOnGogoing = {
@@ -125,11 +126,15 @@ export const fetchCreateEventManagement = createAsyncThunk(
 type fetchDeleteEventManagementPayload = {
 	eventID: string;
 	clanId: string;
+	creatorId: string;
 };
 
 export const updateEventManagement = createAsyncThunk(
 	'updateEventManagement/updateEventManagement',
-	async ({ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo }: UpdateEventManagementPayload, thunkAPI) => {
+	async (
+		{ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo, creator_id }: UpdateEventManagementPayload,
+		thunkAPI
+	) => {
 		try {
 			const body: ApiUpdateEventRequest = {
 				address: address,
@@ -141,6 +146,7 @@ export const updateEventManagement = createAsyncThunk(
 				start_time: start_time,
 				title: title,
 				clan_id: clan_id
+				// creator_id: creator_id
 			};
 
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -160,7 +166,7 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 	async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
+			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId, body.creatorId);
 			if (response) {
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
 			}

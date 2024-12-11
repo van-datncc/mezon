@@ -29,7 +29,7 @@ export function EmbedFields({ fields, message_id, senderId }: EmbedFieldsProps) 
 	}, [fields]);
 
 	return (
-		<div className="mt-2 grid gap-2">
+		<div className="mt-2 grid gap-2  w-fit">
 			{groupedFields.map((row, index) => (
 				<div key={index} className={`grid gap-4 ${row.length === 1 ? 'grid-cols-1' : row.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
 					{row.map((field, index) => (
@@ -42,7 +42,7 @@ export function EmbedFields({ fields, message_id, senderId }: EmbedFieldsProps) 
 								<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
 							</div>
 							{field.inputs && (
-								<div className="flex flex-col gap-1">
+								<div className="flex flex-col gap-1 w-max-[500px]">
 									<InputEmbedByType component={field.inputs} messageId={message_id} senderId={senderId} />
 								</div>
 							)}

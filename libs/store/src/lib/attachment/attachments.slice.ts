@@ -129,6 +129,18 @@ export const attachmentSlice = createSlice({
 			action?.payload?.listAttachments?.forEach((attachment) => {
 				state?.listAttachmentsByChannel[currentChannelId]?.unshift(attachment);
 			});
+		},
+		removeAttachments: (state, action: PayloadAction<{ messageId: string; channelId: string }>) => {
+			const { messageId, channelId } = action.payload;
+			if (state.listAttachmentsByChannel[channelId]) {
+				state.listAttachmentsByChannel[channelId] = state.listAttachmentsByChannel[channelId].filter(
+					(attachment) => attachment.message_id !== messageId
+				);
+
+				if (state.listAttachmentsByChannel[channelId].length === 0) {
+					delete state.listAttachmentsByChannel[channelId];
+				}
+			}
 		}
 	},
 	extraReducers: (builder) => {

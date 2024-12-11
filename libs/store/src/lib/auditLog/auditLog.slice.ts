@@ -12,7 +12,7 @@ export interface AuditLogEntity extends ApiAuditLog {
 	id: string;
 }
 
-export interface IAuditLogState extends EntityState<AuditLogEntity, string> {
+export interface IAuditLogState extends EntityState<ApiAuditLog, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	auditLogData: MezonapiListAuditLog;
@@ -28,7 +28,13 @@ type getAuditLogListPayload = {
 };
 
 export const auditLogAdapter = createEntityAdapter({
-	selectId: (auditLog: AuditLogEntity) => auditLog.id || ''
+	selectId: (auditLog: ApiAuditLog) => auditLog.id || '',
+	sortComparer: (a: ApiAuditLog, b: ApiAuditLog) => {
+		if (a.time_log && b.time_log) {
+			return Date.parse(b.time_log) - Date.parse(a.time_log);
+		}
+		return 0;
+	}
 });
 
 export const fetchAuditLogCached = memoizeAndTrack(
@@ -82,6 +88,9 @@ export const auditLogSlice = createSlice({
 			.addCase(auditLogList.fulfilled, (state: IAuditLogState, action: PayloadAction<MezonapiListAuditLog>) => {
 				state.loadingStatus = 'loaded';
 				state.auditLogData = action.payload;
+				if (action.payload.logs) {
+					auditLogAdapter.addMany(state, action.payload.logs);
+				}
 			})
 			.addCase(auditLogList.rejected, (state: IAuditLogState, action) => {
 				state.loadingStatus = 'error';
@@ -102,4 +111,7 @@ export const getAuditLogState = (rootState: { [AUDIT_LOG_FEATURE_KEY]: IAuditLog
 export const selectAllAuditLog = createSelector(getAuditLogState, selectAll);
 export const selectAllAuditLogData = createSelector(getAuditLogState, (state) => {
 	return state.auditLogData || [];
+});
+export const selectTotalCountAuditLog = createSelector(getAuditLogState, (state) => {
+	return state.auditLogData.total_count || 0;
 });
