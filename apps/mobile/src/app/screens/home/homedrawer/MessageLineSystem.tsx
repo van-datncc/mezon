@@ -15,34 +15,42 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 
 	const messageTime = convertTimeString(message?.create_time as string);
 	const findThreadInText = (text: string) => {
-		const threadRegex = /started a thread: ([^.]+)/;
-		const match = text?.match(threadRegex);
-		return match
-			? {
-					s: match?.index + match[0].indexOf(match[1]),
-					e: match?.index + match[0].indexOf(match[1]) + match[1]?.length,
-					kindOf: ETokenMessage.HASHTAGS
-				}
-			: null;
+		const threadStart = 'started a thread: ';
+		const startIdx = text?.indexOf(threadStart);
+
+		if (startIdx !== -1) {
+			const threadContentStart = startIdx + threadStart?.length;
+			const threadContentEnd = text.indexOf('.', threadContentStart);
+			const threadContent =
+				threadContentEnd !== -1 ? text?.substring(threadContentStart, threadContentEnd) : text?.substring(threadContentStart);
+
+			return {
+				s: threadContentStart,
+				e: threadContentStart + threadContent?.length,
+				kindOf: ETokenMessage.HASHTAGS
+			};
+		}
+		return null;
 	};
 
 	const findMessageInText = (text: string) => {
-		const messageRegex = /a message/;
-		const match = text?.match(messageRegex);
-		return match
-			? {
-					s: match?.index,
-					e: match?.index + match[0]?.length,
-					kindOf: ETokenMessage.LINKS
-				}
-			: null;
+		const messageText = 'a message';
+		const startIdx = text?.indexOf(messageText);
+
+		if (startIdx !== -1) {
+			return {
+				s: startIdx,
+				e: startIdx + messageText?.length,
+				kindOf: ETokenMessage.LINKS
+			};
+		}
+		return null;
 	};
 
 	const elements = useMemo(() => {
 		const elements = [...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS }))]?.sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		const threadInfo = findThreadInText(t);
-
 		if (threadInfo) {
 			elements.push(threadInfo);
 		}
@@ -51,6 +59,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 		if (messageInfo) {
 			elements.push(messageInfo);
 		}
+
 		return elements;
 	}, [mentions, t]);
 
