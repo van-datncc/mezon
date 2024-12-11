@@ -25,7 +25,6 @@ import {
 	directSlice,
 	emojiSuggestionActions,
 	eventManagementActions,
-	fetchDirectMessage,
 	friendsActions,
 	giveCoffeeActions,
 	listChannelsByUserActions,
@@ -63,7 +62,16 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, IMessageTypeCallLog, ModeResponsive, NotificationCode, TIME_OFFSET, ThreadStatus, TypeMessage } from '@mezon/utils';
+import {
+	EOverriddenPermission,
+	IMessageSendPayload,
+	IMessageTypeCallLog,
+	ModeResponsive,
+	NotificationCode,
+	TIME_OFFSET,
+	ThreadStatus,
+	TypeMessage
+} from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
@@ -478,7 +486,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string }));
-						// add members to group
+						// TODO: remove member group
 					}
 				}
 			});
@@ -512,59 +520,59 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchanneladded = useCallback(
 		async (userAdds: UserChannelAddedEvent) => {
-			//TODO: update payload backend add channel, list user ids by channel
-			if (!userAdds?.users?.length) return;
-			const user = userAdds.users.find((user: any) => user.user_id === userId);
+			if (!userAdds?.channel_desc) return;
+			const { channel_desc, users, clan_id } = userAdds;
+			const userIds = users.map((u) => u.user_id);
+			const user = users?.find((user) => user.user_id === userId);
 			if (user) {
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-					await dispatch(fetchDirectMessage({ noCache: true }));
+				if (channel_desc.type === ChannelType.CHANNEL_TYPE_TEXT || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
+					dispatch(channelsActions.add(channel));
+					dispatch(listChannelsByUserActions.add(channel));
 				}
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT || userAdds.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
-					// dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-					// dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
-				}
-				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
 						channelsActions.joinChat({
-							clanId: userAdds.clan_id,
-							channelId: userAdds.channel_id,
-							channelType: userAdds.channel_type,
-							isPublic: userAdds.is_public
+							clanId: clan_id,
+							channelId: channel_desc.channel_id as string,
+							channelType: channel_desc.type as number,
+							isPublic: !channel_desc.channel_private
 						})
 					);
 				}
-			} else {
-				if (clanIdActive === userAdds.clan_id) {
-					const members = userAdds?.users
-						.filter((user) => user?.user_id)
-						.map((user) => ({
-							id: user.user_id,
-							user: {
-								...user,
-								avatar_url: user.avatar,
-								id: user.user_id,
-								about_me: user.about_me,
-								display_name: user.display_name,
-								metadata: user.custom_status,
-								username: user.username,
-								create_time: new Date(user.create_time_second * 1000).toISOString(),
-								online: user.online
-							}
-						}));
-					dispatch(usersClanActions.upsertMany(members));
-				}
-
-				// if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-				// 	dispatch(fetchDirectMessage({ noCache: true }));
-				// 	dispatch(fetchListFriends({ noCache: true }));
-				// }
 			}
 
-			const userIds = userAdds.users.map((item) => item.user_id);
-			dispatch(channelMembersActions.addNewMember({ channel_id: userAdds.channel_id, user_ids: userIds }));
+			if (clanIdActive === clan_id) {
+				const members = users
+					.filter((user) => user?.user_id)
+					.map((user) => ({
+						id: user.user_id,
+						user: {
+							id: user.user_id,
+							avatar_url: user.avatar,
+							about_me: user.about_me,
+							display_name: user.display_name,
+							metadata: user.custom_status,
+							username: user.username,
+							create_time: new Date(user.create_time_second * 1000).toISOString(),
+							online: user.online
+						}
+					}));
+
+				dispatch(usersClanActions.upsertMany(members));
+
+				// TODO: handle add friend to group, update list friend, update current inbox
+				dispatch(
+					channelMembersActions.addNewMember({
+						channel_id: channel_desc.channel_id as string,
+						user_ids: userIds
+					})
+				);
+			}
+
 			dispatch(userChannelsActions.upsertMany(userIds));
 		},
-		[userId, dispatch]
+		[userId, clanIdActive, dispatch]
 	);
 
 	const onuserclanadded = useCallback(
@@ -878,13 +886,33 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpermissionchanged = useCallback(
 		(userPermission: PermissionChangedEvent) => {
 			if (userId === userPermission.user_id && channelId === userPermission.channel_id) {
-				// update backend payload -> not use fetch
-				dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId || '', channelId, noCache: true }));
+				const permissions = [
+					...(userPermission.add_permissions?.map((perm) => ({
+						id: perm.permission_id as string,
+						slug: perm.slug as EOverriddenPermission,
+						active: 1
+					})) || []),
+					...(userPermission.remove_permissions?.map((perm) => ({
+						id: perm.permission_id as string,
+						slug: perm.slug as EOverriddenPermission,
+						active: 0
+					})) || []),
+					...(userPermission.default_permissions?.map((perm) => ({
+						id: perm.permission_id as string,
+						slug: perm.slug as EOverriddenPermission,
+						active: perm.type || 0
+					})) || [])
+				];
+				dispatch(
+					overriddenPoliciesActions.updateChannelPermissions({
+						channelId: userPermission.channel_id,
+						permissions
+					})
+				);
 			}
 		},
-		[dispatch, userId, channelId, clanId]
+		[dispatch, userId, channelId]
 	);
-
 	const onunmuteevent = useCallback(
 		(unmuteEvent: UnmuteEvent) => {
 			if (unmuteEvent.category_id !== '0') {
@@ -922,76 +950,100 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
 	}, []);
 
-	const onroleevent = useCallback((roleEvent: RoleEvent) => {
-		const handleRoleEvent = async () => {
-			if (roleEvent?.status === 0) {
-				if (userId !== roleEvent.user_id) {
+	const onroleevent = useCallback(
+		async (roleEvent: RoleEvent) => {
+			if (userId === roleEvent.user_id) return;
+
+			const { role, status, user_add_ids = [], user_remove_ids = [] } = roleEvent;
+
+			// Handle role assignments/removals
+			if (user_add_ids.length) {
+				dispatch(usersClanActions.updateManyRoleIds(user_add_ids.map((id) => ({ userId: id, roleId: role.id as string }))));
+			}
+
+			if (user_remove_ids.length) {
+				dispatch(usersClanActions.removeManyRoleIds(user_remove_ids.map((id) => ({ userId: id, roleId: role.id as string }))));
+			}
+
+			// Handle new role creation
+			if (status === 0 && role) {
+				dispatch(
+					rolesClanActions.add({
+						id: role.id as string,
+						clan_id: role.clan_id,
+						title: role.title,
+						color: role.color,
+						role_icon: role.role_icon,
+						slug: role.slug,
+						description: role.description,
+						creator_id: role.creator_id,
+						active: role.active,
+						display_online: role.display_online,
+						allow_mention: role.allow_mention,
+						role_channel_active: role.role_channel_active,
+						channel_ids: role.channel_ids,
+						max_level_permission: role.max_level_permission
+					})
+				);
+
+				if (user_add_ids.includes(userId as string)) {
 					dispatch(
-						rolesClanActions.add({
-							id: roleEvent.role.id || '',
-							clan_id: roleEvent.role.clan_id,
-							creator_id: roleEvent.role.creator_id,
-							title: roleEvent.role.title,
-							permission_list: roleEvent.role.permission_list,
-							role_user_list: roleEvent.role.role_user_list,
-							active: roleEvent.role.active
+						policiesActions.addOne({
+							id: role.id as string,
+							title: role.title
 						})
 					);
-					if (roleEvent?.role?.role_user_list?.role_users) {
-						const { id, title } = roleEvent?.role || {};
-						const users = roleEvent.role.role_user_list.role_users;
-						const userExists = users.some((user) => user.id === userId);
-						if (userExists && id) {
-							dispatch(policiesActions.addOne({ id, title }));
-						}
-						dispatch(
-							usersClanActions.updateManyRoleIds(
-								users.map((item) => ({
-									userId: item.id as string,
-									roleId: roleEvent.role.id as string
-								}))
-							)
-						);
-					}
 				}
-			} else if (roleEvent?.status === 1) {
-				if (userId !== roleEvent.user_id) {
-					if (roleEvent?.role?.role_user_list?.role_users) {
-						const users = roleEvent.role.role_user_list.role_users;
-						dispatch(
-							usersClanActions.updateManyRoleIds(
-								users.map((item) => ({
-									userId: item.id as string,
-									roleId: roleEvent.role.id as string
-								}))
-							)
-						);
-					}
-					if (roleEvent.role.permission_list?.permissions || roleEvent.role.role_user_list?.role_users) {
-						const isUserResult = await dispatch(
-							rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
-						).unwrap();
-						if (isUserResult) {
-							//TODO: check assign and unassign role
-							dispatch(policiesActions.updateOne({ id: roleEvent.role.id as string, changes: { title: roleEvent.role.title } }));
-						}
-					}
-					dispatch(rolesClanActions.update(roleEvent.role));
-				}
-			} else if (roleEvent?.status === 2) {
-				if (userId !== roleEvent.user_id) {
-					const isUserResult = await dispatch(
-						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
-					).unwrap();
-					if (isUserResult) {
-						dispatch(policiesActions.removeOne(roleEvent.role.id as string));
-					}
-					dispatch(rolesClanActions.remove(roleEvent.role.id || ''));
-				}
+				return;
 			}
-		};
-		handleRoleEvent();
-	}, []);
+
+			// Handle role update
+			if (status === 1) {
+				const isUserAffected = user_add_ids.includes(userId as string) || user_remove_ids.includes(userId as string);
+
+				if (isUserAffected) {
+					const isUserResult = await dispatch(
+						rolesClanActions.updatePermissionUserByRoleId({
+							roleId: role.id as string,
+							userId: userId as string
+						})
+					).unwrap();
+
+					if (isUserResult) {
+						if (user_add_ids.includes(userId as string)) {
+							dispatch(
+								policiesActions.updateOne({
+									id: role.id as string,
+									changes: { title: role.title }
+								})
+							);
+						} else {
+							dispatch(policiesActions.removeOne(role.id as string));
+						}
+					}
+				}
+
+				dispatch(rolesClanActions.update(role));
+				return;
+			}
+
+			// Handle role deletion
+			if (status === 2) {
+				const isUserResult = await dispatch(
+					rolesClanActions.updatePermissionUserByRoleId({
+						roleId: role.id as string,
+						userId: userId as string
+					})
+				).unwrap();
+
+				if (isUserResult) {
+					dispatch(policiesActions.removeOne(role.id as string));
+				}
+				dispatch(rolesClanActions.remove(role.id as string));
+			}
+		},
+		[userId, dispatch]
+	);
 
 	const onwebrtcsignalingfwd = useCallback(
 		(event: WebrtcSignalingFwd) => {
