@@ -34,7 +34,7 @@ const TopicDiscussionBox = () => {
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
 	useEffect(() => {
 		const fetchMsgResult = async () => {
-			await dispatch(fetchMessages({ channelId: currentTopicId as string, clanId: currentClanId as string }));
+			await dispatch(fetchMessages({ channelId: currentChannelId as string, clanId: currentClanId as string, topicId: currentTopicId || '' }));
 			setIsFetchMessageDone(true);
 		};
 		if (currentTopicId !== '') {

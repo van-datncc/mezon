@@ -178,8 +178,8 @@ export const mapMessageChannelToEntityAction = createAsyncThunk(
 export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string, channelId: string, messageId?: string, direction?: number) => {
-		const response = await mezon.client.listChannelMessages(mezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE);
+	async (mezon: MezonValueContext, clanId: string, channelId: string, messageId?: string, direction?: number, topicId?: string) => {
+		const response = await mezon.client.listChannelMessages(mezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -193,7 +193,7 @@ export const fetchMessagesCached = memoizeAndTrack(
 			if (args[4] === undefined) {
 				args[4] = 1;
 			}
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
+			return args[1] + args[2] + args[3] + args[4] + args[5] + args[0].session.username;
 		}
 	}
 );
@@ -208,6 +208,7 @@ type fetchMessageChannelPayload = {
 	isClearMessage?: boolean;
 	directTimeStamp?: DirectTimeStampArg;
 	viewingOlder?: boolean;
+	topicId?: string;
 };
 
 export const fetchMessages = createAsyncThunk(
@@ -222,11 +223,16 @@ export const fetchMessages = createAsyncThunk(
 			isFetchingLatestMessages,
 			isClearMessage,
 			directTimeStamp,
-			viewingOlder
+			viewingOlder,
+			topicId
 		}: fetchMessageChannelPayload,
 		thunkAPI
 	) => {
 		try {
+			let chlId = channelId;
+			if (topicId !== '') {
+				chlId = topicId || '';
+			}
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			const state = thunkAPI.getState() as RootState;
@@ -235,9 +241,9 @@ export const fetchMessages = createAsyncThunk(
 				currentUser = await thunkAPI.dispatch(accountActions.getUserProfile()).unwrap();
 			}
 			if (noCache) {
-				fetchMessagesCached.delete(mezon, clanId, channelId, messageId, direction);
+				fetchMessagesCached.delete(mezon, clanId, channelId, messageId, direction, topicId);
 			}
-			const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
+			const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction, topicId);
 			if (!response.messages) {
 				return {
 					messages: []
@@ -252,7 +258,7 @@ export const fetchMessages = createAsyncThunk(
 
 			const firstMessage = response.messages[response.messages.length - 1];
 			if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
-				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
+				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: firstMessage.id }));
 			}
 
 			let lastSentMessage = response.last_sent_message;
@@ -267,11 +273,11 @@ export const fetchMessages = createAsyncThunk(
 				thunkAPI.dispatch(
 					messagesActions.setLastMessage({
 						...lastSentMessage,
-						channel_id: channelId
+						channel_id: chlId
 					})
 				);
 			}
-			thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
+			thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId: chlId }));
 
 			let messages = response.messages.map((item) => {
 				return mapMessageChannelToEntity(item, response.last_seen_message?.id);
@@ -287,13 +293,13 @@ export const fetchMessages = createAsyncThunk(
 			const hasMore = lastLoadMessage?.isFirst === false ? false : true;
 
 			if (messages.length > 0) {
-				thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
+				thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
 			}
 
 			if (response.last_seen_message?.id) {
 				thunkAPI.dispatch(
 					messagesActions.setChannelLastMessage({
-						channelId,
+						channelId: chlId,
 						messageId: response.last_seen_message?.id
 					})
 				);
@@ -313,7 +319,7 @@ export const fetchMessages = createAsyncThunk(
 			}
 
 			if (isFetchingLatestMessages) {
-				thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
+				thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId: chlId, status: true }));
 				thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 			}
 
@@ -1042,11 +1048,11 @@ export const messagesSlice = createSlice({
 			.addCase(
 				fetchMessages.fulfilled,
 				(state: MessagesState, action: PayloadAction<FetchMessagesPayloadAction, string, FetchMessagesMeta>) => {
-					const channelId = action?.meta?.arg?.channelId;
+					const channelId = action?.payload.messages.at(0)?.channel_id;
 					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages || false;
 					const isClearMessage = action.payload.isClearMessage || false;
 					const viewingOlder = action.payload.viewingOlder || false;
-					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
+					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId || ''];
 					state.loadingStatus = 'loaded';
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
@@ -1072,7 +1078,8 @@ export const messagesSlice = createSlice({
 						direction,
 						isClearMessage
 					});
-					state.isViewingOlderMessagesByChannelId[channelId] = viewingOlder || state.channelMessages[channelId]?.ids.length >= 200;
+					state.isViewingOlderMessagesByChannelId[channelId || ''] =
+						viewingOlder || state.channelMessages[channelId || '']?.ids.length >= 200;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
@@ -1403,7 +1410,9 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 };
 
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
-	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
+	if (state.channelMessages[channelId]) {
+		state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
+	}
 };
 
 const handleUpdateReplyMessage = (channelEntity: EntityState<MessagesEntity, string> & { id: string }, message_ref_id: string) => {

@@ -834,7 +834,8 @@ export enum RoleEveryOne {
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 4
+	FIRST_MESSAGE = 4,
+	TOPIC_MESSAGE = 9
 }
 
 export enum ModeResponsive {
