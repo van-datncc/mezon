@@ -4,7 +4,7 @@ import { embedActions, useAppDispatch } from '@mezon/store-mobile';
 import { EMessageComponentType, IFieldEmbed, IMessageRatioOption } from '@mezon/utils';
 import { memo, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import { MezonDateTimePicker } from '../../../../../../componentUI';
+import { EmbedDatePicker } from './EmbedDatePicker';
 import { EmbedInput } from './EmbedInput';
 import { EmbedRadioButton } from './EmbedRadioItem';
 import { EmbedSelect } from './EmbedSelect';
@@ -76,11 +76,6 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 		);
 	};
 
-	const handleDatePicked = (value, id) => {
-		dismiss();
-		handleChangeDataInput(value?.getTime()?.toString(), id);
-	};
-
 	return (
 		<View style={styles.container}>
 			{!!groupedFields?.length &&
@@ -108,8 +103,13 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 													onSelectionChanged={handleChangeDataInput}
 												/>
 											)}
+
 											{fieldItem?.inputs?.type === EMessageComponentType.DATEPICKER && (
-												<MezonDateTimePicker onChange={(value) => handleDatePicked(value, fieldItem?.inputs?.id)} />
+												<EmbedDatePicker
+													input={fieldItem?.inputs?.component}
+													messageId={message_id}
+													buttonId={fieldItem?.inputs?.id}
+												/>
 											)}
 											{fieldItem?.inputs?.type === EMessageComponentType.RADIO &&
 												fieldItem?.inputs?.component?.length &&

@@ -17,7 +17,9 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	useEffect(() => {
-		handleChange(input.defaultValue);
+		if (input?.defaultValue) {
+			handleChange(input.defaultValue);
+		}
 	}, []);
 
 	const handleChange = (text) => {
@@ -30,18 +32,18 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 				message_id: messageId,
 				data: {
 					id: buttonId,
-					value: value.toString()
+					value: value
 				}
 			})
 		);
-	}, 500);
+	});
 
 	return (
 		<TextInput
 			style={styles.TextInput}
 			placeholder={input?.placeholder}
 			placeholderTextColor={themeValue.text}
-			onChange={handleChange}
+			onChangeText={handleChange}
 			multiline={!!input?.textarea}
 			keyboardType={input.type === 'number' ? 'numeric' : 'default'}
 			defaultValue={input?.defaultValue?.toString()}
