@@ -279,10 +279,15 @@ export const channelMembers = createSlice({
 			const userIds = payload.user_ids;
 			const channelId = payload.channel_id;
 
-			const channelEntity = state.memberChannels[channelId];
+			if (!state.memberChannels[channelId]) {
+				state.memberChannels[channelId] = {
+					...channelMembersAdapter.getInitialState(),
+					id: channelId
+				};
+			}
 			userIds.forEach((userId) => {
-				if (!channelEntity.ids.includes(userId)) {
-					channelEntity.ids.push(userId);
+				if (!state.memberChannels[channelId]?.ids.includes(userId)) {
+					state.memberChannels[channelId].ids.push(userId);
 				}
 			});
 		},

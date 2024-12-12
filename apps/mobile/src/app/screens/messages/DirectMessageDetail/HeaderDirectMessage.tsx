@@ -112,7 +112,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 						{dmAvatar ? (
 							<FastImage
 								source={{
-									uri: createImgproxyUrl(dmAvatar ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									uri: createImgproxyUrl(dmAvatar ?? '', { width: 100, height: 100, resizeType: 'fit' })
 								}}
 								style={styles.friendAvatar}
 							/>

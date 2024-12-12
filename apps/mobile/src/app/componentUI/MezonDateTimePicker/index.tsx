@@ -1,5 +1,5 @@
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Icons, getNearTime } from '@mezon/mobile-components';
+import { getNearTime } from '@mezon/mobile-components';
 import { Block, Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -97,11 +97,6 @@ export default memo(function MezonDateTimePicker({
 				ref={bottomSheetRef}
 				heightFitContent
 				title={props.title}
-				headerLeft={
-					<TouchableOpacity style={styles.btnHeaderBS} onPress={handleClose}>
-						<Icons.CloseIcon height={16} width={16} color={themeValue.text} />
-					</TouchableOpacity>
-				}
 				headerRight={
 					<TouchableOpacity style={styles.btnHeaderBS} onPress={handleChange}>
 						<Text style={styles.textApply}>Apply</Text>

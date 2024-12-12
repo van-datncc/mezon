@@ -1,18 +1,131 @@
-import { selectAllAuditLogData, selectChannelById, selectMemberClanByUserId, selectRoleByRoleId, useAppSelector } from '@mezon/store';
+import {
+	auditLogList,
+	selectActionAuditLog,
+	selectAllAuditLog,
+	selectChannelById,
+	selectCurrentClan,
+	selectMemberClanByUserId,
+	selectRoleByRoleId,
+	selectTotalCountAuditLog,
+	selectUserAuditLog,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ActionLog, convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { Dropdown, Pagination } from 'flowbite-react';
 import { ApiAuditLog } from 'mezon-js/api.gen';
+import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
-const MainAuditLog = () => {
-	const auditLogData = useSelector(selectAllAuditLogData);
+interface MainAuditLogProps {
+	pageSize: number;
+	setPageSize: Dispatch<SetStateAction<number>>;
+	currentPage: number;
+	setCurrentPage: Dispatch<SetStateAction<number>>;
+}
+
+const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage }: MainAuditLogProps) => {
+	const auditLogData = useSelector(selectAllAuditLog);
+	const totalCount = useSelector(selectTotalCountAuditLog);
+	const currentClan = useSelector(selectCurrentClan);
+	const auditLogFilterAction = useSelector(selectActionAuditLog);
+	const auditLogFilterUser = useSelector(selectUserAuditLog);
+	const dispatch = useAppDispatch();
+	const totalPages = useMemo(() => {
+		if (!totalCount) {
+			return 0;
+		}
+		return Math.ceil(auditLogData.length / pageSize);
+	}, [auditLogData.length, pageSize, totalCount]);
+
+	const onPageChange = (page: number) => {
+		setCurrentPage(page);
+	};
+
+	const handleChangePageSize = (pageSize: number) => {
+		setPageSize(pageSize);
+		setCurrentPage(1);
+	};
+
+	const displayAuditLog = useMemo(() => {
+		if (auditLogData && auditLogData.length) {
+			const start = (currentPage - 1) * pageSize;
+			const end = Math.min(start + pageSize, auditLogData.length);
+			return auditLogData.slice(start, end);
+		}
+	}, [currentPage, pageSize, auditLogData]);
+
+	useEffect(() => {
+		if (
+			auditLogData.length < pageSize &&
+			// auditLogData.length < totalCount &&
+			// auditLogData.length < pageSize * currentPage &&
+			currentClan?.clan_id
+		) {
+			const body = {
+				noCache: true,
+				actionLog: auditLogFilterAction ?? '',
+				userId: auditLogFilterUser?.userId ?? '',
+				clanId: currentClan?.clan_id ?? '',
+				page: currentPage,
+				pageSize: pageSize
+			};
+			dispatch(auditLogList(body));
+		}
+	}, [pageSize, currentPage]);
 
 	return (
 		<div className="flex flex-col">
 			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
-			{auditLogData?.logs && auditLogData.logs.length > 0 ? (
-				auditLogData.logs.map((log) => <AuditLogItem key={log.id} logItem={log} />)
+			{displayAuditLog && displayAuditLog.length > 0 ? (
+				<>
+					{displayAuditLog.map((log) => (
+						<AuditLogItem key={log.id} logItem={log} />
+					))}
+
+					<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mb-2">
+						<div className={'flex flex-row items-center'}>
+							Show
+							<Dropdown
+								value={pageSize}
+								renderTrigger={() => (
+									<div
+										className={
+											'flex flex-row items-center justify-center text-center dark:bg-slate-800 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode border-[1px] dark:border-borderDivider border-buttonLightTertiary rounded mx-1 px-3 w-12'
+										}
+									>
+										<span className="mr-1">{pageSize}</span>
+										<Icons.ArrowDown />
+									</div>
+								)}
+								label={''}
+							>
+								<Dropdown.Item
+									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+									onClick={() => handleChangePageSize(10)}
+								>
+									10
+								</Dropdown.Item>
+								<Dropdown.Item
+									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+									onClick={() => handleChangePageSize(50)}
+								>
+									50
+								</Dropdown.Item>
+								<Dropdown.Item
+									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+									onClick={() => handleChangePageSize(100)}
+								>
+									100
+								</Dropdown.Item>
+							</Dropdown>
+							audit log of {auditLogData.length}
+						</div>
+						<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+					</div>
+				</>
 			) : (
 				<div className="flex flex-col items-center justify-center text-center py-10 max-w-[440px] mx-auto">
 					<div className="flex flex-col items-center justify-center text-center max-w-[300px]">
@@ -63,17 +176,25 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 					{(logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
 						logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
 						logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT) &&
+						logItem?.action_log === ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT ||
+						logItem?.action_log === ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT) &&
 					logItem?.channel_id !== '0' ? (
 						<span>
 							<span>{userName}</span>{' '}
 							<span className="lowercase">
 								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT
+								logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT
 									? 'add'
 									: 'remove'}{' '}
 								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT
+								logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
+								logItem?.action_log === ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT
 									? userNameMention
 									: clanRole?.title}{' '}
 								({logItem?.entity_id}) to channel

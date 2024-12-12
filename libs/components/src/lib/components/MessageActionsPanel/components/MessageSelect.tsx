@@ -32,46 +32,52 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 	const [availableOptions, setAvailableOptions] = useState(select?.options || []);
 	const dispatch = useAppDispatch();
 	const handleOptionSelect = (option: { value: string; label: string }) => {
-		if (selectedOptions.length < (select?.max_options || 1)) {
+		if (selectedOptions.length > (select?.max_options || 1)) {
+			return;
+		}
+		if (!select.min_options && !select.max_options) {
+			setSelectedOptions([option]);
+			setAvailableOptions(select.options.filter((o) => o.value !== option.value));
+		} else {
 			setSelectedOptions((prev) => [...prev, option]);
 			setAvailableOptions((prev) => prev.filter((o) => o.value !== option.value));
-			if (!inside) {
-				dispatch(
-					messagesActions.clickButtonMessage({
-						message_id: messageId,
-						channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
-						button_id: buttonId,
-						sender_id: senderId,
-						user_id: currentUserId,
-						extra_data: option.value
-					})
-				);
-			} else {
-				if (selectedOptions.filter((item) => item.value === option.value).length > 0) {
-					dispatch(
-						embedActions.removeEmbedValuel({
-							message_id: messageId,
-							data: {
-								id: buttonId,
-								value: option.value
-							},
-							multiple: true
-						})
-					);
-					return;
-				}
-				dispatch(
-					embedActions.addEmbedValue({
-						message_id: messageId,
-						data: {
-							id: buttonId,
-							value: option.value
-						},
-						multiple: true
-					})
-				);
-			}
 		}
+		if (!inside) {
+			dispatch(
+				messagesActions.clickButtonMessage({
+					message_id: messageId,
+					channel_id: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string,
+					button_id: buttonId,
+					sender_id: senderId,
+					user_id: currentUserId,
+					extra_data: option.value
+				})
+			);
+			return;
+		}
+		if (selectedOptions.filter((item) => item.value === option.value).length > 0) {
+			dispatch(
+				embedActions.removeEmbedValuel({
+					message_id: messageId,
+					data: {
+						id: buttonId,
+						value: option.value
+					},
+					multiple: true
+				})
+			);
+			return;
+		}
+		dispatch(
+			embedActions.addEmbedValue({
+				message_id: messageId,
+				data: {
+					id: buttonId,
+					value: option.value
+				},
+				multiple: true
+			})
+		);
 	};
 
 	useEffect(() => {

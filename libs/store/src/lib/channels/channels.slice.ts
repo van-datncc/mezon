@@ -25,6 +25,7 @@ import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
+import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -522,6 +523,8 @@ export const markAsReadProcessing = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
+			thunkAPI.dispatch(fetchChannels({ clanId: clan_id || '', noCache: true }));
+			thunkAPI.dispatch(clansActions.fetchClans());
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channels/markAsRead');
