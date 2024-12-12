@@ -96,12 +96,6 @@ const CallingModal = () => {
 		} else {
 			/* empty */
 		}
-
-		// Cleanup function
-		return () => {
-			stopAndReleaseSound();
-			Vibration.cancel();
-		};
 	}, [isInCall, isVisible, signalingData]);
 
 	const playVibration = () => {

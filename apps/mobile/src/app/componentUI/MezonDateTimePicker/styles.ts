@@ -23,6 +23,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		bsContainer: {
+			minHeight: size.s_150 * 2,
 			paddingHorizontal: Metrics.size.xl,
 			flexDirection: 'row',
 			justifyContent: 'center'
@@ -37,7 +38,7 @@ export const style = (colors: Attributes) =>
 
 		textApply: {
 			color: baseColor.blurple,
-			fontSize: Fonts.size.h8,
+			fontSize: Fonts.size.medium,
 			fontWeight: 'bold'
 		},
 		btnHeaderBS: { padding: Metrics.size.l },

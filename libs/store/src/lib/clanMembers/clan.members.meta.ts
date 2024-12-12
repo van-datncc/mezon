@@ -1,6 +1,6 @@
+import { UsersClanEntity } from '@mezon/utils';
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { StatusUserArgs } from '../channelmembers/channel.members';
-import { UsersClanEntity } from './clan.members';
 
 export const CLANMEMBERSMETA_FEATURE_KEY = 'clanMembersMeta';
 

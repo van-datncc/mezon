@@ -1117,6 +1117,40 @@ export const CanvasIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
+export const TopicIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			width="24"
+			height="24"
+			fill="none"
+			x="0px"
+			y="0px"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M5.5 12C5.49988 14.613 6.95512 17.0085 9.2741 18.2127C11.5931 19.4169 14.3897 19.2292 16.527 17.726L19.5 18V12C19.5 8.13401 16.366 5 12.5 5C8.63401 5 5.5 8.13401 5.5 12Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				></path>{' '}
+				<path
+					d="M9.5 13.25C9.08579 13.25 8.75 13.5858 8.75 14C8.75 14.4142 9.08579 14.75 9.5 14.75V13.25ZM13.5 14.75C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25V14.75ZM9.5 10.25C9.08579 10.25 8.75 10.5858 8.75 11C8.75 11.4142 9.08579 11.75 9.5 11.75V10.25ZM15.5 11.75C15.9142 11.75 16.25 11.4142 16.25 11C16.25 10.5858 15.9142 10.25 15.5 10.25V11.75ZM9.5 14.75H13.5V13.25H9.5V14.75ZM9.5 11.75H15.5V10.25H9.5V11.75Z"
+					fill="currentColor"
+				></path>{' '}
+			</g>
+		</svg>
+	);
+};
+
 export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '', isWhite = false }) => {
 	return (
 		<svg
@@ -2285,7 +2319,7 @@ export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			onClick={handleClick}
-			className={isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 		>
 			<path
 				fillRule="evenodd"
@@ -4393,7 +4427,7 @@ export function MacIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function DollarIcon({ fill, ...props }: ClassIconProps) {
+export const DollarIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			height="800px"
@@ -4405,11 +4439,11 @@ export function DollarIcon({ fill, ...props }: ClassIconProps) {
 			viewBox="0 0 64 64"
 			enableBackground="new 0 0 64 64"
 			xmlSpace="preserve"
-			fill={fill}
-			{...props}
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 		>
 			<g id="US-coin">
 				<path
+					fill="currentColor"
 					d="M33.0004005,27.4897995v-11.846199c2.209198,0.1276999,3.8346977,0.6910992,4.7324066,1.6488991
 		c0.8134918,0.8691006,0.7743912,1.7933998,0.771492,1.8554001c-0.0458984,0.5445004,0.3555107,1.0263996,0.9004021,1.078701
 		c0.5517998,0.0438995,1.0381088-0.3501015,1.0907974-0.9004002c0.017601-0.1822014,0.1309013-1.8233013-1.25-3.3428001
@@ -4423,19 +4457,21 @@ export function DollarIcon({ fill, ...props }: ClassIconProps) {
 		C40.0004005,40.3054008,37.6459999,42.5429993,33.0004005,42.8162003z"
 				/>
 				<path
+					fill="currentColor"
 					d="M51.581501,45.0996017c-0.4961014-0.3203011-1.1592026-0.1777-1.4815025,0.3192978
 		c-4.3554993,6.75-9.1483994,7.5059013-9.2372971,7.5186005c-0.5840034,0.0751991-0.9980011,0.6083984-0.9258003,1.1934013
 		c0.0663986,0.5429001,0.5282974,0.9403992,1.0625,0.9403992c0.0429993,0,0.0878983-0.0019989,0.131897-0.0078011
 		c0.235302-0.0283012,5.8095093-0.7958984,10.7695122-8.482399C52.2220993,46.0839996,52.0784988,45.4208984,51.581501,45.0996017z"
 				/>
 				<path
+					fill="currentColor"
 					d="M32,0c-17.6730995,0-32,14.3268995-32,32s14.3268995,32,32,32c17.6731987,0,32-14.3269005,32-32S49.6731987,0,32,0z M32,62
 		c-16.5419998,0-30-13.457901-30-30S15.4580002,2,32,2c16.542099,0,30,13.4579,30,30S48.542099,62,32,62z"
 				/>
 			</g>
 		</svg>
 	);
-}
+};
 
 export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 	return (

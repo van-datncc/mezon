@@ -29,6 +29,7 @@ export * from './lib/chat/hooks/useDMInvite';
 export * from './lib/chat/hooks/useUserById';
 
 export * from './lib/chat/hooks/useActivities';
+export * from './lib/chat/hooks/useCurrentChat';
 export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
@@ -64,6 +65,7 @@ export * from './lib/chat/hooks/useShowName';
 export * from './lib/chat/hooks/useSilentSendMess';
 export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
+export * from './lib/chat/hooks/useTopics';
 export * from './lib/chat/hooks/useWebRTCCall';
 export * from './lib/chat/hooks/useWindowFocusState';
 export * from './lib/policy';

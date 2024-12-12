@@ -70,7 +70,21 @@ export const initialPoliciesState: PoliciesState = policiesAdapter.getInitialSta
 export const policiesSlice = createSlice({
 	name: POLICIES_FEATURE_KEY,
 	initialState: initialPoliciesState,
-	reducers: {},
+	reducers: {
+		addOne: policiesAdapter.addOne,
+		removeOne: policiesAdapter.removeOne,
+		updateOne: (state, action: PayloadAction<{ id: string; changes: Partial<PermissionUserEntity> }>) => {
+			const { id, changes } = action.payload;
+			const existingItem = state.entities[id];
+			if (existingItem) {
+				if (changes.title === existingItem.title) {
+					policiesAdapter.removeOne(state, id);
+				} else {
+					policiesAdapter.updateOne(state, { id, changes });
+				}
+			}
+		}
+	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchPermissionsUser.pending, (state: PoliciesState) => {
@@ -128,10 +142,6 @@ export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsU
 });
 
 export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
-
-export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUser, (permissionsUser) => {
-	return permissionsUser.map((permissionUser) => permissionUser.slug);
-});
 
 export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) => {
 	return permissions.filter((permission) => permission.scope === 2);

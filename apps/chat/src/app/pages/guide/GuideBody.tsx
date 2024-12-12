@@ -209,7 +209,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 	const hightLight = useCallback(
 		(index: number) => {
 			if (selectAnswer.includes(index)) {
-				return 'bg-bgSurface text-primary hover:border-white border-channelActiveColor';
+				return 'bg-bgSurface hover:border-bgSurface hover:bg-[#212121] text-primary hover:border-white border-channelActiveColor';
 			}
 			return;
 		},

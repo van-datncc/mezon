@@ -166,6 +166,14 @@ export type IThread = {
 	last_sent_message?: ApiChannelMessageHeader;
 };
 
+export type ITopicDiscussion = {
+	id?: string | undefined;
+	/// new update
+	clan_id?: string | undefined;
+	channel_id?: string | undefined;
+	message_id?: string | undefined;
+};
+
 export type IContextMenuItemAction = 'REST';
 
 export type IContextMenuItemMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -294,6 +302,7 @@ export interface IMessageInput {
 	required?: boolean;
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
+	defaultValue?: string;
 }
 
 export interface IMessageDatePicker {
@@ -331,6 +340,7 @@ export interface IMessageSelect {
 	// Maximum number of items that can be chosen (defaults to 1)
 	max_options?: number;
 	disabled?: boolean;
+	valueSelected?: IMessageSelectOption;
 }
 
 export interface IMessageComponent<T> {
@@ -361,6 +371,7 @@ export interface IMessageSendPayload {
 	canvas?: CanvasDataResponse;
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
+	tp?: string;
 }
 
 export type IUser = {
@@ -1072,7 +1083,8 @@ export enum TypeMessage {
 	Welcome = 5,
 	CreateThread = 6,
 	CreatePin = 7,
-	MessageBuzz = 8
+	MessageBuzz = 8,
+	Topic = 9
 }
 
 export enum ServerSettingsMenuValue {
@@ -1222,7 +1234,11 @@ export enum ActionLog {
 	ADD_MEMBER_CHANNEL_ACTION_AUDIT = 'Add Member Channel',
 	REMOVE_MEMBER_CHANNEL_ACTION_AUDIT = 'Remove Member Channel',
 	ADD_ROLE_CHANNEL_ACTION_AUDIT = 'Add Role Channel',
-	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel'
+	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel',
+	ADD_MEMBER_THREAD_ACTION_AUDIT = 'Add Member Thread',
+	REMOVE_MEMBER_THREAD_ACTION_AUDIT = 'Remove Member Thread',
+	ADD_ROLE_THREAD_ACTION_AUDIT = 'Add Role Thread',
+	REMOVE_ROLE_THREAD_ACTION_AUDIT = 'Remove Role Thread'
 }
 
 export enum UserAuditLog {
@@ -1302,7 +1318,8 @@ export type MentionReactInputProps = {
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
-	readonly handlePaste?: any;
+	readonly isTopic?: boolean;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
 	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
@@ -1351,4 +1368,8 @@ export interface IImageWindowProps {
 	channelLabel: string;
 	selectedImageIndex: number;
 	images: Array<IAttachmentEntityWithUploader>;
+}
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
 }

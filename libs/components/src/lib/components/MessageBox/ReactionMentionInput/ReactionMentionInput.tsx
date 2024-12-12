@@ -1,13 +1,15 @@
 import {
 	useChannelMembers,
 	useClickUpToEdit,
+	useCurrentChat,
 	useCurrentInbox,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
 	useMessageValue,
 	useReference,
-	useThreads
+	useThreads,
+	useTopics
 } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -25,6 +27,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentTopicId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefEdit,
@@ -37,6 +40,7 @@ import {
 	selectLassSendMessageEntityBySenderId,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
+	selectOpenTopicMessageState,
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
@@ -64,9 +68,13 @@ import {
 	filterMentionsWithAtSign,
 	focusToElement,
 	formatMentionsToString,
+	generateMentionItems,
 	getDisplayMention,
+	insertStringAt,
+	parsePastedMentionData,
 	searchMentionsHashtag,
-	threadError
+	threadError,
+	transformTextWithMentions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -119,6 +127,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
+	const openTopicMessageState = useSelector(selectOpenTopicMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
@@ -126,16 +135,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
 	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const { valueTopic } = useTopics();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
-
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
+	const { currentChatUsersEntities } = useCurrentChat();
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
@@ -312,8 +323,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				}
 				return;
 			}
-
-			if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel && !openThreadMessageState) {
+			if (!nameValueThread?.trim() && props.isThread && !props.isTopic && !threadCurrentChannel && !openThreadMessageState) {
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
@@ -669,9 +679,55 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, []);
 
+	const onPasteMentions = useCallback(
+		(event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+			const pastedData = event.clipboardData.getData('text/mezon-mentions');
+
+			if (!pastedData) return;
+
+			const parsedData = parsePastedMentionData(pastedData);
+			if (!parsedData) return;
+
+			const { message: pastedContent, startIndex, endIndex } = parsedData;
+			const currentInputValueLength = (request?.valueTextInput ?? '').length;
+			const currentFocusIndex = editorRef.current?.selectionStart as number;
+
+			const transformedText =
+				pastedContent?.content?.t && pastedContent?.mentions
+					? transformTextWithMentions(pastedContent.content.t, pastedContent.mentions, currentChatUsersEntities)
+					: pastedContent?.content?.t || '';
+
+			const mentionRaw = generateMentionItems(
+				pastedContent?.mentions || [],
+				transformedText,
+				currentChatUsersEntities,
+				currentInputValueLength
+			);
+
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: insertStringAt(request?.valueTextInput || '', transformedText || '', currentFocusIndex),
+					content: insertStringAt(request?.content || '', pastedContent?.content?.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
+					mentionRaw: [...(request?.mentionRaw || []), ...mentionRaw]
+				},
+				props.isThread
+			);
+
+			const newFocusIndex = currentFocusIndex + (pastedContent?.content?.t?.slice(startIndex, endIndex) || '').length;
+			setTimeout(() => {
+				editorRef.current?.focus();
+				editorRef.current?.setSelectionRange(newFocusIndex, newFocusIndex);
+			}, 0);
+
+			event.preventDefault();
+		},
+		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
+	);
+
 	return (
 		<div className="relative">
-			{props.isThread && !threadCurrentChannel && (
+			{props.isThread && !props.isTopic && !threadCurrentChannel && (
 				<div className={`flex flex-col overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
@@ -697,16 +753,39 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					</div>
 				</div>
 			)}
-			{props.isThread && messageThreadError && !threadCurrentChannel && (
+			{props.isThread && !props.isTopic && messageThreadError && !threadCurrentChannel && (
 				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
 			)}
+
+			{props.isTopic && props.isThread && !currentTopicId && (
+				<div className={`flex flex-col overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
+					<div className="flex flex-col justify-end flex-grow">
+						{valueTopic && openTopicMessageState && <ChannelMessageThread message={valueTopic} />}
+					</div>
+				</div>
+			)}
+
 			<MentionsInput
 				onPaste={(event) => {
-					event.preventDefault();
-					const pastedText = event.clipboardData.getData('text');
-					setPastedContent(pastedText);
+					const pastedData = event.clipboardData.getData('text/mezon-mentions');
+					if (pastedData) {
+						onPasteMentions(event);
+						event.preventDefault();
+					} else {
+						event.preventDefault();
+						const pastedText = event.clipboardData.getData('text');
+						setPastedContent(pastedText);
+					}
 				}}
-				onPasteCapture={props.handlePaste}
+				onPasteCapture={(event) => {
+					if (event.clipboardData.getData('text/mezon-mentions')) {
+						event.preventDefault();
+					} else {
+						if (props.handlePaste) {
+							props.handlePaste(event);
+						}
+					}
+				}}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
