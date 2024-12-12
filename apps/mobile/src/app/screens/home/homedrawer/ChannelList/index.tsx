@@ -23,7 +23,7 @@ import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Linking, ScrollView, View } from 'react-native';
+import { DeviceEventEmitter, InteractionManager, Linking, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { EventViewer } from '../../../../components/Event';
@@ -77,7 +77,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const [isScrollChannelActive, setIsScrollChannelActive] = useState(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
 	}, []);
@@ -116,12 +115,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const handleScrollToChannel = useCallback(
-		(currentChannelId: string) => {
+		(currentChannelId: string, isActiveScroll?: boolean) => {
 			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
-			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
+			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || ''];
 			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
 
-			if (position && isScrollChannelActive) {
+			if (position && isActiveScroll) {
 				flashListRef?.current?.scrollTo({
 					x: 0,
 					y: position - size.s_100 * 2,
@@ -129,7 +128,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				});
 			}
 		},
-		[isScrollChannelActive, currentChannel, selectCategoryOffsets]
+		[selectCategoryOffsets]
 	);
 
 	useEffect(() => {
@@ -145,8 +144,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	useEffect(() => {
-		handleScrollToChannel(currentChannel?.id);
-	}, [currentChannel?.id, handleScrollToChannel]);
+		handleScrollToChannel(currentChannel?.id, isScrollChannelActive);
+	}, [currentChannel?.id, handleScrollToChannel, isScrollChannelActive]);
 
 	useEffect(() => {
 		if (currentClanId && currentClanId?.toString() !== '0') {
@@ -159,11 +158,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		(event, item) => {
 			if (item) {
 				const { y } = event?.nativeEvent?.layout || {};
-				if (selectCategoryOffsets?.[item?.category_id]) return;
-				dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
+				InteractionManager.runAfterInteractions(() => {
+					dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
+				});
 			}
 		},
-		[selectCategoryOffsets, dispatch]
+		[dispatch]
 	);
 
 	const renderItemChannelList = useCallback(

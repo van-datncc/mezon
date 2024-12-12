@@ -20,7 +20,8 @@
             "allowMessageRequest": "Cho phép gửi yêu cầu tin nhắn",
             "reportServer": "Báo cáo clan",
             "leaveServer": "Rời clan",
-            "deleteClan": "Xóa Clan"
+            "deleteClan": "Xóa Clan",
+            "auditLog": "Nhật ký kiểm tra"
         },
         "optionShowEmptyCategories": {
             "title": "Hiển thị danh mục trống",

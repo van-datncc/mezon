@@ -16,5 +16,6 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_14,
 			fontWeight: '600',
 			color: colors.white
-		}
+		},
+		lowercase: { textTransform: 'lowercase' }
 	});
