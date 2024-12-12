@@ -230,7 +230,7 @@ export const fetchMessages = createAsyncThunk(
 	) => {
 		try {
 			let chlId = channelId;
-			if (topicId !== '' && topicId !== undefined) {
+			if (topicId && topicId.trim()) {
 				chlId = topicId || '';
 			}
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
