@@ -3,10 +3,12 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectMessageByMessageId,
+	selectTheme,
 	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -39,6 +41,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			return lines;
 		}
 	})();
+	const theme = useAppSelector(selectTheme);
 
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
@@ -57,8 +60,15 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 				mode={mode}
 			/>
 			{currentMessage?.code === TypeMessage.Topic && (
-				<div className="border border-black rounded-md p-2 w-[100px] flex justify-center items-center" onClick={handleOpenTopic}>
-					view topic
+				<div
+					className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-lg my-1 p-2 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white"
+					onClick={handleOpenTopic}
+				>
+					<p className={'text-sm h-fit'}>view topic</p>
+					<Icons.ArrowRight
+						defaultFill={theme === 'dark' ? '#AEAEAE' : '#535353'}
+						defaultSize={'w-4 h-4 min-w-4 hover:text-white text-borderDividerLight'}
+					/>
 				</div>
 			)}
 		</div>
