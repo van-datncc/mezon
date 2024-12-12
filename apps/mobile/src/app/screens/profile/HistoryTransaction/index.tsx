@@ -54,7 +54,13 @@ export const HistoryTransactionScreen = ({ navigation }: SettingScreenProps<Scre
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<FlashList data={walletLedger} renderItem={renderItem} ItemSeparatorComponent={SeparatorWithLine} estimatedItemSize={size.s_50} />
+			<FlashList
+				data={walletLedger}
+				renderItem={renderItem}
+				ItemSeparatorComponent={SeparatorWithLine}
+				removeClippedSubviews={true}
+				estimatedItemSize={size.s_50}
+			/>
 			<View style={styles.cursor}>
 				<TouchableOpacity
 					style={[styles.cursorItem, { backgroundColor: !prevCursor ? themeValue.borderHighlight : themeValue.borderDim }]}
