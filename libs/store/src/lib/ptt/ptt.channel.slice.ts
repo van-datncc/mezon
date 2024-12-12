@@ -27,6 +27,8 @@ export const initialTalkPTTState: TalkPTTState = TalkPTTAdapter.getInitialState(
 		json_data: '',
 		channel_id: '',
 		user_id: '',
+		clan_id: '',
+		is_talk: false,
 		state: 0
 	}
 });
