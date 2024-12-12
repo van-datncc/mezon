@@ -297,7 +297,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								onClick={handleOpenCreate}
 							/>
 							<div
-								className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red600 rounded-full text-xs text-center top-2`}
+								className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red-600 rounded-full text-xs text-center top-2`}
 							>
 								{numberNotification}
 							</div>
