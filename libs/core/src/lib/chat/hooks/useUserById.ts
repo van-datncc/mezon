@@ -2,6 +2,8 @@ import {
 	ChannelsEntity,
 	selectChannelById2,
 	selectClanView,
+	selectCurrentChannel,
+	selectCurrentDM,
 	selectDmGroupCurrentId,
 	selectHashtagDmById,
 	selectMembeGroupByUserId,
@@ -39,5 +41,12 @@ export const useTagById = (tagId: string | undefined): ChannelsEntity | undefine
 		return isClanView
 			? (selectChannelById2(state, tagId) as unknown as ChannelsEntity)
 			: (selectHashtagDmById(state, tagId) as unknown as ChannelsEntity);
+	});
+};
+
+export const useCurrentInbox = (): ChannelsEntity | null => {
+	return useAppSelector((state) => {
+		const isClanView = selectClanView(state);
+		return isClanView ? selectCurrentChannel(state) : selectCurrentDM(state);
 	});
 };

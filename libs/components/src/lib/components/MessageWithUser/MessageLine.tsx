@@ -2,7 +2,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
@@ -294,21 +294,24 @@ const RenderContent = memo(
 		const divRef = useRef<HTMLDivElement>(null);
 
 		// Calculate the index position within the div
-		const getSelectionIndex = (node: Node, offset: number) => {
-			let currentNode = node;
-			let totalOffset = offset;
+		const getSelectionIndex = useCallback(
+			(node: Node, offset: number) => {
+				let currentNode = node;
+				let totalOffset = offset;
 
-			// Traverse up the DOM tree to calculate the index
-			while (currentNode && currentNode !== divRef.current) {
-				// Traverse previous siblings to account for their text content
-				while (currentNode.previousSibling) {
-					currentNode = currentNode.previousSibling;
-					totalOffset += currentNode.textContent?.length ?? 0;
+				// Traverse up the DOM tree to calculate the index
+				while (currentNode && currentNode !== divRef.current) {
+					// Traverse previous siblings to account for their text content
+					while (currentNode.previousSibling) {
+						currentNode = currentNode.previousSibling;
+						totalOffset += currentNode.textContent?.length ?? 0;
+					}
+					currentNode = currentNode.parentNode as Node;
 				}
-				currentNode = currentNode.parentNode as Node;
-			}
-			return totalOffset;
-		};
+				return totalOffset;
+			},
+			[divRef]
+		);
 
 		// Determine the selection's start and end index
 		const getSelectionRange = () => {

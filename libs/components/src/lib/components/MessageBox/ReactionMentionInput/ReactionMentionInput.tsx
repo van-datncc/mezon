@@ -2,6 +2,7 @@ import {
 	useChannelMembers,
 	useClickUpToEdit,
 	useCurrentChat,
+	useCurrentInbox,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
@@ -140,11 +141,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const { currentChatUsersEntities, currentChat } = useCurrentChat();
+	const { currentChatUsersEntities } = useCurrentChat();
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
-	const currentDmOrChannelId = currentChat?.channel_id;
+	const currentDmOrChannelId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));

@@ -1,4 +1,4 @@
-import { useCurrentChat, useDragAndDrop } from '@mezon/core';
+import { useCurrentInbox, useDragAndDrop } from '@mezon/core';
 import { DragEvent } from 'react';
 import DocumentThumbnail from './DocumentThumbnail';
 
@@ -11,8 +11,7 @@ type DragAndDropUIProps = {
 	onDrop: (e: DragEvent<HTMLElement>) => void;
 };
 function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
-	const { currentChat } = useCurrentChat();
-	const currentChannel = currentChat;
+	const currentChannel = useCurrentInbox();
 	const { setDraggingState } = useDragAndDrop();
 
 	const handleParentDragLeave = (e: DragEvent<HTMLElement>) => {

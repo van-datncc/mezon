@@ -1,5 +1,6 @@
 import { addMention, convertTimeString, ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData, TypeMessage } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
+import { useCallback } from 'react';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
 
@@ -28,21 +29,24 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 		}
 	})();
 
-	const handleCopyMessage = (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => {
-		if (message?.content && message?.mentions) {
-			const key = 'text/mezon-mentions';
-			const copyData = {
-				message: message,
-				startIndex: startIndex,
-				endIndex: endIndex
-			};
-			const value = JSON.stringify(copyData);
+	const handleCopyMessage = useCallback(
+		(event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => {
+			if (message?.content && message?.mentions) {
+				const key = 'text/mezon-mentions';
+				const copyData = {
+					message: message,
+					startIndex: startIndex,
+					endIndex: endIndex
+				};
+				const value = JSON.stringify(copyData);
 
-			event.preventDefault();
+				event.preventDefault();
 
-			event.clipboardData.setData(key, value);
-		}
-	};
+				event.clipboardData.setData(key, value);
+			}
+		},
+		[message]
+	);
 
 	return (
 		<MessageText
