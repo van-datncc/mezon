@@ -1,7 +1,7 @@
 import { MezonContextValue } from '@mezon/transport';
 import { Middleware, ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTransform, persistReducer, persistStore } from 'redux-persist';
+import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
@@ -18,7 +18,7 @@ import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
 import { inviteReducer } from './invite/invite.slice';
-import { MessagesState, messagesReducer } from './messages/messages.slice';
+import { messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
 import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
@@ -60,6 +60,7 @@ import { permissionRoleChannelReducer } from './permissionChannel/permissionRole
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
 import { JoinPTTReducer } from './ptt/ptt.join.slice';
+import { TalkPTTReducer } from './ptt/ptt.talk.slice';
 import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
@@ -108,31 +109,6 @@ const persistedEmojiSuggestionReducer = persistReducer(
 		storage
 	},
 	emojiSuggestionReducer
-);
-
-const transformJumpingError = createTransform<MessagesState, MessagesState>(
-	(inboundState) => {
-		return inboundState;
-	},
-	(outboundState, key) => {
-		if (key === 'isJumpingToPresent') {
-			return {
-				...outboundState,
-				isJumpingToPresent: {}
-			};
-		}
-		return outboundState;
-	},
-	{ whitelist: ['isJumpingToPresent'] }
-);
-
-const persistedMessageReducer = persistReducer(
-	{
-		key: 'messages',
-		storage,
-		blacklist: ['typingUsers', 'isSending']
-	},
-	messagesReducer
 );
 
 const persistedCatReducer = persistReducer(
@@ -389,6 +365,7 @@ const reducer = {
 	[ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
 	dmcall: DMCallReducer,
 	joinPTT: JoinPTTReducer,
+	talkPTT: TalkPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,

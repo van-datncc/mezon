@@ -27,7 +27,7 @@ export const initialJoinPTTState: JoinPTTState = JoinPTTAdapter.getInitialState(
 		json_data: '',
 		clan_id: '',
 		channel_id: '',
-		receiver_id: '',
+		user_id: '',
 		is_talk: false
 	}
 });
@@ -96,5 +96,5 @@ export const selectJoinPTTEntities = createSelector(getJoinPTTState, selectEntit
 export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, userId) => userId], (entities, userId) => {
 	const joins = Object.values(entities);
 	if (!joins?.length) return null;
-	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.receiver_id === userId);
+	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.user_id === userId);
 });
