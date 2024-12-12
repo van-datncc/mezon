@@ -132,7 +132,7 @@ const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
 		storage,
-		blacklist: ['isShowCreateThread']
+		blacklist: ['isShowCreateThread', 'checkCachedThread']
 	},
 	threadsReducer
 );
