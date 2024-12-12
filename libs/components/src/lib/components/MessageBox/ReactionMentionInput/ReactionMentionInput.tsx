@@ -1,6 +1,7 @@
 import {
 	useChannelMembers,
 	useClickUpToEdit,
+	useCurrentChat,
 	useCurrentInbox,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -67,9 +68,13 @@ import {
 	filterMentionsWithAtSign,
 	focusToElement,
 	formatMentionsToString,
+	generateMentionItems,
 	getDisplayMention,
+	insertStringAt,
+	parsePastedMentionData,
 	searchMentionsHashtag,
-	threadError
+	threadError,
+	transformTextWithMentions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -141,6 +146,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
+	const { currentChatUsersEntities } = useCurrentChat();
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
@@ -673,6 +679,52 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, []);
 
+	const onPasteMentions = useCallback(
+		(event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+			const pastedData = event.clipboardData.getData('text/mezon-mentions');
+
+			if (!pastedData) return;
+
+			const parsedData = parsePastedMentionData(pastedData);
+			if (!parsedData) return;
+
+			const { message: pastedContent, startIndex, endIndex } = parsedData;
+			const currentInputValueLength = (request?.valueTextInput ?? '').length;
+			const currentFocusIndex = editorRef.current?.selectionStart as number;
+
+			const transformedText =
+				pastedContent?.content?.t && pastedContent?.mentions
+					? transformTextWithMentions(pastedContent.content.t, pastedContent.mentions, currentChatUsersEntities)
+					: pastedContent?.content?.t || '';
+
+			const mentionRaw = generateMentionItems(
+				pastedContent?.mentions || [],
+				transformedText,
+				currentChatUsersEntities,
+				currentInputValueLength
+			);
+
+			setRequestInput(
+				{
+					...request,
+					valueTextInput: insertStringAt(request?.valueTextInput || '', transformedText || '', currentFocusIndex),
+					content: insertStringAt(request?.content || '', pastedContent?.content?.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
+					mentionRaw: [...(request?.mentionRaw || []), ...mentionRaw]
+				},
+				props.isThread
+			);
+
+			const newFocusIndex = currentFocusIndex + (pastedContent?.content?.t?.slice(startIndex, endIndex) || '').length;
+			setTimeout(() => {
+				editorRef.current?.focus();
+				editorRef.current?.setSelectionRange(newFocusIndex, newFocusIndex);
+			}, 0);
+
+			event.preventDefault();
+		},
+		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
+	);
+
 	return (
 		<div className="relative">
 			{props.isThread && !props.isTopic && !threadCurrentChannel && (
@@ -715,11 +767,25 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 			<MentionsInput
 				onPaste={(event) => {
-					event.preventDefault();
-					const pastedText = event.clipboardData.getData('text');
-					setPastedContent(pastedText);
+					const pastedData = event.clipboardData.getData('text/mezon-mentions');
+					if (pastedData) {
+						onPasteMentions(event);
+						event.preventDefault();
+					} else {
+						event.preventDefault();
+						const pastedText = event.clipboardData.getData('text');
+						setPastedContent(pastedText);
+					}
 				}}
-				onPasteCapture={props.handlePaste}
+				onPasteCapture={(event) => {
+					if (event.clipboardData.getData('text/mezon-mentions')) {
+						event.preventDefault();
+					} else {
+						if (props.handlePaste) {
+							props.handlePaste(event);
+						}
+					}
+				}}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
