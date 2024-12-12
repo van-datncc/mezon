@@ -114,7 +114,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			};
 
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
-			store.dispatch(giveCoffeeActions.updateTokenUser({ tokenEvent }));
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error

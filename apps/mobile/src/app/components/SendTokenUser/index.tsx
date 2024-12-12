@@ -30,7 +30,10 @@ export const SendTokenUser = forwardRef((props, ref: Ref<BottomSheetModalMethods
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} rotate={-1} color={baseColor.gray} />
 			},
 			{
-				onPress: () => dismiss(),
+				onPress: () => {
+					navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HISTORY_TRANSACTION });
+					dismiss();
+				},
 				title: t('settingStack.historyTransaction'),
 				isShow: true,
 				icon: <Icons.History height={size.s_24} width={size.s_24} color={baseColor.gray} />
