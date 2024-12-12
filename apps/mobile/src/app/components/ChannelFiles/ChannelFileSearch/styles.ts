@@ -5,17 +5,17 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 	StyleSheet.create({
 		searchFiles: {
 			backgroundColor: isTablet ? colors.secondary : colors.primary,
-			borderRadius: 40,
+			borderRadius: size.s_8,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			marginHorizontal: size.s_12,
+			marginHorizontal: size.s_10,
 			marginBottom: size.s_8
 		},
 
 		searchInput: {
-			borderRadius: 20,
+			borderRadius: size.s_8,
 			height: isTablet ? size.s_34 : size.s_50,
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
