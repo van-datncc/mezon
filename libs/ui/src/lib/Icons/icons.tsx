@@ -1967,7 +1967,7 @@ export function EyeOpen(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 min-w-4' }) => {
+export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4 min-w-4' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
@@ -1976,7 +1976,7 @@ export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 min-w-4
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M5.91083 3.41075C6.23626 3.08531 6.7639 3.08531 7.08934 3.41075L12.0893 8.41075C12.4148 8.73619 12.4148 9.26382 12.0893 9.58926L7.08934 14.5893C6.7639 14.9147 6.23626 14.9147 5.91083 14.5893C5.58539 14.2638 5.58539 13.7362 5.91083 13.4107L10.3216 9L5.91083 4.58926C5.58539 4.26382 5.58539 3.73619 5.91083 3.41075Z"
-					fill="#AEAEAE"
+					fill={defaultFill}
 				/>
 			</g>
 		</svg>
