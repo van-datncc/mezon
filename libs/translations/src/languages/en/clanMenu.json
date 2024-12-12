@@ -20,7 +20,8 @@
             "allowMessageRequest": "Allow Message Request",
             "reportServer": "Report Clan",
             "leaveServer": "Leave Clan",
-            "deleteClan": "Delete Clan"
+            "deleteClan": "Delete Clan",
+            "auditLog": "Audit Log"
         },
         "optionShowEmptyCategories": {
             "title": "Show Empty Categoties",

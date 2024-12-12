@@ -2,7 +2,7 @@ import { ITalkPtt, LoadingStatus } from '@mezon/utils';
 import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { TalkPTTChannel } from 'mezon-js';
 
-export const TALK_PTT_FEATURE_KEY = 'ptt_talk';
+export const TALK_PTT_FEATURE_KEY = 'talkPTT';
 
 /*
  * Update these interfaces according to your requirements.
@@ -27,6 +27,8 @@ export const initialTalkPTTState: TalkPTTState = TalkPTTAdapter.getInitialState(
 		json_data: '',
 		channel_id: '',
 		user_id: '',
+		clan_id: '',
+		is_talk: false,
 		state: 0
 	}
 });
@@ -94,4 +96,9 @@ export const selectTalkPTTEntities = createSelector(getTalkPTTState, selectEntit
 export const selectTalkPTTByChannelId = createSelector([selectTalkPTTEntities, (state, channelId) => channelId], (entities, channelId) => {
 	const talks = Object.values(entities);
 	return talks.filter((talk) => talk && talk.talkPttData?.channel_id === channelId);
+});
+
+export const selectTalkingUser = createSelector([selectTalkPTTEntities, (state, userId) => userId], (entities, userId) => {
+	const talks = Object.values(entities);
+	return talks.filter((talk) => talk && talk.talkPttData?.user_id === userId && talk.talkPttData?.is_talk === true);
 });

@@ -121,9 +121,9 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		async (value: boolean) => {
 			if (peerConnection.current && channelId.current) {
 				if (value === true) {
-					await mezon.socketRef.current?.talkPTTChannel(channelId.current, true);
+					await mezon.socketRef.current?.talkPTTChannel(clanId.current || '', channelId.current, true);
 				} else {
-					await mezon.socketRef.current?.talkPTTChannel(channelId.current, false);
+					await mezon.socketRef.current?.talkPTTChannel(clanId.current || '', channelId.current, false);
 				}
 			}
 			if (localStream) {

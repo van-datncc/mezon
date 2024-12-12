@@ -1319,7 +1319,7 @@ export type MentionReactInputProps = {
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
 	readonly isTopic?: boolean;
-	readonly handlePaste?: any;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
 	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
@@ -1368,4 +1368,8 @@ export interface IImageWindowProps {
 	channelLabel: string;
 	selectedImageIndex: number;
 	images: Array<IAttachmentEntityWithUploader>;
+}
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
 }

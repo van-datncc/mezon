@@ -29,6 +29,7 @@ export * from './lib/chat/hooks/useDMInvite';
 export * from './lib/chat/hooks/useUserById';
 
 export * from './lib/chat/hooks/useActivities';
+export * from './lib/chat/hooks/useCurrentChat';
 export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
