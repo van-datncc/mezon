@@ -6,7 +6,10 @@
     "filterBtn": "Filter"
   },
   "auditLogItem": {
-    "performedAnAction":"performed an action"
+    "performedAnAction":"performed an action",
+    "toChannel": "to channel",
+    "remove": "remove",
+    "add": "add"
   },
   "filterActionAuditLog": {
     "placeholder": "Search Action"
