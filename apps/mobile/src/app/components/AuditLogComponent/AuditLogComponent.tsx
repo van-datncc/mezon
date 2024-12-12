@@ -86,7 +86,8 @@ export default function AuditLogComponent({ navigation }: MenuClanScreenProps<Cl
 				userId: userAuditLog?.userId ?? '',
 				clanId: currentClanId ?? '',
 				page: 1,
-				pageSize: 10000
+				pageSize: 10000,
+				noCache: true
 			};
 			fetchAudiLogList(body);
 		}
