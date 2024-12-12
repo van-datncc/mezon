@@ -107,7 +107,7 @@ const TopicDiscussionBox = () => {
 						messagesActions.updateToBeTopicMessage({
 							channelId: currentChannelId as string,
 							messageId: valueTopic?.id as string,
-							topicId: currentTopicId as string
+							topicId: topic.id as string
 						})
 					);
 					await sleep(10);

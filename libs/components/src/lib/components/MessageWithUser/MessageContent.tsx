@@ -1,12 +1,4 @@
-import {
-	fetchMessages,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectMessageByMessageId,
-	topicsActions,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId, selectMessageByMessageId, topicsActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -42,8 +34,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
-		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
-		fetchMessages({ channelId: message?.content?.tp as string, clanId: currentClanId as string, noCache: true });
+		dispatch(topicsActions.setCurrentTopicId(currentMessage?.content?.tp || ''));
 	};
 
 	return (
