@@ -6,7 +6,7 @@ export const style = (colors: Attributes) =>
 		container: {
 			flex: 1,
 			paddingRight: size.s_10,
-			marginVertical: size.s_8,
+			marginVertical: size.s_4,
 			borderRadius: size.s_8,
 			backgroundColor: colors.primary,
 			paddingHorizontal: size.s_10,
@@ -16,7 +16,8 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		fileName: {
-			color: colors.textStrong
+			color: colors.textStrong,
+			maxWidth: '90%'
 		},
 		footer: {
 			flexDirection: 'row',
@@ -24,6 +25,12 @@ export const style = (colors: Attributes) =>
 		},
 		footerTitle: {
 			color: colors.text,
-			fontSize: size.small
+			fontSize: size.small,
+			maxWidth: '70%'
+		},
+		footerTime: {
+			color: colors.textDisabled,
+			fontSize: size.small,
+			fontWeight: '300'
 		}
 	});
