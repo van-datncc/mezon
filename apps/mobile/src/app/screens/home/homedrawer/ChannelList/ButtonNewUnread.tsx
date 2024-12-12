@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 type ButtonNewUnreadProps = {
-	handleScrollToChannel: (id: string) => void;
+	handleScrollToChannel: (id: string, isActiveScroll: boolean) => void;
 };
 
 const ButtonNewUnread = React.memo(({ handleScrollToChannel }: ButtonNewUnreadProps) => {
@@ -28,7 +28,7 @@ const ButtonNewUnread = React.memo(({ handleScrollToChannel }: ButtonNewUnreadPr
 		return (
 			<TouchableOpacity
 				onPress={() => {
-					handleScrollToChannel(firstChannelBadgeCount?.channel_id);
+					handleScrollToChannel(firstChannelBadgeCount?.channel_id, true);
 				}}
 				style={styles.buttonBadgeCount}
 			>
