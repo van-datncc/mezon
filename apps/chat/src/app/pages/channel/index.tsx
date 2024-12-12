@@ -69,7 +69,7 @@ function useChannelSeen(channelId: string) {
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {
-		if (!lastMessage || !lastMessage.channel_label) {
+		if (!lastMessage) {
 			return;
 		}
 		const mode =
