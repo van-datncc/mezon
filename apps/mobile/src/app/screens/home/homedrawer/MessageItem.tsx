@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { ActionEmitEvent, ReplyMessageDeleted, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
+import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, messagesActions, MessagesEntity, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
@@ -16,7 +16,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
@@ -254,22 +253,6 @@ const MessageItem = React.memo(
 		const usernameMessage = useMemo(() => {
 			return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
 		}, [isDM, message?.display_name, message?.user?.username]);
-
-		function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
-			const styleAnimation = useAnimatedStyle(() => {
-				return {
-					transform: [{ translateX: drag?.value + 50 }],
-					alignItems: 'center',
-					justifyContent: 'center'
-				};
-			});
-
-			return (
-				<Reanimated.View style={{ ...styleAnimation }}>
-					<ReplyMessageDeleted width={70} height={25} color={Colors.bgViolet} />
-				</Reanimated.View>
-			);
-		}
 
 		const handleLongPressMessage = useCallback(() => {
 			if (preventAction) return;
