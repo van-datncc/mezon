@@ -649,17 +649,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				);
 			});
 
-		builder.when(enableSpeakMessageItem, (builder) => {
-			builder.addMenuItem(
-				'speakMessage',
-				'Speak Message',
-				() => {
-					console.log('speak Message');
-				},
-				<Icons.SpeakMessageRightClick defaultSize="w-4 h-4" />
-			);
-		});
-
 		builder.when(enableRemoveOneReactionItem, (builder) => {
 			builder.addMenuItem(
 				'removeReactions',

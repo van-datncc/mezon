@@ -1,14 +1,7 @@
-import {
-	fetchMessages,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectMessageByMessageId,
-	topicsActions,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId, selectMessageByMessageId, topicsActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
@@ -42,9 +35,27 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
-		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
-		fetchMessages({ channelId: message?.content?.tp as string, clanId: currentClanId as string, noCache: true });
+		dispatch(topicsActions.setCurrentTopicId(currentMessage?.content?.tp || ''));
 	};
+
+	const handleCopyMessage = useCallback(
+		(event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => {
+			if (message?.content && message?.mentions) {
+				const key = 'text/mezon-mentions';
+				const copyData = {
+					message: message,
+					startIndex: startIndex,
+					endIndex: endIndex
+				};
+				const value = JSON.stringify(copyData);
+
+				event.preventDefault();
+
+				event.clipboardData.setData(key, value);
+			}
+		},
+		[message]
+	);
 
 	return (
 		<div>
@@ -55,6 +66,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 				message={message}
 				lines={lineValue as string}
 				mode={mode}
+				onCopy={handleCopyMessage}
 			/>
 			{currentMessage?.code === TypeMessage.Topic && (
 				<div className="border border-black rounded-md p-2 w-[100px] flex justify-center items-center" onClick={handleOpenTopic}>
@@ -73,7 +85,8 @@ const MessageText = ({
 	mode,
 	content,
 	isOnlyContainEmoji,
-	isSearchMessage
+	isSearchMessage,
+	onCopy
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -81,6 +94,7 @@ const MessageText = ({
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }) => {
 	const attachmentOnMessage = message.attachments;
 
@@ -119,6 +133,7 @@ const MessageText = ({
 								content={content}
 								mode={mode}
 								code={message.code}
+								onCopy={onCopy}
 							/>
 						)}
 						{(message.code === TypeMessage.Welcome ||

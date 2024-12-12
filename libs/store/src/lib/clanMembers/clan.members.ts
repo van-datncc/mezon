@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { IUsersClan, LoadingStatus } from '@mezon/utils';
+import { IUsersClan, LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -9,10 +9,6 @@ export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 /*
  * Update these interfaces according to your requirements.
  */
-
-export interface UsersClanEntity extends IUsersClan {
-	id: string; // Primary ID
-}
 
 export const mapUsersClanToEntity = (UsersClanRes: ClanUserListClanUser) => {
 	const id = (UsersClanRes as unknown as any).user.id;
