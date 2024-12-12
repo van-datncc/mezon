@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { clanMembersMetaActions, extracMeta, selectClanMembersMetaEntities } from './clan.members.meta';
@@ -73,6 +73,23 @@ export const UsersClanSlice = createSlice({
 					role_id: state.entities[userId]?.role_id ? [...new Set([...(state.entities[userId].role_id || []), roleId])] : [roleId]
 				}
 			}));
+			UsersClanAdapter.updateMany(state, updates);
+		},
+		removeManyRoleIds: (state, action: PayloadAction<Array<{ userId: string; roleId: string }>>) => {
+			const updates = action.payload
+				.map(({ userId, roleId }) => {
+					const existingMember = state.entities[userId];
+					if (existingMember) {
+						return {
+							id: userId,
+							changes: {
+								role_id: existingMember.role_id?.filter((id) => id !== roleId) || []
+							}
+						};
+					}
+					return null;
+				})
+				.filter(Boolean) as Update<UsersClanEntity, string>[];
 			UsersClanAdapter.updateMany(state, updates);
 		},
 		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
