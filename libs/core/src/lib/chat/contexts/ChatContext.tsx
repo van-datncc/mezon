@@ -1091,13 +1091,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const ontalkpttchannel = useCallback((event: TalkPTTChannel) => {
-		dispatch(
-			TalkPTTActions.add({
-				talkPttData: event,
-				// todo: refactor this
-				id: Snowflake.generate()
-			})
-		);
+		if (event.is_talk) {
+			dispatch(
+				TalkPTTActions.add({
+					talkPttData: event,
+					id: event.user_id
+				})
+			);
+		} else {
+			dispatch(TalkPTTActions.remove(event.user_id));
+		}
 	}, []);
 
 	const setCallbackEventFn = React.useCallback(

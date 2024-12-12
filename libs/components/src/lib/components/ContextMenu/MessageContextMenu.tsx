@@ -630,7 +630,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
 			);
 		});
-		message.code !== TypeMessage.Topic &&
+		message?.code !== TypeMessage.Topic &&
 			builder.when(checkPos, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});

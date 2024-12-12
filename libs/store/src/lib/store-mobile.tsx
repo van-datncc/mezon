@@ -59,6 +59,7 @@ import { permissionRoleChannelReducer } from './permissionChannel/permissionRole
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
 import { JoinPTTReducer } from './ptt/ptt.join.slice';
+import { TalkPTTReducer } from './ptt/ptt.talk.slice';
 import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
@@ -401,6 +402,7 @@ const reducer = {
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
 	joinPTT: JoinPTTReducer,
+	talkPTT: TalkPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer

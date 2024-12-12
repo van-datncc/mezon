@@ -6,7 +6,10 @@
     "filterBtn": "Lọc"
   },
   "auditLogItem": {
-    "performedAnAction": "đã thực hiện một hành động"
+    "performedAnAction": "đã thực hiện một hành động",
+    "toChannel": "đến kênh",
+    "remove": "xóa",
+    "add": "thêm"
   },
   "filterActionAuditLog": {
     "placeholder": "Tìm kiếm hành động"

@@ -4,6 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	let currentIndex = 0;
 	let currentRotation = 0;
 	let currentZoom = 1;
+	let currenPosition = {
+		x: 0,
+		y: 0
+	};
+	let dragstart = {
+		x: 0,
+		y: 0
+	};
+	let dragStatus = false;
 	let isThumbnailListVisible = true;
 
 	function formatDate(dateString) {
@@ -24,12 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function updateImageTransform() {
 		const selectedImage = document.getElementById('selectedImage');
-		selectedImage.style.transform = `rotate(${currentRotation}deg) scale(${currentZoom})`;
+		selectedImage.style.transform = `rotate(${currentRotation}deg) translate(0,0) scale(${currentZoom})`;
 	}
 
 	function resetImageTransform() {
 		currentRotation = 0;
 		currentZoom = 1;
+		currenPosition = {
+			x: 0,
+			y: 0
+		};
 		updateImageTransform();
 	}
 
@@ -91,6 +104,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		const thumbnailContainer = document.getElementById('thumbnails');
 		isThumbnailListVisible = !isThumbnailListVisible;
 		thumbnailContainer.classList.toggle('hidden', !isThumbnailListVisible);
+	}
+	const handleMouseDown = (event) => {
+		dragStatus = true;
+		dragstart = {
+			x: event.clientX - currenPosition.x,
+			y: event.clientY - currenPosition.y
+		};
+	};
+
+	const handleMouseUp = (event) => {
+		dragStatus = false;
+		event.stopPropagation();
+	};
+	function handleDrag(e) {
+		if (currentZoom > 1 && dragStatus) {
+			currenPosition = {
+				x: e.clientX - dragstart.x,
+				y: e.clientY - dragstart.y
+			};
+			selectedImage.style.transform = `scale(${currentZoom}) translate(${currenPosition.x / currentZoom}px, ${currenPosition.y / currentZoom}px) `;
+		}
 	}
 
 	function handleAttachmentData(data) {
@@ -180,7 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const selectedImage = document.getElementById('selectedImage');
 	selectedImage.addEventListener('wheel', handleWheel, { passive: false });
-
+	selectedImage.addEventListener('dragstart', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	selectedImage.addEventListener('mousemove', handleDrag);
+	selectedImage.addEventListener('mousedown', handleMouseDown);
+	// selectedImage.addEventListener('mouseup', handleMouseUp);
+	document.addEventListener('mouseup', handleMouseUp);
 	document.getElementById('resetBtn').addEventListener('click', resetImageTransform);
 
 	document.getElementById('toggleListBtn').addEventListener('click', toggleThumbnailList);
