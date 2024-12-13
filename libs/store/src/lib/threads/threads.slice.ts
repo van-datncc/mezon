@@ -136,8 +136,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	isPrivate: 0,
 	nameValueThread: {},
 	valueThread: null,
-	openThreadMessageState: false,
-	checkCachedThread: false
+	openThreadMessageState: false
 });
 
 export const checkDuplicateThread = createAsyncThunk(
