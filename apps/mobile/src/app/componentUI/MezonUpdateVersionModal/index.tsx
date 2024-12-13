@@ -82,6 +82,7 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 				downloadRef.current.syncInProgress = false;
 				setIsLoading(false);
 				setError('Update failed. Please try again.');
+				handleUpdate();
 				break;
 		}
 	};
@@ -95,7 +96,7 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 			const codePushOptions = {
 				installMode: codePush.InstallMode.IMMEDIATE,
 				mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
-				minimumBackgroundDuration: 0
+				minimumBackgroundDuration: 60 * 5
 			};
 
 			// Start the sync process
@@ -121,7 +122,7 @@ const MezonUpdateVersionModal = (props: IMezonModalProps) => {
 							<Text style={styles.buttonText}>{percent ? `${Math.round(percent)}%` : 'Update'}</Text>
 							{isLoading && <Chase size={size.s_18} color={'#ededed'} />}
 						</TouchableOpacity>
-						{!percent && (
+						{(!percent || !!error) && (
 							<TouchableOpacity onPress={onClose} style={styles.buttonSecond}>
 								<Text style={styles.buttonTextSecond}>Dismiss</Text>
 							</TouchableOpacity>

@@ -324,10 +324,10 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	};
 
 	const handleConfirmDeleteChannel = async () => {
+		handleFocusDefaultChannel();
 		await dispatch(channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' }));
 		setIsShowModalDeleteChannel(false);
 		dismiss();
-		handleFocusDefaultChannel();
 	};
 
 	const handleConfirmLeaveThread = useCallback(async () => {
