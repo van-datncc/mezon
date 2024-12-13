@@ -3,7 +3,6 @@ import { IMessageWithUser, IThread, LoadingStatus, ThreadStatus, TypeCheck, sort
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
-import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
@@ -161,13 +160,10 @@ export const leaveThread = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.leaveThread(mezon.session, threadId);
-			if (response) {
-				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(threadId));
-				if (isPrivate === 1) {
-					await thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
-					await thunkAPI.dispatch(threadsActions.removeByThreadID(threadId));
-					await updateCacheThread(mezon, channelId, clanId, threadId);
-				}
+			if (response && isPrivate === 1) {
+				thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
+				thunkAPI.dispatch(threadsActions.removeByThreadID(threadId));
+				await updateCacheThread(mezon, channelId, clanId, threadId);
 				return { threadId, isPrivate };
 			}
 		} catch (error) {
