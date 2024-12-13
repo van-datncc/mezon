@@ -160,7 +160,7 @@ export const leaveThread = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.leaveThread(mezon.session, threadId);
-			if (response && isPrivate === 1) {
+			if (response) {
 				thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
 				thunkAPI.dispatch(threadsActions.remove(threadId));
 				await updateCacheThread(mezon, channelId, clanId, threadId);

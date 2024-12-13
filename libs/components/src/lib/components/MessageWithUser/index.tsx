@@ -370,6 +370,10 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 
+	const memoizedChildren = useMemo(() => {
+		return children;
+	}, [children]);
+
 	const handleMouseEnter = () => {
 		if (hoverTimeout.current) {
 			clearTimeout(hoverTimeout.current);
@@ -393,7 +397,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 		>
-			{children}
+			{memoizedChildren}
 			{isHover && popup && popup()}
 		</div>
 	);

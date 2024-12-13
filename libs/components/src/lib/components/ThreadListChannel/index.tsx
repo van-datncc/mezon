@@ -53,6 +53,8 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		dispatch(appActions.setIsShowCanvas(false));
 	};
 
+	console.log(threads, 'threadswraper');
+
 	return (
 		<div className="flex flex-col ml-6">
 			{threads.map((thread) => {

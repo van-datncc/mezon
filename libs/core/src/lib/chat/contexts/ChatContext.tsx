@@ -527,7 +527,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (user) {
 				if (channel_desc.type === ChannelType.CHANNEL_TYPE_TEXT || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
-					dispatch(channelsActions.add(channel));
+					dispatch(channelsActions.add({ ...channel, active: 1 }));
 					dispatch(listChannelsByUserActions.add(channel));
 				}
 				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_VOICE) {
@@ -537,6 +537,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							channelId: channel_desc.channel_id as string,
 							channelType: channel_desc.type as number,
 							isPublic: !channel_desc.channel_private
+						})
+					);
+				}
+
+				if (channel_desc.type === ChannelType.CHANNEL_TYPE_GROUP) {
+					dispatch(
+						directActions.addGroupUserWS({
+							channel_desc,
+							users
 						})
 					);
 				}

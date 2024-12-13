@@ -2,8 +2,6 @@ import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
 	ChannelsEntity,
 	appActions,
-	attachmentActions,
-	canvasAPIActions,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
@@ -154,7 +152,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 });
 
 function FileButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowFile, setIsShowFile] = useState<boolean>(false);
 
 	const fileRef = useRef<HTMLDivElement | null>(null);
@@ -166,22 +163,6 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowFile(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowFile) {
-			const fetchCanvas = async () => {
-				const channelId = currentChannel?.channel_id ?? '';
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					await dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
-				}
-			};
-			fetchCanvas();
-		}
-	}, [currentChannel?.channel_id, currentChannel?.clan_id, dispatch, isShowFile]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={fileRef}>
@@ -199,9 +180,7 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
-
 	const canvasRef = useRef<HTMLDivElement | null>(null);
 
 	const handleShowCanvas = () => {
@@ -211,26 +190,6 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowCanvas(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowCanvas) {
-			const fetchCanvas = async () => {
-				const channelId = currentChannel?.channel_id ?? '';
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channel_id: channelId,
-						clan_id: clanId
-					};
-					await dispatch(canvasAPIActions.getChannelCanvasList(body));
-				}
-			};
-			fetchCanvas();
-		}
-	}, [currentChannel?.channel_id]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>

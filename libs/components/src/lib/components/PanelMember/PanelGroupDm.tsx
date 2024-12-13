@@ -4,8 +4,8 @@ import {
 	SetNotificationPayload,
 	channelsActions,
 	deleteChannel,
+	directActions,
 	directMetaActions,
-	fetchDirectMessage,
 	notificationSettingActions,
 	removeMemberChannel,
 	selectCurrentUserId,
@@ -49,7 +49,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 		if (directId === dmGroupId) {
 			navigate('/chat/direct/friends');
 		}
-		await dispatch(fetchDirectMessage({ noCache: true }));
+		await dispatch(directActions.remove(dmGroupId as string));
 	};
 
 	const handleConfirmLeave = (e: Event) => {
