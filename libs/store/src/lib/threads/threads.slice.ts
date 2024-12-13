@@ -2,7 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { IMessageWithUser, IThread, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -29,7 +29,6 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	valueThread: IMessageWithUser | null;
 	openThreadMessageState: boolean;
 	currentThread?: ApiChannelDescription;
-	checkCachedThread: Record<string, boolean>;
 }
 
 export const threadsAdapter = createEntityAdapter({ selectId: (thread: ThreadsEntity) => thread.id || '' });
@@ -59,7 +58,10 @@ export interface FetchThreadsArgs {
 }
 
 const fetchThreadsCached = memoizee(
-	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string) => {
+	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string, defaultResponse?: ApiChannelDescList) => {
+		if (defaultResponse) {
+			return { ...defaultResponse, time: Date.now() };
+		}
 		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, 0, clanId, threadId);
 		return { ...response, time: Date.now() };
 	},
@@ -72,10 +74,20 @@ const fetchThreadsCached = memoizee(
 	}
 );
 
+const updateCacheThread = async (mezon: MezonValueContext, channelId: string, clanId: string, threadIdToLeave: string) => {
+	const response = await fetchThreadsCached(mezon, channelId, clanId);
+	if (response && response.channeldesc) {
+		const updatedChanneldesc = response.channeldesc.filter((thread: ApiChannelDescription) => thread.channel_id !== threadIdToLeave);
+		fetchThreadsCached.delete(mezon, channelId, clanId);
+
+		fetchThreadsCached(mezon, channelId, clanId, undefined, { channeldesc: updatedChanneldesc });
+	}
+};
+
 const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
 	return threads.map((thread) => ({
 		...thread,
-		id: thread.channel_id
+		id: thread.channel_id as string
 	}));
 };
 
@@ -125,7 +137,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	nameValueThread: {},
 	valueThread: null,
 	openThreadMessageState: false,
-	checkCachedThread: {}
+	checkCachedThread: false
 });
 
 export const checkDuplicateThread = createAsyncThunk(
@@ -146,17 +158,18 @@ export const checkDuplicateThread = createAsyncThunk(
 
 export const leaveThread = createAsyncThunk(
 	'thread/leavethread',
-	async ({ clanId, threadId, channelId, isPrivate }: { clanId: string; threadId: string; channelId: string; isPrivate: number }, thunkAPI) => {
+	async ({ clanId, channelId, threadId, isPrivate }: { clanId: string; channelId: string; threadId: string; isPrivate: number }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.leaveThread(mezon.session, threadId);
 			if (response) {
 				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(threadId));
 				if (isPrivate === 1) {
-					thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
-					return { threadId };
+					await thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
+					await thunkAPI.dispatch(threadsActions.removeByThreadID(threadId));
+					await updateCacheThread(mezon, channelId, clanId, threadId);
 				}
-				return undefined;
+				return { threadId, isPrivate };
 			}
 		} catch (error) {
 			captureSentryError(error, 'threads/leavethread');
@@ -172,6 +185,10 @@ export const threadsSlice = createSlice({
 		add: threadsAdapter.addOne,
 		update: threadsAdapter.updateOne,
 		remove: threadsAdapter.removeOne,
+
+		removeByThreadID: (state, action: PayloadAction<string>) => {
+			threadsAdapter.removeOne(state, action.payload);
+		},
 
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
@@ -254,11 +271,6 @@ export const threadsSlice = createSlice({
 			.addCase(checkDuplicateThread.rejected, (state, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.payload as string;
-			})
-			.addCase(leaveThread.fulfilled, (state: ThreadsState, action: PayloadAction<{ threadId: string } | undefined>) => {
-				if (action.payload && action.payload.threadId) {
-					threadsAdapter.removeOne(state, action.payload.threadId);
-				}
 			});
 	}
 });
@@ -325,10 +337,6 @@ export const selectValueThread = createSelector(getThreadsState, (state) => stat
 export const selectOpenThreadMessageState = createSelector(getThreadsState, (state: ThreadsState) => state.openThreadMessageState);
 
 export const selectCurrentThread = createSelector(getThreadsState, (state: ThreadsState) => state.currentThread);
-
-export const selectCheckCachedThread = createSelector([getThreadsState, (_, channelId: string) => channelId], (state, channelId) => {
-	return !!state.checkCachedThread?.[channelId];
-});
 
 export const selectNameValueThread = (channelId: string) =>
 	createSelector(getThreadsState, (state) => {
