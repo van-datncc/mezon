@@ -1,18 +1,19 @@
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
-	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectCurrentTopicId,
-	selectValueTopic
+	selectValueTopic,
+	topicsActions,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
-import ShareLocationConfirmModal from 'apps/mobile/src/app/components/ShareLocationConfirmModal';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSelector } from 'react-redux';
+import ShareLocationConfirmModal from '../../../../../components/ShareLocationConfirmModal';
 import ChannelMessagesWrapper from '../../ChannelMessagesWrapper';
 import { ChatBox } from '../../ChatBox';
 import PanelKeyboard from '../../PanelKeyboard';
@@ -22,19 +23,17 @@ import { style } from './styles';
 
 export default function TopicDiscussion() {
 	const { themeValue } = useTheme();
-	const valueTopic = useSelector(selectValueTopic);
-	console.log('valueTopic: ', valueTopic);
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelKeyboardRef = useRef(null);
-	console.log('currentTopicId: ', currentTopicId);
+	const dispatch = useAppDispatch();
+	const valueTopic = useSelector(selectValueTopic);
 
 	const styles = style(themeValue);
 	useEffect(() => {
 		const fetchMsgResult = async () => {
-			const store = await getStoreAsync();
-			store.dispatch(
+			await dispatch(
 				messagesActions.fetchMessages({
 					channelId: currentChannel?.channel_id,
 					clanId: currentClanId,
@@ -45,13 +44,19 @@ export default function TopicDiscussion() {
 		if (currentTopicId !== '') {
 			fetchMsgResult();
 		}
-	}, [currentClanId, currentTopicId, currentChannel?.channel_id]);
+
+		return () => {
+			dispatch(topicsActions.setCurrentTopicId(''));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: valueTopic?.channel_id as string, isShowCreateTopic: false }));
+		};
+	}, [currentChannel?.channel_id, currentClanId, currentTopicId, dispatch, valueTopic]);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
 		}
 	}, []);
+
 	return (
 		<Block width={'100%'} height={'100%'}>
 			<TopicHeader></TopicHeader>
@@ -75,7 +80,4 @@ export default function TopicDiscussion() {
 			</KeyboardAvoidingView>
 		</Block>
 	);
-}
-function dispatch(arg0: any) {
-	throw new Error('Function not implemented.');
 }
