@@ -140,7 +140,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 							<div
 								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
 							>
-								<span>View Move</span>
+								<span>View More</span>
 							</div>
 						</Item>
 					</Dropdown>

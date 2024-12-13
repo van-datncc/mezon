@@ -483,12 +483,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
 					dispatch(listChannelsByUserActions.remove(userID));
 				} else {
-					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string }));
 						// TODO: remove member group
 					}
 				}
+				dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 			});
 		},
 		[channelId, clanId, dispatch, navigate, userId, directId]

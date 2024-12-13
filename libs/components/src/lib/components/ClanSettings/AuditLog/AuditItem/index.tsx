@@ -1,7 +1,7 @@
 import {
 	auditLogList,
 	selectActionAuditLog,
-	selectAllAuditLog,
+	selectAllAuditLogData,
 	selectChannelById,
 	selectCurrentClan,
 	selectMemberClanByUserId,
@@ -15,7 +15,7 @@ import { Icons } from '@mezon/ui';
 import { ActionLog, convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { Dropdown, Pagination } from 'flowbite-react';
 import { ApiAuditLog } from 'mezon-js/api.gen';
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { Dispatch, SetStateAction, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
@@ -27,61 +27,63 @@ interface MainAuditLogProps {
 }
 
 const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage }: MainAuditLogProps) => {
-	const auditLogData = useSelector(selectAllAuditLog);
+	const auditLogData = useSelector(selectAllAuditLogData);
 	const totalCount = useSelector(selectTotalCountAuditLog);
 	const currentClan = useSelector(selectCurrentClan);
 	const auditLogFilterAction = useSelector(selectActionAuditLog);
 	const auditLogFilterUser = useSelector(selectUserAuditLog);
 	const dispatch = useAppDispatch();
+
 	const totalPages = useMemo(() => {
-		if (!totalCount) {
-			return 0;
-		}
-		return Math.ceil(auditLogData.length / pageSize);
-	}, [auditLogData.length, pageSize, totalCount]);
+		if (!totalCount) return 0;
+		return Math.ceil(totalCount / pageSize);
+	}, [totalCount, pageSize]);
 
 	const onPageChange = (page: number) => {
+		if (currentPage === page) return;
 		setCurrentPage(page);
+		callAuditLog(page, pageSize);
 	};
 
-	const handleChangePageSize = (pageSize: number) => {
-		setPageSize(pageSize);
+	const handleChangePageSize = (size: number) => {
+		if (size === pageSize) {
+			return;
+		}
+
+		setPageSize(size);
 		setCurrentPage(1);
+
+		if (size > pageSize) {
+			const shouldCallApi = auditLogData.length < totalCount;
+
+			if (shouldCallApi) {
+				callAuditLog(1, size);
+			}
+		} else {
+			if (totalCount > size) {
+				callAuditLog(1, size);
+			}
+		}
 	};
 
-	const displayAuditLog = useMemo(() => {
-		if (auditLogData && auditLogData.length) {
-			const start = (currentPage - 1) * pageSize;
-			const end = Math.min(start + pageSize, auditLogData.length);
-			return auditLogData.slice(start, end);
-		}
-	}, [currentPage, pageSize, auditLogData]);
-
-	useEffect(() => {
-		if (
-			auditLogData.length < pageSize &&
-			// auditLogData.length < totalCount &&
-			// auditLogData.length < pageSize * currentPage &&
-			currentClan?.clan_id
-		) {
-			const body = {
-				noCache: true,
-				actionLog: auditLogFilterAction ?? '',
-				userId: auditLogFilterUser?.userId ?? '',
-				clanId: currentClan?.clan_id ?? '',
-				page: currentPage,
-				pageSize: pageSize
-			};
-			dispatch(auditLogList(body));
-		}
-	}, [pageSize, currentPage]);
+	const callAuditLog = (page: number, pageSize: number) => {
+		const body = {
+			noCache: true,
+			actionLog: auditLogFilterAction ?? '',
+			userId: auditLogFilterUser?.userId ?? '',
+			clanId: currentClan?.clan_id ?? '',
+			page: page,
+			pageSize: pageSize
+		};
+		dispatch(auditLogList(body));
+	};
 
 	return (
 		<div className="flex flex-col">
 			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
-			{displayAuditLog && displayAuditLog.length > 0 ? (
+			{auditLogData && auditLogData.length > 0 ? (
 				<>
-					{displayAuditLog.map((log) => (
+					{auditLogData.map((log) => (
 						<AuditLogItem key={log.id} logItem={log} />
 					))}
 
@@ -121,7 +123,7 @@ const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage }: Ma
 									100
 								</Dropdown.Item>
 							</Dropdown>
-							audit log of {auditLogData.length}
+							audit log of {totalCount}
 						</div>
 						<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
 					</div>
