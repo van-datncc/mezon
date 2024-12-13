@@ -162,9 +162,9 @@ export const leaveThread = createAsyncThunk(
 			const response = await mezon.client.leaveThread(mezon.session, threadId);
 			if (response && isPrivate === 1) {
 				thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
-				thunkAPI.dispatch(threadsActions.removeByThreadID(threadId));
+				thunkAPI.dispatch(threadsActions.remove(threadId));
 				await updateCacheThread(mezon, channelId, clanId, threadId);
-				return { threadId, isPrivate };
+				return threadId;
 			}
 		} catch (error) {
 			captureSentryError(error, 'threads/leavethread');
@@ -179,7 +179,7 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		update: threadsAdapter.updateOne,
-		removeByThreadID: (state, action: PayloadAction<string>) => {
+		remove: (state, action: PayloadAction<string>) => {
 			threadsAdapter.removeOne(state, action.payload);
 		},
 
