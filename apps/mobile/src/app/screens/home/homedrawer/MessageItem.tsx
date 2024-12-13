@@ -20,6 +20,7 @@ import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageCallLog } from './components/MessageCallLog';
+import MessageTopic from './components/MessageTopic/MessageTopic';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { MessageLineSystem } from './MessageLineSystem';
 import RenderMessageBlock from './RenderMessageBlock';
@@ -395,6 +396,7 @@ const MessageItem = React.memo(
 									}}
 								/>
 							) : null}
+							<MessageTopic message={message}></MessageTopic>
 						</Pressable>
 					</View>
 				</View>
