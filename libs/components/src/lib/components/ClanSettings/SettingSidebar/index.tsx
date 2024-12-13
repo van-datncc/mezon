@@ -1,5 +1,5 @@
 import { usePermissionChecker } from '@mezon/core';
-import { authActions, selectActionAuditLog, selectCurrentClan, selectUserAuditLog, useAppDispatch } from '@mezon/store';
+import { auditLogList, authActions, selectActionAuditLog, selectCurrentClan, selectUserAuditLog, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
@@ -52,19 +52,19 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			navigate('/application-directory');
 			return;
 		}
-		// if (settingItem.id === ItemSetting.AUDIT_LOG) {
-		// 	if (currentClan?.clan_id) {
-		// 		const body = {
-		// 			noCache: true,
-		// 			actionLog: auditLogFilterAction ?? '',
-		// 			userId: auditLogFilterUser?.userId ?? '',
-		// 			clanId: currentClan?.clan_id ?? '',
-		// 			page: 1,
-		// 			pageSize: 10
-		// 		};
-		// 		dispatch(auditLogList(body));
-		// 	}
-		// }
+		if (settingItem.id === ItemSetting.AUDIT_LOG) {
+			if (currentClan?.clan_id) {
+				const body = {
+					noCache: true,
+					actionLog: auditLogFilterAction ?? '',
+					userId: auditLogFilterUser?.userId ?? '',
+					clanId: currentClan?.clan_id ?? '',
+					page: 1,
+					pageSize: 10
+				};
+				dispatch(auditLogList(body));
+			}
+		}
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};

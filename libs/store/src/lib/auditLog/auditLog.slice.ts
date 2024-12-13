@@ -87,10 +87,10 @@ export const auditLogSlice = createSlice({
 			})
 			.addCase(auditLogList.fulfilled, (state: IAuditLogState, action: PayloadAction<MezonapiListAuditLog>) => {
 				state.loadingStatus = 'loaded';
-				state.auditLogData = action.payload;
-				if (action.payload.logs) {
-					auditLogAdapter.addMany(state, action.payload.logs);
-				}
+				state.auditLogData = {
+					...action.payload,
+					total_count: action.payload?.total_count
+				};
 			})
 			.addCase(auditLogList.rejected, (state: IAuditLogState, action) => {
 				state.loadingStatus = 'error';
@@ -110,7 +110,7 @@ const { selectAll, selectById, selectEntities } = auditLogAdapter.getSelectors()
 export const getAuditLogState = (rootState: { [AUDIT_LOG_FEATURE_KEY]: IAuditLogState }): IAuditLogState => rootState[AUDIT_LOG_FEATURE_KEY];
 export const selectAllAuditLog = createSelector(getAuditLogState, selectAll);
 export const selectAllAuditLogData = createSelector(getAuditLogState, (state) => {
-	return state.auditLogData || [];
+	return state.auditLogData.logs || [];
 });
 export const selectTotalCountAuditLog = createSelector(getAuditLogState, (state) => {
 	return state.auditLogData.total_count || 0;
