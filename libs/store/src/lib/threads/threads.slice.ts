@@ -179,8 +179,6 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		update: threadsAdapter.updateOne,
-		remove: threadsAdapter.removeOne,
-
 		removeByThreadID: (state, action: PayloadAction<string>) => {
 			threadsAdapter.removeOne(state, action.payload);
 		},
