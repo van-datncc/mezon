@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, ipcMain, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
@@ -7,7 +7,15 @@ import { electronAppName, rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 import setupAutoUpdates from './autoUpdates';
-import { ACTIVE_WINDOW, SET_ATTACHMENT_DATA, TRIGGER_SHORTCUT } from './events/constants';
+import {
+	ACTIVE_WINDOW,
+	CHANGE_ATTACHMENT_LIST,
+	GET_ATTACHMENT_DATA,
+	SEND_ATTACHMENT_DATA,
+	SET_ATTACHMENT_DATA,
+	SET_CURRENT_IMAGE,
+	TRIGGER_SHORTCUT
+} from './events/constants';
 import setupRequestPermission from './requestPermission';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
@@ -27,6 +35,8 @@ export default class App {
 	static mainWindow: Electron.BrowserWindow;
 	static application: Electron.App;
 	static BrowserWindow: typeof Electron.BrowserWindow;
+	static imageViewerWindow: Electron.BrowserWindow | null = null;
+	static attachmentData: any;
 
 	public static isDevelopmentMode() {
 		return !app.isPackaged;
@@ -243,9 +253,11 @@ export default class App {
 		App.application.on('activate', App.onActivate);
 	}
 
-	static currentWindow: Electron.BrowserWindow | null = null;
+	static isWindowValid(window: Electron.BrowserWindow | null): boolean {
+		return window !== null && !window.isDestroyed();
+	}
 
-	static openNewWindow(props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
+	static openImageWindow(props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
 		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
 			width: 1000,
 			height: 800,
@@ -264,22 +276,18 @@ export default class App {
 
 		const windowOptions = { ...defaultOptions, ...options };
 
-		if (this.currentWindow && !this.currentWindow.isDestroyed()) {
-			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
-			this.currentWindow.show();
-			return;
-		}
+		if (!this.isWindowValid(this.imageViewerWindow)) {
+			this.imageViewerWindow = new BrowserWindow(windowOptions);
 
-		this.currentWindow = new BrowserWindow(windowOptions);
-
-		const filePath = App.application.isPackaged
-			? 'assets/image-window/image-window.html'
-			: 'apps/desktop/src/assets/image-window/image-window.html';
-		if (App.application.isPackaged) {
-			const baseUrl = join(__dirname, '..', electronAppName, filePath);
+			const filePath = App.application.isPackaged
+				? 'assets/image-window/image-window.html'
+				: 'apps/desktop/src/assets/image-window/image-window.html';
+			const baseUrl = App.application.isPackaged
+				? join(__dirname, '..', electronAppName, filePath)
+				: join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			this.currentWindow.loadURL(
+			this.imageViewerWindow.loadURL(
 				format({
 					pathname: fullUrl,
 					protocol: 'file:',
@@ -287,25 +295,26 @@ export default class App {
 					query: params
 				})
 			);
-		} else {
-			const baseUrl = join(__dirname, '..', '..', '..', filePath);
-			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			this.currentWindow.loadURL(
-				format({
-					pathname: fullUrl,
-					protocol: 'file:',
-					slashes: true,
-					query: params
-				})
-			);
+			this.imageViewerWindow.webContents.on('did-finish-load', () => {
+				this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+			});
 		}
 
-		this.currentWindow.webContents.on('did-finish-load', () => {
-			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
+		ipcMain.on(SEND_ATTACHMENT_DATA, (event, data) => {
+			this.attachmentData = data;
+			this.imageViewerWindow.webContents.send(CHANGE_ATTACHMENT_LIST);
 		});
 
-		return this.currentWindow;
+		ipcMain.on(GET_ATTACHMENT_DATA, () => {
+			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
+		});
+
+		this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+
+		this.imageViewerWindow.show();
+
+		return this.imageViewerWindow;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import {IImageWindowProps} from "../../types";
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export type ElectronBridgeHandler = (...args: any[]) => void;
 export type MezonElectronAPI = {
@@ -13,7 +13,7 @@ export type MezonElectronAPI = {
 	setBadgeCount: (badgeCount: number | null) => void;
 	onWindowBlurred: (callback: () => void) => void;
 	onWindowFocused: (callback: () => void) => void;
-	openNewWindow: (imageWindowProps: IImageWindowProps) => Promise<void>;
+	openImageWindow: (currentImage: ApiMessageAttachment & { create_time?: string; uploaderData: { name: string; avatar: string } }) => Promise<void>;
 };
 declare global {
 	interface Window {
