@@ -206,7 +206,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
+			thunkAPI.dispatch(channelsActions.add({ id: response.channel_id as string, ...response }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
@@ -261,7 +261,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 			if (body.isDmGroup) {
 				return true;
 			}
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId, noCache: true }));
+			thunkAPI.dispatch(channelsActions.remove(body.channelId));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
@@ -276,12 +276,11 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 			await thunkAPI.dispatch(directActions.changeE2EE({ channel_id: body.channel_id, e2ee: body.e2ee }));
 		}
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
-		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			if (body.category_id === '0') {
-				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				thunkAPI.dispatch(directActions.update({ id: body.channel_id, changes: { ...body } }));
 			} else {
-				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+				thunkAPI.dispatch(channelsActions.update({ id: body.channel_id, changes: { ...body } }));
 			}
 		}
 	} catch (error) {
@@ -296,7 +295,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const response = await mezon.client.updateChannelPrivate(mezon.session, body);
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			thunkAPI.dispatch(channelsActions.update({ id: body.channel_id as string, changes: { channel_private: body.channel_private } }));
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }));
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
@@ -346,9 +345,9 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 export const addFavoriteChannel = createAsyncThunk('channels/favorite/add', async (body: ApiAddFavoriteChannelRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.addFavoriteChannel(mezon.session, body.channel_id || '', body.clan_id || '');
+		const response = await mezon.client.addFavoriteChannel(mezon.session, body.channel_id as string, body.clan_id as string);
 		if (response) {
-			thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: body.clan_id || '', noCache: true }));
+			thunkAPI.dispatch(channelsActions.addFavorite(body.channel_id as string));
 			return response;
 		}
 		return;
@@ -365,7 +364,7 @@ export const removeFavoriteChannel = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.removeFavoriteChannel(mezon.session, channelId);
 			if (response) {
-				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: clanId || '', noCache: true }));
+				thunkAPI.dispatch(channelsActions.removeFavorite(channelId));
 			}
 		} catch (error) {
 			captureSentryError(error, 'channels/favorite/remove');
@@ -523,7 +522,7 @@ export const markAsReadProcessing = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(fetchChannels({ clanId: clan_id || '', noCache: true }));
+			thunkAPI.dispatch(channelsActions.update({ id: channel_id as string, changes: { count_mess_unread: 0 } }));
 			thunkAPI.dispatch(clansActions.fetchClans());
 			return response;
 		} catch (error) {
@@ -555,7 +554,10 @@ export const channelsSlice = createSlice({
 	name: CHANNELS_FEATURE_KEY,
 	initialState: initialChannelsState,
 	reducers: {
-		add: channelsAdapter.addOne,
+		add: (state: ChannelsState, action: PayloadAction<ChannelsEntity>) => {
+			channelMetaActions.add(extractChannelMeta(action.payload));
+			channelsAdapter.addOne(state, action.payload);
+		},
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
@@ -695,7 +697,15 @@ export const channelsSlice = createSlice({
 				};
 			}
 		},
-
+		addFavorite: (state, action: PayloadAction<string>) => {
+			if (!Array.isArray(state.favoriteChannels)) {
+				state.favoriteChannels = [];
+			}
+			state.favoriteChannels.push(action.payload);
+		},
+		removeFavorite: (state, action: PayloadAction<string>) => {
+			state.favoriteChannels = state.favoriteChannels.filter((id) => id !== action.payload);
+		},
 		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
 			state.buzzState[action.payload.channelId] = action.payload.buzzState;
 		}

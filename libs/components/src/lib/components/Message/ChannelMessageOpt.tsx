@@ -13,6 +13,7 @@ import {
 	selectDefaultCanvasByChannelId,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -357,6 +358,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread }));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: false }));
 		},
 		[message.channel_id, dispatch]
 	);

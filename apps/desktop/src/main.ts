@@ -114,17 +114,43 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			window.minimize();
 			break;
 		case UNMAXIMIZE_WINDOW:
-			if (window.isMaximized()) {
-				window.unmaximize();
-			} else {
-				window.maximize();
-			}
-			break;
 		case MAXIMIZE_WINDOW:
-			if (window.isMaximized()) {
-				window.restore();
+			if (process.platform === 'darwin') {
+				const screen = require('electron').screen;
+				const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+				const windowBounds = window.getBounds();
+				const isMaximized = windowBounds.width >= display.workArea.width && windowBounds.height >= display.workArea.height;
+				if (isMaximized) {
+					const newWidth = Math.floor(display.workArea.width * 0.8);
+					const newHeight = Math.floor(display.workArea.height * 0.8);
+					const x = Math.floor((display.workArea.width - newWidth) / 2);
+					const y = Math.floor((display.workArea.height - newHeight) / 2);
+					window.setBounds(
+						{
+							x,
+							y,
+							width: newWidth,
+							height: newHeight
+						},
+						false
+					);
+				} else {
+					window.setBounds(
+						{
+							x: display.workArea.x,
+							y: display.workArea.y,
+							width: display.workArea.width,
+							height: display.workArea.height
+						},
+						false
+					);
+				}
 			} else {
-				window.maximize();
+				if (window.isMaximized()) {
+					window.restore();
+				} else {
+					window.maximize();
+				}
 			}
 			break;
 		case CLOSE_APP:

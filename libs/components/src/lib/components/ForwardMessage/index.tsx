@@ -197,7 +197,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					return {
 						id: itemGr?.channel_id ?? '',
 						name: itemGr?.channel_label ?? '',
-						avatarUser: 'assets/images/avatar-group.png' ?? '',
+						avatarUser: 'assets/images/avatar-group.png',
 						idDM: itemGr?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
 						userName: itemGr?.usernames,

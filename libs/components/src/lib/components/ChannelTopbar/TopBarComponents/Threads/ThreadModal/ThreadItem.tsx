@@ -118,12 +118,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 
 	const handleDeleteThread = async () => {
 		await dispatch(channelsActions.deleteChannel({ channelId: channelThread?.channel_id as string, clanId: channelThread?.clan_id as string }));
-		const body = {
-			channelId: channelThread?.parrent_id as string,
-			clanId: channelThread?.clan_id as string,
-			noCache: true
-		};
-		await dispatch(threadsActions.fetchThreads(body));
+		await dispatch(threadsActions.remove(channelThread.id));
 		closeConfirmDelete();
 		preventClosePannel.current = false;
 	};

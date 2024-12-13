@@ -373,7 +373,6 @@ export const loadMoreMessage = createAsyncThunk(
 					fetchMessages({
 						clanId: clanId,
 						channelId: channelId,
-						noCache: true,
 						messageId: lastScrollMessageId,
 						direction: direction
 					})
