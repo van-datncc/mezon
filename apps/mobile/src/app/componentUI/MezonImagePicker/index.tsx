@@ -26,6 +26,7 @@ interface IMezonImagePickerProps {
 	onChange?: (file: any) => void;
 	onLoad?: (url: string) => void;
 	defaultValue: string;
+	localValue?: any;
 	height?: DimensionValue;
 	width?: DimensionValue;
 	rounded?: boolean;
@@ -85,6 +86,7 @@ export default memo(
 			showHelpText,
 			autoUpload = false,
 			rounded = false,
+			localValue,
 			alt,
 			style,
 			defaultColor,
@@ -177,7 +179,9 @@ export default memo(
 			<TouchableOpacity onPress={handlePress} disabled={disabled}>
 				<View style={styles.bannerContainer}>
 					<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
-						{image || !showHelpText ? (
+						{localValue ? (
+							localValue
+						) : image || !showHelpText ? (
 							<MezonClanAvatar image={image} alt={alt} defaultColor={defaultColor} noDefaultText={noDefaultText} />
 						) : (
 							<Text style={styles.textPlaceholder}>Choose an image</Text>
