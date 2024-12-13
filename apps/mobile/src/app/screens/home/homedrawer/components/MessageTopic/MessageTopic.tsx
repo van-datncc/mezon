@@ -15,6 +15,7 @@ const MessageTopic = ({ message }: { message: MessagesEntity }) => {
 	const navigation = useNavigation<any>();
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setValueTopic(message));
+		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
 		});
