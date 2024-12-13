@@ -138,7 +138,6 @@ function ChannelMessages({
 		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
 	}, []);
 
-	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 
@@ -149,7 +148,6 @@ function ChannelMessages({
 	const handleOnChange = useCallback(
 		async (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => {
 			if (!userActiveScroll.current) return;
-			toggleDisableHover(chatRef.current, scrollTimeoutId2);
 			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
 			switch (instance.scrollDirection) {
 				case 'backward':
@@ -423,10 +421,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			};
 		}, []);
 
+		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
+
 		return (
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
 					onWheelCapture={() => {
+						toggleDisableHover(chatRef.current, scrollTimeoutId2);
 						userActiveScroll.current = true;
 					}}
 					onTouchStart={() => {

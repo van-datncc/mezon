@@ -249,17 +249,21 @@ export default class App {
 		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
 			width: 1000,
 			height: 800,
-			show: true,
-			titleBarOverlay: process.platform == 'darwin',
+			backgroundColor: '#1a1a1a',
+			show: false,
 			titleBarStyle: 'hidden',
-			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
+			frame: false,
+			trafficLightPosition: process.platform == 'darwin' ? { x: -20, y: -20 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				preload: join(__dirname, 'main.preload.js')
+				preload: join(__dirname, 'main.preload.js'),
+				backgroundThrottling: false
 			},
-			icon: join(__dirname, 'assets', 'desktop-taskbar-256x256.ico'),
-			autoHideMenuBar: true
+			autoHideMenuBar: true,
+			titleBarOverlay: false,
+			paintWhenInitiallyHidden: true,
+			visualEffectState: 'active'
 		};
 
 		const windowOptions = { ...defaultOptions, ...options };
@@ -267,42 +271,68 @@ export default class App {
 		if (this.currentWindow && !this.currentWindow.isDestroyed()) {
 			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
 			this.currentWindow.show();
+			this.currentWindow.focus();
 			return;
 		}
 
 		this.currentWindow = new BrowserWindow(windowOptions);
 
+		const emptyMenu = Menu.buildFromTemplate([]);
+		this.currentWindow.setMenu(emptyMenu);
+		this.currentWindow.setMenuBarVisibility(false);
+		this.currentWindow.setOpacity(0);
+
 		const filePath = App.application.isPackaged
 			? 'assets/image-window/image-window.html'
 			: 'apps/desktop/src/assets/image-window/image-window.html';
-		if (App.application.isPackaged) {
-			const baseUrl = join(__dirname, '..', electronAppName, filePath);
-			const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			this.currentWindow.loadURL(
-				format({
-					pathname: fullUrl,
-					protocol: 'file:',
-					slashes: true,
-					query: params
-				})
-			);
-		} else {
-			const baseUrl = join(__dirname, '..', '..', '..', filePath);
-			const fullUrl = this.generateFullUrl(baseUrl, params);
+		const loadContent = async () => {
+			try {
+				if (App.application.isPackaged) {
+					const baseUrl = join(__dirname, '..', electronAppName, filePath);
+					const fullUrl = this.generateFullUrl(baseUrl, params);
 
-			this.currentWindow.loadURL(
-				format({
-					pathname: fullUrl,
-					protocol: 'file:',
-					slashes: true,
-					query: params
-				})
-			);
+					await this.currentWindow?.loadURL(
+						format({
+							pathname: fullUrl,
+							protocol: 'file:',
+							slashes: true,
+							query: params
+						})
+					);
+				} else {
+					const baseUrl = join(__dirname, '..', '..', '..', filePath);
+					const fullUrl = this.generateFullUrl(baseUrl, params);
+
+					await this.currentWindow?.loadURL(
+						format({
+							pathname: fullUrl,
+							protocol: 'file:',
+							slashes: true,
+							query: params
+						})
+					);
+				}
+
+				this.currentWindow?.setOpacity(1);
+				this.currentWindow?.show();
+				this.currentWindow?.focus();
+				this.currentWindow?.webContents.send(SET_ATTACHMENT_DATA, props);
+			} catch (error) {
+				console.error('Failed to load window:', error);
+			}
+		};
+
+		loadContent();
+
+		if (!App.application.isPackaged) {
+			this.currentWindow.webContents.on('did-fail-load', (_, code, description) => {
+				console.error('Window load failed:', code, description);
+			});
 		}
 
-		this.currentWindow.webContents.on('did-finish-load', () => {
-			this.currentWindow.webContents.send(SET_ATTACHMENT_DATA, props);
+		this.currentWindow.on('closed', () => {
+			this.currentWindow = null;
 		});
 
 		return this.currentWindow;
