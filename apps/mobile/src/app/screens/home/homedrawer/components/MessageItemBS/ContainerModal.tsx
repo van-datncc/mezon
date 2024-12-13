@@ -17,12 +17,14 @@ import {
 	selectPinMessageByChannelId,
 	setIsForwardAll,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +33,7 @@ import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useImage } from '../../../../../hooks/useImage';
+import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -58,7 +61,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
-
+	const navigation = useNavigation<any>();
 	const { sendMessage } = useChatSending({
 		mode,
 		channelOrDirect:
@@ -312,6 +315,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
+	const handleActionTopicDiscussion = async () => {
+		if (!message) return;
+		dispatch(topicsActions.setValueTopic(message));
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
+		});
+	};
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -365,6 +376,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.ResendMessage:
 				handleResendMessage();
 				break;
+			case EMessageActionType.TopicDiscussion:
+				handleActionTopicDiscussion();
+				break;
 			default:
 				break;
 		}
@@ -406,6 +420,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.GiftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />;
 			case EMessageActionType.ResendMessage:
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
+			case EMessageActionType.TopicDiscussion:
+				return <Icons.DiscussionIcon color={themeValue.text} width={size.s_32} height={size.s_32} />;
 			default:
 				return <View />;
 		}
@@ -418,6 +434,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
+		const isHideTopicDiscussion = message?.code === TypeMessage.Topic;
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
@@ -428,7 +445,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
-			isMyMessage && EMessageActionType.GiveACoffee
+			isMyMessage && EMessageActionType.GiveACoffee,
+			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
 		];
 
 		let availableMessageActions: IMessageAction[] = [];

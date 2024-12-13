@@ -2005,3 +2005,21 @@ export const WelcomeIcon = ({ width = 24, height = 24, color = '#AEAEAE', ...pro
 		</Svg>
 	);
 };
+export const DiscussionIcon = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 28 28" {...props}>
+			<Path
+				fill="none"
+				stroke={color}
+				strokeWidth={1.5}
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				d="M5.5 12a7 7 0 0011.027 5.726L19.5 18v-6a7 7 0 10-14 0z"
+			/>
+			<Path
+				fill={color}
+				d="M9.5 13.25a.75.75 0 000 1.5v-1.5zm4 1.5a.75.75 0 000-1.5v1.5zm-4-4.5a.75.75 0 000 1.5v-1.5zm6 1.5a.75.75 0 000-1.5v1.5zm-6 3h4v-1.5h-4v1.5zm0-3h6v-1.5h-6v1.5z"
+			/>
+		</Svg>
+	);
+};

@@ -45,6 +45,11 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
 			type: EMessageActionType.CopyText
 		},
 		{
+			id: 18,
+			title: t('message:actions.topicDiscussion'),
+			type: EMessageActionType.TopicDiscussion
+		},
+		{
 			id: 7,
 			title: t('message:actions.deleteMessage'),
 			type: EMessageActionType.DeleteMessage
