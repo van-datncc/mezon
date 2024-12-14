@@ -2,7 +2,7 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { getNearTime } from '@mezon/mobile-components';
 import { Block, Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { StyleProp, Text, View, ViewStyle } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MezonBottomSheet from '../MezonBottomSheet';
@@ -17,6 +17,7 @@ type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, 'onPress' | 'postfixIcon' |
 	need24HourFormat?: { is24hourSource: 'locale' | 'device' };
 	needLocale?: { locale: string };
 	error?: string;
+	containerStyle?: StyleProp<ViewStyle>;
 };
 
 export default memo(function MezonDateTimePicker({
@@ -27,6 +28,7 @@ export default memo(function MezonDateTimePicker({
 	need24HourFormat,
 	needLocale,
 	error,
+	containerStyle,
 	...props
 }: IMezonDateTimePicker) {
 	const { themeValue, themeBasic } = useTheme();
@@ -90,6 +92,7 @@ export default memo(function MezonDateTimePicker({
 								day: 'numeric'
 							})
 				}
+				containerStyle={containerStyle}
 				onPress={handlePress}
 			/>
 
