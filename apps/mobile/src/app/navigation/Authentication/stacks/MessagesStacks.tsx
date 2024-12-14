@@ -77,7 +77,12 @@ export const MessagesStacks = ({}: any) => {
 				name={APP_SCREEN.MESSAGES.TOPIC_DISCUSSION}
 				component={TopicDiscussion}
 				options={{
-					title: t('headerTitle.topic')
+					title: t('headerTitle.topic'),
+					headerStyle: {
+						backgroundColor: themeValue.primary
+					},
+					headerShown: false,
+					headerShadowVisible: false
 				}}
 			/>
 		</Stack.Navigator>

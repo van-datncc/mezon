@@ -396,7 +396,7 @@ const MessageItem = React.memo(
 									}}
 								/>
 							) : null}
-							<MessageTopic message={message}></MessageTopic>
+							{message?.code === TypeMessage.Topic && <MessageTopic message={message} avatar={messageAvatar} />}
 						</Pressable>
 					</View>
 				</View>

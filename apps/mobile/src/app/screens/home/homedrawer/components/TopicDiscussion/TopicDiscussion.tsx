@@ -1,17 +1,12 @@
-import { Block, useTheme } from '@mezon/mobile-ui';
-import {
-	messagesActions,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectCurrentTopicId,
-	selectValueTopic,
-	topicsActions,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { useTheme } from '@mezon/mobile-ui';
+import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectCurrentTopicId, topicsActions, useAppDispatch } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import ShareLocationConfirmModal from '../../../../../components/ShareLocationConfirmModal';
 import ChannelMessagesWrapper from '../../ChannelMessagesWrapper';
@@ -28,12 +23,12 @@ export default function TopicDiscussion() {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelKeyboardRef = useRef(null);
 	const dispatch = useAppDispatch();
-	const valueTopic = useSelector(selectValueTopic);
+	const navigation = useNavigation<any>();
 
 	const styles = style(themeValue);
 	useEffect(() => {
 		const fetchMsgResult = async () => {
-			await dispatch(
+			const aa = await dispatch(
 				messagesActions.fetchMessages({
 					channelId: currentChannel?.channel_id,
 					clanId: currentClanId,
@@ -44,12 +39,14 @@ export default function TopicDiscussion() {
 		if (currentTopicId !== '') {
 			fetchMsgResult();
 		}
+	}, [currentChannel?.channel_id, currentClanId, currentTopicId, dispatch]);
 
+	useEffect(() => {
 		return () => {
 			dispatch(topicsActions.setCurrentTopicId(''));
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: valueTopic?.channel_id as string, isShowCreateTopic: false }));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.channel_id as string, isShowCreateTopic: false }));
 		};
-	}, [currentChannel?.channel_id, currentClanId, currentTopicId, dispatch, valueTopic]);
+	}, [currentChannel?.channel_id, dispatch]);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
@@ -57,16 +54,37 @@ export default function TopicDiscussion() {
 		}
 	}, []);
 
+	const onHandlerStateChange = useCallback(
+		(event: { nativeEvent: { translationX: any; velocityX: any } }) => {
+			const { translationX, velocityX } = event.nativeEvent;
+			if (translationX > 50 && velocityX > 300) {
+				navigation.goBack();
+			}
+		},
+		[navigation]
+	);
+
+	const onGoBack = useCallback(() => {
+		navigation.goBack();
+	}, [navigation]);
+
 	return (
-		<Block width={'100%'} height={'100%'}>
-			<TopicHeader></TopicHeader>
-			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 54 : 0}>
-				<ChannelMessagesWrapper
-					channelId={currentTopicId}
-					clanId={currentClanId}
-					isPublic={isPublicChannel(currentChannel)}
-					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
+		<SafeAreaView edges={['top']} style={styles.channelView}>
+			<TopicHeader
+				mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+				handleBack={onGoBack}
+			/>
+			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+				<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
+					<View style={{ flex: 1 }}>
+						<ChannelMessagesWrapper
+							channelId={currentTopicId}
+							clanId={currentClanId}
+							isPublic={isPublicChannel(currentChannel)}
+							mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+						/>
+					</View>
+				</PanGestureHandler>
 				<ChatBox
 					channelId={currentChannel?.channel_id}
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
@@ -78,6 +96,6 @@ export default function TopicDiscussion() {
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 				/>
 			</KeyboardAvoidingView>
-		</Block>
+		</SafeAreaView>
 	);
 }

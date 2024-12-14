@@ -323,6 +323,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
 		});
+		onClose();
 	};
 
 	const implementAction = (type: EMessageActionType) => {
@@ -436,7 +437,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
-		const isHideTopicDiscussion = message?.code === TypeMessage.Topic;
+		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM;
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];

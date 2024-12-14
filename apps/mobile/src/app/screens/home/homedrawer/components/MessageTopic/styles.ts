@@ -9,12 +9,18 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			borderRadius: size.s_10
 		},
+		container: {
+			marginVertical: size.s_2,
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_4,
+		},
 		dateMessageBox: {
 			fontSize: size.small,
 			color: Colors.gray72
 		},
 		repliesText: {
-			fontSize: size.s_14,
+			fontSize: size.small,
 			color: colors.textLink
 		}
 	});

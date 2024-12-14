@@ -32,6 +32,7 @@ import {
 	ThreadStatus,
 	checkIsThread,
 	filterEmptyArrays,
+	sleep,
 	uniqueUsers
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -221,7 +222,7 @@ export const ChatMessageSending = memo(
 					} else {
 						const isMentionEveryOne = mentionsOnMessage?.current?.some?.((mention) => mention.user_id === ID_MENTION_HERE);
 						if (isCreateTopic) {
-							handleSendAndCreateTopic(
+							await handleSendAndCreateTopic(
 								filterEmptyArrays(payloadSendMessage),
 								simplifiedMentionList || [],
 								attachmentDataRef || [],
@@ -318,6 +319,7 @@ export const ChatMessageSending = memo(
 								topicId: topic?.id as string
 							})
 						);
+						await sleep(100);
 						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
 					}
 				}

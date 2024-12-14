@@ -10,5 +10,15 @@ export const style = (colors: Attributes) =>
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '700'
+		},
+		title: {
+			fontSize: size.label,
+			color: colors.text,
+			marginRight: size.s_10,
+			fontWeight: '700'
+		},
+		backButton: {
+			width: size.s_50,
+			paddingVertical: size.s_4
 		}
 	});
