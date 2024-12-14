@@ -127,7 +127,7 @@ export const setChannelPinMessage = createAsyncThunk(
 			mess.isMe = true;
 			mess.hide_editted = true;
 			thunkAPI.dispatch(messagesActions.addNewMessage(mess));
-			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			thunkAPI.dispatch(pinMessageActions.add(mess));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/setChannelPinMessage');
@@ -145,7 +145,7 @@ export const deleteChannelPinMessage = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			thunkAPI.dispatch(pinMessageActions.remove(message_id));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/deleteChannelPinMessage');

@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
+import { ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
@@ -74,7 +74,7 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.closeDirectMess(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			thunkAPI.dispatch(directActions.remove(body.channel_id as string));
 			return response;
 		} else {
 			captureSentryError('no reponse', 'direct/createNewDirectMessage');
@@ -241,6 +241,7 @@ export const directSlice = createSlice({
 		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
 		upsertMany: directAdapter.upsertMany,
+		update: directAdapter.updateOne,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
@@ -297,6 +298,36 @@ export const directSlice = createSlice({
 					}
 				}
 			}
+		},
+		addGroupUserWS: (
+			state,
+			action: PayloadAction<{
+				channel_desc: ApiChannelDescription;
+				users: UserProfileRedis[];
+			}>
+		) => {
+			const { channel_desc, users } = action.payload;
+
+			const userIds = users.map((user) => user.user_id);
+			const usernames = users.map((user) => user.username).join(',');
+			const avatars = users.map((user) => user.avatar);
+			const isOnline = users.map((user) => user.online);
+			const metadata = users.map((user) => JSON.stringify({ status: (user as any).metadata || '' }));
+			const aboutMe = users.map((user) => user.about_me);
+
+			const directEntity: DirectEntity = {
+				...channel_desc,
+				id: channel_desc.channel_id || '',
+				user_id: userIds,
+				usernames,
+				channel_avatar: avatars,
+				is_online: isOnline,
+				metadata,
+				about_me: aboutMe,
+				active: 1
+			};
+
+			directAdapter.upsertOne(state, directEntity);
 		},
 		changeE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent>>) => {
 			if (!action.payload?.channel_id) return;

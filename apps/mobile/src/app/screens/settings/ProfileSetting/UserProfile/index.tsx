@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { IUserProfileValue } from '..';
 import BannerAvatar from './components/Banner';
 import DetailInfo from './components/Info';
+import { DirectMessageLogo } from './components/Logo';
 import { style } from './styles';
 
 interface IUserProfile {
@@ -57,6 +58,8 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 				}}
 				onChange={handleDetailChange}
 			/>
+
+			<DirectMessageLogo />
 		</KeyboardAvoidingView>
 	);
 }

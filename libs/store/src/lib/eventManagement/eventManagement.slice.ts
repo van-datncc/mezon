@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement, ApiUpdateEventRequest } from 'mezon-js/api.gen';
+import { ApiEventManagement, MezonUpdateEventBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -136,7 +136,7 @@ export const updateEventManagement = createAsyncThunk(
 		thunkAPI
 	) => {
 		try {
-			const body: ApiUpdateEventRequest = {
+			const body: MezonUpdateEventBody = {
 				address: address,
 				channel_id: channel_id,
 				event_id: event_id,
@@ -145,8 +145,8 @@ export const updateEventManagement = createAsyncThunk(
 				logo: logo,
 				start_time: start_time,
 				title: title,
-				clan_id: clan_id
-				// creator_id: creator_id
+				clan_id: clan_id,
+				creator_id: creator_id
 			};
 
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));

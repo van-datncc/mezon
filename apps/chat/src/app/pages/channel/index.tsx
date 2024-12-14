@@ -34,6 +34,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -212,6 +213,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannel?.id, isShowCreateThread }));
+			if (isShowCreateThread) {
+				dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
+			}
 		},
 		[currentChannel?.id, dispatch]
 	);

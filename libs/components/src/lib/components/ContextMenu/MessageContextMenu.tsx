@@ -346,6 +346,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread }));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
 		},
 		[currentChannel?.id, dispatch]
 	);
@@ -353,6 +354,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
 			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateTopic }));
+			dispatch(
+				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread: false })
+			);
 		},
 		[currentChannel?.id, dispatch]
 	);

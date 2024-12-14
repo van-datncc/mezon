@@ -104,7 +104,7 @@ const NotificationSoundSetting = () => {
 						isSelected={sound.id === currentSound?.id}
 						onPlay={() => handlePlaySound(sound)}
 						onSelect={() => handleSelectSound(sound)}
-						isPlaying={playingSound?.id === sound.id ?? false}
+						isPlaying={playingSound?.id === sound.id}
 					/>
 				))}
 			</div>
