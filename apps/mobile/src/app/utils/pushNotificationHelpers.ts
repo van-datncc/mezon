@@ -14,7 +14,7 @@ import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationA
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
-import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
+import { Alert, AppState, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
@@ -424,7 +424,9 @@ const listRNCallKeep = async (bodyData: any) => {
 	try {
 		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
 			RNCallKeep.backToForeground();
-			RNCallKeep.endCall(callUUID);
+			if (AppState.currentState !== 'active') {
+				RNCallKeep.endCall(callUUID);
+			}
 			setTimeout(() => {
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
 			}, 3000);

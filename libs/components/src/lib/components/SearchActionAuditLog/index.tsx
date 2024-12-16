@@ -16,6 +16,7 @@ type SearchActionAuditLogProps = {
 	closeModal: () => void;
 	pageSize: number;
 	currentPage: number;
+	selectedDate: string;
 };
 
 const iconMap: { [key in ActionLog]: string } = {
@@ -71,7 +72,15 @@ const iconMap: { [key in ActionLog]: string } = {
 	[ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT]: '-'
 };
 
-const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal, pageSize, currentPage }: SearchActionAuditLogProps) => {
+const SearchActionAuditLogModal = ({
+	currentClanId,
+	actionFilter,
+	userFilter,
+	closeModal,
+	pageSize,
+	currentPage,
+	selectedDate
+}: SearchActionAuditLogProps) => {
 	const dispatch = useAppDispatch();
 	const appearanceTheme = useSelector(selectTheme);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -90,8 +99,7 @@ const SearchActionAuditLogModal = ({ currentClanId, actionFilter, userFilter, cl
 				actionLog: action?.name === ActionLog.ALL_ACTION_AUDIT ? '' : action?.name,
 				userId: userFilter?.userId ?? '',
 				clanId: currentClanId ?? '',
-				page: currentPage,
-				pageSize: pageSize
+				date_log: selectedDate
 			};
 			dispatch(auditLogList(body));
 		}

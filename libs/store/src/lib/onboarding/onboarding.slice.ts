@@ -322,6 +322,14 @@ export const onboardingSlice = createSlice({
 				return;
 			}
 			state.keepAnswers[idQuestion] = [answer];
+		},
+		resetOnboarding: (state, action) => {
+			state.formOnboarding = {
+				greeting: null,
+				rules: [],
+				questions: [],
+				task: []
+			};
 		}
 	},
 	extraReducers: (builder) => {
@@ -461,3 +469,5 @@ export const selectRuleImages = createSelector(getOnboardingState, (state) => st
 export const selectAnswerByQuestionId = createSelector([getOnboardingState, (state, questionId: string) => questionId], (state, questionId) => {
 	return state.keepAnswers[questionId] || [];
 });
+
+export const selectKeepAnswerNumber = createSelector(getOnboardingState, (state) => state.keepAnswers);
