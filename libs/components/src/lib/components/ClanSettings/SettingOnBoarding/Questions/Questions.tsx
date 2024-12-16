@@ -347,9 +347,9 @@ const ModalAddAnswer = ({ closeAnswerPopup, index, setAnswer, titleQuestion, edi
 	return (
 		<ModalControlRule bottomLeftBtn="Remove" bottomLeftBtnFunction={handleRemoveAnswer} onClose={closeAnswerPopup} onSave={handleSaveAnswer}>
 			<>
-				<div className="absolute top-5 flex flex-col gap-2">
+				<div className="absolute top-5 flex flex-col gap-2 w-[400px] ">
 					<div className="uppercase text-xs font-medium">Question {index + 1}</div>
-					<div className="text-xl text-white font-semibold">{titleQuestion || 'What is your question'} ?</div>
+					<div className="text-xl text-white font-semibold truncate">{titleQuestion || 'What is your question'} ?</div>
 				</div>
 				<div className="pb-5 pt-10 flex flex-col gap-2">
 					<ControlInput
