@@ -98,7 +98,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 				</div>
 			</div>
 			<div>
-				<div className="one-line">
+				<div className="">
 					{(logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
 						logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
 						logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
@@ -127,7 +127,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 							</span>
 							<strong className="dark:text-white text-black font-medium">
 								{' '}
-								#{channel?.channel_label} ({channel?.channel_id})
+								#{channel?.channel_label || logItem.channel_label} ({channel?.channel_id || logItem.channel_id})
 							</strong>
 						</span>
 					) : (
