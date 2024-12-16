@@ -56,7 +56,6 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};
-	//
 	return (
 		<div className="flex flex-row flex-1 justify-end">
 			<div className="w-[220px] py-[60px] pl-5 pr-[6px]">
