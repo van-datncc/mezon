@@ -6,6 +6,7 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiOnboardingContent } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
 import Questions from './Questions/Questions';
@@ -28,48 +29,6 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	};
 
 	const currentClan = useSelector(selectCurrentClan);
-	return (
-		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
-			{currentPage === EOnboardingStep.MAIN && (
-				<MainIndex
-					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={!!currentClan?.is_onboarding}
-					toggleEnableStatus={toggleEnableStatus}
-					onCloseSetting={onClose}
-				/>
-			)}
-			{currentPage === EOnboardingStep.QUESTION && <Questions handleGoToPage={handleGoToPage} />}
-			{currentPage === EOnboardingStep.MISSION && (
-				<MemberProvider>
-					<div className="flex flex-col gap-8">
-						<div onClick={() => handleGoToPage(EOnboardingStep.MAIN)} className="flex gap-3 cursor-pointer">
-							<Icons.LongArrowRight className="rotate-180 w-3" />
-							<div className="font-semibold">BACK</div>
-						</div>
-						<ClanGuideSetting />
-					</div>
-				</MemberProvider>
-			)}
-		</div>
-	);
-};
-
-interface IMainIndexProps {
-	isEnableOnBoarding: boolean;
-	toggleEnableStatus: (enable: boolean) => void;
-	handleGoToPage: (page: EOnboardingStep) => void;
-	onCloseSetting?: () => void;
-}
-
-const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
-	const dispatch = useAppDispatch();
-	const openOnboardingPreviewMode = () => {
-		dispatch(onboardingActions.openOnboardingPreviewMode());
-		if (onCloseSetting) {
-			onCloseSetting();
-		}
-	};
-	const currentClanId = useSelector(selectCurrentClanId);
 	const formOnboarding = useSelector(selectFormOnboarding);
 	const { sessionRef, clientRef } = useMezon();
 	const getRuleData = useCallback(async () => {}, [formOnboarding.rules.length]);
@@ -116,6 +75,53 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 	const checkCreateValidate = useMemo(() => {
 		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;
 	}, [formOnboarding]);
+
+	const handleResetOnboarding = () => {
+		dispatch(onboardingActions.resetOnboarding({}));
+	};
+	return (
+		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
+			{currentPage === EOnboardingStep.MAIN && (
+				<MainIndex
+					handleGoToPage={handleGoToPage}
+					isEnableOnBoarding={!!currentClan?.is_onboarding}
+					toggleEnableStatus={toggleEnableStatus}
+					onCloseSetting={onClose}
+				/>
+			)}
+			{currentPage === EOnboardingStep.QUESTION && <Questions handleGoToPage={handleGoToPage} />}
+			{currentPage === EOnboardingStep.MISSION && (
+				<MemberProvider>
+					<div className="flex flex-col gap-8">
+						<div onClick={() => handleGoToPage(EOnboardingStep.MAIN)} className="flex gap-3 cursor-pointer">
+							<Icons.LongArrowRight className="rotate-180 w-3" />
+							<div className="font-semibold">BACK</div>
+						</div>
+						<ClanGuideSetting />
+					</div>
+				</MemberProvider>
+			)}
+			{checkCreateValidate && <ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />}
+		</div>
+	);
+};
+
+interface IMainIndexProps {
+	isEnableOnBoarding: boolean;
+	toggleEnableStatus: (enable: boolean) => void;
+	handleGoToPage: (page: EOnboardingStep) => void;
+	onCloseSetting?: () => void;
+}
+
+const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
+	const dispatch = useAppDispatch();
+	const openOnboardingPreviewMode = () => {
+		dispatch(onboardingActions.openOnboardingPreviewMode());
+		if (onCloseSetting) {
+			onCloseSetting();
+		}
+	};
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		dispatch(onboardingActions.fetchOnboarding({ clan_id: currentClanId as string }));
@@ -225,16 +231,6 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 						</div>
 					}
 				/>
-			</div>
-
-			<div className="w-full flex justify-end">
-				<button
-					onClick={handleCreateOnboarding}
-					disabled={!checkCreateValidate}
-					className="text-white font-semibold rounded-md px-4 py-2 bg-primary cursor-pointer disabled:bg-slate-500 disabled:text-slate-700 disabled:cursor-default disabled:opacity-65"
-				>
-					Create Onboarding
-				</button>
 			</div>
 		</div>
 	);

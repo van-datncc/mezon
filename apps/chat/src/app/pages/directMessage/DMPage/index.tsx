@@ -349,7 +349,7 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		isListenerAttached.current = true;
 
 		const handleKeyPress = (event: KeyboardEvent) => {
-			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
+			if (event.ctrlKey && (event.key === 'g' || event.key === 'G')) {
 				event.preventDefault();
 				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 			}

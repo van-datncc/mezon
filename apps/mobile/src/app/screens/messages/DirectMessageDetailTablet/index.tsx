@@ -80,8 +80,8 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isFetchMemberChannelDmRef = useRef(false);
 	const isModeDM = useMemo(() => {
-		return currentDmGroup?.user_id?.length === 1;
-	}, [currentDmGroup?.user_id?.length]);
+		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
+	}, [currentDmGroup?.type]);
 
 	const isTypeDMGroup = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
