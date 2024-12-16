@@ -217,7 +217,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 	);
 	return (
 		<div className="w-full p-4 flex flex-col gap-2">
-			<p className="text-channelActiveColor font-semibold">{question.title} ?</p>
+			<p className="text-channelActiveColor font-semibold">{question.title}</p>
 			<div className="flex flex-wrap gap-2 flex-1">
 				{question.answers &&
 					question.answers.map((answer, index) => (

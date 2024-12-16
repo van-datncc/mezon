@@ -322,6 +322,14 @@ export const onboardingSlice = createSlice({
 				return;
 			}
 			state.keepAnswers[idQuestion] = [answer];
+		},
+		resetOnboarding: (state, action) => {
+			state.formOnboarding = {
+				greeting: null,
+				rules: [],
+				questions: [],
+				task: []
+			};
 		}
 	},
 	extraReducers: (builder) => {
