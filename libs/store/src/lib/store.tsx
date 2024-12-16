@@ -123,7 +123,7 @@ const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
-		blacklist: ['request']
+		blacklist: ['request', 'previousChannels']
 	},
 	channelsReducer
 );
