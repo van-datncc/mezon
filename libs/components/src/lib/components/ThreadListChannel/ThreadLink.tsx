@@ -98,6 +98,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			)}
 
 			<Link
+				draggable="false"
 				ref={threadLinkRef}
 				to={channelPath}
 				key={thread.channel_id}

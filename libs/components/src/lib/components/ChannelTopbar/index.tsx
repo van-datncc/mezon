@@ -1,13 +1,11 @@
 import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
-	ChannelsEntity,
 	appActions,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
@@ -24,7 +22,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, checkIsThread, isMacDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, isMacDesktop } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -207,7 +205,6 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
@@ -219,27 +216,6 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowThread(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = checkIsThread(currentChannel as ChannelsEntity);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowThread) {
-			const fetchThreads = async () => {
-				const channelId = isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? '');
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channelId,
-						clanId
-					};
-					await dispatch(threadsActions.fetchThreads(body));
-				}
-			};
-			fetchThreads();
-		}
-	}, [currentChannel?.channel_id, isShowThread]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>

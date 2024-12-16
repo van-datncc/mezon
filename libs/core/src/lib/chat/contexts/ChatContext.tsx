@@ -521,7 +521,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onuserchanneladded = useCallback(
 		async (userAdds: UserChannelAddedEvent) => {
 			if (!userAdds?.channel_desc) return;
-			const { channel_desc, users, clan_id } = userAdds;
+			const { channel_desc, users, clan_id, create_time_second, caller } = userAdds;
 			const userIds = users.map((u) => u.user_id);
 			const user = users?.find((user) => user.user_id === userId);
 			if (user) {
@@ -544,8 +544,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channel_desc.type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(
 						directActions.addGroupUserWS({
-							channel_desc,
-							users
+							channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
+							users: [caller, ...users].filter((item) => item && item.user_id !== userId)
 						})
 					);
 				}
@@ -570,7 +570,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				dispatch(usersClanActions.upsertMany(members));
 
-				// TODO: handle add friend to group, update list friend, update current inbox
 				dispatch(
 					channelMembersActions.addNewMember({
 						channel_id: channel_desc.channel_id as string,
@@ -826,11 +825,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelDeleted: ChannelDeletedEvent) => {
 			if (channelDeleted?.deletor === userId) return;
 			if (channelDeleted) {
+				if (channelDeleted.channel_id === currentChannelId) {
+					navigate(`/chat/clans/${clanId}`);
+				}
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
 			}
 		},
-		[dispatch]
+		[dispatch, currentChannelId, clanId, userId]
 	);
 
 	const onchannelupdated = useCallback(
