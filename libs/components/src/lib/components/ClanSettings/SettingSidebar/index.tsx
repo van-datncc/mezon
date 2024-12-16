@@ -52,18 +52,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			navigate('/application-directory');
 			return;
 		}
-		// if (settingItem.id === ItemSetting.AUDIT_LOG) {
-		// 	if (currentClan?.clan_id) {
-		// 		const body = {
-		// 			noCache: true,
-		// 			actionLog: auditLogFilterAction ?? '',
-		// 			userId: auditLogFilterUser?.userId ?? '',
-		// 			clanId: currentClan?.clan_id ?? '',
-		// 			date_log: ''
-		// 		};
-		// 		dispatch(auditLogList(body));
-		// 	}
-		// }
+
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};

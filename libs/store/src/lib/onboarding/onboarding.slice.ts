@@ -469,3 +469,5 @@ export const selectRuleImages = createSelector(getOnboardingState, (state) => st
 export const selectAnswerByQuestionId = createSelector([getOnboardingState, (state, questionId: string) => questionId], (state, questionId) => {
 	return state.keepAnswers[questionId] || [];
 });
+
+export const selectKeepAnswerNumber = createSelector(getOnboardingState, (state) => state.keepAnswers);
