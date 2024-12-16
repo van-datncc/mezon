@@ -8,6 +8,7 @@ import {
 	selectChannelById,
 	selectCurrentClanId,
 	selectFormOnboarding,
+	selectKeepAnswerNumber,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
@@ -19,7 +20,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { DONE_ONBOARDING_STATUS, titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 function GuideBody() {
@@ -31,7 +32,7 @@ function GuideBody() {
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClanId as string));
-
+	const keepAnswerNumber = useSelector(selectKeepAnswerNumber);
 	const handleDoMission = useCallback(
 		(mission: ApiOnboardingItem, index: number) => {
 			if (index === missionDone || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS) {
@@ -69,6 +70,15 @@ function GuideBody() {
 
 	const onboardingItem = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
+	const answerNumberPercent = useMemo(() => {
+		let answerDone = 0;
+		Object.values(keepAnswerNumber).map((answer) => {
+			if (answer.length) {
+				answerDone++;
+			}
+		});
+		return answerDone ? (answerDone / onboardingItem.question.length) * 100 - 100 : -97;
+	}, [keepAnswerNumber, onboardingItem.question.length]);
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
 	}, []);
@@ -76,12 +86,25 @@ function GuideBody() {
 	return (
 		<div className="w-full h-full pt-4 ">
 			<div className="flex gap-6">
-				<div className="flex-1 flex flex-col gap-2">
-					<div className="flex flex-col gap-2">
-						<p className="text-xl font-bold">Questions</p>
-						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg">
+				<div className="flex-1 flex flex-col gap-2 ">
+					<div className="flex flex-col gap-2 ">
+						<div className="flex gap-2 items-center">
+							<p className="text-xl font-bold">Questions</p>
+						</div>
+						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg relative">
 							{onboardingItem?.question.length > 0 &&
 								onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
+							<div className="absolute top-0 -left-4 w-1 h-full">
+								<div className="flex bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
+									<div
+										className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl "
+										style={{
+											animation: 'transform 1s ease-out',
+											transform: `translateY(${answerNumberPercent}%)`
+										}}
+									></div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
