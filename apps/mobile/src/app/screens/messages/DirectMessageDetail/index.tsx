@@ -36,8 +36,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const { handleReconnect } = useContext(ChatContext);
 
 	const isModeDM = useMemo(() => {
-		return currentDmGroup?.user_id?.length === 1;
-	}, [currentDmGroup?.user_id?.length]);
+		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
+	}, [currentDmGroup?.type]);
 
 	const isTypeDMGroup = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
