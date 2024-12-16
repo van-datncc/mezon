@@ -88,23 +88,32 @@ function GuideBody() {
 			<div className="flex gap-6">
 				<div className="flex-1 flex flex-col gap-2 ">
 					<div className="flex flex-col gap-2 ">
-						<div className="flex gap-2 items-center">
-							<p className="text-xl font-bold">Questions</p>
-						</div>
+						<p className="text-xl font-bold">Questions</p>
 						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg relative">
-							{onboardingItem?.question.length > 0 &&
-								onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
-							<div className="absolute top-0 -left-4 w-1 h-full">
-								<div className="flex bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
-									<div
-										className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl "
-										style={{
-											animation: 'transform 1s ease-out',
-											transform: `translateY(${answerNumberPercent}%)`
-										}}
-									></div>
-								</div>
-							</div>
+							{onboardingItem?.question.length > 0 ? (
+								<>
+									{onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
+									<div className="absolute top-0 -left-4 w-1 h-full">
+										<div className="flex bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
+											<div
+												className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl "
+												style={{
+													animation: 'transform 1s ease-out',
+													transform: `translateY(${answerNumberPercent}%)`
+												}}
+											></div>
+										</div>
+									</div>
+								</>
+							) : (
+								<>
+									{(!onboadingMode || (onboadingMode && formOnboarding?.questions?.length === 0)) && (
+										<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+											You don't have any questions. Setting questions for this clan first !!
+										</div>
+									)}
+								</>
+							)}
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
