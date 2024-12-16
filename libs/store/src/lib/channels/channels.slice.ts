@@ -466,6 +466,7 @@ export const fetchChannels = createAsyncThunk(
 			}));
 			const meta = channels.map((ch) => extractChannelMeta(ch));
 			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
+			thunkAPI.dispatch(channelsActions.resetPreviousChannels());
 			return channels;
 		} catch (error) {
 			captureSentryError(error, 'channels/fetchChannels');
@@ -671,6 +672,9 @@ export const channelsSlice = createSlice({
 			if (state.previousChannels.length > 3) {
 				state.previousChannels.pop();
 			}
+		},
+		resetPreviousChannels: (state) => {
+			state.previousChannels = [];
 		},
 		updateChannelBadgeCount: (state: ChannelsState, action: PayloadAction<{ channelId: string; count: number; isReset?: boolean }>) => {
 			const { channelId, count, isReset = false } = action.payload;

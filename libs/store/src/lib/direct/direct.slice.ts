@@ -154,6 +154,7 @@ export const fetchDirectMessage = createAsyncThunk(
 			});
 			const channels = sorted.map(mapDmGroupToEntity);
 			//
+			thunkAPI.dispatch(channelsActions.resetPreviousChannels());
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
 			return channels;
 		} catch (error) {
