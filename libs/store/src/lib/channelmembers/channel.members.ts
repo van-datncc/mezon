@@ -90,15 +90,24 @@ export const fetchChannelMembers = createAsyncThunk(
 			}
 
 			const state = thunkAPI.getState() as RootState;
-			const currentChannel = state?.channels?.entities[channelId] || {};
-			const parentChannel = state?.channels?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
-
+			const currentChannel = state?.channels?.byClans[clanId]?.entities?.entities[channelId] || {};
+			const parentChannel = state?.channels?.byClans[clanId]?.entities?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
 			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
 				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
-				thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] }));
+
+				if (!(Date.now() - response.time > 100)) {
+					thunkAPI.dispatch(
+						channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] })
+					);
+				}
 			}
 
 			const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+
+			if (Date.now() - response.time > 100) {
+				return [];
+			}
+
 			if (!response.channel_users) {
 				return [];
 			}

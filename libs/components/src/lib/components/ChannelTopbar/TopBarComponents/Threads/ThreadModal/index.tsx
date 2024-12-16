@@ -1,5 +1,6 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference } from '@mezon/core';
 import {
+	ChannelsEntity,
 	ThreadsEntity,
 	hasGrandchildModal,
 	searchMessagesActions,
@@ -14,9 +15,9 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EOverriddenPermission } from '@mezon/utils';
+import { EOverriddenPermission, checkIsThread } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { RefObject, useCallback, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -33,16 +34,18 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
+
+	const currentChannel = useSelector(selectCurrentChannel);
+
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			channelId && dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId, isShowCreateThread }));
 			dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
 		},
-		[dispatch]
+		[currentChannel]
 	);
 
 	const { setOpenThreadMessageState } = useReference();
-	const currentChannel = useSelector(selectCurrentChannel);
 	const hasChildModal = useSelector(hasGrandchildModal);
 	const appearanceTheme = useSelector(selectTheme);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
@@ -53,6 +56,23 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch));
 	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch));
 	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch));
+
+	useEffect(() => {
+		const fetchThreads = async () => {
+			const isThread = checkIsThread(currentChannel as ChannelsEntity);
+			const channelId = isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? '');
+			const clanId = currentChannel?.clan_id ?? '';
+
+			if (channelId && clanId) {
+				const body = {
+					channelId,
+					clanId
+				};
+				await dispatch(threadsActions.fetchThreads(body));
+			}
+		};
+		fetchThreads();
+	}, [currentChannel]);
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
