@@ -13,9 +13,8 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ActionLog, convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
-import { Dropdown, Pagination } from 'flowbite-react';
 import { ApiAuditLog } from 'mezon-js/api.gen';
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
@@ -24,9 +23,10 @@ interface MainAuditLogProps {
 	setPageSize: Dispatch<SetStateAction<number>>;
 	currentPage: number;
 	setCurrentPage: Dispatch<SetStateAction<number>>;
+	selectedDate: string;
 }
 
-const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage }: MainAuditLogProps) => {
+const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage, selectedDate }: MainAuditLogProps) => {
 	const auditLogData = useSelector(selectAllAuditLogData);
 	const totalCount = useSelector(selectTotalCountAuditLog);
 	const currentClan = useSelector(selectCurrentClan);
@@ -34,100 +34,24 @@ const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage }: Ma
 	const auditLogFilterUser = useSelector(selectUserAuditLog);
 	const dispatch = useAppDispatch();
 
-	const totalPages = useMemo(() => {
-		if (!totalCount) return 0;
-		return Math.ceil(totalCount / pageSize);
-	}, [totalCount, pageSize]);
-
-	const onPageChange = (page: number) => {
-		if (currentPage === page) return;
-		setCurrentPage(page);
-		callAuditLog(page, pageSize);
-	};
-
-	const handleChangePageSize = (size: number) => {
-		if (size === pageSize) {
-			return;
+	useEffect(() => {
+		if (currentClan?.clan_id) {
+			const body = {
+				noCache: true,
+				actionLog: auditLogFilterAction ?? '',
+				userId: auditLogFilterUser?.userId ?? '',
+				clanId: currentClan?.clan_id ?? '',
+				date_log: selectedDate
+			};
+			dispatch(auditLogList(body));
 		}
-
-		setPageSize(size);
-		setCurrentPage(1);
-
-		if (size > pageSize) {
-			const shouldCallApi = auditLogData.length < totalCount;
-
-			if (shouldCallApi) {
-				callAuditLog(1, size);
-			}
-		} else {
-			if (totalCount > size) {
-				callAuditLog(1, size);
-			}
-		}
-	};
-
-	const callAuditLog = (page: number, pageSize: number) => {
-		const body = {
-			noCache: true,
-			actionLog: auditLogFilterAction ?? '',
-			userId: auditLogFilterUser?.userId ?? '',
-			clanId: currentClan?.clan_id ?? '',
-			page: page,
-			pageSize: pageSize
-		};
-		dispatch(auditLogList(body));
-	};
+	}, [selectedDate]);
 
 	return (
 		<div className="flex flex-col">
 			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
 			{auditLogData && auditLogData.length > 0 ? (
-				<>
-					{auditLogData.map((log) => (
-						<AuditLogItem key={log.id} logItem={log} />
-					))}
-
-					<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mb-2">
-						<div className={'flex flex-row items-center'}>
-							Show
-							<Dropdown
-								value={pageSize}
-								renderTrigger={() => (
-									<div
-										className={
-											'flex flex-row items-center justify-center text-center dark:bg-slate-800 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode border-[1px] dark:border-borderDivider border-buttonLightTertiary rounded mx-1 px-3 w-12'
-										}
-									>
-										<span className="mr-1">{pageSize}</span>
-										<Icons.ArrowDown />
-									</div>
-								)}
-								label={''}
-							>
-								<Dropdown.Item
-									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-									onClick={() => handleChangePageSize(10)}
-								>
-									10
-								</Dropdown.Item>
-								<Dropdown.Item
-									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-									onClick={() => handleChangePageSize(50)}
-								>
-									50
-								</Dropdown.Item>
-								<Dropdown.Item
-									className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-									onClick={() => handleChangePageSize(100)}
-								>
-									100
-								</Dropdown.Item>
-							</Dropdown>
-							audit log of {totalCount}
-						</div>
-						<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
-					</div>
-				</>
+				auditLogData.map((log) => <AuditLogItem key={log.id} logItem={log} />)
 			) : (
 				<div className="flex flex-col items-center justify-center text-center py-10 max-w-[440px] mx-auto">
 					<div className="flex flex-col items-center justify-center text-center max-w-[300px]">
