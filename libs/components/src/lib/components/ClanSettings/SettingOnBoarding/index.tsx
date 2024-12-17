@@ -31,7 +31,6 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const formOnboarding = useSelector(selectFormOnboarding);
 	const { sessionRef, clientRef } = useMezon();
-	const getRuleData = useCallback(async () => {}, [formOnboarding.rules.length]);
 
 	const handleCreateOnboarding = useCallback(async () => {
 		const uploadImageRule = formOnboarding.rules.map((item) => {
@@ -70,7 +69,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				content: formOnboardingData
 			})
 		);
-	}, [getRuleData]);
+	}, [formOnboarding.rules.length, formOnboarding?.task?.length, formOnboarding?.questions?.length]);
 
 	const checkCreateValidate = useMemo(() => {
 		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;
