@@ -291,7 +291,7 @@ const persistedOnboardingReducer = persistReducer(
 	{
 		key: ONBOARDING_FEATURE_KEY,
 		storage,
-		whitelist: ['keepAnswers']
+		whitelist: ['keepAnswers', 'answerByClanId']
 	},
 	onboardingReducer
 );

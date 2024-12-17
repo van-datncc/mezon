@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { DONE_ONBOARDING_STATUS } from '@mezon/utils';
+import { AnswerByClanArgs, DONE_ONBOARDING_STATUS } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem, ApiOnboardingSteps } from 'mezon-js/api.gen';
@@ -37,6 +37,7 @@ export interface OnboardingState extends EntityState<ApiOnboardingSteps, string>
 	};
 	fileRules: Record<number, File>;
 	keepAnswers: Record<string, number[]>;
+	answerByClanId: Record<string, AnswerByClanArgs[] | null>;
 }
 
 export const onboardingUserAdapter = createEntityAdapter({
@@ -233,7 +234,8 @@ export const initialOnboardingState: OnboardingState = onboardingUserAdapter.get
 		task: []
 	},
 	fileRules: [],
-	keepAnswers: {}
+	keepAnswers: {},
+	answerByClanId: {}
 });
 
 export enum ETypeMission {
@@ -322,6 +324,25 @@ export const onboardingSlice = createSlice({
 				return;
 			}
 			state.keepAnswers[idQuestion] = [answer];
+		},
+
+		setAnswerByClanId: (state, action: PayloadAction<{ clanId: string; answerState: AnswerByClanArgs | null }>) => {
+			const { clanId, answerState } = action.payload;
+
+			if (!answerState) {
+				return;
+			}
+
+			const existingAnswers = state.answerByClanId[clanId] || [];
+			const index = existingAnswers.findIndex((item) => item.clanIdQuestionIdAndIndex === answerState.clanIdQuestionIdAndIndex);
+
+			if (index !== -1) {
+				existingAnswers.splice(index, 1);
+			} else {
+				existingAnswers.push(answerState);
+			}
+
+			state.answerByClanId[clanId] = existingAnswers;
 		},
 		resetOnboarding: (state, action) => {
 			state.formOnboarding = {
@@ -471,3 +492,8 @@ export const selectAnswerByQuestionId = createSelector([getOnboardingState, (sta
 });
 
 export const selectKeepAnswerNumber = createSelector(getOnboardingState, (state) => state.keepAnswers);
+
+export const selectAnswerByClanId = createSelector(
+	[getOnboardingState, (state, clanId: string) => clanId],
+	(state, clanId) => state.answerByClanId?.[clanId]
+);
