@@ -118,7 +118,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				if ('Key' in data) {
 					switch (data.Key) {
 						case 'channels':
-							console.log(data.Value, 'vào channel');
+							console.log(data.Value, 'list channels');
 							// setChannels(data.Value);
 							break;
 						case 'session_received':
