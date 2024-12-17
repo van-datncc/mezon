@@ -417,7 +417,7 @@ input:-webkit-autofill:active {
 			font-weight: 500;
 			display: inline;
 			/* Keep the code inline */
-			white-space: nowrap;
+			white-space: break-spaces;
 			/* Prevent wrapping inside the code block */
 		}
 
