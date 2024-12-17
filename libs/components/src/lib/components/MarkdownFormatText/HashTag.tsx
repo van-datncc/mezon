@@ -116,13 +116,19 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			</div>
 		) : null
 	) : (
-		<span
-			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
-			onClick={openUnknown}
-		>
-			# Unknown
-		</span>
+		<PrivateChannelIcon onClick={openUnknown} />
 	);
 };
 
 export default memo(ChannelHashtag);
+function PrivateChannelIcon({ onClick }: { onClick: () => void }) {
+	return (
+		<span
+			onClick={onClick}
+			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap dark:!text-[#ffffff] dark:bg-[#3e3f3f] bg-[#F2F3F5] relative top-[3px] cursor-pointer`}
+		>
+			<Icons.LockedPrivate className={`mt-1 w-4 h-4`} />
+			<span>private-channel</span>
+		</span>
+	);
+}
