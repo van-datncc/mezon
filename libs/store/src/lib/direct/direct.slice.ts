@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
+import { ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
@@ -12,7 +12,7 @@ import { e2eeActions } from '../e2ee/e2ee.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { RootState } from '../store';
-import { directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
+import { DMMetaEntity, directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -74,7 +74,7 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.closeDirectMess(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			thunkAPI.dispatch(directActions.remove(body.channel_id as string));
 			return response;
 		} else {
 			captureSentryError('no reponse', 'direct/createNewDirectMessage');
@@ -226,6 +226,55 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	}
 );
 
+interface AddGroupUserWSPayload {
+	channel_desc: ApiChannelDescription;
+	users: UserProfileRedis[];
+}
+
+export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (payload: AddGroupUserWSPayload, thunkAPI) => {
+	try {
+		const { channel_desc, users } = payload;
+		const userIds: string[] = [];
+		const usernames: string[] = [];
+		const avatars: string[] = [];
+		const isOnline: boolean[] = [];
+		const metadata: string[] = [];
+		const aboutMe: string[] = [];
+		const label: string[] = [];
+
+		for (const user of users) {
+			userIds.push(user.user_id);
+			usernames.push(user.username);
+			avatars.push(user.avatar);
+			isOnline.push(user.online);
+			metadata.push(JSON.stringify({ status: (user as { metadata?: Array<string> }).metadata || '' }));
+			aboutMe.push(user.about_me);
+			label.push(user.display_name);
+		}
+
+		const directEntity: DirectEntity = {
+			...channel_desc,
+			id: channel_desc.channel_id || '',
+			user_id: userIds,
+			usernames: usernames.join(','),
+			channel_avatar: avatars,
+			is_online: isOnline,
+			metadata,
+			about_me: aboutMe,
+			active: 1,
+			channel_label: label.join(',')
+		};
+
+		thunkAPI.dispatch(directActions.upsertOne(directEntity));
+		thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
+
+		return directEntity;
+	} catch (error) {
+		captureSentryError(error, 'direct/addGroupUserWS');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const initialDirectState: DirectState = directAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
@@ -241,6 +290,8 @@ export const directSlice = createSlice({
 		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
 		upsertMany: directAdapter.upsertMany,
+		upsertOne: directAdapter.upsertOne,
+		update: directAdapter.updateOne,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
@@ -386,7 +437,8 @@ export const directActions = {
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
-	openDirectMessage
+	openDirectMessage,
+	addGroupUserWS
 };
 
 const getStatusUnread = (lastSeenStamp: number, lastSentStamp: number) => {
@@ -416,13 +468,6 @@ export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, sel
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 
 export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);
-
-export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
-	return directMessages.filter((dm) => {
-		return state.statusDMChannelUnread[dm.channel_id ?? ''] && dm?.count_mess_unread && dm?.count_mess_unread > 0;
-	});
-});
-export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {
 	return directMessages

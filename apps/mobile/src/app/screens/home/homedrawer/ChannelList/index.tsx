@@ -52,6 +52,7 @@ export type ChannelsPositionRef = {
 		};
 	};
 };
+const TIMER_READY_ONLAYOUT = 10000;
 
 const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: any }) => {
 	const { themeValue } = useTheme();
@@ -66,6 +67,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const [isCanLayout, setIsCanLayout] = useState<boolean>(true);
+	const timerReadyOnLayout = useRef<any>();
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -111,7 +114,11 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const handleCollapseCategory = useCallback(() => {
+		setIsCanLayout(true);
 		setIsScrollChannelActive(false);
+		timerReadyOnLayout.current = setTimeout(async () => {
+			setIsCanLayout(false);
+		}, 2000);
 	}, []);
 
 	const handleScrollToChannel = useCallback(
@@ -132,6 +139,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	);
 
 	useEffect(() => {
+		timerReadyOnLayout.current = setTimeout(() => {
+			setIsCanLayout(false);
+		}, TIMER_READY_ONLAYOUT);
 		const scrollChannel = DeviceEventEmitter.addListener(
 			ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL,
 			({ isActiveScroll }: { isActiveScroll: boolean }) => {
@@ -148,6 +158,10 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, [currentChannel?.id, handleScrollToChannel, isScrollChannelActive]);
 
 	useEffect(() => {
+		setIsScrollChannelActive(true);
+	}, [currentChannel?.id]);
+
+	useEffect(() => {
 		if (currentClanId && currentClanId?.toString() !== '0') {
 			dispatch(channelsActions.fetchListFavoriteChannel({ clanId: currentClanId }));
 		}
@@ -156,14 +170,14 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	const handleLayout = useCallback(
 		(event, item) => {
-			if (item) {
+			if (item && isCanLayout) {
 				const { y } = event?.nativeEvent?.layout || {};
 				InteractionManager.runAfterInteractions(() => {
 					dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
 				});
 			}
 		},
-		[dispatch]
+		[dispatch, isCanLayout]
 	);
 
 	const renderItemChannelList = useCallback(

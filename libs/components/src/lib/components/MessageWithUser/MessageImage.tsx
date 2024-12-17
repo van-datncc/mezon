@@ -47,7 +47,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const currentDm = useSelector(selectCurrentDM);
 	const { currentChatUsersEntities } = useCurrentChat();
 
-	const handleClick = (url: string) => {
+	const handleClick = useCallback((url: string) => {
 		if (checkImage) return;
 
 		if (isElectron()) {
@@ -110,7 +110,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 			dispatch(attachmentActions.setMessageId(messageId));
 		}
-	};
+	}, []);
 
 	const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -171,16 +171,16 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				<div className="flex items-center justify-center bg-bgDarkPopover rounded h-full w-full" style={{ width: width || 150 }}></div>
 			)}
 			{imageLoaded && (
-				<div className="flex">
+				<div className="flex" onClick={handleClick.bind(null, attachmentData.url || '')}>
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
+						draggable="false"
 						key={imageUrlKey}
 						onContextMenu={handleContextMenu}
 						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
-						style={{ width: width || 'auto', height }}
+						style={{ width: width || 'auto', height, cursor: 'pointer' }}
 						src={createImgproxyUrl(attachmentData.url ?? '', { width: 600, height: 300, resizeType: 'fit' })}
 						alt={'message'}
-						onClick={() => handleClick(attachmentData.url || '')}
 					/>
 				</div>
 			)}

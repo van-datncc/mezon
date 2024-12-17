@@ -61,6 +61,7 @@ export const RenderVideoChat = React.memo(
 					resizeMode={ResizeMode.CONTAIN}
 					rate={1.0}
 					shouldPlay={false}
+					progressUpdateIntervalMillis={250}
 					removeClippedSubviews
 					shouldRasterizeIOS
 					style={{

@@ -261,24 +261,33 @@ export default class App {
 		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
 			width: 1000,
 			height: 800,
-			show: true,
-			titleBarOverlay: process.platform == 'darwin',
+			backgroundColor: '#1a1a1a',
+			show: false,
 			titleBarStyle: 'hidden',
-			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
+			frame: false,
+			trafficLightPosition: process.platform == 'darwin' ? { x: -20, y: -20 } : undefined,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				preload: join(__dirname, 'main.preload.js')
+				preload: join(__dirname, 'main.preload.js'),
+				backgroundThrottling: false
 			},
-			icon: join(__dirname, 'assets', 'desktop-taskbar-256x256.ico'),
-			autoHideMenuBar: true
+			autoHideMenuBar: true,
+			titleBarOverlay: false,
+			paintWhenInitiallyHidden: true,
+			visualEffectState: 'active'
 		};
 
 		const windowOptions = { ...defaultOptions, ...options };
 
 		if (!this.isWindowValid(this.imageViewerWindow)) {
 			this.imageViewerWindow = new BrowserWindow(windowOptions);
-
+			
+			const emptyMenu = Menu.buildFromTemplate([]);
+			this.imageViewerWindow.setMenu(emptyMenu);
+			this.imageViewerWindow.setMenuBarVisibility(false);
+			this.imageViewerWindow.setOpacity(0);
+			
 			const filePath = App.application.isPackaged
 				? 'assets/image-window/image-window.html'
 				: 'apps/desktop/src/assets/image-window/image-window.html';
@@ -286,34 +295,56 @@ export default class App {
 				? join(__dirname, '..', electronAppName, filePath)
 				: join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
-
-			this.imageViewerWindow.loadURL(
-				format({
-					pathname: fullUrl,
-					protocol: 'file:',
-					slashes: true,
-					query: params
-				})
-			);
-
-			this.imageViewerWindow.webContents.on('did-finish-load', () => {
-				this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+			
+			const loadContent = async () => {
+				try {
+					this.imageViewerWindow.loadURL(
+						format({
+							pathname: fullUrl,
+							protocol: 'file:',
+							slashes: true,
+							query: params
+						})
+					);
+					
+					this.imageViewerWindow.webContents.on('did-finish-load', () => {
+						this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+					});
+				} catch (error) {
+					console.error('Failed to load window:', error);
+				}
+			};
+			
+			loadContent();
+		}
+		
+		if (!App.application.isPackaged) {
+			this.imageViewerWindow.webContents.on('did-fail-load', (_, code, description) => {
+				console.error('Window load failed:', code, description);
 			});
 		}
+		
+		this.imageViewerWindow?.setOpacity(1);
+		this.imageViewerWindow?.show();
+		this.imageViewerWindow?.focus();
 
+		this.imageViewerWindow.on('closed', () => {
+			this.imageViewerWindow = null;
+		});
+		
 		ipcMain.on(SEND_ATTACHMENT_DATA, (event, data) => {
 			this.attachmentData = data;
 			this.imageViewerWindow.webContents.send(CHANGE_ATTACHMENT_LIST);
 		});
-
+		
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
 			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
 		});
-
+		
 		this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
-
+		
 		this.imageViewerWindow.show();
-
+		
 		return this.imageViewerWindow;
 	}
 

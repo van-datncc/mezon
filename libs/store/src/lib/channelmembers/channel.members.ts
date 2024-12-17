@@ -95,10 +95,20 @@ export const fetchChannelMembers = createAsyncThunk(
 
 			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
 				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
-				thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] }));
+
+				if (!(Date.now() - response.time > 100)) {
+					thunkAPI.dispatch(
+						channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] })
+					);
+				}
 			}
 
 			const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+
+			if (Date.now() - response.time > 100) {
+				return [];
+			}
+
 			if (!response.channel_users) {
 				return [];
 			}

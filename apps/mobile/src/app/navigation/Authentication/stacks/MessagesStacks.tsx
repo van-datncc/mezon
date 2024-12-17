@@ -5,6 +5,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 import { ChatBoxStreamComponent } from '../../../screens/home/homedrawer/components/StreamingRoom/ChatBoxStream';
+import TopicDiscussion from '../../../screens/home/homedrawer/components/TopicDiscussion/TopicDiscussion';
 import { DirectMessageDetailScreen } from '../../../screens/messages/DirectMessageDetail';
 import { NewGroupScreen } from '../../../screens/messages/NewGroup';
 import { NewMessageScreen } from '../../../screens/messages/NewMessage';
@@ -70,6 +71,18 @@ export const MessagesStacks = ({}: any) => {
 				component={ChatBoxStreamComponent}
 				options={{
 					title: t('headerTitle.chat')
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MESSAGES.TOPIC_DISCUSSION}
+				component={TopicDiscussion}
+				options={{
+					title: t('headerTitle.topic'),
+					headerStyle: {
+						backgroundColor: themeValue.primary
+					},
+					headerShown: false,
+					headerShadowVisible: false
 				}}
 			/>
 		</Stack.Navigator>

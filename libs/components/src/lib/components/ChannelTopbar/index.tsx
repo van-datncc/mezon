@@ -1,15 +1,11 @@
 import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
-	ChannelsEntity,
 	appActions,
-	attachmentActions,
-	canvasAPIActions,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
@@ -26,7 +22,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, checkIsThread, isMacDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, isMacDesktop } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -154,7 +150,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 });
 
 function FileButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowFile, setIsShowFile] = useState<boolean>(false);
 
 	const fileRef = useRef<HTMLDivElement | null>(null);
@@ -166,22 +161,6 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowFile(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowFile) {
-			const fetchCanvas = async () => {
-				const channelId = currentChannel?.channel_id ?? '';
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					await dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
-				}
-			};
-			fetchCanvas();
-		}
-	}, [currentChannel?.channel_id, currentChannel?.clan_id, dispatch, isShowFile]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={fileRef}>
@@ -199,9 +178,7 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
-
 	const canvasRef = useRef<HTMLDivElement | null>(null);
 
 	const handleShowCanvas = () => {
@@ -211,26 +188,6 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowCanvas(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowCanvas) {
-			const fetchCanvas = async () => {
-				const channelId = currentChannel?.channel_id ?? '';
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channel_id: channelId,
-						clan_id: clanId
-					};
-					await dispatch(canvasAPIActions.getChannelCanvasList(body));
-				}
-			};
-			fetchCanvas();
-		}
-	}, [currentChannel?.channel_id]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
@@ -248,7 +205,6 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
@@ -260,27 +216,6 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowThread(false);
 	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = checkIsThread(currentChannel as ChannelsEntity);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowThread) {
-			const fetchThreads = async () => {
-				const channelId = isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? '');
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channelId,
-						clanId
-					};
-					await dispatch(threadsActions.fetchThreads(body));
-				}
-			};
-			fetchThreads();
-		}
-	}, [currentChannel?.channel_id, isShowThread]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>

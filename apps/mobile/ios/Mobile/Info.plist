@@ -50,6 +50,8 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
@@ -110,6 +112,7 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
+		<string>audio</string>
 		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

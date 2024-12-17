@@ -1,7 +1,7 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
-import { selectAllListDocumentByChannel, selectCurrentChannel, selectTheme } from '@mezon/store';
+import { attachmentActions, selectAllListDocumentByChannel, selectCurrentChannel, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { RefObject, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyFile from './EmptyFile';
 import FileItem from './FileItem';
@@ -13,12 +13,19 @@ type FileModalProps = {
 };
 
 const FileModal = ({ onClose, rootRef }: FileModalProps) => {
+	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [keywordSearch, setKeywordSearch] = useState('');
 
 	const appearanceTheme = useSelector(selectTheme);
 	const allAttachments = useSelector(selectAllListDocumentByChannel((currentChannel?.channel_id ?? '') as string));
 	const modalRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const { channel_id: channelId, clan_id: clanId } = currentChannel || {};
+		if (!channelId || !clanId) return;
+		dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
+	}, []);
 
 	const filteredAttachments = allAttachments.filter(
 		(attachment) => attachment.filename && attachment.filename.toLowerCase().includes(keywordSearch.toLowerCase())

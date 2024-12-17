@@ -1,11 +1,13 @@
 import { useFriends } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, useAppDispatch } from '@mezon/store-mobile';
+import { clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import LogoMezonDark from '../../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../../assets/svg/logoMezonLight.svg';
+import { MezonAvatar } from '../../../../componentUI';
 import { SeparatorWithLine } from '../../../../components/Common';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
@@ -19,6 +21,7 @@ const ServerList = React.memo(() => {
 	const { quantityPendingRequest } = useFriends();
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
+	const logoCustom = useSelector(selectLogoCustom);
 	const dispatch = useAppDispatch();
 
 	const navigateToDM = () => {
@@ -31,7 +34,13 @@ const ServerList = React.memo(() => {
 	return (
 		<View style={styles.wrapperServerList}>
 			<TouchableOpacity style={styles.wrapperLogo} onPress={() => navigateToDM()}>
-				{theme === 'light' ? <LogoMezonLight width={size.s_50} height={size.s_50} /> : <LogoMezonDark width={size.s_50} height={size.s_50} />}
+				{logoCustom ? (
+					<MezonAvatar width={size.s_50} height={size.s_50} avatarUrl={logoCustom} username="" />
+				) : theme === 'light' ? (
+					<LogoMezonLight width={size.s_50} height={size.s_50} />
+				) : (
+					<LogoMezonDark width={size.s_50} height={size.s_50} />
+				)}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>
 						<Text style={styles.badgeText}>{quantityPendingRequest > 99 ? `+99` : quantityPendingRequest}</Text>

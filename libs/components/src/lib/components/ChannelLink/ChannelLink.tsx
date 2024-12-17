@@ -338,7 +338,8 @@ export const ChannelLink = memo(
 		prev.channel?.id === curr?.channel?.id &&
 		prev.isActive === curr.isActive &&
 		prev.numberNotification === curr.numberNotification &&
-		prev.isUnReadChannel === curr.isUnReadChannel
+		prev.isUnReadChannel === curr.isUnReadChannel &&
+		prev.channel?.channel_label === curr?.channel?.channel_label
 );
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;

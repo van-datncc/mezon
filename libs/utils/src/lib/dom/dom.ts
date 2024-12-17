@@ -13,7 +13,11 @@ export function toggleDisableHover(element: HTMLDivElement | null, timeoutId: Re
 	if (!element) return;
 	timeoutId.current && clearTimeout(timeoutId.current);
 	element.classList.add('disable-hover');
-	timeoutId.current = setTimeout(() => {
+	const removeHover = () => {
 		element.classList.remove('disable-hover');
+	};
+
+	timeoutId.current = setTimeout(() => {
+		requestAnimationFrame(removeHover);
 	}, 150);
 }
