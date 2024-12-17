@@ -116,12 +116,12 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			</div>
 		) : null
 	) : (
-		<PrivateChannelIcon onClick={openUnknown} />
+		<PrivateChannel onClick={openUnknown} />
 	);
 };
 
 export default memo(ChannelHashtag);
-function PrivateChannelIcon({ onClick }: { onClick: () => void }) {
+function PrivateChannel({ onClick }: { onClick: () => void }) {
 	return (
 		<span
 			onClick={onClick}
