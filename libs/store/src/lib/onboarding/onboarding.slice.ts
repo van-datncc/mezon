@@ -424,16 +424,6 @@ export const onboardingSlice = createSlice({
 					onboardingUserAdapter.setAll(state, action.payload);
 				}
 			});
-		// .addCase(doneOnboarding.fulfilled, (state, action) => {
-		// 	if (action.payload) {
-		// 		onboardingUserAdapter.updateOne(state, {
-		// 			id: action.payload,
-		// 			changes: {
-		// 				onboarding_step: 3
-		// 			}
-		// 		});
-		// 	}
-		// });
 	}
 });
 
@@ -490,8 +480,6 @@ export const selectRuleImages = createSelector(getOnboardingState, (state) => st
 export const selectAnswerByQuestionId = createSelector([getOnboardingState, (state, questionId: string) => questionId], (state, questionId) => {
 	return state.keepAnswers[questionId] || [];
 });
-
-export const selectKeepAnswerNumber = createSelector(getOnboardingState, (state) => state.keepAnswers);
 
 export const selectAnswerByClanId = createSelector(
 	[getOnboardingState, (state, clanId: string) => clanId],

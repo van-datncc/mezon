@@ -10,7 +10,6 @@ import {
 	selectChannelById,
 	selectCurrentClanId,
 	selectFormOnboarding,
-	selectKeepAnswerNumber,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
@@ -34,7 +33,6 @@ function GuideBody() {
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClanId as string));
-	const keepAnswerNumber = useSelector(selectKeepAnswerNumber);
 	const answerByClanId = useAppSelector((state) => selectAnswerByClanId(state, currentClanId ?? ''));
 
 	const handleDoMission = useCallback(
@@ -87,16 +85,6 @@ function GuideBody() {
 	const answerPercent = useMemo(() => {
 		return totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
 	}, [totalAnswersLength, totalNumberAnswer]);
-
-	const answerNumberPercent = useMemo(() => {
-		let answerDone = 0;
-		Object.values(keepAnswerNumber).map((answer) => {
-			if (answer.length) {
-				answerDone++;
-			}
-		});
-		return answerDone ? (answerDone / onboardingItem.question.length) * 100 - 100 : -97;
-	}, [keepAnswerNumber, onboardingItem.question.length]);
 
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
