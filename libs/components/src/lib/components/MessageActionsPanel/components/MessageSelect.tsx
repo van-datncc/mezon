@@ -75,7 +75,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					id: buttonId,
 					value: option.value
 				},
-				multiple: checkMultipleSelect
+				multiple: true
 			})
 		);
 	};
