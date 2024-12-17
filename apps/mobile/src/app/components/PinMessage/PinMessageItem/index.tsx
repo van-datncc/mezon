@@ -31,7 +31,9 @@ interface IPinMessageItemProps {
 const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessageItem?.channel_id, pinMessageItem?.message_id)) || {};
+	const message =
+		useAppSelector((state) => selectMessageByMessageId(state, pinMessageItem?.channel_id, pinMessageItem?.message_id)) ||
+		({} as IMessageWithUser);
 	const dispatch = useAppDispatch();
 	const currentChannel = useContext(threadDetailContext);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -68,7 +70,9 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 			<View style={styles.pinMessageItemBox}>
 				<Text style={styles.pinMessageItemName}>{pinMessageItem?.username}</Text>
 				<RenderTextMarkdownContent content={contentMessage} isEdited={false} />
-				<MessageAttachment message={message as IMessageWithUser} />
+				{message?.attachments?.length > 0 && (
+					<MessageAttachment attachments={message?.attachments || []} senderId={message?.sender_id} createTime={message?.create_time} />
+				)}
 			</View>
 			<View>
 				<TouchableOpacity

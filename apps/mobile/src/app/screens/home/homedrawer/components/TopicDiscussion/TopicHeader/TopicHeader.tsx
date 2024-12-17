@@ -89,7 +89,13 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 				onMention={onMention}
 				onChannelMention={onChannelMention}
 			/>
-			<MessageAttachment message={valueTopic} />
+			{valueTopic?.attachments?.length > 0 && (
+				<MessageAttachment
+					attachments={valueTopic?.attachments || []}
+					senderId={valueTopic?.sender_id}
+					createTime={valueTopic?.create_time}
+				/>
+			)}
 		</Block>
 	);
 });
