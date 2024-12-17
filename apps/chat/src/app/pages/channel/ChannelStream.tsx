@@ -2,6 +2,7 @@ import { AvatarImage } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	appActions,
+	ChannelsEntity,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectIsShowChatStream,
@@ -15,19 +16,19 @@ import {
 	videoStreamActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannelMember, IStreamInfo, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { createImgproxyUrl, getAvatarForPrioritize, IChannelMember, IStreamInfo } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import Hls from 'hls.js';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface MediaPlayerProps {
 	src: string;
+	videoRef: RefObject<HTMLVideoElement>;
 }
-
-function HLSPlayer({ src }: MediaPlayerProps) {
-	const videoRef = useRef<HTMLVideoElement | null>(null);
+///
+function HLSPlayer({ src, videoRef }: MediaPlayerProps) {
+	// const videoRef = useRef<HTMLVideoElement | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const isPlaying = useSelector(selectStatusStream);
 	const [isLoading, setIsLoading] = useState(true);
@@ -39,129 +40,129 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 	const [errorLimitReached, setErrorLimitReached] = useState(false);
 	const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-	useEffect(() => {
-		const videoElement = videoRef.current;
-		let hls: Hls | null = null;
-		let retryCount = 0;
-		const maxRetries = 10;
-		let mediaErrorRetryCount = 0;
-		const maxMediaErrorRetries = 5;
+	// useEffect(() => {
+	// 	const videoElement = videoRef.current;
+	// 	let hls: Hls | null = null;
+	// 	let retryCount = 0;
+	// 	const maxRetries = 10;
+	// 	let mediaErrorRetryCount = 0;
+	// 	const maxMediaErrorRetries = 5;
 
-		if (isPlaying && videoElement) {
-			if (Hls.isSupported()) {
-				hls = new Hls({
-					enableWorker: true, // Improve performance and avoid lag/frame drops.
-					lowLatencyMode: true, // Enable Low-Latency HLS part playlist and segment loading.
-					liveSyncDurationCount: 2, // Start from the last few segments.
-					liveMaxLatencyDurationCount: 10, // Maximum delay allowed from edge of live.
-					maxBufferLength: 8, // Maximum buffer length in seconds.
-					maxMaxBufferLength: 10, // The max Maximum buffer length in seconds.
-					maxLiveSyncPlaybackRate: 1.2, // Catch up if the latency is large.
-					liveDurationInfinity: true // Override current Media Source duration to Infinity for a live broadcast.
-				});
+	// 	if (isPlaying && videoElement) {
+	// 		if (Hls.isSupported()) {
+	// 			hls = new Hls({
+	// 				enableWorker: true, // Improve performance and avoid lag/frame drops.
+	// 				lowLatencyMode: true, // Enable Low-Latency HLS part playlist and segment loading.
+	// 				liveSyncDurationCount: 2, // Start from the last few segments.
+	// 				liveMaxLatencyDurationCount: 10, // Maximum delay allowed from edge of live.
+	// 				maxBufferLength: 8, // Maximum buffer length in seconds.
+	// 				maxMaxBufferLength: 10, // The max Maximum buffer length in seconds.
+	// 				maxLiveSyncPlaybackRate: 1.2, // Catch up if the latency is large.
+	// 				liveDurationInfinity: true // Override current Media Source duration to Infinity for a live broadcast.
+	// 			});
 
-				hls.on(Hls.Events.ERROR, (event, data) => {
-					if (data.fatal && hls) {
-						switch (data.type) {
-							case Hls.ErrorTypes.NETWORK_ERROR:
-								if (retryCount < maxRetries) {
-									retryCount++;
-									setTimeout(() => {
-										if (hls) {
-											hls.loadSource(src);
-											hls.attachMedia(videoElement);
-										}
-									}, 2000);
-								} else {
-									setErrorLimitReached(true);
-									setIsLoading(false);
-								}
-								break;
-							case Hls.ErrorTypes.MEDIA_ERROR:
-								if (mediaErrorRetryCount < maxMediaErrorRetries) {
-									mediaErrorRetryCount++;
-									if (!mediaError) {
-										setMediaError(true);
-										videoElement.pause();
-										setIsLoading(true);
-										setTimeout(() => {
-											hls?.recoverMediaError();
-											setMediaError(false);
-										}, 3000);
-									}
-								} else {
-									setErrorLimitReached(true);
-									setIsLoading(false);
-								}
-								break;
-							default:
-								if (hls) {
-									hls.destroy();
-								}
-								break;
-						}
-					}
+	// 			hls.on(Hls.Events.ERROR, (event, data) => {
+	// 				if (data.fatal && hls) {
+	// 					switch (data.type) {
+	// 						case Hls.ErrorTypes.NETWORK_ERROR:
+	// 							if (retryCount < maxRetries) {
+	// 								retryCount++;
+	// 								setTimeout(() => {
+	// 									if (hls) {
+	// 										hls.loadSource(src);
+	// 										hls.attachMedia(videoElement);
+	// 									}
+	// 								}, 2000);
+	// 							} else {
+	// 								setErrorLimitReached(true);
+	// 								setIsLoading(false);
+	// 							}
+	// 							break;
+	// 						case Hls.ErrorTypes.MEDIA_ERROR:
+	// 							if (mediaErrorRetryCount < maxMediaErrorRetries) {
+	// 								mediaErrorRetryCount++;
+	// 								if (!mediaError) {
+	// 									setMediaError(true);
+	// 									videoElement.pause();
+	// 									setIsLoading(true);
+	// 									setTimeout(() => {
+	// 										hls?.recoverMediaError();
+	// 										setMediaError(false);
+	// 									}, 3000);
+	// 								}
+	// 							} else {
+	// 								setErrorLimitReached(true);
+	// 								setIsLoading(false);
+	// 							}
+	// 							break;
+	// 						default:
+	// 							if (hls) {
+	// 								hls.destroy();
+	// 							}
+	// 							break;
+	// 					}
+	// 				}
 
-					if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-						// videoElement.pause();
-						setIsLoading(true);
-					}
-				});
+	// 				if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+	// 					// videoElement.pause();
+	// 					setIsLoading(true);
+	// 				}
+	// 			});
 
-				hls.loadSource(src);
-				hls.attachMedia(videoElement);
-				hls.on(Hls.Events.MANIFEST_PARSED, () => {
-					videoElement.play().catch((error) => {
-						if (error.name === 'NotAllowedError') {
-							setIsMuted(true);
-							videoElement.muted = true;
-						}
-					});
-					setIsLoading(false);
-				});
-			} else {
-				videoElement.src = src;
-				videoElement.addEventListener('loadedmetadata', () => {
-					videoElement.play().catch((error) => {
-						if (error.name === 'NotAllowedError') {
-							setIsMuted(true);
-							videoElement.muted = true;
-						}
-					});
-					setIsLoading(false);
-				});
-			}
-		}
+	// 			hls.loadSource(src);
+	// 			hls.attachMedia(videoElement);
+	// 			hls.on(Hls.Events.MANIFEST_PARSED, () => {
+	// 				videoElement.play().catch((error) => {
+	// 					if (error.name === 'NotAllowedError') {
+	// 						setIsMuted(true);
+	// 						videoElement.muted = true;
+	// 					}
+	// 				});
+	// 				setIsLoading(false);
+	// 			});
+	// 		} else {
+	// 			videoElement.src = src;
+	// 			videoElement.addEventListener('loadedmetadata', () => {
+	// 				videoElement.play().catch((error) => {
+	// 					if (error.name === 'NotAllowedError') {
+	// 						setIsMuted(true);
+	// 						videoElement.muted = true;
+	// 					}
+	// 				});
+	// 				setIsLoading(false);
+	// 			});
+	// 		}
+	// 	}
 
-		return () => {
-			if (hls) {
-				hls.destroy();
-			}
-		};
-	}, [isPlaying, mediaError, src]);
+	// 	return () => {
+	// 		if (hls) {
+	// 			hls.destroy();
+	// 		}
+	// 	};
+	// }, [isPlaying, mediaError, src]);
 
 	const handleToggleMute = () => {
-		const videoElement = videoRef.current;
-		if (videoElement) {
-			videoElement.muted = !isMuted;
-			setIsMuted(videoElement.muted);
-		}
+		// const videoElement = videoRef.current;
+		// if (videoRef) {
+		// 	videoRef.muted = !isMuted;
+		// 	setIsMuted(videoRef.muted);
+		// }
 	};
 
 	const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const newVolume = parseFloat(event.target.value);
-		const videoElement = videoRef.current;
-		if (videoElement) {
-			videoElement.volume = newVolume;
-			setVolume(newVolume);
-			if (newVolume > 0) {
-				videoElement.muted = false;
-				setIsMuted(false);
-			} else {
-				videoElement.muted = true;
-				setIsMuted(true);
-			}
-		}
+		// const videoElement = videoRef.current;
+		// if (videoRef) {
+		// 	videoRef.volume = newVolume;
+		// 	setVolume(newVolume);
+		// 	if (newVolume > 0) {
+		// 		videoRef.muted = false;
+		// 		setIsMuted(false);
+		// 	} else {
+		// 		videoRef.muted = true;
+		// 		setIsMuted(true);
+		// 	}
+		// }
 	};
 
 	const handleFullscreen = () => {
@@ -355,9 +356,18 @@ type ChannelStreamProps = {
 	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	channelName?: string;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, channel: ChannelsEntity) => void;
+	streamVideoRef: RefObject<HTMLVideoElement>;
 };
 
-export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, channelName }: ChannelStreamProps) {
+export default function ChannelStream({
+	hlsUrl,
+	memberJoin,
+	currentStreamInfo,
+	channelName,
+	handleChannelClick,
+	streamVideoRef
+}: ChannelStreamProps) {
 	const streamPlay = useSelector(selectStatusStream);
 	const appearanceTheme = useSelector(selectTheme);
 	const { userProfile } = useAuth();
@@ -375,6 +385,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 		if (!channel || !currentClan || !currentStreamInfo) return;
 		if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) return;
 		if (currentStreamInfo.streamId !== channel.id || (!streamPlay && currentStreamInfo?.streamId === channel.id)) {
+			handleChannelClick(currentClan?.id as string, channel?.channel_id as string, userProfile?.user?.id as string, channel);
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -455,7 +466,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 						<div
 							className={`transition-all duration-300 h-full max-sm:w-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}
 						>
-							<HLSPlayer src={hlsUrl} />
+							<HLSPlayer videoRef={streamVideoRef} src={hlsUrl} />
 						</div>
 					) : (
 						<div className="sm:h-[250px] md:h-[350px] lg:h-[450px] xl:h-[550px] w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight text-5xl flex justify-center items-center text-center">

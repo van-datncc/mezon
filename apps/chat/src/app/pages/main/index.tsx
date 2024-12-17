@@ -68,6 +68,7 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
+import { useWebRTCStream } from 'libs/components/src/lib/components/StreamContext/StreamContext';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -280,6 +281,12 @@ function MyApp() {
 
 	const previewMode = useSelector(selectOnboardingMode);
 
+	const { streamVideoRef, handleChannelClick, connectSocket } = useWebRTCStream();
+
+	useEffect(() => {
+		connectSocket();
+	}, []);
+
 	return (
 		<div
 			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
@@ -300,6 +307,8 @@ function MyApp() {
 						memberJoin={streamChannelMember}
 						channelName={currentChannel?.channel_label}
 						currentStreamInfo={currentStreamInfo}
+						handleChannelClick={handleChannelClick}
+						streamVideoRef={streamVideoRef}
 					/>
 				</div>
 			)}
