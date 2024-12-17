@@ -202,59 +202,73 @@ export const ChatBoxBottomBar = memo(
 		);
 		const handleTextInputChange = async (text: string) => {
 			setTextChange(text);
-			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
-			if (isConvertToFileTxt) {
+			setText(text);
+			if (!text) return;
+
+			if (text?.length > MIN_THRESHOLD_CHARS) {
 				setText('');
 				currentTextInput.current = '';
 				await onConvertToFiles(text);
-			} else {
-				const convertedHashtag = convertMentionsToText(text);
-				const words = convertedHashtag.split(mentionRegexSplit);
-				const mentionList = [];
-				const hashtagList = [];
-				let mentionBeforeCount = 0;
-				let mentionBeforeHashtagCount = 0;
-				let indexOfLastHashtag = 0;
-				let indexOfLastMention = 0;
-
-				words?.forEach((word) => {
-					if (word.startsWith('@[') && word.endsWith(']')) {
-						mentionBeforeCount++;
-						const mentionUserName = word?.slice(2, -1);
-						const mention = listMentions?.find((item) => `${item?.display}` === mentionUserName);
-						if (mention) {
-							const startindex = convertedHashtag.indexOf(word, indexOfLastMention);
-							indexOfLastMention = startindex + 1;
-							mentionList.push({
-								user_id: mention?.id?.toString() ?? '',
-								s: startindex - (mentionBeforeHashtagCount * 2 + (mentionBeforeCount - 1) * 2),
-								e: startindex + word.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
-							});
-						}
-						return;
-					}
-					if (word?.startsWith('<#') && word?.endsWith('>')) {
-						const channelLabel = word?.slice(2, -1);
-						const channelInfo = getChannelHashtag(listHashtagDm, listChannel, mode, channelLabel);
-						mentionBeforeHashtagCount++;
-						if (channelInfo) {
-							const startindex = convertedHashtag.indexOf(word, indexOfLastHashtag);
-							indexOfLastHashtag = startindex + 1;
-							hashtagList.push({
-								channelid: channelInfo?.channel_id?.toString() ?? '',
-								s: startindex - (mentionBeforeCount * 2 + (mentionBeforeHashtagCount - 1) * 2),
-								e: startindex + word.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
-							});
-						}
-					}
-				});
-				hashtagsOnMessage.current = hashtagList;
-				mentionsOnMessage.current = mentionList;
-				setMentionTextValue(text);
-				setText(convertedHashtag);
+				return;
 			}
+
+			const convertedHashtag = convertMentionsToText(text);
+			const words = convertedHashtag?.split?.(mentionRegexSplit);
+
+			const mentionList: Array<{ user_id: string; s: number; e: number }> = [];
+			const hashtagList: Array<{ channelid: string; s: number; e: number }> = [];
+
+			let mentionBeforeCount = 0;
+			let mentionBeforeHashtagCount = 0;
+			let indexOfLastHashtag = 0;
+			let indexOfLastMention = 0;
+			words?.reduce?.((offset, word) => {
+				if (word?.startsWith?.('@[') && word?.endsWith?.(']')) {
+					mentionBeforeCount++;
+					const mentionUserName = word?.slice?.(2, -1);
+					const mention = listMentions?.find?.((item) => `${item?.display}` === mentionUserName);
+
+					if (mention) {
+						const startindex = convertedHashtag?.indexOf?.(word, indexOfLastMention);
+						indexOfLastMention = startindex + 1;
+
+						mentionList.push({
+							user_id: mention.id?.toString() ?? '',
+							s: startindex - (mentionBeforeHashtagCount * 2 + (mentionBeforeCount - 1) * 2),
+							e: startindex + word.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
+						});
+					}
+					return offset;
+				}
+
+				if (word?.startsWith?.('<#') && word?.endsWith?.('>')) {
+					const channelLabel = word?.slice?.(2, -1);
+					const channelInfo = getChannelHashtag(listHashtagDm, listChannel, mode, channelLabel);
+
+					mentionBeforeHashtagCount++;
+
+					if (channelInfo) {
+						const startindex = convertedHashtag?.indexOf?.(word, indexOfLastHashtag);
+						indexOfLastHashtag = startindex + 1;
+
+						hashtagList?.push?.({
+							channelid: channelInfo?.channel_id?.toString() ?? '',
+							s: startindex - (mentionBeforeCount * 2 + (mentionBeforeHashtagCount - 1) * 2),
+							e: startindex + word.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
+						});
+					}
+				}
+
+				return offset;
+			}, 0);
+
+			hashtagsOnMessage.current = hashtagList;
+			mentionsOnMessage.current = mentionList;
+			setMentionTextValue(text);
+			setText(convertedHashtag);
 			setIsShowAttachControl(false);
-			if (![EMessageActionType.CreateThread].includes(messageAction)) {
+
+			if (messageAction !== EMessageActionType.CreateThread) {
 				saveMessageToCache(text);
 			}
 		};

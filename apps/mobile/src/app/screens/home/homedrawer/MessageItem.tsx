@@ -55,6 +55,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 
 		const isInviteLink = useMemo(() => {
+			if (!lk) return false;
 			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		}, [contentMessage, lk]);
 
@@ -63,6 +64,7 @@ const MessageItem = React.memo(
 		}, [message?.content?.callLog]);
 
 		const isGoogleMapsLink = useMemo(() => {
+			if (!lk) return false;
 			return Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
 		}, [contentMessage, lk]);
 		const userProfile = useSelector(selectAllAccount);
@@ -89,15 +91,14 @@ const MessageItem = React.memo(
 		}, []);
 
 		const hasIncludeMention = useMemo(() => {
-			const userIdMention = userProfile?.user?.id;
-			const mentionOnMessage = message.mentions;
-			let includesHere = false;
-			if (typeof message.content?.t == 'string') {
-				includesHere = message.content.t?.includes('@here');
-			}
-			const includesUser = !!userIdMention && mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
-			const checkReplied = !!userIdMention && message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
-			return includesHere || includesUser || checkReplied;
+			const userId = userProfile?.user?.id;
+
+			if (!userId) return false;
+			const hasHereMention = message.content?.t?.includes('@here') ?? false;
+			const hasUserMention = message.mentions?.some((mention) => mention?.user_id === userId);
+			const isReplyToUser = message.references?.[0]?.message_sender_id === userId;
+
+			return hasHereMention || hasUserMention || isReplyToUser;
 		}, [userProfile?.user?.id, message?.mentions, message?.content?.t, message?.references]);
 
 		const isSameUser = useMemo(() => {
@@ -159,7 +160,7 @@ const MessageItem = React.memo(
 					timeoutRef.current = setTimeout(() => {
 						setShowHighlightReply(false);
 						dispatch(messagesActions.setIdMessageToJump(null));
-					}, 2000);
+					}, 3000);
 				} else {
 					setShowHighlightReply(false);
 					timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -329,7 +330,14 @@ const MessageItem = React.memo(
 								messageSenderId={message?.sender_id}
 								mode={mode}
 							/>
-							<MessageAttachment message={message} onLongPressImage={onLongPressImage} />
+							{message?.attachments?.length > 0 && (
+								<MessageAttachment
+									attachments={message?.attachments}
+									senderId={message?.sender_id}
+									createTime={message?.create_time}
+									onLongPressImage={onLongPressImage}
+								/>
+							)}
 							<Block opacity={message.isError || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink || isGoogleMapsLink ? (
 									<RenderMessageBlock

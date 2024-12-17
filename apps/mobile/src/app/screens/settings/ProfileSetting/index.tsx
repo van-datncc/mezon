@@ -137,7 +137,6 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 						clanId: currentClanId || '',
 						channelId: currentChannelId || '',
 						channelType: ChannelType.CHANNEL_TYPE_TEXT,
-						noCache: true,
 						repace: true
 					})
 				);

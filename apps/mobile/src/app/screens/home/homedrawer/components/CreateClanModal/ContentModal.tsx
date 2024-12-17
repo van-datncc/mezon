@@ -47,7 +47,7 @@ const CreateClanModal = memo(({ visible, setVisible }: ICreateClanProps) => {
 					store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
 					save(STORAGE_CLAN_ID, res?.clan_id);
 					store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id }));
 					await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
 					setVisible(false);
 				}

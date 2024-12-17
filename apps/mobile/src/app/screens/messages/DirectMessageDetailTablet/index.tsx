@@ -121,8 +121,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-				noCache: true
+				channelType: currentChannel?.type
 			})
 		);
 	}, [currentChannel]);

@@ -37,7 +37,7 @@ export const ListClanPopup = React.memo(() => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));
-			const channelResp = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
+			const channelResp = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId }));
 			if (channelResp?.payload) {
 				await setDefaultChannelLoader(channelResp.payload, clanId);
 			}
