@@ -953,15 +953,8 @@ export type BuzzArgs = {
 };
 
 export type AnswerByClanArgs = {
-	// clanId?: string;
 	clanIdQuestionIdAndIndex?: string;
 };
-
-// export type AnswerByClanPayload = {
-// 	clanId?: string;
-// 	questionId?: string;
-// 	answerIndex?: number;
-// };
 
 export enum EUserSettings {
 	ACCOUNT = 'Account',
