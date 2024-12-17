@@ -25,7 +25,7 @@ export const embedSlice = createSlice({
 	reducers: {
 		addEmbedValue: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
 			const { message_id, data, multiple } = action.payload;
-			if (!multiple) {
+			if (multiple) {
 				state.formDataEmbed[message_id] = {
 					...state.formDataEmbed[message_id],
 					[data.id]: data.value
@@ -40,7 +40,7 @@ export const embedSlice = createSlice({
 				return;
 			}
 			if (state.formDataEmbed[message_id][data.id]) {
-				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id], data.value];
+				state.formDataEmbed[message_id][data.id] = [data.value];
 				return;
 			}
 			state.formDataEmbed[message_id][data.id] = [data.value];
