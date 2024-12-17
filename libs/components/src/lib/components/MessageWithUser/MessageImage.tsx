@@ -1,4 +1,4 @@
-import { useAppParams, useAttachments } from '@mezon/core';
+import { useAppParams, useAttachments, useCurrentChat } from '@mezon/core';
 import {
 	attachmentActions,
 	checkListAttachmentExist,
@@ -6,12 +6,16 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentDM,
-	selectEntitesUserClans,
-	selectGroupMembersEntities,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
-import { IAttachmentEntity, IImageWindowProps, SHOW_POSITION, createImgproxyUrl, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import {
+	IAttachmentEntity,
+	IImageWindowProps,
+	SEND_ATTACHMENT_DATA,
+	SHOW_POSITION,
+	createImgproxyUrl,
+	notImplementForGifOrStickerSendFromPanel
+} from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -41,13 +45,21 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const checkListAttachment = useSelector(checkListAttachmentExist((currentDmGroupId || currentChannelId) as string));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
-	const allClanUsers = useSelector(selectEntitesUserClans);
-	const allDmUsers = useAppSelector((state) => selectGroupMembersEntities(state, directId));
+	const { currentChatUsersEntities } = useCurrentChat();
 
 	const handleClick = useCallback((url: string) => {
 		if (checkImage) return;
 
 		if (isElectron()) {
+			const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
+			window.electron.openImageWindow({
+				...attachmentData,
+				uploaderData: {
+					name: currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
+					avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+				}
+			});
+
 			if ((currentClanId && currentChannelId) || currentDmGroupId) {
 				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
@@ -56,7 +68,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						const attachmentList = data.payload as IAttachmentEntity[];
 						const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
 						const imageListWithUploaderInfo = imageList.map((image) => {
-							const uploader = directId ? allDmUsers[image.uploader as string] : allClanUsers[image.uploader as string];
+							const uploader = currentChatUsersEntities?.[image.uploader as string];
 							return {
 								...image,
 								uploaderData: {
@@ -75,7 +87,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 							images: imageListWithUploaderInfo,
 							selectedImageIndex: selectedImageIndex
 						};
-						window.electron.openNewWindow(channelImagesData);
+						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
 					});
 			}
 		} else {

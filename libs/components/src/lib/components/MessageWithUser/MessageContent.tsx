@@ -1,6 +1,6 @@
 import {
 	selectCurrentChannelId,
-	selectCurrentClanId,
+	selectMemberClanByUserId,
 	selectMessageByMessageId,
 	selectTheme,
 	threadsActions,
@@ -31,10 +31,10 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 	const dispatch = useAppDispatch();
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, message.id || ''));
+	const topicCreator = useSelector(selectMemberClanByUserId(currentMessage?.content?.cid as string));
 	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return safeJSONParse(message.content).t;
@@ -82,10 +82,14 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			/>
 			{currentMessage?.code === TypeMessage.Topic && (
 				<div
-					className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-lg my-1 p-2 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white"
+					className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-md my-1 p-1 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white group/view-topic-btn"
 					onClick={handleOpenTopic}
 				>
-					<p className={'text-sm h-fit'}>view topic</p>
+					<div className="flex items-center gap-2 text-sm h-fit">
+						<img src={topicCreator?.clan_avatar} alt={`${topicCreator?.clan_nick}'s avatar`} className="size-7 rounded-md object-cover" />
+						<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>
+						<p>View topic</p>
+					</div>
 					<Icons.ArrowRight
 						defaultFill={theme === 'dark' ? '#AEAEAE' : '#535353'}
 						defaultSize={'w-4 h-4 min-w-4 hover:text-white text-borderDividerLight'}
