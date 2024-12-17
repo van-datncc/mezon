@@ -23,7 +23,7 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils';
+import { ChannelThreads, EOverriddenPermission, EPermission, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -308,15 +308,21 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	];
 
 	const handleFocusDefaultChannel = async () => {
-		const firstTextChannel = categorizedChannels[0]?.channels?.filter((channel) => channel?.type === 1)?.[0];
+		const firstTextChannel = categorizedChannels.reduce((firstChannel, category) => {
+			if (firstChannel) return firstChannel;
+			const typeThreeChannel = category.channels?.find((channel) => channel?.type === 3);
+			if (typeThreeChannel) {
+				return typeThreeChannel;
+			} else {
+				return category.channels?.[0];
+			}
+		}, null) as IChannel;
 		if (!firstTextChannel) return;
 		const { clan_id: clanId, channel_id: channelId } = firstTextChannel || {};
 		const store = await getStoreAsync();
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		await Promise.all([
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
-		]);
+		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 		if (!channelsCache?.includes(channelId)) {
 			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
@@ -331,7 +337,14 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	};
 
 	const handleConfirmLeaveThread = useCallback(async () => {
-		await dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: channel?.id || '' }));
+		await dispatch(
+			threadsActions.leaveThread({
+				clanId: currentClan?.id || '',
+				channelId: channel?.parrent_id || '',
+				threadId: channel?.id || '',
+				isPrivate: channel.channel_private || 0
+			})
+		);
 		dismiss();
 		handleJoinChannel();
 	}, []);
