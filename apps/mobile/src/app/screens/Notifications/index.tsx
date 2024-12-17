@@ -40,7 +40,7 @@ const Notifications = () => {
 	const [notify, setNotify] = useState<INotification>();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
-	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
+	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
 	const dispatch = useAppDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const { t } = useTranslation(['notification']);
@@ -69,7 +69,7 @@ const Notifications = () => {
 
 	const initLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId, noCache: true }));
+		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
 	};
 
 	const handleFilterNotify = (tabNotify) => {
@@ -149,7 +149,7 @@ const Notifications = () => {
 			requestAnimationFrame(async () => {
 				const promises = [];
 				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-					promises.push(store.dispatch(directActions.fetchDirectMessage({ noCache: true })));
+					promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
 				} else {
 					if (notify?.content?.clan_id !== currentClanId) {

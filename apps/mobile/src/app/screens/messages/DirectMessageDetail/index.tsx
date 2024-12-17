@@ -77,8 +77,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-				noCache: true
+				channelType: currentChannel?.type
 			})
 		);
 	}, [currentChannel]);

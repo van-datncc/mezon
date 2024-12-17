@@ -6,6 +6,10 @@ import CustomIncomingCall from './src/app/screens/customIncomingCall';
 import { createLocalNotification, setupIncomingCall } from './src/app/utils/pushNotificationHelpers';
 notifee.onBackgroundEvent(async () => {});
 
+// eslint-disable-next-line no-undef
+if (__DEV__) {
+	require('./reactotronConfig');
+}
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const offer = remoteMessage?.data?.offer;
 	if (offer) {

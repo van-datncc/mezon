@@ -83,6 +83,7 @@ export default function TopicDiscussion() {
 							<ChannelMessagesWrapper
 								channelId={currentTopicId}
 								clanId={currentClanId}
+								isDisableLoadMore={true}
 								isPublic={isPublicChannel(currentChannel)}
 								mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 							/>

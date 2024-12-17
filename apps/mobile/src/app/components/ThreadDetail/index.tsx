@@ -47,18 +47,17 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const loadingStatus = useSelector((state: RootState) => state?.threads?.loadingStatus);
 	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
 
-	useEffect(() => {
-		fetchThreads();
-	}, [currentChannel, dispatch, isThread]);
-
-	const fetchThreads = async () => {
+	const fetchThreads = useCallback(async () => {
 		const body = {
 			channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
-			clanId: currentChannel?.clan_id ?? '',
-			noCache: true
+			clanId: currentChannel?.clan_id ?? ''
 		};
 		await dispatch(threadsActions.fetchThreads(body));
-	};
+	}, [currentChannel?.channel_id, currentChannel?.clan_id, currentChannel?.parrent_id, dispatch, isThread]);
+
+	useEffect(() => {
+		fetchThreads();
+	}, [fetchThreads]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const getActiveThreads = useSelector(selectActiveThreads(searchText));
