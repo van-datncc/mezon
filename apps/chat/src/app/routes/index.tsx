@@ -75,232 +75,241 @@ export const Routes = memo(() => {
 
 	const routes = useMemo(
 		() =>
-			(isElectron() ? createHashRouter : createBrowserRouter)([
-				{
-					path: '',
-					loader: loaderWithStore(appLoader),
-					shouldRevalidate: shouldRevalidateApp,
-					element: <AppLayout />,
-					errorElement: <ErrorRoutes />,
-					children: [
-						// initial route to redirect to /chat
-						{
-							path: '/mezon',
-							element: <InitialRoutes />
-						},
-						isElectron()
-							? {
-									path: '/',
-									element: <InitialRoutes />
-								}
-							: {
-									path: '/',
-									loader: loaderWithStore(loginLoader),
-									element: <MezonPage />
-								},
-						{
-							path: '/application-directory',
-							element: <AppDirectory />
-						},
-						{
-							path: 'desktop',
-							element: <GuessLayout />,
-							children: [
-								{
-									path: 'login',
-									loader: loaderWithStore(loginLoader),
-									element: <Login />
-								},
-								{
-									path: 'login-desktop',
-									loader: loaderWithStore(loginLoader),
-									element: <LoginDesktop />
-								}
-							]
-						},
-						{
-							path: 'chat',
-							loader: loaderWithStore(authLoader),
-							shouldRevalidate: shouldRevalidateAuth,
-							element: <ProtectedRoutes />,
-							children: [
-								{
-									path: '',
-									loader: loaderWithStore(mainLoader),
-									shouldRevalidate: shouldRevalidateMain,
-									element: <MainLayout />,
-									children: [
-										{
-											path: '',
-											element: <Main />,
-											children: [
-												{
-													path: 'clans',
-													element: <ClansRoutes />,
-													children: [
-														{
-															path: ':clanId',
-															loader: loaderWithStore(clanLoader),
-															shouldRevalidate: shouldRevalidateServer,
-															element: <ClanLayout />,
-															children: [
-																{
-																	path: '',
-																	element: <ClanIndex />
-																},
-																{
-																	path: 'member-safety',
-																	element: (
-																		<MemberProvider>
-																			<MemberMain />
-																		</MemberProvider>
-																	)
-																},
-																{
-																	path: 'channel-setting',
-																	element: <ChannelSettingMain />
-																},
-																{
-																	path: 'channels',
-																	element: <ChannelLayout />,
-																	children: [
-																		{
-																			path: '',
-																			element: <ChannelIndex />
-																		},
-																		{
-																			path: ':channelId',
-																			loader: loaderWithStore(channelLoader),
-																			shouldRevalidate: shouldRevalidateChannel,
-																			element: <ChannelMain />,
-																			children: [
-																				{
-																					path: 'threads',
-																					element: <ThreadsRoutes />,
-																					children: [
-																						{
-																							path: ':threadId',
-																							element: <ThreadsMain />
-																						}
-																					]
-																				},
-																				{
-																					path: 'canvas',
-																					element: <CanvasRoutes />,
-																					children: [
-																						{
-																							path: ':canvasId',
-																							loader: loaderWithStore(canvasLoader),
-																							shouldRevalidate: shouldRevalidateCanvas,
-																							element: <Canvas />
-																						}
-																					]
-																				}
-																			]
-																		}
-																	]
-																},
-																{
-																	path: 'guide',
-																	element: (
-																		<MemberProvider>
-																			<GuideMain />
-																		</MemberProvider>
-																	)
-																}
-															]
-														}
-													]
-												},
-												{
-													path: 'direct',
-													element: <DirectMain />,
-													loader: loaderWithStore(directLoader),
-													children: [
-														{
-															path: '',
-															element: <DirectMessageIndex />
-														},
+			(isElectron() ? createHashRouter : createBrowserRouter)(
+				[
+					{
+						path: '',
+						loader: loaderWithStore(appLoader),
+						shouldRevalidate: shouldRevalidateApp,
+						element: <AppLayout />,
+						errorElement: <ErrorRoutes />,
+						children: [
+							// initial route to redirect to /chat
+							{
+								path: '/mezon',
+								element: <InitialRoutes />
+							},
+							isElectron()
+								? {
+										path: '/',
+										element: <InitialRoutes />
+									}
+								: {
+										path: '/',
+										loader: loaderWithStore(loginLoader),
+										element: <MezonPage />
+									},
+							{
+								path: '/application-directory',
+								element: <AppDirectory />
+							},
+							{
+								path: 'desktop',
+								element: <GuessLayout />,
+								children: [
+									{
+										path: 'login',
+										loader: loaderWithStore(loginLoader),
+										element: <Login />
+									},
+									{
+										path: 'login-desktop',
+										loader: loaderWithStore(loginLoader),
+										element: <LoginDesktop />
+									}
+								]
+							},
+							{
+								path: 'chat',
+								loader: loaderWithStore(authLoader),
+								shouldRevalidate: shouldRevalidateAuth,
+								element: <ProtectedRoutes />,
+								children: [
+									{
+										path: '',
+										loader: loaderWithStore(mainLoader),
+										shouldRevalidate: shouldRevalidateMain,
+										element: <MainLayout />,
+										children: [
+											{
+												path: '',
+												element: <Main />,
+												children: [
+													{
+														path: 'clans',
+														element: <ClansRoutes />,
+														children: [
+															{
+																path: ':clanId',
+																loader: loaderWithStore(clanLoader),
+																shouldRevalidate: shouldRevalidateServer,
+																element: <ClanLayout />,
+																children: [
+																	{
+																		path: '',
+																		element: <ClanIndex />
+																	},
+																	{
+																		path: 'member-safety',
+																		element: (
+																			<MemberProvider>
+																				<MemberMain />
+																			</MemberProvider>
+																		)
+																	},
+																	{
+																		path: 'channel-setting',
+																		element: <ChannelSettingMain />
+																	},
+																	{
+																		path: 'channels',
+																		element: <ChannelLayout />,
+																		children: [
+																			{
+																				path: '',
+																				element: <ChannelIndex />
+																			},
+																			{
+																				path: ':channelId',
+																				loader: loaderWithStore(channelLoader),
+																				shouldRevalidate: shouldRevalidateChannel,
+																				element: <ChannelMain />,
+																				children: [
+																					{
+																						path: 'threads',
+																						element: <ThreadsRoutes />,
+																						children: [
+																							{
+																								path: ':threadId',
+																								element: <ThreadsMain />
+																							}
+																						]
+																					},
+																					{
+																						path: 'canvas',
+																						element: <CanvasRoutes />,
+																						children: [
+																							{
+																								path: ':canvasId',
+																								loader: loaderWithStore(canvasLoader),
+																								shouldRevalidate: shouldRevalidateCanvas,
+																								element: <Canvas />
+																							}
+																						]
+																					}
+																				]
+																			}
+																		]
+																	},
+																	{
+																		path: 'guide',
+																		element: (
+																			<MemberProvider>
+																				<GuideMain />
+																			</MemberProvider>
+																		)
+																	}
+																]
+															}
+														]
+													},
+													{
+														path: 'direct',
+														element: <DirectMain />,
+														loader: loaderWithStore(directLoader),
+														children: [
+															{
+																path: '',
+																element: <DirectMessageIndex />
+															},
 
-														{
-															path: 'friends',
-															loader: loaderWithStore(friendsLoader),
-															element: <FriendsPage />
-														},
-														{
-															path: 'message',
-															element: <DMRoutes />,
-															children: [
-																{
-																	path: '',
-																	element: <DirectMessageIndex />
-																},
-																{
-																	path: ':directId/:type',
-																	loader: loaderWithStore(directMessageLoader),
-																	shouldRevalidate: shouldRevalidateChannel,
-																	element: <DirectMessage />
-																}
-															]
-														}
-													]
-												},
-												{
-													path: 'canvas-mobile',
-													element: <Outlet />,
-													children: [
-														{
-															path: ':clanId',
-															loader: loaderWithStore(clanLoader),
-															shouldRevalidate: shouldRevalidateServer,
-															element: <Outlet />,
-															children: [
-																{
-																	path: ':channelId',
-																	loader: loaderWithStore(channelLoader),
-																	shouldRevalidate: shouldRevalidateChannel,
-																	element: <Outlet />,
-																	children: [
-																		{
-																			path: ':canvasId',
-																			loader: loaderWithStore(canvasLoader),
-																			shouldRevalidate: shouldRevalidateCanvas,
-																			element: <Canvas />
-																		}
-																	]
-																}
-															]
-														}
-													]
-												}
-											]
-										}
-									]
-								}
-							]
-						},
-						{
-							path: 'invite',
-							loader: loaderWithStore(authLoader),
-							shouldRevalidate: shouldRevalidateAuth,
-							element: <ProtectedRoutes />,
-							children: [
-								{
-									path: ':inviteId',
-									loader: loaderWithStore(inviteLoader),
-									shouldRevalidate: shouldRevalidateInvite,
-									element: <InvitePage />
-								}
-							]
-						},
-						// fallback route, renders when no other route is matched
-						{
-							path: '*',
-							element: <InitialRoutes />
-						}
-					]
+															{
+																path: 'friends',
+																loader: loaderWithStore(friendsLoader),
+																element: <FriendsPage />
+															},
+															{
+																path: 'message',
+																element: <DMRoutes />,
+																children: [
+																	{
+																		path: '',
+																		element: <DirectMessageIndex />
+																	},
+																	{
+																		path: ':directId/:type',
+																		loader: loaderWithStore(directMessageLoader),
+																		shouldRevalidate: shouldRevalidateChannel,
+																		element: <DirectMessage />
+																	}
+																]
+															}
+														]
+													},
+													{
+														path: 'canvas-mobile',
+														element: <Outlet />,
+														children: [
+															{
+																path: ':clanId',
+																loader: loaderWithStore(clanLoader),
+																shouldRevalidate: shouldRevalidateServer,
+																element: <Outlet />,
+																children: [
+																	{
+																		path: ':channelId',
+																		loader: loaderWithStore(channelLoader),
+																		shouldRevalidate: shouldRevalidateChannel,
+																		element: <Outlet />,
+																		children: [
+																			{
+																				path: ':canvasId',
+																				loader: loaderWithStore(canvasLoader),
+																				shouldRevalidate: shouldRevalidateCanvas,
+																				element: <Canvas />
+																			}
+																		]
+																	}
+																]
+															}
+														]
+													}
+												]
+											}
+										]
+									}
+								]
+							},
+							{
+								path: 'invite',
+								loader: loaderWithStore(authLoader),
+								shouldRevalidate: shouldRevalidateAuth,
+								element: <ProtectedRoutes />,
+								children: [
+									{
+										path: ':inviteId',
+										loader: loaderWithStore(inviteLoader),
+										shouldRevalidate: shouldRevalidateInvite,
+										element: <InvitePage />
+									}
+								]
+							},
+							// fallback route, renders when no other route is matched
+							{
+								path: '*',
+								element: <InitialRoutes />
+							}
+						]
+					}
+				],
+				{
+					future: {
+						v7_fetcherPersist: true,
+						v7_startTransition: true,
+						v7_partialHydration: true
+					}
 				}
-			]),
+			),
 		[loaderWithStore]
 	);
 

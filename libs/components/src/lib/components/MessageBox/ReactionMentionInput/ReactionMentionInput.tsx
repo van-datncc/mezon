@@ -584,7 +584,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}
 
-	const clickUpToEditMessage = () => {
+	const clickUpToEditMessage = useCallback(() => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !request?.valueTextInput) {
 			dispatch(referencesActions.setOpenEditMessageState(true));
@@ -602,7 +602,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				})
 			);
 		}
-	};
+	}, [lastMessageByUserId, currentDmOrChannelId, request]);
 
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -928,7 +928,7 @@ MentionReactInput.displayName = 'MentionReactInput';
 const useEnterPressTracker = () => {
 	const [enterCount, setEnterCount] = useState(0);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const { handleOpenPopupQuickMess, handleClosePopupQuickMess } = useHandlePopupQuickMess();
+	const { handleOpenPopupQuickMess } = useHandlePopupQuickMess();
 
 	const resetEnterCount = () => {
 		setEnterCount(0);

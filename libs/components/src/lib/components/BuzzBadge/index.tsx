@@ -1,7 +1,7 @@
-import { channelsActions, directActions } from '@mezon/store';
+import { channelsActions, directActions, selectCurrentClanId } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 type BuzzBadgeProps = {
 	channelId: string;
 	isReset: boolean;
@@ -15,19 +15,26 @@ const BuzzBadge = ({ channelId, isReset, senderId, mode, timestamp }: BuzzBadgeP
 
 	const isPosDmOrGr = mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChannelOrThread = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		if (isReset) {
 			const timer = setTimeout(() => {
 				if (isChannelOrThread) {
-					dispatch(channelsActions.setBuzzState({ channelId, buzzState: null }));
+					dispatch(
+						channelsActions.setBuzzState({
+							clanId: currentClanId as string,
+							channelId,
+							buzzState: null
+						})
+					);
 				} else if (isPosDmOrGr) {
 					dispatch(directActions.setBuzzStateDirect({ channelId, buzzState: null }));
 				}
 			}, 10000);
 			return () => clearTimeout(timer);
 		}
-	}, [isReset, senderId, channelId, dispatch, isPosDmOrGr, isChannelOrThread, timestamp]);
+	}, [isReset, senderId, channelId, dispatch, isPosDmOrGr, isChannelOrThread, timestamp, currentClanId]);
 
 	return (
 		<div>

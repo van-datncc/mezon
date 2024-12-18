@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useChatSending, useMenu } from '@mezon/core';
+import { useAppParams, useChatSending, useIdleRender, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
@@ -124,6 +124,10 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	};
 
 	const isLightMode = appearanceTheme === 'light';
+
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return null;
 
 	return (
 		<>

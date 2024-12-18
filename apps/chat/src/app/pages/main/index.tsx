@@ -376,8 +376,8 @@ const SidebarMenu = memo(
 		const logoCustom = useSelector(selectLogoCustom);
 
 		const setModeResponsive = useCallback(
-			(value: string) => {
-				dispatch(channelsActions.setModeResponsive(value));
+			(value: ModeResponsive) => {
+				dispatch(channelsActions.setModeResponsive({ clanId: currentClanId as string, mode: value }));
 			},
 			[dispatch]
 		);
@@ -450,6 +450,7 @@ const SidebarMenu = memo(
 								onClick={() => {
 									setModeResponsive(ModeResponsive.MODE_DM);
 								}}
+								draggable="false"
 							>
 								<NavLinkComponent active={!isClanView}>
 									<div>
@@ -464,6 +465,7 @@ const SidebarMenu = memo(
 											height={48}
 											className="clan w-full aspect-square object-cover"
 											onClick={handleClickToJoinClan}
+											draggable="false"
 										/>
 										{quantityPendingRequest !== 0 && (
 											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">

@@ -148,7 +148,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const modeResponsive = useSelector(selectModeResponsive);
-	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
+	const channels = useAppSelector((state) => selectChannelsByClanId(state, currentClanId ?? ''));
+
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
@@ -272,7 +273,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		});
 		const timestamp = Math.round(Date.now() / 1000);
 		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
+			//fixit
+			dispatch(
+				channelsActions.setBuzzState({
+					clanId: currentClanId as string,
+					channelId: channelId,
+					buzzState: { isReset: true, senderId, timestamp }
+				})
+			);
 		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
 		}
@@ -348,7 +356,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 				} else {
 					if (mess.isMe) {
-						dispatch(channelsActions.updateChannelBadgeCount({ channelId: message.channel_id, count: 0, isReset: true }));
+						dispatch(
+							channelsActions.updateChannelBadgeCount({
+								channelId: message.channel_id,
+								clanId: message.clan_id || '',
+								count: 0,
+								isReset: true
+							})
+						);
 					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				}
@@ -429,7 +444,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					isTabVisible === false;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
-					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
+					dispatch(
+						channelsActions.updateChannelBadgeCount({
+							clanId: (notification as any).clan_id,
+							channelId: (notification as any).channel_id ?? '',
+							count: 1
+						})
+					);
 
 					if (isNotCurrentDirect) {
 						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
@@ -465,7 +486,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
 		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
-		dispatch(channelsActions.updateChannelBadgeCount({ channelId: lastSeenMess.channel_id, count: 0, isReset: true }));
+		dispatch(
+			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
+		);
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
 	}, []);
 
@@ -480,7 +503,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						navigate(`/chat/direct/friends`);
 					}
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
-					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
+					// TODO:  backend send clan_id
+					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: clanId as string }));
 					dispatch(listChannelsByUserActions.remove(userID));
 				} else {
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -527,7 +551,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (user) {
 				if (channel_desc.type === ChannelType.CHANNEL_TYPE_TEXT || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
-					dispatch(channelsActions.add({ ...channel, active: 1 }));
+					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
 				}
 				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_VOICE) {
@@ -545,7 +569,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						directActions.addGroupUserWS({
 							channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
-							users: [caller, ...users].filter((item) => item && item.user_id !== userId)
+							users: [caller, ...users].filter((item) => item.user_id !== userId)
 						})
 					);
 				}
@@ -850,21 +874,37 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
-						dispatch(channelsActions.update({ id: channelUpdated.channel_id, changes: { ...channelUpdated } }));
+						dispatch(
+							channelsActions.update({
+								clanId: channelUpdated.clan_id,
+								update: { id: channelUpdated.channel_id, changes: { ...channelUpdated } }
+							})
+						);
 						dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 				if (channelUpdated.app_url) {
-					dispatch(channelsActions.updateAppChannel({ channelId: channelUpdated.channel_id, changes: { ...channelUpdated } }));
+					dispatch(
+						channelsActions.updateAppChannel({
+							clanId: channelUpdated.clan_id,
+							channelId: channelUpdated.channel_id,
+							changes: { ...channelUpdated }
+						})
+					);
 				}
 				if (
 					channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD &&
 					channelUpdated.status === ThreadStatus.joined &&
 					channelUpdated.creator_id !== userId
 				) {
-					dispatch(channelsActions.update({ id: channelUpdated.channel_id, changes: { ...channelUpdated } }));
+					dispatch(
+						channelsActions.update({
+							clanId: channelUpdated.clan_id,
+							update: { id: channelUpdated.channel_id, changes: { ...channelUpdated } }
+						})
+					);
 					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 				}
 			}
@@ -1404,5 +1444,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 };
 
 const ChatContextConsumer = ChatContext.Consumer;
+
+ChatContextProvider.displayName = 'ChatContextProvider';
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };

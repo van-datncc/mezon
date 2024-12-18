@@ -19,8 +19,8 @@ export const CreateNewChannelModal = () => {
 	const appUrlInputRef = useRef<ChannelAppUrlModalRef>(null);
 	const [isInputError, setIsInputError] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentCategory = useSelector((state: RootState) => state.channels.currentCategory);
-	const isOpenModal = useSelector((state: RootState) => state.channels.isOpenCreateNewChannel);
+	const currentCategory = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.currentCategory);
+	const isOpenModal = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.isOpenCreateNewChannel);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	const [validate, setValidate] = useState(true);
 	const [validateUrl, setValidateUrl] = useState(true);
@@ -37,7 +37,7 @@ export const CreateNewChannelModal = () => {
 
 	useEffect(() => {
 		if (isLoading === 'loaded') {
-			dispatch(channelsActions.openCreateNewModalChannel(false));
+			dispatch(channelsActions.openCreateNewModalChannel({ clanId: currentClanId as string, isOpen: false }));
 		}
 	}, [dispatch, isLoading]);
 
@@ -92,7 +92,7 @@ export const CreateNewChannelModal = () => {
 		setIsErrorName('');
 		setIsErrorAppUrl('');
 		clearDataAfterCreateNew();
-		dispatch(channelsActions.openCreateNewModalChannel(false));
+		dispatch(channelsActions.openCreateNewModalChannel({ clanId: currentClanId as string, isOpen: false }));
 	};
 
 	const handleChannelNameChange = (value: string) => {
@@ -143,7 +143,7 @@ export const CreateNewChannelModal = () => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleClose = useCallback(() => {
-		dispatch(channelsActions.openCreateNewModalChannel(false));
+		dispatch(channelsActions.openCreateNewModalChannel({ clanId: currentClanId as string, isOpen: false }));
 	}, [isOpenModal]);
 	useEscapeKeyClose(modalRef, handleClose);
 

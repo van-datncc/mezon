@@ -1,4 +1,12 @@
-import { EGuideType, ETypeMission, onboardingActions, selectChannelsByClanId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import {
+	EGuideType,
+	ETypeMission,
+	onboardingActions,
+	selectChannelsByClanId,
+	selectCurrentClanId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -29,7 +37,7 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 		}
 	];
 	const currentClanId = useSelector(selectCurrentClanId);
-	const allChannel = useSelector(selectChannelsByClanId(currentClanId as string));
+	const allChannel = useAppSelector((state) => selectChannelsByClanId(state, currentClanId as string));
 	const listMissionChannel = useMemo(() => {
 		return allChannel.filter((channel) => channel.channel_private !== ChannelStatusEnum.isPrivate);
 	}, [allChannel]);

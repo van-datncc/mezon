@@ -9,7 +9,6 @@ import {
 } from '@mezon/components';
 import {
 	useApp,
-	useAppNavigation,
 	useAppParams,
 	useAuth,
 	useChatMessages,
@@ -30,7 +29,6 @@ import {
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
-	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
@@ -78,8 +76,15 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					clanId: previousChannels.at(1)?.clanId || '',
+					channelId: previousChannels.at(1)?.channelId || '',
+					count: 0,
+					isReset: true
+				})
+			);
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
 	useEffect(() => {
@@ -108,9 +113,7 @@ function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: st
 
 const DirectMessage = () => {
 	// TODO: move selector to store
-	const { clanId, directId, type } = useAppParams();
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
-	const { navigate } = useAppNavigation();
+	const { directId, type } = useAppParams();
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
@@ -119,11 +122,6 @@ const DirectMessage = () => {
 	const { userId } = useAuth();
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		if (defaultChannelId) {
-			navigate(`./${defaultChannelId}`);
-		}
-	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 	const reactionTopState = useSelector(selectReactionTopState);
@@ -190,6 +188,7 @@ const DirectMessage = () => {
 	const handleClose = useCallback(() => {}, []);
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
@@ -199,17 +198,19 @@ const DirectMessage = () => {
 				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
-				<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
+				<div className="h-heightTopBar">
+					<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
+				</div>
 				<div className={`flex flex-row flex-1 w-full ${isHaveCallInChannel || isPlayDialTone ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>
 						<div
-							className={`overflow-y-auto bg-[#1E1E1E]  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink " ref={messagesContainerRef}`}
+							className={`overflow-y-auto  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink`}
+							ref={messagesContainerRef}
 						>
 							{
 								<ChannelMessages
-									key={directId}
 									clanId="0"
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
@@ -290,7 +291,7 @@ const DirectMessage = () => {
 						</div>
 					</div>
 					<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
+					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && isShowMemberListDM && (
 						<div
 							className={`dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_60px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 						>
