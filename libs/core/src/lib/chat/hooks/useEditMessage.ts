@@ -68,8 +68,8 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	);
 
 	const handleSend = useCallback(
-		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
-			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false);
+		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[], topic_id: string) => {
+			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false, topic_id);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? []);
 			dispatch(referencesActions.setOpenEditMessageState(false));
 		},
