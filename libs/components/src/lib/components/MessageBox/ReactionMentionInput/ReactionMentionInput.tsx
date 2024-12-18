@@ -570,12 +570,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
-
-	const input = document.querySelector(isNotChannel ? '#editorReactMention' : '#editorReactMentionChannel') as HTMLElement;
+	
 	function handleEventAfterEmojiPicked() {
 		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
 
-		if (isEmptyEmojiPicked || !input || !editorRef?.current) {
+		if (isEmptyEmojiPicked || !editorRef?.current) {
 			return;
 		}
 		if (emojiPicked) {
@@ -624,9 +623,17 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 	
 	const emojiPickedKeyValue = useMemo(() => {
-		return Object.entries(emojiPicked || {})
+		const entries = Object.entries(emojiPicked || {});
+		
+		if (entries.length === 0) {
+			return '';
+		}
+		
+		const timestampNow = Date.now().toString();
+		
+		return entries
 			.map(([key, value]) => `${key}=${value}`)
-			.join(' ');
+			.join(' ') + ' ' + timestampNow;
 	}, [emojiPicked]);
 
 	useEffect(() => {
