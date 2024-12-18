@@ -147,13 +147,16 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { currentChatUsersEntities } = useCurrentChat();
+	const isNotChannel = props.isThread || props.isTopic;
+	const inputElementId = isNotChannel ? `editorReactMention` : `editorReactMentionChannel`;
+	const isShowEmojiPicker = !props.isThread;
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
 	const currentDmOrChannelId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
-	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
+	const { request, setRequestInput } = useMessageValue(isNotChannel ? currentChannelId + String(isNotChannel) : (currentChannelId as string));
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
 	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useProcessMention(
@@ -214,12 +217,15 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 				setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(0, prevUndoHistory.length - 1));
 
-				setRequestInput({
-					...request,
-					valueTextInput: valueTextInput,
-					content: content,
-					mentionRaw: mentionRaw
-				});
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: valueTextInput,
+						content: content,
+						mentionRaw: mentionRaw
+					},
+					isNotChannel
+				);
 			}
 		} else if ((ctrlKey || metaKey) && (key === 'y' || key === 'Y')) {
 			event.preventDefault();
@@ -233,12 +239,15 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 				setRedoHistory((prevRedoHistory) => prevRedoHistory.slice(1));
 
-				setRequestInput({
-					...request,
-					valueTextInput: valueTextInput,
-					content: content,
-					mentionRaw: mentionRaw
-				});
+				setRequestInput(
+					{
+						...request,
+						valueTextInput: valueTextInput,
+						content: content,
+						mentionRaw: mentionRaw
+					},
+					isNotChannel
+				);
 			}
 		}
 
@@ -296,7 +305,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						valueTextInput: displayMarkup,
 						content: displayPlaintext
 					},
-					props.isThread
+					isNotChannel
 				);
 
 				return;
@@ -346,7 +355,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					anonymousMessage,
 					mentionEveryone
 				);
-				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+				setRequestInput({ ...request, valueTextInput: '', content: '' }, isNotChannel);
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -380,7 +389,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						mentionEveryone
 					);
 				}
-				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+				setRequestInput({ ...request, valueTextInput: '', content: '' }, isNotChannel);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
@@ -495,7 +504,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				content: newPlainTextValue,
 				mentionRaw: mentions
 			},
-			props.isThread
+			isNotChannel
 		);
 		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
@@ -527,7 +536,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					valueTextInput: newValue,
 					content: newPlainTextValue
 				},
-				props.isThread
+				isNotChannel
 			);
 			setIsPasteMulti(false);
 		}
@@ -544,7 +553,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					valueTextInput: previousValue,
 					content: previousPlainText
 				},
-				props.isThread
+				isNotChannel
 			);
 			setPastedContent('');
 		}
@@ -562,15 +571,15 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
 
-	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
 		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
 
-		if (isEmptyEmojiPicked || !input) {
+		if (isEmptyEmojiPicked || !editorRef?.current) {
 			return;
-		} else if (emojiPicked) {
+		}
+		if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `::[${emojiKey}](${emojiValue})${' '}`);
+				textFieldEdit.insert(editorRef.current, `::[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -613,6 +622,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 
+	const emojiPickedKeyValue = useMemo(() => {
+		const entries = Object.entries(emojiPicked || {});
+
+		if (entries.length === 0) {
+			return '';
+		}
+
+		const timestampNow = Date.now().toString();
+
+		return entries.map(([key, value]) => `${key}=${value}`).join(' ') + ' ' + timestampNow;
+	}, [emojiPicked]);
+
 	useEffect(() => {
 		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
 			return editorRef?.current?.blur();
@@ -620,7 +641,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (dataReferences.message_ref_id || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
 			return focusToElement(editorRef);
 		}
-	}, [dataReferences.message_ref_id, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
+	}, [dataReferences.message_ref_id, emojiPickedKeyValue, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -673,9 +694,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
 
 	useEffect(() => {
-		const textarea = document.getElementById('editorReactMention');
-		if (textarea) {
-			textarea.removeAttribute('aria-hidden');
+		if (editorRef.current) {
+			editorRef.current.removeAttribute('aria-hidden');
 		}
 	}, []);
 
@@ -711,7 +731,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					content: insertStringAt(request?.content || '', pastedContent?.content?.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
 					mentionRaw: [...(request?.mentionRaw || []), ...mentionRaw]
 				},
-				props.isThread
+				isNotChannel
 			);
 
 			const newFocusIndex = currentFocusIndex + (pastedContent?.content?.t?.slice(startIndex, endIndex) || '').length;
@@ -786,7 +806,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						}
 					}
 				}}
-				id="editorReactMention"
+				id={inputElementId}
 				inputRef={editorRef}
 				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
@@ -889,7 +909,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			{!props.isThread && (
+			{isShowEmojiPicker && (
 				<GifStickerEmojiButtons
 					activeTab={SubPanelName.NONE}
 					currentClanId={props.currentClanId}
