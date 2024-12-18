@@ -14,9 +14,10 @@ type ChannelMessagesProps = {
 	mode: ChannelStreamMode;
 	isPublic?: boolean;
 	isDM?: boolean;
+	isDisableLoadMore?: boolean;
 };
 
-const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, isDM }: ChannelMessagesProps) => {
+const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, isDM, isDisableLoadMore }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		return () => {
@@ -30,8 +31,14 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, 
 
 	return (
 		<View style={{ flex: 1 }}>
-			<ChannelMessages channelId={channelId} clanId={clanId} mode={mode} isDM={isDM} isPublic={isPublic} />
-
+			<ChannelMessages
+				channelId={channelId}
+				clanId={clanId}
+				mode={mode}
+				isDM={isDM}
+				isPublic={isPublic}
+				isDisableLoadMore={isDisableLoadMore}
+			/>
 			<ChannelMessageListener />
 			<ChannelMessageReactionListener />
 			<ChannelMessageActionListener mode={mode} isPublic={isPublic} clanId={clanId} channelId={channelId} />

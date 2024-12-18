@@ -69,7 +69,7 @@ const DeleteClanModal = ({
 			store.dispatch(clansActions.joinClan({ clanId: clans?.[indexClanJoin]?.clan_id }));
 			save(STORAGE_CLAN_ID, clans?.[indexClanJoin]?.clan_id);
 			store.dispatch(clansActions.changeCurrentClan({ clanId: clans[indexClanJoin]?.clan_id }));
-			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clans[indexClanJoin]?.clan_id, noCache: true }));
+			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clans[indexClanJoin]?.clan_id }));
 			await setDefaultChannelLoader(respChannel.payload, clans[indexClanJoin]?.clan_id);
 		} else {
 			navigation.navigate(APP_SCREEN.MESSAGES.HOME);

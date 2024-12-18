@@ -372,6 +372,7 @@ export interface IMessageSendPayload {
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
 	tp?: string;
+	cid?: string;
 }
 
 export type IUser = {

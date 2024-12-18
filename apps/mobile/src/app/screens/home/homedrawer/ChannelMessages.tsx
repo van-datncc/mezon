@@ -20,6 +20,7 @@ import { Direction_Mode, LIMIT_MESSAGE, sleep } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, LayoutAnimation, Platform, TouchableOpacity, UIManager, View } from 'react-native';
+import uuid from 'react-native-uuid';
 import { useSelector } from 'react-redux';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import ChannelMessageList from './components/ChannelMessageList';
@@ -33,6 +34,7 @@ type ChannelMessagesProps = {
 	mode: ChannelStreamMode;
 	isDM?: boolean;
 	isPublic?: boolean;
+	isDisableLoadMore?: boolean;
 };
 
 const getEntitiesArray = (state: any) => {
@@ -46,7 +48,7 @@ if (Platform.OS === 'android') {
 	}
 }
 
-const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, isDisableLoadMore }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -57,7 +59,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 	const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(true);
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
-	const [, setTriggerRender] = useState<boolean>(false);
+	const [, setTriggerRender] = useState<boolean | string>(false);
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
@@ -135,6 +137,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
+			if (isDisableLoadMore) return;
 			if (isLoadMore?.current?.[direction] || isFetching) return;
 			if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
 				return;
@@ -153,7 +156,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 				}
 			});
 			isLoadMore.current[direction] = true;
-			setTriggerRender(true);
+			setTriggerRender(uuid.v4());
 			if (direction === ELoadMoreDirection.bottom) {
 				await dispatch(
 					messagesActions.loadMoreMessage({
@@ -164,7 +167,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 					})
 				);
 				isLoadMore.current[direction] = false;
-				setTriggerRender(false);
+				setTriggerRender(uuid.v4());
 				scrollChannelMessageToIndex(LIMIT_MESSAGE + Math.floor(LIMIT_MESSAGE / 1.2));
 				return;
 			}
@@ -177,14 +180,14 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic }:
 				})
 			);
 			isLoadMore.current[direction] = false;
-			setTriggerRender(false);
+			setTriggerRender(uuid.v4());
 			// if (messages?.length >= LIMIT_MESSAGE * 4) {
 			// 	scrollChannelMessageToIndex(LIMIT_MESSAGE * 3);
 			// }
 
 			return true;
 		},
-		[isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, scrollChannelMessageToIndex]
+		[isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, scrollChannelMessageToIndex, isDisableLoadMore]
 	);
 
 	const renderItem = useCallback(

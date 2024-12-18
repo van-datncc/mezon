@@ -47,7 +47,7 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 						save(STORAGE_CLAN_ID, res?.clan_id);
 						await store.dispatch(clansActions.fetchClans());
 						store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-						const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+						const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id }));
 						await setDefaultChannelLoader(respChannel?.payload, res?.clan_id);
 						store.dispatch(appActions.setLoadingMainMobile(false));
 					});

@@ -5,7 +5,9 @@ import App from './app/navigation';
 import CustomIncomingCall from './app/screens/customIncomingCall';
 import { createLocalNotification, setupIncomingCall } from './app/utils/pushNotificationHelpers';
 notifee.onBackgroundEvent(async () => {});
-
+if (__DEV__) {
+	require('../reactotronConfig');
+}
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const offer = remoteMessage?.data?.offer;
 	if (offer) {

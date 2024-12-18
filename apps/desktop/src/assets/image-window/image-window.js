@@ -57,25 +57,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		username.textContent = image.uploaderData.name;
 		timestamp.textContent = formatDateTime(image.create_time);
 
-		currentIndex = index;
-		resetImageTransform();
+		if (index !== undefined) {
+			currentIndex = index;
+			resetImageTransform();
 
-		// Update active thumbnail
-		const thumbnailContainer = document.getElementById('thumbnails');
-		const thumbnails = document.querySelectorAll('.thumbnail');
-		thumbnails.forEach((thumb, idx) => {
-			if (idx === index) {
-				thumb.classList.add('active');
-				setTimeout(() => {
-					thumb.scrollIntoView({
-						behavior: 'smooth',
-						block: 'center'
-					});
-				}, 0);
-			} else {
-				thumb.classList.remove('active');
-			}
-		});
+			// Update active thumbnail
+			const thumbnailContainer = document.getElementById('thumbnails');
+			const thumbnails = document.querySelectorAll('.thumbnail');
+			thumbnails.forEach((thumb, idx) => {
+				if (idx === index) {
+					thumb.classList.add('active');
+					setTimeout(() => {
+						thumb.scrollIntoView({
+							behavior: 'smooth',
+							block: 'center'
+						});
+					}, 0);
+				} else {
+					thumb.classList.remove('active');
+				}
+			});
+		}
 	}
 
 	function navigateImage(direction) {
@@ -241,4 +243,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
 		handleAttachmentData(data);
 	});
+
+	window.electron.on('APP::SET_CURRENT_IMAGE', (event, data) => {
+		updateSelectedImage(data);
+	});
+
+	window.electron.on('APP::CHANGE_ATTACHMENT_LIST', () => {
+		window.electron.send('APP::GET_ATTACHMENT_DATA');
+	});
+
+	window.electron.send('APP::GET_ATTACHMENT_DATA');
 });

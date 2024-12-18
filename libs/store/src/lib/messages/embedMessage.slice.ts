@@ -40,7 +40,7 @@ export const embedSlice = createSlice({
 				return;
 			}
 			if (state.formDataEmbed[message_id][data.id]) {
-				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id], data.value];
+				state.formDataEmbed[message_id][data.id] = [data.value];
 				return;
 			}
 			state.formDataEmbed[message_id][data.id] = [data.value];

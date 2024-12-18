@@ -10,7 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { IMessageSelect, IMessageSelectOption, ModeResponsive } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { SelectOptions } from './SelectOptions';
 
@@ -80,6 +80,9 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 		);
 	};
 
+	const checkMultipleSelect = useMemo(() => {
+		return (!!select.min_options && select.min_options > 1) || (!!select.max_options && select.max_options > 1);
+	}, [select.min_options, select.max_options]);
 	useEffect(() => {
 		if (select.valueSelected) {
 			handleOptionSelect(select.valueSelected);
@@ -136,7 +139,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 
 	return (
 		<Dropdown
-			dismissOnClick={false}
+			dismissOnClick={!checkMultipleSelect}
 			label=""
 			renderTrigger={() => (
 				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">

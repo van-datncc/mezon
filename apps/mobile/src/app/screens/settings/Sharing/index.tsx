@@ -204,7 +204,7 @@ export const Sharing = ({ data, onClose }) => {
 		requestAnimationFrame(async () => {
 			if (isDiffClan) {
 				await store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
-				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id, noCache: true }));
+				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id }));
 			}
 			if (isDiffChannel) {
 				await store.dispatch(
