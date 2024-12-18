@@ -123,7 +123,7 @@ const ClanLayout = () => {
 	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannel?.id as string));
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
-	// console.log(streamPlay, 'streamPlay');
+
 	return (
 		<>
 			<div
