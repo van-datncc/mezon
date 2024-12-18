@@ -8,7 +8,8 @@ import {
 	selectChannelMetaEntities,
 	selectCurrentChannel,
 	selectCurrentClan,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
@@ -65,7 +66,7 @@ const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, clo
 const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
-	const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(category.clan_id || '', category.id));
+	const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, category.id));
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
@@ -153,13 +154,22 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 
 	const handleSortByName = () => {
 		dispatch(
-			categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[category.id], categoryId: category.id })
+			categoriesActions.setCategoryIdSortChannel({
+				isSortChannelByCategoryId: !categoryIdSortChannel[category.id],
+				categoryId: category.id,
+				clanId: category.clan_id as string
+			})
 		);
 	};
 
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
-		dispatch(channelsActions.openCreateNewModalChannel(true));
-		dispatch(channelsActions.setCurrentCategory(paramCategory));
+		dispatch(channelsActions.openCreateNewModalChannel({ clanId: paramCategory.clan_id as string, isOpen: true }));
+		dispatch(
+			channelsActions.setCurrentCategory({
+				clanId: paramCategory.clan_id as string,
+				category: paramCategory
+			})
+		);
 	};
 
 	const handleOpenCreateChannelModal = (category: ICategoryChannel) => {

@@ -124,9 +124,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	const toggleShowEmptyCategory = () => {
 		if (isShowEmptyCategory) {
-			dispatch(categoriesActions.setHideEmptyCategory());
+			dispatch(categoriesActions.setHideEmptyCategory(currentClanId as string));
 		} else {
-			dispatch(categoriesActions.setShowEmptyCategory());
+			dispatch(categoriesActions.setShowEmptyCategory(currentClanId as string));
 		}
 	};
 

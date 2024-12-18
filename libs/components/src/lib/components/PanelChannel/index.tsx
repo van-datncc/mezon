@@ -104,7 +104,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
 
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
+	const currentCategory = useAppSelector((state) => selectCategoryById(state, channel?.category_id as string));
 	const hasModalInChild = useSelector(hasGrandchildModal);
 	const favoriteChannel = useSelector(selectAllChannelsFavorite);
 	const [isFavorite, setIsFavorite] = useState<boolean>(false);
@@ -298,8 +298,13 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	);
 
 	const handleOpenCreateChannelModal = () => {
-		dispatch(channelsActions.setCurrentCategory(currentCategory));
-		dispatch(channelsActions.openCreateNewModalChannel(true));
+		dispatch(
+			channelsActions.setCurrentCategory({
+				clanId: currentClan?.id || '',
+				category: currentCategory
+			})
+		);
+		dispatch(channelsActions.openCreateNewModalChannel({ isOpen: true, clanId: currentClan?.id as string }));
 	};
 
 	const { handleMarkAsReadChannel, statusMarkAsReadChannel } = useMarkAsRead();

@@ -1,5 +1,5 @@
 import { EElementHightLight, useDriver } from '@mezon/core';
-import { channelsActions, selectAllChannels, selectMembersClanCount, useAppSelector } from '@mezon/store';
+import { channelsActions, selectAllChannels, selectCurrentClanId, selectMembersClanCount, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import 'driver.js/dist/driver.css';
 import { ReactNode, useEffect } from 'react';
@@ -13,6 +13,7 @@ export type OnBoardWelcomeProps = {
 export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 	const numberMemberClan = useAppSelector(selectMembersClanCount);
 	const numberChannel = useSelector(selectAllChannels);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const dispatch = useDispatch();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
@@ -27,7 +28,7 @@ export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 		if (numberChannel.length < 1) {
 			return;
 		}
-		dispatch(channelsActions.openCreateNewModalChannel(true));
+		dispatch(channelsActions.openCreateNewModalChannel({ isOpen: true, clanId: currentClanId as string }));
 	};
 
 	useEffect(() => {

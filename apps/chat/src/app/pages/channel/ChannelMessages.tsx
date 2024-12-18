@@ -1,5 +1,6 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
+import { useIdleRender } from '@mezon/core';
 import {
 	messagesActions,
 	pinMessageActions,
@@ -90,6 +91,10 @@ function ChannelMessages({
 	const isFetchingRef = useRef<boolean>(false);
 	const hasMoreTopRef = useRef<boolean>(false);
 	const hasMoreBottomRef = useRef<boolean>(false);
+
+	useEffect(() => {
+		userActiveScroll.current = false;
+	}, [channelId]);
 
 	useEffect(() => {
 		isFetchingRef.current = isFetching;
@@ -253,6 +258,9 @@ function ChannelMessages({
 			return;
 		}
 	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
+
+	const shouldRender = useIdleRender();
+	if (!shouldRender) return null;
 
 	return (
 		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>

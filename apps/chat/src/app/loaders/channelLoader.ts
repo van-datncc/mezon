@@ -11,7 +11,7 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	}
 	await dispatch(channelsActions.addThreadToChannels({ channelId, clanId }));
 	dispatch(channelsActions.joinChannel({ clanId, channelId, noFetchMembers: false, messageId: messageId || '' }));
-	dispatch(channelsActions.setPreviousChannels({ channelId }));
+	dispatch(channelsActions.setPreviousChannels({ clanId, channelId }));
 	notificationService.setCurrentChannelId(channelId);
 	return null;
 };
