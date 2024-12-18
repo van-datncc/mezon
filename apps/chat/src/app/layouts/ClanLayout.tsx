@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton, useWebRTCStream } from '@mezon/components';
 import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -23,7 +23,6 @@ import {
 } from '@mezon/store';
 import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
-import { useWebRTCStream } from 'libs/components/src/lib/components/StreamContext/StreamContext';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
