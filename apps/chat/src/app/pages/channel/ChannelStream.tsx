@@ -7,6 +7,7 @@ import {
 	selectIsShowChatStream,
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId2,
+	selectRemoteVideoStream,
 	selectStatusStream,
 	selectTheme,
 	useAppDispatch,
@@ -17,148 +18,41 @@ import {
 import { Icons } from '@mezon/ui';
 import { IChannelMember, IStreamInfo, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import Hls from 'hls.js';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface MediaPlayerProps {
-	src: string;
+	videoRef: RefObject<HTMLVideoElement>;
 }
 
-function HLSPlayer({ src }: MediaPlayerProps) {
-	const videoRef = useRef<HTMLVideoElement | null>(null);
+function HLSPlayer({ videoRef }: MediaPlayerProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const isPlaying = useSelector(selectStatusStream);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isMuted, setIsMuted] = useState(false);
 	const [volume, setVolume] = useState(1);
 	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [mediaError, setMediaError] = useState(false);
 	const [showControls, setShowControls] = useState(false);
 	const [errorLimitReached, setErrorLimitReached] = useState(false);
 	const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	useEffect(() => {
-		const videoElement = videoRef.current;
-		let hls: Hls | null = null;
-		let retryCount = 0;
-		const maxRetries = 10;
-		let mediaErrorRetryCount = 0;
-		const maxMediaErrorRetries = 5;
-
-		if (isPlaying && videoElement) {
-			if (Hls.isSupported()) {
-				hls = new Hls({
-					enableWorker: true, // Improve performance and avoid lag/frame drops.
-					lowLatencyMode: true, // Enable Low-Latency HLS part playlist and segment loading.
-					liveSyncDurationCount: 2, // Start from the last few segments.
-					liveMaxLatencyDurationCount: 10, // Maximum delay allowed from edge of live.
-					maxBufferLength: 8, // Maximum buffer length in seconds.
-					maxMaxBufferLength: 10, // The max Maximum buffer length in seconds.
-					maxLiveSyncPlaybackRate: 1.2, // Catch up if the latency is large.
-					liveDurationInfinity: true // Override current Media Source duration to Infinity for a live broadcast.
-				});
-
-				hls.on(Hls.Events.ERROR, (event, data) => {
-					if (data.fatal && hls) {
-						switch (data.type) {
-							case Hls.ErrorTypes.NETWORK_ERROR:
-								if (retryCount < maxRetries) {
-									retryCount++;
-									setTimeout(() => {
-										if (hls) {
-											hls.loadSource(src);
-											hls.attachMedia(videoElement);
-										}
-									}, 2000);
-								} else {
-									setErrorLimitReached(true);
-									setIsLoading(false);
-								}
-								break;
-							case Hls.ErrorTypes.MEDIA_ERROR:
-								if (mediaErrorRetryCount < maxMediaErrorRetries) {
-									mediaErrorRetryCount++;
-									if (!mediaError) {
-										setMediaError(true);
-										videoElement.pause();
-										setIsLoading(true);
-										setTimeout(() => {
-											hls?.recoverMediaError();
-											setMediaError(false);
-										}, 3000);
-									}
-								} else {
-									setErrorLimitReached(true);
-									setIsLoading(false);
-								}
-								break;
-							default:
-								if (hls) {
-									hls.destroy();
-								}
-								break;
-						}
-					}
-
-					if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-						// videoElement.pause();
-						setIsLoading(true);
-					}
-				});
-
-				hls.loadSource(src);
-				hls.attachMedia(videoElement);
-				hls.on(Hls.Events.MANIFEST_PARSED, () => {
-					videoElement.play().catch((error) => {
-						if (error.name === 'NotAllowedError') {
-							setIsMuted(true);
-							videoElement.muted = true;
-						}
-					});
-					setIsLoading(false);
-				});
-			} else {
-				videoElement.src = src;
-				videoElement.addEventListener('loadedmetadata', () => {
-					videoElement.play().catch((error) => {
-						if (error.name === 'NotAllowedError') {
-							setIsMuted(true);
-							videoElement.muted = true;
-						}
-					});
-					setIsLoading(false);
-				});
-			}
-		}
-
-		return () => {
-			if (hls) {
-				hls.destroy();
-			}
-		};
-	}, [isPlaying, mediaError, src]);
+	const isRemoteVideoStream = useSelector(selectRemoteVideoStream);
 
 	const handleToggleMute = () => {
-		const videoElement = videoRef.current;
-		if (videoElement) {
-			videoElement.muted = !isMuted;
-			setIsMuted(videoElement.muted);
+		if (videoRef.current) {
+			videoRef.current.muted = !isMuted;
+			setIsMuted(videoRef.current.muted);
 		}
 	};
 
 	const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const newVolume = parseFloat(event.target.value);
-		const videoElement = videoRef.current;
-		if (videoElement) {
-			videoElement.volume = newVolume;
+		if (videoRef.current) {
+			videoRef.current.volume = newVolume;
 			setVolume(newVolume);
 			if (newVolume > 0) {
-				videoElement.muted = false;
+				videoRef.current.muted = false;
 				setIsMuted(false);
 			} else {
-				videoElement.muted = true;
+				videoRef.current.muted = true;
 				setIsMuted(true);
 			}
 		}
@@ -217,13 +111,31 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 			onMouseMove={handleMouseMoveOrClick}
 			onClick={handleMouseMoveOrClick}
 		>
-			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full object-contain" />
+			<div className="custom-video-container w-full h-full" style={{ position: 'relative' }}>
+				{!isRemoteVideoStream && (
+					<img
+						src="http://do78x13wq0td.cloudfront.net/prod/Uploads/images/imsv2/1734066191951-145%20(14).png"
+						alt="background"
+						className="w-full h-full object-cover"
+					/>
+				)}
+				<video
+					className="custom-video w-full h-full object-contain"
+					ref={videoRef}
+					autoPlay
+					playsInline
+					controls={false}
+					style={{
+						display: isRemoteVideoStream ? 'block' : 'none'
+					}}
+				/>
+			</div>
 
-			{isLoading && (
+			{/* {isLoading && (
 				<div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex justify-center items-center text-white text-xl z-50">
 					Loading...
 				</div>
-			)}
+			)} */}
 			{errorLimitReached && (
 				<div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex justify-center items-center text-white text-xl z-50">
 					Cannot play video. Please try again later.
@@ -355,9 +267,22 @@ type ChannelStreamProps = {
 	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	channelName?: string;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string) => void;
+	streamVideoRef: RefObject<HTMLVideoElement>;
+	disconnect: () => void;
+	isStream: boolean;
 };
 
-export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, channelName }: ChannelStreamProps) {
+export default function ChannelStream({
+	hlsUrl,
+	memberJoin,
+	currentStreamInfo,
+	channelName,
+	handleChannelClick,
+	streamVideoRef,
+	disconnect,
+	isStream
+}: ChannelStreamProps) {
 	const streamPlay = useSelector(selectStatusStream);
 	const appearanceTheme = useSelector(selectTheme);
 	const { userProfile } = useAuth();
@@ -375,6 +300,14 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 		if (!channel || !currentClan || !currentStreamInfo) return;
 		if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) return;
 		if (currentStreamInfo.streamId !== channel.id || (!streamPlay && currentStreamInfo?.streamId === channel.id)) {
+			disconnect();
+			handleChannelClick(
+				currentClan?.id as string,
+				channel?.channel_id as string,
+				userProfile?.user?.id as string,
+				channel?.channel_id as string
+			);
+
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -392,6 +325,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
+		disconnect();
 		const idStreamByMe = memberJoin?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
 		dispatch(usersStreamActions.remove(idStreamByMe || ''));
 		dispatch(appActions.setIsShowChatStream(false));
@@ -400,6 +334,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 
 	const handleJoinChannel = async () => {
 		dispatch(videoStreamActions.startStream(currentStreamInfo as IStreamInfo));
+		handleChannelClick(currentClan?.id as string, channel?.channel_id as string, userProfile?.user?.id as string, channel?.channel_id as string);
 	};
 
 	const toggleMembers = () => {
@@ -451,11 +386,11 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 		<div className="w-full h-full flex relative group" onMouseMove={handleMouseMoveOrClick} onClick={handleMouseMoveOrClick}>
 			<div className="flex flex-col justify-center gap-2 w-full bg-black">
 				<div className={`relative min-h-40 h-fit items-center flex justify-center ${memberJoin.length > 0 && showMembers ? 'mt-6' : ''}`}>
-					{hlsUrl ? (
+					{isStream ? (
 						<div
 							className={`transition-all duration-300 h-full max-sm:w-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}
 						>
-							<HLSPlayer src={hlsUrl} />
+							<HLSPlayer videoRef={streamVideoRef} />
 						</div>
 					) : (
 						<div className="sm:h-[250px] md:h-[350px] lg:h-[450px] xl:h-[550px] w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight text-5xl flex justify-center items-center text-center">
