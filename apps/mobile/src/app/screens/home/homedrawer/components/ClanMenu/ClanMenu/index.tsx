@@ -158,8 +158,8 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => {
-				handleMarkAsReadClan(currentClan?.clan_id);
+			onPress: async () => {
+				await handleMarkAsReadClan(currentClan?.clan_id);
 				dismiss();
 			},
 			title: t('menu.watchMenu.markAsRead')
