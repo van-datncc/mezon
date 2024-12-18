@@ -149,7 +149,6 @@ const TopicDiscussionBox = () => {
 							channelID: currentChannel?.channel_id as string,
 							channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
 						})}
-						isThread
 						isTopic
 					/>
 				</div>
