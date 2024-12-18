@@ -1,5 +1,5 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
-import { useTopics } from '@mezon/core';
+import { useAuth, useTopics } from '@mezon/core';
 import {
 	RootState,
 	fetchMessages,
@@ -32,6 +32,7 @@ const TopicDiscussionBox = () => {
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
+	const { userProfile } = useAuth();
 	useEffect(() => {
 		const fetchMsgResult = async () => {
 			await dispatch(fetchMessages({ channelId: currentChannelId as string, clanId: currentClanId as string, topicId: currentTopicId || '' }));
@@ -107,7 +108,8 @@ const TopicDiscussionBox = () => {
 						messagesActions.updateToBeTopicMessage({
 							channelId: currentChannelId as string,
 							messageId: valueTopic?.id as string,
-							topicId: topic.id as string
+							topicId: topic.id as string,
+							creatorId: userProfile?.user?.id as string
 						})
 					);
 					await sleep(10);
@@ -115,7 +117,7 @@ const TopicDiscussionBox = () => {
 				}
 			}
 		},
-		[createTopic, currentTopicId, currentTopicId, sendMessageTopic, sessionUser]
+		[createTopic, currentTopicId, currentTopicId, sendMessageTopic, sessionUser, userProfile]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -138,6 +140,7 @@ const TopicDiscussionBox = () => {
 					type={ChannelType.CHANNEL_TYPE_TEXT}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					isTopicBox
+					topicId={currentTopicId}
 				/>
 			)}
 			<div className="flex flex-col flex-1 justify-end">

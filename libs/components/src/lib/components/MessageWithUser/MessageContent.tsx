@@ -1,4 +1,5 @@
 import {
+	getFirstMessageOfTopic,
 	selectCurrentChannelId,
 	selectMemberClanByUserId,
 	selectMessageByMessageId,
@@ -9,7 +10,16 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, TypeMessage, addMention, convertTimeString, isValidEmojiData } from '@mezon/utils';
+import {
+	ETypeLinkMedia,
+	IExtendedMessage,
+	IMessageWithUser,
+	TypeMessage,
+	addMention,
+	convertTimeString,
+	createImgproxyUrl,
+	isValidEmojiData
+} from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -25,9 +35,10 @@ type IMessageContentProps = {
 	mode?: number;
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
+	isInTopic?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
+const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageContentProps) => {
 	const dispatch = useAppDispatch();
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
@@ -48,6 +59,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
 		dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread: false }));
 		dispatch(topicsActions.setCurrentTopicId(currentMessage?.content?.tp || ''));
+		dispatch(getFirstMessageOfTopic(currentMessage?.content?.tp || ''));
 	};
 
 	const handleCopyMessage = useCallback(
@@ -69,6 +81,8 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 		[message]
 	);
 
+	const avatarToDisplay = topicCreator?.clan_avatar ? topicCreator?.clan_avatar : topicCreator?.user?.avatar_url;
+
 	return (
 		<div>
 			<MessageText
@@ -80,13 +94,17 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 				mode={mode}
 				onCopy={handleCopyMessage}
 			/>
-			{currentMessage?.code === TypeMessage.Topic && (
+			{!isInTopic && currentMessage?.code === TypeMessage.Topic && (
 				<div
 					className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-md my-1 p-1 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white group/view-topic-btn"
 					onClick={handleOpenTopic}
 				>
 					<div className="flex items-center gap-2 text-sm h-fit">
-						<img src={topicCreator?.clan_avatar} alt={`${topicCreator?.clan_nick}'s avatar`} className="size-7 rounded-md object-cover" />
+						<img
+							src={createImgproxyUrl(avatarToDisplay ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+							alt={`${topicCreator?.user?.username}'s avatar`}
+							className="size-7 rounded-md object-cover"
+						/>
 						<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>
 						<p>View topic</p>
 					</div>
