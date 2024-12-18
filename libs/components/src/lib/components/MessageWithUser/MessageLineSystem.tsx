@@ -1,7 +1,8 @@
-import { messagesActions, useAppDispatch } from '@mezon/store';
-import { EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser } from '@mezon/utils';
+import { messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
+import { EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser, TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
 type MessageLineSystemProps = {
@@ -56,6 +57,7 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 	);
 	const { allUserIdsInChannel } = useMessageContextMenu();
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 
 	const getIdMessageToJump = useCallback(
 		(e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
@@ -116,6 +118,42 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 		return formattedContent;
 	}, [elements, t, mode]);
 
+	let threadLabel = '';
+	let threadId = '';
+	let threadContent = '';
+
+	if (message.code === TypeMessage.CreateThread && content && message.content && message.content.t) {
+		const parts = message.content.t.split('(');
+		if (parts.length > 1) {
+			const threadPart = parts[1]?.trim();
+			if (threadPart) {
+				const threadParts = threadPart.split(',');
+				if (threadParts.length > 1) {
+					threadLabel = threadParts[0]?.trim() || '';
+					threadId = threadParts[1]?.replace(')', '').trim() || '';
+				}
+			}
+		} else {
+			// used for old unformatted messages
+			threadContent = message.content.t.replace(/^@\w+\s*/, '');
+		}
+	}
+
+	const handelJumpToChannel = () => {
+		if (threadId) {
+			navigate(`/chat/clans/${message?.clan_id}/channels/${threadId}`);
+		}
+	};
+
+	const handleShowThreads = () => {
+		dispatch(threadsActions.showThreadModal());
+	};
+
+	const handleShowPinMessage = async () => {
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: message?.channel_id }));
+		dispatch(pinMessageActions.showPinModal());
+	};
+
 	return (
 		<div
 			style={
@@ -131,11 +169,35 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 			}
 			className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
 		>
-			{content} pinned{' '}
-			<span onClick={getIdMessageToJump} className="font-semibold cursor-pointer hover:underline">
-				a message
-			</span>{' '}
-			to this channel. See all pinned messages.
+			{content}{' '}
+			{message.code === TypeMessage.CreatePin && (
+				<>
+					pinned{' '}
+					<span onClick={getIdMessageToJump} className="font-semibold cursor-pointer hover:underline">
+						a message
+					</span>{' '}
+					to this channel. See{' '}
+					<span onClick={handleShowPinMessage} className="font-semibold cursor-pointer hover:underline">
+						all pinned
+					</span>{' '}
+					messages.
+				</>
+			)}
+			{message.code === TypeMessage.CreateThread &&
+				(threadId ? (
+					<>
+						started a thread:{' '}
+						<span onClick={handelJumpToChannel} className="font-semibold cursor-pointer hover:underline">
+							{threadLabel}
+						</span>{' '}
+						. See{' '}
+						<span onClick={handleShowThreads} className="font-semibold cursor-pointer hover:underline">
+							all threads
+						</span>{' '}
+					</>
+				) : (
+					<>{threadContent}</>
+				))}
 		</div>
 	);
 });

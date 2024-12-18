@@ -12,9 +12,11 @@ import {
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsPinModalVisible,
 	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
+	selectIsThreadModalVisible,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
@@ -205,16 +207,17 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
-	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+	const isShowThread = useSelector(selectIsThreadModalVisible);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
+	const dispatch = useDispatch();
 	const handleShowThreads = () => {
-		setIsShowThread(!isShowThread);
+		dispatch(threadsActions.showThreadModal());
 	};
 
 	const handleClose = useCallback(() => {
-		setIsShowThread(false);
+		dispatch(threadsActions.hideThreadModal());
 	}, []);
 
 	return (
@@ -295,17 +298,17 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
-	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
+	const isShowPinMessage = useSelector(selectIsPinModalVisible);
 	const pinRef = useRef<HTMLDivElement | null>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
 
 	const handleShowPinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
-		setIsShowPinMessage(!isShowPinMessage);
+		dispatch(pinMessageActions.showPinModal());
 	};
 
 	const handleClose = useCallback(() => {
-		setIsShowPinMessage(false);
+		dispatch(pinMessageActions.hidePinModal());
 	}, []);
 
 	return (
