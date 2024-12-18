@@ -54,7 +54,7 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 			{isRoleUser && (
 				<Block flexDirection="row" alignItems="center" gap={size.s_10}>
 					<Icons.RoleIcon width={size.s_20} height={size.s_20} />
-					<Text style={[styles.roleText, { color: color }]}>{`${name}`}</Text>
+					<Text style={[styles.roleText, { color: color ?? themeValue.textRoleLink }]}>{`${name}`}</Text>
 				</Block>
 			)}
 			{name?.startsWith('here') && <Text style={[styles.roleText, styles.textHere]}>{`@${name}`}</Text>}

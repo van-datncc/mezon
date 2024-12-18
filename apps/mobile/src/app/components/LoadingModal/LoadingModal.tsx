@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'rgba(0,0,0,0.7)',
 		position: 'absolute',
+		zIndex: 2,
 		top: 0,
 		left: 0,
 		width: '100%',
