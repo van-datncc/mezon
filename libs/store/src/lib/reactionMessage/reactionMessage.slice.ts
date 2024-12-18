@@ -85,6 +85,7 @@ export type WriteMessageReactionArgs = {
 	actionDelete: boolean;
 	isPublic: boolean;
 	userId: string;
+	topic_id: string;
 };
 
 const reactionQueue: Array<() => Promise<void>> = [];
@@ -109,7 +110,21 @@ async function processReactionQueue() {
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
 	async (
-		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic, userId }: WriteMessageReactionArgs,
+		{
+			id,
+			clanId,
+			channelId,
+			mode,
+			messageId,
+			emoji_id,
+			emoji,
+			count,
+			messageSenderId,
+			actionDelete,
+			isPublic,
+			userId,
+			topic_id
+		}: WriteMessageReactionArgs,
 		thunkAPI
 	) => {
 		const action = async () => {
@@ -134,7 +149,8 @@ export const writeMessageReaction = createAsyncThunk(
 					emoji,
 					count,
 					messageSenderId,
-					actionDelete
+					actionDelete,
+					topic_id
 				);
 
 				const emojiLastest: EmojiStorage = {

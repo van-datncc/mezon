@@ -146,7 +146,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			} else if (draftContent === originalContent) {
 				handleCancelEdit();
 			} else {
-				handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
+				handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft, message?.content?.tp || '');
 				handleCancelEdit();
 			}
 		}
@@ -164,7 +164,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
+			handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft, message?.content?.tp || '');
 		}
 		handleCancelEdit();
 	};
