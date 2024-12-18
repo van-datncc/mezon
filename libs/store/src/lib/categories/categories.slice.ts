@@ -101,10 +101,10 @@ export const checkDuplicateCategoryInClan = createAsyncThunk(
 
 export const deleteCategory = createAsyncThunk(
 	'categories/deleteCategory',
-	async ({ clanId, categoryId }: { clanId: string; categoryId: string }, thunkAPI) => {
+	async ({ clanId, categoryId, categoryLabel }: { clanId: string; categoryId: string; categoryLabel: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId);
+			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId, categoryLabel);
 			if (response) {
 				thunkAPI.dispatch(fetchCategories({ clanId }));
 				thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));

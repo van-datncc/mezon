@@ -17,7 +17,13 @@ export function useCategory() {
 			const toMembersPage = (clanId: string) => {
 				return `/chat/clans/${clanId}/member-safety`;
 			};
-			await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
+			await dispatch(
+				categoriesActions.deleteCategory({
+					clanId: category.clan_id as string,
+					categoryId: category.id as string,
+					categoryLabel: category.category_name as string
+				})
+			);
 			const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
 
 			let channelNavId = '';

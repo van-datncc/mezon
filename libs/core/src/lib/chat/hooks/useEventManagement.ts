@@ -61,8 +61,10 @@ export function useEventManagement() {
 	);
 
 	const deleteEventManagement = useCallback(
-		async (clan_id: string, event_id: string, creator_id: string) => {
-			await dispatch(eventManagementActions.fetchDeleteEventManagement({ clanId: clan_id, eventID: event_id, creatorId: creator_id }));
+		async (clan_id: string, event_id: string, creator_id: string, label: string) => {
+			await dispatch(
+				eventManagementActions.fetchDeleteEventManagement({ clanId: clan_id, eventID: event_id, creatorId: creator_id, eventLabel: label })
+			);
 		},
 		[dispatch]
 	);

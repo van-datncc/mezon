@@ -127,6 +127,7 @@ type fetchDeleteEventManagementPayload = {
 	eventID: string;
 	clanId: string;
 	creatorId: string;
+	eventLabel: string;
 };
 
 export const updateEventManagement = createAsyncThunk(
@@ -166,7 +167,7 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 	async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId, body.creatorId);
+			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId, body.creatorId, body.eventLabel);
 			if (response) {
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
 			}

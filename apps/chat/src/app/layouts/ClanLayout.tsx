@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton, useWebRTCStream } from '@mezon/components';
 import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -39,13 +39,15 @@ const ClanEffects: React.FC<{
 	isShowChatStream: boolean;
 	isShowCreateThread: boolean;
 	isShowCreateTopic: boolean;
-}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic }) => {
+	userId?: string;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId }) => {
 	// move code thanh.levan
 
 	const { canvasId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -69,6 +71,8 @@ const ClanEffects: React.FC<{
 			currentStreamInfo?.clanId !== currentClan.id &&
 			currentStreamInfo?.streamId !== currentChannel.channel_id
 		) {
+			disconnect();
+			handleChannelClick(currentClan?.id as string, currentChannel.channel_id as string, userId as string, currentChannel.channel_id as string);
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -175,6 +179,7 @@ const ClanLayout = () => {
 				isShowChatStream={isShowChatStream}
 				isShowCreateThread={isShowCreateThread}
 				isShowCreateTopic={isShowCreateTopic}
+				userId={userProfile?.user?.id || ''}
 			/>
 		</>
 	);

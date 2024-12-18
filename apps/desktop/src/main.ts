@@ -1,4 +1,4 @@
-import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, screen, shell } from 'electron';
 import log from 'electron-log/main';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
@@ -7,6 +7,7 @@ import App from './app/app';
 import {
 	CLOSE_APP,
 	DOWNLOAD_FILE,
+	DOWN_LOAD_IMAGE,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
@@ -19,7 +20,6 @@ import {
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
-
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
 	messageId: string;
@@ -116,7 +116,6 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 		case UNMAXIMIZE_WINDOW:
 		case MAXIMIZE_WINDOW:
 			if (process.platform === 'darwin') {
-				const screen = require('electron').screen;
 				const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
 				const windowBounds = window.getBounds();
 				const isMaximized = windowBounds.width >= display.workArea.width && windowBounds.height >= display.workArea.height;
@@ -169,6 +168,14 @@ ipcMain.on(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindow
 
 ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
 	handleWindowAction(App.mainWindow, action);
+});
+
+ipcMain.handle(DOWN_LOAD_IMAGE, (event, action, data) => {
+	const win = BrowserWindow.getFocusedWindow();
+	const fileURL = action?.payload?.fileURL;
+	if (fileURL) {
+		win.webContents.downloadURL(fileURL);
+	}
 });
 
 // handle setup events as quickly as possible

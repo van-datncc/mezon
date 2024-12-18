@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { GET_APP_VERSION, GET_DEVICE_ID, OPEN_NEW_WINDOW, SENDER_ID, SET_BADGE_COUNT } from '../events/constants';
+import { DOWN_LOAD_IMAGE, GET_APP_VERSION, GET_DEVICE_ID, OPEN_NEW_WINDOW, SENDER_ID, SET_BADGE_COUNT } from '../events/constants';
 
 contextBridge.exposeInMainWorld('electron', {
 	platform: process.platform,
@@ -27,5 +27,8 @@ contextBridge.exposeInMainWorld('electron', {
 	invoke: (channel, data) => ipcRenderer.invoke(channel, data),
 	openImageWindow: (props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
 		return ipcRenderer.send(OPEN_NEW_WINDOW, props, options, params);
+	},
+	dowloadImage: (url: string) => {
+		return ipcRenderer.invoke(DOWN_LOAD_IMAGE, { payload: { fileURL: url } });
 	}
 });
