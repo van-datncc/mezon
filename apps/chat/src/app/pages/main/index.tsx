@@ -304,9 +304,13 @@ function MyApp() {
 				</div>
 			)}
 
-			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall?.channel_id && (
-				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
-			)}
+			{isPlayRingTone &&
+				!!dataCall &&
+				!isInCall &&
+				directId !== dataCall?.channel_id &&
+				dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
+					<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
+				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
 
