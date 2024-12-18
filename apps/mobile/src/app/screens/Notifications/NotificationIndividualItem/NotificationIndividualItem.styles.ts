@@ -23,8 +23,12 @@ export const style = (colors: Attributes) =>
 			marginBottom: 5,
 			flex: 1
 		},
+		notifyUserName: {
+			fontSize: size.s_16,
+			fontWeight: 'bold'
+		},
 		notifyDuration: {
-			color: colors?.textStrong
+			color: colors.textStrong
 		},
 		boxImage: {
 			width: size.s_40,

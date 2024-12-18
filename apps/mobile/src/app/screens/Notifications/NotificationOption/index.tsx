@@ -4,6 +4,7 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSwitch, reserve } from '../../../componentUI';
+import { EActionDataNotify } from '../types';
 import { style } from './NotificationOption.styles';
 interface INotificationOptionProps {
 	selectedTabs: { mention: boolean; individual: boolean };
@@ -18,7 +19,7 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 		onChangeTab(value, isSelected);
 	};
 	const Btn = useCallback(
-		({ val }: { val: 'individual' | 'mention' }) => (
+		({ val }: { val: EActionDataNotify }) => (
 			<MezonSwitch
 				value={selectedTabs[val]}
 				onValueChange={(isSelected) => {
@@ -35,12 +36,17 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 				{
 					title: t('tabNotify.forYou'),
 					icon: <Icons.AtIcon color={themeValue.textStrong} />,
-					component: <Btn val="individual" />
+					component: <Btn val={EActionDataNotify.Individual} />
 				},
 				{
 					title: t('tabNotify.mention'),
 					icon: <Icons.BellIcon color={themeValue.textStrong} />,
-					component: <Btn val="mention" />
+					component: <Btn val={EActionDataNotify.Mention} />
+				},
+				{
+					title: t('tabNotify.messages'),
+					icon: <Icons.ChatIcon color={themeValue.textStrong} />,
+					component: <Btn val={EActionDataNotify.Messages} />
 				}
 			] satisfies IMezonMenuItemProps[],
 		[]

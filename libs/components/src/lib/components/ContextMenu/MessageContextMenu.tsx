@@ -534,7 +534,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 								1,
 								message?.sender_id ?? '',
 								false,
-								isPublicChannel(currentChannel)
+								isPublicChannel(currentChannel),
+								message.content?.tp ?? ''
 							);
 						}
 					} catch (error) {
