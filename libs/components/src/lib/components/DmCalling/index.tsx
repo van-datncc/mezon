@@ -27,7 +27,7 @@ import { Icons } from '@mezon/ui';
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { IMessageTypeCallLog, createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
@@ -101,8 +101,12 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [isPlayBusyTone]);
 
 	const isInChannelCalled = useMemo(() => {
+		const isSignalDataOffer = signalingData?.[0]?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER;
+		if (!isSignalDataOffer && !isInCall) {
+			return false;
+		}
 		return currentDmGroup?.user_id?.some((i) => i === signalingData?.[0]?.callerId);
-	}, [currentDmGroup?.user_id, signalingData]);
+	}, [currentDmGroup?.user_id, isInCall, signalingData]);
 
 	useEffect(() => {
 		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;

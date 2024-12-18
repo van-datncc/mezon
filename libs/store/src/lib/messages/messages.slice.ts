@@ -344,11 +344,12 @@ type LoadMoreMessArgs = {
 	channelId: string;
 	direction?: Direction_Mode;
 	fromMobile?: boolean;
+	topicId?: string;
 };
 
 export const loadMoreMessage = createAsyncThunk(
 	'messages/loadMoreMessage',
-	async ({ clanId, channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false }: LoadMoreMessArgs, thunkAPI) => {
+	async ({ clanId, channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false, topicId }: LoadMoreMessArgs, thunkAPI) => {
 		try {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
 			// ignore when:
@@ -361,6 +362,16 @@ export const loadMoreMessage = createAsyncThunk(
 			}
 
 			if (direction === Direction_Mode.BEFORE_TIMESTAMP) {
+				if (topicId) {
+					return await thunkAPI.dispatch(
+						fetchMessages({
+							clanId: clanId,
+							channelId: channelId,
+							direction: direction,
+							topicId: topicId
+						})
+					);
+				}
 				// scroll up
 				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 				const firstChannelMessageId = selectFirstMessageIdByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -378,6 +389,16 @@ export const loadMoreMessage = createAsyncThunk(
 					})
 				);
 			} else {
+				if (topicId) {
+					return await thunkAPI.dispatch(
+						fetchMessages({
+							clanId: clanId,
+							channelId: channelId,
+							direction: direction,
+							topicId: topicId
+						})
+					);
+				}
 				// scroll down
 				const lastChannelMessageId = selectLatestMessageId(getMessagesRootState(thunkAPI), channelId);
 				const firstScrollMessageId = selectLastLoadedMessageIdByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -1029,9 +1050,10 @@ export const messagesSlice = createSlice({
 		setIsJumpingToPresent(state, action: PayloadAction<{ channelId: string; status: boolean }>) {
 			state.isJumpingToPresent[action.payload.channelId] = action.payload.status;
 		},
-		updateToBeTopicMessage(state, action: PayloadAction<{ channelId: string; messageId: string; topicId: string }>) {
+		updateToBeTopicMessage(state, action: PayloadAction<{ channelId: string; messageId: string; topicId: string; creatorId: string }>) {
 			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].code = 9;
 			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].content!.tp = action.payload.topicId;
+			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].content!.cid = action.payload.creatorId;
 		},
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
