@@ -208,11 +208,8 @@ export const pinMessageSlice = createSlice({
 		setJumpPinMessageId: (state, action) => {
 			state.jumpPinMessageId = action.payload;
 		},
-		showPinModal: (state: PinMessageState) => {
+		togglePinModal: (state: PinMessageState) => {
 			state.isPinModalVisible = !state.isPinModalVisible;
-		},
-		hidePinModal: (state: PinMessageState) => {
-			state.isPinModalVisible = false;
 		}
 	},
 	extraReducers: (builder) => {

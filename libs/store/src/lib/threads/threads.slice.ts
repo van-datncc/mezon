@@ -184,13 +184,9 @@ export const threadsSlice = createSlice({
 		remove: (state, action: PayloadAction<string>) => {
 			threadsAdapter.removeOne(state, action.payload);
 		},
-		showThreadModal: (state: ThreadsState) => {
+		toggleThreadModal: (state: ThreadsState) => {
 			state.isThreadModalVisible = !state.isThreadModalVisible;
 		},
-		hideThreadModal: (state: ThreadsState) => {
-			state.isThreadModalVisible = false;
-		},
-
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
 				...state.isShowCreateThread,

@@ -1,5 +1,5 @@
 import { messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
-import { EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser, TypeMessage } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser, TypeMessage, parseThreadInfo } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -52,9 +52,9 @@ interface ElementTokenSystem {
 
 const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumMessageEnabled, isTokenClickAble }: RenderContentProps) => {
 	const { t, mentions = [] } = data;
-	const elements: ElementTokenSystem[] = [...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS }))].sort(
-		(a, b) => (a.s ?? 0) - (b.s ?? 0)
-	);
+	const elements = useMemo(() => {
+		return [...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS }))].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+	}, [mentions]);
 	const { allUserIdsInChannel } = useMessageContextMenu();
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -118,26 +118,12 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 		return formattedContent;
 	}, [elements, t, mode]);
 
-	let threadLabel = '';
-	let threadId = '';
-	let threadContent = '';
-
-	if (message.code === TypeMessage.CreateThread && content && message.content && message.content.t) {
-		const parts = message.content.t.split('(');
-		if (parts.length > 1) {
-			const threadPart = parts[1]?.trim();
-			if (threadPart) {
-				const threadParts = threadPart.split(',');
-				if (threadParts.length > 1) {
-					threadLabel = threadParts[0]?.trim() || '';
-					threadId = threadParts[1]?.replace(')', '').trim() || '';
-				}
-			}
-		} else {
-			// used for old unformatted messages
-			threadContent = message.content.t.replace(/^@\w+\s*/, '');
+	const { threadLabel, threadId, threadContent } = useMemo(() => {
+		if (message.code === TypeMessage.CreateThread && message.content?.t) {
+			return parseThreadInfo(message.content.t);
 		}
-	}
+		return { threadLabel: '', threadId: '', threadContent: '' };
+	}, [message.code, message.content?.t]);
 
 	const handelJumpToChannel = () => {
 		if (threadId) {
@@ -146,12 +132,12 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 	};
 
 	const handleShowThreads = () => {
-		dispatch(threadsActions.showThreadModal());
+		dispatch(threadsActions.toggleThreadModal());
 	};
 
 	const handleShowPinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: message?.channel_id }));
-		dispatch(pinMessageActions.showPinModal());
+		dispatch(pinMessageActions.togglePinModal());
 	};
 
 	return (

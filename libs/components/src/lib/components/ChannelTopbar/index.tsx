@@ -212,13 +212,9 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
 	const dispatch = useDispatch();
-	const handleShowThreads = () => {
-		dispatch(threadsActions.showThreadModal());
+	const handleToggleThreads = () => {
+		dispatch(threadsActions.toggleThreadModal());
 	};
-
-	const handleClose = useCallback(() => {
-		dispatch(threadsActions.hideThreadModal());
-	}, []);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
@@ -226,11 +222,11 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 				className={`${isShowThread && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Threads"
 			>
-				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none" onClick={handleToggleThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
 			</Tippy>
-			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
+			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -302,14 +298,10 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const pinRef = useRef<HTMLDivElement | null>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
 
-	const handleShowPinMessage = async () => {
+	const handleTogglePinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
-		dispatch(pinMessageActions.showPinModal());
+		dispatch(pinMessageActions.togglePinModal());
 	};
-
-	const handleClose = useCallback(() => {
-		dispatch(pinMessageActions.hidePinModal());
-	}, []);
 
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
@@ -317,11 +309,11 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Pinned Messages"
 			>
-				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none relative" onClick={handleTogglePinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
 				</button>
 			</Tippy>
-			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
+			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleTogglePinMessage} />}
 		</div>
 	);
 }
