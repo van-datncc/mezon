@@ -21,7 +21,7 @@ import {
 	isValidEmojiData
 } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
@@ -81,6 +81,13 @@ const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageC
 		[message]
 	);
 
+	const avatarToDisplay = useMemo(() => {
+		if (topicCreator?.clan_avatar) {
+			return topicCreator?.clan_avatar;
+		}
+		return topicCreator?.user?.avatar_url;
+	}, [topicCreator?.clan_avatar, topicCreator?.user?.avatar_url]);
+
 	return (
 		<div>
 			<MessageText
@@ -99,8 +106,8 @@ const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageC
 				>
 					<div className="flex items-center gap-2 text-sm h-fit">
 						<img
-							src={createImgproxyUrl(topicCreator?.clan_avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-							alt={`${topicCreator?.clan_nick}'s avatar`}
+							src={createImgproxyUrl(avatarToDisplay ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+							alt={`${topicCreator?.user?.username}'s avatar`}
 							className="size-7 rounded-md object-cover"
 						/>
 						<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>

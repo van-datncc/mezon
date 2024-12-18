@@ -1050,9 +1050,10 @@ export const messagesSlice = createSlice({
 		setIsJumpingToPresent(state, action: PayloadAction<{ channelId: string; status: boolean }>) {
 			state.isJumpingToPresent[action.payload.channelId] = action.payload.status;
 		},
-		updateToBeTopicMessage(state, action: PayloadAction<{ channelId: string; messageId: string; topicId: string }>) {
+		updateToBeTopicMessage(state, action: PayloadAction<{ channelId: string; messageId: string; topicId: string; cid: string }>) {
 			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].code = 9;
 			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].content!.tp = action.payload.topicId;
+			state.channelMessages[action.payload.channelId].entities[action.payload.messageId].content!.cid = action.payload.cid;
 		},
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
