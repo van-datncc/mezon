@@ -681,9 +681,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
 
 	useEffect(() => {
-		const textarea = document.getElementById(inputElementId);
-		if (textarea) {
-			textarea.removeAttribute('aria-hidden');
+		if (editorRef.current) {
+			editorRef.current.removeAttribute('aria-hidden');
 		}
 	}, []);
 
