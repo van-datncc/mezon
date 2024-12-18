@@ -96,9 +96,19 @@ class ContextMenu {
 				break;
 			}
 			case 'saveImage': {
-				const link = document.createElement('a');
-				link.href = this.currentTarget.src;
-				link.click();
+				fetch(this.currentTarget.src)
+					.then((response) => response.blob())
+					.then((blob) => {
+						const url = window.URL.createObjectURL(new Blob([blob]));
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = 'image.png';
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+						window.URL.revokeObjectURL(url);
+					})
+					.catch((error) => console.error('Error downloading image:', error));
 				break;
 			}
 		}
@@ -110,5 +120,5 @@ class ContextMenu {
 // Initialize context menu
 document.addEventListener('DOMContentLoaded', async () => {
 	const contextMenu = new ContextMenu();
-	await contextMenu.init();
+	// await contextMenu.init();
 });
