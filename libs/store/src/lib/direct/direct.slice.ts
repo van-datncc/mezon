@@ -9,7 +9,7 @@ import { StatusUserArgs, channelMembersActions } from '../channelmembers/channel
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
 import { e2eeActions } from '../e2ee/e2ee.slice';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { RootState } from '../store';
 import { DMMetaEntity, directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
@@ -275,6 +275,15 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 	}
 });
 
+export const follower = createAsyncThunk('direct/follower', async (_, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		await mezon.socketRef.current?.follower();
+	} catch (error) {
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const initialDirectState: DirectState = directAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
@@ -438,7 +447,8 @@ export const directActions = {
 	joinDirectMessage,
 	closeDirectMessage,
 	openDirectMessage,
-	addGroupUserWS
+	addGroupUserWS,
+	follower
 };
 
 const getStatusUnread = (lastSeenStamp: number, lastSentStamp: number) => {
