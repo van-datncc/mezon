@@ -32,7 +32,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	}, [hasManageClanPermission, currentUserId]);
 
 	const handleDelete = () => {
-		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));
+		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string, label: emoji.shortname as string }));
 	};
 	const handleOnMouseLeave = () => {
 		if (!focus) {
