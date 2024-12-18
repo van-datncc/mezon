@@ -23,6 +23,7 @@ import {
 } from '@mezon/store';
 import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
+import { useWebRTCStream } from 'libs/components/src/lib/components/StreamContext/StreamContext';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -39,13 +40,15 @@ const ClanEffects: React.FC<{
 	isShowChatStream: boolean;
 	isShowCreateThread: boolean;
 	isShowCreateTopic: boolean;
-}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic }) => {
+	userId?: string;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId }) => {
 	// move code thanh.levan
 
 	const { canvasId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -69,6 +72,8 @@ const ClanEffects: React.FC<{
 			currentStreamInfo?.clanId !== currentClan.id &&
 			currentStreamInfo?.streamId !== currentChannel.channel_id
 		) {
+			disconnect();
+			handleChannelClick(currentClan?.id as string, currentChannel.channel_id as string, userId as string, currentChannel.channel_id as string);
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -118,7 +123,7 @@ const ClanLayout = () => {
 	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannel?.id as string));
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
-
+	// console.log(streamPlay, 'streamPlay');
 	return (
 		<>
 			<div
@@ -175,6 +180,7 @@ const ClanLayout = () => {
 				isShowChatStream={isShowChatStream}
 				isShowCreateThread={isShowCreateThread}
 				isShowCreateTopic={isShowCreateTopic}
+				userId={userProfile?.user?.id || ''}
 			/>
 		</>
 	);
