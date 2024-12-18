@@ -14,7 +14,7 @@ import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationA
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
-import { Alert, AppState, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
@@ -423,16 +423,16 @@ const showRNNotificationCall = async (bodyData: any, callID: string) => {
 const listRNCallKeep = async (bodyData: any) => {
 	try {
 		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-			RNCallKeep.backToForeground();
-			if (AppState.currentState !== 'active') {
-				RNCallKeep.endCall(callUUID);
+			for (let i = 0; i < 10; i++) {
+				RNCallKeep.backToForeground();
 			}
 			setTimeout(() => {
+				RNCallKeep.endCall(callUUID);
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
 			}, 3000);
-			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-				RNCallKeep.endCall(callUUID);
-			});
+		});
+		RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+			RNCallKeep.endCall(callUUID);
 		});
 	} catch (error) {
 		/* empty */
@@ -447,13 +447,14 @@ export const setupIncomingCall = async (body: string) => {
 			playSound: true,
 			vibration: true,
 			sound: 'ringing',
-			vibrationPattern: [0, 500, 1000]
+			vibrationPattern: [0, 500, 1000],
+			timeout: 30000
 		};
 		const callID = uuid.v4()?.toString();
-		RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', false, options);
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData, callID);
 		} else {
+			RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', false, options);
 			await listRNCallKeep(bodyData);
 		}
 	} catch (error) {
