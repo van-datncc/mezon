@@ -109,7 +109,7 @@ const TopicDiscussionBox = () => {
 							channelId: currentChannelId as string,
 							messageId: valueTopic?.id as string,
 							topicId: topic.id as string,
-							cid: userProfile?.user?.id as string
+							creatorId: userProfile?.user?.id as string
 						})
 					);
 					await sleep(10);
