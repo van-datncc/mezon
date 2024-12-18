@@ -12,11 +12,12 @@ export default function ClanIndex() {
 	const channelId = idsSelectedChannel[clanId as string];
 	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const defaultChannelId = useAppSelector((state) => selectDefaultChannelIdByClanId(state, clanId as string));
-	const redirectId = channel?.id || defaultChannelId;
 
 	useEffect(() => {
+		if (!defaultChannelId) return;
+		const redirectId = channel?.id || defaultChannelId;
 		navigate(`./channels/${redirectId}`);
-	}, []);
+	}, [channel, defaultChannelId]);
 
 	return (
 		<div className="flex-row bg-bgSurface flex grow">
