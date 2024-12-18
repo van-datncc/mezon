@@ -21,7 +21,7 @@ import {
 	isValidEmojiData
 } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
@@ -81,12 +81,7 @@ const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageC
 		[message]
 	);
 
-	const avatarToDisplay = useMemo(() => {
-		if (topicCreator?.clan_avatar) {
-			return topicCreator?.clan_avatar;
-		}
-		return topicCreator?.user?.avatar_url;
-	}, [topicCreator?.clan_avatar, topicCreator?.user?.avatar_url]);
+	const avatarToDisplay = topicCreator?.clan_avatar ? topicCreator?.clan_avatar : topicCreator?.user?.avatar_url;
 
 	return (
 		<div>
