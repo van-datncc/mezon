@@ -2,7 +2,6 @@ class ContextMenu {
 	constructor() {
 		this.menu = null;
 		this.currentTarget = null;
-		this.init();
 	}
 
 	async init() {
@@ -120,5 +119,5 @@ class ContextMenu {
 // Initialize context menu
 document.addEventListener('DOMContentLoaded', async () => {
 	const contextMenu = new ContextMenu();
-	// await contextMenu.init();
+	await contextMenu.init();
 });
