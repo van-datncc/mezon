@@ -1,19 +1,18 @@
-import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { createImgproxyUrl, getTimeDifferenceDate } from '@mezon/utils';
+import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { selectMemberClanByUserId } from '@mezon/store-mobile';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { useMessageSender } from '../../../hooks/useMessageSender';
+import { useSelector } from 'react-redux';
+import { MezonAvatar } from '../../../componentUI';
+import { useMessageParser } from '../../../hooks/useMessageParser';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { style } from './NotificationIndividualItem.styles';
 
 function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
-	const user = useAppSelector((state) => selectMemberClanByUserId2(state, notify.sender_id || ''));
-	const { avatarImg } = useMessageSender(user as any);
+	const user = useSelector(selectMemberClanByUserId(notify.sender_id ?? ''));
 	const userName = notify?.content?.username || user?.user?.display_name || user?.user?.username;
-	const messageTimeDifference = getTimeDifferenceDate(notify.create_time);
+	const { messageTimeDifference } = useMessageParser(notify?.content);
+	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	let notice = notify?.subject;
@@ -22,7 +21,6 @@ function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }
 		const userNameLength = userName?.length;
 		notice = notify?.subject?.includes(userName) ? notify?.subject?.slice(userNameLength) : notify?.subject;
 	}
-
 	return (
 		<TouchableOpacity
 			onPress={() => {
@@ -34,19 +32,16 @@ function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }
 		>
 			<View style={styles.notifyContainer}>
 				<View style={styles.notifyHeader}>
-					<View style={styles.boxImage}>
-						<FastImage
-							source={{
-								uri: avatarImg
-									? createImgproxyUrl(avatarImg ?? '', { width: 100, height: 100, resizeType: 'fit' })
-									: AVATAR_DEFAULT_URL
-							}}
-							style={styles.image}
-						/>
-					</View>
+					<MezonAvatar
+						avatarUrl={user?.user?.avatar_url || ''}
+						username={user?.user?.display_name || notify?.content?.username || ''}
+					></MezonAvatar>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							{userName} {notice}
+							<Text numberOfLines={2} style={{ ...styles.notifyUserName, color: colorsUsername }}>
+								{userName}
+							</Text>{' '}
+							{notice}
 						</Text>
 					</View>
 					<Text style={styles.notifyDuration}>{messageTimeDifference}</Text>
