@@ -2,7 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { IMessageWithUser, ITopicDiscussion, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiSdTopic } from 'mezon-js/api.gen';
 import { ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
@@ -27,6 +27,7 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 	valueTopic: IMessageWithUser | null;
 	openTopicMessageState: boolean;
 	currentTopicId?: string;
+	firstMessageOfCurrentTopic?: ApiSdTopic;
 }
 
 export const topicsAdapter = createEntityAdapter({ selectId: (topic: TopicDiscussionsEntity) => topic.id || '' });
@@ -58,6 +59,17 @@ const mapToTopicEntity = (topics: ApiChannelDescription[]) => {
 		id: topic.channel_id
 	}));
 };
+
+export const getFirstMessageOfTopic = createAsyncThunk('topics/getFirstMessageOfTopic', async (topicId: string, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.getTopicDetail(mezon.session, topicId);
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'topics/getFirstMessageOfTopic');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 
 export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ channelId, clanId, noCache }: FetchTopicDiscussionsArgs, thunkAPI) => {
 	try {
@@ -156,6 +168,9 @@ export const topicsSlice = createSlice({
 			.addCase(fetchTopics.rejected, (state: TopicDiscussionsState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			})
+			.addCase(getFirstMessageOfTopic.fulfilled, (state: TopicDiscussionsState, action) => {
+				state.firstMessageOfCurrentTopic = action.payload;
 			});
 	}
 });
@@ -225,3 +240,5 @@ export const selectCurrentTopicId = createSelector(getTopicsState, (state: Topic
 export const selectIsShowCreateTopic = createSelector([getTopicsState, (_, channelId: string) => channelId], (state, channelId) => {
 	return !!state.isShowCreateTopic?.[channelId];
 });
+
+export const selectFirstMessageOfCurrentTopic = createSelector(getTopicsState, (state) => state.firstMessageOfCurrentTopic);

@@ -138,6 +138,7 @@ const TopicDiscussionBox = () => {
 					type={ChannelType.CHANNEL_TYPE_TEXT}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					isTopicBox
+					topicId={currentTopicId}
 				/>
 			)}
 			<div className="flex flex-col flex-1 justify-end">

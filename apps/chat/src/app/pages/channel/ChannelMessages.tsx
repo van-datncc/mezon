@@ -1,12 +1,14 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider } from '@mezon/components';
+import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
 import {
 	messagesActions,
 	pinMessageActions,
 	selectAllAccount,
 	selectAllChannelMemberIds,
 	selectAllRoleIds,
+	selectCurrentChannelId,
 	selectDataReferences,
+	selectFirstMessageOfCurrentTopic,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -15,6 +17,7 @@ import {
 	selectIsViewingOlderMessagesByChannelId,
 	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
+	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
@@ -48,6 +51,7 @@ type ChannelMessagesProps = {
 	userIdsFromThreadBox?: string[];
 	isThreadBox?: boolean;
 	isTopicBox?: boolean;
+	topicId?: string;
 };
 
 function ChannelMessages({
@@ -59,7 +63,8 @@ function ChannelMessages({
 	mode,
 	userIdsFromThreadBox,
 	isThreadBox = false,
-	isTopicBox
+	isTopicBox,
+	topicId
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
@@ -79,7 +84,7 @@ function ChannelMessages({
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const chatRef = useRef<HTMLDivElement | null>(null);
 
 	const isFetchingRef = useRef<boolean>(false);
@@ -118,8 +123,33 @@ function ChannelMessages({
 			}
 
 			if (direction === ELoadMoreDirection.bottom) {
+				//load more in topic
+				if (isTopicBox) {
+					await dispatch(
+						messagesActions.loadMoreMessage({
+							clanId,
+							channelId: currentChannelId as string,
+							direction: Direction_Mode.AFTER_TIMESTAMP,
+							topicId
+						})
+					);
+					return true;
+				}
 				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
 				dispatch(messagesActions.setViewingOlder({ channelId, status: true }));
+				return true;
+			}
+
+			//load more in topic
+			if (isTopicBox) {
+				await dispatch(
+					messagesActions.loadMoreMessage({
+						clanId,
+						channelId: currentChannelId as string,
+						direction: Direction_Mode.BEFORE_TIMESTAMP,
+						topicId
+					})
+				);
 				return true;
 			}
 
@@ -127,7 +157,7 @@ function ChannelMessages({
 
 			return true;
 		},
-		[dispatch, clanId, channelId]
+		[isTopicBox, dispatch, clanId, channelId, currentChannelId, topicId]
 	);
 
 	const getChatScrollBottomOffset = useCallback(() => {
@@ -245,6 +275,7 @@ function ChannelMessages({
 				firsRowCached={firsRowCached}
 				lastRowCached={lastRowCached}
 				currentScrollDirection={currentScrollDirection}
+				isTopic={isTopicBox}
 			/>
 		</MessageContextMenuProvider>
 	);
@@ -284,6 +315,7 @@ type ChatMessageListProps = {
 	firsRowCached: React.MutableRefObject<string>;
 	lastRowCached: React.MutableRefObject<string>;
 	currentScrollDirection: React.MutableRefObject<ELoadMoreDirection | null>;
+	isTopic?: boolean;
 };
 
 const ChatMessageList: React.FC<ChatMessageListProps> = memo(
@@ -305,7 +337,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		isLoadMore,
 		firsRowCached,
 		lastRowCached,
-		currentScrollDirection
+		currentScrollDirection,
+		isTopic
 	}) => {
 		const dispatch = useAppDispatch();
 		const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -314,6 +347,10 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
+
+		const currentChannelId = useSelector(selectCurrentChannelId);
+		const firstMsgId = useSelector(selectFirstMessageOfCurrentTopic)?.message_id;
+		const firstMsgOfThisTopic = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, firstMsgId as string));
 
 		const rowVirtualizer = useVirtualizer({
 			count: messages.length,
@@ -464,6 +501,20 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 								transform: `translateY(${rowVirtualizer.getVirtualItems()[0]?.start ?? 0}px)`
 							}}
 						>
+							{isTopic && (
+								<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
+									<div
+										className={`fullBoxText relative group ${firstMsgOfThisTopic.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
+									>
+										<MessageWithUser
+											isTopic={isTopic}
+											allowDisplayShortProfile={true}
+											message={firstMsgOfThisTopic}
+											mode={mode}
+										/>
+									</div>
+								</div>
+							)}
 							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 								const messageId = messages[virtualRow.index];
 								const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
@@ -486,6 +537,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 											isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
 											checkMessageTargetToMoved={checkMessageTargetToMoved}
 											messageReplyHighlight={messageReplyHighlight}
+											isTopic={isTopic}
 										/>
 									</div>
 								);
