@@ -28,6 +28,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	valueThread: IMessageWithUser | null;
 	openThreadMessageState: boolean;
 	currentThread?: ApiChannelDescription;
+	isThreadModalVisible?: boolean;
 }
 
 export const threadsAdapter = createEntityAdapter({ selectId: (thread: ThreadsEntity) => thread.id || '' });
@@ -135,7 +136,8 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	isPrivate: 0,
 	nameValueThread: {},
 	valueThread: null,
-	openThreadMessageState: false
+	openThreadMessageState: false,
+	isThreadModalVisible: false
 });
 
 export const checkDuplicateThread = createAsyncThunk(
@@ -182,7 +184,9 @@ export const threadsSlice = createSlice({
 		remove: (state, action: PayloadAction<string>) => {
 			threadsAdapter.removeOne(state, action.payload);
 		},
-
+		toggleThreadModal: (state: ThreadsState) => {
+			state.isThreadModalVisible = !state.isThreadModalVisible;
+		},
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
 				...state.isShowCreateThread,
@@ -339,6 +343,8 @@ export const selectNameValueThread = (channelId: string) =>
 export const selectIsShowCreateThread = createSelector([getThreadsState, (_, channelId: string) => channelId], (state, channelId) => {
 	return !!state.isShowCreateThread?.[channelId];
 });
+
+export const selectIsThreadModalVisible = createSelector(getThreadsState, (state: ThreadsState) => state.isThreadModalVisible);
 // new update
 
 export const selectActiveThreads = (keywordSearch: string) =>
