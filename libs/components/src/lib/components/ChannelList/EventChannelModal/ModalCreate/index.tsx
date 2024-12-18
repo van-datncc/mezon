@@ -56,7 +56,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				}
 			}
 		}
-	}, []);
+	}, [currentEvent, eventChannel]);
 
 	const choiceSpeaker = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const choiceLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
