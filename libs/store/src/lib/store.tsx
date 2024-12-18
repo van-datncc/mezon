@@ -132,7 +132,7 @@ const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
 		storage,
-		blacklist: ['isShowCreateThread']
+		blacklist: ['isShowCreateThread', 'isThreadModalVisible']
 	},
 	threadsReducer
 );
@@ -208,7 +208,8 @@ const persistedChannelCatSettingReducer = persistReducer(
 const persistedPinMsgReducer = persistReducer(
 	{
 		key: 'pinmessages',
-		storage
+		storage,
+		blacklist: ['isPinModalVisible']
 	},
 	pinMessageReducer
 );

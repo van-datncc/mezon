@@ -20,6 +20,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ESummaryInfo } from '@mezon/utils';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../StreamContext/StreamContext';
 
 interface StreamInfoProps {
 	type?: string;
@@ -40,6 +41,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 	const dmUserId = currentDmGroup?.user_id?.[0] || '';
 	const direct = useAppSelector((state) => selectDirectById(state, groupCallId)) || {};
 	const isJoinedCall = useSelector(selectJoinedCall);
+	const { disconnect } = useWebRTCStream();
 
 	const { handleEndCall, toggleAudio, toggleVideo } = useWebRTCCall(
 		dmUserId,
@@ -81,6 +83,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setUserCallId(''));
 		} else if (type === ESummaryInfo.STREAM && currentStreamInfo) {
+			disconnect();
 			dispatch(videoStreamActions.stopStream());
 			const userStreamId = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
 			dispatch(usersStreamActions.remove(userStreamId || ''));

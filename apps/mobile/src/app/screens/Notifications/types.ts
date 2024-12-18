@@ -13,7 +13,8 @@ export interface IMessageNotifyProps {
 export enum EActionDataNotify {
 	All = 'all',
 	Individual = 'individual',
-	Mention = 'mention'
+	Mention = 'mention',
+	Messages = 'messages'
 }
 
 export enum ENotifyBsToShow {

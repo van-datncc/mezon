@@ -53,6 +53,7 @@ export type MessageWithUserProps = {
 	channelLabel?: string;
 	checkMessageTargetToMoved?: boolean;
 	messageReplyHighlight?: boolean;
+	isTopic?: boolean;
 };
 
 function MessageWithUser({
@@ -69,7 +70,8 @@ function MessageWithUser({
 	showDivider,
 	channelLabel,
 	checkMessageTargetToMoved,
-	messageReplyHighlight
+	messageReplyHighlight,
+	isTopic
 }: Readonly<MessageWithUserProps>) {
 	const userLogin = useAuth();
 	const userId = userLogin?.userId;
@@ -297,6 +299,7 @@ function MessageWithUser({
 														isError={message.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
+														isInTopic={isTopic}
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />

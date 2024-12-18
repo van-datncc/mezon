@@ -14,6 +14,7 @@ export type MezonElectronAPI = {
 	onWindowBlurred: (callback: () => void) => void;
 	onWindowFocused: (callback: () => void) => void;
 	openImageWindow: (currentImage: ApiMessageAttachment & { create_time?: string; uploaderData: { name: string; avatar: string } }) => Promise<void>;
+	dowloadImage: (url: string) => Promise<void>;
 };
 declare global {
 	interface Window {

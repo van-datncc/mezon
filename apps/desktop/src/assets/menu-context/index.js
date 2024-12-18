@@ -2,7 +2,6 @@ class ContextMenu {
 	constructor() {
 		this.menu = null;
 		this.currentTarget = null;
-		this.init();
 	}
 
 	async init() {
@@ -96,9 +95,7 @@ class ContextMenu {
 				break;
 			}
 			case 'saveImage': {
-				const link = document.createElement('a');
-				link.href = this.currentTarget.src;
-				link.click();
+				window.electron.dowloadImage(this.currentTarget.src);
 				break;
 			}
 		}

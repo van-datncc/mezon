@@ -97,6 +97,7 @@ export { default as DmCalling } from './components/DmCalling';
 export { default as ModalCall } from './components/ModalCall';
 
 export { PushToTalkProvider } from './components/PushToTalk/PushToTalkContext';
+export { WebRTCStreamProvider } from './components/StreamContext/StreamContext';
 export { WebRTCProvider } from './components/WebRTC/WebRTCContext';
 
 export * from './components/HtmlCanvas';

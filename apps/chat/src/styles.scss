@@ -1086,6 +1086,10 @@ input:-webkit-autofill:active {
 	}
 }
 
-.contexify_itemContent{
+.contexify_itemContent {
 	width: 100%;
+}
+
+.custom-video::-webkit-media-controls {
+	display: none !important;
 }

@@ -24,8 +24,6 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	const dispatch = useAppDispatch();
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 
-	const [isOnClickOutsideActive, setIsOnClickOutsideActive] = useState(true);
-
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -37,8 +35,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	useOnClickOutside(panelRef, isOnClickOutsideActive ? handClosePannel : () => {});
+	useOnClickOutside(panelRef, handClosePannel);
 	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
 	useEffect(() => {
 		if (statusMarkAsReadClan === 'success' || statusMarkAsReadClan === 'error') {
@@ -63,7 +60,6 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 
 	const handleInvitePeople = () => {
 		dispatch(clansActions.toggleInvitePeople({ status: true }));
-		setIsOnClickOutsideActive(false);
 	};
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile, setIsShowSettingProfileInitTab, setClanIdSettingProfile } =
 		useSettingFooter();

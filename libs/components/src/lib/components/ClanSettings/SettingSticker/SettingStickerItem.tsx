@@ -25,7 +25,7 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 	};
 	const handleDeleteSticker = async () => {
 		if (sticker.id) {
-			await dispatch(deleteSticker({ stickerId: sticker.id, clan_id: clanId as string }));
+			await dispatch(deleteSticker({ stickerId: sticker.id, clan_id: clanId as string, stickerLabel: sticker.shortname as string }));
 		}
 	};
 	return (
