@@ -95,19 +95,7 @@ class ContextMenu {
 				break;
 			}
 			case 'saveImage': {
-				fetch(this.currentTarget.src)
-					.then((response) => response.blob())
-					.then((blob) => {
-						const url = window.URL.createObjectURL(new Blob([blob]));
-						const a = document.createElement('a');
-						a.href = url;
-						a.download = 'image.png';
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-						window.URL.revokeObjectURL(url);
-					})
-					.catch((error) => console.error('Error downloading image:', error));
+				window.electron.dowloadImage(this.currentTarget.src);
 				break;
 			}
 		}
