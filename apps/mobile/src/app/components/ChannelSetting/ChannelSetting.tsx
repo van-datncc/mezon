@@ -374,7 +374,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				)}
 			</View>
 
-			{/*<MezonMenu menu={topMenu} />*/}
+			<MezonMenu menu={topMenu} />
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
 
