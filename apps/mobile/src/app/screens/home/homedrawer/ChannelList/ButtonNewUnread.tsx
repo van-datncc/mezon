@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectChannelsByClanId, selectCurrentClanId } from '@mezon/store';
+import { selectChannelsByClanId, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -16,7 +16,7 @@ const ButtonNewUnread = React.memo(({ handleScrollToChannel }: ButtonNewUnreadPr
 	const styles = style(themeValue, isTabletLandscape);
 	const { t } = useTranslation('channelMenu');
 	const currentClanId = useSelector(selectCurrentClanId);
-	const channelsInClan = useSelector(selectChannelsByClanId(currentClanId ?? ''));
+	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClanId as string));
 
 	const findFirstChannelWithBadgeCount = (channels = []) => channels?.find((item) => item?.count_mess_unread > 0) || null;
 

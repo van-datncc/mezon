@@ -43,10 +43,11 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 
 	return (
 		<div onContextMenu={handleMouseClick} className="relative">
-			<NavLink to={linkClan} onClick={handleClick}>
+			<NavLink to={linkClan} onClick={handleClick} draggable="false">
 				<NavLinkComponent active={active}>
 					{option.logo ? (
 						<Image
+							draggable="false"
 							src={createImgproxyUrl(option.logo ?? '', { width: 100, height: 100, resizeType: 'fit' }) || ''}
 							alt={option.clan_name || ''}
 							placeholder="blur"

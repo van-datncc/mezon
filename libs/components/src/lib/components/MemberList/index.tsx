@@ -1,3 +1,4 @@
+import { useIdleRender } from '@mezon/core';
 import { selectCloseMenu } from '@mezon/store';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
@@ -7,6 +8,10 @@ export type MemberListProps = { className?: string };
 
 function MemberList() {
 	const closeMenu = useSelector(selectCloseMenu);
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return <></>;
+
 	return (
 		<div className={`self-stretch h-full flex-col justify-start items-start flex gap-[24px] w-full ${closeMenu ? 'pt-20' : 'pt-0'}`}>
 			<div className="w-full">

@@ -15,7 +15,7 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 			type: Number(type)
 		})
 	);
-	dispatch(channelsActions.setPreviousChannels({ channelId: directId }));
+	dispatch(channelsActions.setPreviousChannels({ clanId: '0', channelId: directId }));
 	notificationService.setCurrentChannelId(directId);
 
 	return null;

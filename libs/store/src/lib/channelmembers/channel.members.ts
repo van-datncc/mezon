@@ -90,8 +90,8 @@ export const fetchChannelMembers = createAsyncThunk(
 			}
 
 			const state = thunkAPI.getState() as RootState;
-			const currentChannel = state?.channels?.entities[channelId] || {};
-			const parentChannel = state?.channels?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
+			const currentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[channelId] || {};
+			const parentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
 
 			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
 				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
@@ -575,8 +575,9 @@ export const selectAllChannelMembers = createSelector(
 		selectMemberIdsByChannelId,
 		getUsersClanState,
 		selectGrouplMembers,
-		(state, channelId: string) => {
-			const channel = state.channels?.entities[channelId];
+		(state: RootState, channelId: string) => {
+			const currentClanId = state.clans?.currentClanId;
+			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
 			const parentId = channel?.parrent_id;
 			const isDm = state.direct?.currentDirectMessageId === channelId || '';
@@ -611,8 +612,9 @@ export const selectAllChannelMemberIds = createSelector(
 		getChannelMembersState,
 		getUsersClanState,
 		selectGrouplMembers,
-		(state, channelId: string) => {
-			const channel = state.channels?.entities[channelId];
+		(state: RootState, channelId: string) => {
+			const currentClanId = state.clans?.currentClanId;
+			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
 			const parentId = channel?.parrent_id;
 

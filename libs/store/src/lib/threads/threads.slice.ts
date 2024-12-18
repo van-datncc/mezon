@@ -101,7 +101,6 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 		if (!response.channeldesc) {
 			return [];
 		}
-
 		const threads = mapToThreadEntity(response.channeldesc);
 		return threads;
 	} catch (error) {
@@ -163,7 +162,7 @@ export const leaveThread = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.leaveThread(mezon.session, threadId);
 			if (response) {
-				thunkAPI.dispatch(channelsActions.removeByChannelID(threadId));
+				thunkAPI.dispatch(channelsActions.removeByChannelID({ channelId: threadId, clanId }));
 				thunkAPI.dispatch(threadsActions.remove(threadId));
 				await updateCacheThread(mezon, channelId, clanId, threadId);
 				return threadId;

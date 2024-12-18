@@ -4,7 +4,7 @@ import { CustomLoaderFunction } from './appLoader';
 
 export const directLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(emojiSuggestionActions.fetchEmoji({}));
-	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_DM));
+	dispatch(channelsActions.setModeResponsive({ clanId: '0', mode: ModeResponsive.MODE_DM }));
 	dispatch(directActions.follower());
 	return null;
 };

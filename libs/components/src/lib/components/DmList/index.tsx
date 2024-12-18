@@ -1,4 +1,4 @@
-import { useFriends } from '@mezon/core';
+import { useFriends, useIdleRender } from '@mezon/core';
 import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import Tippy from '@tippy.js/react';
@@ -15,6 +15,11 @@ function DirectMessageList() {
 	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const appearanceTheme = useSelector(selectTheme);
 	const { quantityPendingRequest } = useFriends();
+
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return null;
+
 	return (
 		<>
 			<div className="mt-5 px-2 py-1">
@@ -43,34 +48,37 @@ function DirectMessageList() {
 	);
 }
 
-const CreateMessageGroupModal = memo(() => {
-	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const buttonPlusRef = useRef<HTMLDivElement | null>(null);
-	const appearanceTheme = useSelector(selectTheme);
+const CreateMessageGroupModal = memo(
+	() => {
+		const [isOpen, setIsOpen] = useState<boolean>(false);
+		const buttonPlusRef = useRef<HTMLDivElement | null>(null);
+		const appearanceTheme = useSelector(selectTheme);
 
-	const onClickOpenModal = () => {
-		setIsOpen(!isOpen);
-	};
+		const onClickOpenModal = () => {
+			setIsOpen(!isOpen);
+		};
 
-	const handleCloseModal = useCallback(() => {
-		setIsOpen(false);
-	}, []);
+		const handleCloseModal = useCallback(() => {
+			setIsOpen(false);
+		}, []);
 
-	return (
-		<div
-			ref={buttonPlusRef}
-			onClick={onClickOpenModal}
-			className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full whitespace-nowrap"
-		>
-			<Tippy content="Create DM" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
-				<span>
-					<Icons.Plus className="w-4 h-4" />
-				</span>
-			</Tippy>
-			{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
-		</div>
-	);
-});
+		return (
+			<div
+				ref={buttonPlusRef}
+				onClick={onClickOpenModal}
+				className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full whitespace-nowrap"
+			>
+				<Tippy content="Create DM" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+					<span>
+						<Icons.Plus className="w-4 h-4" />
+					</span>
+				</Tippy>
+				{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
+			</div>
+		);
+	},
+	() => true
+);
 
 const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean }) => {
 	const navigate = useNavigate();
@@ -95,4 +103,4 @@ const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean })
 	);
 });
 
-export default memo(DirectMessageList);
+export default memo(DirectMessageList, () => true);

@@ -79,7 +79,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 
 	useEffect(() => {
 		if (isLoading === 'loaded') {
-			dispatch(channelsActions.openCreateNewModalChannel(false));
+			dispatch(channelsActions.openCreateNewModalChannel({ isOpen: false, clanId: currentChannel?.clan_id as string }));
 		}
 	}, [dispatch, isLoading]);
 

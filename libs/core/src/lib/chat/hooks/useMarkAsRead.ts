@@ -6,7 +6,8 @@ import {
 	markAsReadProcessing,
 	selectChannelsByClanId,
 	selectCurrentClanId,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { ChannelThreads, ICategoryChannel, TIME_OFFSET } from '@mezon/utils';
 import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
@@ -20,7 +21,7 @@ export function useMarkAsRead() {
 	const [statusMarkAsReadCategory, setStatusMarkAsReadCategory] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const [statusMarkAsReadClan, setStatusMarkAsReadClan] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const currentClanId = useSelector(selectCurrentClanId);
-	const channelsInClan = useSelector(selectChannelsByClanId(currentClanId ?? ''));
+	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClanId ?? ''));
 
 	const actionMarkAsRead = useCallback(
 		async (body: ApiMarkAsReadRequest) => {
@@ -49,7 +50,8 @@ export function useMarkAsRead() {
 
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
-					channelId: channel?.channel_id ?? '',
+					clanId: channel?.clan_id as string,
+					channelId: channel?.channel_id as string,
 					count: 0,
 					isReset: true
 				})
@@ -118,7 +120,6 @@ export function useMarkAsRead() {
 
 			setStatusMarkAsReadClan('pending');
 			try {
-				const result = await actionMarkAsRead(body);
 				const allChannelsAndThreads = getChannelsWithBadgeCountClan(channelsInClan);
 				setStatusMarkAsReadClan('success');
 				allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
@@ -221,7 +222,8 @@ export function useResetCountChannelBadge() {
 
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
-					channelId: channel?.channel_id ?? '',
+					clanId: channel?.clan_id as string,
+					channelId: channel?.channel_id as string,
 					count: 0,
 					isReset: true
 				})
