@@ -149,6 +149,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { currentChatUsersEntities } = useCurrentChat();
 	const isNotChannel = props.isThread || props.isTopic;
 	const inputElementId = isNotChannel ? `editorReactMention` : `editorReactMentionChannel`;
+	const isShowEmojiPicker = !props.isThread;
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
@@ -574,11 +575,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	function handleEventAfterEmojiPicked() {
 		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
 
-		if (isEmptyEmojiPicked || !input) {
+		if (isEmptyEmojiPicked || !input || !editorRef?.current) {
 			return;
-		} else if (emojiPicked) {
+		}
+		if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `::[${emojiKey}](${emojiValue})${' '}`);
+				textFieldEdit.insert(editorRef.current, `::[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -620,6 +622,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	};
 
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
+	
+	const emojiPickedKeyValue = useMemo(() => {
+		return Object.entries(emojiPicked || {})
+			.map(([key, value]) => `${key}=${value}`)
+			.join(' ');
+	}, [emojiPicked]);
 
 	useEffect(() => {
 		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
@@ -628,7 +636,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (dataReferences.message_ref_id || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
 			return focusToElement(editorRef);
 		}
-	}, [dataReferences.message_ref_id, emojiPicked?.shortName, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
+	}, [dataReferences.message_ref_id, emojiPickedKeyValue, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -731,8 +739,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		},
 		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
 	);
-
-	const isShowEmojiPicker = !props.isThread || props.isTopic;
 
 	return (
 		<div className="relative">
