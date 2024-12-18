@@ -49,7 +49,7 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 	};
 
 	const handleDeleteEmoji = async () => {
-		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: item, clan_id: item.clan_id as string }));
+		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: item, clan_id: item.clan_id as string, label: item.shortname }));
 	};
 
 	const focusTextInput = () => {

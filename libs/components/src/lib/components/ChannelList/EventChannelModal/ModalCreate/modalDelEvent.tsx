@@ -13,7 +13,7 @@ const ModalDelEvent = (props: ModalDelEventProps) => {
 	const { deleteEventManagement } = useEventManagement();
 
 	const handleDeleteEvent = async () => {
-		await deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '');
+		await deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '', event?.title || '');
 		closeModal();
 	};
 
