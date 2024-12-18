@@ -42,7 +42,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
-			isPublicChannel(currentChannel)
+			isPublicChannel(currentChannel),
+			message.content?.tp ?? ''
 		);
 	}
 

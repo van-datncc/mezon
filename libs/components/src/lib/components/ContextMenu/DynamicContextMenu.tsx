@@ -1,5 +1,5 @@
 import { useAppParams, useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { selectClanView, selectCurrentChannel, selectTheme } from '@mezon/store';
+import { selectClanView, selectCurrentChannel, selectMessageByMessageId, selectTheme, useAppSelector } from '@mezon/store';
 import { ContextMenuItem, IEmoji, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { CSSProperties, useCallback, useMemo, useState } from 'react';
@@ -27,10 +27,20 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 
 	const isClanView = useSelector(selectClanView);
 	const currentChannel = useSelector(selectCurrentChannel);
-
+	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, messageId || ''));
 	const handleClickEmoji = useCallback(
 		async (emojiId: string, emojiShortCode: string) => {
-			await reactionMessageDispatch('', messageId, emojiId, emojiShortCode, 1, userId.userId ?? '', false, isPublicChannel(currentChannel));
+			await reactionMessageDispatch(
+				'',
+				messageId,
+				emojiId,
+				emojiShortCode,
+				1,
+				userId.userId ?? '',
+				false,
+				isPublicChannel(currentChannel),
+				currentMessage?.content?.tp ?? ''
+			);
 		},
 		[messageId, currentChannel, directId, isClanView, reactionMessageDispatch, userId]
 	);
