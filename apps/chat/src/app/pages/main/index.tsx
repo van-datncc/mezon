@@ -49,6 +49,7 @@ import {
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
+	selectStatusStream,
 	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
 	selectTheme,
@@ -95,6 +96,7 @@ function MyApp() {
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	//remove
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { currentURL, directId } = useAppParams();
@@ -281,10 +283,18 @@ function MyApp() {
 
 	const previewMode = useSelector(selectOnboardingMode);
 
-	const { streamVideoRef, handleChannelClick, connectSocket } = useWebRTCStream();
+	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
+	const streamPlay = useSelector(selectStatusStream);
 
 	useEffect(() => {
-		connectSocket();
+		if (streamPlay) {
+			handleChannelClick(
+				currentStreamInfo?.clanId as string,
+				currentStreamInfo?.streamId as string,
+				userProfile?.user?.id as string,
+				currentStreamInfo?.streamId as string
+			);
+		}
 	}, []);
 
 	return (
@@ -296,22 +306,22 @@ function MyApp() {
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<SidebarMenu openCreateClanModal={openCreateClanModal} />
 			<MainContent />
-			{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-				<div
-					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
-					style={streamStyle}
-				>
-					<ChannelStream
-						key={currentStreamInfo?.streamId}
-						hlsUrl={channelStream?.streaming_url}
-						memberJoin={streamChannelMember}
-						channelName={currentChannel?.channel_label}
-						currentStreamInfo={currentStreamInfo}
-						handleChannelClick={handleChannelClick}
-						streamVideoRef={streamVideoRef}
-					/>
-				</div>
-			)}
+			<div
+				className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+				style={streamStyle}
+			>
+				<ChannelStream
+					key={currentStreamInfo?.streamId}
+					hlsUrl={channelStream?.streaming_url}
+					memberJoin={streamChannelMember}
+					channelName={currentChannel?.channel_label}
+					currentStreamInfo={currentStreamInfo}
+					handleChannelClick={handleChannelClick}
+					streamVideoRef={streamVideoRef}
+					disconnect={disconnect}
+					isStream={isStream}
+				/>
+			</div>
 
 			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall?.channel_id && (
 				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />

@@ -1,4 +1,4 @@
-import { ChannelsEntity } from '@mezon/store';
+import { useAppDispatch, videoStreamActions } from '@mezon/store';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 interface WebRTCContextType {
@@ -10,9 +10,9 @@ interface WebRTCContextType {
 	sendMessage: (message: Record<string, unknown>) => void;
 	errors: string[];
 	messages: string[];
-	handleChannelClick: (clanId: string, channelId: string, userId: string, channel: ChannelsEntity) => void;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string) => void;
 	streamVideoRef: React.RefObject<HTMLVideoElement>;
-	connectSocket: () => void;
+	isStream: boolean;
 }
 
 interface WebRTCProviderProps {
@@ -22,7 +22,7 @@ interface WebRTCProviderProps {
 const WebRTCStreamContext = createContext<WebRTCContextType | null>(null);
 
 export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
-	const [ws, setWs] = useState<WebSocket | null>(null);
+	const dispatch = useAppDispatch();
 	const [isSupported, setIsSupported] = useState(true);
 	const [isConnected, setIsConnected] = useState(false);
 	const [connectionState, setConnectionState] = useState<RTCIceConnectionState>('new');
@@ -30,14 +30,14 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 	const [messages, setMessages] = useState<string[]>([]);
 	const streamVideoRef = useRef<HTMLVideoElement>(null);
 	const pcRef = useRef<RTCPeerConnection | null>(null);
+	const wsRef = useRef<WebSocket | null>(null);
+	const [isStream, setIsStream] = useState(false);
 
 	const debug = useCallback((...args: string[]) => {
-		console.log(...args);
 		addMessage(args.join(' '));
 	}, []);
 
 	const addError = useCallback((...msgs: string[]) => {
-		console.log(...msgs);
 		setErrors((prev) => [...prev, ...msgs]);
 	}, []);
 
@@ -68,88 +68,14 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 	const wsSend = useCallback(
 		(message: Record<string, unknown>) => {
 			const jsonStr = JSON.stringify(message);
-			if (ws?.readyState === WebSocket.OPEN) {
-				ws.send(jsonStr);
+			if (wsRef.current?.readyState === WebSocket.OPEN) {
+				wsRef.current.send(jsonStr);
 			} else {
 				debug('ws: send not ready, skipping...', jsonStr);
 			}
 		},
-		[ws, debug]
+		[wsRef.current, debug]
 	);
-
-	const connectSocket = () => {
-		const websocket = new WebSocket('wss://stn.nccsoft.vn/ws');
-		try {
-			const peerConnection = initPeerConnection();
-			websocket.onopen = () => {
-				debug('ws: connection open');
-				const f = () => {
-					console.log('webrtc: create offer');
-					peerConnection
-						?.createOffer()
-						.then((d) => {
-							console.log('webrtc: set local description');
-							peerConnection?.setLocalDescription(d);
-							websocket.send(
-								JSON.stringify({
-									Key: 'session_subscriber',
-									ClanId: '1',
-									ChannelId: '2',
-									UserId: '3',
-									Value: d
-								})
-							);
-							websocket.send(
-								JSON.stringify({
-									Key: 'get_channels'
-								})
-							);
-							// websocket.send(JSON.stringify({ Key: 'connect_subscriber', Value: { ChannelId: 'ggg' } }));
-						})
-						.catch((e) => {
-							console.log(e, 'error');
-						});
-				};
-				websocket.readyState === WebSocket.OPEN ? f() : websocket.addEventListener('open', f);
-			};
-
-			websocket.onmessage = (event) => {
-				const data = JSON.parse(event.data);
-				if ('Key' in data) {
-					switch (data.Key) {
-						case 'channels':
-							console.log(data.Value, 'list channels');
-							// setChannels(data.Value);
-							break;
-						case 'session_received':
-							console.log('session_received');
-							// setLoading(false);
-							break;
-						case 'error':
-							console.log('error');
-							// setError(data.Value);
-							break;
-						case 'sd_answer':
-							startSession(data.Value);
-							break;
-						case 'ice_candidate':
-							pcRef.current?.addIceCandidate(data.Value);
-							break;
-						default:
-							console.log('Unhandled message:', data);
-					}
-				}
-			};
-
-			websocket.onerror = (error) => {
-				addError('WebSocket error:', error.toString());
-			};
-
-			setWs(websocket);
-		} catch (error) {
-			console.log(error, 'error');
-		}
-	};
 
 	// RTCPeerConnection handling
 	const initPeerConnection = useCallback(() => {
@@ -185,12 +111,29 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 
 		peerConnection.ontrack = (event) => {
 			const remoteStream = event.streams[0];
-			console.log(remoteStream, 'remoteStream');
 			if (streamVideoRef.current) {
 				streamVideoRef.current.srcObject = remoteStream;
 				streamVideoRef.current.autoplay = true;
 				streamVideoRef.current.controls = true;
 			}
+			remoteStream.getVideoTracks().forEach((track) => {
+				track.onmute = () => {
+					dispatch(videoStreamActions.setIsRemoteVideoStream(false));
+				};
+
+				track.onunmute = () => {
+					dispatch(videoStreamActions.setIsRemoteVideoStream(true));
+				};
+			});
+
+			remoteStream.getAudioTracks().forEach((track) => {
+				track.onmute = () => {
+					dispatch(videoStreamActions.setIsRemoteAudioStream(false));
+				};
+				track.onunmute = () => {
+					dispatch(videoStreamActions.setIsRemoteAudioStream(true));
+				};
+			});
 		};
 
 		peerConnection.addTransceiver('audio');
@@ -203,7 +146,6 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		(sd: string) => {
 			if (pcRef.current) {
 				try {
-					console.log('webrtc: set remote description');
 					pcRef.current.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sd }));
 				} catch (e) {
 					alert(e);
@@ -222,7 +164,6 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 
 		try {
 			const offer = await peerConnection.createOffer();
-			console.log(offer, 'offer');
 			await peerConnection.setLocalDescription(offer);
 
 			wsSend({
@@ -237,23 +178,93 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 	}, [pcRef.current, wsSend, isSupported, initPeerConnection, addError]);
 
 	const disconnect = useCallback(() => {
+		wsRef.current?.close();
 		pcRef.current?.close();
-		// setPc(null);
 		pcRef.current = null;
+		wsRef.current = null;
 		setIsConnected(false);
 		setConnectionState('closed');
 		debug('WebRTC connection closed');
-	}, [pcRef.current, debug]);
+	}, [debug]);
 
-	const handleChannelClick = useCallback(
-		(clanId: string, channelId: string, userId: string, channel: ChannelsEntity) => {
-			if (ws) {
-				// websocket.send(JSON.stringify({ Key: 'connect_subscriber', Value: { ChannelId: 'ggg' } }));
-				wsSend({ Key: 'connect_subscriber', ClanId: clanId, ChannelId: channelId, UserId: userId, Value: { ChannelId: 'xxxx' } });
-			}
-		},
-		[ws]
-	);
+	const handleChannelClick = useCallback((clanId: string, channelId: string, userId: string, streamId: string) => {
+		const websocket = new WebSocket('wss://stn.nccsoft.vn/ws');
+		try {
+			const peerConnection = initPeerConnection();
+			websocket.onopen = () => {
+				debug('ws: connection open');
+				const f = () => {
+					peerConnection
+						?.createOffer()
+						.then((d) => {
+							peerConnection?.setLocalDescription(d);
+							websocket.send(
+								JSON.stringify({
+									Key: 'session_subscriber',
+									ClanId: clanId,
+									ChannelId: channelId,
+									UserId: userId,
+									Value: d
+								})
+							);
+							websocket.send(
+								JSON.stringify({
+									Key: 'get_channels'
+								})
+							);
+						})
+						.catch((e) => {
+							console.log(e, 'error');
+						});
+				};
+				websocket.readyState === WebSocket.OPEN ? f() : websocket.addEventListener('open', f);
+			};
+
+			websocket.onmessage = (event) => {
+				const data = JSON.parse(event.data);
+				if ('Key' in data) {
+					switch (data.Key) {
+						case 'channels':
+							if (data.Value.includes(streamId)) {
+								websocket.send(
+									JSON.stringify({
+										Key: 'connect_subscriber',
+										ClanId: clanId,
+										ChannelId: channelId,
+										UserId: userId,
+										Value: { ChannelId: streamId }
+									})
+								);
+								setIsStream(true);
+							} else {
+								setIsStream(false);
+							}
+							break;
+						case 'session_received':
+							break;
+						case 'error':
+							break;
+						case 'sd_answer':
+							startSession(data.Value);
+							break;
+						case 'ice_candidate':
+							pcRef.current?.addIceCandidate(data.Value);
+							break;
+						default:
+							console.log('Unhandled message:', data);
+					}
+				}
+			};
+
+			websocket.onerror = (error) => {
+				addError('WebSocket error:', error.toString());
+			};
+
+			wsRef.current = websocket;
+		} catch (error) {
+			console.log(error, 'error');
+		}
+	}, []);
 
 	const value = {
 		isSupported,
@@ -266,7 +277,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		messages,
 		handleChannelClick,
 		streamVideoRef,
-		connectSocket
+		isStream
 	};
 
 	return <WebRTCStreamContext.Provider value={value}>{children}</WebRTCStreamContext.Provider>;
