@@ -70,7 +70,13 @@ const CallingModal = () => {
 
 	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-		if (signalingData && !!latestSignalingEntry && !isVisible && !isInCall && ![4, 5]?.includes(latestSignalingEntry?.signalingData?.data_type)) {
+		if (
+			signalingData &&
+			!!latestSignalingEntry &&
+			!isVisible &&
+			!isInCall &&
+			latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER
+		) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 

@@ -148,7 +148,8 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				1,
 				message?.sender_id ?? '',
 				false,
-				isPublicChannel(channel)
+				isPublicChannel(channel),
+				message.content?.tp ?? ''
 			);
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);

@@ -17,9 +17,9 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUs
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import { MentionItem } from 'react-mentions';
 import { electronBridge } from '../bridge';
 import { REQUEST_PERMISSION_CAMERA, REQUEST_PERMISSION_MICROPHONE } from '../bridge/electron/constants';
-import { MentionItem } from 'react-mentions';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import { Platform, getPlatform } from '../hooks/platform';
 import {
@@ -1036,4 +1036,20 @@ export const generateMentionItems = (
 			return null;
 		})
 		.filter((item): item is MentionItem => item !== null);
+};
+
+export const parseThreadInfo = (messageContent: string) => {
+	const match = messageContent.match(/\(([^,]+),\s*([^)]+)\)/);
+	if (match) {
+		return {
+			threadLabel: match[1]?.trim() || '',
+			threadId: match[2]?.trim() || '',
+			threadContent: ''
+		};
+	}
+	return {
+		threadLabel: '',
+		threadId: '',
+		threadContent: messageContent.replace(/^@\w+\s*/, '')
+	};
 };

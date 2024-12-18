@@ -2,6 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { BellIcon, CheckIcon, Icons, isEqual, LinkIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectAllChannels, selectChannelById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { checkIsThread } from '@mezon/utils';
 import { DrawerActions } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -33,7 +34,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const dispatch = useAppDispatch();
 	const channel = useAppSelector((state) => selectChannelById(state, channelId || ''));
-	const isChannel = useMemo(() => channel?.parrent_id === '0', [channel?.parrent_id]);
+	const isChannel = !checkIsThread(channel);
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const [isCheckDuplicateNameChannel, setIsCheckDuplicateNameChannel] = useState<boolean>(false);
@@ -212,15 +213,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const topMenu = useMemo(
 		() =>
 			[
-				{ items: categoryMenu },
+				// { items: categoryMenu },
 				{
 					items: permissionMenu,
 					bottomDescription: t('fields.channelPermission.description')
-				},
-				{
-					items: notificationMenu,
-					bottomDescription: ''
 				}
+				// {
+				// 	items: notificationMenu,
+				// 	bottomDescription: ''
+				// }
 			] satisfies IMezonMenuSectionProps[],
 		[currentCategoryName]
 	);
@@ -374,7 +375,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				)}
 			</View>
 
-			{/*<MezonMenu menu={topMenu} />*/}
+			<MezonMenu menu={topMenu} />
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
 

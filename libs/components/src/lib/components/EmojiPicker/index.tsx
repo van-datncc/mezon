@@ -94,7 +94,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
-				isPublicChannel(currentChannel)
+				isPublicChannel(currentChannel),
+				messageEmoji.content?.tp ?? ''
 			);
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(referencesActions.setIdReferenceMessageReaction(''));

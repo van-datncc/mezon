@@ -20,6 +20,7 @@ export interface PinMessageState extends EntityState<PinMessageEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	jumpPinMessageId: string;
+	isPinModalVisible?: boolean;
 }
 
 export const pinMessageAdapter = createEntityAdapter<PinMessageEntity>();
@@ -193,7 +194,8 @@ export const updateLastPin = createAsyncThunk(
 export const initialPinMessageState: PinMessageState = pinMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	jumpPinMessageId: ''
+	jumpPinMessageId: '',
+	isPinModalVisible: false
 });
 
 export const pinMessageSlice = createSlice({
@@ -205,6 +207,9 @@ export const pinMessageSlice = createSlice({
 		remove: pinMessageAdapter.removeOne,
 		setJumpPinMessageId: (state, action) => {
 			state.jumpPinMessageId = action.payload;
+		},
+		togglePinModal: (state: PinMessageState) => {
+			state.isPinModalVisible = !state.isPinModalVisible;
 		}
 	},
 	extraReducers: (builder) => {
@@ -283,5 +288,7 @@ export const selectLastPinMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectPinMessageByChannelId(channelId), (filteredMessages) => {
 		return filteredMessages[filteredMessages.length - 1]?.id || null;
 	});
+
+export const selectIsPinModalVisible = createSelector(getPinMessageState, (state: PinMessageState) => state.isPinModalVisible);
 
 export const selectJumpPinMessageId = createSelector(getPinMessageState, (state) => state.jumpPinMessageId);

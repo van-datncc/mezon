@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChannelMembers, useChatSending, usePermissionChecker } from '@mezon/core';
-import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, CopyIcon, Icons, formatContentEditMessage } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
@@ -156,7 +156,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionCopyText = () => {
 		onClose();
-		Clipboard.setString(message.content.t);
+		Clipboard.setString(formatContentEditMessage(message)?.formatContentDraft);
 		Toast.show({
 			type: 'success',
 			props: {
