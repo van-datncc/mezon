@@ -1,0 +1,537 @@
+diff --git a/node_modules/react-native-callkeep/.idea/.gitignore b/node_modules/react-native-callkeep/.idea/.gitignore
+new file mode 100644
+index 0000000..13566b8
+--- /dev/null
++++ b/node_modules/react-native-callkeep/.idea/.gitignore
+@@ -0,0 +1,8 @@
++# Default ignored files
++/shelf/
++/workspace.xml
++# Editor-based HTTP Client requests
++/httpRequests/
++# Datasource local storage ignored files
++/dataSources/
++/dataSources.local.xml
+diff --git a/node_modules/react-native-callkeep/.idea/git_toolbox_blame.xml b/node_modules/react-native-callkeep/.idea/git_toolbox_blame.xml
+new file mode 100644
+index 0000000..7dc1249
+--- /dev/null
++++ b/node_modules/react-native-callkeep/.idea/git_toolbox_blame.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="GitToolBoxBlameSettings">
++    <option name="version" value="2" />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/.idea/modules.xml b/node_modules/react-native-callkeep/.idea/modules.xml
+new file mode 100644
+index 0000000..fc521cb
+--- /dev/null
++++ b/node_modules/react-native-callkeep/.idea/modules.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/react-native-callkeep.iml" filepath="$PROJECT_DIR$/.idea/react-native-callkeep.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/.idea/react-native-callkeep.iml b/node_modules/react-native-callkeep/.idea/react-native-callkeep.iml
+new file mode 100644
+index 0000000..24643cc
+--- /dev/null
++++ b/node_modules/react-native-callkeep/.idea/react-native-callkeep.iml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="WEB_MODULE" version="4">
++  <component name="NewModuleRootManager">
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.tmp" />
++      <excludeFolder url="file://$MODULE_DIR$/temp" />
++      <excludeFolder url="file://$MODULE_DIR$/tmp" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/.idea/workspace.xml b/node_modules/react-native-callkeep/.idea/workspace.xml
+new file mode 100644
+index 0000000..90a4355
+--- /dev/null
++++ b/node_modules/react-native-callkeep/.idea/workspace.xml
+@@ -0,0 +1,62 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
++  <component name="ChangeListManager">
++    <list default="true" id="bbfbc6af-be4f-4b9b-97bf-d4f114341544" name="Changes" comment="" />
++    <option name="SHOW_DIALOG" value="false" />
++    <option name="HIGHLIGHT_CONFLICTS" value="true" />
++    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++    <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="ProjectColorInfo">{
++  &quot;customColor&quot;: &quot;&quot;,
++  &quot;associatedIndex&quot;: 0
++}</component>
++  <component name="ProjectId" id="2py9WDQi2YezudikFOdflatqnVT" />
++  <component name="ProjectViewState">
++    <option name="autoscrollFromSource" value="true" />
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++    <option name="showMembers" value="true" />
++  </component>
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "node.js.detected.package.eslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
++    "vue.rearranger.settings.migration": "true"
++  },
++  "keyToStringList": {
++    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
++      "JavaScript"
++    ]
++  }
++}]]></component>
++  <component name="SharedIndexes">
++    <attachedChunks>
++      <set>
++        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
++      </set>
++    </attachedChunks>
++  </component>
++  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
++  <component name="TaskManager">
++    <task active="true" id="Default" summary="Default task">
++      <changelist id="bbfbc6af-be4f-4b9b-97bf-d4f114341544" name="Changes" comment="" />
++      <created>1733727478489</created>
++      <option name="number" value="Default" />
++      <option name="presentableId" value="Default" />
++      <updated>1733727478489</updated>
++      <workItem from="1733727480243" duration="9146000" />
++      <workItem from="1733754387212" duration="41000" />
++    </task>
++    <servers />
++  </component>
++  <component name="TypeScriptGeneratedFilesManager">
++    <option name="version" value="3" />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/.transforms/855766cef735483c921e661ed3e810f7/results.bin b/node_modules/react-native-callkeep/android/build/.transforms/855766cef735483c921e661ed3e810f7/results.bin
+new file mode 100644
+index 0000000..61a58fa
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/.transforms/855766cef735483c921e661ed3e810f7/results.bin
+@@ -0,0 +1 @@
++i/classes_dex
+diff --git a/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/results.bin b/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/transformed/classes/classes_dex/classes.dex b/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..af066bf
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/.transforms/9d21e1496371320da9a707cd2c14f89f/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/react-native-callkeep/android/build/.transforms/f454dc598e5811e89361c0ee46c1f9fc/results.bin b/node_modules/react-native-callkeep/android/build/.transforms/f454dc598e5811e89361c0ee46c1f9fc/results.bin
+new file mode 100644
+index 0000000..e3f0ff0
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/.transforms/f454dc598e5811e89361c0ee46c1f9fc/results.bin
+@@ -0,0 +1 @@
++i/classes_global-synthetics
+diff --git a/node_modules/react-native-callkeep/android/build/generated/source/buildConfig/release/io/wazo/callkeep/BuildConfig.java b/node_modules/react-native-callkeep/android/build/generated/source/buildConfig/release/io/wazo/callkeep/BuildConfig.java
+new file mode 100644
+index 0000000..da9b1a4
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/generated/source/buildConfig/release/io/wazo/callkeep/BuildConfig.java
+@@ -0,0 +1,10 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package io.wazo.callkeep;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = false;
++  public static final String LIBRARY_PACKAGE_NAME = "io.wazo.callkeep";
++  public static final String BUILD_TYPE = "release";
++}
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/AndroidManifest.xml b/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..f92cc53
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/AndroidManifest.xml
+@@ -0,0 +1,15 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="io.wazo.callkeep" >
++
++    <uses-sdk android:minSdkVersion="21" />
++
++    <uses-permission android:name="android.permission.CALL_PHONE" />
++    <uses-permission
++        android:name="android.permission.READ_PHONE_STATE"
++        android:maxSdkVersion="29" />
++    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
++    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
++    <uses-permission android:name="android.permission.VIBRATE" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/output-metadata.json b/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/output-metadata.json
+new file mode 100644
+index 0000000..5984c46
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/aapt_friendly_merged_manifests/release/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "io.wazo.callkeep",
++  "variantName": "release",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/aar_metadata/release/aar-metadata.properties b/node_modules/react-native-callkeep/android/build/intermediates/aar_metadata/release/aar-metadata.properties
+new file mode 100644
+index 0000000..776557e
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/aar_metadata/release/aar-metadata.properties
+@@ -0,0 +1,5 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/annotation_processor_list/release/annotationProcessors.json b/node_modules/react-native-callkeep/android/build/intermediates/annotation_processor_list/release/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/annotation_processor_list/release/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/compile_library_classes_jar/release/classes.jar b/node_modules/react-native-callkeep/android/build/intermediates/compile_library_classes_jar/release/classes.jar
+new file mode 100644
+index 0000000..3b40a2d
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/compile_library_classes_jar/release/classes.jar differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/compile_r_class_jar/release/R.jar b/node_modules/react-native-callkeep/android/build/intermediates/compile_r_class_jar/release/R.jar
+new file mode 100644
+index 0000000..169bdf6
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/compile_r_class_jar/release/R.jar differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/compile_symbol_list/release/R.txt b/node_modules/react-native-callkeep/android/build/intermediates/compile_symbol_list/release/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseJniLibFolders/merger.xml b/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..ce7ea49
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/jniLibs"/></dataSet><dataSet config="release" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/release/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseShaders/merger.xml b/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseShaders/merger.xml
+new file mode 100644
+index 0000000..441b871
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/incremental/mergeReleaseShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/shaders"/></dataSet><dataSet config="release" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/release/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/incremental/packageReleaseAssets/merger.xml b/node_modules/react-native-callkeep/android/build/intermediates/incremental/packageReleaseAssets/merger.xml
+new file mode 100644
+index 0000000..3b627f1
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/incremental/packageReleaseAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/assets"/></dataSet><dataSet config="release" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/release/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/build/intermediates/shader_assets/release/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/compile-file-map.properties b/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/compile-file-map.properties
+new file mode 100644
+index 0000000..a2c7fd9
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Mon Dec 16 18:00:07 ICT 2024
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/merger.xml b/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/merger.xml
+new file mode 100644
+index 0000000..724a864
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/incremental/release/packageReleaseResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release" generated-set="release$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/build/generated/res/resValues/release"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/build/generated/res/resValues/release"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/BuildConfig.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/BuildConfig.class
+new file mode 100644
+index 0000000..36607ff
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/BuildConfig.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/Constants.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/Constants.class
+new file mode 100644
+index 0000000..1431c43
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/Constants.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils$1.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils$1.class
+new file mode 100644
+index 0000000..2edfdd4
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils$1.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils.class
+new file mode 100644
+index 0000000..41dc2a1
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/MapUtils.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepBackgroundMessagingService.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepBackgroundMessagingService.class
+new file mode 100644
+index 0000000..135262e
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepBackgroundMessagingService.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$1.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$1.class
+new file mode 100644
+index 0000000..5d16482
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$1.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$CallStateListener.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$CallStateListener.class
+new file mode 100644
+index 0000000..fac5f49
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$CallStateListener.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$LegacyCallStateListener.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$LegacyCallStateListener.class
+new file mode 100644
+index 0000000..f96d7ff
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$LegacyCallStateListener.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$VoiceBroadcastReceiver.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$VoiceBroadcastReceiver.class
+new file mode 100644
+index 0000000..7508b23
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule$VoiceBroadcastReceiver.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule.class
+new file mode 100644
+index 0000000..8161c41
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepModule.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepPackage.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepPackage.class
+new file mode 100644
+index 0000000..a53c172
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/RNCallKeepPackage.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConference.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConference.class
+new file mode 100644
+index 0000000..be38a83
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConference.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection$1.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection$1.class
+new file mode 100644
+index 0000000..de9749e
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection$1.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection.class
+new file mode 100644
+index 0000000..bf89219
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnection.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$1.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$1.class
+new file mode 100644
+index 0000000..e210211
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$1.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$2.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$2.class
+new file mode 100644
+index 0000000..e07f06d
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$2.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$3.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$3.class
+new file mode 100644
+index 0000000..d786fb7
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$3.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$4.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$4.class
+new file mode 100644
+index 0000000..2918ecc
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService$4.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService.class b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService.class
+new file mode 100644
+index 0000000..abbab8a
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/javac/release/classes/io/wazo/callkeep/VoiceConnectionService.class differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/local_only_symbol_list/release/R-def.txt b/node_modules/react-native-callkeep/android/build/intermediates/local_only_symbol_list/release/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/local_only_symbol_list/release/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/manifest_merge_blame_file/release/manifest-merger-blame-release-report.txt b/node_modules/react-native-callkeep/android/build/intermediates/manifest_merge_blame_file/release/manifest-merger-blame-release-report.txt
+new file mode 100644
+index 0000000..c1c8391
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/manifest_merge_blame_file/release/manifest-merger-blame-release-report.txt
+@@ -0,0 +1,26 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="io.wazo.callkeep" >
++4
++5    <uses-sdk android:minSdkVersion="21" />
++6
++7    <uses-permission android:name="android.permission.CALL_PHONE" />
++7-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:4:5-69
++7-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:4:22-66
++8    <uses-permission
++8-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:5:5-6:51
++9        android:name="android.permission.READ_PHONE_STATE"
++9-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:5:22-72
++10        android:maxSdkVersion="29" />
++10-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:6:22-48
++11    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
++11-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:7:5-77
++11-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:7:22-74
++12    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
++12-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:8:5-75
++12-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:8:22-72
++13    <uses-permission android:name="android.permission.VIBRATE" />
++13-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:9:5-66
++13-->/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:9:22-63
++14
++15</manifest>
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/merged_manifest/release/AndroidManifest.xml b/node_modules/react-native-callkeep/android/build/intermediates/merged_manifest/release/AndroidManifest.xml
+new file mode 100644
+index 0000000..f92cc53
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/merged_manifest/release/AndroidManifest.xml
+@@ -0,0 +1,15 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="io.wazo.callkeep" >
++
++    <uses-sdk android:minSdkVersion="21" />
++
++    <uses-permission android:name="android.permission.CALL_PHONE" />
++    <uses-permission
++        android:name="android.permission.READ_PHONE_STATE"
++        android:maxSdkVersion="29" />
++    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
++    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
++    <uses-permission android:name="android.permission.VIBRATE" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/navigation_json/release/navigation.json b/node_modules/react-native-callkeep/android/build/intermediates/navigation_json/release/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/navigation_json/release/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/runtime_library_classes_jar/release/classes.jar b/node_modules/react-native-callkeep/android/build/intermediates/runtime_library_classes_jar/release/classes.jar
+new file mode 100644
+index 0000000..03f20bb
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/intermediates/runtime_library_classes_jar/release/classes.jar differ
+diff --git a/node_modules/react-native-callkeep/android/build/intermediates/symbol_list_with_package_name/release/package-aware-r.txt b/node_modules/react-native-callkeep/android/build/intermediates/symbol_list_with_package_name/release/package-aware-r.txt
+new file mode 100644
+index 0000000..7612bfd
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/intermediates/symbol_list_with_package_name/release/package-aware-r.txt
+@@ -0,0 +1 @@
++io.wazo.callkeep
+diff --git a/node_modules/react-native-callkeep/android/build/outputs/logs/manifest-merger-release-report.txt b/node_modules/react-native-callkeep/android/build/outputs/logs/manifest-merger-release-report.txt
+new file mode 100644
+index 0000000..b6b5610
+--- /dev/null
++++ b/node_modules/react-native-callkeep/android/build/outputs/logs/manifest-merger-release-report.txt
+@@ -0,0 +1,39 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:2:1-10:12
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:2:1-10:12
++	package
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:2:70-96
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
++	xmlns:android
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:2:11-69
++uses-permission#android.permission.CALL_PHONE
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:4:5-69
++	android:name
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:4:22-66
++uses-permission#android.permission.READ_PHONE_STATE
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:5:5-6:51
++	android:maxSdkVersion
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:6:22-48
++	android:name
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:5:22-72
++uses-permission#android.permission.READ_PHONE_NUMBERS
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:7:5-77
++	android:name
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:7:22-74
++uses-permission#android.permission.MANAGE_OWN_CALLS
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:8:5-75
++	android:name
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:8:22-72
++uses-permission#android.permission.VIBRATE
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:9:5-66
++	android:name
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml:9:22-63
++uses-sdk
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
+diff --git a/node_modules/react-native-callkeep/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-callkeep/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..09d9c1c
+Binary files /dev/null and b/node_modules/react-native-callkeep/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin differ
+diff --git a/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml b/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
+index fe2b6cc..830860f 100644
+--- a/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-callkeep/android/src/main/AndroidManifest.xml
+@@ -6,4 +6,5 @@
+                      android:maxSdkVersion="29" />
+     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
++    <uses-permission android:name="android.permission.VIBRATE" />
+ </manifest>
+diff --git a/node_modules/react-native-callkeep/android/src/main/java/io/wazo/callkeep/VoiceConnectionService.java b/node_modules/react-native-callkeep/android/src/main/java/io/wazo/callkeep/VoiceConnectionService.java
+index 5d58692..c663b9e 100644
+--- a/node_modules/react-native-callkeep/android/src/main/java/io/wazo/callkeep/VoiceConnectionService.java
++++ b/node_modules/react-native-callkeep/android/src/main/java/io/wazo/callkeep/VoiceConnectionService.java
+@@ -307,8 +307,10 @@ public class VoiceConnectionService extends ConnectionService {
+ 
+         String NOTIFICATION_CHANNEL_ID = foregroundSettings.getString("channelId");
+         String channelName = foregroundSettings.getString("channelName");
+-        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+-        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
++        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
++        chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
++        chan.enableVibration(true);
++        chan.setVibrationPattern(new long[]{0, 1000, 800});
+         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+         assert manager != null;
+         manager.createNotificationChannel(chan);
+@@ -316,8 +318,10 @@ public class VoiceConnectionService extends ConnectionService {
+         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+         notificationBuilder.setOngoing(true)
+             .setContentTitle(foregroundSettings.getString("notificationTitle"))
+-            .setPriority(NotificationManager.IMPORTANCE_MIN)
+-            .setCategory(Notification.CATEGORY_SERVICE);
++            .setPriority(NotificationManager.IMPORTANCE_HIGH)
++            .setCategory(Notification.CATEGORY_SERVICE)
++            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
++            .setVibrate(new long[]{0, 1000, 800});
+ 
+         Activity currentActivity = RNCallKeepModule.instance.getCurrentReactActivity();
+         if (currentActivity != null) {
