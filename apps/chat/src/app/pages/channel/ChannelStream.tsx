@@ -126,7 +126,7 @@ function HLSPlayer({ videoRef }: MediaPlayerProps) {
 					playsInline
 					controls={false}
 					style={{
-						display: isRemoteVideoStream ? 'block' : 'none' // Chỉ hiển thị video khi có stream
+						display: isRemoteVideoStream ? 'block' : 'none'
 					}}
 				/>
 			</div>
