@@ -485,6 +485,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					])}
 				>
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
+					{isTopic && (
+						<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
+							<div className={`fullBoxText relative group ${firstMsgOfThisTopic.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
+								<MessageWithUser isTopic={isTopic} allowDisplayShortProfile={true} message={firstMsgOfThisTopic} mode={mode} />
+							</div>
+						</div>
+					)}
 					<div
 						style={{
 							height: `${rowVirtualizer.getTotalSize()}px`,
@@ -501,20 +508,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 								transform: `translateY(${rowVirtualizer.getVirtualItems()[0]?.start ?? 0}px)`
 							}}
 						>
-							{isTopic && (
-								<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
-									<div
-										className={`fullBoxText relative group ${firstMsgOfThisTopic.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
-									>
-										<MessageWithUser
-											isTopic={isTopic}
-											allowDisplayShortProfile={true}
-											message={firstMsgOfThisTopic}
-											mode={mode}
-										/>
-									</div>
-								</div>
-							)}
 							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 								const messageId = messages[virtualRow.index];
 								const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
