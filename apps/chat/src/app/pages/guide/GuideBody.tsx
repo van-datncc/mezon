@@ -79,6 +79,7 @@ function GuideBody() {
 	}, [onboardingItem.question]);
 
 	const totalNumberAnswer = answerByClanId?.length || 0;
+
 	const answerPercent = totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
 
 	useEffect(() => {
