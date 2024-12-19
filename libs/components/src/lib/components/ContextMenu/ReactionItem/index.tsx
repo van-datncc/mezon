@@ -33,9 +33,9 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			userId.userId ?? '',
 			false,
 			isPublicChannel(currentChannel),
-			currentMessage.content.tp ?? ''
+			currentMessage?.content?.tp ?? ''
 		);
-	}, [emojiId, emojiShortCode, activeMode, messageId, currentChannel, directId, isClanView, reactionMessageDispatch, userId]);
+	}, [reactionMessageDispatch, messageId, emojiId, emojiShortCode, userId.userId, currentChannel, currentMessage?.content?.tp]);
 
 	return (
 		<div

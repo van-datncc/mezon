@@ -6,12 +6,15 @@ import {
 	selectAllNotificationClan,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
+	selectAllTopics,
 	selectCurrentClan,
 	selectLastNotificationId,
+	selectTopicsSort,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, sortNotificationsByDate } from '@mezon/utils';
+import { ApiSdTopic } from 'mezon-js/dist/api.gen';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AllNotification from './AllNotification';
@@ -19,6 +22,7 @@ import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
 import NotificationWebhookClan from './NotificationWebhookClan';
+import TopicNotification from './TopicNotification';
 
 export type MemberListProps = { className?: string };
 
@@ -30,14 +34,16 @@ const InboxType = {
 	ALL: 'all',
 	INDIVIDUAL: 'individual',
 	MESSAGES: 'messages',
-	MENTIONS: 'mentions'
+	MENTIONS: 'mentions',
+	TOPICS: 'topics'
 };
 
 const tabDataNotify = [
 	{ title: 'All', value: InboxType.ALL },
 	{ title: 'For you', value: InboxType.INDIVIDUAL },
 	{ title: 'Messages', value: InboxType.MESSAGES },
-	{ title: 'Mentions', value: InboxType.MENTIONS }
+	{ title: 'Mentions', value: InboxType.MENTIONS },
+	{ title: 'topics', value: InboxType.TOPICS }
 ];
 
 function NotificationList({ rootRef }: NotificationProps) {
@@ -52,6 +58,8 @@ function NotificationList({ rootRef }: NotificationProps) {
 
 	const getNotificationExcludeMentionAndReplyUnread = useSelector(selectAllNotificationExcludeMentionAndReply);
 	const getAllNotificationMentionAndReply = useSelector(selectAllNotificationMentionAndReply);
+	const getAllTopic = useSelector(selectTopicsSort);
+	const allTopic = useSelector(selectAllTopics);
 
 	const getExcludeMentionAndReply = useMemo(() => {
 		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
@@ -109,7 +117,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 						</div>
 					</div>
 					<div className="flex flex-row border-b-[1px] border-b-gray-300">
-						<div className="flex flex-row gap-4 py-3 w-[70%]">
+						<div className="flex flex-row gap-4 py-3 w-[90%]">
 							{tabDataNotify.map((tab, index: number) => {
 								return (
 									<div key={index}>
@@ -182,6 +190,18 @@ function NotificationList({ rootRef }: NotificationProps) {
 										unreadListConverted={[]}
 										notification={notification}
 									/>
+								))
+							) : (
+								<EmptyNotification isEmptyMentions />
+							)}
+						</div>
+					)}
+
+					{currentTabNotify === InboxType.TOPICS && (
+						<div>
+							{getAllTopic.length > 0 ? (
+								getAllTopic.map((topic: ApiSdTopic, index: number) => (
+									<TopicNotification topic={topic} key={`all-${topic?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyMentions />

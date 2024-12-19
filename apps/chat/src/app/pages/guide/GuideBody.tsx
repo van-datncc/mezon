@@ -1,14 +1,15 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import { GuideItemLayout } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
 import {
 	ETypeMission,
 	fetchOnboarding,
 	onboardingActions,
+	selectAnswerByClanId,
 	selectAnswerByQuestionId,
 	selectChannelById,
 	selectCurrentClanId,
 	selectFormOnboarding,
-	selectKeepAnswerNumber,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
@@ -32,7 +33,8 @@ function GuideBody() {
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClanId as string));
-	const keepAnswerNumber = useSelector(selectKeepAnswerNumber);
+	const answerByClanId = useAppSelector((state) => selectAnswerByClanId(state, currentClanId as string));
+
 	const handleDoMission = useCallback(
 		(mission: ApiOnboardingItem, index: number) => {
 			if (index === missionDone || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS) {
@@ -70,15 +72,16 @@ function GuideBody() {
 
 	const onboardingItem = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
-	const answerNumberPercent = useMemo(() => {
-		let answerDone = 0;
-		Object.values(keepAnswerNumber).map((answer) => {
-			if (answer.length) {
-				answerDone++;
-			}
-		});
-		return answerDone ? (answerDone / onboardingItem.question.length) * 100 - 100 : -97;
-	}, [keepAnswerNumber, onboardingItem.question.length]);
+	const totalAnswersLength = useMemo(() => {
+		return onboardingItem.question.reduce((sum, question) => {
+			return sum + (question.answers?.length || 0);
+		}, 0);
+	}, [onboardingItem.question]);
+
+	const totalNumberAnswer = answerByClanId?.length || 0;
+
+	const answerPercent = totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
+
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
 	}, []);
@@ -96,10 +99,10 @@ function GuideBody() {
 									<div className="absolute top-0 -left-4 w-1 h-full">
 										<div className="flex bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
 											<div
-												className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A]  rounded-2xl "
+												className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A] rounded-2xl"
 												style={{
-													animation: 'transform 1s ease-out',
-													transform: `translateY(${answerNumberPercent}%)`
+													height: `${answerPercent}%`,
+													transition: 'height 1s ease-out'
 												}}
 											></div>
 										</div>
@@ -230,11 +233,22 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 	const dispatch = useAppDispatch();
 	const selectAnswer = useSelector((state) => selectAnswerByQuestionId(state, question.id as string));
+
+	const currentClanId = useSelector(selectCurrentClanId);
 	const handleOnClickQuestion = (index: number) => {
 		dispatch(
 			onboardingActions.doAnswer({
 				answer: index,
 				idQuestion: question.id as string
+			})
+		);
+
+		dispatch(
+			onboardingActions.setAnswerByClanId({
+				clanId: currentClanId as string,
+				answerState: {
+					clanIdQuestionIdAndIndex: `${currentClanId}-${question.id}-${index}`
+				}
 			})
 		);
 	};

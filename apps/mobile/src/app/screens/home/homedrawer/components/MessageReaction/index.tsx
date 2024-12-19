@@ -15,6 +15,7 @@ export type IReactionMessageProps = {
 	countToRemove?: number;
 	senderId: string;
 	actionDelete?: boolean;
+	topicId?: string;
 };
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {

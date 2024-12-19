@@ -166,14 +166,6 @@ export type IThread = {
 	last_sent_message?: ApiChannelMessageHeader;
 };
 
-export type ITopicDiscussion = {
-	id?: string | undefined;
-	/// new update
-	clan_id?: string | undefined;
-	channel_id?: string | undefined;
-	message_id?: string | undefined;
-};
-
 export type IContextMenuItemAction = 'REST';
 
 export type IContextMenuItemMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -950,6 +942,10 @@ export type BuzzArgs = {
 	isReset?: boolean;
 	senderId?: string;
 	timestamp?: number;
+};
+
+export type AnswerByClanArgs = {
+	clanIdQuestionIdAndIndex?: string;
 };
 
 export enum EUserSettings {

@@ -49,10 +49,11 @@ export const MessageReactionWrapper = React.memo(
 					emoji: emoji?.trim() ?? '',
 					senderId: userId ?? '',
 					countToRemove: countToRemove,
-					actionDelete: true
+					actionDelete: true,
+					topicId: message.content?.tp || ''
 				} as IReactionMessageProps);
 			},
-			[message?.channel_id, message?.id, mode, userId]
+			[message?.channel_id, message.content?.tp, message?.id, mode, userId]
 		);
 
 		const onReactItemLongPress = (emojiId: string) => {
@@ -93,7 +94,8 @@ export const MessageReactionWrapper = React.memo(
 									emoji: emojiItemData.emoji ?? '',
 									senderId: userId ?? '',
 									countToRemove: 1,
-									actionDelete: false
+									actionDelete: false,
+									topicId: message.content?.tp || ''
 								} as IReactionMessageProps);
 							}}
 							key={index + emojiItemData.emojiId}

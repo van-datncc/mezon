@@ -49,6 +49,7 @@ import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
+import { walletLedgerReducer } from './giveCoffee/historyTransaction.slice';
 import { EMBED_MESSAGE, embedReducer } from './messages/embedMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
@@ -416,7 +417,8 @@ const reducer = {
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,
-	topicdiscussions: persistedTopicReducer
+	topicdiscussions: persistedTopicReducer,
+	walletLedger: walletLedgerReducer
 };
 
 let storeInstance = configureStore({

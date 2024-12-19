@@ -1,6 +1,7 @@
 import { ChatContext, useChatReaction } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { mapReactionToEntity, reactionActions, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectCurrentChannel } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { isPublicChannel } from '@mezon/utils';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
@@ -11,6 +12,7 @@ import { IReactionMessageProps } from './components';
 const maxRetries = 10;
 const ChannelMessageReactionListener = React.memo(() => {
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
+	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { socketRef } = useMezon();
 	const { handleReconnect } = useContext(ChatContext);
@@ -19,6 +21,26 @@ const ChannelMessageReactionListener = React.memo(() => {
 
 	const onReactionMessage = useCallback(
 		async (data: IReactionMessageProps) => {
+			const fakeDataToRetry = {
+				action: false,
+				channel_id: data.channelId,
+				clan_id: '',
+				count: 1,
+				emoji: data.emoji,
+				emoji_id: data.emojiId,
+				isSending: true,
+				id: new Date().getTime().toString(),
+				is_public: isPublicChannel(currentChannel),
+				message_id: data.messageId,
+				message_sender_id: '',
+				mode: data.mode,
+				sender_avatar: '',
+				sender_id: data.senderId,
+				sender_name: '',
+				topic_id: data?.topicId || ''
+			};
+			dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(fakeDataToRetry)));
+			dispatch(messagesActions.updateMessageReactions(mapReactionToEntity(fakeDataToRetry)));
 			if (!socketRef?.current?.isOpen()) {
 				handleReconnect('');
 				intervalRef.current = setInterval(() => {
@@ -38,7 +60,8 @@ const ChannelMessageReactionListener = React.memo(() => {
 					data?.countToRemove ?? 0,
 					data?.senderId ?? '',
 					data?.actionDelete ?? false,
-					isPublicChannel(currentChannel)
+					isPublicChannel(currentChannel),
+					data?.topicId ?? ''
 				);
 			}
 		},
@@ -58,7 +81,8 @@ const ChannelMessageReactionListener = React.memo(() => {
 					data?.countToRemove ?? 0,
 					data?.senderId ?? '',
 					data?.actionDelete ?? false,
-					isPublicChannel(currentChannel)
+					isPublicChannel(currentChannel),
+					data?.topicId ?? ''
 				);
 			}
 		},
