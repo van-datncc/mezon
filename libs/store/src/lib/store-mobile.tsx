@@ -65,7 +65,6 @@ import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
-import { channelsStreamReducer } from './stream/channelsStream.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
@@ -387,7 +386,6 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	pushToTalkUsers: pushToTalkMembersReducer,
-	channelsstream: channelsStreamReducer,
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
