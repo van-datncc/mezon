@@ -1135,6 +1135,13 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
 	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE)
 );
+export const selectAllTextChannel = createSelector(selectAllChannels, (channels) =>
+	channels.filter(
+		(channel) =>
+			(channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private) ||
+			(channel.type === ChannelType.CHANNEL_TYPE_THREAD && channel.channel_private)
+	)
+);
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);
 
