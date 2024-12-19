@@ -311,20 +311,31 @@ export const ChatMessageSending = memo(
 
 					const topic = (await dispatch(topicsActions.createTopic(body))).payload as ApiSdTopic;
 					dispatch(topicsActions.setCurrentTopicId(topic?.id || ''));
+
 					if (topic) {
-						dispatch(
+						await dispatch(
 							messagesActions.updateToBeTopicMessage({
 								channelId: currentChannel?.channel_id as string,
 								messageId: valueTopic?.id as string,
-								topicId: topic?.id as string
+								topicId: topic.id as string,
+								creatorId: userProfile?.user?.id as string
 							})
 						);
-						await sleep(100);
+
+						await sleep(10);
 						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
+						await dispatch(
+							messagesActions.fetchMessages({
+								channelId: currentChannel?.channel_id,
+								clanId: currentChannel?.clan_id,
+								topicId: topic.id || '',
+								noCache: true
+							})
+						);
 					}
 				}
 			},
-			[currentChannel?.channel_id, currentChannel?.clan_id, currentTopicId, dispatch, sendMessageTopic, valueTopic?.id]
+			[currentChannel?.channel_id, currentChannel?.clan_id, currentTopicId, dispatch, sendMessageTopic, valueTopic?.id, userProfile?.user?.id]
 		);
 
 		return (

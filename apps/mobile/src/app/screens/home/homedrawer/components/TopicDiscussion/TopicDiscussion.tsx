@@ -3,7 +3,7 @@ import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectCurre
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,7 +24,6 @@ export default function TopicDiscussion() {
 	const panelKeyboardRef = useRef(null);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
-	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
 
 	const styles = style(themeValue);
 	useEffect(() => {
@@ -36,12 +35,11 @@ export default function TopicDiscussion() {
 					topicId: currentTopicId || ''
 				})
 			);
-			setIsFetchMessageDone(true);
 		};
 		if (currentTopicId !== '') {
 			fetchMsgResult();
 		}
-	}, [currentChannel?.channel_id, currentClanId, currentTopicId, dispatch]);
+	}, []);
 
 	useEffect(() => {
 		return () => {
@@ -79,15 +77,13 @@ export default function TopicDiscussion() {
 			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
 				<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
 					<View style={{ flex: 1 }}>
-						{isFetchMessageDone && (
-							<ChannelMessagesWrapper
-								channelId={currentTopicId}
-								clanId={currentClanId}
-								isDisableLoadMore={true}
-								isPublic={isPublicChannel(currentChannel)}
-								mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-							/>
-						)}
+						<ChannelMessagesWrapper
+							channelId={currentTopicId}
+							clanId={currentClanId}
+							isDisableLoadMore={true}
+							isPublic={isPublicChannel(currentChannel)}
+							mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+						/>
 					</View>
 				</PanGestureHandler>
 				<ChatBox
