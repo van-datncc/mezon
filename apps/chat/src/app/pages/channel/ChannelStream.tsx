@@ -263,7 +263,6 @@ function UserItem({ user }: { user: IChannelMember }) {
 }
 
 type ChannelStreamProps = {
-	hlsUrl?: string;
 	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	channelName?: string;
@@ -274,7 +273,6 @@ type ChannelStreamProps = {
 };
 
 export default function ChannelStream({
-	hlsUrl,
 	memberJoin,
 	currentStreamInfo,
 	channelName,
@@ -367,7 +365,7 @@ export default function ChannelStream({
 		};
 	}, []);
 
-	return !streamPlay ? (
+	return !streamPlay || !memberJoin.length ? (
 		<div className="w-full h-full bg-black flex justify-center items-center">
 			<div className="flex flex-col justify-center items-center gap-4 w-full">
 				<div className="w-full flex gap-2 justify-center p-2">
@@ -377,7 +375,11 @@ export default function ChannelStream({
 					{channelName && channelName.length > 20 ? `${channelName.substring(0, 20)}...` : channelName}
 				</div>
 				{memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
-				<button className="bg-green-700 rounded-3xl p-2 hover:bg-green-600" onClick={handleJoinChannel}>
+				<button
+					disabled={!memberJoin.length}
+					className={`bg-green-700 rounded-3xl p-2 ${memberJoin.length > 0 ? 'hover:bg-green-600' : 'opacity-50'}`}
+					onClick={handleJoinChannel}
+				>
 					Join stream
 				</button>
 			</div>
