@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement, MezonUpdateEventBody } from 'mezon-js/api.gen';
+import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -59,7 +59,7 @@ export const fetchEventManagement = createAsyncThunk(
 
 type CreateEventManagementpayload = {
 	clan_id: string;
-	channel_id: string;
+	channel_voice_id: string;
 	address: string;
 	title: string;
 	start_time: string;
@@ -71,7 +71,7 @@ type CreateEventManagementpayload = {
 export type UpdateEventManagementPayload = {
 	event_id: string;
 	clan_id: string;
-	channel_id: string;
+	channel_voice_id: string;
 	address: string;
 	title: string;
 	start_time: string;
@@ -83,7 +83,7 @@ export type UpdateEventManagementPayload = {
 
 export type EventManagementOnGogoing = {
 	address: string;
-	channel_id: string;
+	channel_voice_id: string;
 	clan_id: string;
 	description: string;
 	end_time: Date;
@@ -96,12 +96,12 @@ export type EventManagementOnGogoing = {
 
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
-	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementpayload, thunkAPI) => {
+	async ({ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo }: CreateEventManagementpayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const body = {
 				clan_id: clan_id,
-				channel_id: channel_id || '',
+				channel_voice_id: channel_voice_id || '',
 				address: address || '',
 				title: title,
 				start_time: start_time,
@@ -130,16 +130,39 @@ type fetchDeleteEventManagementPayload = {
 	eventLabel: string;
 };
 
+export interface MezonUpdateEventBody {
+	//
+	event_id?: string;
+	//
+	address?: string;
+	//
+	channel_voice_id?: string;
+	//
+	clan_id?: string;
+	//
+	creator_id?: string;
+	//
+	description?: string;
+	//
+	end_time?: string;
+	//
+	logo?: string;
+	//
+	start_time?: string;
+	//
+	title?: string;
+}
+
 export const updateEventManagement = createAsyncThunk(
 	'updateEventManagement/updateEventManagement',
 	async (
-		{ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo, creator_id }: UpdateEventManagementPayload,
+		{ event_id, clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, creator_id }: UpdateEventManagementPayload,
 		thunkAPI
 	) => {
 		try {
 			const body: MezonUpdateEventBody = {
 				address: address,
-				channel_id: channel_id,
+				channel_voice_id: channel_voice_id,
 				event_id: event_id,
 				description: description,
 				end_time: end_time,
