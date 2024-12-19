@@ -337,7 +337,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	useEffect(() => {
 		if (isShowInbox) {
 			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
-			dispatch(topicsActions.fetchTopics({ channelId: currentChannelId || '' }));
+			dispatch(topicsActions.fetchTopics({ channelId: currentChannelId as string }));
 		}
 	}, [isShowInbox]);
 

@@ -3,7 +3,7 @@ import { getFirstMessageOfTopic, selectAllUserClans, selectMemberClanByUserId, t
 import { createImgproxyUrl } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiSdTopic } from 'mezon-js/dist/api.gen';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 export type TopicProps = {
@@ -16,9 +16,11 @@ function TopicNotificationItem({ topic }: TopicProps) {
 	const memberClan = useSelector(selectAllUserClans);
 	const { userId } = useAuth();
 	const userIds = topic.last_sent_message?.repliers;
-	const usernames = memberClan
-		.filter((profile) => (userIds || []).includes(profile?.user?.id || '') && profile?.user?.id !== userId)
-		.map((profile) => profile?.user?.username);
+	const usernames = useMemo(() => {
+		return memberClan
+			.filter((profile) => (userIds || []).includes(profile?.user?.id || '') && profile?.user?.id !== userId)
+			.map((profile) => profile?.user?.username);
+	}, [memberClan, userIds, userId]);
 	useEffect(() => {
 		if (usernames.length === 0) {
 			setSubjectTopic('Topic and you');
@@ -67,8 +69,12 @@ interface IMentionTabContent {
 }
 
 function AllTabContent({ messageReplied, subject, lastMessageTopic }: IMentionTabContent) {
-	const messageRl = messageReplied?.content ? safeJSONParse(messageReplied?.content) : null;
-	const lastMsgTopic = lastMessageTopic?.content ? safeJSONParse(lastMessageTopic?.content) : null;
+	const messageRl = useMemo(() => {
+		return messageReplied?.content ? safeJSONParse(messageReplied?.content) : null;
+	}, [messageReplied]);
+	const lastMsgTopic = useMemo(() => {
+		return lastMessageTopic?.content ? safeJSONParse(lastMessageTopic?.content) : null;
+	}, [lastMessageTopic]);
 	const [senderId, setSubjectTopic] = useState(lastMessageTopic?.sender_id ?? '');
 	useEffect(() => {
 		setSubjectTopic(lastMessageTopic?.sender_id ?? '');
