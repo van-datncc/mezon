@@ -50,8 +50,15 @@ export const fetchUserChannels = createAsyncThunk(
 
 			const response = await fetchUserChannelsCached(mezon, channelId, 500);
 
+			if (Date.now() - response.time > 100) {
+				return {
+					...response,
+					fromCache: true
+				};
+			}
+
 			if (response) {
-				return response ?? [];
+				return { ...response, fromCache: false };
 			}
 		} catch (error) {
 			captureSentryError(error, 'allUsersByAddChannel/fetchUserChannels');
@@ -74,6 +81,7 @@ export const userChannelsSlice = createSlice({
 		builder
 			.addCase(fetchUserChannels.fulfilled, (state: UsersByAddChannelState, actions) => {
 				state.loadingStatus = 'loaded';
+				if (actions.payload?.fromCache) return;
 				if (actions.payload?.user_ids) {
 					UserChannelAdapter.setAll(state, actions.payload.user_ids);
 				} else {

@@ -10,6 +10,7 @@ import {
 	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
+	useAppSelector,
 	UsersStreamEntity,
 	VoiceEntity
 } from '@mezon/store';
@@ -92,7 +93,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		return [];
 	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, inPushToTalkMembers]);
 
-	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
+	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, channel.category_id as string));
 	const unreadMessageCount = channel?.count_mess_unread || 0;
 
 	const handleOpenInvite = () => {

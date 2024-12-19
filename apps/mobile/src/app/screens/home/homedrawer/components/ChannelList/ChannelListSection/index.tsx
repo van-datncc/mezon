@@ -1,4 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
 import { categoriesActions, selectCategoryExpandStateByCategoryId, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { memo, useCallback } from 'react';
@@ -23,13 +24,14 @@ const ChannelListSection = memo(
 		const styles = style(useTheme().themeValue);
 		const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 		const dispatch = useAppDispatch();
-		const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(data?.clan_id || '', data?.category_id));
+		const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, data?.category_id));
 
 		const handleOnPressSortChannel = useCallback(() => {
 			dispatch(
 				categoriesActions.setCategoryIdSortChannel({
 					isSortChannelByCategoryId: !categoryIdSortChannel[data?.category_id],
-					categoryId: data?.category_id
+					categoryId: data?.category_id,
+					clanId: data?.clan_id
 				})
 			);
 		}, [categoryIdSortChannel, data?.category_id, dispatch]);

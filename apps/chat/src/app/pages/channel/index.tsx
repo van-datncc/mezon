@@ -82,14 +82,26 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					clanId: previousChannels.at(1)?.clanId as string,
+					channelId: previousChannels.at(1)?.channelId as string,
+					count: 0,
+					isReset: true
+				})
+			);
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
-			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
+			dispatch(
+				channelsActions.upsertOne({
+					clanId: currentChannel?.clan_id || '',
+					channel: channelWithActive as ChannelsEntity
+				})
+			);
 		}
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
@@ -309,7 +321,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
 								ref={messagesContainerRef}
 							>
-								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+								<ChannelMedia currentChannel={currentChannel} />
 							</div>
 							<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
 						</div>

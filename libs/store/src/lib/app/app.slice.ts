@@ -76,7 +76,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 		clearAllMemoizedFunctions();
 
 		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
-		const currentChannelId = state.channels?.currentChannelId;
+		const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
 		const currentDirectId = state.direct?.currentDirectMessageId;
 		const currentClanId = state.clans?.currentClanId;
 		const path = isElectron() ? window.location.hash : window.location.pathname;

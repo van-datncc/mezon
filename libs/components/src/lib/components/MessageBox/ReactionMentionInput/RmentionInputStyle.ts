@@ -13,16 +13,19 @@ export default {
 			outline: 'none'
 		},
 		highlighter: {
-			padding: 9,
-			border: '1px solid transparent',
-			maxHeight: '350px'
+			padding: '9px 100px 9px 9px',
+			border: 'none',
+			maxHeight: '350px',
+			overflow: 'auto',
+			minWidth: '300px'
 		},
 		input: {
-			padding: '9px 100px 9px 10px',
+			padding: '9px 100px 9px 9px',
 			border: 'none',
 			outline: 'none',
-			whiteSpace: 'pre-wrap',
-			overflow: 'hidden auto'
+			maxHeight: '350px',
+			overflow: 'auto',
+			minWidth: '300px'
 		}
 	},
 

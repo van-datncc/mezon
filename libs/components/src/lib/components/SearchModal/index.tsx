@@ -201,7 +201,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const previous: SearchItemProps[] = [];
 		if (totalListSortedWithoutPreviousList.length > 0) {
 			for (let i = totalListSortedWithoutPreviousList.length - 1; i >= 0; i--) {
-				if (previousChannels.includes(totalListSortedWithoutPreviousList[i]?.channelId || totalListSortedWithoutPreviousList[i]?.id || '')) {
+				if (
+					previousChannels
+						.map((item) => item.channelId)
+						.includes(totalListSortedWithoutPreviousList[i]?.channelId || totalListSortedWithoutPreviousList[i]?.id || '')
+				) {
 					previous.unshift(totalListSortedWithoutPreviousList[i]);
 					totalListSortedWithoutPreviousList.splice(i, 1);
 				}
@@ -212,7 +216,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			for (let i = listDirectSearch.length - 1; i >= 0; i--) {
 				const itemDMId = listDirectSearch[i]?.idDM || '';
 				const existsInPrevious = previous.some((item) => item?.id === listDirectSearch[i]?.idDM);
-				if (previousChannels.includes(itemDMId) && !existsInPrevious) {
+				if (previousChannels.map((item) => item.channelId).includes(itemDMId) && !existsInPrevious) {
 					previous.unshift(listDirectSearch[i]);
 				}
 			}
@@ -239,7 +243,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		async (user: any) => {
 			const foundDirect = listDirectSearch.find((item) => item.id === user.id);
 			if (foundDirect !== undefined) {
-				dispatch(channelsActions.setPreviousChannels({ channelId: foundDirect.idDM || '' }));
+				dispatch(
+					channelsActions.setPreviousChannels({
+						clanId: '0',
+						channelId: foundDirect.idDM || ''
+					})
+				);
 				dispatch(directActions.openDirectMessage({ channelId: foundDirect.idDM || '', clanId: '0' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({

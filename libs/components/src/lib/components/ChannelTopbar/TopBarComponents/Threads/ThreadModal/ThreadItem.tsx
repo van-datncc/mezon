@@ -89,7 +89,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 	}, [message, thread]);
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
-		dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
+		dispatch(channelsActions.upsertOne({ clanId, channel: thread as ChannelsEntity }));
 		dispatch(appActions.setIsShowCanvas(false));
 		navigate(toChannelPage(channelId, clanId));
 		setIsShowThread();

@@ -463,7 +463,7 @@ export const jumpToMessage = createAsyncThunk(
 			}
 
 			const state = thunkAPI.getState() as RootState;
-			if (clanId && state.channels.currentChannelId !== channelId) {
+			if (clanId && state.channels.byClans[clanId]?.currentChannelId !== channelId) {
 				let channelPath = `/chat/clans/${clanId}/channels/${channelId}`;
 				if (clanId === '0') {
 					channelPath = `/chat/direct/message/${channelId}/${mode}`;

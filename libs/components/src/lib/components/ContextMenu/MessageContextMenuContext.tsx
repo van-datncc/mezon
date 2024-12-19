@@ -1,3 +1,4 @@
+import { useIdleRender } from '@mezon/core';
 import { SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -161,6 +162,10 @@ export const MessageContextMenuProvider = ({
 			onVisibilityChange
 		]
 	);
+
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return null;
 
 	return (
 		<MessageContextMenuContext.Provider value={value}>

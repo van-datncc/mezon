@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useAppDispatch, videoStreamActions } from '@mezon/store';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 

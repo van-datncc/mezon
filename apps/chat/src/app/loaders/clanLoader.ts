@@ -16,7 +16,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(emojiSuggestionActions.fetchEmoji({}));
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId }));
-	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
+	dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
 	dispatch(channelsActions.fetchListFavoriteChannel({ clanId: clanId }));
 	dispatch(fetchSystemMessageByClanId(clanId));
 	dispatch(getAllPttMembersInChannel({ channelId: '', channelType: ChannelType.CHANNEL_TYPE_TEXT, clanId: clanId ?? '' }));

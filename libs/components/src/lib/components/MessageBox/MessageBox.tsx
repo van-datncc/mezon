@@ -1,4 +1,4 @@
-import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
+import { useDragAndDrop, useIdleRender, usePermissionChecker, useReference } from '@mezon/core';
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
@@ -114,6 +114,11 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
+
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return <></>;
+
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			{checkAttachment && (

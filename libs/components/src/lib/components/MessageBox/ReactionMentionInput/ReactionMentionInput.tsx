@@ -584,7 +584,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}
 
-	const clickUpToEditMessage = () => {
+	const clickUpToEditMessage = useCallback(() => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !request?.valueTextInput) {
 			dispatch(referencesActions.setOpenEditMessageState(true));
@@ -602,7 +602,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				})
 			);
 		}
-	};
+	}, [lastMessageByUserId, currentDmOrChannelId, request]);
 
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -818,23 +818,26 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						width: `${!closeMenu ? mentionWidth : '90vw'}`,
 						left: `${!closeMenu ? '-40px' : '-30px'}`
 					},
-					control: {
-						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
-						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`
-					},
+
 					'&multiLine': {
-						...(appearanceTheme === 'light' ? lightMentionsInputStyle['&multiLine'] : darkMentionsInputStyle['&multiLine']),
+						highlighter: {
+							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 9px',
+							border: 'none',
+							maxHeight: '350px',
+							overflow: 'auto',
+							minWidth: '300px'
+						},
 						input: {
-							...(appearanceTheme === 'light'
-								? lightMentionsInputStyle['&multiLine'].input
-								: darkMentionsInputStyle['&multiLine'].input),
-							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 10px'
+							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 9px',
+							border: 'none',
+							outline: 'none',
+							maxHeight: '350px',
+							overflow: 'auto',
+							minWidth: '300px'
 						}
-					},
-					maxWidth: '100%',
-					maxHeight: '350px'
+					}
 				}}
-				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
+				className={`dark:bg-channelTextarea  bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -928,7 +931,7 @@ MentionReactInput.displayName = 'MentionReactInput';
 const useEnterPressTracker = () => {
 	const [enterCount, setEnterCount] = useState(0);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const { handleOpenPopupQuickMess, handleClosePopupQuickMess } = useHandlePopupQuickMess();
+	const { handleOpenPopupQuickMess } = useHandlePopupQuickMess();
 
 	const resetEnterCount = () => {
 		setEnterCount(0);
