@@ -529,7 +529,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			emoji: emoji?.trim() ?? '',
 			senderId: senderId ?? '',
 			countToRemove: 1,
-			actionDelete: false
+			actionDelete: false,
+			topicId: message.content?.tp || ''
 		} as IReactionMessageProps);
 
 		onClose();
