@@ -13,7 +13,7 @@ export const style = (colors: Attributes) =>
 			marginVertical: size.s_2,
 			flexDirection: 'row',
 			alignItems: 'center',
-			gap: size.s_4,
+			gap: size.s_4
 		},
 		dateMessageBox: {
 			fontSize: size.small,
@@ -22,5 +22,9 @@ export const style = (colors: Attributes) =>
 		repliesText: {
 			fontSize: size.small,
 			color: colors.textLink
+		},
+		userName: {
+			fontSize: size.small,
+			fontWeight: 'bold'
 		}
 	});
