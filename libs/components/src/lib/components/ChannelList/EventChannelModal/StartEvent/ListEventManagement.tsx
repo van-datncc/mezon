@@ -1,5 +1,6 @@
-import { EventManagementEntity } from '@mezon/store';
+import { EventManagementEntity, selectAllChannelsByUser, useAppSelector } from '@mezon/store';
 import { OptionEvent } from '@mezon/utils';
+import { useRef } from 'react';
 import ItemEventManagement from '../ModalCreate/itemEventManagement';
 
 type ListEventManagementProps = {
@@ -11,6 +12,8 @@ type ListEventManagementProps = {
 
 const ListEventManagement = (props: ListEventManagementProps) => {
 	const { allEventManagement, onOpenDetailItem, openModelUpdate, onUpdateEventId } = props;
+	const listChannelsRef = useRef(useAppSelector(selectAllChannelsByUser));
+
 	return allEventManagement.map((event, index) => {
 		return (
 			<div key={index}>
