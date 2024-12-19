@@ -2,7 +2,6 @@ import {
 	selectCurrentChannelId,
 	selectIsShowCreateTopic,
 	selectMessageTopicError,
-	selectNameTopicError,
 	selectValueTopic,
 	topicsActions,
 	useAppDispatch
@@ -14,7 +13,6 @@ import { useSelector } from 'react-redux';
 export function useTopics() {
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const nameTopicError = useSelector(selectNameTopicError);
 	const messageTopicError = useSelector(selectMessageTopicError);
 	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannelId as string));
 	const valueTopic = useSelector(selectValueTopic);
@@ -47,7 +45,6 @@ export function useTopics() {
 	return useMemo(
 		() => ({
 			isShowCreateTopic,
-			nameTopicError,
 			messageTopicError,
 			valueTopic,
 			setIsShowCreateTopic,
@@ -55,15 +52,6 @@ export function useTopics() {
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage
 		}),
-		[
-			isShowCreateTopic,
-			messageTopicError,
-			nameTopicError,
-			valueTopic,
-			setIsShowCreateTopic,
-			setValueTopic,
-			setOpenTopicMessageState,
-			setTurnOffTopicMessage
-		]
+		[isShowCreateTopic, messageTopicError, valueTopic, setIsShowCreateTopic, setValueTopic, setOpenTopicMessageState, setTurnOffTopicMessage]
 	);
 }
