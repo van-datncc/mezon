@@ -29,6 +29,7 @@ export enum EActivities {
 	LOL = 'LeagueClientUx'
 }
 
+const IMAGE_WINDOW_KEY = 'IMAGE_WINDOW_KEY';
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
 	// be closed automatically when the JavaScript object is garbage collected.
@@ -37,6 +38,7 @@ export default class App {
 	static BrowserWindow: typeof Electron.BrowserWindow;
 	static imageViewerWindow: Electron.BrowserWindow | null = null;
 	static attachmentData: any;
+	static listWindowOpen: Record<string, Electron.BrowserWindow | null>;
 
 	public static isDevelopmentMode() {
 		return !app.isPackaged;
@@ -280,14 +282,18 @@ export default class App {
 
 		const windowOptions = { ...defaultOptions, ...options };
 
-		if (!this.isWindowValid(this.imageViewerWindow)) {
+		if (!this.isWindowValid(this.imageViewerWindow) && !this.listWindowOpen?.[IMAGE_WINDOW_KEY]) {
 			this.imageViewerWindow = new BrowserWindow(windowOptions);
-			
+			this.listWindowOpen = {
+				...this.listWindowOpen,
+				[IMAGE_WINDOW_KEY]: this.imageViewerWindow
+			};
+
 			const emptyMenu = Menu.buildFromTemplate([]);
 			this.imageViewerWindow.setMenu(emptyMenu);
 			this.imageViewerWindow.setMenuBarVisibility(false);
-			this.imageViewerWindow.setOpacity(0);
-			
+			// this.imageViewerWindow.setOpacity(0);
+
 			const filePath = App.application.isPackaged
 				? 'assets/image-window/image-window.html'
 				: 'apps/desktop/src/assets/image-window/image-window.html';
@@ -295,7 +301,7 @@ export default class App {
 				? join(__dirname, '..', electronAppName, filePath)
 				: join(__dirname, '..', '..', '..', filePath);
 			const fullUrl = this.generateFullUrl(baseUrl, params);
-			
+
 			const loadContent = async () => {
 				try {
 					this.imageViewerWindow.loadURL(
@@ -306,7 +312,7 @@ export default class App {
 							query: params
 						})
 					);
-					
+
 					this.imageViewerWindow.webContents.on('did-finish-load', () => {
 						this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 					});
@@ -314,37 +320,36 @@ export default class App {
 					console.error('Failed to load window:', error);
 				}
 			};
-			
+
 			loadContent();
+			this.imageViewerWindow?.show();
+			this.imageViewerWindow?.focus();
 		}
-		
+
 		if (!App.application.isPackaged) {
+			this.imageViewerWindow.webContents.removeAllListeners('did-fail-load');
 			this.imageViewerWindow.webContents.on('did-fail-load', (_, code, description) => {
 				console.error('Window load failed:', code, description);
 			});
 		}
-		
-		this.imageViewerWindow?.setOpacity(1);
-		this.imageViewerWindow?.show();
-		this.imageViewerWindow?.focus();
 
+		this.imageViewerWindow?.setOpacity(1);
+		ipcMain.removeAllListeners('closed');
 		this.imageViewerWindow.on('closed', () => {
 			this.imageViewerWindow = null;
+			delete this.listWindowOpen[IMAGE_WINDOW_KEY];
 		});
-		
+		ipcMain.removeAllListeners(SEND_ATTACHMENT_DATA);
 		ipcMain.on(SEND_ATTACHMENT_DATA, (event, data) => {
 			this.attachmentData = data;
 			this.imageViewerWindow.webContents.send(CHANGE_ATTACHMENT_LIST);
 		});
-		
+		ipcMain.removeAllListeners(GET_ATTACHMENT_DATA);
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
 			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
 		});
-		
+
 		this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
-		
-		this.imageViewerWindow.show();
-		
 		return this.imageViewerWindow;
 	}
 
