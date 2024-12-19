@@ -15,7 +15,6 @@ import {
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
-	channelsStreamActions,
 	clanMembersMetaActions,
 	clansActions,
 	clansSlice,
@@ -104,10 +103,8 @@ import {
 	StickerCreateEvent,
 	StickerDeleteEvent,
 	StickerUpdateEvent,
-	StreamingEndedEvent,
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
-	StreamingStartedEvent,
 	TalkPTTChannel,
 	UnmuteEvent,
 	UserChannelAddedEvent,
@@ -226,31 +223,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onPTTchannelLeaved = useCallback(
 		(user: PTTLeavedEvent) => {
 			dispatch(pttMembersActions.remove(user?.id));
-		},
-		[dispatch]
-	);
-
-	const onstreamingchannelstarted = useCallback(
-		(channel: StreamingStartedEvent) => {
-			if (channel) {
-				dispatch(
-					channelsStreamActions.add({
-						id: channel.channel_id,
-						channel_id: channel.channel_id,
-						clan_id: channel.clan_id,
-						is_streaming: channel.is_streaming,
-						streaming_url: channel.streaming_url !== '' ? `${channel.streaming_url}&user_id=${userId}` : channel.streaming_url
-					})
-				);
-			}
-		},
-		[dispatch]
-	);
-
-	const onstreamingchannelended = useCallback(
-		(channel: StreamingEndedEvent) => {
-			dispatch(channelsStreamActions.remove(channel.channel_id));
-			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
 		},
 		[dispatch]
 	);
@@ -1172,10 +1144,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onstreamingchannelleaved = onstreamingchannelleaved;
 
-			socket.onstreamingchannelstarted = onstreamingchannelstarted;
-
-			socket.onstreamingchannelended = onstreamingchannelended;
-
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
@@ -1281,8 +1249,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onvoiceleaved,
 			onstreamingchanneljoined,
 			onstreamingchannelleaved,
-			onstreamingchannelstarted,
-			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent,
@@ -1412,8 +1378,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onvoiceleaved,
 		onstreamingchanneljoined,
 		onstreamingchannelleaved,
-		onstreamingchannelstarted,
-		onstreamingchannelended,
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,
