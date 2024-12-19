@@ -50,13 +50,13 @@ import {
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectStatusStream,
-	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 
+import { useWebRTCStream } from '@mezon/components';
 import { Icons, Image } from '@mezon/ui';
 import {
 	IClan,
@@ -69,7 +69,6 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
-import { useWebRTCStream } from 'libs/components/src/lib/components/StreamContext/StreamContext';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -96,8 +95,6 @@ function MyApp() {
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	//remove
-	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
@@ -312,7 +309,6 @@ function MyApp() {
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
-					hlsUrl={channelStream?.streaming_url}
 					memberJoin={streamChannelMember}
 					channelName={currentChannel?.channel_label}
 					currentStreamInfo={currentStreamInfo}
