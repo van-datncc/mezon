@@ -85,7 +85,7 @@ export type WriteMessageReactionArgs = {
 	actionDelete: boolean;
 	isPublic: boolean;
 	userId: string;
-	topic_id: string;
+	topic_id?: string;
 };
 
 const reactionQueue: Array<() => Promise<void>> = [];

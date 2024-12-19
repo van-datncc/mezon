@@ -111,7 +111,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			message_sender_id: string,
 			action_delete: boolean,
 			is_public: boolean,
-			topic_id: string
+			topic_id?: string
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {

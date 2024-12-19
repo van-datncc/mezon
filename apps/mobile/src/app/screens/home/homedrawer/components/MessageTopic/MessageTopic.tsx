@@ -1,9 +1,10 @@
-import { size, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, topicsActions, useAppDispatch } from '@mezon/store-mobile';
+import { size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { MessagesEntity, selectMemberClanByUserId, topicsActions, useAppDispatch } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -13,6 +14,8 @@ const MessageTopic = ({ message, avatar }: { message: MessagesEntity; avatar: st
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
+	const topicCreator = useSelector(selectMemberClanByUserId(message?.content?.cid as string))?.user;
+	const colorsUsername = useColorsRoleById(topicCreator?.id)?.highestPermissionRoleColor;
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setValueTopic(message));
 		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
@@ -23,7 +26,13 @@ const MessageTopic = ({ message, avatar }: { message: MessagesEntity; avatar: st
 	};
 	return (
 		<TouchableOpacity onPress={handleOpenTopic} style={styles.container}>
-			<MezonAvatar avatarUrl={avatar} username={message?.username} width={size.s_20} height={size.s_20}></MezonAvatar>
+			<MezonAvatar
+				avatarUrl={topicCreator?.avatar_url}
+				username={topicCreator?.display_name || topicCreator?.username}
+				width={size.s_20}
+				height={size.s_20}
+			></MezonAvatar>
+			<Text style={{ ...styles.userName, color: colorsUsername }}>{topicCreator?.display_name || topicCreator?.username}</Text>
 			<Text style={styles.repliesText}>view topic</Text>
 			<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 		</TouchableOpacity>

@@ -1,8 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, ITopicDiscussion, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiChannelDescription, ApiSdTopic } from 'mezon-js/api.gen';
+import { ApiSdTopic } from 'mezon-js/api.gen';
 import { ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
@@ -12,7 +12,7 @@ export const TOPIC_DISCUSSIONS_FEATURE_KEY = 'topicdiscussions';
 /*
  * Update these interfaces according to your requirements.
  */
-export interface TopicDiscussionsEntity extends ITopicDiscussion {
+export interface TopicDiscussionsEntity extends ApiSdTopic {
 	id: string; // Primary ID
 }
 
@@ -20,10 +20,8 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowCreateTopic?: Record<string, boolean>;
-	nameTopicError?: string;
 	messageTopicError?: string;
 	listTopicId?: Record<string, string>;
-	nameValueTopic?: Record<string, string>;
 	valueTopic: IMessageWithUser | null;
 	openTopicMessageState: boolean;
 	currentTopicId?: string;
@@ -34,13 +32,11 @@ export const topicsAdapter = createEntityAdapter({ selectId: (topic: TopicDiscus
 
 export interface FetchTopicDiscussionsArgs {
 	channelId: string;
-	clanId: string;
-	topicDiscussionId?: string;
 	noCache?: boolean;
 }
 
 const fetchTopicsCached = memoizee(
-	async (mezon: MezonValueContext, channelId: string, clanId: string, topicDiscussionId?: string) => {
+	async (mezon: MezonValueContext, channelId: string) => {
 		const response = await mezon.client.listSdTopic(mezon.session, channelId, 50);
 		return { ...response, time: Date.now() };
 	},
@@ -53,10 +49,10 @@ const fetchTopicsCached = memoizee(
 	}
 );
 
-const mapToTopicEntity = (topics: ApiChannelDescription[]) => {
+const mapToTopicEntity = (topics: ApiSdTopic[]) => {
 	return topics.map((topic) => ({
 		...topic,
-		id: topic.channel_id
+		id: topic.id
 	}));
 };
 
@@ -71,13 +67,13 @@ export const getFirstMessageOfTopic = createAsyncThunk('topics/getFirstMessageOf
 	}
 });
 
-export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ channelId, clanId, noCache }: FetchTopicDiscussionsArgs, thunkAPI) => {
+export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ channelId, noCache }: FetchTopicDiscussionsArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchTopicsCached.clear(mezon, channelId, clanId);
+			fetchTopicsCached.clear(mezon, channelId);
 		}
-		const response = await fetchTopicsCached(mezon, channelId, clanId);
+		const response = await fetchTopicsCached(mezon, channelId);
 		if (!response.topics) {
 			return [];
 		}
@@ -105,7 +101,7 @@ export const createTopic = createAsyncThunk('topics/createTopic', async (body: A
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createSdTopic(mezon.session, body);
 		if (response) {
-			await thunkAPI.dispatch(fetchTopics({ channelId: body.channel_id as string, clanId: body.clan_id as string, noCache: true }));
+			await thunkAPI.dispatch(fetchTopics({ channelId: body.channel_id as string, noCache: true }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -133,9 +129,6 @@ export const topicsSlice = createSlice({
 				...state.listTopicId,
 				[action.payload.channelId]: ''
 			};
-		},
-		setNameTopicError: (state, action: PayloadAction<string>) => {
-			state.nameTopicError = action.payload;
 		},
 		setValueTopic: (state, action: PayloadAction<IMessageWithUser | null>) => {
 			state.valueTopic = action.payload;
@@ -198,7 +191,7 @@ export const topicsReducer = topicsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const topicsActions = { ...topicsSlice.actions, createTopic };
+export const topicsActions = { ...topicsSlice.actions, createTopic, fetchTopics };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -225,8 +218,6 @@ export const selectTopicsEntities = createSelector(getTopicsState, selectEntitie
 
 export const selectTopicById = createSelector([selectTopicsEntities, (state, topicId: string) => topicId], (state, topicId) => state[topicId]);
 
-export const selectNameTopicError = createSelector(getTopicsState, (state) => state.nameTopicError);
-
 export const selectMessageTopicError = createSelector(getTopicsState, (state) => state.messageTopicError);
 
 export const selectListTopicId = createSelector(getTopicsState, (state) => state.listTopicId);
@@ -242,3 +233,10 @@ export const selectIsShowCreateTopic = createSelector([getTopicsState, (_, chann
 });
 
 export const selectFirstMessageOfCurrentTopic = createSelector(getTopicsState, (state) => state.firstMessageOfCurrentTopic);
+export const selectTopicsSort = createSelector(selectAllTopics, (data) => {
+	return data.sort((a, b) => {
+		const timestampA = a?.last_sent_message?.timestamp_seconds || 0;
+		const timestampB = b?.last_sent_message?.timestamp_seconds || 0;
+		return timestampB - timestampA;
+	});
+});
