@@ -21,9 +21,6 @@ export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
 }
-interface IMetadata {
-	status: string;
-}
 
 export interface ChannelMemberAvatar {
 	avatar: string;

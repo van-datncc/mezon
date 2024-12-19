@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiSuggestionContext } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -105,7 +105,7 @@ interface RecentEmojiProps {
 }
 
 const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
-	const { emojiConverted } = useEmojiSuggestion();
+	const { emojiConverted } = useEmojiSuggestionContext();
 
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);
