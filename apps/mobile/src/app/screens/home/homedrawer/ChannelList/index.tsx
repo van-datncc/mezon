@@ -103,7 +103,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			bottomSheetChannelMenuRef.current?.present();
 			setCurrentPressedChannel(channel);
 			setIsUnKnownChannel(!channel?.channel_id);
-			dispatch(channelsActions.setSelectedChannelId(channel?.channel_id));
+			dispatch(
+				channelsActions.setSelectedChannelId({
+					clanId: channel?.clan_id,
+					channelId: channel?.channel_id
+				})
+			);
 		},
 		[dispatch]
 	);
@@ -137,6 +142,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		},
 		[selectCategoryOffsets]
 	);
+
+	useEffect(() => {
+		if (currentChannel?.channel_id) {
+			DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, currentChannel?.channel_id);
+		}
+	}, [currentChannel?.channel_id]);
 
 	useEffect(() => {
 		timerReadyOnLayout.current = setTimeout(() => {

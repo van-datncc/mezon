@@ -4,14 +4,12 @@ import { useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	appActions,
-	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
 	gifsStickerEmojiActions,
 	messagesActions,
 	selectCurrentChannel,
-	selectCurrentClanId,
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -77,7 +75,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	useChannelSeen(directMessageId || '');
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const isFetchMemberChannelDmRef = useRef(false);
 	const isModeDM = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
@@ -117,13 +114,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 		// Rejoin previous clan (other than 0) when exiting the DM detail screen
 		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
-		store.dispatch(
-			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel?.clan_id || '',
-				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type
-			})
-		);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
@@ -237,7 +227,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
                     <VideoIcon /> */}
 				</View>
 			</View>
-			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />}
+			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
 		</SafeAreaView>
 	);
 };

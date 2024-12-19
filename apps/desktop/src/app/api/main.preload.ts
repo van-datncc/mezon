@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	invoke: (channel, data) => ipcRenderer.invoke(channel, data),
 	openImageWindow: (props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
-		return ipcRenderer.send(OPEN_NEW_WINDOW, props, options, params);
+		return ipcRenderer.invoke(OPEN_NEW_WINDOW, props, options, params);
 	},
 	dowloadImage: (url: string) => {
 		return ipcRenderer.invoke(DOWN_LOAD_IMAGE, { payload: { fileURL: url } });

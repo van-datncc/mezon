@@ -158,8 +158,11 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 	}
 };
 
-ipcMain.on(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
 	const newWindow = App.openImageWindow(props, options, params);
+
+	// Remove the existing listener if it exists
+	ipcMain.removeAllListeners(IMAGE_WINDOW_TITLE_BAR_ACTION);
 
 	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
 		handleWindowAction(newWindow, action);
