@@ -952,6 +952,10 @@ export type BuzzArgs = {
 	timestamp?: number;
 };
 
+export type AnswerByClanArgs = {
+	clanIdQuestionIdAndIndex?: string;
+};
+
 export enum EUserSettings {
 	ACCOUNT = 'Account',
 	PROFILES = 'Profiles',
