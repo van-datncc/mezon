@@ -38,7 +38,6 @@ export type FooterProfileProps = {
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
 	const { isJoined, isTalking, toggleTalking, quitPTT } = usePushToTalk();
-
 	const longPressHandlers = useLongPress<HTMLDivElement>({
 		onStart: () => toggleTalking(true),
 		onFinish: () => toggleTalking(false)
@@ -50,6 +49,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const showModalSendToken = useSelector(selectShowModalSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
+	const myProfile = useAuth();
+	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
+
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
@@ -58,14 +60,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
-	const myProfile = useAuth();
-	const isMe = useMemo(() => {
-		return userId === myProfile.userId;
-	}, [myProfile.userId, userId]);
+	const isMe = userId === myProfile?.userId;
+
 	const tokenInWallet = useMemo(() => {
 		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
 	}, [myProfile?.userProfile?.wallet]);
-	const getTokenSocket = useSelector(selectUpdateToken(myProfile.userId ?? ''));
 
 	const handleClickFooterProfile = () => {
 		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));

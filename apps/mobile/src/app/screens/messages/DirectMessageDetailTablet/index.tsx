@@ -1,4 +1,4 @@
-import { useChatMessages, useMemberStatus, useSeenMessagePool } from '@mezon/core';
+import { useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -11,7 +11,9 @@ import {
 	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
-	useAppDispatch
+	selectLastMessageByChannelId,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { SubPanelName } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -27,7 +29,7 @@ import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {

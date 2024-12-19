@@ -11,7 +11,6 @@ import {
 	useApp,
 	useAppParams,
 	useAuth,
-	useChatMessages,
 	useChatSending,
 	useDragAndDrop,
 	useGifsStickersEmoji,
@@ -34,6 +33,7 @@ import {
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
+	selectLastMessageByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
@@ -52,7 +52,7 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();

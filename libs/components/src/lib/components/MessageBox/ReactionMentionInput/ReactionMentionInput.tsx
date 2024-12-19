@@ -3,7 +3,7 @@ import {
 	useClickUpToEdit,
 	useCurrentChat,
 	useCurrentInbox,
-	useEmojiSuggestion,
+	useEmojiSuggestionContext,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
 	useMessageValue,
@@ -15,7 +15,6 @@ import {
 	ChannelsEntity,
 	emojiSuggestionActions,
 	messagesActions,
-	reactionActions,
 	referencesActions,
 	selectAllAccount,
 	selectAllChannels,
@@ -52,7 +51,6 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
-	EmojiPlaces,
 	IMentionOnMessage,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -138,8 +136,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const { valueTopic } = useTopics();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
-	const { emojis } = useEmojiSuggestion();
-	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
+	const { emojis, emojiPicked, addEmojiState } = useEmojiSuggestionContext();
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
@@ -395,7 +392,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			}
-			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
