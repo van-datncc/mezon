@@ -20,6 +20,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -327,6 +328,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
@@ -335,6 +337,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	useEffect(() => {
 		if (isShowInbox) {
 			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
+			dispatch(topicsActions.fetchTopics({ channelId: currentChannelId as string }));
 		}
 	}, [isShowInbox]);
 
