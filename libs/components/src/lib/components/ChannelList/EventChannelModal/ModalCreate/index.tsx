@@ -102,7 +102,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 			timeValueStart,
 			timeValueEnd,
 			contentSubmit.description,
-			contentSubmit.logo
+			contentSubmit.logo,
+			contentSubmit.textChannelId as string
 		);
 
 		hanldeCloseModal();
@@ -126,7 +127,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 			timeValueEnd,
 			contentSubmit.description,
 			contentSubmit.logo,
-			creatorId || ''
+			creatorId || '',
+			contentSubmit.textChannelId as string
 		);
 
 		hanldeCloseModal();

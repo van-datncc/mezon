@@ -20,7 +20,8 @@ export function useEventManagement() {
 			start_time: string,
 			end_time: string,
 			description: string,
-			logo: string
+			logo: string,
+			channel_id: string
 		) => {
 			await dispatch(
 				eventManagementActions.fetchCreateEventManagement({
@@ -31,7 +32,8 @@ export function useEventManagement() {
 					start_time,
 					end_time,
 					description,
-					logo
+					logo,
+					channel_id
 				})
 			);
 		},
@@ -49,7 +51,8 @@ export function useEventManagement() {
 			end_time: string,
 			description: string,
 			logo: string,
-			creator_id: string
+			creator_id: string,
+			channel_id: string
 		) => {
 			await dispatch(
 				eventManagementActions.updateEventManagement({
@@ -62,7 +65,8 @@ export function useEventManagement() {
 					end_time,
 					description,
 					logo,
-					creator_id
+					creator_id,
+					channel_id
 				})
 			);
 		},

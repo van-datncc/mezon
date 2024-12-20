@@ -51,6 +51,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		onEventUpdateId,
 		textChannelId
 	} = props;
+	const isPrivateEvent = textChannelId && textChannelId !== '0';
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
@@ -151,6 +152,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
+						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
 					</div>
 					{event?.creator_id && (
 						<Tippy content={<p style={{ width: 'max-content' }}>{`Created by ${userCreate?.user?.username}`}</p>}>
@@ -242,7 +244,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				)}
 			</div>
 			<div className="flex gap-x-2 mx-4 mb-2">
-				{textChannelId && (
+				{textChannelId && textChannelId !== '0' && (
 					<span className="flex flex-row">
 						<p className="text-slate-400">
 							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}

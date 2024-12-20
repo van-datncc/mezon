@@ -1,14 +1,17 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
 	ETypeMission,
+	EventManagementEntity,
 	JoinPTTActions,
 	appActions,
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
 	selectBuzzStateByChannelId,
+	selectChannelById,
 	selectCloseMenu,
 	selectCurrentMission,
+	selectEventByChannelId,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -17,15 +20,17 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, EEventStatus, IChannel, convertToUTC } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import BuzzBadge from '../BuzzBadge';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
+import { timeFomat } from '../ChannelList/EventChannelModal/timeFomatEvent';
 import SettingChannel from '../ChannelSetting';
 import ModalConfirm from '../ModalConfirm';
 import PanelChannel from '../PanelChannel';
@@ -79,6 +84,55 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const theme = useSelector(selectTheme);
 
 		const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
+		const events = useAppSelector((state) => selectEventByChannelId(state, channel?.channel_id ?? ''));
+		const [updatedNearestEvent, setUpdatedNearestEvent] = useState<EventManagementEntity | null>(null);
+
+		useEffect(() => {
+			if (events.length > 0) {
+				const nearestEvent = events[0];
+				const now = Date.now();
+
+				const startTimeUTC = convertToUTC(nearestEvent.start_time as string);
+				const endTimeUTC = convertToUTC(nearestEvent.end_time as string);
+
+				const upcoming = now < startTimeUTC && startTimeUTC - now <= 1000 * 60 * 120;
+				const ongoing = now >= startTimeUTC && now <= endTimeUTC;
+				const completed = now > endTimeUTC;
+
+				let eventStatus = EEventStatus.UNKNOWN;
+				if (upcoming) {
+					eventStatus = EEventStatus.UPCOMING;
+				} else if (ongoing) {
+					eventStatus = EEventStatus.ONGOING;
+				} else if (completed) {
+					eventStatus = EEventStatus.COMPLETED;
+				}
+
+				setUpdatedNearestEvent({ ...nearestEvent, status: eventStatus });
+			} else {
+				setUpdatedNearestEvent(null);
+			}
+		}, [events]);
+
+		const cssEventStatus = useMemo(() => {
+			return updatedNearestEvent?.status === EEventStatus.UPCOMING
+				? 'text-purple-500'
+				: updatedNearestEvent?.status === EEventStatus.ONGOING
+					? 'text-green-500'
+					: 'dark:text-zinc-400 text-colorTextLightMode';
+		}, [updatedNearestEvent?.status]);
+
+		const eventStatusNotice = useMemo(() => {
+			return updatedNearestEvent?.status === EEventStatus.UPCOMING
+				? '10 minutes left. Join in!'
+				: updatedNearestEvent?.status === EEventStatus.ONGOING
+					? 'Event is taking place!'
+					: null;
+		}, [updatedNearestEvent?.status]);
+
+		const nearestEventAvaiable = updatedNearestEvent?.status === EEventStatus.UPCOMING || updatedNearestEvent?.status === EEventStatus.ONGOING;
+		const channelVoice = useAppSelector((state) => selectChannelById(state, updatedNearestEvent?.channel_voice_id ?? '')) || {};
+
 		const handleOpenCreate = () => {
 			openSettingModal();
 			closeProfileItem();
@@ -157,15 +211,20 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			}
 		};
 
+		const openVoiceChannel = (url: string) => {
+			const urlVoice = `https://meet.google.com/${url}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
+		};
+
 		const openModalJoinVoiceChannel = useCallback(
 			(url: string) => {
 				if (channel.status === 1) {
-					const urlVoice = `https://meet.google.com/${url}`;
-					window.open(urlVoice, '_blank', 'noreferrer');
+					openVoiceChannel(url);
 				}
 			},
 			[channel.status]
 		);
+
 		const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 
 		const notVoiceOrAppOrStreamChannel =
@@ -287,6 +346,21 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							/>
 						) : null}
+						{nearestEventAvaiable && (
+							<Tippy
+								content={
+									<div style={{ width: 'max-content' }}>
+										<p>{`Event: ${updatedNearestEvent?.title}`}</p>
+										<p>{eventStatusNotice}</p>
+										<p>{timeFomat(updatedNearestEvent?.start_time ?? '')}</p>
+									</div>
+								}
+							>
+								<div className={`absolute top-2 right-14 z-20`} onClick={() => openVoiceChannel(channelVoice.meeting_code ?? '')}>
+									<Icons.IconEvents defaultSize={`w-4 h-4 ${cssEventStatus}`} />
+								</div>
+							</Tippy>
+						)}
 					</Link>
 				)}
 

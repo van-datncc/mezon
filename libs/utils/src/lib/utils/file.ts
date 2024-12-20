@@ -202,3 +202,13 @@ export const handleProcessTextAndLinks = ({
 			console.error('Cannot get images from link:', error);
 		});
 };
+
+export const convertToUTC = (time: string): number => {
+	const timeLocal = new Date(time);
+	if (isNaN(timeLocal.getTime())) {
+		console.error(`Invalid time: ${time}`);
+		return NaN;
+	}
+	const timeUTC = timeLocal.getTime() + timeLocal.getTimezoneOffset() * 60000;
+	return timeUTC;
+};
