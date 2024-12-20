@@ -39,6 +39,7 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectGotifyToken,
 	selectGroupCallId,
 	selectIsInCall,
 	selectIsShowChatStream,
@@ -282,17 +283,20 @@ function MyApp() {
 
 	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
 	const streamPlay = useSelector(selectStatusStream);
-
+	const gotifyToken = useSelector(selectGotifyToken);
 	useEffect(() => {
+		if (!gotifyToken) return;
 		if (streamPlay) {
 			handleChannelClick(
 				currentStreamInfo?.clanId as string,
 				currentStreamInfo?.streamId as string,
 				userProfile?.user?.id as string,
-				currentStreamInfo?.streamId as string
+				currentStreamInfo?.streamId as string,
+				userProfile?.user?.username as string,
+				gotifyToken as string
 			);
 		}
-	}, []);
+	}, [gotifyToken]);
 
 	return (
 		<div
