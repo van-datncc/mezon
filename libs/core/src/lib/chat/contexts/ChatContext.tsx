@@ -153,6 +153,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
+	const isClanView = useSelector(selectClanView);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -238,25 +239,34 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const handleBuzz = (channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
-		const audio = new Audio('assets/audio/buzz.mp3');
-		audio.play().catch((error) => {
-			console.error('Failed to play buzz sound:', error);
-		});
-		const timestamp = Math.round(Date.now() / 1000);
-		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			//fixit
-			dispatch(
-				channelsActions.setBuzzState({
-					clanId: currentClanId as string,
-					channelId: channelId,
-					buzzState: { isReset: true, senderId, timestamp }
-				})
-			);
-		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId, timestamp } }));
-		}
-	};
+	const handleBuzz = useCallback(
+		(channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
+			const audio = new Audio('assets/audio/buzz.mp3');
+			audio.play().catch((error) => {
+				console.error('Failed to play buzz sound:', error);
+			});
+
+			const timestamp = Math.round(Date.now() / 1000);
+
+			if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+				dispatch(
+					channelsActions.setBuzzState({
+						clanId: currentClanId as string,
+						channelId: channelId,
+						buzzState: { isReset: true, senderId, timestamp }
+					})
+				);
+			} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+				dispatch(
+					directActions.setBuzzStateDirect({
+						channelId: channelId,
+						buzzState: { isReset: true, senderId, timestamp }
+					})
+				);
+			}
+		},
+		[currentClanId]
+	);
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
@@ -264,14 +274,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
 
+			console.log(message, 'message');
+
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
 				mess.isMe = senderId === userId;
+
 				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
 					dispatch(DMCallActions.setCallMessageId(message?.message_id));
 				}
+
 				const isMobile = directId === undefined && channelId === undefined;
 				mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
@@ -301,7 +315,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-					dispatch(directMetaActions.updateDMSocket(message));
+					const newDm = await dispatch(directActions.addDirectByMessageWS(mess)).unwrap();
+					!newDm && dispatch(directMetaActions.updateDMSocket(message));
+
 					const path = isElectron() ? window.location.hash : window.location.pathname;
 					const isFriendPageView = path.includes('/chat/direct/friends');
 					const isNotCurrentDirect =
@@ -311,6 +327,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						(currentDirectId && !RegExp(currentDirectId).test(message?.channel_id)) ||
 						(isElectron() && isFocusDesktop === false) ||
 						isTabVisible === false;
+
 					if (isNotCurrentDirect) {
 						dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 						dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -338,14 +355,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						);
 					}
 					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 				}
 				// check
-				dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			} catch (error) {
 				captureSentryError(message, 'onchannelmessage');
 			}
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
+		[userId, directId, currentDirectId, isClanView, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
 	);
 
 	const onchannelpresence = useCallback(
@@ -441,7 +458,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
+		[userId, isClanView, directId, currentDirectId, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
 	);
 
 	const onpinmessage = useCallback(
@@ -966,8 +983,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch]
 	);
-
-	const isClanView = useSelector(selectClanView);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));

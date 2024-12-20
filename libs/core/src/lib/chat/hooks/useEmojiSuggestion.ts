@@ -117,11 +117,6 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		[dispatch]
 	);
 
-	const categoriesEmoji = useMemo(
-		() => ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'],
-		[]
-	);
-
 	const categoryEmoji = useMemo(() => {
 		return emojiMetadata
 			.map((emoji) => ({
@@ -136,9 +131,11 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		return categoryEmoji.map((emoji) => emoji.clan_name || '');
 	}, [categoryEmoji]);
 
-	useEffect(() => {
-		categoriesEmoji.splice(2, 0, ...clanNames);
-	}, [clanNames, categoriesEmoji]);
+	const categoriesEmoji = useMemo(() => {
+		const defaultCategories = ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+		const mergedCategories = [...defaultCategories.slice(0, 2), ...clanNames, ...defaultCategories.slice(2)];
+		return [...new Set(mergedCategories)];
+	}, [clanNames]);
 
 	return useMemo(
 		() => ({
@@ -174,4 +171,35 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 			categoryEmoji
 		]
 	);
+}
+
+export function useEmojiConverted() {
+	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
+	const userId = useAuth();
+	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
+
+	useEffect(() => {
+		const emojiRecentStorage = localStorage.getItem('recentEmojis');
+		setEmojiRecentData(emojiRecentStorage);
+	}, []);
+
+	const emojisRecentDataParse = useMemo(() => {
+		if (!emojiRecentData) return [];
+		const parsedData = safeJSONParse(emojiRecentData);
+		return parsedData.filter((emojiItem: EmojiStorage) => emojiItem.senderId === userId.userId);
+	}, [emojiRecentData, userId.userId]);
+
+	const emojiConverted = useMemo(() => {
+		return emojisRecentDataParse.reverse().map((item: EmojiStorage) => {
+			const emojiFound = emojiMetadata.find((emoji) => emoji.shortname === item.emoji);
+			return {
+				id: emojiFound?.id,
+				src: emojiFound?.src,
+				category: 'Recent',
+				shortname: emojiFound?.shortname
+			};
+		});
+	}, [emojisRecentDataParse, emojiMetadata]);
+
+	return emojiConverted;
 }
