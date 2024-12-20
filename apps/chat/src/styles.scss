@@ -1093,3 +1093,28 @@ input:-webkit-autofill:active {
 .custom-video::-webkit-media-controls {
 	display: none !important;
 }
+
+.dark-attachment-loader {
+    width: 20px;
+    height: 20px;
+    --c:no-repeat linear-gradient(#d3d6fd 0 0);
+    background: var(--c),var(--c),var(--c),var(--c);
+    background-size: 11px 11px;
+    animation: arrangement 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+
+.light-attachment-loader {
+    width: 20px;
+    height: 20px;
+    --c:no-repeat linear-gradient(#939bf9 0 0);
+    background: var(--c),var(--c),var(--c),var(--c);
+    background-size: 11px 11px;
+    animation: arrangement 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+
+@keyframes arrangement {
+   0%   {background-position: 0    0,100% 0   ,100% 100%,0 100%}
+   33%  {background-position: 0    0,100% 0   ,100% 100%,0 100%;width:30px;height: 30px}
+   66%  {background-position: 100% 0,100% 100%,0    100%,0 0   ;width:30px;height: 30px}
+   100% {background-position: 100% 0,100% 100%,0    100%,0 0   }
+}
