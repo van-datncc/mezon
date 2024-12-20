@@ -68,7 +68,7 @@ const DrawerContent = React.memo(() => {
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					<ServerList />
-					<BackNativeListener />
+					{!isTabletLandscape && <BackNativeListener />}
 					<ChannelListWrapper />
 				</View>
 				{isTabletLandscape && <ProfileBar />}

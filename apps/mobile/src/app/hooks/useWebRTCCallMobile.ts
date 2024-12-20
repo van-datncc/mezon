@@ -386,6 +386,11 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 						}
 					})
 				);
+			} else {
+				const bodyFCMMobile = {
+					offer: 'CANCEL_CALL'
+				};
+				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 			}
 			setCallState({
 				localStream: null,

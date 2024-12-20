@@ -321,7 +321,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		const { clan_id: clanId, channel_id: channelId } = firstTextChannel || {};
 		const store = await getStoreAsync();
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 		if (!channelsCache?.includes(channelId)) {

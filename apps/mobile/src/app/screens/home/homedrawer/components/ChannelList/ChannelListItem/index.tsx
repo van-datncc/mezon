@@ -111,7 +111,13 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					requestAnimationFrame(async () => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(
-							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+							channelsActions.joinChannel({
+								clanId: clanId ?? '',
+								channelId: channelId,
+								noFetchMembers: false,
+								isClearMessage: true,
+								noCache: true
+							})
 						);
 					});
 				}, 0);
