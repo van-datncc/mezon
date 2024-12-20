@@ -1,14 +1,9 @@
-import { Block, useTheme } from '@mezon/mobile-ui';
-import { selectStreamChannelByChannelId } from '@mezon/store-mobile';
+import { useTheme } from '@mezon/mobile-ui';
 import { default as React, memo, useRef, useState } from 'react';
-import { View } from 'react-native';
 // import Orientation from 'react-native-orientation-locker';
-import Video from 'react-native-video';
-import { useSelector } from 'react-redux';
 import { style } from './styles';
 
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Text } from 'react-native';
 
 export function StreamingScreen({
 	streamID,
@@ -19,7 +14,7 @@ export function StreamingScreen({
 	onFullScreenVideo: () => void;
 	streamID: string;
 }) {
-	const channelStream = useSelector(selectStreamChannelByChannelId(streamID || ''));
+	// const channelStream = useSelector(selectStreamChannelByChannelId(streamID || ''));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const videoRef = useRef(null);
@@ -55,48 +50,49 @@ export function StreamingScreen({
 	};
 
 	return (
-		<View style={styles.container}>
-			{channelStream?.streaming_url ? (
-				<View>
-					{loading && !error && (
-						<View style={styles.loadingOverlay}>
-							<ActivityIndicator size="large" color="white" />
-						</View>
-					)}
+		<div></div>
+		// <View style={styles.container}>
+		// 	{channelStream?.streaming_url ? (
+		// 		<View>
+		// 			{loading && !error && (
+		// 				<View style={styles.loadingOverlay}>
+		// 					<ActivityIndicator size="large" color="white" />
+		// 				</View>
+		// 			)}
 
-					{error ? (
-						<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
-							<Text style={styles.errorText}>{t('noStreaming')}</Text>
-						</Block>
-					) : (
-						<Video
-							controls={false}
-							ref={videoRef}
-							source={{
-								uri: channelStream?.streaming_url
-							}}
-							ignoreSilentSwitch={'ignore'}
-							mixWithOthers={'mix'}
-							resizeMode={isFullScreen ? 'cover' : 'contain'}
-							style={isFullScreen ? styles.fullScreenVideo : styles.video}
-							onLoadStart={handleVideoLoadStart}
-							onLoad={handleVideoLoad}
-							onError={handleVideoError}
-						/>
-					)}
-				</View>
-			) : (
-				<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
-					<Text style={styles.errorText}>{t('noDisplay')}</Text>
-				</Block>
-			)}
+		// 			{error ? (
+		// 				<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
+		// 					<Text style={styles.errorText}>{t('noStreaming')}</Text>
+		// 				</Block>
+		// 			) : (
+		// 				<Video
+		// 					controls={false}
+		// 					ref={videoRef}
+		// 					source={{
+		// 						uri: channelStream?.streaming_url
+		// 					}}
+		// 					ignoreSilentSwitch={'ignore'}
+		// 					mixWithOthers={'mix'}
+		// 					resizeMode={isFullScreen ? 'cover' : 'contain'}
+		// 					style={isFullScreen ? styles.fullScreenVideo : styles.video}
+		// 					onLoadStart={handleVideoLoadStart}
+		// 					onLoad={handleVideoLoad}
+		// 					onError={handleVideoError}
+		// 				/>
+		// 			)}
+		// 		</View>
+		// 	) : (
+		// 		<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
+		// 			<Text style={styles.errorText}>{t('noDisplay')}</Text>
+		// 		</Block>
+		// 	)}
 
-			{/*{(isAnimationComplete || isFullScreen) && !error && channelStream?.streaming_url && Platform.OS !== 'ios' && (*/}
-			{/*	<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>*/}
-			{/*		<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />*/}
-			{/*	</TouchableOpacity>*/}
-			{/*)}*/}
-		</View>
+		// 	{/*{(isAnimationComplete || isFullScreen) && !error && channelStream?.streaming_url && Platform.OS !== 'ios' && (*/}
+		// 	{/*	<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>*/}
+		// 	{/*		<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />*/}
+		// 	{/*	</TouchableOpacity>*/}
+		// 	{/*)}*/}
+		// </View>
 	);
 }
 
