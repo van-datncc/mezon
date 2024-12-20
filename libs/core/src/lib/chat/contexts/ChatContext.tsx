@@ -274,8 +274,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
 
-			console.log(message, 'message');
-
 			try {
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
