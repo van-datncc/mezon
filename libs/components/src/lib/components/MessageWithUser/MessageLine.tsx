@@ -2,7 +2,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
@@ -18,6 +18,7 @@ type MessageLineProps = {
 	isEditted: boolean;
 	isInPinMsg?: boolean;
 	code?: number;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 };
 
 const MessageLineComponent = ({
@@ -31,7 +32,8 @@ const MessageLineComponent = ({
 	isHideLinkOneImage,
 	isEditted,
 	isInPinMsg,
-	code
+	code,
+	onCopy
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -58,6 +60,7 @@ const MessageLineComponent = ({
 				isEditted={isEditted}
 				isInPinMsg={isInPinMsg}
 				code={code}
+				onCopy={onCopy}
 			/>
 		</div>
 	);
@@ -78,6 +81,7 @@ interface RenderContentProps {
 	isEditted: boolean;
 	isInPinMsg?: boolean;
 	code?: number;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }
 
 export interface ElementToken {
@@ -104,7 +108,8 @@ const RenderContent = memo(
 		isHideLinkOneImage,
 		isEditted,
 		isInPinMsg,
-		code
+		code,
+		onCopy
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -286,8 +291,67 @@ const RenderContent = memo(
 			return formattedContent;
 		}, [elements, t, mode]);
 
+		const divRef = useRef<HTMLDivElement>(null);
+
+		// Calculate the index position within the div
+		const getSelectionIndex = useCallback(
+			(node: Node, offset: number) => {
+				let currentNode = node;
+				let totalOffset = offset;
+
+				// Traverse up the DOM tree to calculate the index
+				while (currentNode && currentNode !== divRef.current) {
+					// Traverse previous siblings to account for their text content
+					while (currentNode.previousSibling) {
+						currentNode = currentNode.previousSibling;
+						totalOffset += currentNode.textContent?.length ?? 0;
+					}
+					currentNode = currentNode.parentNode as Node;
+				}
+				return totalOffset;
+			},
+			[divRef]
+		);
+
+		// Determine the selection's start and end index
+		const getSelectionRange = () => {
+			const selection = window.getSelection();
+
+			// Ensure selection exists and is within the div
+			if (selection && selection.rangeCount > 0 && divRef.current) {
+				const range = selection?.getRangeAt(0);
+				const { startContainer, endContainer, startOffset, endOffset } = range;
+
+				// // Check if selection is within the target div
+				if (divRef.current.contains(startContainer) && divRef.current.contains(endContainer)) {
+					const startIndex = getSelectionIndex(startContainer, startOffset);
+					const endIndex = getSelectionIndex(endContainer, endOffset);
+					return { startIndex, endIndex };
+				}
+			}
+
+			return { startIndex: 0, endIndex: 0 };
+		};
+
+		const handleCopy = (event: React.ClipboardEvent<HTMLDivElement>) => {
+			const { startIndex, endIndex } = getSelectionRange();
+
+			const isSelectionHasMention = mentions.find((mention) => {
+				return (mention.s || 0) >= startIndex && (mention.e as number) <= endIndex;
+			});
+
+			if (isSelectionHasMention) {
+				if (onCopy) {
+					onCopy(event, startIndex, endIndex);
+				}
+				return;
+			}
+		};
+
 		return (
 			<div
+				ref={divRef}
+				onCopy={handleCopy}
 				style={
 					isJumMessageEnabled
 						? {

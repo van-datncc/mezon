@@ -21,6 +21,7 @@ export type MessageProps = {
 	messageReplyHighlight?: boolean;
 	message: MessagesEntity;
 	previousMessage: MessagesEntity;
+	isTopic?: boolean;
 };
 
 export type MessageRef = {
@@ -46,7 +47,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	checkMessageTargetToMoved,
 	messageReplyHighlight,
 	message,
-	previousMessage
+	previousMessage,
+	isTopic
 }: Readonly<MessageProps>) => {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
@@ -129,3 +131,5 @@ export const MemorizedChannelMessage = memo(
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved
 );
+
+MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

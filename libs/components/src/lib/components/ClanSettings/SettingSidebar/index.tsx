@@ -1,5 +1,5 @@
 import { usePermissionChecker } from '@mezon/core';
-import { auditLogList, authActions, selectActionAuditLog, selectCurrentClan, selectUserAuditLog, useAppDispatch } from '@mezon/store';
+import { authActions, selectActionAuditLog, selectCurrentClan, selectUserAuditLog, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
@@ -22,6 +22,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const auditLogFilterAction = useSelector(selectActionAuditLog);
 	const auditLogFilterUser = useSelector(selectUserAuditLog);
 	const navigate = useNavigate();
+
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
 			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS, ItemSetting.AUDIT_LOG].includes(item.id)) {
@@ -51,23 +52,10 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			navigate('/application-directory');
 			return;
 		}
-		if (settingItem.id === ItemSetting.AUDIT_LOG) {
-			if (currentClan?.clan_id) {
-				const body = {
-					noCache: true,
-					actionLog: auditLogFilterAction ?? '',
-					userId: auditLogFilterUser?.userId ?? '',
-					clanId: currentClan?.clan_id ?? '',
-					page: 1,
-					pageSize: 10000
-				};
-				dispatch(auditLogList(body));
-			}
-		}
+
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};
-
 	return (
 		<div className="flex flex-row flex-1 justify-end">
 			<div className="w-[220px] py-[60px] pl-5 pr-[6px]">

@@ -43,7 +43,6 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 						id: currentChannel?.channel_id ?? '',
 						lastSeenTimestamp: timestamp,
 						lastSentTimestamp: timestamp,
-						lastSeenPinMessage: '',
 						clanId: currentChannel?.clan_id ?? '',
 						isMute: false
 					}

@@ -3,6 +3,7 @@ export { ChannelList } from './components/ChannelList';
 export { default as ChannelTopbar } from './components/ChannelTopbar';
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
 export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
+export { default as TopicHeader } from './components/ChannelTopbar/TopBarComponents/TopicDiscussion/CreateTopicDiscussion/TopicHeader';
 export { default as ChatWelcome } from './components/ChatWelcome';
 export * from './components/ChatWelcome/OnBoardWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
@@ -96,4 +97,7 @@ export { default as DmCalling } from './components/DmCalling';
 export { default as ModalCall } from './components/ModalCall';
 
 export { PushToTalkProvider } from './components/PushToTalk/PushToTalkContext';
+export { WebRTCStreamProvider, useWebRTCStream } from './components/StreamContext/StreamContext';
 export { WebRTCProvider } from './components/WebRTC/WebRTCContext';
+
+export * from './components/HtmlCanvas';

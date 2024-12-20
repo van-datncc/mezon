@@ -1,4 +1,5 @@
 import {
+	embedActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentUserId,
@@ -9,7 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { IMessageSelect, IMessageSelectOption, ModeResponsive } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { SelectOptions } from './SelectOptions';
 
@@ -18,21 +19,30 @@ type MessageSelectProps = {
 	messageId: string;
 	senderId: string;
 	buttonId: string;
+	inside?: boolean;
 };
 
-export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId }) => {
+export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId, senderId, buttonId, inside }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const currentUserId = useSelector(selectCurrentUserId);
-
 	const [selectedOptions, setSelectedOptions] = useState<Array<IMessageSelectOption>>([]);
+
 	const [availableOptions, setAvailableOptions] = useState(select?.options || []);
 	const dispatch = useAppDispatch();
 	const handleOptionSelect = (option: { value: string; label: string }) => {
-		if (selectedOptions.length < (select?.max_options || 1)) {
+		if (selectedOptions.length > (select?.max_options || 1)) {
+			return;
+		}
+		if (!select.min_options && !select.max_options) {
+			setSelectedOptions([option]);
+			setAvailableOptions(select.options.filter((o) => o.value !== option.value));
+		} else {
 			setSelectedOptions((prev) => [...prev, option]);
 			setAvailableOptions((prev) => prev.filter((o) => o.value !== option.value));
+		}
+		if (!inside) {
 			dispatch(
 				messagesActions.clickButtonMessage({
 					message_id: messageId,
@@ -43,8 +53,41 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					extra_data: option.value
 				})
 			);
+			return;
 		}
+		if (selectedOptions.filter((item) => item.value === option.value).length > 0) {
+			dispatch(
+				embedActions.removeEmbedValuel({
+					message_id: messageId,
+					data: {
+						id: buttonId,
+						value: option.value
+					},
+					multiple: true
+				})
+			);
+			return;
+		}
+		dispatch(
+			embedActions.addEmbedValue({
+				message_id: messageId,
+				data: {
+					id: buttonId,
+					value: option.value
+				},
+				multiple: true
+			})
+		);
 	};
+
+	const checkMultipleSelect = useMemo(() => {
+		return (!!select.min_options && select.min_options > 1) || (!!select.max_options && select.max_options > 1);
+	}, [select.min_options, select.max_options]);
+	useEffect(() => {
+		if (select.valueSelected) {
+			handleOptionSelect(select.valueSelected);
+		}
+	}, []);
 
 	const handleRemoveOption = (e: React.MouseEvent<HTMLButtonElement>, option: { value: string; label: string }) => {
 		e.stopPropagation();
@@ -57,6 +100,16 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 				(a, b) => select.options.findIndex((opt) => opt.value === a.value) - select.options.findIndex((opt) => opt.value === b.value)
 			);
 		});
+		dispatch(
+			embedActions.removeEmbedValuel({
+				message_id: messageId,
+				data: {
+					id: buttonId,
+					value: option.value
+				},
+				multiple: true
+			})
+		);
 	};
 
 	const handleClearSelection = () => {
@@ -86,7 +139,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 
 	return (
 		<Dropdown
-			dismissOnClick={false}
+			dismissOnClick={!checkMultipleSelect}
 			label=""
 			renderTrigger={() => (
 				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">

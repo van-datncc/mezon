@@ -89,7 +89,7 @@ export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker'
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
 		if (res) {
-			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
+			thunkAPI.dispatch(stickerSettingActions.update({ id: stickerId, changes: { ...request } }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'settingClanSticker/updateSticker');
@@ -106,18 +106,21 @@ export const removeStickersByClanId = createAsyncThunk('settingClanSticker/remov
 	thunkAPI.dispatch(stickerSettingActions.removeMany(stickerIdsToRemove));
 });
 
-export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
-		if (res) {
-			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
+export const deleteSticker = createAsyncThunk(
+	'settingClanSticker/deleteSticker',
+	async (data: { stickerId: string; clan_id: string; stickerLabel: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id, data.stickerLabel);
+			if (res) {
+				thunkAPI.dispatch(stickerSettingActions.remove(data.stickerId));
+			}
+		} catch (error) {
+			captureSentryError(error, 'settingClanSticker/deleteSticker');
+			return thunkAPI.rejectWithValue(error);
 		}
-	} catch (error) {
-		captureSentryError(error, 'settingClanSticker/deleteSticker');
-		return thunkAPI.rejectWithValue(error);
 	}
-});
+);
 
 export const settingClanStickerSlice = createSlice({
 	name: SETTING_CLAN_STICKER,

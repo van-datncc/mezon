@@ -51,9 +51,20 @@ type SearchMemberAuditLogProps = {
 	actionFilter: string;
 	userFilter?: IUserAuditLog | null;
 	closeModal: () => void;
+	pageSize: number;
+	currentPage: number;
+	selectedDate: string;
 };
 
-const SearchMemberAuditLogModal = ({ currentClanId, actionFilter, userFilter, closeModal }: SearchMemberAuditLogProps) => {
+const SearchMemberAuditLogModal = ({
+	currentClanId,
+	actionFilter,
+	userFilter,
+	closeModal,
+	pageSize,
+	currentPage,
+	selectedDate
+}: SearchMemberAuditLogProps) => {
 	const dispatch = useAppDispatch();
 	const appearanceTheme = useSelector(selectTheme);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -83,8 +94,7 @@ const SearchMemberAuditLogModal = ({ currentClanId, actionFilter, userFilter, cl
 				actionLog: actionFilter ? actionFilter : '',
 				userId: user?.userId ?? '',
 				clanId: currentClanId ?? '',
-				page: 1,
-				pageSize: 10000
+				date_log: selectedDate
 			};
 			dispatch(auditLogList(body));
 		}

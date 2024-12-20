@@ -1,7 +1,16 @@
-import { useChatMessages, useSeenMessagePool } from '@mezon/core';
+import { useSeenMessagePool } from '@mezon/core';
 import { IUserStatus, Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { MessagesEntity, directActions, directMetaActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import {
+	MessagesEntity,
+	channelsActions,
+	directActions,
+	directMetaActions,
+	selectDmGroupCurrent,
+	selectLastMessageByChannelId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -27,7 +36,7 @@ interface HeaderProps {
 }
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
@@ -48,6 +57,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId || '', count: 0, isReset: true }));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, []);
@@ -111,7 +121,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 						{dmAvatar ? (
 							<FastImage
 								source={{
-									uri: createImgproxyUrl(dmAvatar ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									uri: createImgproxyUrl(dmAvatar ?? '', { width: 100, height: 100, resizeType: 'fit' })
 								}}
 								style={styles.friendAvatar}
 							/>

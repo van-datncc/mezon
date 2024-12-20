@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
-import { IUsersClan, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { LoadingStatus, UsersClanEntity } from '@mezon/utils';
+import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { clanMembersMetaActions, extracMeta, selectClanMembersMetaEntities } from './clan.members.meta';
@@ -9,10 +9,6 @@ export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 /*
  * Update these interfaces according to your requirements.
  */
-
-export interface UsersClanEntity extends IUsersClan {
-	id: string; // Primary ID
-}
 
 export const mapUsersClanToEntity = (UsersClanRes: ClanUserListClanUser) => {
 	const id = (UsersClanRes as unknown as any).user.id;
@@ -54,6 +50,7 @@ export const UsersClanSlice = createSlice({
 		setAll: UsersClanAdapter.setAll,
 		add: UsersClanAdapter.addOne,
 		upsertMany: UsersClanAdapter.upsertMany,
+		updateMany: UsersClanAdapter.updateMany,
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanNick, clanAvt } = action.payload;
@@ -64,6 +61,32 @@ export const UsersClanSlice = createSlice({
 					clan_avatar: clanAvt
 				}
 			});
+		},
+		updateManyRoleIds: (state, action: PayloadAction<Array<{ userId: string; roleId: string }>>) => {
+			const updates = action.payload.map(({ userId, roleId }) => ({
+				id: userId,
+				changes: {
+					role_id: state.entities[userId]?.role_id ? [...new Set([...(state.entities[userId].role_id || []), roleId])] : [roleId]
+				}
+			}));
+			UsersClanAdapter.updateMany(state, updates);
+		},
+		removeManyRoleIds: (state, action: PayloadAction<Array<{ userId: string; roleId: string }>>) => {
+			const updates = action.payload
+				.map(({ userId, roleId }) => {
+					const existingMember = state.entities[userId];
+					if (existingMember) {
+						return {
+							id: userId,
+							changes: {
+								role_id: existingMember.role_id?.filter((id) => id !== roleId) || []
+							}
+						};
+					}
+					return null;
+				})
+				.filter(Boolean) as Update<UsersClanEntity, string>[];
+			UsersClanAdapter.updateMany(state, updates);
 		},
 		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;

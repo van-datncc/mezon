@@ -1,35 +1,34 @@
-import { useAppNavigation, usePathMatch } from '@mezon/core';
+import { useAppNavigation, useIdleRender, usePathMatch } from '@mezon/core';
 import {
-	ChannelsEntity,
 	appActions,
-	canvasAPIActions,
 	notificationActions,
+	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsPinModalVisible,
 	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
-	selectLastPinMessageByChannelId,
-	selectLastSeenPinMessageChannelById,
+	selectIsThreadModalVisible,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, checkIsThread, isMacDesktop } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import { ChannelStatusEnum, IChannel, isMacDesktop } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -37,6 +36,7 @@ import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import { ChannelLabel } from './TopBarComponents';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
+import FileModal from './TopBarComponents/FilesModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import { PushToTalkBtn } from './TopBarComponents/PushToTalkButton/PushToTalkButton';
@@ -56,6 +56,10 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
+
+	const shouldRender = useIdleRender();
+	if (!shouldRender) return null;
+
 	return (
 		<div
 			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
@@ -108,14 +112,9 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	const channelParent =
 		useAppSelector((state) => selectChannelById(state, (channel?.parrent_id ? (channel.parrent_id as string) : '') ?? '')) || {};
 
-	const isNotThread = useMemo(() => {
-		return channel?.parrent_id === '0';
-	}, [channel?.parrent_id]);
+	const isNotThread = channel?.parrent_id === '0';
 
-	const isPrivateChannel = useMemo(() => {
-		return channel?.channel_private === ChannelStatusEnum.isPrivate;
-	}, [channel?.channel_private]);
-
+	const isPrivateChannel = channel?.channel_private === ChannelStatusEnum.isPrivate;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -126,6 +125,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
 								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
 								{isNotThread && isPrivateChannel && <PushToTalkBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
@@ -156,10 +156,36 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	);
 });
 
-function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
-	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
+function FileButton({ isLightMode }: { isLightMode: boolean }) {
+	const [isShowFile, setIsShowFile] = useState<boolean>(false);
 
+	const fileRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowFile = () => {
+		setIsShowFile(!isShowFile);
+	};
+
+	const handleClose = useCallback(() => {
+		setIsShowFile(false);
+	}, []);
+
+	return (
+		<div className="relative leading-5 h-5" ref={fileRef}>
+			<Tippy
+				className={`${isShowFile && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
+				content="Files"
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowFile} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.FileIcon isWhite={isShowFile} defaultSize="size-6" />
+				</button>
+			</Tippy>
+			{isShowFile && <FileModal onClose={handleClose} rootRef={fileRef} />}
+		</div>
+	);
+}
+
+function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
+	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
 	const canvasRef = useRef<HTMLDivElement | null>(null);
 
 	const handleShowCanvas = () => {
@@ -170,93 +196,42 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 		setIsShowCanvas(false);
 	}, []);
 
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowCanvas) {
-			const fetchCanvas = async () => {
-				const channelId = currentChannel?.channel_id ?? '';
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channel_id: channelId,
-						clan_id: clanId
-					};
-					await dispatch(canvasAPIActions.getChannelCanvasList(body));
-				}
-			};
-			fetchCanvas();
-		}
-	}, [currentChannel?.channel_id]);
-
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
-			<Tooltip
-				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Canvas"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
 	);
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
-	const dispatch = useAppDispatch();
-	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+	const isShowThread = useSelector(selectIsThreadModalVisible);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
-	const handleShowThreads = () => {
-		setIsShowThread(!isShowThread);
+	const dispatch = useDispatch();
+	const handleToggleThreads = () => {
+		dispatch(threadsActions.toggleThreadModal());
 	};
-
-	const handleClose = useCallback(() => {
-		setIsShowThread(false);
-	}, []);
-
-	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = checkIsThread(currentChannel as ChannelsEntity);
-
-	useEffect(() => {
-		if (currentChannel?.channel_id || isShowThread) {
-			const fetchThreads = async () => {
-				const channelId = isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? '');
-				const clanId = currentChannel?.clan_id ?? '';
-
-				if (channelId && clanId) {
-					const body = {
-						channelId,
-						clanId
-					};
-					await dispatch(threadsActions.fetchThreads(body));
-				}
-			};
-			fetchThreads();
-		}
-	}, [currentChannel?.channel_id, isShowThread]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<Tooltip
-				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowThread && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Threads"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
-				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none" onClick={handleToggleThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
-			</Tooltip>
-			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
+			</Tippy>
+			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -305,12 +280,9 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={notiRef}>
-			<Tooltip
-				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center`}
+			<Tippy
+				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Notification Settings"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
 					{isMuteBell ? (
@@ -319,42 +291,34 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 						<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
 					)}
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
 }
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
-	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
+	const isShowPinMessage = useSelector(selectIsPinModalVisible);
 	const pinRef = useRef<HTMLDivElement | null>(null);
-	const handleShowPinMessage = () => {
-		setIsShowPinMessage(!isShowPinMessage);
-	};
-	const handleClose = useCallback(() => {
-		setIsShowPinMessage(false);
-	}, []);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
-	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
-	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
-	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
+
+	const handleTogglePinMessage = async () => {
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
+		dispatch(pinMessageActions.togglePinModal());
+	};
+
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
-			<Tooltip
-				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center`}
+			<Tippy
+				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 				content="Pinned Messages"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
 			>
-				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none relative" onClick={handleTogglePinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
-					{shouldShowPinIndicator && (
-						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
-					)}
 				</button>
-			</Tooltip>
-			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
+			</Tippy>
+			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleTogglePinMessage} />}
 		</div>
 	);
 }
@@ -364,6 +328,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
@@ -372,17 +337,18 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	useEffect(() => {
 		if (isShowInbox) {
 			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
+			dispatch(topicsActions.fetchTopics({ channelId: currentChannelId as string }));
 		}
 	}, [isShowInbox]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy content={isShowInbox ? '' : 'Inbox'} className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
 					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
-			</Tooltip>
+			</Tippy>
 			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
@@ -402,11 +368,11 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 	const { navigate } = useAppNavigation();
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip content="Help" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy content="Help" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button onClick={() => navigate('help')}>
 					<Icons.Help />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }
@@ -421,17 +387,11 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip
-				content="Members"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-				className={'flex justify-center items-center'}
-			>
+			<Tippy content="Members" className={`flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }
@@ -443,11 +403,11 @@ function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip className="w-max" content="Show Chat" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tippy className={`w-max ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Show Chat">
 				<button onClick={handleClick}>
 					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 				</button>
-			</Tooltip>
+			</Tippy>
 		</div>
 	);
 }

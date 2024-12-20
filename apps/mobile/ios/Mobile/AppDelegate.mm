@@ -8,6 +8,8 @@
 #import "RNCallKeep.h"
 #import <PushKit/PushKit.h>
 #import "RNVoipPushNotificationManager.h"
+#import <AVFoundation/AVFoundation.h>
+#import "RNFBMessagingModule.h"
 
 @implementation AppDelegate
 
@@ -46,7 +48,8 @@
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
 
-  self.initialProps = @{};
+    self.initialProps = [RNFBMessagingModule addCustomPropsToUserProps:nil withLaunchOptions:launchOptions];
+  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }

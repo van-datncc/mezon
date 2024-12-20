@@ -204,14 +204,15 @@ export const Sharing = ({ data, onClose }) => {
 		requestAnimationFrame(async () => {
 			if (isDiffClan) {
 				await store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
-				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id, noCache: true }));
+				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id }));
 			}
 			if (isDiffChannel) {
 				await store.dispatch(
 					channelsActions.joinChannel({
 						clanId: channelSelected.clan_id ?? '',
 						channelId: channelSelected.channel_id,
-						noFetchMembers: false
+						noFetchMembers: false,
+						noCache: true
 					})
 				);
 			}
@@ -355,18 +356,33 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const handleFiles = async (files: any) => {
-		const session = mezon.sessionRef.current;
-		const client = mezon.clientRef.current;
-		if (!files || !client || !session) {
-			throw new Error('Client or files are not initialized');
+		const maxRetries = 5;
+		const retryDelay = 4000; // 4 seconds
+
+		for (let attempt = 1; attempt <= maxRetries; attempt++) {
+			try {
+				const session = mezon.sessionRef.current;
+				const client = mezon.clientRef.current;
+				if (!files || !client || !session) {
+					throw new Error('Client or files are not initialized');
+				}
+
+				const promises = Array.from(files).map((file: any) => {
+					return handleUploadFileMobile(client, session, currentClan?.id, currentChannelId, file.name, file);
+				});
+
+				const response = await Promise.all(promises);
+				setAttachmentUpload(response);
+				break;
+			} catch (error) {
+				if (attempt === maxRetries) {
+					/* empty */
+				} else {
+					// alert(`Attempt ${attempt} failed. Retrying in ${retryDelay / 1000} seconds...`);
+					await new Promise((resolve) => setTimeout(resolve, retryDelay));
+				}
+			}
 		}
-
-		const promises = Array.from(files).map((file: any) => {
-			return handleUploadFileMobile(client, session, currentClan?.id, currentChannelId, file.name, file);
-		});
-
-		const response = await Promise.all(promises);
-		setAttachmentUpload(response);
 	};
 
 	function removeAttachmentByUrl(urlToRemove: string) {

@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { ETypeLinkMedia, IChannelAttachment, LoadingStatus } from '@mezon/utils';
+import { ETypeLinkMedia, IAttachmentEntity, IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
@@ -55,7 +55,8 @@ const fetchChannelAttachmentsCached = memoizeAndTrack(
 );
 
 export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachment, channelId?: string, clanId?: string) => {
-	return { ...attachmentRes, id: attachmentRes.id || '', channelId, clanId };
+	const attachmentEntity: IAttachmentEntity = { ...attachmentRes, id: attachmentRes.id || '', channelId, clanId };
+	return attachmentEntity;
 };
 
 export const fetchChannelAttachments = createAsyncThunk(
@@ -120,10 +121,25 @@ export const attachmentSlice = createSlice({
 		},
 		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
 			const currentChannelId = action?.payload?.channelId;
-			if (state.listAttachmentsByChannel[currentChannelId]) {
-				action?.payload?.listAttachments.map((attachment) => {
-					state.listAttachmentsByChannel?.[currentChannelId]?.unshift?.(attachment);
-				});
+
+			if (!state.listAttachmentsByChannel[currentChannelId]) {
+				state.listAttachmentsByChannel[currentChannelId] = [];
+			}
+
+			action?.payload?.listAttachments?.forEach((attachment) => {
+				state?.listAttachmentsByChannel[currentChannelId]?.unshift(attachment);
+			});
+		},
+		removeAttachments: (state, action: PayloadAction<{ messageId: string; channelId: string }>) => {
+			const { messageId, channelId } = action.payload;
+			if (state.listAttachmentsByChannel[channelId]) {
+				state.listAttachmentsByChannel[channelId] = state.listAttachmentsByChannel[channelId].filter(
+					(attachment) => attachment.message_id !== messageId
+				);
+
+				if (state.listAttachmentsByChannel[channelId].length === 0) {
+					delete state.listAttachmentsByChannel[channelId];
+				}
 			}
 		}
 	},
@@ -216,6 +232,25 @@ export const selectAllListAttachmentByChannel = (channelId: string) =>
 			return [];
 		}
 		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
+	});
+
+export const selectAllListDocumentByChannel = (channelId: string) =>
+	createSelector(getAttachmentState, (state) => {
+		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
+			return [];
+		}
+
+		return state.listAttachmentsByChannel[channelId].reduce<AttachmentEntity[]>((result, att) => {
+			const { filetype, filename } = att || {};
+			if (!filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) && !filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)) {
+				result.push({
+					...att,
+					filename: filename ?? 'File',
+					filetype: filetype ?? 'File'
+				});
+			}
+			return result;
+		}, []);
 	});
 
 export const checkListAttachmentExist = (channelId: string) =>

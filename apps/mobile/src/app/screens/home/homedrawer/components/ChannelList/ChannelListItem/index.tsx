@@ -19,7 +19,6 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -48,7 +47,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const bottomSheetChannelStreamingRef = useRef<BottomSheetModal>(null);
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 	const [isActive, setIsActive] = useState<boolean>(false);
-	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(props?.data?.clan_id || '', props?.data?.category_id || ''));
+	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
 	const isUnReadThreads = useMemo(() => {
 		if (!props?.data?.threads || !props?.data?.threads?.length) return false;
 		return props?.data?.threads?.some((thread) => {
@@ -112,7 +111,13 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					requestAnimationFrame(async () => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(
-							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+							channelsActions.joinChannel({
+								clanId: clanId ?? '',
+								channelId: channelId,
+								noFetchMembers: false,
+								isClearMessage: true,
+								noCache: true
+							})
 						);
 					});
 				}, 0);

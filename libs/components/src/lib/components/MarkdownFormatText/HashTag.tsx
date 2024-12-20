@@ -1,4 +1,4 @@
-import { useAppNavigation, useTagById } from '@mezon/core';
+import { useAppNavigation, useAuth, useTagById } from '@mezon/core';
 import {
 	ChannelsEntity,
 	appActions,
@@ -7,6 +7,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
+	selectGotifyToken,
 	selectStatusStream,
 	selectThreadById,
 	useAppDispatch,
@@ -18,6 +19,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useCallback } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../StreamContext/StreamContext';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {
@@ -35,6 +37,9 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const playStream = useSelector(selectStatusStream);
 	const clanById = useSelector(selectCurrentClan);
+	const { userProfile } = useAuth();
+	const gotifyToken = useSelector(selectGotifyToken);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
 
 	let channel = useTagById(tagId);
 	const thread = useAppSelector((state) => selectThreadById(state, tagId));
@@ -48,6 +53,15 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		} else {
 			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
+					disconnect();
+					handleChannelClick(
+						clanById?.id as string,
+						channel?.channel_id as string,
+						userProfile?.user?.id as string,
+						channel?.channel_id as string,
+						userProfile?.user?.username as string,
+						gotifyToken as string
+					);
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: clanById?.id || '',
@@ -116,13 +130,19 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			</div>
 		) : null
 	) : (
-		<span
-			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
-			onClick={openUnknown}
-		>
-			# Unknown
-		</span>
+		<PrivateChannel onClick={openUnknown} />
 	);
 };
 
 export default memo(ChannelHashtag);
+function PrivateChannel({ onClick }: { onClick: () => void }) {
+	return (
+		<span
+			onClick={onClick}
+			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap dark:!text-[#ffffff] dark:bg-[#3e3f3f] bg-[#F2F3F5] relative top-[3px] cursor-pointer`}
+		>
+			<Icons.LockedPrivate className={`mt-1 w-4 h-4`} />
+			<span>private-channel</span>
+		</span>
+	);
+}

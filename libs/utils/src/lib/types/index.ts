@@ -38,8 +38,10 @@ import {
 import { ApiNotifiReactMessage, ApiNotificationChannelCategorySetting, ApiPermissionRoleChannel } from 'mezon-js/dist/api.gen';
 import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
+import { CanvasDataResponse } from './htmlCanvas';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
+export * from './htmlCanvas';
 export * from './messageLine';
 export * from './mimeTypes';
 export * from './permissions';
@@ -240,8 +242,8 @@ export interface IFieldEmbed {
 	name: string;
 	value: string;
 	inline?: boolean;
-	options?: IMessageRatioOption[];
-	inputs?: SelectComponent | InputComponent;
+	inputs?: SelectComponent | InputComponent | DatePickerComponent | RadioComponent;
+	button?: ButtonComponent[];
 }
 
 export enum EButtonMessageStyle {
@@ -255,14 +257,21 @@ export enum EButtonMessageStyle {
 export enum EMessageComponentType {
 	BUTTON = 1,
 	SELECT = 2,
-	INPUT = 3
+	INPUT = 3,
+	DATEPICKER = 4,
+	RADIO = 5
 }
 
+export enum EIconEmbedButtonMessage {
+	PLAY = 'PLAY',
+	PAUSE = 'PAUSE'
+}
 export interface IButtonMessage {
 	label: string;
 	disable?: boolean;
 	style?: EButtonMessageStyle;
 	url?: string;
+	icon?: EIconEmbedButtonMessage;
 }
 
 export interface IMessageSelectOption {
@@ -272,7 +281,6 @@ export interface IMessageSelectOption {
 	default?: boolean;
 }
 export interface IMessageRatioOption {
-	id: string;
 	label: string;
 	description?: string;
 	name?: string;
@@ -281,12 +289,16 @@ export interface IMessageRatioOption {
 }
 
 export interface IMessageInput {
-	id: string;
 	placeholder?: string;
 	type?: HTMLInputTypeAttribute;
 	required?: boolean;
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
+	defaultValue?: string;
+}
+
+export interface IMessageDatePicker {
+	value: string | Date;
 }
 
 export enum IMessageTypeCallLog {
@@ -320,6 +332,7 @@ export interface IMessageSelect {
 	// Maximum number of items that can be chosen (defaults to 1)
 	max_options?: number;
 	disabled?: boolean;
+	valueSelected?: IMessageSelectOption;
 }
 
 export interface IMessageComponent<T> {
@@ -331,6 +344,8 @@ export interface IMessageComponent<T> {
 export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
 export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
 export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessageComponentType.INPUT };
+export type DatePickerComponent = IMessageComponent<IMessageDatePicker> & { type: EMessageComponentType.DATEPICKER };
+export type RadioComponent = IMessageComponent<IMessageRatioOption[]> & { type: EMessageComponentType.RADIO };
 
 export interface IMessageActionRow {
 	components: Array<ButtonComponent | SelectComponent | InputComponent>;
@@ -345,8 +360,11 @@ export interface IMessageSendPayload {
 	mk?: IMarkdownOnMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
+	canvas?: CanvasDataResponse;
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
+	tp?: string;
+	cid?: string;
 }
 
 export type IUser = {
@@ -644,6 +662,7 @@ export type MentionDataProps = {
 	user?: ApiUser;
 	username?: string | undefined;
 	isRoleUser?: boolean;
+	color?: string | undefined;
 };
 
 export type UserSearchDataProps = {
@@ -925,6 +944,10 @@ export type BuzzArgs = {
 	timestamp?: number;
 };
 
+export type AnswerByClanArgs = {
+	clanIdQuestionIdAndIndex?: string;
+};
+
 export enum EUserSettings {
 	ACCOUNT = 'Account',
 	PROFILES = 'Profiles',
@@ -1057,7 +1080,8 @@ export enum TypeMessage {
 	Welcome = 5,
 	CreateThread = 6,
 	CreatePin = 7,
-	MessageBuzz = 8
+	MessageBuzz = 8,
+	Topic = 9
 }
 
 export enum ServerSettingsMenuValue {
@@ -1203,7 +1227,15 @@ export enum ActionLog {
 	DELETE_CANVAS_ACTION_AUDIT = 'Delete Canvas',
 	CREATE_CATEGORY_ACTION_AUDIT = 'Create Category',
 	UPDATE_CATEGORY_ACTION_AUDIT = 'Update Category',
-	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category'
+	DELETE_CATEGORY_ACTION_AUDIT = 'Delete Category',
+	ADD_MEMBER_CHANNEL_ACTION_AUDIT = 'Add Member Channel',
+	REMOVE_MEMBER_CHANNEL_ACTION_AUDIT = 'Remove Member Channel',
+	ADD_ROLE_CHANNEL_ACTION_AUDIT = 'Add Role Channel',
+	REMOVE_ROLE_CHANNEL_ACTION_AUDIT = 'Remove Role Channel',
+	ADD_MEMBER_THREAD_ACTION_AUDIT = 'Add Member Thread',
+	REMOVE_MEMBER_THREAD_ACTION_AUDIT = 'Remove Member Thread',
+	ADD_ROLE_THREAD_ACTION_AUDIT = 'Add Role Thread',
+	REMOVE_ROLE_THREAD_ACTION_AUDIT = 'Remove Role Thread'
 }
 
 export enum UserAuditLog {
@@ -1283,7 +1315,8 @@ export type MentionReactInputProps = {
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
-	readonly handlePaste?: any;
+	readonly isTopic?: boolean;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
 	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
@@ -1313,4 +1346,27 @@ export enum CallLog {
 	OUTGOING_CALL = 'Outgoing call',
 	YOU_CANCELED = 'You canceled',
 	TIME_DEFAULT = '0 mins 0 secs'
+}
+
+export interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
+export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
+	uploaderData: {
+		avatar: string;
+		name: string;
+	};
+}
+
+export interface IImageWindowProps {
+	channelLabel: string;
+	selectedImageIndex: number;
+	images: Array<IAttachmentEntityWithUploader>;
+}
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
 }

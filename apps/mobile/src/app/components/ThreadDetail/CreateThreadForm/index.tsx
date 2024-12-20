@@ -234,7 +234,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 							}}
 							onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 						/>
-						<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+						<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 						<Block height={Platform.OS === 'ios' ? size.s_40 : 0} />
 					</KeyboardAvoidingView>
 				)}

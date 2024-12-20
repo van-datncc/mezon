@@ -1,5 +1,5 @@
 import { LoadingStatus } from '@mezon/utils';
-import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
 
@@ -9,7 +9,6 @@ export interface ChannelMetaEntity {
 	id: string; // Primary ID
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
-	lastSeenPinMessage: string;
 	clanId: string;
 	isMute: boolean;
 }
@@ -46,12 +45,6 @@ export const channelMetaSlice = createSlice({
 			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
-			}
-		},
-		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
-			const channel = state?.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
 			}
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
@@ -104,20 +97,16 @@ import { remove } from '@mezon/mobile-components';
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = channelMetaAdapter.getSelectors();
+const { selectEntities } = channelMetaAdapter.getSelectors();
 
 export const getChannelMetaState = (rootState: { [CHANNELMETA_FEATURE_KEY]: ChannelMetaState }): ChannelMetaState =>
 	rootState[CHANNELMETA_FEATURE_KEY];
 
-export const selectAllChannelMeta = createSelector(getChannelMetaState, selectAll);
-
 export const selectChannelMetaEntities = createSelector(getChannelMetaState, selectEntities);
 
-export const selectLastSeenPinMessageChannelById = (channelId: string) =>
-	createSelector(getChannelMetaState, (state) => {
-		const channel = state?.entities[channelId];
-		return channel?.lastSeenPinMessage || '';
-	});
+export const selectChannelMetaById = createSelector([selectChannelMetaEntities, (state, channelId) => channelId], (entities, channelId) => {
+	return entities[channelId];
+});
 
 export const selectIsUnreadChannelById = createSelector(
 	[getChannelMetaState, selectChannelMetaEntities, (state, channelId) => channelId],
@@ -128,12 +117,6 @@ export const selectIsUnreadChannelById = createSelector(
 		return inactiveMuteSetting && channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 	}
 );
-
-export const selectLastChannelTimestamp = (channelId: string) =>
-	createSelector(getChannelMetaState, (state) => {
-		const channel = state?.entities?.[channelId];
-		return channel?.lastSeenTimestamp || 0;
-	});
 
 export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selectChannelMetaEntities], (state, settings) => {
 	if (state.lastSentChannelId && settings?.[state.lastSentChannelId]?.isMute !== true) {
@@ -152,8 +135,3 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 	}
 	return false;
 });
-
-export const selectAllChannelLastSeenTimestampByClanId = (clanId: string) =>
-	createSelector(selectAllChannelMeta, (channelMetas) =>
-		channelMetas.filter((channelMeta) => channelMeta.lastSeenTimestamp && channelMeta.clanId === clanId)
-	);

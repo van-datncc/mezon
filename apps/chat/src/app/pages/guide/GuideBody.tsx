@@ -1,9 +1,12 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import { GuideItemLayout } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
 import {
 	ETypeMission,
 	fetchOnboarding,
 	onboardingActions,
+	selectAnswerByClanId,
+	selectAnswerByQuestionId,
 	selectChannelById,
 	selectCurrentClanId,
 	selectFormOnboarding,
@@ -18,7 +21,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { DONE_ONBOARDING_STATUS, titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 function GuideBody() {
@@ -30,6 +33,7 @@ function GuideBody() {
 	const missionSum = useSelector(selectMissionSum);
 	const missionDone = useSelector(selectMissionDone);
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClanId as string));
+	const answerByClanId = useAppSelector((state) => selectAnswerByClanId(state, currentClanId as string));
 
 	const handleDoMission = useCallback(
 		(mission: ApiOnboardingItem, index: number) => {
@@ -68,6 +72,16 @@ function GuideBody() {
 
 	const onboardingItem = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 
+	const totalAnswersLength = useMemo(() => {
+		return onboardingItem.question.reduce((sum, question) => {
+			return sum + (question.answers?.length || 0);
+		}, 0);
+	}, [onboardingItem.question]);
+
+	const totalNumberAnswer = answerByClanId?.length || 0;
+
+	const answerPercent = totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
+
 	useEffect(() => {
 		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
 	}, []);
@@ -75,12 +89,34 @@ function GuideBody() {
 	return (
 		<div className="w-full h-full pt-4 ">
 			<div className="flex gap-6">
-				<div className="flex-1 flex flex-col gap-2">
-					<div className="flex flex-col gap-2">
+				<div className="flex-1 flex flex-col gap-2 ">
+					<div className="flex flex-col gap-2 ">
 						<p className="text-xl font-bold">Questions</p>
-						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg">
-							{onboardingItem?.question.length > 0 &&
-								onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
+						<div className="bg-bgSecondaryHover flex flex-col gap-2 rounded-lg relative">
+							{onboardingItem?.question.length > 0 ? (
+								<>
+									{onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
+									<div className="absolute top-0 -left-4 w-1 h-full">
+										<div className="flex bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
+											<div
+												className="absolute w-1 h-full transition-transform duration-1000 bg-[#16A34A] rounded-2xl"
+												style={{
+													height: `${answerPercent}%`,
+													transition: 'height 1s ease-out'
+												}}
+											></div>
+										</div>
+									</div>
+								</>
+							) : (
+								<>
+									{(!onboadingMode || (onboadingMode && formOnboarding?.questions?.length === 0)) && (
+										<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-channelTextLabel font-semibold justify-between bg-[#282a2e] rounded-lg">
+											You don't have any questions. Setting questions for this clan first !!
+										</div>
+									)}
+								</>
+							)}
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
@@ -195,18 +231,50 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 };
 
 const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
+	const dispatch = useAppDispatch();
+	const selectAnswer = useSelector((state) => selectAnswerByQuestionId(state, question.id as string));
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const handleOnClickQuestion = (index: number) => {
+		dispatch(
+			onboardingActions.doAnswer({
+				answer: index,
+				idQuestion: question.id as string
+			})
+		);
+
+		dispatch(
+			onboardingActions.setAnswerByClanId({
+				clanId: currentClanId as string,
+				answerState: {
+					clanIdQuestionIdAndIndex: `${currentClanId}-${question.id}-${index}`
+				}
+			})
+		);
+	};
+	const hightLight = useCallback(
+		(index: number) => {
+			if (selectAnswer.includes(index)) {
+				return 'bg-bgSurface hover:border-bgSurface hover:bg-[#212121] text-primary hover:border-white border-channelActiveColor';
+			}
+			return;
+		},
+		[selectAnswer.length]
+	);
 	return (
 		<div className="w-full p-4 flex flex-col gap-2">
-			<p className="text-channelActiveColor font-semibold">{question.title} ?</p>
-			<div className="flex flex-wrap gap-2">
+			<p className="text-channelActiveColor font-semibold">{question.title}</p>
+			<div className="flex flex-wrap gap-2 flex-1">
 				{question.answers &&
-					question.answers.map((answer) => (
+					question.answers.map((answer, index) => (
 						<GuideItemLayout
 							key={answer.title}
 							icon={answer.emoji}
 							description={answer.description}
 							title={answer.title}
-							className="w-1/3 rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2"
+							height={'h-auto'}
+							onClick={() => handleOnClickQuestion(index)}
+							className={` w-fit h-fit rounded-xl hover:bg-transparent text-white justify-center items-center px-4 py-2 border-2 border-[#4e5058] hover:border-[#7d808c]  font-medium flex gap-2 ${hightLight(index)}`}
 						/>
 					))}
 			</div>

@@ -6,7 +6,8 @@ import {
 	messagesActions,
 	MessagesEntity,
 	selectAllMessageSearch,
-	selectMessageSearchByChannelId
+	selectMessageSearchByChannelId,
+	useAppSelector
 } from '@mezon/store';
 import { getStoreAsync, ISearchMessage, searchMessagesActions, selectCurrentPage, useAppDispatch } from '@mezon/store-mobile';
 import { SIZE_PAGE_SEARCH } from '@mezon/utils';
@@ -37,7 +38,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	const isDmOrGroup = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id));
+	const messageSearchByChannelId = useAppSelector((state) => selectMessageSearchByChannelId(state, currentChannel?.channel_id));
 	const searchMessages = useSelector(selectAllMessageSearch);
 	const ViewLoadMore = () => {
 		return (
@@ -129,7 +130,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	const handleJoinChannel = async (clanId: string, channelId: string) => {
 		const store = await getStoreAsync();
 		requestAnimationFrame(async () => {
-			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
 		});
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);

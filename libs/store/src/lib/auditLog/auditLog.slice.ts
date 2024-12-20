@@ -12,7 +12,7 @@ export interface AuditLogEntity extends ApiAuditLog {
 	id: string;
 }
 
-export interface IAuditLogState extends EntityState<AuditLogEntity, string> {
+export interface IAuditLogState extends EntityState<ApiAuditLog, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	auditLogData: MezonapiListAuditLog;
@@ -22,18 +22,23 @@ type getAuditLogListPayload = {
 	actionLog: string;
 	userId: string;
 	clanId: string;
-	page: number;
-	pageSize: number;
+	date_log: string;
 	noCache?: boolean;
 };
 
 export const auditLogAdapter = createEntityAdapter({
-	selectId: (auditLog: AuditLogEntity) => auditLog.id || ''
+	selectId: (auditLog: ApiAuditLog) => auditLog.id || '',
+	sortComparer: (a: ApiAuditLog, b: ApiAuditLog) => {
+		if (a.time_log && b.time_log) {
+			return Date.parse(b.time_log) - Date.parse(a.time_log);
+		}
+		return 0;
+	}
 });
 
 export const fetchAuditLogCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, actionLog: string, userId: string, clanId?: string, page?: number, page_size?: number) => {
-		const response = await mezon.client.listAuditLog(mezon.session, actionLog, userId, clanId, page, page_size);
+	async (mezon: MezonValueContext, actionLog: string, userId: string, clanId?: string, date_log?: string) => {
+		const response = await mezon.client.listAuditLog(mezon.session, actionLog, userId, clanId, date_log);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -41,21 +46,21 @@ export const fetchAuditLogCached = memoizeAndTrack(
 		maxAge: FETCH_AUDIT_LOG_CACHED_TIME,
 		normalizer: (args) => {
 			// set default value
-			return args[1] + args[2] + args[3] + args[4] + args[5] + args[0].session.username;
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
 		}
 	}
 );
 
 export const auditLogList = createAsyncThunk(
 	'auditLog/auditLogList',
-	async ({ actionLog, userId, clanId, page, pageSize, noCache }: getAuditLogListPayload, thunkAPI) => {
+	async ({ actionLog, userId, clanId, date_log, noCache }: getAuditLogListPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchAuditLogCached.clear(mezon, actionLog, userId, clanId, page, pageSize);
+				fetchAuditLogCached.clear(mezon, actionLog, userId, clanId, date_log);
 			}
-			const response = await fetchAuditLogCached(mezon, actionLog, userId, clanId, page, pageSize);
+			const response = await fetchAuditLogCached(mezon, actionLog, userId, clanId, date_log);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'attachment/fetchChannelAttachments');
@@ -81,7 +86,10 @@ export const auditLogSlice = createSlice({
 			})
 			.addCase(auditLogList.fulfilled, (state: IAuditLogState, action: PayloadAction<MezonapiListAuditLog>) => {
 				state.loadingStatus = 'loaded';
-				state.auditLogData = action.payload;
+				state.auditLogData = {
+					...action.payload,
+					total_count: action.payload?.total_count
+				};
 			})
 			.addCase(auditLogList.rejected, (state: IAuditLogState, action) => {
 				state.loadingStatus = 'error';
@@ -101,5 +109,8 @@ const { selectAll, selectById, selectEntities } = auditLogAdapter.getSelectors()
 export const getAuditLogState = (rootState: { [AUDIT_LOG_FEATURE_KEY]: IAuditLogState }): IAuditLogState => rootState[AUDIT_LOG_FEATURE_KEY];
 export const selectAllAuditLog = createSelector(getAuditLogState, selectAll);
 export const selectAllAuditLogData = createSelector(getAuditLogState, (state) => {
-	return state.auditLogData || [];
+	return state.auditLogData.logs || [];
+});
+export const selectTotalCountAuditLog = createSelector(getAuditLogState, (state) => {
+	return state.auditLogData.total_count || 0;
 });

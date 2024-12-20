@@ -138,17 +138,11 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 								<TouchableOpacity style={styles.deleteFriendButton} onPress={handleRemoveFriend}>
 									<Text style={styles.buttonText}>{t('userAction.removeFriend')}</Text>
 								</TouchableOpacity>
-							) : (
-								<TouchableOpacity style={styles.addFriendButton} onPress={handleAddFriend}>
-									<Text style={styles.buttonText}>{t('userAction.addFriend')}</Text>
-								</TouchableOpacity>
-							)}
-							{checkAddFriend === EStateFriend.OTHER_PENDING && (
+							) : checkAddFriend === EStateFriend.OTHER_PENDING ? (
 								<View style={[styles.addFriendButton, { opacity: 0.6 }]}>
 									<Text style={styles.buttonText}>{t('sendAddFriendSuccess')}</Text>
 								</View>
-							)}
-							{checkAddFriend === EStateFriend.MY_PENDING && (
+							) : checkAddFriend === EStateFriend.MY_PENDING ? (
 								<View style={styles.friendActions}>
 									<TouchableOpacity style={styles.addFriendButton} onPress={handleAcceptFriend}>
 										<Text style={styles.buttonText}>{t('accept')}</Text>
@@ -157,6 +151,10 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 										<Text style={styles.buttonText}>{t('ignore')}</Text>
 									</TouchableOpacity>
 								</View>
+							) : (
+								<TouchableOpacity style={styles.addFriendButton} onPress={handleAddFriend}>
+									<Text style={styles.buttonText}>{t('userAction.addFriend')}</Text>
+								</TouchableOpacity>
 							)}
 							<Pressable style={styles.blockButton}>
 								<Text style={styles.buttonText}>{t('pendingContent.block')}</Text>

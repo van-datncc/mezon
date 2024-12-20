@@ -56,7 +56,8 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, 
 	if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
 		await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
 	} else {
-		const dataChannelSort = dataChannel?.sort((a: any, b: any) => {
+		const data = dataChannel?.channels || dataChannel || [];
+		const dataChannelSort = data?.sort?.((a: any, b: any) => {
 			if (a.category_name && b.category_name) {
 				return a.category_name.localeCompare(b.category_name);
 			}

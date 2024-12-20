@@ -45,7 +45,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			isPublicChannel(currentChannel)
+			isPublicChannel(currentChannel),
+			message.content?.tp || ''
 		);
 	};
 

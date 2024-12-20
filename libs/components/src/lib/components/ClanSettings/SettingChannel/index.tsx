@@ -9,9 +9,10 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { getAvatarForPrioritize } from '@mezon/utils';
+import { createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { formatDistance } from 'date-fns';
-import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
+import { Avatar, AvatarSizes, Dropdown, Pagination } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useMemo, useRef, useState } from 'react';
@@ -204,7 +205,7 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize,
 								userIds={thread?.user_ids || []}
 								channelId={thread?.id as string}
 								messageCount={thread?.message_count || 0}
-								lastMessage={channelParrent.last_sent_message}
+								lastMessage={thread.last_sent_message}
 							/>
 						))
 					) : (
@@ -285,6 +286,16 @@ const ItemInfor = ({
 		);
 	}, [channelId]);
 
+	const imgCreator = useMemo(() => {
+		if (creatorChannel?.clan_avatar) {
+			return createImgproxyUrl(creatorChannel?.clan_avatar, { width: 32, height: 32, resizeType: 'fit' });
+		}
+		if (creatorChannel?.user?.avatar_url) {
+			return createImgproxyUrl(creatorChannel?.user?.avatar_url, { width: 32, height: 32, resizeType: 'fit' });
+		}
+		return 'assets/avatar-user.svg';
+	}, [creatorChannel?.clan_avatar, creatorChannel?.user?.avatar_url]);
+
 	return (
 		<div
 			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] dark:before:bg-borderDivider before:bg-bgLightSecondary before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
@@ -311,14 +322,14 @@ const ItemInfor = ({
 					<span className="truncate pr-8">{label}</span>
 				</div>
 				<div className="flex-1 flex " onClick={handleShowAllMemberList}>
-					{privateChannel ? (
+					{privateChannel || isThread ? (
 						<Avatar.Group className={`flex flex-1 items-center gap-3 ${isThread ? '-ml-8' : ''}`}>
-							{userIds.slice(0, 2).map((member) => (
+							{userIds.slice(0, 3).map((member) => (
 								<AvatarUserShort id={member} key={member} hiddenTooltip={true} />
 							))}
 							{userIds.length > 3 && (
 								<Avatar.Counter
-									total={userIds.length - 1}
+									total={userIds.length - 3}
 									className="h-4 w-6 dark:text-textPrimary text-textPrimaryLight ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
 								/>
 							)}
@@ -339,15 +350,15 @@ const ItemInfor = ({
 
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					{(creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url) && (
-						<Tooltip
-							content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username}
+						<Tippy
+							content={
+								<span>{creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username} </span>
+							}
 							placement="left"
+							arrow={false}
 						>
-							<img
-								src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url || 'assets/avatar-user.svg'}
-								className="w-8 h-8 object-cover rounded-full "
-							/>
-						</Tooltip>
+							<img src={imgCreator} className="w-8 h-8 object-cover rounded-full " />
+						</Tippy>
 					)}
 				</div>
 			</div>
@@ -374,7 +385,10 @@ export const AvatarUserShort = ({
 
 	return (
 		<div className="flex items-center gap-3">
-			<img src={avatarUrl} className="rounded-full h-6 aspect-square object-cover" />
+			<img
+				src={createImgproxyUrl(avatarUrl, { width: 24, height: 24, resizeType: 'fit' })}
+				className="rounded-full h-6 aspect-square object-cover"
+			/>
 			{showName ? (
 				<div className="text-textLightTheme dark:text-channelTextareaLight">
 					{member?.clan_nick || member?.user?.display_name || member?.user?.username}

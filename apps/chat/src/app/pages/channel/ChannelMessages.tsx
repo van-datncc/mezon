@@ -1,12 +1,15 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider } from '@mezon/components';
+import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
+import { useIdleRender } from '@mezon/core';
 import {
 	messagesActions,
 	pinMessageActions,
 	selectAllAccount,
 	selectAllChannelMemberIds,
 	selectAllRoleIds,
+	selectCurrentChannelId,
 	selectDataReferences,
+	selectFirstMessageOfCurrentTopic,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -15,6 +18,7 @@ import {
 	selectIsViewingOlderMessagesByChannelId,
 	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
+	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
@@ -47,6 +51,8 @@ type ChannelMessagesProps = {
 	userName?: string;
 	userIdsFromThreadBox?: string[];
 	isThreadBox?: boolean;
+	isTopicBox?: boolean;
+	topicId?: string;
 };
 
 function ChannelMessages({
@@ -57,7 +63,9 @@ function ChannelMessages({
 	userName,
 	mode,
 	userIdsFromThreadBox,
-	isThreadBox = false
+	isThreadBox = false,
+	isTopicBox,
+	topicId
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
@@ -77,12 +85,16 @@ function ChannelMessages({
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const chatRef = useRef<HTMLDivElement | null>(null);
 
 	const isFetchingRef = useRef<boolean>(false);
 	const hasMoreTopRef = useRef<boolean>(false);
 	const hasMoreBottomRef = useRef<boolean>(false);
+
+	useEffect(() => {
+		userActiveScroll.current = false;
+	}, [channelId]);
 
 	useEffect(() => {
 		isFetchingRef.current = isFetching;
@@ -116,8 +128,33 @@ function ChannelMessages({
 			}
 
 			if (direction === ELoadMoreDirection.bottom) {
+				//load more in topic
+				if (isTopicBox) {
+					await dispatch(
+						messagesActions.loadMoreMessage({
+							clanId,
+							channelId: currentChannelId as string,
+							direction: Direction_Mode.AFTER_TIMESTAMP,
+							topicId
+						})
+					);
+					return true;
+				}
 				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
 				dispatch(messagesActions.setViewingOlder({ channelId, status: true }));
+				return true;
+			}
+
+			//load more in topic
+			if (isTopicBox) {
+				await dispatch(
+					messagesActions.loadMoreMessage({
+						clanId,
+						channelId: currentChannelId as string,
+						direction: Direction_Mode.BEFORE_TIMESTAMP,
+						topicId
+					})
+				);
 				return true;
 			}
 
@@ -125,7 +162,7 @@ function ChannelMessages({
 
 			return true;
 		},
-		[dispatch, clanId, channelId]
+		[isTopicBox, dispatch, clanId, channelId, currentChannelId, topicId]
 	);
 
 	const getChatScrollBottomOffset = useCallback(() => {
@@ -136,7 +173,6 @@ function ChannelMessages({
 		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
 	}, []);
 
-	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 
@@ -147,7 +183,6 @@ function ChannelMessages({
 	const handleOnChange = useCallback(
 		async (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => {
 			if (!userActiveScroll.current) return;
-			toggleDisableHover(chatRef.current, scrollTimeoutId2);
 			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
 			switch (instance.scrollDirection) {
 				case 'backward':
@@ -224,6 +259,9 @@ function ChannelMessages({
 		}
 	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
+	const shouldRender = useIdleRender();
+	if (!shouldRender) return null;
+
 	return (
 		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<ChatMessageList
@@ -245,6 +283,7 @@ function ChannelMessages({
 				firsRowCached={firsRowCached}
 				lastRowCached={lastRowCached}
 				currentScrollDirection={currentScrollDirection}
+				isTopic={isTopicBox}
 			/>
 		</MessageContextMenuProvider>
 	);
@@ -284,6 +323,7 @@ type ChatMessageListProps = {
 	firsRowCached: React.MutableRefObject<string>;
 	lastRowCached: React.MutableRefObject<string>;
 	currentScrollDirection: React.MutableRefObject<ELoadMoreDirection | null>;
+	isTopic?: boolean;
 };
 
 const ChatMessageList: React.FC<ChatMessageListProps> = memo(
@@ -305,7 +345,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		isLoadMore,
 		firsRowCached,
 		lastRowCached,
-		currentScrollDirection
+		currentScrollDirection,
+		isTopic
 	}) => {
 		const dispatch = useAppDispatch();
 		const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -314,6 +355,10 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
+
+		const currentChannelId = useSelector(selectCurrentChannelId);
+		const firstMsgId = useSelector(selectFirstMessageOfCurrentTopic)?.message_id;
+		const firstMsgOfThisTopic = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, firstMsgId as string));
 
 		const rowVirtualizer = useVirtualizer({
 			count: messages.length,
@@ -421,10 +466,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			};
 		}, []);
 
+		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
+
 		return (
 			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
 				<div
 					onWheelCapture={() => {
+						toggleDisableHover(chatRef.current, scrollTimeoutId2);
 						userActiveScroll.current = true;
 					}}
 					onTouchStart={() => {
@@ -445,6 +493,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					])}
 				>
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
+					{isTopic && (
+						<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
+							<div className={`fullBoxText relative group ${firstMsgOfThisTopic.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
+								<MessageWithUser isTopic={isTopic} allowDisplayShortProfile={true} message={firstMsgOfThisTopic} mode={mode} />
+							</div>
+						</div>
+					)}
 					<div
 						style={{
 							height: `${rowVirtualizer.getTotalSize()}px`,
@@ -483,6 +538,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 											isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
 											checkMessageTargetToMoved={checkMessageTargetToMoved}
 											messageReplyHighlight={messageReplyHighlight}
+											isTopic={isTopic}
 										/>
 									</div>
 								);
@@ -511,3 +567,5 @@ const MemoizedChannelMessages = memo(ChannelMessages, (prev, cur) => prev.channe
 };
 
 export default MemoizedChannelMessages;
+
+(MemoizedChannelMessages as any).displayName = 'MemoizedChannelMessages';

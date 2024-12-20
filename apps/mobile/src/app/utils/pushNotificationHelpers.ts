@@ -24,7 +24,8 @@ import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
 export const checkNotificationPermission = async () => {
-	await notifee.requestPermission();
+	if (Platform.OS === 'ios') await notifee.requestPermission();
+
 	if (Platform.OS === 'android' && Platform.Version >= 33) {
 		const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
@@ -197,7 +198,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			const isExistChannel = respChannel?.payload?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
+			const isExistChannel = respChannel?.payload?.channels?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (isExistChannel) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -214,7 +215,8 @@ export const navigateToNotification = async (store: any, notification: any, navi
 									clanId: clanId ?? '',
 									channelId: channelId,
 									noFetchMembers: false,
-									isClearMessage: true
+									isClearMessage: true,
+									noCache: true
 								})
 							)
 						: Promise.resolve()
@@ -375,8 +377,9 @@ export const setupCallKeep = async () => {
 	}
 };
 
-const showRNNotificationCall = async (bodyData: any) => {
+const showRNNotificationCall = async (bodyData: any, callID: string) => {
 	try {
+		await notifee.cancelAllNotifications();
 		const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
 		if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return;
 		const answerOption = {
@@ -398,20 +401,20 @@ const showRNNotificationCall = async (bodyData: any) => {
 				callerName: bodyData?.callerName
 			}
 		};
-		RNNotificationCall.displayNotification(uuid.v4(), bodyData?.callerAvatar, 30000, answerOption);
+		RNNotificationCall.displayNotification(callID, bodyData?.callerAvatar, 30000, answerOption);
 		RNNotificationCall.addEventListener('endCall', (data: any) => {
-			const { callUUID = '' } = data || {};
-			RNCallKeep.endCall(callUUID);
-			RNNotificationCall.declineCall(callUUID);
+			const { payload = {} } = data || {};
+			setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}'), isDecline: true });
+			}, 3000);
 		});
 		RNNotificationCall.addEventListener('answer', (data: any) => {
-			RNNotificationCall.backToApp();
 			RNNotificationCall.hideNotification();
-			const { callUUID = '', payload = {} } = data || {};
-			RNCallKeep.endCall(callUUID);
+			RNNotificationCall.backToApp();
+			const { payload = {} } = data || {};
 			setTimeout(() => {
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
-			}, 5000);
+			}, 3000);
 		});
 	} catch (error) {
 		/* empty */
@@ -421,14 +424,16 @@ const showRNNotificationCall = async (bodyData: any) => {
 const listRNCallKeep = async (bodyData: any) => {
 	try {
 		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-			RNCallKeep.backToForeground();
-			RNCallKeep.endCall(callUUID);
+			for (let i = 0; i < 10; i++) {
+				RNCallKeep.backToForeground();
+			}
 			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
-			}, 5000);
-			RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
 				RNCallKeep.endCall(callUUID);
-			});
+				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
+			}, 3000);
+		});
+		RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+			RNCallKeep.endCall(callUUID);
 		});
 	} catch (error) {
 		/* empty */
@@ -437,16 +442,37 @@ const listRNCallKeep = async (bodyData: any) => {
 export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = safeJSONParse(body || '{}');
-		const statusSetup = await setupCallKeep();
-		if (!statusSetup) return;
-
+		if (bodyData?.offer === 'CANCEL_CALL') {
+			const callID = load('callID');
+			if (callID) {
+				if (Platform.OS === 'android') {
+					RNNotificationCall.hideNotification();
+					RNNotificationCall.declineCall(callID);
+				} else {
+					RNCallKeep.endCall(callID);
+				}
+			}
+			return;
+		}
+		// const statusSetup = await setupCallKeep();
+		// if (!statusSetup) return;
+		const options = {
+			playSound: true,
+			vibration: true,
+			sound: 'ringing',
+			vibrationPattern: [0, 500, 1000],
+			timeout: 30000
+		};
+		const callID = uuid.v4()?.toString();
+		save('callID', callID);
 		if (Platform.OS === 'android') {
-			await showRNNotificationCall(bodyData);
+			await showRNNotificationCall(bodyData, callID);
 		} else {
+			RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', false, options);
 			await listRNCallKeep(bodyData);
 		}
-		RNCallKeep.displayIncomingCall(uuid.v4(), uuid.v4(), `${bodyData?.callerName} is calling you`, 'number', false, null);
 	} catch (error) {
+		console.error('log  => setupIncomingCall', error);
 		/* empty */
 	}
 };

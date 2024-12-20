@@ -73,10 +73,6 @@ const CategoryOrderSetting = () => {
 		setHasChanged(false);
 	};
 
-	const handleDeleteCategoriesOrder = () => {
-		dispatch(categoriesActions.deleteCategoriesOrder(currentClanId || ''));
-	};
-
 	return (
 		<div className="overflow-y-auto">
 			{categoryListState.map((category, index) => (

@@ -7,9 +7,10 @@ import { useSelector } from 'react-redux';
 export type UseDeleteMessageOptions = {
 	channelId: string;
 	mode: number;
+	hasAttachment?: boolean;
 };
 
-export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
+export function useDeleteMessage({ channelId, mode, hasAttachment }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isClanView = useSelector(selectClanView);
@@ -33,9 +34,9 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				isClanView: isClanView as boolean
 			});
 
-			await socket.removeChatMessage(payload.clan_id, channelId, mode, payload.is_public, messageId);
+			await socket.removeChatMessage(payload.clan_id, channelId, mode, payload.is_public, messageId, hasAttachment);
 		},
-		[socketRef, channel, channelId, dispatch, currentClanId, mode, isClanView]
+		[socketRef, channel, channelId, dispatch, currentClanId, mode, isClanView, hasAttachment]
 	);
 
 	return useMemo(

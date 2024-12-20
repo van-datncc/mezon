@@ -4,6 +4,7 @@ import React, { useCallback, useContext, useMemo, useRef, useState } from 'react
 import { ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import Canvas from '../../Canvas';
+import ChannelFiles from '../../ChannelFiles';
 import MediaChannel from '../../MediaChannel/MediaChannel';
 import { MemberListStatus } from '../../MemberStatus';
 import PinMessage from '../../PinMessage';
@@ -17,6 +18,9 @@ const TabList = [
 	},
 	{
 		title: 'Media'
+	},
+	{
+		title: 'Files'
 	},
 	{
 		title: 'Pins'
@@ -48,7 +52,7 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 	const handelHeaderTabChange = useCallback(
 		(index: number) => {
 			setTabActive(index);
-			if (index === 1) dispatch(attachmentActions.fetchChannelAttachments({ clanId: currentClanId, channelId: channelId }));
+			if (index === 1 || index === 2) dispatch(attachmentActions.fetchChannelAttachments({ clanId: currentClanId, channelId: channelId }));
 		},
 		[channelId, currentClanId, dispatch]
 	);
@@ -62,7 +66,7 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 						<MemberListStatus />
 					) : tabActive === 1 ? (
 						<MediaChannel />
-					) : tabActive === 3 && currentChannel.parrent_id === '0' ? (
+					) : tabActive === 4 && currentChannel.parrent_id === '0' ? (
 						<Canvas
 							channelId={
 								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
@@ -70,6 +74,14 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 									: channelId
 							}
 							clanId={currentClanId}
+						/>
+					) : tabActive === 2 ? (
+						<ChannelFiles
+							currentChannelId={
+								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+									? currentChannel?.channel_id
+									: channelId
+							}
 						/>
 					) : (
 						<PinMessage

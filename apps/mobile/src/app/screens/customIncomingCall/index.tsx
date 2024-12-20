@@ -25,7 +25,7 @@ export default function CustomIncomingCall(props: CustomIncomingActivityProps) {
 				<TouchableOpacity
 					style={[styles.button, styles.declineButton]}
 					onPress={() => {
-						RNNotificationCall.declineCall(props.uuid, props.payload);
+						RNNotificationCall?.declineCall?.(props.uuid, props.payload);
 					}}
 				>
 					<Text style={styles.buttonText}>Decline</Text>
@@ -34,7 +34,7 @@ export default function CustomIncomingCall(props: CustomIncomingActivityProps) {
 				<TouchableOpacity
 					style={[styles.button, styles.answerButton]}
 					onPress={() => {
-						RNNotificationCall.answerCall(props.uuid, props.payload);
+						RNNotificationCall?.answerCall?.(props.uuid, props.payload);
 					}}
 				>
 					<Text style={styles.buttonText}>Answer</Text>

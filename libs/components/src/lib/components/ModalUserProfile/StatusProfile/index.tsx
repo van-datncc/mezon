@@ -6,6 +6,7 @@ import { Dropdown } from 'flowbite-react';
 import { safeJSONParse } from 'mezon-js';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
@@ -31,6 +32,8 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		return parse;
 	}, [userProfile?.wallet]);
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
+	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
+
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
@@ -40,6 +43,12 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	};
 	const handleCloseWithdrawModal = () => {
 		setIsShowModalWithdraw(false);
+	};
+	const handleOpenHistoryModal = () => {
+		setIsShowModalHistory(true);
+	};
+	const handleCloseHistoryModal = () => {
+		setIsShowModalHistory(false);
 	};
 	const statusIcon = (status: string): ReactNode => {
 		switch (status) {
@@ -79,6 +88,11 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 						onClick={handleOpenWithdrawModal}
 						children="Withdraw Token"
 						startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
+					/>
+					<ItemStatus
+						onClick={handleOpenHistoryModal}
+						children="History Transaction"
+						startIcon={<Icons.History className="bg-green-500" />}
 					/>
 				</Dropdown>
 				<Dropdown
@@ -124,6 +138,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				<ItemStatus children="Manage Accounts" />
 			</Dropdown>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
+			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 		</>
 	);
 };

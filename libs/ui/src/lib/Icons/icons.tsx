@@ -1117,6 +1117,40 @@ export const CanvasIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
+export const TopicIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			width="24"
+			height="24"
+			fill="none"
+			x="0px"
+			y="0px"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M5.5 12C5.49988 14.613 6.95512 17.0085 9.2741 18.2127C11.5931 19.4169 14.3897 19.2292 16.527 17.726L19.5 18V12C19.5 8.13401 16.366 5 12.5 5C8.63401 5 5.5 8.13401 5.5 12Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				></path>{' '}
+				<path
+					d="M9.5 13.25C9.08579 13.25 8.75 13.5858 8.75 14C8.75 14.4142 9.08579 14.75 9.5 14.75V13.25ZM13.5 14.75C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25V14.75ZM9.5 10.25C9.08579 10.25 8.75 10.5858 8.75 11C8.75 11.4142 9.08579 11.75 9.5 11.75V10.25ZM15.5 11.75C15.9142 11.75 16.25 11.4142 16.25 11C16.25 10.5858 15.9142 10.25 15.5 10.25V11.75ZM9.5 14.75H13.5V13.25H9.5V14.75ZM9.5 11.75H15.5V10.25H9.5V11.75Z"
+					fill="currentColor"
+				></path>{' '}
+			</g>
+		</svg>
+	);
+};
+
 export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '', isWhite = false }) => {
 	return (
 		<svg
@@ -1244,6 +1278,23 @@ export function JoinedPTT(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				{' '}
 				<circle cx="8" cy="8" r="8" fill="currentColor"></circle>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function LeavePtt(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g fill="currentColor">
+					{' '}
+					<path d="M1 8a6 6 0 018.514-5.45.75.75 0 01-.629 1.363 4.5 4.5 0 100 8.175.75.75 0 11.63 1.361A6 6 0 011 8z"></path>{' '}
+					<path d="M11.245 4.695a.75.75 0 00-.05 1.06l1.36 1.495H6.75a.75.75 0 000 1.5h5.805l-1.36 1.495a.75.75 0 001.11 1.01l2.5-2.75a.748.748 0 00-.002-1.012l-2.498-2.748a.75.75 0 00-1.06-.05z"></path>{' '}
+				</g>{' '}
 			</g>
 		</svg>
 	);
@@ -1916,7 +1967,7 @@ export function EyeOpen(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 min-w-4' }) => {
+export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4 min-w-4' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
@@ -1925,7 +1976,7 @@ export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 min-w-4
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M5.91083 3.41075C6.23626 3.08531 6.7639 3.08531 7.08934 3.41075L12.0893 8.41075C12.4148 8.73619 12.4148 9.26382 12.0893 9.58926L7.08934 14.5893C6.7639 14.9147 6.23626 14.9147 5.91083 14.5893C5.58539 14.2638 5.58539 13.7362 5.91083 13.4107L10.3216 9L5.91083 4.58926C5.58539 4.26382 5.58539 3.73619 5.91083 3.41075Z"
-					fill="#AEAEAE"
+					fill={defaultFill}
 				/>
 			</g>
 		</svg>
@@ -2268,7 +2319,7 @@ export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			onClick={handleClick}
-			className={isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 		>
 			<path
 				fillRule="evenodd"
@@ -4376,7 +4427,7 @@ export function MacIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function DollarIcon({ fill, ...props }: ClassIconProps) {
+export const DollarIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			height="800px"
@@ -4388,11 +4439,11 @@ export function DollarIcon({ fill, ...props }: ClassIconProps) {
 			viewBox="0 0 64 64"
 			enableBackground="new 0 0 64 64"
 			xmlSpace="preserve"
-			fill={fill}
-			{...props}
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 		>
 			<g id="US-coin">
 				<path
+					fill="currentColor"
 					d="M33.0004005,27.4897995v-11.846199c2.209198,0.1276999,3.8346977,0.6910992,4.7324066,1.6488991
 		c0.8134918,0.8691006,0.7743912,1.7933998,0.771492,1.8554001c-0.0458984,0.5445004,0.3555107,1.0263996,0.9004021,1.078701
 		c0.5517998,0.0438995,1.0381088-0.3501015,1.0907974-0.9004002c0.017601-0.1822014,0.1309013-1.8233013-1.25-3.3428001
@@ -4406,19 +4457,21 @@ export function DollarIcon({ fill, ...props }: ClassIconProps) {
 		C40.0004005,40.3054008,37.6459999,42.5429993,33.0004005,42.8162003z"
 				/>
 				<path
+					fill="currentColor"
 					d="M51.581501,45.0996017c-0.4961014-0.3203011-1.1592026-0.1777-1.4815025,0.3192978
 		c-4.3554993,6.75-9.1483994,7.5059013-9.2372971,7.5186005c-0.5840034,0.0751991-0.9980011,0.6083984-0.9258003,1.1934013
 		c0.0663986,0.5429001,0.5282974,0.9403992,1.0625,0.9403992c0.0429993,0,0.0878983-0.0019989,0.131897-0.0078011
 		c0.235302-0.0283012,5.8095093-0.7958984,10.7695122-8.482399C52.2220993,46.0839996,52.0784988,45.4208984,51.581501,45.0996017z"
 				/>
 				<path
+					fill="currentColor"
 					d="M32,0c-17.6730995,0-32,14.3268995-32,32s14.3268995,32,32,32c17.6731987,0,32-14.3269005,32-32S49.6731987,0,32,0z M32,62
 		c-16.5419998,0-30-13.457901-30-30S15.4580002,2,32,2c16.542099,0,30,13.4579,30,30S48.542099,62,32,62z"
 				/>
 			</g>
 		</svg>
 	);
-}
+};
 
 export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
@@ -6328,6 +6381,98 @@ export function RightFilledTriangle(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				<path d="M5.536 21.886a1.004 1.004 0 0 0 1.033-.064l13-9a1 1 0 0 0 0-1.644l-13-9A1 1 0 0 0 5 3v18a1 1 0 0 0 .536.886z"></path>
 			</g>
+		</svg>
+	);
+}
+
+export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="-1 0 8 8" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+					<g id="Dribbble-Light-Preview" transform="translate(-227.000000, -3765.000000)" fill="currentColor">
+						<g id="icons" transform="translate(56.000000, 160.000000)">
+							<path
+								d="M172,3605 C171.448,3605 171,3605.448 171,3606 L171,3612 C171,3612.552 171.448,3613 172,3613 C172.552,3613 173,3612.552 173,3612 L173,3606 C173,3605.448 172.552,3605 172,3605 M177,3606 L177,3612 C177,3612.552 176.552,3613 176,3613 C175.448,3613 175,3612.552 175,3612 L175,3606 C175,3605.448 175.448,3605 176,3605 C176.552,3605 177,3605.448 177,3606"
+								id="pause-[#1006]"
+							>
+								{' '}
+							</path>{' '}
+						</g>{' '}
+					</g>{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function History(props: React.HTMLAttributes<SVGAElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<path
+				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
+export function CalendarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" id="calendar" {...props}>
+			<path
+				fill="currentColor"
+				d="M14.262,4.441h-.771V3.653a.5.5,0,1,0-1,0v.788H7.509V3.653a.5.5,0,0,0-1,0v.788H5.738a2.5,2.5,0,0,0-2.5,2.5v7.406a2.5,2.5,0,0,0,2.5,2.5h8.524a2.5,2.5,0,0,0,2.5-2.5V6.941A2.5,2.5,0,0,0,14.262,4.441Zm-8.524,1h8.524a1.5,1.5,0,0,1,1.5,1.5v.376H4.238V6.941A1.5,1.5,0,0,1,5.738,5.441Zm8.524,10.406H5.738a1.5,1.5,0,0,1-1.5-1.5V8.317H15.762v6.03A1.5,1.5,0,0,1,14.262,15.847ZM6.821,10.49a.5.5,0,1,1-.707,0A.5.5,0,0,1,6.821,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,9.176,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,11.531,10.49Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,13.886,10.49ZM6.821,12.968a.5.5,0,1,1-.707,0A.5.5,0,0,1,6.821,12.968Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,9.176,12.968Zm2.355,0a.5.5,0,1,1-.707,0A.5.5,0,0,1,11.531,12.968Z"
+			></path>
+		</svg>
+	);
+}
+
+export const FileIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="100"
+			height="100"
+			viewBox="0 0 100 100"
+			id="attachment"
+			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+		>
+			<g id="_x37_7_Essential_Icons">
+				<path
+					id="Attachment"
+					fill="currentColor"
+					d="M18.8 85.1c-7.8-7.8-7.8-20.5 0-28.3L63.1 13c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8L38.6 76.7c-3.1 3.1-8.2 3.1-11.3 0-3.1-3.1-3.1-8.2 0-11.3l22.3-21.8c.8-.8 2.1-.8 2.8 0 .8.8.8 2.1 0 2.8L30.2 68.2c-1.5 1.5-1.5 4.1 0 5.6 1.6 1.6 4.1 1.6 5.7 0L80.2 30c3.9-3.9 3.9-10.2 0-14.1-3.9-3.9-10.2-3.9-14.1 0L21.7 59.7c-6.2 6.2-6.2 16.4 0 22.6 6.3 6.2 16.4 6.2 22.6 0l38.3-37.8c.8-.8 2.1-.8 2.8 0 .8.8.8 2.1 0 2.8L47.1 85.2c-7.8 7.7-20.4 7.8-28.3-.1z"
+				></path>
+			</g>
+			<g id="Info">
+				<path id="BORDER" fill="#00F" d="M664-510v1684h-1784V-510H664m8-8h-1800v1700H672V-518z"></path>
+			</g>
+		</svg>
+	);
+};
+
+export function LockedPrivate(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			className="w-4 h-4"
+			{...props}
+		>
+			<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+			<path d="M7 11V7a5 5 0 0 1 10 0v4" />
 		</svg>
 	);
 }

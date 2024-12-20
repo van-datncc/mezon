@@ -1,14 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import {
-	useAppNavigation,
-	useAuth,
-	useDragAndDrop,
-	usePermissionChecker,
-	useSearchMessages,
-	useSeenMessagePool,
-	useWindowFocusState
-} from '@mezon/core';
+import { useAppNavigation, useDragAndDrop, usePermissionChecker, useSearchMessages, useSeenMessagePool, useWindowFocusState } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ETypeMission,
@@ -42,6 +34,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -74,7 +67,6 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
-	const { userId } = useAuth();
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {
@@ -82,20 +74,34 @@ function useChannelSeen(channelId: string) {
 			return;
 		}
 		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+				? ChannelStreamMode.STREAM_MODE_CHANNEL
+				: ChannelStreamMode.STREAM_MODE_THREAD;
 		markAsReadSeen(lastMessage, mode);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					clanId: previousChannels.at(1)?.clanId as string,
+					channelId: previousChannels.at(1)?.channelId as string,
+					count: 0,
+					isReset: true
+				})
+			);
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
-			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
+			dispatch(
+				channelsActions.upsertOne({
+					clanId: currentChannel?.clan_id || '',
+					channel: channelWithActive as ChannelsEntity
+				})
+			);
 		}
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
@@ -126,7 +132,9 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const mode =
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+			? ChannelStreamMode.STREAM_MODE_CHANNEL
+			: ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
 	const currentClan = useSelector(selectCurrentClan);
@@ -217,6 +225,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannel?.id, isShowCreateThread }));
+			if (isShowCreateThread) {
+				dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
+			}
 		},
 		[currentChannel?.id, dispatch]
 	);
@@ -310,7 +321,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
 								ref={messagesContainerRef}
 							>
-								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+								<ChannelMedia currentChannel={currentChannel} />
 							</div>
 							<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
 						</div>
@@ -348,8 +359,17 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 };
 
-export default function ChannelMain() {
+interface IChannelMainProps {
+	topicChannelId?: string;
+}
+
+export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
+
+	let chlId = currentChannel?.id || '';
+	if (topicChannelId) {
+		chlId = topicChannelId;
+	}
 
 	if (!currentChannel) {
 		return null;
@@ -357,8 +377,8 @@ export default function ChannelMain() {
 
 	return (
 		<>
-			<ChannelMainContent channelId={currentChannel?.id} />
-			<ChannelSeenListener channelId={currentChannel?.id || ''} />
+			<ChannelMainContent channelId={chlId} />
+			<ChannelSeenListener channelId={chlId} />
 		</>
 	);
 }

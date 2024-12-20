@@ -47,6 +47,7 @@ export const directMetaSlice = createSlice({
 	initialState: dmMetaAdapter.getInitialState(),
 	reducers: {
 		add: directMetaAdapter.addOne,
+		upsertOne: directMetaAdapter.upsertOne,
 		removeAll: directMetaAdapter.removeAll,
 		remove: directMetaAdapter.removeOne,
 		update: directMetaAdapter.updateOne,

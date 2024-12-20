@@ -9,10 +9,8 @@ import {
 } from '@mezon/components';
 import {
 	useApp,
-	useAppNavigation,
 	useAppParams,
 	useAuth,
-	useChatMessages,
 	useChatSending,
 	useDragAndDrop,
 	useGifsStickersEmoji,
@@ -21,6 +19,7 @@ import {
 	useWindowFocusState
 } from '@mezon/core';
 import {
+	DirectEntity,
 	MessagesEntity,
 	channelsActions,
 	directActions,
@@ -29,12 +28,12 @@ import {
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
-	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
+	selectLastMessageByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
@@ -53,7 +52,7 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
@@ -77,8 +76,15 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: previousChannels.at(1) || '', count: 0, isReset: true }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1) || '', timestamp }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					clanId: previousChannels.at(1)?.clanId || '',
+					channelId: previousChannels.at(1)?.channelId || '',
+					count: 0,
+					isReset: true
+				})
+			);
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
 	useEffect(() => {
@@ -99,16 +105,15 @@ function useChannelSeen(channelId: string) {
 	}, [dispatch, channelId, lastMessage]);
 }
 
-function DirectSeenListener({ channelId }: { channelId: string }) {
+function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: string; mode: number; currentChannel: DirectEntity }) {
+	KeyPressListener({ currentChannel, mode });
 	useChannelSeen(channelId);
 	return null;
 }
 
 const DirectMessage = () => {
 	// TODO: move selector to store
-	const { clanId, directId, type } = useAppParams();
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
-	const { navigate } = useAppNavigation();
+	const { directId, type } = useAppParams();
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
@@ -117,11 +122,6 @@ const DirectMessage = () => {
 	const { userId } = useAuth();
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		if (defaultChannelId) {
-			navigate(`./${defaultChannelId}`);
-		}
-	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 	const reactionTopState = useSelector(selectReactionTopState);
@@ -188,27 +188,6 @@ const DirectMessage = () => {
 	const handleClose = useCallback(() => {}, []);
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode });
-	const isListenerAttached = useRef(false);
-
-	useEffect(() => {
-		if (isListenerAttached.current) return;
-		isListenerAttached.current = true;
-
-		const handleKeyPress = (event: KeyboardEvent) => {
-			if (event.ctrlKey && (event.key === 'b' || event.key === 'B')) {
-				event.preventDefault();
-				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-			}
-		};
-
-		window.addEventListener('keydown', handleKeyPress);
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyPress);
-			isListenerAttached.current = false;
-		};
-	}, [currentDmGroup]);
 
 	return (
 		<>
@@ -219,17 +198,19 @@ const DirectMessage = () => {
 				h-[100%] overflow-visible relative`}
 				onDragEnter={handleDragEnter}
 			>
-				<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
+				<div className="h-heightTopBar">
+					<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
+				</div>
 				<div className={`flex flex-row flex-1 w-full ${isHaveCallInChannel || isPlayDialTone ? 'h-heightCallDm' : ''}`}>
 					<div
 						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>
 						<div
-							className={`overflow-y-auto bg-[#1E1E1E]  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink " ref={messagesContainerRef}`}
+							className={`overflow-y-auto  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink`}
+							ref={messagesContainerRef}
 						>
 							{
 								<ChannelMessages
-									key={directId}
 									clanId="0"
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
@@ -310,7 +291,7 @@ const DirectMessage = () => {
 						</div>
 					</div>
 					<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
+					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && isShowMemberListDM && (
 						<div
 							className={`dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_60px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 						>
@@ -337,7 +318,7 @@ const DirectMessage = () => {
 					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
-			<DirectSeenListener channelId={directId as string} />
+			<DirectSeenListener channelId={directId as string} mode={mode} currentChannel={currentDmGroup} />
 		</>
 	);
 };
@@ -353,6 +334,37 @@ const SearchMessageChannel = () => {
 			channelId={currentChannelId || ''}
 		/>
 	);
+};
+
+type KeyPressListenerProps = {
+	currentChannel: DirectEntity | null;
+	mode: ChannelStreamMode;
+};
+
+const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
+	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
+	const isListenerAttached = useRef(false);
+
+	useEffect(() => {
+		if (isListenerAttached.current) return;
+		isListenerAttached.current = true;
+
+		const handleKeyPress = (event: KeyboardEvent) => {
+			if (event.ctrlKey && (event.key === 'g' || event.key === 'G')) {
+				event.preventDefault();
+				sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyPress);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress);
+			isListenerAttached.current = false;
+		};
+	}, [sendMessage]);
+
+	return null;
 };
 
 export default memo(DirectMessage);

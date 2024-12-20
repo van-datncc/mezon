@@ -26,7 +26,7 @@ export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapte
 
 export const fetchUserChannelsCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channelId: string, limit: number) => {
-		const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, limit);
+		const response = await mezon.client.listChannelUsersUC(mezon.session, channelId, limit);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -50,8 +50,15 @@ export const fetchUserChannels = createAsyncThunk(
 
 			const response = await fetchUserChannelsCached(mezon, channelId, 500);
 
+			if (Date.now() - response.time > 100) {
+				return {
+					...response,
+					fromCache: true
+				};
+			}
+
 			if (response) {
-				return response ?? [];
+				return { ...response, fromCache: false };
 			}
 		} catch (error) {
 			captureSentryError(error, 'allUsersByAddChannel/fetchUserChannels');
@@ -65,6 +72,7 @@ export const userChannelsSlice = createSlice({
 	initialState: initialUserChannelState,
 	reducers: {
 		add: UserChannelAdapter.addOne,
+		upsertMany: UserChannelAdapter.upsertMany,
 		remove: UserChannelAdapter.removeOne,
 		update: UserChannelAdapter.updateOne,
 		removeMany: UserChannelAdapter.removeMany
@@ -73,6 +81,7 @@ export const userChannelsSlice = createSlice({
 		builder
 			.addCase(fetchUserChannels.fulfilled, (state: UsersByAddChannelState, actions) => {
 				state.loadingStatus = 'loaded';
+				if (actions.payload?.fromCache) return;
 				if (actions.payload?.user_ids) {
 					UserChannelAdapter.setAll(state, actions.payload.user_ids);
 				} else {

@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiConverted } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -13,6 +13,7 @@ import {
 	selectDefaultCanvasByChannelId,
 	selectTheme,
 	threadsActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -104,7 +105,7 @@ interface RecentEmojiProps {
 }
 
 const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
-	const { emojiConverted } = useEmojiSuggestion();
+	const emojiConverted = useEmojiConverted();
 
 	const firstThreeElements = useMemo(() => {
 		return emojiConverted.slice(0, 3);
@@ -147,7 +148,8 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				1,
 				message?.sender_id ?? '',
 				false,
-				isPublicChannel(channel)
+				isPublicChannel(channel),
+				message.content?.tp ?? ''
 			);
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
@@ -156,12 +158,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 
 	return useMenuBuilderPlugin((builder) => {
 		builder.when(userId !== message.sender_id, (builder) => {
-			builder.addMenuItem(
-				'giveacoffee',
-				'Give a coffee',
-				handleItemClick,
-				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
-			);
+			builder.addMenuItem('giveacoffee', 'Give a coffee', handleItemClick, <Icons.DollarIcon defaultSize="w-5 h-5" />);
 		});
 	});
 }
@@ -251,7 +248,7 @@ function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPI
 		builder.when(
 			userId === currentChannel?.creator_id && mode !== ChannelStreamMode.STREAM_MODE_DM && mode !== ChannelStreamMode.STREAM_MODE_GROUP,
 			(builder) => {
-				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5 pointer-events-none " />);
+				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5" />);
 			}
 		);
 	});
@@ -362,6 +359,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread }));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: false }));
 		},
 		[message.channel_id, dispatch]
 	);

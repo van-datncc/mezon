@@ -23,7 +23,7 @@ import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Linking, ScrollView, View } from 'react-native';
+import { DeviceEventEmitter, InteractionManager, Linking, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { EventViewer } from '../../../../components/Event';
@@ -52,6 +52,7 @@ export type ChannelsPositionRef = {
 		};
 	};
 };
+const TIMER_READY_ONLAYOUT = 10000;
 
 const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: any }) => {
 	const { themeValue } = useTheme();
@@ -66,6 +67,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const [isCanLayout, setIsCanLayout] = useState<boolean>(true);
+	const timerReadyOnLayout = useRef<any>();
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -77,7 +80,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const [isScrollChannelActive, setIsScrollChannelActive] = useState(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
 	}, []);
@@ -101,7 +103,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			bottomSheetChannelMenuRef.current?.present();
 			setCurrentPressedChannel(channel);
 			setIsUnKnownChannel(!channel?.channel_id);
-			dispatch(channelsActions.setSelectedChannelId(channel?.channel_id));
+			dispatch(
+				channelsActions.setSelectedChannelId({
+					clanId: channel?.clan_id,
+					channelId: channel?.channel_id
+				})
+			);
 		},
 		[dispatch]
 	);
@@ -112,16 +119,20 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const handleCollapseCategory = useCallback(() => {
+		setIsCanLayout(true);
 		setIsScrollChannelActive(false);
+		timerReadyOnLayout.current = setTimeout(async () => {
+			setIsCanLayout(false);
+		}, 2000);
 	}, []);
 
 	const handleScrollToChannel = useCallback(
-		(currentChannelId: string) => {
+		(currentChannelId: string, isActiveScroll?: boolean) => {
 			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
-			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
+			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || ''];
 			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
 
-			if (position && isScrollChannelActive) {
+			if (position && isActiveScroll) {
 				flashListRef?.current?.scrollTo({
 					x: 0,
 					y: position - size.s_100 * 2,
@@ -129,10 +140,19 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				});
 			}
 		},
-		[isScrollChannelActive, currentChannel, selectCategoryOffsets]
+		[selectCategoryOffsets]
 	);
 
 	useEffect(() => {
+		if (currentChannel?.channel_id) {
+			DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, currentChannel?.channel_id);
+		}
+	}, [currentChannel?.channel_id]);
+
+	useEffect(() => {
+		timerReadyOnLayout.current = setTimeout(() => {
+			setIsCanLayout(false);
+		}, TIMER_READY_ONLAYOUT);
 		const scrollChannel = DeviceEventEmitter.addListener(
 			ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL,
 			({ isActiveScroll }: { isActiveScroll: boolean }) => {
@@ -145,8 +165,12 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	useEffect(() => {
-		handleScrollToChannel(currentChannel?.id);
-	}, [currentChannel?.id, handleScrollToChannel]);
+		handleScrollToChannel(currentChannel?.id, isScrollChannelActive);
+	}, [currentChannel?.id, handleScrollToChannel, isScrollChannelActive]);
+
+	useEffect(() => {
+		setIsScrollChannelActive(true);
+	}, [currentChannel?.id]);
 
 	useEffect(() => {
 		if (currentClanId && currentClanId?.toString() !== '0') {
@@ -157,13 +181,14 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	const handleLayout = useCallback(
 		(event, item) => {
-			if (item) {
+			if (item && isCanLayout) {
 				const { y } = event?.nativeEvent?.layout || {};
-				if (selectCategoryOffsets?.[item?.category_id]) return;
-				dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
+				InteractionManager.runAfterInteractions(() => {
+					dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
+				});
 			}
 		},
-		[selectCategoryOffsets, dispatch]
+		[dispatch, isCanLayout]
 	);
 
 	const renderItemChannelList = useCallback(
@@ -216,7 +241,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				const store = await getStoreAsync();
 				requestAnimationFrame(async () => {
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
 				});
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}

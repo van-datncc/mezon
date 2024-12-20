@@ -1,6 +1,6 @@
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { usePushToTalk } from '../../../PushToTalk/PushToTalkContext';
@@ -28,12 +28,9 @@ export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) =>
 	return (
 		shouldShowPtt && (
 			<div className="relative flex gap-[15px] leading-5 h-5">
-				<Tooltip
-					className={`w-[140px] flex justify-center items-center`}
+				<Tippy
+					className={`w-[140px] flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 					content={isJoined ? 'Leave PTT' : 'Join PTT'}
-					trigger="hover"
-					animation="duration-500"
-					style={isLightMode ? 'light' : 'dark'}
 				>
 					<button
 						onClick={
@@ -56,7 +53,7 @@ export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) =>
 							<Icons.NotJoinedPTT className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
 						)}
 					</button>
-				</Tooltip>
+				</Tippy>
 			</div>
 		)
 	);

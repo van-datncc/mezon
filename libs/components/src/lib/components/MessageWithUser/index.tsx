@@ -17,6 +17,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
+import { HtmlCanvasView } from '../HtmlCanvas';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
@@ -52,6 +53,7 @@ export type MessageWithUserProps = {
 	channelLabel?: string;
 	checkMessageTargetToMoved?: boolean;
 	messageReplyHighlight?: boolean;
+	isTopic?: boolean;
 };
 
 function MessageWithUser({
@@ -68,7 +70,8 @@ function MessageWithUser({
 	showDivider,
 	channelLabel,
 	checkMessageTargetToMoved,
-	messageReplyHighlight
+	messageReplyHighlight,
+	isTopic
 }: Readonly<MessageWithUserProps>) {
 	const userLogin = useAuth();
 	const userId = userLogin?.userId;
@@ -296,9 +299,14 @@ function MessageWithUser({
 														isError={message.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
+														isInTopic={isTopic}
 													/>
 												)}
 												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+
+												{/* show html canvas */}
+												{message?.content?.canvas && <HtmlCanvasView response={message?.content?.canvas} />}
+
 												{Array.isArray(message.content?.embed) &&
 													message.content.embed?.map((embed, index) => (
 														<EmbedMessage
@@ -364,11 +372,12 @@ interface HoverStateWrapperProps {
 const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage }) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
-	const isScrolling = useRef(false);
+
+	const memoizedChildren = useMemo(() => {
+		return children;
+	}, [children]);
 
 	const handleMouseEnter = () => {
-		if (isScrolling.current) return;
-
 		if (hoverTimeout.current) {
 			clearTimeout(hoverTimeout.current);
 		}
@@ -386,8 +395,12 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 		}, 100);
 	};
 	return (
-		<div className={isSearchMessage ? 'w-full' : ''} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-			{children}
+		<div
+			className={`${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7]`}
+			onMouseEnter={handleMouseEnter}
+			onMouseLeave={handleMouseLeave}
+		>
+			{memoizedChildren}
 			{isHover && popup && popup()}
 		</div>
 	);

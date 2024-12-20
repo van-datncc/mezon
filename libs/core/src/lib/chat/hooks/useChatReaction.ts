@@ -84,7 +84,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					id: currentChannel?.channel_id ?? '',
 					lastSeenTimestamp: timestamp,
 					lastSentTimestamp: timestamp,
-					lastSeenPinMessage: '',
 					clanId: currentChannel?.clan_id ?? '',
 					isMute: false
 				}
@@ -111,7 +110,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			count: number,
 			message_sender_id: string,
 			action_delete: boolean,
-			is_public: boolean
+			is_public: boolean,
+			topic_id?: string
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
@@ -143,7 +143,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
 					isPublic: payload.is_public,
-					userId: userId as string
+					userId: userId as string,
+					topic_id
 				})
 			).unwrap();
 		},

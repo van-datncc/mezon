@@ -41,7 +41,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 				const clanResp = await store.dispatch(clansActions.fetchClans());
 				await setCurrentClanLoader(clanResp.payload);
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id }));
 				await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
 				setVisible(false);
 			}

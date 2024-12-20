@@ -1,13 +1,19 @@
+import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import { AppRegistry } from 'react-native';
 import App from './src/app/navigation';
 import CustomIncomingCall from './src/app/screens/customIncomingCall';
 import { createLocalNotification, setupIncomingCall } from './src/app/utils/pushNotificationHelpers';
+notifee.onBackgroundEvent(async () => {});
 
+// eslint-disable-next-line no-undef
+if (__DEV__) {
+	require('./reactotronConfig');
+}
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-	const title = remoteMessage?.notification?.title;
-	if (title === 'Incoming call') {
-		await setupIncomingCall(remoteMessage?.notification?.body);
+	const offer = remoteMessage?.data?.offer;
+	if (offer) {
+		await setupIncomingCall(offer);
 	} else {
 		await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 	}

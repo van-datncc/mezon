@@ -1,11 +1,8 @@
 import { useSeenMessagePool } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import {
-	ChannelsEntity,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
-	gifsStickerEmojiActions,
 	listChannelsByUserActions,
 	selectAnyUnreadChannels,
 	selectChannelById,
@@ -14,10 +11,10 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { SubPanelName, TIME_OFFSET } from '@mezon/utils';
+import { TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect } from 'react';
-import { DeviceEventEmitter, View } from 'react-native';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 
 function useChannelSeen(channelId: string) {
@@ -26,13 +23,6 @@ function useChannelSeen(channelId: string) {
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
-
-	useEffect(() => {
-		if (channelId) {
-			DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
-		}
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	}, [channelId, currentChannel, dispatch]);
 
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
@@ -44,14 +34,12 @@ function useChannelSeen(channelId: string) {
 	}, [lastMessage, channelId, markAsReadSeen, currentChannel?.type]);
 
 	useEffect(() => {
-		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
-			const channelWithActive = { ...currentChannel, active: 1 };
-			dispatch(channelsActions.upsertOne(channelWithActive as ChannelsEntity));
-		}
 		if (!statusFetchChannel) return;
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: 0, isReset: true }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({ clanId: currentChannel?.clan_id ?? '', channelId: channelId, count: 0, isReset: true })
+			);
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}

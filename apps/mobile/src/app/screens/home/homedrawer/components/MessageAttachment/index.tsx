@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -11,8 +11,10 @@ import { RenderVideoChat } from '../RenderVideoChat';
 import { style } from './styles';
 
 interface IProps {
-	message: IMessageWithUser;
+	attachments: ApiMessageAttachment[];
 	onLongPressImage?: () => void;
+	senderId: string;
+	createTime: string;
 }
 const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	const videos: ApiMessageAttachment[] = [];
@@ -32,10 +34,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	return { videos, images, documents };
 };
 
-export const MessageAttachment = React.memo(({ message, onLongPressImage }: IProps) => {
-	const attachments = useMemo(() => {
-		return message?.attachments || [];
-	}, [message?.attachments]);
+export const MessageAttachment = React.memo(({ attachments, onLongPressImage, senderId, createTime }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -55,11 +54,11 @@ export const MessageAttachment = React.memo(({ message, onLongPressImage }: IPro
 		(image: any) => {
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_IMAGE_DETAIL_MESSAGE_ITEM, {
 				...image,
-				uploader: message.sender_id,
-				create_time: message.create_time
+				uploader: senderId,
+				create_time: createTime
 			});
 		},
-		[message.create_time, message?.sender_id]
+		[senderId, createTime]
 	);
 
 	const renderDocuments = () => {
@@ -68,9 +67,8 @@ export const MessageAttachment = React.memo(({ message, onLongPressImage }: IPro
 				return null;
 			}
 			const isShowImage = isImage(document?.url?.toLowerCase());
-			if (isShowImage) {
-				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
-
+			const checkImage = notImplementForGifOrStickerSendFromPanel(document);
+			if (isShowImage || checkImage) {
 				return (
 					<RenderImageChat
 						disable={checkImage}

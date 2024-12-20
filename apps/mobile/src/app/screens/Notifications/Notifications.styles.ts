@@ -63,5 +63,10 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_16,
 			borderRadius: 8,
 			gap: size.s_10
+		},
+		loadMoreChannelMessage: {
+			paddingVertical: size.s_20,
+			alignItems: 'center',
+			justifyContent: 'center'
 		}
 	});

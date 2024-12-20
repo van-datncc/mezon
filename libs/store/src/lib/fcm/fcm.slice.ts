@@ -1,8 +1,17 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 const REGIS_FCM_TOKEN_CACHED_TIME = 1000 * 60 * 3;
+
+export const FCM_FEATURE_KEY = 'fcm';
+export interface fcm {
+	token: string | null;
+}
+
+const initialState: fcm = {
+	token: null
+};
 
 type FcmDeviceTokenPayload = {
 	tokenId: string;
@@ -31,6 +40,7 @@ export const registFcmDeviceToken = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue(null);
 			}
+			thunkAPI.dispatch(fcmActions.setGotifyToken(response?.token));
 			return response;
 		} catch {
 			return null;
@@ -38,4 +48,21 @@ export const registFcmDeviceToken = createAsyncThunk(
 	}
 );
 
-export const fcmActions = { registFcmDeviceToken };
+export const fcmSlice = createSlice({
+	name: FCM_FEATURE_KEY,
+	initialState: initialState,
+	reducers: {
+		setGotifyToken(state, action) {
+			state.token = action.payload;
+		}
+		// ...
+	}
+});
+
+export const fcmReducer = fcmSlice.reducer;
+
+export const fcmActions = { ...fcmSlice.actions, registFcmDeviceToken };
+
+export const getFcmState = (rootState: { [FCM_FEATURE_KEY]: fcm }): fcm => rootState[FCM_FEATURE_KEY];
+
+export const selectGotifyToken = createSelector(getFcmState, (state) => state.token);

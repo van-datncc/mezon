@@ -12,11 +12,14 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { ChannelType, Client, Session } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
+import { ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import { MentionItem } from 'react-mentions';
+import { electronBridge } from '../bridge';
+import { REQUEST_PERMISSION_CAMERA, REQUEST_PERMISSION_MICROPHONE } from '../bridge/electron/constants';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import { Platform, getPlatform } from '../hooks/platform';
 import {
@@ -40,7 +43,8 @@ import {
 	MentionDataProps,
 	NotificationEntity,
 	SearchItemProps,
-	SenderInfoOptionals
+	SenderInfoOptionals,
+	UsersClanEntity
 } from '../types';
 export * from './file';
 export * from './mergeRefs';
@@ -901,7 +905,7 @@ type ImgproxyOptions = {
 export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
 	const extension = sourceImageUrl.split('.').pop()?.toLowerCase();
 	if (!sourceImageUrl) return '';
-	if (extension === 'gif' || !sourceImageUrl.startsWith('https://cdn.mezon.vn')) {
+	if (extension === 'gif' || !sourceImageUrl.startsWith('https://cdn.mezon.vn') || sourceImageUrl.startsWith('https://cdn.mezon.vn/stickers')) {
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;
@@ -937,6 +941,14 @@ export function copyChannelLink(clanId: string, channelId: string) {
 
 export const requestMediaPermission = async (mediaType: 'audio' | 'video'): Promise<IPermissonMedia> => {
 	try {
+		if (isMacDesktop) {
+			if (mediaType === 'audio') {
+				await electronBridge.invoke(REQUEST_PERMISSION_MICROPHONE);
+			}
+			if (mediaType === 'video') {
+				await electronBridge.invoke(REQUEST_PERMISSION_CAMERA);
+			}
+		}
 		const stream = await navigator.mediaDevices.getUserMedia({ [mediaType]: true });
 		stream.getTracks().forEach((track) => track.stop());
 		return 'granted';
@@ -959,3 +971,85 @@ export function formatNumber(amount: number, locales: string, currency = ''): st
 
 	return formattedAmount;
 }
+
+export const insertStringAt = (original: string, toInsert: string, index: number): string => {
+	if (index < 0 || index > original.length) {
+		throw new Error('Index out of bounds');
+	}
+
+	return original.slice(0, index) + toInsert + original.slice(index);
+};
+
+export const parsePastedMentionData = (data: string): { message: IMessageWithUser; startIndex: number; endIndex: number } | null => {
+	try {
+		return safeJSONParse(data);
+	} catch {
+		return null;
+	}
+};
+
+export const transformTextWithMentions = (
+	text: string,
+	mentions: ApiMessageMention[],
+	usersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>
+): string => {
+	let offsetAdjustment = 0;
+
+	for (const mention of mentions) {
+		const { s, e, user_id } = mention;
+		const start = (s || 0) + offsetAdjustment;
+		const end = (e as number) + offsetAdjustment;
+
+		const user = usersEntities?.[user_id as string];
+		if (user) {
+			const name = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
+			const replacement = `@[${name}](${user_id})`;
+			text = text.slice(0, start) + replacement + text.slice(end);
+			offsetAdjustment += replacement.length - (end - start);
+		}
+	}
+
+	return text;
+};
+
+export const generateMentionItems = (
+	mentions: ApiMessageMention[],
+	transformedText: string,
+	usersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>,
+	inputLength: number
+): MentionItem[] => {
+	return mentions
+		.map((mention) => {
+			const user = usersEntities?.[mention.user_id as string];
+			if (user) {
+				const name = user.clan_nick || user.user?.display_name || user.user?.username || '';
+				const mentionText = `@[${name}](${mention.user_id})`;
+				const index = transformedText.indexOf(mentionText);
+				return {
+					display: name,
+					id: user.id,
+					childIndex: 0,
+					index: ((index !== -1 ? index : (mention.s ?? 0)) as number) + inputLength,
+					plainTextIndex: (mention.s ?? 0) + inputLength
+				};
+			}
+			return null;
+		})
+		.filter((item): item is MentionItem => item !== null);
+};
+
+export const parseThreadInfo = (messageContent: string) => {
+	const match = messageContent.match(/\(([^,]+),\s*([^)]+)\)/);
+	if (match) {
+		return {
+			threadLabel: match[1]?.trim() || '',
+			threadId: match[2]?.trim() || '',
+			threadContent: ''
+		};
+	}
+	return {
+		threadLabel: '',
+		threadId: '',
+		threadContent: messageContent.replace(/^@\w+\s*/, '')
+	};
+};

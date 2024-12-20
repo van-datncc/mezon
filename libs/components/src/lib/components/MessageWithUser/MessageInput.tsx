@@ -1,4 +1,4 @@
-import { useChannelMembers, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import { useChannelMembers, useEditMessage, useEmojiSuggestionContext, useEscapeKey } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	selectAllChannels,
@@ -55,7 +55,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		mode,
 		message
 	);
-	const { emojis } = useEmojiSuggestion();
+	const { emojis } = useEmojiSuggestionContext();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
@@ -146,7 +146,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			} else if (draftContent === originalContent) {
 				handleCancelEdit();
 			} else {
-				handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
+				handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft, message?.content?.tp || '');
 				handleCancelEdit();
 			}
 		}
@@ -164,7 +164,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
+			handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft, message?.content?.tp || '');
 		}
 		handleCancelEdit();
 	};

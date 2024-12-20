@@ -5,7 +5,7 @@ import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { appActions, categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -43,12 +43,18 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const [showEmptyCategories, setShowEmptyCategories] = useState<boolean>(isShowEmptyCategory ?? true);
-
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
+	const isCanEditRole = useMemo(() => {
+		return hasAdminPermission || isClanOwner || hasManageClanPermission;
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 	const handleOpenInvite = () => {
 		inviteRef?.current.present();
 		dismiss();
 	};
-	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	const handleOpenSettings = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS, params: { inviteRef: inviteRef } });
@@ -92,6 +98,17 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 			},
 			title: t('menu.optionsMenu.editServerProfile')
 		},
+		{
+			onPress: () => {
+				dismiss();
+				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
+					screen: APP_SCREEN.MENU_CLAN.AUDIT_LOG
+				});
+			},
+			title: t('menu.optionsMenu.auditLog'),
+			isShow: isCanEditRole
+		},
+
 		// {
 		// 	title: t('menu.optionsMenu.showAllChannels'),
 		// 	component: <MezonSwitch />,
@@ -141,8 +158,8 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => {
-				handleMarkAsReadClan(currentClan?.clan_id);
+			onPress: async () => {
+				await handleMarkAsReadClan(currentClan?.clan_id);
 				dismiss();
 			},
 			title: t('menu.watchMenu.markAsRead')

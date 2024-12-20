@@ -102,9 +102,8 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
 			endCallTimeout.current = null;
 			timeStartConnected.current = null;
-			stopAllTracks();
 		};
-	}, [stopAllTracks]);
+	}, []);
 
 	const handleSend = useCallback(
 		(
@@ -126,7 +125,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const initializePeerConnection = useCallback(() => {
 		const pc = new RTCPeerConnection(RTCConfig);
 		pc.addEventListener('icecandidate', async (event) => {
-			if (event?.candidate) {
+			if (event?.candidate && pc?.signalingState !== 'have-local-offer') {
 				await mezon.socketRef.current?.forwardWebrtcSignaling(
 					dmUserId,
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
@@ -187,28 +186,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 	const startCall = async (isVideoCall: boolean, isAnswerCall = false) => {
 		try {
-			if (!isAnswerCall) {
-				handleSend(
-					{
-						t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call`,
-						callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL }
-					},
-					[],
-					[],
-					[]
-				);
-				endCallTimeout.current = setTimeout(() => {
-					dispatch(
-						DMCallActions.updateCallLog({
-							channelId,
-							content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
-						})
-					);
-					handleEndCall({ isCancelGoBack: false });
-				}, 60000);
-			}
-			InCallManager.start({ media: 'audio' });
-			playDialTone();
+			// Request permission microphone
 			const haveMicrophonePermission = await requestMicrophonePermission();
 			if (!haveMicrophonePermission) {
 				Toast.show({
@@ -223,7 +201,8 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					mic: true
 				}));
 			}
-			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
+
+			// Request permission camera if it's a video call
 			let haveCameraPermission;
 			if (isVideoCall) {
 				haveCameraPermission = await requestCameraPermission();
@@ -243,25 +222,39 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				audio: true,
 				video: isVideoCall && haveCameraPermission
 			});
+			// Initialize peer connection
 			const pc = initializePeerConnection();
 
 			// Add tracks to peer connection
 			stream.getTracks().forEach((track) => {
 				pc.addTrack(track, stream);
 			});
-			// Create and set local description
-			const offer = await pc.createOffer(sessionConstraints);
-			await pc.setLocalDescription(offer);
+			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
 
-			// Update state
-			setCallState({
-				localStream: stream,
-				remoteStream: null,
-				peerConnection: pc
-			});
-			// Send offer through signaling server
-			const compressedOffer = await compress(JSON.stringify(offer));
 			if (!isAnswerCall) {
+				playDialTone();
+				handleSend(
+					{
+						t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call`,
+						callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL }
+					},
+					[],
+					[],
+					[]
+				);
+				endCallTimeout.current = setTimeout(() => {
+					dispatch(
+						DMCallActions.updateCallLog({
+							channelId,
+							content: { t: '', callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.TIMEOUTCALL } }
+						})
+					);
+					handleEndCall({ isCancelGoBack: false });
+				}, 60000);
+
+				const offer = await pc.createOffer(sessionConstraints);
+				await pc.setLocalDescription(offer);
+				const compressedOffer = await compress(JSON.stringify(offer));
 				const bodyFCMMobile = {
 					offer: compressedOffer,
 					callerName,
@@ -270,8 +263,22 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					channelId
 				};
 				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
 			}
-			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
+
+			// Update state
+			setCallState({
+				localStream: stream,
+				remoteStream: null,
+				peerConnection: pc
+			});
 		} catch (error) {
 			console.error('Error starting call:', error);
 			handleEndCall({ isCancelGoBack: false });
@@ -336,8 +343,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 								callState.storedIceCandidates = [];
 							}
 							callState.storedIceCandidates.push(new RTCIceCandidate(candidate));
-							// Store the candidate to be added later
-							// You can implement a mechanism to store and add candidates later
 						}
 					}
 					break;
@@ -357,7 +362,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			if (callState.peerConnection) {
 				callState.peerConnection.close();
 			}
-			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
+			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_QUIT, '', channelId, userId);
 			dispatch(DMCallActions.removeAll());
 			dispatch(audioCallActions.setUserCallId(''));
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
@@ -381,6 +386,11 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 						}
 					})
 				);
+			} else {
+				const bodyFCMMobile = {
+					offer: 'CANCEL_CALL'
+				};
+				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 			}
 			setCallState({
 				localStream: null,

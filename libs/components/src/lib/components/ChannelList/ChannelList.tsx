@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannels, useIdleRender } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -32,6 +32,10 @@ export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
 	const appearanceTheme = useSelector(selectTheme);
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return <></>;
+
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
@@ -152,7 +156,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			}
 		}
 	});
-
 	return (
 		<SimpleBarReact scrollableNodeProps={{ ref: parentRef }} style={{ maxHeight: height }}>
 			<div
@@ -286,4 +289,9 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 		</div>
 	);
 };
-export default memo(ChannelList, () => true);
+
+const ChannelListMem = memo(ChannelList, () => true);
+
+ChannelListMem.displayName = 'ChannelListMem';
+
+export default ChannelListMem;

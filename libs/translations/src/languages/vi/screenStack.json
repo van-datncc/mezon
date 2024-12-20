@@ -32,6 +32,9 @@
     "language": "Cài Đặt Ngôn Ngữ",
     "profile": "Cài Đặt Hồ Sơ",
     "account": "Tài Khoản",
-    "blockedUsers": "Người Dùng Bị Chặn"
+    "blockedUsers": "Người Dùng Bị Chặn",
+    "sendToken": "Gửi Token",
+    "withdrawToken": "Rút Token",
+    "historyTransaction": "Lịch sử giao dịch"
   }
 }

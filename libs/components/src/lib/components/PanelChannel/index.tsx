@@ -39,6 +39,7 @@ import { ChannelType, NotificationType } from 'mezon-js';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import ModalConfirm from '../ModalConfirm';
 import GroupPanels from './GroupPanels';
@@ -103,10 +104,11 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
 
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
+	const currentCategory = useAppSelector((state) => selectCategoryById(state, channel?.category_id as string));
 	const hasModalInChild = useSelector(hasGrandchildModal);
 	const favoriteChannel = useSelector(selectAllChannelsFavorite);
 	const [isFavorite, setIsFavorite] = useState<boolean>(false);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (favoriteChannel && favoriteChannel.length > 0) {
@@ -136,8 +138,16 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	};
 
 	const handleLeaveChannel = () => {
-		dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: selectedChannel || '' }));
+		dispatch(
+			threadsActions.leaveThread({
+				clanId: currentClan?.id || '',
+				threadId: selectedChannel || '',
+				channelId: currentChannel.parrent_id || '',
+				isPrivate: currentChannel.channel_private || 0
+			})
+		);
 		handleCloseModalConfirm();
+		navigate(`/chat/clans/${currentClan?.id}/channels/${currentChannel.parrent_id}`);
 	};
 
 	const [openModelConfirm, closeModelConfirm] = useModal(() => (
@@ -288,8 +298,13 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	);
 
 	const handleOpenCreateChannelModal = () => {
-		dispatch(channelsActions.setCurrentCategory(currentCategory));
-		dispatch(channelsActions.openCreateNewModalChannel(true));
+		dispatch(
+			channelsActions.setCurrentCategory({
+				clanId: currentClan?.id || '',
+				category: currentCategory
+			})
+		);
+		dispatch(channelsActions.openCreateNewModalChannel({ isOpen: true, clanId: currentClan?.id as string }));
 	};
 
 	const { handleMarkAsReadChannel, statusMarkAsReadChannel } = useMarkAsRead();

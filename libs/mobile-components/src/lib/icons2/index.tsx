@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Circle, ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
+import { Circle, ClipPath, Defs, G, Line, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
 
 export const ActivityIcon = ({ width, height, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
@@ -1936,6 +1936,90 @@ export const Inbox = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) 
 				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
 				clipRule="evenodd"
 			></Path>
+		</Svg>
+	);
+};
+
+export const RoleIcon = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => (
+	<Svg width={width} height={height} fill="none" viewBox="0 0 24 24">
+		<Path
+			fill={color}
+			fillRule="evenodd"
+			d="M3.47 5.18c.27-.4.64-.74 1.1-.96l6.09-3.05a3 3 0 0 1 2.68 0l6.1 3.05A2.83 2.83 0 0 1 21 6.75v3.5a14.17 14.17 0 0 1-8.42 12.5c-.37.16-.79.16-1.16 0A14.18 14.18 0 0 1 3 9.77V6.75c0-.57.17-1.11.47-1.57Zm2.95 10.3A12.18 12.18 0 0 0 12 20.82a12.18 12.18 0 0 0 5.58-5.32A9.49 9.49 0 0 0 12.47 14h-.94c-1.88 0-3.63.55-5.11 1.49ZM12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+		/>
+	</Svg>
+);
+
+export const History = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
+			<Path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<Path
+				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</Svg>
+	);
+};
+
+export const SendMoney = ({ width = 24, height = 24, rotate = 1, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} scaleX={rotate} scaleY={rotate} viewBox="0 0 24 24" fill="none">
+			<Path
+				d="M9.5 13.75C9.5 14.72 10.25 15.5 11.17 15.5H13.05C13.85 15.5 14.5 14.82 14.5 13.97C14.5 13.06 14.1 12.73 13.51 12.52L10.5 11.47C9.91 11.26 9.51001 10.94 9.51001 10.02C9.51001 9.17999 10.16 8.48999 10.96 8.48999H12.84C13.76 8.48999 14.51 9.26999 14.51 10.24"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<Path d="M12 7.5V16.5" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<Path
+				d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2"
+				stroke="#23b850"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<Path d="M22 6V2H18" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+			<Path d="M17 7L22 2" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+		</Svg>
+	);
+};
+
+export const WelcomeIcon = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
+			<G id="Live area">
+				<Line x1="2" y1="9" x2="10" y2="9" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+				<Path
+					id="Vector"
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M10.0893 3.41075C10.4148 3.08531 10.9424 3.08531 11.2679 3.41075L16.2679 8.41075C16.5933 8.73619 16.5933 9.26382 16.2679 9.58926L11.2679 14.5893C10.9424 14.9147 10.4148 14.9147 10.0893 14.5893C9.7639 14.2638 9.7639 13.7362 10.0893 13.4107L14.5 9L10.0893 4.58926C9.7639 4.26382 9.7639 3.73619 10.0893 3.41075Z"
+					fill="#16A34A"
+				/>
+			</G>
+		</Svg>
+	);
+};
+export const DiscussionIcon = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) => {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 28 28" {...props}>
+			<Path
+				fill="none"
+				stroke={color}
+				strokeWidth={1.5}
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				d="M5.5 12a7 7 0 0011.027 5.726L19.5 18v-6a7 7 0 10-14 0z"
+			/>
+			<Path
+				fill={color}
+				d="M9.5 13.25a.75.75 0 000 1.5v-1.5zm4 1.5a.75.75 0 000-1.5v1.5zm-4-4.5a.75.75 0 000 1.5v-1.5zm6 1.5a.75.75 0 000-1.5v1.5zm-6 3h4v-1.5h-4v1.5zm0-3h6v-1.5h-6v1.5z"
+			/>
 		</Svg>
 	);
 };

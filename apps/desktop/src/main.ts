@@ -1,4 +1,4 @@
-import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, screen, shell } from 'electron';
 import log from 'electron-log/main';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
@@ -7,6 +7,7 @@ import App from './app/app';
 import {
 	CLOSE_APP,
 	DOWNLOAD_FILE,
+	DOWN_LOAD_IMAGE,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
@@ -19,7 +20,6 @@ import {
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
-
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
 	messageId: string;
@@ -114,17 +114,42 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			window.minimize();
 			break;
 		case UNMAXIMIZE_WINDOW:
-			if (window.isMaximized()) {
-				window.unmaximize();
-			} else {
-				window.maximize();
-			}
-			break;
 		case MAXIMIZE_WINDOW:
-			if (window.isMaximized()) {
-				window.restore();
+			if (process.platform === 'darwin') {
+				const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+				const windowBounds = window.getBounds();
+				const isMaximized = windowBounds.width >= display.workArea.width && windowBounds.height >= display.workArea.height;
+				if (isMaximized) {
+					const newWidth = Math.floor(display.workArea.width * 0.8);
+					const newHeight = Math.floor(display.workArea.height * 0.8);
+					const x = Math.floor((display.workArea.width - newWidth) / 2);
+					const y = Math.floor((display.workArea.height - newHeight) / 2);
+					window.setBounds(
+						{
+							x,
+							y,
+							width: newWidth,
+							height: newHeight
+						},
+						false
+					);
+				} else {
+					window.setBounds(
+						{
+							x: display.workArea.x,
+							y: display.workArea.y,
+							width: display.workArea.width,
+							height: display.workArea.height
+						},
+						false
+					);
+				}
 			} else {
-				window.maximize();
+				if (window.isMaximized()) {
+					window.restore();
+				} else {
+					window.maximize();
+				}
 			}
 			break;
 		case CLOSE_APP:
@@ -133,8 +158,11 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 	}
 };
 
-ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
-	const newWindow = App.openNewWindow(props, options, params);
+ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+	const newWindow = App.openImageWindow(props, options, params);
+
+	// Remove the existing listener if it exists
+	ipcMain.removeAllListeners(IMAGE_WINDOW_TITLE_BAR_ACTION);
 
 	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
 		handleWindowAction(newWindow, action);
@@ -143,6 +171,14 @@ ipcMain.on(OPEN_NEW_WINDOW, (event, props: ImageWindowProps, options?: Electron.
 
 ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
 	handleWindowAction(App.mainWindow, action);
+});
+
+ipcMain.handle(DOWN_LOAD_IMAGE, (event, action, data) => {
+	const win = BrowserWindow.getFocusedWindow();
+	const fileURL = action?.payload?.fileURL;
+	if (fileURL) {
+		win.webContents.downloadURL(fileURL);
+	}
 });
 
 // handle setup events as quickly as possible

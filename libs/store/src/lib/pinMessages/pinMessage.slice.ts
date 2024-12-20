@@ -20,6 +20,7 @@ export interface PinMessageState extends EntityState<PinMessageEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	jumpPinMessageId: string;
+	isPinModalVisible?: boolean;
 }
 
 export const pinMessageAdapter = createEntityAdapter<PinMessageEntity>();
@@ -30,7 +31,7 @@ type fetchChannelPinMessagesPayload = {
 };
 
 const CHANNEL_PIN_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
-const fetchChannelPinMessagesCached = memoizeAndTrack(
+export const fetchChannelPinMessagesCached = memoizeAndTrack(
 	(mezon: MezonValueContext, channelId: string) => mezon.client.pinMessagesList(mezon.session, '', channelId, ''),
 	{
 		promise: true,
@@ -52,7 +53,7 @@ export const fetchChannelPinMessages = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchChannelPinMessagesCached.clear(mezon, channelId);
+				fetchChannelPinMessagesCached.delete(mezon, channelId);
 			}
 			const response = await fetchChannelPinMessagesCached(mezon, channelId);
 			if (!response) {
@@ -76,6 +77,17 @@ type SetChannelPinMessagesPayload = {
 	channel_id: string;
 	message_id: string;
 };
+
+export const clearPinMessagesCacheThunk = createAsyncThunk('pinmessage/clearCache', async (channelId: string, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		fetchChannelPinMessagesCached.delete(mezon, channelId);
+	} catch (error) {
+		captureSentryError(error, 'pinmessage/clearCache');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const setChannelPinMessage = createAsyncThunk(
 	'pinmessage/setChannelPinMessage',
 	async ({ clan_id, channel_id, message_id }: SetChannelPinMessagesPayload, thunkAPI) => {
@@ -116,7 +128,7 @@ export const setChannelPinMessage = createAsyncThunk(
 			mess.isMe = true;
 			mess.hide_editted = true;
 			thunkAPI.dispatch(messagesActions.addNewMessage(mess));
-			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			thunkAPI.dispatch(pinMessageActions.add(mess));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/setChannelPinMessage');
@@ -134,7 +146,7 @@ export const deleteChannelPinMessage = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
+			thunkAPI.dispatch(pinMessageActions.remove(message_id));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/deleteChannelPinMessage');
@@ -182,7 +194,8 @@ export const updateLastPin = createAsyncThunk(
 export const initialPinMessageState: PinMessageState = pinMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	jumpPinMessageId: ''
+	jumpPinMessageId: '',
+	isPinModalVisible: false
 });
 
 export const pinMessageSlice = createSlice({
@@ -194,6 +207,9 @@ export const pinMessageSlice = createSlice({
 		remove: pinMessageAdapter.removeOne,
 		setJumpPinMessageId: (state, action) => {
 			state.jumpPinMessageId = action.payload;
+		},
+		togglePinModal: (state: PinMessageState) => {
+			state.isPinModalVisible = !state.isPinModalVisible;
 		}
 	},
 	extraReducers: (builder) => {
@@ -241,7 +257,8 @@ export const pinMessageActions = {
 	setChannelPinMessage,
 	deleteChannelPinMessage,
 	updateLastPin,
-	joinPinMessage
+	joinPinMessage,
+	clearPinMessagesCacheThunk
 };
 
 /*
@@ -271,5 +288,7 @@ export const selectLastPinMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectPinMessageByChannelId(channelId), (filteredMessages) => {
 		return filteredMessages[filteredMessages.length - 1]?.id || null;
 	});
+
+export const selectIsPinModalVisible = createSelector(getPinMessageState, (state: PinMessageState) => state.isPinModalVisible);
 
 export const selectJumpPinMessageId = createSelector(getPinMessageState, (state) => state.jumpPinMessageId);

@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { DONE_ONBOARDING_STATUS } from '@mezon/utils';
+import { AnswerByClanArgs, DONE_ONBOARDING_STATUS } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem, ApiOnboardingSteps } from 'mezon-js/api.gen';
@@ -36,6 +36,8 @@ export interface OnboardingState extends EntityState<ApiOnboardingSteps, string>
 		task: ApiOnboardingContent[];
 	};
 	fileRules: Record<number, File>;
+	keepAnswers: Record<string, number[]>;
+	answerByClanId: Record<string, AnswerByClanArgs[] | null>;
 }
 
 export const onboardingUserAdapter = createEntityAdapter({
@@ -62,7 +64,7 @@ export const fetchOnboarding = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchOnboardingCached.clear();
+				fetchOnboardingCached.delete(mezon, clan_id);
 			}
 			const response = await fetchOnboardingCached(mezon, clan_id);
 
@@ -85,6 +87,27 @@ export const createOnboardingTask = createAsyncThunk(
 			const response = await mezon.client.createOnboarding(mezon.session, {
 				clan_id,
 				contents: [...content]
+			});
+			if (!response) {
+				return false;
+			}
+			thunkAPI.dispatch(fetchOnboarding({ clan_id: clan_id, noCache: true }));
+			return { content, clan_id };
+		} catch (error) {
+			captureSentryError(error, 'onboarding/createOnboarding');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const editOnboarding = createAsyncThunk(
+	'onboarding/editOnboarding',
+	async ({ content, idOnboarding, clan_id }: { content: ApiOnboardingContent; idOnboarding: string; clan_id: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateOnboarding(mezon.session, idOnboarding, {
+				clan_id,
+				...content
 			});
 			if (!response) {
 				return false;
@@ -210,7 +233,9 @@ export const initialOnboardingState: OnboardingState = onboardingUserAdapter.get
 		questions: [],
 		task: []
 	},
-	fileRules: []
+	fileRules: [],
+	keepAnswers: {},
+	answerByClanId: {}
 });
 
 export enum ETypeMission {
@@ -252,8 +277,13 @@ export const onboardingSlice = createSlice({
 		addRules: (state, action: PayloadAction<RuleType>) => {
 			state.formOnboarding.rules.push(action.payload);
 		},
-		addQuestion: (state, action: PayloadAction<ApiOnboardingContent>) => {
-			state.formOnboarding.questions.push(action.payload);
+		addQuestion: (state, action: PayloadAction<{ data: ApiOnboardingContent; update?: number }>) => {
+			const { data, update } = action.payload;
+			if (update !== undefined) {
+				state.formOnboarding.questions[update] = data;
+				return;
+			}
+			state.formOnboarding.questions.push(data);
 		},
 		addMission: (state, action: PayloadAction<ApiOnboardingContent>) => {
 			state.formOnboarding.task.push(action.payload);
@@ -282,6 +312,45 @@ export const onboardingSlice = createSlice({
 		},
 		clearFileRule: (state) => {
 			state.fileRules = [];
+		},
+		doAnswer: (state, action: PayloadAction<{ idQuestion: string; answer: number }>) => {
+			const { idQuestion, answer } = action.payload;
+			if (state.keepAnswers[idQuestion] && state.keepAnswers[idQuestion].includes(answer)) {
+				state.keepAnswers[idQuestion] = state.keepAnswers[idQuestion].filter((value) => value !== answer);
+				return;
+			}
+			if (state.keepAnswers[idQuestion]) {
+				state.keepAnswers[idQuestion].push(answer);
+				return;
+			}
+			state.keepAnswers[idQuestion] = [answer];
+		},
+
+		setAnswerByClanId: (state, action: PayloadAction<{ clanId: string; answerState: AnswerByClanArgs | null }>) => {
+			const { clanId, answerState } = action.payload;
+
+			if (!answerState) {
+				return;
+			}
+
+			const existingAnswers = state.answerByClanId[clanId] || [];
+			const index = existingAnswers.findIndex((item) => item.clanIdQuestionIdAndIndex === answerState.clanIdQuestionIdAndIndex);
+
+			if (index !== -1) {
+				existingAnswers.splice(index, 1);
+			} else {
+				existingAnswers.push(answerState);
+			}
+
+			state.answerByClanId[clanId] = existingAnswers;
+		},
+		resetOnboarding: (state, action) => {
+			state.formOnboarding = {
+				greeting: null,
+				rules: [],
+				questions: [],
+				task: []
+			};
 		}
 	},
 	extraReducers: (builder) => {
@@ -355,16 +424,6 @@ export const onboardingSlice = createSlice({
 					onboardingUserAdapter.setAll(state, action.payload);
 				}
 			});
-		// .addCase(doneOnboarding.fulfilled, (state, action) => {
-		// 	if (action.payload) {
-		// 		onboardingUserAdapter.updateOne(state, {
-		// 			id: action.payload,
-		// 			changes: {
-		// 				onboarding_step: 3
-		// 			}
-		// 		});
-		// 	}
-		// });
 	}
 });
 
@@ -377,7 +436,8 @@ export const onboardingActions = {
 	removeOnboardingTask,
 	enableOnboarding,
 	fetchProcessingOnboarding,
-	doneOnboarding
+	doneOnboarding,
+	editOnboarding
 };
 
 const { selectAll, selectEntities, selectById } = onboardingUserAdapter.getSelectors();
@@ -416,3 +476,12 @@ export const selectCurrentMission = createSelector(
 );
 
 export const selectRuleImages = createSelector(getOnboardingState, (state) => state.fileRules);
+
+export const selectAnswerByQuestionId = createSelector([getOnboardingState, (state, questionId: string) => questionId], (state, questionId) => {
+	return state.keepAnswers[questionId] || [];
+});
+
+export const selectAnswerByClanId = createSelector(
+	[getOnboardingState, (state, clanId: string) => clanId],
+	(state, clanId) => state.answerByClanId?.[clanId]
+);

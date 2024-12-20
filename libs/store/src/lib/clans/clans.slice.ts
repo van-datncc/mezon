@@ -14,7 +14,6 @@ import { defaultNotificationActions } from '../notificationSetting/notificationS
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
-import { channelsStreamActions } from '../stream/channelsStream.slice';
 import { usersStreamActions } from '../stream/usersStream.slice';
 import { voiceActions } from '../voice/voice.slice';
 
@@ -66,7 +65,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 	'clans/changeCurrentClan',
 	async ({ clanId, noCache = false }: ChangeCurrentClanArgs, thunkAPI) => {
 		try {
-			thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId: '' }));
 			thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
 			thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
 			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
@@ -76,8 +75,8 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 			thunkAPI.dispatch(policiesActions.fetchPermission());
 			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 			thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
-			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
-			thunkAPI.dispatch(channelsActions.setStatusChannelFetch());
+			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
+			thunkAPI.dispatch(channelsActions.setStatusChannelFetch(clanId));
 			thunkAPI.dispatch(
 				voiceActions.fetchVoiceChannelMembers({
 					clanId: clanId ?? '',
@@ -85,7 +84,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 					channelType: ChannelType.CHANNEL_TYPE_VOICE
 				})
 			);
-			thunkAPI.dispatch(channelsStreamActions.listStreamChannels({ clanId }));
 			thunkAPI.dispatch(
 				usersStreamActions.fetchStreamChannelMembers({
 					clanId: clanId ?? '',
@@ -226,7 +224,7 @@ export const updateBageClanWS = createAsyncThunk('clans/updateBageClanWS', async
 		throw Error('refresh app error: state does not init');
 	}
 
-	const channel = state.channels?.entities[channel_id];
+	const channel = state.channels?.byClans[state.clans?.currentClanId as string]?.entities?.entities?.[channel_id];
 
 	try {
 		const numberNotification = channel?.count_mess_unread ? channel?.count_mess_unread : 0;

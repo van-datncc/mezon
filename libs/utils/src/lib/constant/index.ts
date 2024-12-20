@@ -33,7 +33,7 @@ export const threadError: ThreadError = {
 
 export const titleMission = ['Send a message in', 'Visit a channel', 'Do anything you want'];
 
-export const MIN_THRESHOLD_CHARS = 4000;
+export const MIN_THRESHOLD_CHARS = 8000;
 
 export type ITypeConvert = {
 	type: string;

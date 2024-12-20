@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import { ActionEmitEvent, ReplyMessageDeleted, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
+import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, messagesActions, MessagesEntity, seenMessagePool, selectAllAccount, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Animated, DeviceEventEmitter, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
@@ -20,7 +20,9 @@ import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageCallLog } from './components/MessageCallLog';
+import MessageTopic from './components/MessageTopic/MessageTopic';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
+import { MessageLineSystem } from './MessageLineSystem';
 import RenderMessageBlock from './RenderMessageBlock';
 import { IMessageActionNeedToResolve } from './types';
 import WelcomeMessage from './WelcomeMessage';
@@ -53,6 +55,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 
 		const isInviteLink = useMemo(() => {
+			if (!lk) return false;
 			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		}, [contentMessage, lk]);
 
@@ -61,6 +64,7 @@ const MessageItem = React.memo(
 		}, [message?.content?.callLog]);
 
 		const isGoogleMapsLink = useMemo(() => {
+			if (!lk) return false;
 			return Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
 		}, [contentMessage, lk]);
 		const userProfile = useSelector(selectAllAccount);
@@ -71,16 +75,30 @@ const MessageItem = React.memo(
 			return message?.sender_id === '0' && message?.username?.toLowerCase() === 'system';
 		}, [message?.sender_id, message?.username]);
 
+		const isMessageSystem = useMemo(
+			() => message?.code === TypeMessage.Welcome || message?.code === TypeMessage.CreateThread || message?.code === TypeMessage.CreatePin,
+			[message?.code]
+		);
+		const translateX = useRef(new Animated.Value(0)).current;
+		const onReplyMessage = useCallback(() => {
+			const payload: IMessageActionNeedToResolve = {
+				type: EMessageActionType.Reply,
+				targetMessage: message,
+				isStillShowKeyboard: true,
+				replyTo: senderDisplayName
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
+		}, []);
+
 		const hasIncludeMention = useMemo(() => {
-			const userIdMention = userProfile?.user?.id;
-			const mentionOnMessage = message.mentions;
-			let includesHere = false;
-			if (typeof message.content?.t == 'string') {
-				includesHere = message.content.t?.includes('@here');
-			}
-			const includesUser = !!userIdMention && mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
-			const checkReplied = !!userIdMention && message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
-			return includesHere || includesUser || checkReplied;
+			const userId = userProfile?.user?.id;
+
+			if (!userId) return false;
+			const hasHereMention = message.content?.t?.includes('@here') ?? false;
+			const hasUserMention = message.mentions?.some((mention) => mention?.user_id === userId);
+			const isReplyToUser = message.references?.[0]?.message_sender_id === userId;
+
+			return hasHereMention || hasUserMention || isReplyToUser;
 		}, [userProfile?.user?.id, message?.mentions, message?.content?.t, message?.references]);
 
 		const isSameUser = useMemo(() => {
@@ -99,7 +117,6 @@ const MessageItem = React.memo(
 		}, [message?.code]);
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
-		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
 		const isDM = useMemo(() => {
@@ -143,7 +160,7 @@ const MessageItem = React.memo(
 					timeoutRef.current = setTimeout(() => {
 						setShowHighlightReply(false);
 						dispatch(messagesActions.setIdMessageToJump(null));
-					}, 2000);
+					}, 3000);
 				} else {
 					setShowHighlightReply(false);
 					timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -215,36 +232,6 @@ const MessageItem = React.memo(
 			return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
 		}, [isDM, message?.display_name, message?.user?.username]);
 
-		const renderRightActions = (progress, dragX) => {
-			const scale = dragX.interpolate({
-				inputRange: [-50, 0],
-				outputRange: [1, 0],
-				extrapolate: 'clamp'
-			});
-			return (
-				<Animated.View style={[{ transform: [{ scale }] }, { alignItems: 'center', justifyContent: 'center' }]}>
-					<ReplyMessageDeleted width={70} height={25} color={Colors.bgViolet} />
-				</Animated.View>
-			);
-		};
-
-		const handleSwipeableOpen = (direction: 'left' | 'right') => {
-			if (preventAction && swipeableRef.current) {
-				swipeableRef.current.close();
-			}
-			if (direction === 'right') {
-				swipeableRef.current?.close();
-				const payload: IMessageActionNeedToResolve = {
-					type: EMessageActionType.Reply,
-					targetMessage: message,
-					isStillShowKeyboard: true,
-					replyTo: senderDisplayName
-				};
-				//Note: trigger to ChatBox.tsx
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
-			}
-		};
-
 		const handleLongPressMessage = useCallback(() => {
 			if (preventAction) return;
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
@@ -281,15 +268,34 @@ const MessageItem = React.memo(
 			outputRange: ['transparent', themeValue.secondaryWeight]
 		});
 
+		if (isMessageSystem) {
+			return <MessageLineSystem message={message} />;
+		}
+
+		const panResponder = PanResponder.create({
+			onMoveShouldSetPanResponder: (_, gestureState) => {
+				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && gestureState.dx < -5) {
+					Animated.sequence([
+						Animated.timing(translateX, {
+							toValue: -100,
+							duration: 200,
+							useNativeDriver: true
+						}),
+						Animated.spring(translateX, {
+							toValue: 0,
+							useNativeDriver: true
+						})
+					]).start();
+					onReplyMessage && onReplyMessage();
+					return true;
+				}
+
+				return false;
+			}
+		});
+
 		return (
-			<Animated.View style={[{ backgroundColor: bgColor }]}>
-				{/* <Swipeable
-			renderRightActions={renderRightActions}
-			ref={swipeableRef}
-			overshootRight={false}
-			onSwipeableOpen={handleSwipeableOpen}
-			hitSlop={{ left: -10 }
-		> */}
+			<Animated.View {...panResponder?.panHandlers} style={[{ backgroundColor: bgColor }, { transform: [{ translateX }] }]}>
 				<View
 					style={[
 						styles.messageWrapper,
@@ -324,7 +330,14 @@ const MessageItem = React.memo(
 								messageSenderId={message?.sender_id}
 								mode={mode}
 							/>
-							<MessageAttachment message={message} onLongPressImage={onLongPressImage} />
+							{message?.attachments?.length > 0 && (
+								<MessageAttachment
+									attachments={message?.attachments}
+									senderId={message?.sender_id}
+									createTime={message?.create_time}
+									onLongPressImage={onLongPressImage}
+								/>
+							)}
 							<Block opacity={message.isError || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink || isGoogleMapsLink ? (
 									<RenderMessageBlock
@@ -391,10 +404,11 @@ const MessageItem = React.memo(
 									}}
 								/>
 							) : null}
+							{message?.code === TypeMessage.Topic && <MessageTopic message={message} avatar={messageAvatar} />}
 						</Pressable>
 					</View>
 				</View>
-				{/* </Swipeable> */}
+
 				{/*<NewMessageRedLine*/}
 				{/*	channelId={props?.channelId}*/}
 				{/*	messageId={props?.messageId}*/}

@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement, ApiUpdateEventRequest } from 'mezon-js/api.gen';
+import { ApiEventManagement, MezonUpdateEventBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -78,6 +78,7 @@ export type UpdateEventManagementPayload = {
 	end_time: string;
 	description: string;
 	logo: string;
+	creator_id: string;
 };
 
 export type EventManagementOnGogoing = {
@@ -125,13 +126,18 @@ export const fetchCreateEventManagement = createAsyncThunk(
 type fetchDeleteEventManagementPayload = {
 	eventID: string;
 	clanId: string;
+	creatorId: string;
+	eventLabel: string;
 };
 
 export const updateEventManagement = createAsyncThunk(
 	'updateEventManagement/updateEventManagement',
-	async ({ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo }: UpdateEventManagementPayload, thunkAPI) => {
+	async (
+		{ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo, creator_id }: UpdateEventManagementPayload,
+		thunkAPI
+	) => {
 		try {
-			const body: ApiUpdateEventRequest = {
+			const body: MezonUpdateEventBody = {
 				address: address,
 				channel_id: channel_id,
 				event_id: event_id,
@@ -140,7 +146,8 @@ export const updateEventManagement = createAsyncThunk(
 				logo: logo,
 				start_time: start_time,
 				title: title,
-				clan_id: clan_id
+				clan_id: clan_id,
+				creator_id: creator_id
 			};
 
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -160,7 +167,7 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 	async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
+			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId, body.creatorId, body.eventLabel);
 			if (response) {
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
 			}

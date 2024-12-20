@@ -39,6 +39,7 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectGotifyToken,
 	selectGroupCallId,
 	selectIsInCall,
 	selectIsShowChatStream,
@@ -49,19 +50,21 @@ import {
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
-	selectStreamChannelByChannelId,
+	selectStatusStream,
 	selectStreamMembersByChannelId,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 
+import { useWebRTCStream } from '@mezon/components';
 import { Icons, Image } from '@mezon/ui';
 import {
 	IClan,
 	ModeResponsive,
 	Platform,
 	TIME_OF_SHOWING_FIRST_POPUP,
+	createImgproxyUrl,
 	getPlatform,
 	isLinuxDesktop,
 	isMacDesktop,
@@ -93,7 +96,6 @@ function MyApp() {
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
@@ -217,8 +219,8 @@ function MyApp() {
 			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
-				dispatch(fetchDirectMessage({ noCache: true }));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+				dispatch(fetchDirectMessage({}));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 				openSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
@@ -279,6 +281,23 @@ function MyApp() {
 
 	const previewMode = useSelector(selectOnboardingMode);
 
+	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
+	const streamPlay = useSelector(selectStatusStream);
+	const gotifyToken = useSelector(selectGotifyToken);
+	useEffect(() => {
+		if (!gotifyToken) return;
+		if (streamPlay) {
+			handleChannelClick(
+				currentStreamInfo?.clanId as string,
+				currentStreamInfo?.streamId as string,
+				userProfile?.user?.id as string,
+				currentStreamInfo?.streamId as string,
+				userProfile?.user?.username as string,
+				gotifyToken as string
+			);
+		}
+	}, [gotifyToken]);
+
 	return (
 		<div
 			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
@@ -288,24 +307,29 @@ function MyApp() {
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<SidebarMenu openCreateClanModal={openCreateClanModal} />
 			<MainContent />
-			{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-				<div
-					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
-					style={streamStyle}
-				>
-					<ChannelStream
-						key={currentStreamInfo?.streamId}
-						hlsUrl={channelStream?.streaming_url}
-						memberJoin={streamChannelMember}
-						channelName={currentChannel?.channel_label}
-						currentStreamInfo={currentStreamInfo}
-					/>
-				</div>
-			)}
+			<div
+				className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+				style={streamStyle}
+			>
+				<ChannelStream
+					key={currentStreamInfo?.streamId}
+					memberJoin={streamChannelMember}
+					channelName={currentChannel?.channel_label}
+					currentStreamInfo={currentStreamInfo}
+					handleChannelClick={handleChannelClick}
+					streamVideoRef={streamVideoRef}
+					disconnect={disconnect}
+					isStream={isStream}
+				/>
+			</div>
 
-			{isPlayRingTone && !!dataCall && !isInCall && directId !== dataCall?.channel_id && (
-				<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
-			)}
+			{isPlayRingTone &&
+				!!dataCall &&
+				!isInCall &&
+				directId !== dataCall?.channel_id &&
+				dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
+					<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
+				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
 
@@ -352,8 +376,8 @@ const SidebarMenu = memo(
 		const logoCustom = useSelector(selectLogoCustom);
 
 		const setModeResponsive = useCallback(
-			(value: string) => {
-				dispatch(channelsActions.setModeResponsive(value));
+			(value: ModeResponsive) => {
+				dispatch(channelsActions.setModeResponsive({ clanId: currentClanId as string, mode: value }));
 			},
 			[dispatch]
 		);
@@ -426,13 +450,14 @@ const SidebarMenu = memo(
 								onClick={() => {
 									setModeResponsive(ModeResponsive.MODE_DM);
 								}}
+								draggable="false"
 							>
 								<NavLinkComponent active={!isClanView}>
 									<div>
 										<Image
 											src={
 												logoCustom
-													? logoCustom
+													? createImgproxyUrl(logoCustom, { width: 44, height: 44, resizeType: 'fit' })
 													: `assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`
 											}
 											alt={'logoMezon'}
@@ -440,6 +465,7 @@ const SidebarMenu = memo(
 											height={48}
 											className="clan w-full aspect-square object-cover"
 											onClick={handleClickToJoinClan}
+											draggable="false"
 										/>
 										{quantityPendingRequest !== 0 && (
 											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">

@@ -28,6 +28,7 @@ import {
 	setSelectedMessage,
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -42,6 +43,7 @@ import {
 	ModeResponsive,
 	SHOW_POSITION,
 	SubPanelName,
+	TypeMessage,
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
@@ -344,6 +346,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread }));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
+		},
+		[currentChannel?.id, dispatch]
+	);
+
+	const setIsShowCreateTopic = useCallback(
+		(isShowCreateTopic: boolean, channelId?: string) => {
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateTopic }));
+			dispatch(
+				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread: false })
+			);
 		},
 		[currentChannel?.id, dispatch]
 	);
@@ -355,12 +368,26 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		[dispatch]
 	);
 
+	const setValueTopic = useCallback(
+		(value: IMessageWithUser | null) => {
+			dispatch(topicsActions.setValueTopic(value));
+		},
+		[dispatch]
+	);
+
 	const handleCreateThread = useCallback(() => {
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
 		setValueThread(message);
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
+
+	const handleCreateTopic = useCallback(() => {
+		setIsShowCreateTopic(true);
+		dispatch(topicsActions.setOpenTopicMessageState(true));
+		setValueTopic(message);
+		dispatch(topicsActions.setCurrentTopicId(''));
+	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
 
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
@@ -507,14 +534,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 								1,
 								message?.sender_id ?? '',
 								false,
-								isPublicChannel(currentChannel)
+								isPublicChannel(currentChannel),
+								message.content?.tp ?? ''
 							);
 						}
 					} catch (error) {
 						console.error('Failed to give cofffee message', error);
 					}
 				},
-				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
+				<Icons.DollarIconRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -555,7 +583,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				activeMode !== ChannelStreamMode.STREAM_MODE_DM &&
 				activeMode !== ChannelStreamMode.STREAM_MODE_GROUP,
 			(builder) => {
-				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
+				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIconRightClick defaultSize="w-4 h-4" />);
 			}
 		);
 
@@ -607,6 +635,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
 			);
 		});
+		message?.code !== TypeMessage.Topic &&
+			builder.when(checkPos, (builder) => {
+				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
+			});
 
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
@@ -621,17 +653,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 				);
 			});
-
-		builder.when(enableSpeakMessageItem, (builder) => {
-			builder.addMenuItem(
-				'speakMessage',
-				'Speak Message',
-				() => {
-					console.log('speak Message');
-				},
-				<Icons.SpeakMessageRightClick defaultSize="w-4 h-4" />
-			);
-		});
 
 		builder.when(enableRemoveOneReactionItem, (builder) => {
 			builder.addMenuItem(
@@ -733,7 +754,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		handleForwardMessage,
 		handleForwardAllMessage,
 		urlImage,
-		handleItemClick
+		handleItemClick,
+		handleCreateTopic
 	]);
 	/* eslint-disable no-console */
 

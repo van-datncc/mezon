@@ -49,6 +49,7 @@ import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
+import { walletLedgerReducer } from './giveCoffee/historyTransaction.slice';
 import { EMBED_MESSAGE, embedReducer } from './messages/embedMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
@@ -59,17 +60,18 @@ import { permissionRoleChannelReducer } from './permissionChannel/permissionRole
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
 import { JoinPTTReducer } from './ptt/ptt.join.slice';
+import { TalkPTTReducer } from './ptt/ptt.talk.slice';
 import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
-import { channelsStreamReducer } from './stream/channelsStream.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
+import { topicsReducer } from './topicDiscussion/topicDiscussions.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
@@ -157,6 +159,15 @@ const persistedThreadReducer = persistReducer(
 		blacklist: ['isShowCreateThread']
 	},
 	threadsReducer
+);
+
+const persistedTopicReducer = persistReducer(
+	{
+		key: 'topicdiscussions',
+		storage,
+		blacklist: ['isShowCreateTopic']
+	},
+	topicsReducer
 );
 
 const persistedChannelMembersReducer = persistReducer(
@@ -375,7 +386,6 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	pushToTalkUsers: pushToTalkMembersReducer,
-	channelsstream: channelsStreamReducer,
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
@@ -401,9 +411,12 @@ const reducer = {
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
 	joinPTT: JoinPTTReducer,
+	talkPTT: TalkPTTReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
-	[EMBED_MESSAGE]: embedReducer
+	[EMBED_MESSAGE]: embedReducer,
+	topicdiscussions: persistedTopicReducer,
+	walletLedger: walletLedgerReducer
 };
 
 let storeInstance = configureStore({

@@ -1,5 +1,28 @@
-import { addMention, convertTimeString, ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData, TypeMessage } from '@mezon/utils';
+import {
+	getFirstMessageOfTopic,
+	selectCurrentChannelId,
+	selectMemberClanByUserId,
+	selectMessageByMessageId,
+	selectTheme,
+	threadsActions,
+	topicsActions,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
+import { Icons } from '@mezon/ui';
+import {
+	ETypeLinkMedia,
+	IExtendedMessage,
+	IMessageWithUser,
+	TypeMessage,
+	addMention,
+	convertTimeString,
+	createImgproxyUrl,
+	isValidEmojiData
+} from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
+import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
 
@@ -12,14 +35,17 @@ type IMessageContentProps = {
 	mode?: number;
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
+	isInTopic?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
+const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageContentProps) => {
+	const dispatch = useAppDispatch();
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
-
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, message.id || ''));
+	const topicCreator = useSelector(selectMemberClanByUserId(currentMessage?.content?.cid as string));
 	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return safeJSONParse(message.content).t;
@@ -27,16 +53,68 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			return lines;
 		}
 	})();
+	const theme = useAppSelector(selectTheme);
+
+	const handleOpenTopic = () => {
+		dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: true }));
+		dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread: false }));
+		dispatch(topicsActions.setCurrentTopicId(currentMessage?.content?.tp || ''));
+		dispatch(getFirstMessageOfTopic(currentMessage?.content?.tp || ''));
+	};
+
+	const handleCopyMessage = useCallback(
+		(event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => {
+			if (message?.content && message?.mentions) {
+				const key = 'text/mezon-mentions';
+				const copyData = {
+					message: message,
+					startIndex: startIndex,
+					endIndex: endIndex
+				};
+				const value = JSON.stringify(copyData);
+
+				event.preventDefault();
+
+				event.clipboardData.setData(key, value);
+			}
+		},
+		[message]
+	);
+
+	const avatarToDisplay = topicCreator?.clan_avatar ? topicCreator?.clan_avatar : topicCreator?.user?.avatar_url;
 
 	return (
-		<MessageText
-			isOnlyContainEmoji={isOnlyContainEmoji}
-			isSearchMessage={isSearchMessage}
-			content={contentUpdatedMention}
-			message={message}
-			lines={lineValue as string}
-			mode={mode}
-		/>
+		<div>
+			<MessageText
+				isOnlyContainEmoji={isOnlyContainEmoji}
+				isSearchMessage={isSearchMessage}
+				content={contentUpdatedMention}
+				message={message}
+				lines={lineValue as string}
+				mode={mode}
+				onCopy={handleCopyMessage}
+			/>
+			{!isInTopic && currentMessage?.code === TypeMessage.Topic && (
+				<div
+					className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-md my-1 p-1 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white group/view-topic-btn"
+					onClick={handleOpenTopic}
+				>
+					<div className="flex items-center gap-2 text-sm h-fit">
+						<img
+							src={createImgproxyUrl(avatarToDisplay ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+							alt={`${topicCreator?.user?.username}'s avatar`}
+							className="size-7 rounded-md object-cover"
+						/>
+						<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>
+						<p>View topic</p>
+					</div>
+					<Icons.ArrowRight
+						defaultFill={theme === 'dark' ? '#AEAEAE' : '#535353'}
+						defaultSize={'w-4 h-4 min-w-4 hover:text-white text-borderDividerLight'}
+					/>
+				</div>
+			)}
+		</div>
 	);
 };
 
@@ -48,7 +126,8 @@ const MessageText = ({
 	mode,
 	content,
 	isOnlyContainEmoji,
-	isSearchMessage
+	isSearchMessage,
+	onCopy
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -56,6 +135,7 @@ const MessageText = ({
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
+	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }) => {
 	const attachmentOnMessage = message.attachments;
 
@@ -73,7 +153,7 @@ const MessageText = ({
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
 					<div className="w-full flex gap-4">
-						{message.code === TypeMessage.CreatePin ? (
+						{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
 							<MessageLineSystem
 								message={message}
 								isHideLinkOneImage={checkOneLinkImage}
@@ -94,6 +174,7 @@ const MessageText = ({
 								content={content}
 								mode={mode}
 								code={message.code}
+								onCopy={onCopy}
 							/>
 						)}
 						{(message.code === TypeMessage.Welcome ||

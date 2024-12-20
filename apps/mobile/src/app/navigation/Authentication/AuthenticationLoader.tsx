@@ -3,6 +3,8 @@ import { ActionEmitEvent, getAppInfo } from '@mezon/mobile-components';
 import {
 	DMCallActions,
 	appActions,
+	channelsActions,
+	directActions,
 	fcmActions,
 	getStoreAsync,
 	selectCurrentChannel,
@@ -10,6 +12,7 @@ import {
 	selectDmGroupCurrentId,
 	selectLoadingMainMobile
 } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
@@ -22,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
+import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import {
 	checkNotificationPermission,
 	handleFCMToken,
@@ -36,6 +40,7 @@ export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
+	const mezon = useMezon();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
@@ -78,7 +83,17 @@ export const AuthenticationLoader = () => {
 
 	useEffect(() => {
 		let timer;
-		const callListener = DeviceEventEmitter.addListener(ActionEmitEvent.GO_TO_CALL_SCREEN, ({ payload }) => {
+		const callListener = DeviceEventEmitter.addListener(ActionEmitEvent.GO_TO_CALL_SCREEN, async ({ payload, isDecline = false }) => {
+			if (isDecline) {
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					payload?.callerId,
+					WebrtcSignalingType.WEBRTC_SDP_QUIT,
+					'',
+					payload?.channelId,
+					''
+				);
+				return;
+			}
 			dispatch(appActions.setLoadingMainMobile(true));
 			dispatch(DMCallActions.setIsInCall(true));
 			const signalingData = {
@@ -123,7 +138,10 @@ export const AuthenticationLoader = () => {
 				// Case: FCM start call
 				const title = remoteMessage?.notification?.title;
 				const body = remoteMessage?.notification?.body;
-				if (title === 'Incoming call' || (body && (body?.includes('started a video call') || body?.includes('started a audio call')))) {
+				if (
+					title === 'Incoming call' ||
+					(body && ['started a video call', 'started a audio call', 'Untitled message'].some((text) => body?.includes?.(text)))
+				) {
 					return;
 				}
 				Toast.show({
@@ -144,8 +162,9 @@ export const AuthenticationLoader = () => {
 				});
 			}
 			//Payload from FCM need messageType and sound
-			if (remoteMessage.notification.body === 'Buzz!!') {
+			if (remoteMessage?.notification?.body === 'Buzz!!') {
 				playBuzzSound();
+				handleBuzz(remoteMessage);
 			}
 		});
 		// To get All Received Urls
@@ -170,6 +189,21 @@ export const AuthenticationLoader = () => {
 				}
 			});
 		});
+	};
+
+	const handleBuzz = (notification) => {
+		const link = notification?.data?.link;
+		if (!link) return;
+		const linkMatch = link.match(clanAndChannelIdLinkRegex);
+		const timestamp = Math.round(Date.now() / 1000);
+		if (linkMatch) {
+			const channelId = linkMatch?.[2];
+			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId: '', timestamp } }));
+		} else {
+			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
+			const channelId = linkDirectMessageMatch[1];
+			dispatch(directActions.setBuzzStateDirect({ channelId: channelId, buzzState: { isReset: true, senderId: '', timestamp } }));
+		}
 	};
 
 	const loadFileSharing = () => {

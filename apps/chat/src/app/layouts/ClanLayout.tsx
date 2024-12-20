@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton, useWebRTCStream } from '@mezon/components';
 import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -9,11 +9,13 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
+	selectGotifyToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
+	selectIsShowCreateTopic,
 	selectStatusMenu,
 	selectStatusStream,
 	useAppDispatch,
@@ -29,6 +31,7 @@ import { Outlet } from 'react-router-dom';
 import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
+import TopicDiscussionMain from '../pages/topicDiscussion';
 
 const ClanEffects: React.FC<{
 	chatStreamRef: React.RefObject<HTMLDivElement>;
@@ -36,13 +39,18 @@ const ClanEffects: React.FC<{
 	currentClan: ClansEntity | null;
 	isShowChatStream: boolean;
 	isShowCreateThread: boolean;
-}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread }) => {
+	isShowCreateTopic: boolean;
+	userId?: string;
+	userName?: string;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId, userName }) => {
 	// move code thanh.levan
 
 	const { canvasId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
+	const gotifyToken = useSelector(selectGotifyToken);
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -66,6 +74,15 @@ const ClanEffects: React.FC<{
 			currentStreamInfo?.clanId !== currentClan.id &&
 			currentStreamInfo?.streamId !== currentChannel.channel_id
 		) {
+			disconnect();
+			handleChannelClick(
+				currentClan?.id as string,
+				currentChannel.channel_id as string,
+				userId as string,
+				currentChannel.channel_id as string,
+				userName as string,
+				gotifyToken as string
+			);
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -83,10 +100,10 @@ const ClanEffects: React.FC<{
 	}, [currentStreamInfo, currentClan, currentChannel]);
 
 	useEffect(() => {
-		if (isShowCreateThread) {
+		if (isShowCreateThread || isShowCreateTopic) {
 			setIsShowMemberList(false);
 		}
-	}, [isShowCreateThread]);
+	}, [isShowCreateThread, isShowCreateTopic]);
 
 	const checkTypeChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	useEffect(() => {
@@ -112,6 +129,7 @@ const ClanLayout = () => {
 	const memberPath = `/chat/clans/${currentClan?.clan_id}/member-safety`;
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id as string));
+	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannel?.id as string));
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
 
@@ -126,13 +144,15 @@ const ClanLayout = () => {
 					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 					{streamPlay && <StreamInfo type={ESummaryInfo.STREAM} />}
 					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
-					<FooterProfile
-						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
-						status={userProfile?.user?.online}
-						avatar={userProfile?.user?.avatar_url || ''}
-						userId={userProfile?.user?.id || ''}
-						isDM={false}
-					/>
+					<div style={{ height: 56, width: '100%' }}>
+						<FooterProfile
+							name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
+							status={userProfile?.user?.online}
+							avatar={userProfile?.user?.avatar_url || ''}
+							userId={userProfile?.user?.id || ''}
+							isDM={false}
+						/>
+					</div>
 				</div>
 			</div>
 			<div
@@ -151,9 +171,15 @@ const ClanLayout = () => {
 					</div>
 				)}
 			</div>
-			{isShowCreateThread && (
+			{isShowCreateThread && !isShowCreateTopic && (
 				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 					<ThreadsMain />
+				</div>
+			)}
+
+			{isShowCreateTopic && !isShowCreateThread && (
+				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+					<TopicDiscussionMain />
 				</div>
 			)}
 			<Setting isDM={false} />
@@ -164,6 +190,9 @@ const ClanLayout = () => {
 				chatStreamRef={chatStreamRef}
 				isShowChatStream={isShowChatStream}
 				isShowCreateThread={isShowCreateThread}
+				isShowCreateTopic={isShowCreateTopic}
+				userId={userProfile?.user?.id || ''}
+				userName={userProfile?.user?.username || ''}
 			/>
 		</>
 	);

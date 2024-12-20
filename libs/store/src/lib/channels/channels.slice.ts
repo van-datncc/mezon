@@ -11,9 +11,18 @@ import {
 	RequestInput,
 	TypeCheck
 } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, GetThunkAPI, PayloadAction } from '@reduxjs/toolkit';
+import {
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSlice,
+	EntityState,
+	GetThunkAPI,
+	PayloadAction,
+	Update
+} from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent, safeJSONParse } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
@@ -25,6 +34,7 @@ import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
+import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -32,7 +42,6 @@ import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
-import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
@@ -57,7 +66,6 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds) ?? 0,
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		lastSeenPinMessage: channel.last_pin_message || '',
 		clanId: channel.clan_id ?? '',
 		isMute: channel.is_mute ?? false
 	};
@@ -72,26 +80,49 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	};
 };
 
-export interface ChannelsState extends EntityState<ChannelsEntity, string> {
+export interface ChannelsState {
+	byClans: Record<
+		string,
+		{
+			entities: EntityState<ChannelsEntity, string>;
+			currentChannelId?: string | null;
+			selectedChannelId?: string | null;
+			currentVoiceChannelId: string;
+			request: Record<string, RequestInput>;
+			idChannelSelected: Record<string, string>;
+			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
+			previousChannels: Array<{ clanId: string; channelId: string }>;
+			appChannelsList: Record<string, ApiChannelAppResponse>;
+			fetchChannelSuccess: boolean;
+			favoriteChannels: string[];
+			buzzState: Record<string, BuzzArgs | null>;
+			isOpenCreateNewChannel?: boolean;
+			currentCategory?: ICategory;
+		}
+	>;
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
 	error?: string | null;
-	currentChannelId?: string | null;
-	isOpenCreateNewChannel?: boolean;
-	currentCategory: ICategory | null;
-	currentVoiceChannelId: string;
-	request: Record<string, RequestInput>;
-	idChannelSelected: Record<string, string>;
-	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
-	selectedChannelId?: string | null;
-	previousChannels: string[];
-	appChannelsList: Record<string, ApiChannelAppResponse>;
-	fetchChannelSuccess: boolean;
-	favoriteChannels: string[];
-	buzzState: Record<string, BuzzArgs | null>;
 }
 
-export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
+const channelsAdapter = createEntityAdapter<ChannelsEntity>();
+
+const getInitialClanState = () => {
+	return {
+		entities: channelsAdapter.getInitialState(),
+		currentChannelId: null,
+		selectedChannelId: null,
+		currentVoiceChannelId: '',
+		request: {},
+		idChannelSelected: {},
+		modeResponsive: ModeResponsive.MODE_DM,
+		previousChannels: [],
+		appChannelsList: {},
+		fetchChannelSuccess: false,
+		favoriteChannels: [],
+		buzzState: {}
+	};
+};
 
 export interface ChannelsRootState {
 	[CHANNELS_FEATURE_KEY]: ChannelsState;
@@ -109,6 +140,7 @@ type fetchChannelMembersPayload = {
 	messageId?: string;
 	isDmGroup?: boolean;
 	isClearMessage?: boolean;
+	noCache?: boolean;
 };
 
 type JoinChatPayload = {
@@ -151,11 +183,11 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
-	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true, noCache = false }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(reactionActions.removeAll());
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
-			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
 			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
@@ -164,7 +196,7 @@ export const joinChannel = createAsyncThunk(
 
 			if (!state.messages?.idMessageToJump?.id) {
 				thunkAPI.dispatch(
-					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
+					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache })
 				);
 			}
 
@@ -181,9 +213,8 @@ export const joinChannel = createAsyncThunk(
 				}
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
-			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
-			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
+			thunkAPI.dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
 
 			const isPublic = channel ? (checkIsThread(channel as ChannelsEntity) ? false : !channel.channel_private) : false;
 			if (channel) {
@@ -210,7 +241,9 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
+			thunkAPI.dispatch(
+				channelsActions.add({ channel: { id: response.channel_id as string, ...response }, clanId: response.clan_id as string })
+			);
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
@@ -265,7 +298,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 			if (body.isDmGroup) {
 				return true;
 			}
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId, noCache: true }));
+			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
@@ -276,16 +309,26 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 export const updateChannel = createAsyncThunk('channels/updateChannel', async (body: ApiUpdateChannelDescRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const state = thunkAPI.getState() as RootState;
+		const clanId = state.clans.currentClanId;
+
 		if (body.e2ee) {
 			await thunkAPI.dispatch(directActions.changeE2EE({ channel_id: body.channel_id, e2ee: body.e2ee }));
 		}
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
-		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			if (body.category_id === '0') {
-				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				thunkAPI.dispatch(directActions.update({ id: body.channel_id, changes: { ...body } }));
 			} else {
-				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+				thunkAPI.dispatch(
+					channelsActions.update({
+						clanId: clanId as string,
+						update: {
+							id: body.channel_id,
+							changes: { ...body }
+						}
+					})
+				);
 			}
 		}
 	} catch (error) {
@@ -298,9 +341,9 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.updateChannelPrivate(mezon.session, body);
-		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
+		const clanID = selectClanId()(thunkAPI.getState() as RootState) || '';
+
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }));
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
@@ -320,7 +363,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 export const fetchListFavoriteChannelCache = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string) => {
 		const response = await mezon.client.getListFavoriteChannel(mezon.session, clanId);
-		return response;
+		return { ...response, time: Date.now() };
 	},
 	{
 		promise: true,
@@ -335,12 +378,18 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchListFavoriteChannelCache.clear(mezon, clanId);
+			fetchListFavoriteChannelCache.delete(mezon, clanId);
 		}
 
 		const response = await fetchListFavoriteChannelCache(mezon, clanId);
 
-		return response;
+		if (Date.now() - response.time > 100) {
+			return {
+				fromCache: true
+			};
+		}
+
+		return { ...response, clanId };
 	} catch (error) {
 		captureSentryError(error, 'channels/favorite');
 		return thunkAPI.rejectWithValue(error);
@@ -350,9 +399,14 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 export const addFavoriteChannel = createAsyncThunk('channels/favorite/add', async (body: ApiAddFavoriteChannelRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.addFavoriteChannel(mezon.session, body.channel_id || '', body.clan_id || '');
+		const response = await mezon.client.addFavoriteChannel(mezon.session, body.channel_id as string, body.clan_id as string);
 		if (response) {
-			thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: body.clan_id || '', noCache: true }));
+			thunkAPI.dispatch(
+				channelsActions.addFavorite({
+					clanId: body.clan_id as string,
+					channelId: body.channel_id as string
+				})
+			);
 			return response;
 		}
 		return;
@@ -369,7 +423,12 @@ export const removeFavoriteChannel = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.removeFavoriteChannel(mezon.session, channelId);
 			if (response) {
-				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: clanId || '', noCache: true }));
+				thunkAPI.dispatch(
+					channelsActions.removeFavorite({
+						clanId: clanId,
+						channelId: channelId
+					})
+				);
 			}
 		} catch (error) {
 			captureSentryError(error, 'channels/favorite/remove');
@@ -415,7 +474,12 @@ export const addThreadToChannels = createAsyncThunk(
 				)
 				.unwrap();
 			if (data?.length > 0) {
-				thunkAPI.dispatch(channelsActions.upsertOne({ ...data[0], active: 1 } as ChannelsEntity));
+				thunkAPI.dispatch(
+					channelsActions.upsertOne({
+						clanId: clanId,
+						channel: { ...data[0], active: 1 } as ChannelsEntity
+					})
+				);
 			}
 		}
 	}
@@ -427,11 +491,11 @@ export const fetchChannels = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				await fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
+				await fetchChannelsCached.delete(mezon, 500, 1, clanId, channelType);
 			}
 			const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 			if (!response.channeldesc) {
-				return [];
+				return { channels: [], clanId };
 			}
 			thunkAPI.dispatch(fetchAppChannels({ clanId: clanId, noCache: Boolean(noCache) }));
 			if (Date.now() - response.time < 100) {
@@ -448,7 +512,7 @@ export const fetchChannels = createAsyncThunk(
 
 			const state = thunkAPI.getState() as RootState;
 
-			const currentChannelId = state.channels?.currentChannelId;
+			const currentChannelId = state.channels?.byClans[clanId]?.currentChannelId;
 
 			if (currentChannelId && !response?.channeldesc?.some((item) => item.channel_id === currentChannelId)) {
 				const data = await thunkAPI
@@ -465,13 +529,21 @@ export const fetchChannels = createAsyncThunk(
 				}
 			}
 
+			if (Date.now() - response.time > 1000) {
+				return {
+					channels: [],
+					clanId: clanId,
+					fromCache: true
+				};
+			}
+
 			const channels = response.channeldesc.map((channel) => ({
 				...mapChannelToEntity(channel),
 				last_seen_message: channel.last_seen_message ? channel.last_seen_message : { timestamp_seconds: 0 }
 			}));
 			const meta = channels.map((ch) => extractChannelMeta(ch));
 			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
-			return channels;
+			return { channels, clanId };
 		} catch (error) {
 			captureSentryError(error, 'channels/fetchChannels');
 			return thunkAPI.rejectWithValue(error);
@@ -502,7 +574,7 @@ export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			await fetchAppChannelCached.clear(mezon, clanId);
+			await fetchAppChannelCached.delete(mezon, clanId);
 		}
 
 		const response = await fetchAppChannelCached(mezon, clanId);
@@ -527,6 +599,16 @@ export const markAsReadProcessing = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
+			thunkAPI.dispatch(
+				channelsActions.update({
+					clanId: clan_id as string,
+					update: {
+						id: channel_id as string,
+						changes: { count_mess_unread: 0 }
+					}
+				})
+			);
+			thunkAPI.dispatch(clansActions.fetchClans());
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channels/markAsRead');
@@ -535,34 +617,52 @@ export const markAsReadProcessing = createAsyncThunk(
 	}
 );
 
-export const initialChannelsState: ChannelsState = channelsAdapter.getInitialState({
+export const initialChannelsState: ChannelsState = {
+	byClans: {},
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
-	error: null,
-	isOpenCreateNewChannel: false,
-	currentCategory: null,
-	currentVoiceChannelId: '',
-	request: {},
-	idChannelSelected: safeJSONParse(localStorage.getItem('remember_channel') || '{}'),
-	modeResponsive: ModeResponsive.MODE_DM,
-	quantityNotifyChannels: {},
-	previousChannels: [],
-	appChannelsList: {},
-	fetchChannelSuccess: false,
-	favoriteChannels: [],
-	buzzState: {}
-});
+	error: null
+};
 
 export const channelsSlice = createSlice({
 	name: CHANNELS_FEATURE_KEY,
 	initialState: initialChannelsState,
 	reducers: {
-		add: channelsAdapter.addOne,
-		removeAll: channelsAdapter.removeAll,
-		remove: channelsAdapter.removeOne,
-		update: channelsAdapter.updateOne,
-		upsertOne: (state: ChannelsState, action: PayloadAction<ChannelsEntity>) => {
-			const existingEntity = state.entities[action.payload?.id];
+		add: (state: ChannelsState, action: PayloadAction<{ clanId: string; channel: ChannelsEntity }>) => {
+			const { clanId, channel } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			channelMetaActions.add(extractChannelMeta(channel));
+			channelsAdapter.addOne(state.byClans[clanId].entities, channel);
+		},
+
+		removeAll: (state, action: PayloadAction<string>) => {
+			if (state.byClans[action.payload]) {
+				channelsAdapter.removeAll(state.byClans[action.payload].entities);
+			}
+		},
+
+		remove: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (state.byClans[clanId]) {
+				channelsAdapter.removeOne(state.byClans[clanId].entities, channelId);
+			}
+		},
+
+		update: (state, action: PayloadAction<{ clanId: string; update: Update<ChannelsEntity, string> }>) => {
+			const { clanId, update } = action.payload;
+			if (state.byClans[clanId]) {
+				channelsAdapter.updateOne(state.byClans[clanId].entities, update);
+			}
+		},
+
+		upsertOne: (state: ChannelsState, action: PayloadAction<{ clanId: string; channel: ChannelsEntity }>) => {
+			const { clanId, channel } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			const existingEntity = state.byClans[clanId].entities.entities[channel.id];
 			if (
 				!existingEntity ||
 				!isEqual(
@@ -571,35 +671,72 @@ export const channelsSlice = createSlice({
 						last_seen_message: { ...existingEntity.last_seen_message },
 						last_sent_message: { ...existingEntity.last_sent_message }
 					},
-					action.payload
+					channel
 				)
 			) {
-				channelsAdapter.upsertOne(state, action.payload);
+				channelsAdapter.upsertOne(state.byClans[clanId].entities, channel);
 			}
 		},
-		removeByChannelID: (state, action: PayloadAction<string>) => {
-			channelsAdapter.removeOne(state, action.payload);
+
+		removeByChannelID: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (state.byClans[clanId]) {
+				channelsAdapter.removeOne(state.byClans[clanId].entities, channelId);
+			}
 		},
-		setModeResponsive: (state, action) => {
-			state.modeResponsive = action.payload;
+		setModeResponsive: (state, action: PayloadAction<{ clanId: string; mode: ModeResponsive }>) => {
+			const { clanId, mode } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].modeResponsive = mode;
 		},
-		setCurrentChannelId: (state, action: PayloadAction<string>) => {
-			state.currentChannelId = action.payload;
+		setCurrentChannelId: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].currentChannelId = channelId;
 		},
-		setSelectedChannelId: (state, action: PayloadAction<string>) => {
-			state.selectedChannelId = action.payload;
+
+		setSelectedChannelId: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].selectedChannelId = channelId;
 		},
-		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
-			state.currentVoiceChannelId = action.payload;
+
+		setCurrentVoiceChannelId: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].currentVoiceChannelId = channelId;
 		},
-		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
-			state.isOpenCreateNewChannel = action.payload;
+
+		openCreateNewModalChannel: (state, action: PayloadAction<{ clanId: string; isOpen: boolean }>) => {
+			const { clanId, isOpen } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].isOpenCreateNewChannel = isOpen;
 		},
-		setCurrentCategory: (state, action: PayloadAction<ICategory>) => {
-			state.currentCategory = action.payload;
+
+		setCurrentCategory: (state, action: PayloadAction<{ clanId: string; category: ICategory }>) => {
+			const { clanId, category } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].currentCategory = category;
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
+			const clanId = payload.clan_id;
+
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
 
 			if (payload.parrent_id !== '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
@@ -607,92 +744,160 @@ export const channelsSlice = createSlice({
 					type: payload.channel_type,
 					active: 1
 				});
-				channelsAdapter.addOne(state, channel);
+				channelsAdapter.addOne(state.byClans[clanId].entities, channel);
 			} else if (payload.parrent_id === '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
 					type: payload.channel_type
 				});
-				channelsAdapter.addOne(state, channel);
+				channelsAdapter.addOne(state.byClans[clanId].entities, channel);
 			}
 		},
+
 		deleteChannelSocket: (state, action: PayloadAction<ChannelDeletedEvent>) => {
 			const payload = action.payload;
-			channelsAdapter.removeOne(state, payload.channel_id);
-		},
-		updateChannelSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
-			const payload = action.payload;
-			channelsAdapter.updateOne(state, {
-				id: payload.channel_id,
-				changes: {
-					channel_label: payload.channel_label,
-					app_url: payload.app_url,
-					status: payload.status,
-					meeting_code: payload.meeting_code
-				}
-			});
+			const clanId = payload.clan_id;
+
+			if (state.byClans[clanId]) {
+				channelsAdapter.removeOne(state.byClans[clanId].entities, payload.channel_id);
+			}
 		},
 
-		setStatusChannelFetch: (state) => {
-			state.fetchChannelSuccess = false;
+		updateChannelSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
+			const payload = action.payload;
+			const clanId = payload.clan_id;
+
+			if (state.byClans[clanId]) {
+				channelsAdapter.updateOne(state.byClans[clanId].entities, {
+					id: payload.channel_id,
+					changes: {
+						...action.payload
+					}
+				});
+			}
+		},
+
+		setStatusChannelFetch: (state, action: PayloadAction<string>) => {
+			const clanId = action.payload;
+			if (state.byClans[clanId]) {
+				state.byClans[clanId].fetchChannelSuccess = false;
+			}
 		},
 
 		updateChannelPrivateSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
 			const payload = action.payload;
-			const entity = state.entities[payload.channel_id];
-			let channelPrivate: number;
-			if (entity) {
-				if (entity.channel_private && entity.channel_private === 1) {
-					channelPrivate = 0;
+			const clanId = payload.clan_id;
+
+			if (state.byClans[clanId]) {
+				const entity = state.byClans[clanId].entities.entities[payload.channel_id];
+				let channelPrivate: number;
+				if (entity) {
+					if (entity.channel_private && entity.channel_private === 1) {
+						channelPrivate = 0;
+					} else {
+						channelPrivate = 1;
+					}
 				} else {
 					channelPrivate = 1;
 				}
-			} else {
-				channelPrivate = 1;
+				channelsAdapter.updateOne(state.byClans[clanId].entities, {
+					id: payload.channel_id,
+					changes: {
+						channel_private: channelPrivate
+					}
+				});
 			}
-			channelsAdapter.updateOne(state, {
-				id: payload.channel_id,
-				changes: {
-					channel_private: channelPrivate
-				}
-			});
 		},
-		setRequestInput: (state, action: PayloadAction<{ channelId: string; request: RequestInput }>) => {
-			state.request[action.payload.channelId] = action.payload.request;
+
+		setRequestInput: (state, action: PayloadAction<{ clanId: string; channelId: string; request: RequestInput }>) => {
+			const { clanId, channelId, request } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].request[channelId] = request;
 		},
+
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
-			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
-			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].idChannelSelected[clanId] = channelId;
+			localStorage.setItem('remember_channel', JSON.stringify(state.byClans[clanId].idChannelSelected));
 		},
+
 		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
-			delete state.idChannelSelected[action.payload.clanId];
-			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
-		},
-		setPreviousChannels: (state, action: PayloadAction<{ channelId: string }>) => {
-			state.previousChannels = state.previousChannels.filter((channelId) => channelId !== action.payload.channelId);
-			state.previousChannels.unshift(action.payload.channelId);
-			if (state.previousChannels.length > 3) {
-				state.previousChannels.pop();
+			const { clanId } = action.payload;
+			if (state.byClans[clanId]) {
+				delete state.byClans[clanId].idChannelSelected[clanId];
+				localStorage.setItem('remember_channel', JSON.stringify(state.byClans[clanId].idChannelSelected));
 			}
 		},
-		updateChannelBadgeCount: (state: ChannelsState, action: PayloadAction<{ channelId: string; count: number; isReset?: boolean }>) => {
-			const { channelId, count, isReset = false } = action.payload;
-			const entity = state.entities[channelId];
-			if (entity) {
-				const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
-				if (entity.count_mess_unread !== newCountMessUnread) {
-					channelsAdapter.updateOne(state, {
-						id: channelId,
-						changes: {
-							count_mess_unread: newCountMessUnread
-						}
-					});
+
+		setPreviousChannels: (state: ChannelsState, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) return;
+
+			state.byClans[clanId].previousChannels = [{ clanId, channelId }, ...(state.byClans[clanId].previousChannels || []).slice(0, 4)];
+		},
+		updateChannelBadgeCount: (
+			state: ChannelsState,
+			action: PayloadAction<{ clanId: string; channelId: string; count: number; isReset?: boolean }>
+		) => {
+			const { clanId, channelId, count, isReset = false } = action.payload;
+			if (state.byClans[clanId]) {
+				const entity = state.byClans[clanId].entities.entities[channelId];
+				if (entity) {
+					const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
+					if (entity.count_mess_unread !== newCountMessUnread) {
+						channelsAdapter.updateOne(state.byClans[clanId].entities, {
+							id: channelId,
+							changes: {
+								count_mess_unread: newCountMessUnread
+							}
+						});
+					}
 				}
 			}
 		},
 
-		setBuzzState: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
-			state.buzzState[action.payload.channelId] = action.payload.buzzState;
+		updateAppChannel: (state, action: PayloadAction<{ clanId: string; channelId: string; changes: Partial<ApiChannelAppResponse> }>) => {
+			const { clanId, channelId, changes } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			if (state.byClans[clanId].appChannelsList[channelId]) {
+				state.byClans[clanId].appChannelsList[channelId] = {
+					...state.byClans[clanId].appChannelsList[channelId],
+					...changes
+				};
+			}
+		},
+
+		addFavorite: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			if (!Array.isArray(state.byClans[clanId].favoriteChannels)) {
+				state.byClans[clanId].favoriteChannels = [];
+			}
+			state.byClans[clanId].favoriteChannels.push(channelId);
+		},
+
+		removeFavorite: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (state.byClans[clanId]) {
+				state.byClans[clanId].favoriteChannels = state.byClans[clanId].favoriteChannels.filter((id) => id !== channelId);
+			}
+		},
+
+		setBuzzState: (state, action: PayloadAction<{ clanId: string; channelId: string; buzzState: BuzzArgs | null }>) => {
+			const { clanId, channelId, buzzState } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].buzzState[channelId] = buzzState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -700,11 +905,15 @@ export const channelsSlice = createSlice({
 			.addCase(fetchChannels.pending, (state: ChannelsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
-				channelsAdapter.setAll(state, action.payload);
-				state.fetchChannelSuccess = true;
-				state.loadingStatus = 'loaded';
-			})
+			.addCase(
+				fetchChannels.fulfilled,
+				(state: ChannelsState, action: PayloadAction<{ channels: ChannelsEntity[]; clanId: string; fromCache?: boolean }>) => {
+					state.loadingStatus = 'loaded';
+					state.byClans[action.payload.clanId].fetchChannelSuccess = true;
+					if (action.payload.fromCache) return;
+					channelsAdapter.setAll(state.byClans[action.payload.clanId].entities, action.payload.channels);
+				}
+			)
 			.addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -725,9 +934,11 @@ export const channelsSlice = createSlice({
 			.addCase(createNewChannel.pending, (state: ChannelsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
+			.addCase(createNewChannel.fulfilled, (state: ChannelsState, action) => {
 				state.loadingStatus = 'loaded';
-				state.isOpenCreateNewChannel = false;
+				if (action.payload?.clan_id) {
+					state.byClans[action.payload.clan_id].isOpenCreateNewChannel = false;
+				}
 			})
 			.addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
 				state.loadingStatus = 'error';
@@ -746,8 +957,12 @@ export const channelsSlice = createSlice({
 				state.error = action.error.message;
 			});
 
-		builder.addCase(fetchAppChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ApiChannelAppResponse[]>) => {
-			state.appChannelsList = action.payload.reduce<Record<string, ApiChannelAppResponse>>((acc, appChannel) => {
+		builder.addCase(fetchAppChannels.fulfilled, (state: ChannelsState, action) => {
+			const clanId = action.meta.arg.clanId;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			state.byClans[clanId].appChannelsList = action.payload.reduce<Record<string, ApiChannelAppResponse>>((acc, appChannel) => {
 				if (appChannel.channel_id) {
 					acc[appChannel.channel_id] = appChannel;
 				}
@@ -759,27 +974,27 @@ export const channelsSlice = createSlice({
 			.addCase(fetchListFavoriteChannel.pending, (state) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchListFavoriteChannel.fulfilled, (state, action) => {
-				state.loadingStatus = 'loaded';
-				if (action.payload) {
-					state.favoriteChannels = action.payload.channel_ids;
-				} else {
-					state.favoriteChannels = [];
+			.addCase(
+				fetchListFavoriteChannel.fulfilled,
+				(state, action: PayloadAction<{ channel_ids: string[]; clanId: string; fromCache?: boolean }>) => {
+					if (!action?.payload || action.payload?.fromCache) return;
+					const { clanId } = action.payload;
+					if (!state.byClans[clanId]) {
+						state.byClans[clanId] = getInitialClanState();
+					}
+					state.byClans[clanId].favoriteChannels = action.payload.channel_ids;
+					state.byClans[clanId].fetchChannelSuccess = true;
 				}
-				state.fetchChannelSuccess = true;
-			})
+			)
 			.addCase(fetchListFavoriteChannel.rejected, (state, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addCase(addFavoriteChannel.fulfilled, (state, action) => {
-				if (!state.favoriteChannels) {
-					state.favoriteChannels = [];
-				}
-				state.favoriteChannels.push(action.payload?.channel_id || '');
-			})
 			.addCase(removeFavoriteChannel.fulfilled, (state, action) => {
-				state.favoriteChannels = state.favoriteChannels.filter((id) => id !== action.meta.arg.channelId);
+				const { clanId, channelId } = action.meta.arg;
+				if (state.byClans[clanId]) {
+					state.byClans[clanId].favoriteChannels = state.byClans[clanId].favoriteChannels.filter((id) => id !== channelId);
+				}
 			});
 	}
 });
@@ -842,23 +1057,39 @@ import { remove } from '@mezon/mobile-components';
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = channelsAdapter.getSelectors();
+const { selectAll } = channelsAdapter.getSelectors();
 
 export const getChannelsState = (rootState: { [CHANNELS_FEATURE_KEY]: ChannelsState }): ChannelsState => rootState[CHANNELS_FEATURE_KEY];
 
-export const selectAllChannels = createSelector(getChannelsState, selectAll);
+export const selectAllChannels = createSelector([getChannelsState, (state: RootState) => state.clans.currentClanId as string], (state, clanId) =>
+	selectAll(state.byClans[clanId]?.entities ?? channelsAdapter.getInitialState())
+);
 
-export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
-
+export const selectChannelsEntities = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.entities.entities ?? {}
+);
 export const selectChannelById2 = createSelector([selectChannelsEntities, (state, id) => id], (channelsEntities, id) => channelsEntities[id] || null);
 
-export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
+export const selectCurrentChannelId = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.currentChannelId
+);
 
-export const selectSelectedChannelId = createSelector(getChannelsState, (state) => state.selectedChannelId);
+export const selectSelectedChannelId = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.selectedChannelId
+);
 
-export const selectModeResponsive = createSelector(getChannelsState, (state) => state.modeResponsive);
+export const selectModeResponsive = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.modeResponsive
+);
 
-export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
+export const selectCurrentVoiceChannelId = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.currentVoiceChannelId
+);
 
 export const selectChannelUserByChannelId = createSelector(
 	[selectAllChannelsByUser, (state, channelId: string) => channelId],
@@ -904,68 +1135,64 @@ export const selectChannelFirst = createSelector(selectAllChannels, (channels) =
 
 export const selectChannelSecond = createSelector(selectAllChannels, (channels) => channels[1]);
 
-export const selectChannelsByClanId = (clainId: string) =>
-	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id === clainId));
+export const selectChannelsByClanId = createSelector(
+	[selectAllChannels, (state: RootState, clanId: string) => clanId],
+	(channels, clanId) => channels
+);
 
-export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
-	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
-		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
-			const selectedChannel = channels.find((channel) => channel.channel_id === idsSelectedChannel[clanId]);
-			if (selectedChannel) {
-				return selectedChannel.id;
-			}
-		}
-
-		if (categories) {
-			for (const category of categories) {
-				const filteredChannel = channels.find(
-					(channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.category_id === category
-				);
-				if (filteredChannel) {
-					return filteredChannel.id;
-				}
-			}
-		}
-
+export const selectDefaultChannelIdByClanId = createSelector(
+	[selectAllChannels, (state: RootState, clanId: string) => clanId],
+	(channels, clanId) => {
 		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT);
-
 		return defaultChannel ? defaultChannel.id : null;
-	});
+	}
+);
 
-export const selectRequestByChannelId = (channelId: string) =>
-	createSelector(getChannelsState, (state) => {
-		return state.request?.[channelId];
-	});
+export const selectRequestByChannelId = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (state, channelId: string) => channelId],
+	(state, clanId, channelId) => state.byClans[clanId]?.request[channelId] ?? null
+);
 
-export const selectIdChannelSelectedByClanId = (clanId: string) =>
-	createSelector(getChannelsState, (state) => {
-		return state.idChannelSelected[clanId];
-	});
+export const selectAllIdChannelSelected = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.idChannelSelected ?? {}
+);
 
-export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
+export const selectAllChannelsFavorite = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.favoriteChannels ?? []
+);
 
-export const selectAllChannelsFavorite = createSelector(getChannelsState, (state) => state.favoriteChannels);
-
-export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);
+export const selectPreviousChannels = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.previousChannels ?? []
+);
 
 export const selectAppChannelById = (channelId: string) =>
-	createSelector(getChannelsState, (state) => {
-		return state.appChannelsList[channelId];
-	});
+	createSelector(
+		[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+		(state, clanId) => state.byClans[clanId]?.appChannelsList[channelId]
+	);
 
-export const selectFetchChannelStatus = createSelector(getChannelsState, (state) => state.fetchChannelSuccess);
+export const selectFetchChannelStatus = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.fetchChannelSuccess ?? false
+);
 
-export const selectAnyUnreadChannels = createSelector([getChannelsState, selectEntiteschannelCategorySetting], (state, settings) => {
-	for (let index = 0; index < state?.ids?.length; index++) {
-		const channel = state?.entities?.[state?.ids[index]];
-		if (settings?.[channel?.id]?.action === enableMute) continue;
-		if (channel.count_mess_unread && channel.count_mess_unread > 0) {
-			return true;
+export const selectAnyUnreadChannels = createSelector(
+	[getChannelsState, selectEntiteschannelCategorySetting, (state: RootState) => state.clans.currentClanId as string],
+	(state, settings, clanId) => {
+		const entities = state.byClans[clanId]?.entities;
+		if (!entities) return false;
+
+		for (const id of entities.ids) {
+			const channel = entities.entities[id];
+			if (settings?.[channel?.id]?.action === enableMute) continue;
+			if (channel?.count_mess_unread) return true;
 		}
+		return false;
 	}
-	return false;
-});
+);
 
 export const selectThreadCurrentChannel = createSelector(
 	[selectChannelsEntities, selectCurrentChannelId, selectListThreadId],
@@ -978,18 +1205,29 @@ export const selectThreadCurrentChannel = createSelector(
 );
 
 export const selectChannelThreads = createSelector([selectAllChannels], (channels) => {
-	const channelFilter = channels.filter((channel) => channel.parrent_id === '0' || channel.parrent_id === '');
-	const channelThread = channelFilter.map((channel) => {
-		const thread = channels.filter((thread) => channel && channel?.channel_id === thread.parrent_id) as ChannelsEntity[];
-		return {
-			...channel,
-			threads: thread
-		};
-	});
-	return channelThread as ChannelThreads[];
+	const threadsByParentId = new Map<string, ChannelsEntity[]>();
+
+	const parentChannels: ChannelsEntity[] = [];
+
+	for (const channel of channels) {
+		const parentId = channel.parrent_id;
+
+		if (parentId === '0' || parentId === '') {
+			parentChannels.push(channel);
+		} else {
+			const threads = threadsByParentId.get(parentId as string) || [];
+			threads.push(channel);
+			threadsByParentId.set(parentId as string, threads);
+		}
+	}
+
+	return parentChannels.map((channel) => ({
+		...channel,
+		threads: threadsByParentId.get(channel.channel_id as string) || []
+	})) as ChannelThreads[];
 });
 
 export const selectBuzzStateByChannelId = createSelector(
-	[getChannelsState, (state, channelId: string) => channelId],
-	(state, channelId) => state.buzzState?.[channelId]
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (state, channelId: string) => channelId],
+	(state, clanId, channelId) => state.byClans[clanId]?.buzzState[channelId]
 );

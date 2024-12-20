@@ -1,17 +1,19 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
 import { getUpdateOrAddClanChannelCache, Icons, save, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
 	clansActions,
 	directActions,
+	fetchListNotification,
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
 	RootState,
 	selectCurrentClanId,
+	selectLastNotificationId,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
@@ -20,7 +22,7 @@ import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -40,7 +42,7 @@ const Notifications = () => {
 	const [notify, setNotify] = useState<INotification>();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const loadingStatus = useSelector((state: RootState) => state?.notification?.loadingStatus);
-	const isLoading = useMemo(() => ['loading', 'not loaded']?.includes(loadingStatus), [loadingStatus]);
+	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
 	const dispatch = useAppDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const { t } = useTranslation(['notification']);
@@ -48,55 +50,70 @@ const Notifications = () => {
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const bottomSheetOptionsRef = useRef<BottomSheetModal>(null);
 	const timeoutRef = useRef(null);
-
-	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
+	const [isLoadMore, setIsLoadMore] = useState(true);
+	const [firstLoading, setFirstLoading] = useState(true);
+	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true, messages: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
+	const lastNotificationId = useSelector(selectLastNotificationId);
 
 	useFocusEffect(
 		React.useCallback(() => {
+			setSelectedTabs({ individual: true, mention: true, messages: true });
+			setIsLoadMore(true);
 			if (currentClanId && currentClanId !== '0') {
 				initLoader();
 			}
 			return () => {
 				dispatch(notificationActions.refreshStatus());
+				setNotificationsFilter([]);
+				setFirstLoading(true);
 			};
 		}, [currentClanId])
 	);
 
-	useEffect(() => {
-		handleFilterNotify(EActionDataNotify.All);
-	}, [notification]);
+	const handleFilterNotify = useCallback(
+		(selectedTabs) => {
+			const sortNotifications = notification?.sort((a, b) => {
+				const dateA = new Date(a.create_time || '').getTime();
+				const dateB = new Date(b.create_time || '').getTime();
+				return dateB - dateA;
+			});
+
+			const allTabs = [EActionDataNotify.Individual, EActionDataNotify.Mention, EActionDataNotify.Messages];
+			const isAllSelected = allTabs.every((tab) => selectedTabs.includes(tab));
+			if (isAllSelected) {
+				setNotificationsFilter(sortNotifications);
+				return;
+			}
+
+			const isNotificationIncluded = (notification) => {
+				return selectedTabs.some((tab) => {
+					switch (tab) {
+						case EActionDataNotify.Individual:
+							return (
+								notification?.code !== NotificationCode.USER_REPLIED &&
+								notification?.code !== NotificationCode.USER_MENTIONED &&
+								notification?.code !== NotificationCode.NOTIFICATION_CLAN
+							);
+						case EActionDataNotify.Mention:
+							return notification?.code === NotificationCode.USER_REPLIED || notification?.code === NotificationCode.USER_MENTIONED;
+						case EActionDataNotify.Messages:
+							return notification?.code === NotificationCode.NOTIFICATION_CLAN;
+						default:
+							return false;
+					}
+				});
+			};
+
+			const filteredNotifications = sortNotifications.filter(isNotificationIncluded);
+			setNotificationsFilter(filteredNotifications);
+		},
+		[notification]
+	);
 
 	const initLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId, noCache: true }));
-	};
-
-	const handleFilterNotify = (tabNotify) => {
-		const sortNotifications = notification.sort((a, b) => {
-			const dateA = new Date(a.create_time || '').getTime();
-			const dateB = new Date(b.create_time || '').getTime();
-			return dateB - dateA;
-		});
-
-		switch (tabNotify) {
-			case EActionDataNotify.Individual:
-				setNotificationsFilter(
-					sortNotifications.filter((item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED)
-				);
-				break;
-			case EActionDataNotify.Mention:
-				setNotificationsFilter(
-					sortNotifications.filter((item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED)
-				);
-				break;
-			case EActionDataNotify.All:
-				setNotificationsFilter(sortNotifications);
-				break;
-			default:
-				setNotificationsFilter([]);
-				break;
-		}
+		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
 	};
 
 	const handleTabChange = (value, isSelected) => {
@@ -107,15 +124,23 @@ const Notifications = () => {
 	};
 
 	useEffect(() => {
-		setSelectedTabs({ individual: true, mention: true });
-	}, [currentClanId]);
-
-	useEffect(() => {
-		const { individual, mention } = selectedTabs;
-		handleFilterNotify(
-			individual && mention ? EActionDataNotify.All : individual ? EActionDataNotify.Individual : mention ? EActionDataNotify.Mention : null
-		);
-	}, [selectedTabs.individual, selectedTabs.mention]);
+		const selectedTabKeys = Object.entries(selectedTabs)
+			?.filter(([key, value]) => value)
+			?.map(([key]) => {
+				switch (key) {
+					case EActionDataNotify.Individual:
+						return EActionDataNotify.Individual;
+					case EActionDataNotify.Mention:
+						return EActionDataNotify.Mention;
+					case EActionDataNotify.Messages:
+						return EActionDataNotify.Messages;
+					default:
+						return null;
+				}
+			})
+			?.filter(Boolean);
+		handleFilterNotify(selectedTabKeys);
+	}, [selectedTabs, handleFilterNotify]);
 
 	useEffect(() => {
 		return () => {
@@ -149,7 +174,7 @@ const Notifications = () => {
 			requestAnimationFrame(async () => {
 				const promises = [];
 				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-					promises.push(store.dispatch(directActions.fetchDirectMessage({ noCache: true })));
+					promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
 				} else {
 					if (notify?.content?.clan_id !== currentClanId) {
@@ -161,7 +186,8 @@ const Notifications = () => {
 							channelsActions.joinChannel({
 								clanId: notify?.content?.clan_id ?? '',
 								channelId: notify?.content?.channel_id,
-								noFetchMembers: false
+								noFetchMembers: false,
+								noCache: true
 							})
 						)
 					);
@@ -216,6 +242,27 @@ const Notifications = () => {
 		navigation.goBack();
 	};
 
+	const fetchMoreData = useCallback(async () => {
+		setFirstLoading(false);
+		if (isLoadMore) {
+			await dispatch(
+				fetchListNotification({
+					clanId: currentClanId || '',
+					notificationId: lastNotificationId
+				})
+			);
+			setIsLoadMore(false);
+		}
+	}, [isLoadMore, dispatch, currentClanId, lastNotificationId]);
+
+	const ViewLoadMore = () => {
+		return (
+			<View style={styles.loadMoreChannelMessage}>
+				<ActivityIndicator size="large" color={Colors.tertiary} />
+			</View>
+		);
+	};
+
 	return (
 		<View style={styles.notifications}>
 			<View style={styles.notificationsHeader}>
@@ -233,7 +280,7 @@ const Notifications = () => {
 					</View>
 				</Pressable>
 			</View>
-			{isLoading ? (
+			{isLoading && firstLoading ? (
 				<SkeletonNotification numberSkeleton={8} />
 			) : notificationsFilter?.length ? (
 				<FlashList
@@ -247,6 +294,9 @@ const Notifications = () => {
 					}}
 					estimatedItemSize={200}
 					keyExtractor={(item) => `${item.id}_item_noti`}
+					onEndReached={fetchMoreData}
+					onEndReachedThreshold={0.5}
+					ListFooterComponent={isLoadMore && <ViewLoadMore />}
 				/>
 			) : (
 				<EmptyNotification />

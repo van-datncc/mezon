@@ -1,4 +1,4 @@
-import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
+import { useAuth, useIdleRender, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -15,10 +15,10 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, useLongPress } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
+import Tippy from '@tippy.js/react';
 import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MicButton } from '../ChannelTopbar/TopBarComponents/PushToTalkButton/MicIcon';
 import { MemberProfile } from '../MemberProfile';
@@ -37,8 +37,7 @@ export type FooterProfileProps = {
 };
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
-	const { isJoined, isTalking, toggleTalking } = usePushToTalk();
-
+	const { isJoined, isTalking, toggleTalking, quitPTT } = usePushToTalk();
 	const longPressHandlers = useLongPress<HTMLDivElement>({
 		onStart: () => toggleTalking(true),
 		onFinish: () => toggleTalking(false)
@@ -50,6 +49,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const showModalSendToken = useSelector(selectShowModalSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
+	const myProfile = useAuth();
+	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
+
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
@@ -58,14 +60,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
-	const myProfile = useAuth();
-	const isMe = useMemo(() => {
-		return userId === myProfile.userId;
-	}, [myProfile.userId, userId]);
+	const isMe = userId === myProfile?.userId;
+
 	const tokenInWallet = useMemo(() => {
 		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
 	}, [myProfile?.userProfile?.wallet]);
-	const getTokenSocket = useSelector(selectUpdateToken(myProfile.userId ?? ''));
 
 	const handleClickFooterProfile = () => {
 		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));
@@ -117,11 +116,36 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
 		handleCloseModalSendToken();
 	};
-	const rootRef = useRef<HTMLButtonElement>(null);
+
+	const loadParamsSendTokenFromURL = () => {
+		const params = new URLSearchParams(window.location.search);
+		const openPopup = params.get('openPopup') === 'true';
+		if (!openPopup) return;
+
+		const tokenParam = params.get('token');
+		const userIdParam = params.get('userId');
+		const noteParam = params.get('note');
+
+		if (tokenParam) setToken(Number(tokenParam));
+		if (userIdParam) setSelectedUserId(userIdParam);
+		if (noteParam) setNote(noteParam);
+
+		dispatch(giveCoffeeActions.setShowModalSendToken(true));
+	};
+
+	useEffect(() => {
+		loadParamsSendTokenFromURL();
+	}, []);
+
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return <></>;
 
 	return (
 		<>
-			<button
+			<div
 				ref={rootRef}
 				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
@@ -129,7 +153,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`} onClick={handleClickFooterProfile}>
-					<div className="pointer-events-none">
+					<div className="cursor-pointer">
 						<MemberProfile
 							name={name}
 							status={{ status: isMe ? true : status, isMobile: false }}
@@ -152,23 +176,34 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					)}
 				</div>
 				{isJoined && (
-					<div {...longPressHandlers}>
-						<MicButton isTalking={isTalking} />
-					</div>
+					<>
+						<Tippy content="Quit PTT" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+							<span>
+								<Icons.LeavePtt
+									onClick={quitPTT}
+									className="cursor-pointer size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
+								/>
+							</span>
+						</Tippy>
+
+						<div {...longPressHandlers}>
+							<MicButton isTalking={isTalking} />
+						</div>
+					</>
 				)}
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+					<Tippy content="Settings" className={` ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
 						<div
 							onClick={openSetting}
-							className="ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
+							className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
 						>
 							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
 						</div>
-					</Tooltip>
+					</Tippy>
 				</div>
-			</button>
+			</div>
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}
@@ -182,6 +217,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{showModalSendToken && (
 				<ModalSendToken
 					setToken={setToken}
+					token={token}
+					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
 					onClose={handleCloseModalSendToken}
@@ -190,6 +227,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					error={error}
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
+					note={note}
 				/>
 			)}
 		</>

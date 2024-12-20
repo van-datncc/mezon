@@ -117,7 +117,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const handleVoiceChannel = (id: string) => {
 			if (channel.status === StatusVoiceChannel.Active) {
-				dispatch(channelsActions.setCurrentVoiceChannelId(id));
+				dispatch(channelsActions.setCurrentVoiceChannelId({ channelId: id, clanId: channel.clan_id as string }));
 				dispatch(voiceActions.setStatusCall(true));
 				dispatch(videoStreamActions.stopStream());
 			}
@@ -143,7 +143,12 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setStatusMenu(false);
 			}
 			if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
-				dispatch(channelsActions.setCurrentChannelId(channel.id));
+				dispatch(
+					channelsActions.setCurrentChannelId({
+						clanId: channel.clan_id as string,
+						channelId: channel.id
+					})
+				);
 				dispatch(JoinPTTActions.clear());
 			}
 			dispatch(appActions.setIsShowCanvas(false));
@@ -201,7 +206,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const [openSettingModal, closeSettingModal] = useModal(() => {
 			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
-		}, []);
+		}, [channel]);
 
 		const isAgeRestrictedChannel = useMemo(() => {
 			return channel?.age_restricted === 1;
@@ -240,7 +245,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
 					</span>
 				) : (
-					<Link to={channelPath} onClick={handleClick} className="channel-link">
+					<Link to={channelPath} onClick={handleClick} className="channel-link" draggable="false">
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
@@ -297,7 +302,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								onClick={handleOpenCreate}
 							/>
 							<div
-								className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red600 rounded-full text-xs text-center top-2`}
+								className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red-600 rounded-full text-xs text-center top-2`}
 							>
 								{numberNotification}
 							</div>
@@ -338,7 +343,9 @@ export const ChannelLink = memo(
 		prev.channel?.id === curr?.channel?.id &&
 		prev.isActive === curr.isActive &&
 		prev.numberNotification === curr.numberNotification &&
-		prev.isUnReadChannel === curr.isUnReadChannel
+		prev.isUnReadChannel === curr.isUnReadChannel &&
+		prev.channel?.channel_label === curr?.channel?.channel_label &&
+		prev.channel?.channel_private === curr?.channel?.channel_private
 );
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;

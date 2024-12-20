@@ -47,7 +47,7 @@ const FriendsPage = () => {
 	});
 
 	useEffect(() => {
-		dispatch(channelsActions.setCurrentChannelId(''));
+		dispatch(channelsActions.setCurrentChannelId({ clanId: '0', channelId: '' }));
 	}, []);
 
 	const handleChange = (key: string, value: string) => {

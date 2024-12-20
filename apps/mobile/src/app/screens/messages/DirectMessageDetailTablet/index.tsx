@@ -1,19 +1,17 @@
-import { useAuth, useChatMessages, useMemberStatus, useSeenMessagePool } from '@mezon/core';
+import { useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	appActions,
-	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
 	gifsStickerEmojiActions,
 	messagesActions,
 	selectCurrentChannel,
-	selectCurrentClanId,
 	selectDmGroupCurrent,
-	selectIsUnreadDMById,
+	selectLastMessageByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
@@ -31,15 +29,13 @@ import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
 
-	const { userId } = useAuth();
-	const isUnreadDM = useAppSelector((state) => selectIsUnreadDMById(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
@@ -81,11 +77,10 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	useChannelSeen(directMessageId || '');
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const isFetchMemberChannelDmRef = useRef(false);
 	const isModeDM = useMemo(() => {
-		return currentDmGroup?.user_id?.length === 1;
-	}, [currentDmGroup?.user_id?.length]);
+		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
+	}, [currentDmGroup?.type]);
 
 	const isTypeDMGroup = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
@@ -121,14 +116,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 		// Rejoin previous clan (other than 0) when exiting the DM detail screen
 		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
-		store.dispatch(
-			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel?.clan_id || '',
-				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-				noCache: true
-			})
-		);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
@@ -242,7 +229,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
                     <VideoIcon /> */}
 				</View>
 			</View>
-			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />}
+			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
 		</SafeAreaView>
 	);
 };
