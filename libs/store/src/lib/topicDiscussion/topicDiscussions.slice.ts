@@ -31,13 +31,13 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 export const topicsAdapter = createEntityAdapter({ selectId: (topic: TopicDiscussionsEntity) => topic.id || '' });
 
 export interface FetchTopicDiscussionsArgs {
-	channelId: string;
+	clanId: string;
 	noCache?: boolean;
 }
 
 const fetchTopicsCached = memoizee(
-	async (mezon: MezonValueContext, channelId: string) => {
-		const response = await mezon.client.listSdTopic(mezon.session, channelId, 50);
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.listSdTopic(mezon.session, clanId, 50);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -67,13 +67,13 @@ export const getFirstMessageOfTopic = createAsyncThunk('topics/getFirstMessageOf
 	}
 });
 
-export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ channelId, noCache }: FetchTopicDiscussionsArgs, thunkAPI) => {
+export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ clanId, noCache }: FetchTopicDiscussionsArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchTopicsCached.clear(mezon, channelId);
+			fetchTopicsCached.clear(mezon, clanId);
 		}
-		const response = await fetchTopicsCached(mezon, channelId);
+		const response = await fetchTopicsCached(mezon, clanId);
 		if (!response.topics) {
 			return [];
 		}
@@ -101,7 +101,7 @@ export const createTopic = createAsyncThunk('topics/createTopic', async (body: A
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createSdTopic(mezon.session, body);
 		if (response) {
-			await thunkAPI.dispatch(fetchTopics({ channelId: body.channel_id as string, noCache: true }));
+			await thunkAPI.dispatch(fetchTopics({ clanId: body.clan_id as string, noCache: true }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);

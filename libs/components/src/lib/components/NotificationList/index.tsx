@@ -43,7 +43,7 @@ const tabDataNotify = [
 	{ title: 'For you', value: InboxType.INDIVIDUAL },
 	{ title: 'Messages', value: InboxType.MESSAGES },
 	{ title: 'Mentions', value: InboxType.MENTIONS },
-	{ title: 'topics', value: InboxType.TOPICS }
+	{ title: 'Topics', value: InboxType.TOPICS }
 ];
 
 function NotificationList({ rootRef }: NotificationProps) {
