@@ -349,7 +349,6 @@ export default class App {
 			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
 		});
 
-		this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 		return this.imageViewerWindow;
 	}
 
