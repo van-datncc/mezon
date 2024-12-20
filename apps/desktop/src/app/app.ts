@@ -314,7 +314,7 @@ export default class App {
 					);
 
 					this.imageViewerWindow.webContents.on('did-finish-load', () => {
-						this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+						this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
 					});
 				} catch (error) {
 					console.error('Failed to load window:', error);
@@ -346,10 +346,13 @@ export default class App {
 		});
 		ipcMain.removeAllListeners(GET_ATTACHMENT_DATA);
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
-			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
+			if (!this.listWindowOpen?.[IMAGE_WINDOW_KEY]) {
+				this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
+			} else {
+				this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
+			}
 		});
 
-		this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 		return this.imageViewerWindow;
 	}
 
