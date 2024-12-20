@@ -1,9 +1,7 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
-import { selectReactionPlaceActive } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { SubPanelName } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 
 export const InputSearch: React.FC = () => {
@@ -14,7 +12,6 @@ export const InputSearch: React.FC = () => {
 	const searchInputRef = useRef<HTMLInputElement | null>(null);
 	const { trendingClickingStatus, setClickedTrendingGif, categoriesStatus, setShowCategories, buttonArrowBackStatus, setButtonArrowBack } =
 		useGifs();
-	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const { setValueInputSearch, valueInputToCheckHandleSearch, valuePlaceHolder } = useGifsStickersEmoji();
 
@@ -41,7 +38,7 @@ export const InputSearch: React.FC = () => {
 	}, [valueSearchGif]);
 
 	useEffect(() => {
-		if (subPanelActive !== SubPanelName.NONE || reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_NONE) {
+		if (subPanelActive !== SubPanelName.NONE) {
 			searchInputRef.current?.focus();
 		}
 	}, [subPanelActive]);
@@ -75,13 +72,7 @@ export const InputSearch: React.FC = () => {
 					<input
 						onChange={handleInputChange}
 						type="text"
-						placeholder={
-							subPanelActive === SubPanelName.EMOJI ||
-							reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM ||
-							reactionPlaceActive === EmojiPlaces.EMOJI_REACTION
-								? valuePlaceHolder
-								: 'search'
-						}
+						placeholder={valuePlaceHolder || 'search'}
 						className="dark:text-[#AEAEAE] text-black dark:placeholder-[#AEAEAE] placeholder-colorTextLightMode outline-none bg-transparent w-full"
 						value={valueInputToCheckHandleSearch}
 						ref={searchInputRef}

@@ -1,4 +1,4 @@
-import { useAppParams, useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAppParams, useAuth, useChatReaction, useEmojiConverted } from '@mezon/core';
 import { selectClanView, selectCurrentChannel, selectMessageByMessageId, selectTheme, useAppSelector } from '@mezon/store';
 import { ContextMenuItem, IEmoji, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -18,7 +18,7 @@ type Props = {
 
 export default function DynamicContextMenu({ menuId, items, mode, messageId }: Props) {
 	const appearanceTheme = useSelector(selectTheme);
-	const { emojiConverted } = useEmojiSuggestion();
+	const emojiConverted = useEmojiConverted();
 
 	const { directId } = useAppParams();
 

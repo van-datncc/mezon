@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { safeJSONParse } from 'mezon-js';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
@@ -39,7 +39,6 @@ export type UpdateBulkMessageReactionsArgs = {
 export interface ReactionState extends EntityState<ReactionEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	reactionPlaceActive: EmojiPlaces;
 	reactionTopState: boolean;
 	reactionBottomState: boolean;
 	reactionRightState: boolean;
@@ -176,7 +175,6 @@ export const writeMessageReaction = createAsyncThunk(
 export const initialReactionState: ReactionState = reactionAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	reactionPlaceActive: EmojiPlaces.EMOJI_REACTION,
 	reactionTopState: false,
 	reactionBottomState: false,
 	reactionRightState: false,
@@ -197,9 +195,6 @@ export const reactionSlice = createSlice({
 	initialState: initialReactionState,
 	reducers: {
 		removeAll: reactionAdapter.removeAll,
-		setReactionPlaceActive(state, action) {
-			state.reactionPlaceActive = action.payload;
-		},
 		setReactionTopState(state, action) {
 			state.reactionTopState = action.payload;
 		},
@@ -375,8 +370,6 @@ export const getReactionState = (rootState: { [REACTION_FEATURE_KEY]: ReactionSt
 export const selectAllEmojiReaction = createSelector(getReactionState, selectAll);
 
 export const selectEmojiReactionEntities = createSelector(getReactionState, selectEntities);
-
-export const selectReactionPlaceActive = createSelector(getReactionState, (state: ReactionState) => state.reactionPlaceActive);
 
 export const selectReactionTopState = createSelector(getReactionState, (state: ReactionState) => state.reactionTopState);
 

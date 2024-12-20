@@ -206,7 +206,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const [openSettingModal, closeSettingModal] = useModal(() => {
 			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
-		}, []);
+		}, [channel]);
 
 		const isAgeRestrictedChannel = useMemo(() => {
 			return channel?.age_restricted === 1;
@@ -344,7 +344,8 @@ export const ChannelLink = memo(
 		prev.isActive === curr.isActive &&
 		prev.numberNotification === curr.numberNotification &&
 		prev.isUnReadChannel === curr.isUnReadChannel &&
-		prev.channel?.channel_label === curr?.channel?.channel_label
+		prev.channel?.channel_label === curr?.channel?.channel_label &&
+		prev.channel?.channel_private === curr?.channel?.channel_private
 );
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;
