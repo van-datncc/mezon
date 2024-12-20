@@ -8,9 +8,6 @@ interface WebRTCContextType {
 	connectionState: RTCIceConnectionState;
 	connect: () => Promise<void>;
 	disconnect: () => void;
-	sendMessage: (message: Record<string, unknown>) => void;
-	errors: string[];
-	messages: string[];
 	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
 	streamVideoRef: React.RefObject<HTMLVideoElement>;
 	isStream: boolean;
@@ -27,25 +24,10 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 	const [isSupported, setIsSupported] = useState(true);
 	const [isConnected, setIsConnected] = useState(false);
 	const [connectionState, setConnectionState] = useState<RTCIceConnectionState>('new');
-	const [errors, setErrors] = useState<string[]>([]);
-	const [messages, setMessages] = useState<string[]>([]);
 	const streamVideoRef = useRef<HTMLVideoElement>(null);
 	const pcRef = useRef<RTCPeerConnection | null>(null);
 	const wsRef = useRef<WebSocket | null>(null);
 	const [isStream, setIsStream] = useState(false);
-
-	const debug = useCallback((...args: string[]) => {
-		addMessage(args.join(' '));
-	}, []);
-
-	const addError = useCallback((...msgs: string[]) => {
-		setErrors((prev) => [...prev, ...msgs]);
-	}, []);
-
-	const addMessage = useCallback((message: string) => {
-		const timestamp = new Date().toISOString();
-		setMessages((prev) => [`${timestamp} ${message}`, ...prev]);
-	}, []);
 
 	useEffect(() => {
 		const checkSupport = () => {
@@ -57,26 +39,17 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				window.RTCPeerConnection
 			);
 			setIsSupported(supported);
-
-			if (!supported) {
-				addError('WebRTC is not supported in your browser');
-			}
 		};
 		checkSupport();
-	}, [addError]);
+	}, []);
 
 	// WebSocket handling
-	const wsSend = useCallback(
-		(message: Record<string, unknown>) => {
-			const jsonStr = JSON.stringify(message);
-			if (wsRef.current?.readyState === WebSocket.OPEN) {
-				wsRef.current.send(jsonStr);
-			} else {
-				debug('ws: send not ready, skipping...', jsonStr);
-			}
-		},
-		[wsRef.current, debug]
-	);
+	const wsSend = useCallback((message: Record<string, unknown>) => {
+		const jsonStr = JSON.stringify(message);
+		if (wsRef.current?.readyState === WebSocket.OPEN) {
+			wsRef.current.send(jsonStr);
+		}
+	}, []);
 
 	// RTCPeerConnection handling
 	const initPeerConnection = useCallback(() => {
@@ -89,15 +62,8 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		});
 
 		peerConnection.oniceconnectionstatechange = () => {
-			debug('ICE state:', peerConnection.iceConnectionState);
 			setConnectionState(peerConnection.iceConnectionState);
 			setIsConnected(peerConnection.iceConnectionState === 'connected');
-			// Handle spinner visibility based on connection state
-			const states = ['new', 'checking', 'failed', 'disconnected', 'closed', 'completed', 'connected'];
-			if (states.includes(peerConnection.iceConnectionState)) {
-				// You might want to handle spinner visibility through a state
-				debug(`ICE connection state changed to: ${peerConnection.iceConnectionState}`);
-			}
 		};
 
 		peerConnection.onicecandidate = (event) => {
@@ -141,20 +107,17 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 
 		pcRef.current = peerConnection;
 		return peerConnection;
-	}, [wsSend, debug]);
+	}, [dispatch, wsSend]);
 
-	const startSession = useCallback(
-		(sd: string) => {
-			if (pcRef.current) {
-				try {
-					pcRef.current.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sd }));
-				} catch (e) {
-					alert(e);
-				}
+	const startSession = useCallback((sd: string) => {
+		if (pcRef.current) {
+			try {
+				pcRef.current.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sd }));
+			} catch (e) {
+				alert(e);
 			}
-		},
-		[pcRef.current]
-	);
+		}
+	}, []);
 
 	const connect = useCallback(async () => {
 		if (!isSupported) {
@@ -172,11 +135,10 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				Value: offer
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Unknown error during connection';
-			addError(errorMessage);
+			console.log(error, 'error');
 			throw error;
 		}
-	}, [pcRef.current, wsSend, isSupported, initPeerConnection, addError]);
+	}, [wsSend, isSupported, initPeerConnection]);
 
 	const disconnect = useCallback(() => {
 		wsRef.current?.close();
@@ -185,8 +147,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		wsRef.current = null;
 		setIsConnected(false);
 		setConnectionState('closed');
-		debug('WebRTC connection closed');
-	}, [debug]);
+	}, []);
 
 	const handleChannelClick = useCallback(
 		(clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => {
@@ -195,7 +156,6 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 			try {
 				const peerConnection = initPeerConnection();
 				websocket.onopen = () => {
-					debug('ws: connection open');
 					const f = () => {
 						peerConnection
 							?.createOffer()
@@ -260,7 +220,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				};
 
 				websocket.onerror = (error) => {
-					addError('WebSocket error:', error.toString());
+					console.log(error, 'error');
 				};
 
 				wsRef.current = websocket;
@@ -277,9 +237,6 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		connectionState,
 		connect,
 		disconnect,
-		sendMessage: wsSend,
-		errors,
-		messages,
 		handleChannelClick,
 		streamVideoRef,
 		isStream
