@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
+import { ChannelMessage, ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
@@ -152,8 +152,7 @@ export const fetchDirectMessage = createAsyncThunk(
 
 				return -1;
 			});
-			const channels = sorted.map(mapDmGroupToEntity);
-			//
+			const channels = sorted.map(mapDmGroupToEntity).filter((item) => item.active);
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
 			return channels;
 		} catch (error) {
@@ -226,6 +225,63 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	}
 );
 
+const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
+	return {
+		id: message.channel_id,
+		clan_id: '0',
+		parrent_id: '0',
+		channel_id: message.channel_id,
+		category_id: '0',
+		type: ChannelType.CHANNEL_TYPE_DM,
+		creator_id: message.sender_id,
+		channel_label: message.display_name,
+		channel_private: 1,
+		channel_avatar: [message.avatar as string],
+		user_id: [message.sender_id],
+		last_sent_message: {
+			id: message.id,
+			timestamp_seconds: message.create_time_seconds,
+			sender_id: message.sender_id,
+			content: JSON.stringify(message.content),
+			attachment: '[]',
+			referece: '[]',
+			mention: '[]',
+			reaction: '[]'
+		},
+		last_seen_message: {
+			id: message.id,
+			timestamp_seconds: message.create_time_seconds
+		},
+		is_online: [true],
+		active: ActiveDm.OPEN_DM,
+		usernames: message.username,
+		creator_name: message.username,
+		create_time_seconds: message.create_time_seconds,
+		update_time_seconds: message.create_time_seconds,
+		metadata: ['{}'],
+		about_me: ['']
+	};
+};
+
+export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageWS', async (message: ChannelMessage, thunkAPI) => {
+	try {
+		const state = thunkAPI.getState() as RootState;
+		const existingDirect = selectDirectById(state, message.channel_id);
+
+		if (!existingDirect) {
+			const directEntity = mapMessageToConversation(message);
+			thunkAPI.dispatch(directActions.upsertOne(directEntity));
+			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
+			return directEntity;
+		}
+
+		return null;
+	} catch (error) {
+		captureSentryError(error, 'direct/addDirectByMessageWS');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 interface AddGroupUserWSPayload {
 	channel_desc: ApiChannelDescription;
 	users: UserProfileRedis[];
@@ -296,9 +352,7 @@ export const directSlice = createSlice({
 	name: DIRECT_FEATURE_KEY,
 	initialState: initialDirectState,
 	reducers: {
-		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
-		upsertMany: directAdapter.upsertMany,
 		upsertOne: directAdapter.upsertOne,
 		update: directAdapter.updateOne,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
@@ -448,6 +502,7 @@ export const directActions = {
 	closeDirectMessage,
 	openDirectMessage,
 	addGroupUserWS,
+	addDirectByMessageWS,
 	follower
 };
 
