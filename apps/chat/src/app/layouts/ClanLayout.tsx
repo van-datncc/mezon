@@ -9,6 +9,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
+	selectGotifyToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
@@ -40,7 +41,8 @@ const ClanEffects: React.FC<{
 	isShowCreateThread: boolean;
 	isShowCreateTopic: boolean;
 	userId?: string;
-}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId }) => {
+	userName?: string;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId, userName }) => {
 	// move code thanh.levan
 
 	const { canvasId } = useAppParams();
@@ -48,6 +50,7 @@ const ClanEffects: React.FC<{
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const { handleChannelClick, disconnect } = useWebRTCStream();
+	const gotifyToken = useSelector(selectGotifyToken);
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -72,7 +75,14 @@ const ClanEffects: React.FC<{
 			currentStreamInfo?.streamId !== currentChannel.channel_id
 		) {
 			disconnect();
-			handleChannelClick(currentClan?.id as string, currentChannel.channel_id as string, userId as string, currentChannel.channel_id as string);
+			handleChannelClick(
+				currentClan?.id as string,
+				currentChannel.channel_id as string,
+				userId as string,
+				currentChannel.channel_id as string,
+				userName as string,
+				gotifyToken as string
+			);
 			dispatch(
 				videoStreamActions.startStream({
 					clanId: currentClan.id || '',
@@ -182,6 +192,7 @@ const ClanLayout = () => {
 				isShowCreateThread={isShowCreateThread}
 				isShowCreateTopic={isShowCreateTopic}
 				userId={userProfile?.user?.id || ''}
+				userName={userProfile?.user?.username || ''}
 			/>
 		</>
 	);

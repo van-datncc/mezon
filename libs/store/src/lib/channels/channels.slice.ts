@@ -140,6 +140,7 @@ type fetchChannelMembersPayload = {
 	messageId?: string;
 	isDmGroup?: boolean;
 	isClearMessage?: boolean;
+	noCache?: boolean;
 };
 
 type JoinChatPayload = {
@@ -182,7 +183,7 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
-	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true, noCache = false }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(reactionActions.removeAll());
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
@@ -194,7 +195,9 @@ export const joinChannel = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 
 			if (!state.messages?.idMessageToJump?.id) {
-				thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage }));
+				thunkAPI.dispatch(
+					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache })
+				);
 			}
 
 			const channel = selectChannelById(getChannelsRootState(thunkAPI), channelId);

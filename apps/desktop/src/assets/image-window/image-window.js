@@ -61,8 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			currentIndex = index;
 			resetImageTransform();
 
-			// Update active thumbnail
-			const thumbnailContainer = document.getElementById('thumbnails');
 			const thumbnails = document.querySelectorAll('.thumbnail');
 			thumbnails.forEach((thumb, idx) => {
 				if (idx === index) {
@@ -245,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	window.electron.on('APP::SET_CURRENT_IMAGE', (event, data) => {
-		updateSelectedImage(data);
+		selectedImage.src = data.url;
 	});
 
 	window.electron.on('APP::CHANGE_ATTACHMENT_LIST', () => {

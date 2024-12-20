@@ -86,7 +86,9 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 
 				timeoutRef.current = setTimeout(async () => {
 					requestAnimationFrame(async () => {
-						await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+						await store.dispatch(
+							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true })
+						);
 					});
 				}, 0);
 
