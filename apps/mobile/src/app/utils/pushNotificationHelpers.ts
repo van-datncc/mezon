@@ -198,7 +198,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			const isExistChannel = respChannel?.payload?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
+			const isExistChannel = respChannel?.payload?.channels?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (isExistChannel) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -215,7 +215,8 @@ export const navigateToNotification = async (store: any, notification: any, navi
 									clanId: clanId ?? '',
 									channelId: channelId,
 									noFetchMembers: false,
-									isClearMessage: true
+									isClearMessage: true,
+									noCache: true
 								})
 							)
 						: Promise.resolve()
@@ -441,6 +442,18 @@ const listRNCallKeep = async (bodyData: any) => {
 export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = safeJSONParse(body || '{}');
+		if (bodyData?.offer === 'CANCEL_CALL') {
+			const callID = load('callID');
+			if (callID) {
+				if (Platform.OS === 'android') {
+					RNNotificationCall.hideNotification();
+					RNNotificationCall.declineCall(callID);
+				} else {
+					RNCallKeep.endCall(callID);
+				}
+			}
+			return;
+		}
 		// const statusSetup = await setupCallKeep();
 		// if (!statusSetup) return;
 		const options = {
@@ -451,6 +464,7 @@ export const setupIncomingCall = async (body: string) => {
 			timeout: 30000
 		};
 		const callID = uuid.v4()?.toString();
+		save('callID', callID);
 		if (Platform.OS === 'android') {
 			await showRNNotificationCall(bodyData, callID);
 		} else {

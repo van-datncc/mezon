@@ -382,6 +382,11 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					}
 				})
 			);
+		} else {
+			const bodyFCMMobile = {
+				offer: 'CANCEL_CALL'
+			};
+			await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 		}
 
 		try {

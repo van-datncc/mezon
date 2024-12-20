@@ -241,7 +241,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				const store = await getStoreAsync();
 				requestAnimationFrame(async () => {
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
 				});
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}

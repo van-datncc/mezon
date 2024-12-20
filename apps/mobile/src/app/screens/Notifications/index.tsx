@@ -186,7 +186,8 @@ const Notifications = () => {
 							channelsActions.joinChannel({
 								clanId: notify?.content?.clan_id ?? '',
 								channelId: notify?.content?.channel_id,
-								noFetchMembers: false
+								noFetchMembers: false,
+								noCache: true
 							})
 						)
 					);

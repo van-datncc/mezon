@@ -4,6 +4,7 @@ import {
 	appActions,
 	selectCurrentChannel,
 	selectCurrentClan,
+	selectGotifyToken,
 	selectIsShowChatStream,
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId2,
@@ -266,7 +267,7 @@ type ChannelStreamProps = {
 	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	channelName?: string;
-	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string) => void;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
 	streamVideoRef: RefObject<HTMLVideoElement>;
 	disconnect: () => void;
 	isStream: boolean;
@@ -290,6 +291,7 @@ export default function ChannelStream({
 	const [showMembersButton, setShowMembersButton] = useState(true);
 	const hideButtonsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const gotifyToken = useSelector(selectGotifyToken);
 
 	const channel = useSelector(selectCurrentChannel);
 	const currentClan = useSelector(selectCurrentClan);
@@ -303,7 +305,9 @@ export default function ChannelStream({
 				currentClan?.id as string,
 				channel?.channel_id as string,
 				userProfile?.user?.id as string,
-				channel?.channel_id as string
+				channel?.channel_id as string,
+				userProfile?.user?.username as string,
+				gotifyToken as string
 			);
 
 			dispatch(
@@ -332,7 +336,14 @@ export default function ChannelStream({
 
 	const handleJoinChannel = async () => {
 		dispatch(videoStreamActions.startStream(currentStreamInfo as IStreamInfo));
-		handleChannelClick(currentClan?.id as string, channel?.channel_id as string, userProfile?.user?.id as string, channel?.channel_id as string);
+		handleChannelClick(
+			currentClan?.id as string,
+			channel?.channel_id as string,
+			userProfile?.user?.id as string,
+			channel?.channel_id as string,
+			userProfile?.user?.username as string,
+			gotifyToken as string
+		);
 	};
 
 	const toggleMembers = () => {
