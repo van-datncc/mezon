@@ -9,6 +9,7 @@ import {
 } from '@mezon/store';
 import { MessageCrypt } from '@mezon/utils';
 
+import { WebRTCStreamProvider } from '@mezon/components';
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
@@ -114,7 +115,9 @@ const MainLayoutWrapper = () => {
 	return (
 		<MezonSuspense>
 			<ChatContextProvider>
-				<MainLayout />
+				<WebRTCStreamProvider>
+					<MainLayout />
+				</WebRTCStreamProvider>
 			</ChatContextProvider>
 		</MezonSuspense>
 	);

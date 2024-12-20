@@ -7,6 +7,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
+	selectGotifyToken,
 	selectStatusStream,
 	selectThreadById,
 	useAppDispatch,
@@ -37,6 +38,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const playStream = useSelector(selectStatusStream);
 	const clanById = useSelector(selectCurrentClan);
 	const { userProfile } = useAuth();
+	const gotifyToken = useSelector(selectGotifyToken);
 	const { handleChannelClick, disconnect } = useWebRTCStream();
 
 	let channel = useTagById(tagId);
@@ -56,7 +58,9 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 						clanById?.id as string,
 						channel?.channel_id as string,
 						userProfile?.user?.id as string,
-						channel?.channel_id as string
+						channel?.channel_id as string,
+						userProfile?.user?.username as string,
+						gotifyToken as string
 					);
 					dispatch(
 						videoStreamActions.startStream({

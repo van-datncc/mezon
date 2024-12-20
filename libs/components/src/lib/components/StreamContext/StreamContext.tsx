@@ -11,7 +11,7 @@ interface WebRTCContextType {
 	sendMessage: (message: Record<string, unknown>) => void;
 	errors: string[];
 	messages: string[];
-	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string) => void;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
 	streamVideoRef: React.RefObject<HTMLVideoElement>;
 	isStream: boolean;
 }
@@ -188,86 +188,88 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		debug('WebRTC connection closed');
 	}, [debug]);
 
-	const handleChannelClick = useCallback((clanId: string, channelId: string, userId: string, streamId: string) => {
-		const wsUrl = process.env.NX_CHAT_APP_STREAM_WS_URL;
-		console.log(wsUrl, 'wsUrl');
-		const websocket = new WebSocket(`${wsUrl}/ws`);
-		try {
-			const peerConnection = initPeerConnection();
-			websocket.onopen = () => {
-				debug('ws: connection open');
-				const f = () => {
-					peerConnection
-						?.createOffer()
-						.then((d) => {
-							peerConnection?.setLocalDescription(d);
-							websocket.send(
-								JSON.stringify({
-									Key: 'session_subscriber',
-									ClanId: clanId,
-									ChannelId: channelId,
-									UserId: userId,
-									Value: d
-								})
-							);
-							websocket.send(
-								JSON.stringify({
-									Key: 'get_channels'
-								})
-							);
-						})
-						.catch((e) => {
-							console.log(e, 'error');
-						});
-				};
-				websocket.readyState === WebSocket.OPEN ? f() : websocket.addEventListener('open', f);
-			};
-
-			websocket.onmessage = (event) => {
-				const data = JSON.parse(event.data);
-				if ('Key' in data) {
-					switch (data.Key) {
-						case 'channels':
-							if (data.Value.includes(streamId)) {
+	const handleChannelClick = useCallback(
+		(clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => {
+			const wsUrl = process.env.NX_CHAT_APP_STREAM_WS_URL;
+			const websocket = new WebSocket(`${wsUrl}/ws?username=${userName}&token=${gotifyToken}`);
+			try {
+				const peerConnection = initPeerConnection();
+				websocket.onopen = () => {
+					debug('ws: connection open');
+					const f = () => {
+						peerConnection
+							?.createOffer()
+							.then((d) => {
+								peerConnection?.setLocalDescription(d);
 								websocket.send(
 									JSON.stringify({
-										Key: 'connect_subscriber',
+										Key: 'session_subscriber',
 										ClanId: clanId,
 										ChannelId: channelId,
 										UserId: userId,
-										Value: { ChannelId: streamId }
+										Value: d
 									})
 								);
-								setIsStream(true);
-							} else {
-								setIsStream(false);
-							}
-							break;
-						case 'session_received':
-							break;
-						case 'error':
-							break;
-						case 'sd_answer':
-							startSession(data.Value);
-							break;
-						case 'ice_candidate':
-							pcRef.current?.addIceCandidate(data.Value);
-							break;
-						default:
-							console.log('Unhandled message:', data);
+								websocket.send(
+									JSON.stringify({
+										Key: 'get_channels'
+									})
+								);
+							})
+							.catch((e) => {
+								console.log(e, 'error');
+							});
+					};
+					websocket.readyState === WebSocket.OPEN ? f() : websocket.addEventListener('open', f);
+				};
+
+				websocket.onmessage = (event) => {
+					const data = JSON.parse(event.data);
+					if ('Key' in data) {
+						switch (data.Key) {
+							case 'channels':
+								if (data.Value.includes(streamId)) {
+									websocket.send(
+										JSON.stringify({
+											Key: 'connect_subscriber',
+											ClanId: clanId,
+											ChannelId: channelId,
+											UserId: userId,
+											Value: { ChannelId: streamId }
+										})
+									);
+									setIsStream(true);
+								} else {
+									setIsStream(false);
+								}
+								break;
+							case 'session_received':
+								break;
+							case 'error':
+								break;
+							case 'sd_answer':
+								startSession(data.Value);
+								break;
+							case 'ice_candidate':
+								pcRef.current?.addIceCandidate(data.Value);
+								break;
+							default:
+								console.log('Unhandled message:', data);
+						}
 					}
-				}
-			};
+				};
 
-			websocket.onerror = (error) => {
-				addError('WebSocket error:', error.toString());
-			};
+				websocket.onerror = (error) => {
+					addError('WebSocket error:', error.toString());
+				};
 
-			wsRef.current = websocket;
-		} catch (error) {
-			console.log(error, 'error');
-		}
-	}, []);
+				wsRef.current = websocket;
+			} catch (error) {
+				console.log(error, 'error');
+			}
+		},
+		[]
+	);
 
 	const value = {
 		isSupported,
