@@ -105,7 +105,7 @@ const ChannelMessageListener = React.memo(() => {
 				clanId,
 				channelId,
 				noFetchMembers: false,
-				noCache: true,
+				noCache: true
 			})
 		);
 	};

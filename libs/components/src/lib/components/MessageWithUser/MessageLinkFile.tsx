@@ -1,14 +1,17 @@
+import { selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { DOWNLOAD_FILE, EFailAttachment, electronBridge } from '@mezon/utils';
+import { DOWNLOAD_FILE, EFailAttachment, electronBridge, IMessageWithUser } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { RenderAttachmentThumbnail } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 	readonly mode?: ChannelStreamMode;
+	message?: IMessageWithUser;
 };
 function formatFileSize(bytes: number) {
 	if (bytes >= 1000000) {
@@ -20,7 +23,7 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-function MessageLinkFile({ attachmentData, mode }: MessageImage) {
+function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 	const handleDownload = async () => {
 		// window.open(attachmentData.);
 		const response = await fetch(attachmentData.url as string);
@@ -58,14 +61,25 @@ function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 		setHoverShowOptButtonStatus(true);
 	};
 
+	const appearanceTheme = useSelector(selectTheme);
+
+	const AttachmentLoader = () => {
+		return (
+			<div className="w-[30px] h-[30px] flex justify-center items-center">
+				<div className={appearanceTheme === 'light' ? 'light-attachment-loader' : 'dark-attachment-loader'} />
+			</div>
+		);
+	};
+
 	return (
 		<div
 			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
-			className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
+			className={`break-all w-full cursor-default gap-3 flex items-center mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
-			<div className="flex items-center">{thumbnailAttachment}</div>
+			{message?.isSending ? <AttachmentLoader /> : <div className="flex items-center">{thumbnailAttachment}</div>}
+
 			{attachmentData.filename === EFailAttachment.FAIL_ATTACHMENT ? (
 				<div className="text-red-500">Attachment failed to load.</div>
 			) : (

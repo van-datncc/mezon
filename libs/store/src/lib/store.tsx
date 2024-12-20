@@ -47,6 +47,7 @@ import { E2EE_FEATURE_KEY, e2eeReducer } from './e2ee/e2ee.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
+import { fcmReducer } from './fcm/fcm.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
 import { walletLedgerReducer } from './giveCoffee/historyTransaction.slice';
@@ -345,6 +346,7 @@ const reducer = {
 	activitiesapi: activitiesAPIReducer,
 	auditlog: auditLogReducer,
 	audiocall: audioCallReducer,
+	fcm: fcmReducer,
 	auditlogfilter: auditLogFilterReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
