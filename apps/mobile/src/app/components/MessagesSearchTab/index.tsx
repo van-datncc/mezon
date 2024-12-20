@@ -130,7 +130,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	const handleJoinChannel = async (clanId: string, channelId: string) => {
 		const store = await getStoreAsync();
 		requestAnimationFrame(async () => {
-			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
 		});
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);

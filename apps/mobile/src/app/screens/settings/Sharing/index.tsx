@@ -211,7 +211,8 @@ export const Sharing = ({ data, onClose }) => {
 					channelsActions.joinChannel({
 						clanId: channelSelected.clan_id ?? '',
 						channelId: channelSelected.channel_id,
-						noFetchMembers: false
+						noFetchMembers: false,
+						noCache: true
 					})
 				);
 			}

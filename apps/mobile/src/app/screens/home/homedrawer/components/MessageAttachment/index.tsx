@@ -67,9 +67,8 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, se
 				return null;
 			}
 			const isShowImage = isImage(document?.url?.toLowerCase());
-			if (isShowImage) {
-				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
-
+			const checkImage = notImplementForGifOrStickerSendFromPanel(document);
+			if (isShowImage || checkImage) {
 				return (
 					<RenderImageChat
 						disable={checkImage}

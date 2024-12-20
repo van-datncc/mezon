@@ -104,7 +104,8 @@ const ChannelMessageListener = React.memo(() => {
 			channelsActions.joinChannel({
 				clanId,
 				channelId,
-				noFetchMembers: false
+				noFetchMembers: false,
+				noCache: true,
 			})
 		);
 	};
