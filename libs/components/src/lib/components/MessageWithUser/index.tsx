@@ -86,32 +86,32 @@ function MessageWithUser({
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 
-	const attachments = message.attachments ?? [];
+	const attachments = message?.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
-	const isMeMessage = message.isMe;
+	const isMeMessage = message?.isMe;
 
-	const shouldNotRender = hasFailedAttachment && !isMeMessage && Object.keys(message.content).length === 0 && !message.mentions?.length;
+	const shouldNotRender = hasFailedAttachment && !isMeMessage && Object.keys(message?.content).length === 0 && !message?.mentions?.length;
 
 	const hasIncludeMention = (() => {
-		if (typeof message.content?.t == 'string') {
-			if (message.content.t?.includes('@here')) return true;
+		if (typeof message?.content?.t == 'string') {
+			if (message?.content.t?.includes('@here')) return true;
 		}
 		const userIdMention = userLogin.userProfile?.user?.id;
-		const includesUser = message.mentions?.some((mention) => mention.user_id === userIdMention);
-		const includesRole = message.mentions?.some((item) => user?.role_id?.includes(item?.role_id as string));
+		const includesUser = message?.mentions?.some((mention) => mention.user_id === userIdMention);
+		const includesRole = message?.mentions?.some((item) => user?.role_id?.includes(item?.role_id as string));
 		return includesUser || includesRole;
 	})();
 
-	const checkMessageHasReply = !!message.references?.length && message.code == TypeMessage.Chat;
+	const checkMessageHasReply = !!message?.references?.length && message?.code == TypeMessage.Chat;
 
 	const checkMessageIncludeMention = hasIncludeMention;
 
 	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
-	const checkJumpPinMessage = jumpPinMessageId === message.id;
+	const checkJumpPinMessage = jumpPinMessageId === message?.id;
 
 	const containerClass = classNames('relative', 'message-container', {
-		'is-sending': message.isSending,
-		'is-error': message.isError,
+		'is-sending': message?.isSending,
+		'is-error': message?.isError,
 		'bg-[#383B47]': isHighlight
 	});
 
@@ -177,7 +177,7 @@ function MessageWithUser({
 	}, [mode]);
 
 	const avatar = useMemo(() => {
-		if (isDM && shortUserId.current === message.sender_id) {
+		if (isDM && shortUserId.current === message?.sender_id) {
 			return message?.avatar;
 		}
 
@@ -185,12 +185,12 @@ function MessageWithUser({
 			return message?.references?.[0]?.mesages_sender_avatar ?? '';
 		}
 
-		if (shortUserId.current === message.sender_id) {
+		if (shortUserId.current === message?.sender_id) {
 			return message?.clan_avatar || message?.avatar;
 		}
-	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.references, message.sender_id]);
+	}, [isDM, message?.avatar, message?.clan_avatar, message?.references, message?.sender_id]);
 
-	const messageHour = convertTimeHour(message?.create_time || ('' as string));
+	const messageHour = message ? convertTimeHour(message.create_time) : '';
 
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
@@ -214,7 +214,7 @@ function MessageWithUser({
 					mode={mode}
 					positionType={''}
 					avatar={avatar}
-					name={message.clan_nick || message?.display_name || message?.username}
+					name={message?.clan_nick || message?.display_name || message?.username}
 					isDM={isDM}
 				/>
 			</div>
@@ -222,14 +222,14 @@ function MessageWithUser({
 	}, [message, avatar]);
 
 	const isMessageSystem =
-		message.code === TypeMessage.Welcome || message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
+		message?.code === TypeMessage.Welcome || message?.code === TypeMessage.CreateThread || message?.code === TypeMessage.CreatePin;
 
 	return (
 		<>
-			{showDivider && <MessageDateDivider message={message} />}
-			{!shouldNotRender && (
+			{message && showDivider && <MessageDateDivider message={message} />}
+			{message && !shouldNotRender && (
 				<HoverStateWrapper isSearchMessage={isSearchMessage} popup={popup}>
-					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
+					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message?.id}`}>
 						<div className="relative rounded-sm overflow-visible">
 							<div className={!isMessageSystem ? childDivClass : 'absolute w-0.5 h-full left-0'}></div>
 							<div className={!isMessageSystem ? parentDivClass : 'flex h-15 flex-col w-auto px-3 pt-[2px]'}>
@@ -245,13 +245,13 @@ function MessageWithUser({
 								>
 									{isMessageSystem ? (
 										<div className="size-10 mt-[2px] flex justify-center rounded-full object-cover min-w-5 min-h-5">
-											{message.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8" />}
-											{message.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6" />}
-											{message.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" />}
+											{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8" />}
+											{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6" />}
+											{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" />}
 										</div>
 									) : (
 										<div>
-											{message.references?.length === 0 && isCombine && !isShowFull ? (
+											{message?.references?.length === 0 && isCombine && !isShowFull ? (
 												<div className="w-10 flex items-center justify-center min-w-10">
 													<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">
 														{messageHour}
@@ -262,7 +262,7 @@ function MessageWithUser({
 													message={message}
 													isEditing={isEditing}
 													mode={mode}
-													onClick={(e) => handleOpenShortUser(e, message.sender_id)}
+													onClick={(e) => handleOpenShortUser(e, message?.sender_id)}
 												/>
 											)}
 										</div>
@@ -271,11 +271,11 @@ function MessageWithUser({
 									<div className="w-full relative h-full">
 										{!isMessageSystem && (
 											<div>
-												{!(isCombine && message.references?.length === 0 && !isShowFull) && (
+												{!(isCombine && message?.references?.length === 0 && !isShowFull) && (
 													<MessageHead
 														message={message}
 														mode={mode}
-														onClick={(e) => handleOpenShortUser(e, message.sender_id)}
+														onClick={(e) => handleOpenShortUser(e, message?.sender_id)}
 													/>
 												)}
 											</div>
@@ -285,18 +285,18 @@ function MessageWithUser({
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 												{isEditing && (
 													<MessageInput
-														messageId={message.id}
-														channelId={message.channel_id}
+														messageId={message?.id}
+														channelId={message?.channel_id}
 														mode={mode}
 														channelLabel={channelLabel as string}
 														message={message}
 													/>
 												)}
-												{!isEditing && !message.content?.callLog?.callLogType && (
+												{!isEditing && !message?.content?.callLog?.callLogType && (
 													<MessageContent
 														message={message}
-														isSending={message.isSending}
-														isError={message.isError}
+														isSending={message?.isSending}
+														isError={message?.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
 														isInTopic={isTopic}
@@ -307,35 +307,35 @@ function MessageWithUser({
 												{/* show html canvas */}
 												{message?.content?.canvas && <HtmlCanvasView response={message?.content?.canvas} />}
 
-												{Array.isArray(message.content?.embed) &&
-													message.content.embed?.map((embed, index) => (
+												{Array.isArray(message?.content?.embed) &&
+													message?.content.embed?.map((embed, index) => (
 														<EmbedMessage
 															key={index}
 															embed={embed}
-															senderId={message.sender_id}
-															message_id={message.id}
+															senderId={message?.sender_id}
+															message_id={message?.id}
 														/>
 													))}
 
-												{!!message.content?.callLog?.callLogType && (
+												{!!message?.content?.callLog?.callLogType && (
 													<CallLogMessage
 														userId={userId || ''}
 														userName={userLogin.userProfile?.user?.display_name || ''}
-														channelId={message.channel_id}
-														messageId={message.id}
-														senderId={message.sender_id}
-														callLog={message.content?.callLog}
+														channelId={message?.channel_id}
+														messageId={message?.id}
+														senderId={message?.sender_id}
+														callLog={message?.content?.callLog}
 														contentMsg={message?.content?.t || ''}
 													/>
 												)}
 
-												{message.content?.components &&
-													message.content.components.map((actionRow, index) => (
+												{message?.content?.components &&
+													message?.content.components.map((actionRow, index) => (
 														<div className={'flex flex-col'} key={index}>
 															<MessageActionsPanel
 																actionRow={actionRow}
-																messageId={message.id}
-																senderId={message.sender_id}
+																messageId={message?.id}
+																senderId={message?.sender_id}
 															/>
 														</div>
 													))}
