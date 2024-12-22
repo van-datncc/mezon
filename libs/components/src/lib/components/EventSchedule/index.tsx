@@ -1,9 +1,9 @@
-import { timeFormat } from '@mezon/mobile-components';
 import { EventManagementEntity, selectChannelById, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EEventStatus, openVoiceChannel } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
 import React from 'react';
+import { timeFomat } from '../ChannelList/EventChannelModal/timeFomatEvent';
 
 type EventScheduleProps = {
 	event: EventManagementEntity;
@@ -11,9 +11,9 @@ type EventScheduleProps = {
 };
 
 const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
-	const channelVoice = useAppSelector((state) => selectChannelById(state, event.channel_voice_id ?? '')) || {};
-	const eventIsUpcoming = event.event_status === EEventStatus.UPCOMING;
-	const eventIsOngoing = event.event_status === EEventStatus.ONGOING;
+	const channelVoice = useAppSelector((state) => selectChannelById(state, event?.channel_voice_id ?? '')) || {};
+	const eventIsUpcoming = event?.event_status === EEventStatus.UPCOMING;
+	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 	const nearestEventAvaiable = eventIsUpcoming || eventIsOngoing;
 	if (!nearestEventAvaiable) return null;
 	const eventStatusNotice = eventIsUpcoming
@@ -36,7 +36,7 @@ const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
 				<div style={{ width: 'max-content' }}>
 					<p>{`Event: ${event.title}`}</p>
 					<p>{eventStatusNotice}</p>
-					<p>{timeFormat(event.start_time ?? '')}</p>
+					<p>{timeFomat(event.start_time ?? '')}</p>
 				</div>
 			}
 		>
