@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { IUsersClan, LoadingStatus, UsersClanEntity } from '@mezon/utils';
+import { LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';

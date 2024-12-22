@@ -5,12 +5,14 @@ import { safeJSONParse } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiSdTopic } from 'mezon-js/dist/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 export type TopicProps = {
 	readonly topic: ApiSdTopic;
 };
 
 function TopicNotificationItem({ topic }: TopicProps) {
+	const navigate = useNavigate();
 	const [subjectTopic, setSubjectTopic] = useState('');
 	const dispatch = useAppDispatch();
 	const memberClan = useSelector(selectAllUserClans);
@@ -32,7 +34,8 @@ function TopicNotificationItem({ topic }: TopicProps) {
 			setSubjectTopic(`${usernames[usernames.length - 1]} and ${usernames.length - 1} others`);
 		}
 	}, [usernames, userIds]);
-	const handleOpenTopic = () => {
+	const handleOpenTopic = async () => {
+		await navigate(`/chat/clans/${topic.clan_id}/channels/${topic.channel_id}`);
 		dispatch(topicsActions.setIsShowCreateTopic({ channelId: topic.channel_id as string, isShowCreateTopic: true }));
 		dispatch(threadsActions.setIsShowCreateThread({ channelId: topic.channel_id as string, isShowCreateThread: false }));
 		dispatch(topicsActions.setCurrentTopicId(topic.id || ''));
