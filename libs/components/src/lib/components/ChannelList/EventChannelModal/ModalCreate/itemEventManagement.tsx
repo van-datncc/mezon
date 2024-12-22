@@ -72,8 +72,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	});
 
 	const eventStatus = useMemo(() => {
-		if (event?.status) {
-			return event.status;
+		if (event?.event_status) {
+			return event.event_status;
 		} else if (start) {
 			const currentTime = Date.now();
 			const startTimeLocal = new Date(start);
@@ -90,7 +90,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		}
 
 		return EEventStatus.UNKNOWN;
-	}, [start, event?.status]);
+	}, [start, event?.event_status]);
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};

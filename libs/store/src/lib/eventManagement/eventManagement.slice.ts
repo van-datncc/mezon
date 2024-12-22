@@ -9,7 +9,7 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
-	status?: string | null;
+	event_status?: string | null;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
@@ -243,7 +243,7 @@ export const eventManagementSlice = createSlice({
 			eventManagementAdapter.updateOne(state, {
 				id: action.payload.event_id,
 				changes: {
-					status: action.payload.event_status
+					event_status: action.payload.event_status
 				}
 			});
 
