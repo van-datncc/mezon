@@ -1,6 +1,6 @@
 import { ToastController } from '@mezon/components';
 import { useEscapeKey } from '@mezon/core';
-import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { fcmActions, getFirstMessageOfTopic, selectAllAccount, selectIsLogin, threadsActions, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
@@ -120,7 +120,14 @@ const AppLayout = () => {
 		)
 			.then((response): void => {
 				const token = (response?.payload as { token: string })?.token;
-				notificationService.connect(token);
+				notificationService.connect(token, (msg) => {
+					if (msg?.extras?.topicId && msg?.extras?.topicId !== '0') {
+						dispatch(topicsActions.setIsShowCreateTopic({ channelId: msg.channel_id as string, isShowCreateTopic: true }));
+						dispatch(threadsActions.setIsShowCreateThread({ channelId: msg.channel_id as string, isShowCreateThread: false }));
+						dispatch(topicsActions.setCurrentTopicId(msg?.extras?.topicId || ''));
+						dispatch(getFirstMessageOfTopic(msg?.extras?.topicId || ''));
+					}
+				});
 			})
 			.catch((error) => {
 				console.error(error);

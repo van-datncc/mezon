@@ -5,6 +5,7 @@ import { electronBridge } from './electron';
 export interface IMessageExtras {
 	link: string; // link for navigating
 	e2eemess: string;
+	topicId: string;
 }
 
 export interface NotificationData {
@@ -74,7 +75,7 @@ export class MezonNotificationService {
 		this.currentUserId = userId;
 	};
 
-	public connect = async (token: string) => {
+	public connect = async (token: string, pushNotiCallback?: (notification: NotificationData) => void) => {
 		const hasPermission = await this.checkNotificationPermission();
 
 		if (!hasPermission) {
@@ -114,7 +115,9 @@ export class MezonNotificationService {
 						msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string, true);
 					}
 					this.pushNotification(title, msgContent, image, link);
-
+					if (pushNotiCallback) {
+						pushNotiCallback(msg);
+					}
 					//check app update
 					if (isElectron() && msg?.appid && msg.appid !== this.previousAppId) {
 						this.previousAppId = msg.appid;

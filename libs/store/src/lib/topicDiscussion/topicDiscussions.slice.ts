@@ -3,7 +3,7 @@ import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiSdTopic } from 'mezon-js/api.gen';
-import { ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
 
@@ -147,6 +147,20 @@ export const topicsSlice = createSlice({
 		},
 		setCurrentTopicId: (state, action: PayloadAction<string>) => {
 			state.currentTopicId = action.payload;
+		},
+		setTopicLastSent: (state, action: PayloadAction<{ topicId: string; lastSentMess: ApiChannelMessageHeader }>) => {
+			const topic = state.entities[action.payload.topicId];
+			if (topic) {
+				if (!topic.last_sent_message) {
+					topic.last_sent_message = {} as ApiChannelMessageHeader;
+				}
+
+				const { content, sender_id, timestamp_seconds } = action.payload.lastSentMess;
+
+				topic.last_sent_message.content = typeof content === 'object' ? JSON.stringify(content) : content || '';
+				topic.last_sent_message.sender_id = sender_id;
+				topic.last_sent_message.timestamp_seconds = timestamp_seconds;
+			}
 		}
 	},
 	extraReducers: (builder) => {
