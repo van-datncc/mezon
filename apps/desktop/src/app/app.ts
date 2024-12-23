@@ -334,7 +334,7 @@ export default class App {
 		}
 
 		this.imageViewerWindow?.setOpacity(1);
-		ipcMain.removeAllListeners('closed');
+		this.imageViewerWindow.removeAllListeners('closed');
 		this.imageViewerWindow.on('closed', () => {
 			this.imageViewerWindow = null;
 			delete this.listWindowOpen[IMAGE_WINDOW_KEY];
@@ -346,11 +346,7 @@ export default class App {
 		});
 		ipcMain.removeAllListeners(GET_ATTACHMENT_DATA);
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
-			if (!this.listWindowOpen?.[IMAGE_WINDOW_KEY]) {
-				this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
-			} else {
-				this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
-			}
+			this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 		});
 
 		return this.imageViewerWindow;
