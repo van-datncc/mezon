@@ -1,6 +1,6 @@
 import {
 	selectAllUserClans,
-	selectClanView,
+	selectClanView, selectCurrentChannel, selectCurrentDM,
 	selectEntitesUserClans,
 	selectGrouplMembers,
 	selectGroupMembersEntities,
@@ -15,13 +15,18 @@ export function useCurrentChat() {
 	const allDmUsersEntities = useAppSelector((state) => selectGroupMembersEntities(state, directId));
 	const allClanUsers = useAppSelector(selectAllUserClans);
 	const allDmUsers = useAppSelector((state) => selectGrouplMembers(state, directId));
+	const currentChannel = useAppSelector(selectCurrentChannel);
+	const currentDm = useAppSelector(selectCurrentDM)
 
 	const currentChatUsers = isClanView ? allClanUsers : allDmUsers;
 
 	const currentChatUsersEntities = isClanView ? allClanUsersEntities : allDmUsersEntities;
+	
+	const currentChat = isClanView ? currentChannel : currentDm;
 
 	return {
 		currentChatUsers,
-		currentChatUsersEntities
+		currentChatUsersEntities,
+		currentChat
 	};
 }

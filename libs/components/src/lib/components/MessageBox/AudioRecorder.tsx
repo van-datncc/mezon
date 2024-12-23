@@ -1,6 +1,13 @@
-import { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { handleUploadFile, useMezon } from "@mezon/transport";
+import { useChatSending, useCurrentChat } from "@mezon/core";
+import { ApiChannelDescription } from "mezon-js/api.gen";
 
-const AudioRecorder = () => {
+type AudioRecorderProps = {
+	onSendRecord: () => void;
+}
+
+const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 	const [isRecording, setIsRecording] = useState(false);
 	const [audioUrl, setAudioUrl] = useState('');
 	const [seconds, setSeconds] = useState(0);
@@ -8,6 +15,16 @@ const AudioRecorder = () => {
 	const chunksRef = useRef<BlobPart[]>([]);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
+	const { sessionRef, clientRef } = useMezon();
+	const { currentChat } = useCurrentChat();
+	const { sendMessage } = useChatSending({channelOrDirect: currentChat as ApiChannelDescription, mode: 2});
+	
+	
+	const blobToFile = (blob: Blob): File => {
+		// Generate a timestamp for unique filename
+		const timestamp = new Date().getTime();
+		return new File([blob], `audio-${timestamp}.ogg`, { type: 'audio/mp3' });
+	};
 
 	const startRecording = async () => {
 		if (isRecording) return;
@@ -28,6 +45,8 @@ const AudioRecorder = () => {
 				chunksRef.current = [];
 				const audioUrl = URL.createObjectURL(blob);
 				setAudioUrl(audioUrl);
+				
+				sendRecording();
 			};
 
 			recorder.start();
@@ -63,25 +82,44 @@ const AudioRecorder = () => {
 		recorderRef.current = null;
 	};
 
-	const sendRecording = () => {
+	const sendRecording = async() => {
 		if (isRecording && recorderRef.current) {
 			recorderRef.current.stop();
-			recorderRef.current.onstop = () => {
-				const blob = new Blob(chunksRef.current, { type: 'audio/ogg; codecs=opus' });
+			recorderRef.current.onstop = async () => {
+				const blob = new Blob (chunksRef.current, { type: 'audio/ogg; codecs=opus' });
 				chunksRef.current = [];
-				const audioUrl = URL.createObjectURL(blob);
-				setAudioUrl(audioUrl);
-
-				alert(`Audio URL đã được gửi: ${audioUrl}`);
-
-				resetRecording();
+				const client = clientRef.current;
+				const session = sessionRef.current;
+				if (!client || !session) return;
+				
+				const fileUploaded = await handleUploadFile (client, session, '', '', 'record', blobToFile (blob))
+				const audioUrl = URL.createObjectURL (blob);
+				console.log(fileUploaded)
+				setAudioUrl (fileUploaded.url || 'abc');
+				
+				const attachmentsArray = [fileUploaded];
+				
+				await sendMessage ({}, [], [...attachmentsArray])
+				
+				// alert (`Audio URL đã được gửi: ${audioUrl}`);
+				
+				resetRecording ();
+				onSendRecord();
 			};
 		} else if (audioUrl) {
-			alert(`Audio URL đã được gửi: ${audioUrl}`);
+			// alert(`Audio URL đã được gửi: ${audioUrl}`);
 
 			resetRecording();
 		}
 	};
+	
+	useEffect (() => {
+		startRecording();
+		return (() => {
+			resetRecording ();
+			onSendRecord();
+		})
+	}, []);
 
 	return (
 		<div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
@@ -90,7 +128,7 @@ const AudioRecorder = () => {
 					display: 'flex',
 					alignItems: 'center',
 					gap: '10px',
-					backgroundColor: '#ff5252',
+					// backgroundColor: '#ff5252',
 					padding: '10px',
 					borderRadius: '5px',
 					color: 'white',
@@ -124,7 +162,7 @@ const AudioRecorder = () => {
 					{isRecording ? (
 						<span>{new Date(seconds * 1000).toISOString().substring(14, 19)}</span>
 					) : (
-						<audio src={audioUrl} controls style={{ flex: 1 }} />
+						<audio src={audioUrl} controls style={{ flex: 1 }} className={'w-full'}/>
 					)}
 					<button
 						onClick={stopRecording}
@@ -158,22 +196,22 @@ const AudioRecorder = () => {
 				</button>
 			</div>
 
-			{!isRecording && !audioUrl && (
-				<button
-					onClick={startRecording}
-					style={{
-						padding: '10px 20px',
-						backgroundColor: '#ff5252',
-						color: 'white',
-						border: 'none',
-						borderRadius: '5px',
-						cursor: 'pointer',
-						marginTop: '20px'
-					}}
-				>
-					Start Recording
-				</button>
-			)}
+			{/*{!isRecording && !audioUrl && (*/}
+			{/*	<button*/}
+			{/*		onClick={startRecording}*/}
+			{/*		style={{*/}
+			{/*			padding: '10px 20px',*/}
+			{/*			backgroundColor: '#ff5252',*/}
+			{/*			color: 'white',*/}
+			{/*			border: 'none',*/}
+			{/*			borderRadius: '5px',*/}
+			{/*			cursor: 'pointer',*/}
+			{/*			marginTop: '20px'*/}
+			{/*		}}*/}
+			{/*	>*/}
+			{/*		Start Recording*/}
+			{/*	</button>*/}
+			{/*)}*/}
 		</div>
 	);
 };

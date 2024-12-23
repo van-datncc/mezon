@@ -1322,6 +1322,7 @@ export type MentionReactInputProps = {
 	readonly currentChannelId?: string;
 	readonly mode?: number;
 	hasPermissionEdit?: boolean;
+	onStartRecord?: () => void;
 };
 
 export type IOtherCall = {

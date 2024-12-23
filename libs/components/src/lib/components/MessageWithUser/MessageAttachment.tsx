@@ -16,34 +16,56 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 	const videos: ApiMessageAttachment[] = [];
 	const images: (ApiMessageAttachment & { create_time?: string })[] = [];
 	const documents: ApiMessageAttachment[] = [];
-
+	const audio: ApiMessageAttachment[] = [];
+	
 	attachments.forEach((attachment) => {
 		if (isMediaTypeNotSupported(attachment.filetype)) {
-			return documents.push(attachment);
+			documents.push(attachment);
+			return;
 		}
+		
 		if (
-			((attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
-				!attachment.url?.includes(EMimeTypes.tenor)) ||
-			attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
+			(attachment.filetype?.includes(EMimeTypes.mp4) ||
+				attachment.filetype?.includes(EMimeTypes.mov)) &&
+			!attachment.url?.includes(EMimeTypes.tenor)
 		) {
 			videos.push(attachment);
-		} else if (
-			(attachment.filetype?.indexOf(EMimeTypes.png) !== -1 ||
-				attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1 ||
+			return;
+		}
+		
+		if (attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)) {
+			videos.push(attachment);
+			return;
+		}
+		
+		if (
+			(attachment.filetype?.includes(EMimeTypes.png) ||
+				attachment.filetype?.includes(EMimeTypes.jpeg) ||
 				attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) &&
 			!attachment.filetype?.includes('svg+xml')
 		) {
 			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
 				...attachment,
 				sender_id: message.sender_id,
-				create_time: message.create_time
+				create_time: message.create_time,
 			};
 			images.push(resultAttach);
-		} else {
-			documents.push(attachment);
+			return;
 		}
+		
+		if(attachment.filetype?.includes(EMimeTypes.audio)) {
+			audio.push(attachment);
+			return;
+		}
+		
+		documents.push(attachment);
 	});
-	return { videos, images, documents };
+	
+	if(audio.length > 0) {
+		console.log ({ videos, images, documents, audio })
+	}
+	
+	return { videos, images, documents, audio };
 };
 
 const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMessageWithUser; onContextMenu: any; mode: ChannelStreamMode }> = ({
@@ -52,7 +74,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 	onContextMenu,
 	mode
 }) => {
-	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments, message), [attachments]);
+	const { videos, images, documents, audio } = useMemo(() => classifyAttachments(attachments, message), [attachments]);
 	return (
 		<>
 			{videos.length > 0 && (
@@ -82,6 +104,12 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 				documents.map((document, index) => (
 					<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
 				))}
+			
+			{audio.length > 0 &&
+				audio.map((audio, index) => (
+					<audio key={`${index}_${audio.url}`} controls src={audio.url}/>
+				))
+			}
 		</>
 	);
 };
