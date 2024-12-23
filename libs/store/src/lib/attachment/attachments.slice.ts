@@ -252,6 +252,3 @@ export const selectAllListDocumentByChannel = (channelId: string) =>
 			return result;
 		}, []);
 	});
-
-export const checkListAttachmentExist = (channelId: string) =>
-	createSelector(getAttachmentState, (state) => Boolean(state.listAttachmentsByChannel[channelId]));

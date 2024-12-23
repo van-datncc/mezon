@@ -1,13 +1,5 @@
 import { useAppParams, useAttachments, useCurrentChat } from '@mezon/core';
-import {
-	attachmentActions,
-	checkListAttachmentExist,
-	selectCurrentChannel,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectCurrentDM,
-	useAppDispatch
-} from '@mezon/store';
+import { attachmentActions, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, selectCurrentDM, useAppDispatch } from '@mezon/store';
 import {
 	IAttachmentEntity,
 	IImageWindowProps,
@@ -42,7 +34,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const { directId: currentDmGroupId } = useAppParams();
 	const [showLoader, setShowLoader] = useState(false);
 	const fadeIn = useRef(false);
-	const checkListAttachment = useSelector(checkListAttachmentExist((currentDmGroupId || currentChannelId) as string));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
 	const { currentChatUsersEntities } = useCurrentChat();
@@ -75,7 +66,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 									avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
 									name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
 								},
-								url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
+								url: createImgproxyUrl(image.url || '', { width: 1280, height: 720, resizeType: 'fit' })
 							};
 						});
 						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
@@ -102,7 +93,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				})
 			);
 
-			if (((currentClanId && currentChannelId) || currentDmGroupId) && !checkListAttachment) {
+			if ((currentClanId && currentChannelId) || currentDmGroupId) {
 				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
 				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
