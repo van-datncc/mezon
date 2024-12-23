@@ -51,7 +51,7 @@ const LocationModal = (props: LocationModalProps) => {
 		}
 	}, [voicesChannel]);
 
-	const handleChangeTextChannel = (selectedOption: any) => {
+	const handleSelectChannelAudience = (selectedOption: any) => {
 		setContentSubmit({
 			...contentSubmit,
 			textChannelId: selectedOption.value
@@ -166,7 +166,7 @@ const LocationModal = (props: LocationModalProps) => {
 			<Select
 				options={optionsTextChannel}
 				value={optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId)}
-				onChange={handleChangeTextChannel}
+				onChange={handleSelectChannelAudience}
 				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 			/>
 		</div>
