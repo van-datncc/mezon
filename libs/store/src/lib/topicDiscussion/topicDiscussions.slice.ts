@@ -1,10 +1,13 @@
 import { captureSentryError } from '@mezon/logger';
+// import { threadsActions } from '@mezon/store';
+import { threadsActions } from '@mezon/store-mobile';
 import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiSdTopic } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { RootState } from '../store';
 const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
 
 export const TOPIC_DISCUSSIONS_FEATURE_KEY = 'topicdiscussions';
@@ -109,6 +112,30 @@ export const createTopic = createAsyncThunk('topics/createTopic', async (body: A
 	} catch (error) {
 		captureSentryError(error, 'channels/createNewChannel');
 		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const handleTopicNotification = createAsyncThunk('topics/handleTopicNotification', async ({ msg }: any, thunkAPI) => {
+	const state = thunkAPI.getState() as RootState;
+	const currentTopicId = state.topicdiscussions.currentTopicId;
+	const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
+	const isShowCreateTopic = currentChannelId ? !!state.topicdiscussions.isShowCreateTopic?.[currentChannelId] : false;
+
+	if (msg?.extras?.topicId && msg?.extras?.topicId !== '0' && (currentTopicId !== msg?.extras?.topicId || !isShowCreateTopic)) {
+		thunkAPI.dispatch(
+			topicsActions.setIsShowCreateTopic({
+				channelId: msg.channel_id as string,
+				isShowCreateTopic: true
+			})
+		);
+		thunkAPI.dispatch(
+			threadsActions.setIsShowCreateThread({
+				channelId: msg.channel_id as string,
+				isShowCreateThread: false
+			})
+		);
+		thunkAPI.dispatch(topicsActions.setCurrentTopicId(msg?.extras?.topicId || ''));
+		thunkAPI.dispatch(getFirstMessageOfTopic(msg?.extras?.topicId || ''));
 	}
 });
 
