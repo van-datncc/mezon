@@ -71,26 +71,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
-	const eventStatus = useMemo(() => {
-		if (event?.event_status) {
-			return event.event_status;
-		} else if (start) {
-			const currentTime = Date.now();
-			const startTimeLocal = new Date(start);
-			const startTimeUTC = startTimeLocal.getTime() + startTimeLocal.getTimezoneOffset() * 60000;
-			const leftTime = startTimeUTC - currentTime;
+	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
+	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 
-			if (leftTime > 0 && leftTime <= 1000 * 60 * 10) {
-				return EEventStatus.UPCOMING;
-			}
-
-			if (leftTime <= 0) {
-				return EEventStatus.ONGOING;
-			}
-		}
-
-		return EEventStatus.UNKNOWN;
-	}, [start, event?.event_status]);
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
@@ -119,12 +102,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	}, []);
 
 	const cssEventStatus = useMemo(() => {
-		return eventStatus === EEventStatus.UPCOMING
-			? 'text-purple-500'
-			: eventStatus === EEventStatus.ONGOING
-				? 'text-green-500'
-				: 'dark:text-zinc-400 text-colorTextLightMode';
-	}, [eventStatus]);
+		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
+	}, [event?.event_status]);
 
 	return (
 		<div
@@ -146,9 +125,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
 						<p className={`font-semibold ${cssEventStatus}`}>
-							{eventStatus === EEventStatus.UPCOMING
+							{eventIsUpcomming
 								? '10 minutes left. Join in!'
-								: eventStatus === EEventStatus.ONGOING
+								: eventIsOngoing
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
@@ -225,14 +204,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							Share
 						</button>
 
-						{eventStatus === EEventStatus.ONGOING && isClanOwner ? (
+						{eventIsOngoing && isClanOwner ? (
 							<button
 								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
 								onClick={() => setOpenModalDelEvent(true)}
 							>
 								End event
 							</button>
-						) : eventStatus !== EEventStatus.ONGOING ? (
+						) : !eventIsOngoing ? (
 							<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
 								<Icons.MuteBell defaultSize="size-4 text-white" />
 								Interested
