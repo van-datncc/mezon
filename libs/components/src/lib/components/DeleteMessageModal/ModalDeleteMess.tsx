@@ -1,6 +1,7 @@
 import { useChatSending, useCurrentInbox, useDeleteMessage, useEditMessage, useEscapeKeyClose } from '@mezon/core';
 import { selectOpenEditMessageState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -11,11 +12,13 @@ type ModalDeleteMessProps = {
 	mode: number;
 	channelId?: string;
 	channelLable?: string;
-	isRemoveAttachment?: boolean;
+	isRemoveAttachmentNoContent?: boolean;
+	attachmentData?: ApiMessageAttachment;
+	isRemoveAttachmentAction?: boolean;
 };
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
-	const { mess, closeModal, mode, isRemoveAttachment } = props;
+	const { mess, closeModal, mode, isRemoveAttachmentNoContent, attachmentData, isRemoveAttachmentAction = false } = props;
 	const current = useCurrentInbox() || undefined;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const isEditing = useSelector(selectOpenEditMessageState);
@@ -30,9 +33,17 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 	const { editSendMessage } = useChatSending({ channelOrDirect: current, mode });
 
+	const messagePreviewWithAttachmentRemove = {
+		...mess,
+		attachments: [attachmentData],
+		content: { t: '' }
+	};
+
 	const handleAction = () => {
-		if (isRemoveAttachment) {
-			editSendMessage(mess.content, mess.id, mess.mentions ?? [], [], true, '');
+		if (isRemoveAttachmentNoContent) {
+			const remainingAttachments =
+				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
+			editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
 		} else {
 			deleteSendMessage(mess.id);
 		}
@@ -67,18 +78,32 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start items-start gap-3 inline-flex overflow-hidden">
 				<div className="dark:text-white text-black">
 					<div className="p-4 pb-0">
-						<h3 className="font-bold pb-4">{isRemoveAttachment ? 'Remove Attachment' : 'Delete Message'}</h3>
-						<p>{isRemoveAttachment ? 'Do you want to remove the attachment on this message?' : 'Do you want to delete this message?'}</p>
+						<h3 className="font-bold pb-4">{isRemoveAttachmentNoContent ? 'Remove Attachment' : 'Delete Message'}</h3>
+						<p>
+							{isRemoveAttachmentNoContent
+								? 'Do you want to remove the attachment on this message?'
+								: 'Do you want to delete this message?'}
+						</p>
 					</div>
 					<div className="p-4 max-w-[720px] max-h-[50vh] overflow-y-auto hide-scrollbar">
-						<MessageWithUser allowDisplayShortProfile={false} message={mess} mode={mode} isMention={true} isShowFull={true} />
+						<MessageWithUser
+							allowDisplayShortProfile={false}
+							message={
+								isRemoveAttachmentAction && messagePreviewWithAttachmentRemove
+									? (messagePreviewWithAttachmentRemove as IMessageWithUser)
+									: (mess as IMessageWithUser)
+							}
+							mode={mode}
+							isMention={true}
+							isShowFull={true}
+						/>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
 							Cancel
 						</button>
 						<button onClick={handleAction} className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white">
-							{isRemoveAttachment ? 'Remove' : 'Delete'}
+							{isRemoveAttachmentNoContent ? 'Remove' : 'Delete'}
 						</button>
 					</div>
 				</div>

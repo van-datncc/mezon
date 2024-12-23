@@ -75,7 +75,14 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 	const [showModal, closeModal] = useModal(() => {
 		if (message && mode) {
 			return (
-				<ModalDeleteMess mess={message || undefined} closeModal={closeModal} mode={mode} isRemoveAttachment={message?.content?.t !== ''} />
+				<ModalDeleteMess
+					mess={message || undefined}
+					closeModal={closeModal}
+					mode={mode}
+					isRemoveAttachmentNoContent={message?.content?.t !== '' || message?.attachments?.length !== 1}
+					isRemoveAttachmentAction={true}
+					attachmentData={attachmentData}
+				/>
 			);
 		}
 	}, [message?.id, mode, message?.content?.t]);
