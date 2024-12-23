@@ -61,10 +61,6 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 		documents.push(attachment);
 	});
 	
-	if(audio.length > 0) {
-		console.log ({ videos, images, documents, audio })
-	}
-	
 	return { videos, images, documents, audio };
 };
 

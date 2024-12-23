@@ -94,7 +94,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 				
 				const fileUploaded = await handleUploadFile (client, session, '', '', 'record', blobToFile (blob))
 				const audioUrl = URL.createObjectURL (blob);
-				console.log(fileUploaded)
+				
 				setAudioUrl (fileUploaded.url || 'abc');
 				
 				const attachmentsArray = [fileUploaded];
