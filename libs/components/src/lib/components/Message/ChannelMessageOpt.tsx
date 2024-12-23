@@ -219,7 +219,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 function useAddToNoteBuilder(message: IMessageWithUser, currentChannel: ChannelsEntity | null, mode: number) {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		if (message && message.channel_id && message.clan_id) {
+		if (message && message.channel_id && message.clan_id !== '0') {
 			dispatch(
 				canvasAPIActions.getChannelCanvasList({
 					channel_id: message.channel_id,
