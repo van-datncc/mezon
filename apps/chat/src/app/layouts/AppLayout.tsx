@@ -1,15 +1,6 @@
 import { ToastController } from '@mezon/components';
 import { useEscapeKey } from '@mezon/core';
-import {
-	fcmActions,
-	handleTopicNotification,
-	selectAllAccount,
-	selectCurrentChannelId,
-	selectCurrentTopicId,
-	selectIsLogin,
-	selectIsShowCreateTopic,
-	useAppDispatch
-} from '@mezon/store';
+import { fcmActions, handleTopicNotification, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
@@ -101,9 +92,6 @@ const AppLayout = () => {
 	const location = useLocation();
 	const urlParams = new URLSearchParams(location.search);
 	const viewMode = urlParams.get('viewMode');
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentTopicId = useSelector(selectCurrentTopicId);
-	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannelId as string));
 	const { redirectTo } = useLoaderData() as IAppLoaderData;
 	useEffect(() => {
 		if (redirectTo) {
