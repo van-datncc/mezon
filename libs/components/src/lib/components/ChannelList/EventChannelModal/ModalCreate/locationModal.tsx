@@ -2,7 +2,7 @@ import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
@@ -51,42 +51,54 @@ const LocationModal = (props: LocationModalProps) => {
 		}
 	}, [voicesChannel]);
 
-	const handleSelectChannelAudience = (selectedOption: any) => {
-		setContentSubmit({
-			...contentSubmit,
-			textChannelId: selectedOption.value
-		});
-	};
+	const handleSelectChannelAudience = useCallback(
+		(selectedOption: any) => {
+			setContentSubmit((prevContentSubmit) => ({
+				...prevContentSubmit,
+				textChannelId: selectedOption.value
+			}));
+		},
+		[setContentSubmit]
+	);
 
-	const optionsTextChannel = textChannels.map((channel) => {
-		const isTextChannel = channel.type === ChannelType.CHANNEL_TYPE_TEXT;
-		const isThread = channel.type === ChannelType.CHANNEL_TYPE_THREAD;
-		const isPrivateChannel = channel.channel_private;
+	const optionsTextChannel = useMemo(
+		() =>
+			textChannels.map((channel) => {
+				const isTextChannel = channel.type === ChannelType.CHANNEL_TYPE_TEXT;
+				const isThread = channel.type === ChannelType.CHANNEL_TYPE_THREAD;
+				const isPrivateChannel = channel.channel_private;
 
-		const icon = isTextChannel ? (
-			isPrivateChannel ? (
-				<Icons.HashtagLocked />
-			) : (
-				<Icons.Hashtag />
-			)
-		) : isThread ? (
-			isPrivateChannel ? (
-				<Icons.ThreadIconLocker />
-			) : (
-				<Icons.ThreadIcon />
-			)
-		) : null;
+				const icon = isTextChannel ? (
+					isPrivateChannel ? (
+						<Icons.HashtagLocked />
+					) : (
+						<Icons.Hashtag />
+					)
+				) : isThread ? (
+					isPrivateChannel ? (
+						<Icons.ThreadIconLocker />
+					) : (
+						<Icons.ThreadIcon />
+					)
+				) : null;
 
-		return {
-			value: channel.id,
-			label: (
-				<div className="flex items-center gap-x-2 dark:text-white text-black">
-					{icon}
-					{channel.channel_label}
-				</div>
-			)
-		};
-	});
+				return {
+					value: channel.id,
+					label: (
+						<div className="flex items-center gap-x-2 dark:text-white text-black">
+							{icon}
+							{channel.channel_label}
+						</div>
+					)
+				};
+			}),
+		[textChannels]
+	);
+
+	const selectedOption = useMemo(
+		() => optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId),
+		[optionsTextChannel, contentSubmit.textChannelId]
+	);
 
 	return (
 		<div>
@@ -165,7 +177,7 @@ const LocationModal = (props: LocationModalProps) => {
 			</div>
 			<Select
 				options={optionsTextChannel}
-				value={optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId)}
+				value={selectedOption}
 				onChange={handleSelectChannelAudience}
 				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 			/>
