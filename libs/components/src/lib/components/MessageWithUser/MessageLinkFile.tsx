@@ -5,8 +5,9 @@ import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { RenderAttachmentThumbnail } from '../../components';
+import { ModalDeleteMess, RenderAttachmentThumbnail } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -71,6 +72,18 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 		);
 	};
 
+	const [showModal, closeModal] = useModal(() => {
+		if (message && mode) {
+			return (
+				<ModalDeleteMess mess={message || undefined} closeModal={closeModal} mode={mode} isRemoveAttachment={message?.content?.t !== ''} />
+			);
+		}
+	}, [message?.id, mode, message?.content?.t]);
+
+	const handleOpenRemoveAttachementModal = () => {
+		showModal();
+	};
+
 	return (
 		<div
 			onMouseEnter={hoverOptButton}
@@ -98,7 +111,10 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 								>
 									<Icons.Download defaultSize="w-4 h-4" />
 								</div>
-								<div className={`rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
+								<div
+									onClick={handleOpenRemoveAttachementModal}
+									className={`rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}
+								>
 									<Icons.TrashIcon className="w-4 h-4" />
 								</div>
 							</div>
