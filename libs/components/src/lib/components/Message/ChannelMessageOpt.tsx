@@ -73,8 +73,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
-	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
-	const createTopicMenu = useTopicMenuBuilder(realTimeMessage);
+	const createTopicMenu = useTopicMenuBuilder(message);
 	const items = useMenuBuilder([giveACoffeeMenu, createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
 
 	return (
@@ -106,9 +105,10 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 export default memo(ChannelMessageOpt);
 
 function useTopicMenuBuilder(message: IMessageWithUser) {
+	const currentChannel = useSelector(selectCurrentChannel);
+	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
 	const dispatch = useAppDispatch();
 	const clanIdFromParam = useParams().clanId;
-	const currentChannel = useSelector(selectCurrentChannel);
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
@@ -130,14 +130,14 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 	const handleCreateTopic = useCallback(() => {
 		setIsShowCreateTopic(true);
 		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setValueTopic(message);
+		setValueTopic(realTimeMessage);
 		dispatch(topicsActions.setCurrentTopicId(''));
-	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
+	}, [dispatch, realTimeMessage, setIsShowCreateTopic, setValueTopic]);
 
 	const menuPlugin = useMemo(() => {
 		const plugin = {
 			setup: (builder: MenuBuilder) => {
-				builder.when(clanIdFromParam && message?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
+				builder.when(clanIdFromParam && realTimeMessage?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
 					builder.addMenuItem(
 						'topic',
 						'topic',
@@ -148,7 +148,7 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 			}
 		};
 		return plugin;
-	}, [clanIdFromParam, handleCreateTopic, message?.code]);
+	}, [clanIdFromParam, handleCreateTopic, realTimeMessage?.code]);
 
 	return menuPlugin;
 }
