@@ -66,7 +66,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 									avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
 									name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
 								},
-								url: createImgproxyUrl(image.url || '', { width: 0, height: 0, resizeType: 'force' })
+								url: createImgproxyUrl(image.url || '', { width: 600, height: 300, resizeType: 'fit' })
 							};
 						});
 						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
