@@ -9,7 +9,7 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
-	event_status?: string | null;
+	event_status?: EEventStatus | null;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();

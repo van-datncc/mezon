@@ -977,6 +977,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
+			// console.log('eventCreatedEvent: ', eventCreatedEvent);
 			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
 		},
 		[dispatch]
