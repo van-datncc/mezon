@@ -49,11 +49,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 
 	const frequencies = useMemo(() => {
 		const options = [
-			'Does not repeat'
-			// `Weekly on ${startDayOfWeek}`,
-			// `Every other ${startDayOfWeek}`,
-			// `Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`,
-			// `Annually on ${startDate} ${startMonth}`
+			'Does not repeat',
+			`Weekly on ${startDayOfWeek}`,
+			`Every other ${startDayOfWeek}`,
+			`Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`,
+			`Annually on ${startDate} ${startMonth}`
 		];
 		if (startDayOfWeek !== 'Sunday' && startDayOfWeek !== 'Saturday') {
 			options.push('Every weekday (Monday to Friday)');
