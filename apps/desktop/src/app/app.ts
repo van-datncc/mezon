@@ -346,11 +346,7 @@ export default class App {
 		});
 		ipcMain.removeAllListeners(GET_ATTACHMENT_DATA);
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
-			if (!this.listWindowOpen?.[IMAGE_WINDOW_KEY]) {
-				this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
-			} else {
-				this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
-			}
+			this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 		});
 
 		return this.imageViewerWindow;
