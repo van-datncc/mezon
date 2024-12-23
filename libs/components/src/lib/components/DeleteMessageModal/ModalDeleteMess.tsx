@@ -2,7 +2,7 @@ import { useChatSending, useCurrentInbox, useDeleteMessage, useEditMessage, useE
 import { selectOpenEditMessageState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
 
@@ -41,7 +41,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 	const removeLastFile = mess.content.t === '' && mess.attachments?.length === 1;
 
-	const handleAction = () => {
+	const handleAction = useCallback(() => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
@@ -53,7 +53,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		}
 		handleCancelEdit();
 		closeModal();
-	};
+	}, [isRemoveAttachmentNoContent, attachmentData, mess, removeLastFile, editSendMessage, deleteSendMessage, handleCancelEdit, closeModal]);
 
 	const handleEnter = (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
