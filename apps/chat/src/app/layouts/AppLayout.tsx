@@ -1,6 +1,6 @@
 import { ToastController } from '@mezon/components';
 import { useEscapeKey } from '@mezon/core';
-import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { fcmActions, handleTopicNotification, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
@@ -92,7 +92,6 @@ const AppLayout = () => {
 	const location = useLocation();
 	const urlParams = new URLSearchParams(location.search);
 	const viewMode = urlParams.get('viewMode');
-
 	const { redirectTo } = useLoaderData() as IAppLoaderData;
 	useEffect(() => {
 		if (redirectTo) {
@@ -120,7 +119,9 @@ const AppLayout = () => {
 		)
 			.then((response): void => {
 				const token = (response?.payload as { token: string })?.token;
-				notificationService.connect(token);
+				notificationService.connect(token, (msg) => {
+					dispatch(handleTopicNotification({ msg }));
+				});
 			})
 			.catch((error) => {
 				console.error(error);
