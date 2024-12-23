@@ -2,6 +2,7 @@ import { GoogleButtonLogin, LoginForm, TitleSection } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
 import { authActions, selectIsLogin, useAppDispatch } from '@mezon/store';
 import isElectron from 'is-electron';
+import { safeJSONParse } from 'mezon-js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
