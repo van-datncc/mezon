@@ -14,16 +14,27 @@ export function useEventManagement() {
 	const createEventManagement = useCallback(
 		async (
 			clan_id: string,
-			channel_id: string,
+			channel_voice_id: string,
 			address: string,
 			title: string,
 			start_time: string,
 			end_time: string,
 			description: string,
-			logo: string
+			logo: string,
+			channel_id: string
 		) => {
 			await dispatch(
-				eventManagementActions.fetchCreateEventManagement({ clan_id, channel_id, address, title, start_time, end_time, description, logo })
+				eventManagementActions.fetchCreateEventManagement({
+					clan_id,
+					channel_voice_id,
+					address,
+					title,
+					start_time,
+					end_time,
+					description,
+					logo,
+					channel_id
+				})
 			);
 		},
 		[dispatch]
@@ -33,27 +44,29 @@ export function useEventManagement() {
 		async (
 			event_id: string,
 			clan_id: string,
-			channel_id: string,
+			channel_voice_id: string,
 			address: string,
 			title: string,
 			start_time: string,
 			end_time: string,
 			description: string,
 			logo: string,
-			creator_id: string
+			creator_id: string,
+			channel_id: string
 		) => {
 			await dispatch(
 				eventManagementActions.updateEventManagement({
 					event_id,
 					clan_id,
-					channel_id,
+					channel_voice_id,
 					address,
 					title,
 					start_time,
 					end_time,
 					description,
 					logo,
-					creator_id
+					creator_id,
+					channel_id
 				})
 			);
 		},

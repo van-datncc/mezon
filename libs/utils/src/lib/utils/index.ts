@@ -1053,3 +1053,8 @@ export const parseThreadInfo = (messageContent: string) => {
 		threadContent: messageContent.replace(/^@\w+\s*/, '')
 	};
 };
+
+export const openVoiceChannel = (url: string) => {
+	const urlVoice = `https://meet.google.com/${url}`;
+	window.open(urlVoice, '_blank', 'noreferrer');
+};

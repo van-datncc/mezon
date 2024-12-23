@@ -3,6 +3,7 @@ import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMem
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -28,6 +29,7 @@ export type ItemEventManagementProps = {
 	setOpenModalDetail?: (status: boolean) => void;
 	openModelUpdate?: () => void;
 	onEventUpdateId?: (id: string) => void;
+	textChannelId?: string;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
@@ -46,12 +48,15 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		isReviewEvent,
 		setOpenModalDetail,
 		openModelUpdate,
-		onEventUpdateId
+		onEventUpdateId,
+		textChannelId
 	} = props;
+	const isPrivateEvent = textChannelId && textChannelId !== '0';
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
-
+	const textChannel = useAppSelector((state) => selectChannelById(state, textChannelId ?? '')) || {};
+	const isThread = textChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const appearanceTheme = useSelector(selectTheme);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
@@ -67,8 +72,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	});
 
 	const eventStatus = useMemo(() => {
-		if (event?.status) {
-			return event.status;
+		if (event?.event_status) {
+			return event.event_status;
 		} else if (start) {
 			const currentTime = Date.now();
 			const startTimeLocal = new Date(start);
@@ -85,7 +90,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		}
 
 		return EEventStatus.UNKNOWN;
-	}, [start, event?.status]);
+	}, [start, event?.event_status]);
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
@@ -147,6 +152,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
+						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
 					</div>
 					{event?.creator_id && (
 						<Tippy content={<p style={{ width: 'max-content' }}>{`Created by ${userCreate?.user?.username}`}</p>}>
@@ -201,6 +207,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</>
 					)}
 				</div>
+
 				{event && (
 					<div
 						className="flex gap-x-2 items-center"
@@ -236,7 +243,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					</div>
 				)}
 			</div>
-
+			<div className="flex gap-x-2 mx-4 mb-2">
+				{textChannelId && textChannelId !== '0' && (
+					<span className="flex flex-row">
+						<p className="text-slate-400">
+							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
+							<strong className="text-slate-100">{textChannel.channel_label}</strong>
+						</p>
+					</span>
+				)}
+			</div>
 			{openPanel && (
 				<PanelEventItem
 					event={event}

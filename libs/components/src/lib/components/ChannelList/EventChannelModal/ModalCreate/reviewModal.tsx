@@ -23,6 +23,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 				start={time}
 				isReviewEvent
 				reviewDescription={contentSubmit.description}
+				textChannelId={contentSubmit?.textChannelId}
 			/>
 			<div className="mt-8">
 				<h3 className="text-center font-semibold text-xl">Here's a preview of your event.</h3>
