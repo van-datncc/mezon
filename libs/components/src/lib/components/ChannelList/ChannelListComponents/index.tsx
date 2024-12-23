@@ -8,15 +8,18 @@ import {
 	selectMissionDone,
 	selectMissionSum,
 	selectNumberEvent,
+	selectNumberEventPrivate,
 	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectOngoingEvent,
 	selectProcessingByClan,
 	selectShowNumEvent,
+	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { DONE_ONBOARDING_STATUS, EPermission } from '@mezon/utils';
+import Tippy from '@tippy.js/react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,6 +28,9 @@ import EventModal from '../EventChannelModal';
 
 export const Events = memo(() => {
 	const numberEventManagement = useSelector(selectNumberEvent);
+	const numberEventManagementPrivate = useSelector(selectNumberEventPrivate);
+	const numberEventManagementPublic = numberEventManagement - numberEventManagementPrivate;
+
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
 	const previewMode = useSelector(selectOnboardingMode);
@@ -34,6 +40,7 @@ export const Events = memo(() => {
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const onboardingByClan = useSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
+	const appearanceTheme = useSelector(selectTheme);
 
 	const closeModal = () => {
 		closeEventModal();
@@ -107,28 +114,39 @@ export const Events = memo(() => {
 				</Link>
 			)}
 
-			<div
-				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
-				onClick={openModal}
+			<Tippy
+				content={
+					<div style={{ width: 'max-content' }}>
+						<p>{`Public Event: ${numberEventManagementPublic}`}</p>
+						<p>{`Private Event: ${numberEventManagementPrivate}`}</p>
+					</div>
+				}
+				className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
 			>
-				<div className="grow w-5 flex-row items-center gap-2 flex">
-					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.IconEvents />
+				<div
+					className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
+					onClick={openModal}
+				>
+					<div className="grow w-5 flex-row items-center gap-2 flex">
+						<div className="w-5 h-5 relative flex flex-row items-center">
+							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+								<Icons.IconEvents />
+							</div>
+						</div>
+						<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">
+							{numberEventManagement === 0 && 'Events'}
+							{numberEventManagement === 1 && '1 Event'}
+							{numberEventManagement > 1 && `${numberEventManagement} Events`}
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">
-						{numberEventManagement === 0 && 'Events'}
-						{numberEventManagement === 1 && '1 Event'}
-						{numberEventManagement > 1 && `${numberEventManagement} Events`}
-					</div>
+					{numberEventManagement !== 0 && showNumEvent && (
+						<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
+							<div className="text-white text-xs font-medium">{numberEventManagement}</div>
+						</div>
+					)}
 				</div>
-				{numberEventManagement !== 0 && showNumEvent && (
-					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
-						<div className="text-white text-xs font-medium">{numberEventManagement}</div>
-					</div>
-				)}
-			</div>
+			</Tippy>
+
 			<Link
 				to={memberPath}
 				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isMemberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}

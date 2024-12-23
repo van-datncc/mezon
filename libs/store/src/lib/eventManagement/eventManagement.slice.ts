@@ -301,6 +301,11 @@ export const selectEventById = (eventId: string) =>
 		const entities = selectEventManagementEntities({ eventmanagement: state });
 		return entities[eventId] || null;
 	});
+
+export const selectNumberEventPrivate = createSelector(
+	selectAllEventManagement,
+	(events) => events.filter((event) => event.channel_id && event.channel_id !== '0' && event.channel_id !== '').length
+);
 export const selectEventByChannelId = createSelector([selectAllEventManagement, (_, channelId: string) => channelId], (events, channelId) =>
 	events
 		.filter((event) => event.channel_id === channelId)
