@@ -1,5 +1,6 @@
 import { addBotChat, clansActions, selectAllAccount, selectAllClans, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalSuccess from './ModalSuccess';

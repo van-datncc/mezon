@@ -3,6 +3,7 @@ import { authActions, fetchApplications, getApplicationDetail, selectAllApps, se
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
+import { safeJSONParse } from 'mezon-js';
 import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';

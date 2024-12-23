@@ -495,7 +495,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
 					{isTopic && (
 						<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
-							<div className={`fullBoxText relative group ${firstMsgOfThisTopic.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
+							<div className={`fullBoxText relative group ${firstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
 								<MessageWithUser isTopic={isTopic} allowDisplayShortProfile={true} message={firstMsgOfThisTopic} mode={mode} />
 							</div>
 						</div>

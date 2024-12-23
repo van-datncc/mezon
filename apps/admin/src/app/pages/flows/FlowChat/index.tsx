@@ -57,7 +57,7 @@ const FlowChatPopup = () => {
 			);
 			let urlImage: string[] | undefined = [];
 			try {
-				urlImage = safeJSONParse(response.urlImage);
+				urlImage = JSON.parse(response.urlImage);
 			} catch {
 				urlImage = undefined;
 			}
