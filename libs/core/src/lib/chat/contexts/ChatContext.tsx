@@ -205,7 +205,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelleaved = useCallback(
 		(user: StreamingLeavedEvent) => {
-			dispatch(usersStreamActions.remove(user.id));
+			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
 	);
