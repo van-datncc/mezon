@@ -334,7 +334,7 @@ export default class App {
 		}
 
 		this.imageViewerWindow?.setOpacity(1);
-		ipcMain.removeAllListeners('closed');
+		this.imageViewerWindow.removeAllListeners('closed');
 		this.imageViewerWindow.on('closed', () => {
 			this.imageViewerWindow = null;
 			delete this.listWindowOpen[IMAGE_WINDOW_KEY];
