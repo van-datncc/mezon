@@ -39,11 +39,15 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		content: { t: '' }
 	};
 
+	const removeLastFile = mess.content.t === '' && mess.attachments?.length === 1;
+
 	const handleAction = () => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
 			editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
+		} else if (removeLastFile) {
+			deleteSendMessage(mess.id);
 		} else {
 			deleteSendMessage(mess.id);
 		}
