@@ -1,5 +1,14 @@
 import { useAuth, useGetPriorityNameFromUserClan } from '@mezon/core';
-import { getFirstMessageOfTopic, selectAllUserClans, selectMemberClanByUserId, threadsActions, topicsActions, useAppDispatch } from '@mezon/store';
+import {
+	getFirstMessageOfTopic,
+	notificationActions,
+	selectAllUserClans,
+	selectIsShowInbox,
+	selectMemberClanByUserId,
+	threadsActions,
+	topicsActions,
+	useAppDispatch
+} from '@mezon/store';
 import { createImgproxyUrl } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiSdTopic } from 'mezon-js/dist/api.gen';
@@ -13,6 +22,7 @@ export type TopicProps = {
 
 function TopicNotificationItem({ topic }: TopicProps) {
 	const navigate = useNavigate();
+	const isShowInbox = useSelector(selectIsShowInbox);
 	const [subjectTopic, setSubjectTopic] = useState('');
 	const dispatch = useAppDispatch();
 	const memberClan = useSelector(selectAllUserClans);
@@ -40,13 +50,15 @@ function TopicNotificationItem({ topic }: TopicProps) {
 		dispatch(threadsActions.setIsShowCreateThread({ channelId: topic.channel_id as string, isShowCreateThread: false }));
 		dispatch(topicsActions.setCurrentTopicId(topic.id || ''));
 		dispatch(getFirstMessageOfTopic(topic.id || ''));
+		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
 	const allTabProps = {
 		messageReplied: topic?.message,
 		subject: subjectTopic,
 		senderId: topic?.last_sent_message?.sender_id,
-		lastMessageTopic: topic?.last_sent_message
+		lastMessageTopic: topic?.last_sent_message,
+		topic: topic
 	};
 
 	return (
@@ -57,7 +69,7 @@ function TopicNotificationItem({ topic }: TopicProps) {
 			>
 				Jump
 			</button>
-			{<AllTabContent {...allTabProps} />}
+			<AllTabContent {...allTabProps} />
 		</div>
 	);
 }
@@ -69,22 +81,23 @@ interface IMentionTabContent {
 	subject?: string;
 	senderId?: string;
 	lastMessageTopic?: ApiChannelMessageHeader;
+	topic?: ApiSdTopic;
 }
 
-function AllTabContent({ messageReplied, subject, lastMessageTopic }: IMentionTabContent) {
+function AllTabContent({ messageReplied, subject, lastMessageTopic, topic }: IMentionTabContent) {
 	const messageRl = useMemo(() => {
 		return messageReplied?.content ? safeJSONParse(messageReplied?.content) : null;
 	}, [messageReplied]);
 	const lastMsgTopic = useMemo(() => {
 		return lastMessageTopic?.content ? safeJSONParse(lastMessageTopic?.content) : null;
 	}, [lastMessageTopic]);
-	const [senderId, setSubjectTopic] = useState(lastMessageTopic?.sender_id ?? '');
+	const [senderId, setSubjectTopic] = useState(topic?.last_sent_message?.sender_id ?? '');
 	useEffect(() => {
 		setSubjectTopic(lastMessageTopic?.sender_id ?? '');
 	}, [lastMessageTopic]);
 
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(senderId || '');
-	const userLastSent = useSelector(selectMemberClanByUserId(lastMessageTopic?.sender_id ?? ''));
+	const lastSentUser = useSelector(selectMemberClanByUserId(lastMessageTopic?.sender_id ?? ''));
 
 	return (
 		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg">
@@ -93,14 +106,15 @@ function AllTabContent({ messageReplied, subject, lastMessageTopic }: IMentionTa
 					<AvatarImage
 						alt="user avatar"
 						className="w-11 h-10 rounded-full border-2 border-[#FFFFFF] dark:border-[#313338] z-10"
-						userName={userLastSent?.user?.username}
-						srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : userLastSent?.user?.avatar_url) ?? '', {
+						userName={lastSentUser?.user?.username}
+						srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : lastSentUser?.user?.avatar_url) ?? '', {
 							width: 300,
 							height: 300,
 							resizeType: 'fit'
 						})}
-						src={priorityAvatar ? priorityAvatar : userLastSent?.user?.avatar_url}
+						src={priorityAvatar ? priorityAvatar : lastSentUser?.user?.avatar_url}
 					/>
+					{/* The below component will be used in the future! */}
 					{/* <AvatarImage
 						alt="second avatar"
 						className="w-8 h-8 rounded-lg border-2 border-[#FFFFFF] dark:border-[#313338] absolute -bottom-1 -right-2 z-0"
@@ -118,10 +132,15 @@ function AllTabContent({ messageReplied, subject, lastMessageTopic }: IMentionTa
 						<div className="text-[12px] font-bold uppercase">{subject}</div>
 					</div>
 					<div>
-						<div className="text-[12px] ">{`Replied to: ${messageRl?.t}`}</div>
+						<div className="text-[12px] ">
+							<b className="font-semibold">Replied to</b>: {messageRl ? messageRl?.t : 'Unreachable message'}
+						</div>
 					</div>
 					<div>
-						<div className="text-[13px] ">{`${userLastSent?.user?.username}: ${lastMsgTopic?.t}`}</div>
+						<div className="text-[13px] ">
+							<b className="font-semibold">{lastSentUser ? lastSentUser?.user?.username : 'Sender'}</b>:{' '}
+							{lastMsgTopic ? lastMsgTopic?.t : 'Unreachable message'}
+						</div>
 					</div>
 				</div>
 			</div>
