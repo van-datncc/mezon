@@ -10,6 +10,7 @@ import {
 	referencesActions,
 	selectChannelById,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	selectDefaultCanvasByChannelId,
 	selectMessageByMessageId,
 	selectTheme,
@@ -35,7 +36,6 @@ import clx from 'classnames';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import ReactionPart from '../ContextMenu/ReactionPart';
 
 type ChannelMessageOptProps = {
@@ -108,7 +108,7 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
 	const dispatch = useAppDispatch();
-	const clanIdFromParam = useParams().clanId;
+	const clanId = useSelector(selectCurrentClanId);
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
@@ -137,7 +137,7 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 	const menuPlugin = useMemo(() => {
 		const plugin = {
 			setup: (builder: MenuBuilder) => {
-				builder.when(clanIdFromParam && realTimeMessage?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
+				builder.when(clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
 					builder.addMenuItem(
 						'topic',
 						'topic',
@@ -148,7 +148,7 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 			}
 		};
 		return plugin;
-	}, [clanIdFromParam, handleCreateTopic, realTimeMessage?.code]);
+	}, [clanId, handleCreateTopic, realTimeMessage?.code]);
 
 	return menuPlugin;
 }
