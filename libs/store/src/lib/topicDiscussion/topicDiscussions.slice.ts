@@ -1,6 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-// import { threadsActions } from '@mezon/store';
-import { threadsActions } from '@mezon/store-mobile';
+import { threadsActions } from '@mezon/store';
 import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
