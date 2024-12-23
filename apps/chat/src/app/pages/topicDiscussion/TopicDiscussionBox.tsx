@@ -12,7 +12,6 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, sleep } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -130,9 +129,6 @@ const TopicDiscussionBox = () => {
 
 	return (
 		<>
-			<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-bgInputDark bg-bgTextarea rounded-full pointer-events-none">
-				<Icons.TopicIcon defaultSize="w-7 h-7" />
-			</div>
 			{isFetchMessageDone && (
 				<MemoizedChannelMessages
 					channelId={currentTopicId as string}
