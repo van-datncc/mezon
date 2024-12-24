@@ -5,7 +5,6 @@ import {
 	onboardingActions,
 	referencesActions,
 	selectAnonymousMode,
-	selectCurrentChannel,
 	selectCurrentClan,
 	selectDataReferences,
 	selectIsViewingOlderMessagesByChannelId,
@@ -80,8 +79,6 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	}, [sendMessageTyping]);
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
-	const getCurrentChannel = useSelector(selectCurrentChannel);
-
 	useEffect(() => {
 		const isEmojiReactionPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
 
@@ -89,7 +86,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 		const isSmallScreen = window.innerWidth < 640;
 
-		const isStreamChat = getCurrentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+		const isStreamChat = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen) || (isEmojiReactionPanel && isStreamChat);
 
