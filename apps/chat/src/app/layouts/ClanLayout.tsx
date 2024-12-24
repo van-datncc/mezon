@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton, useWebRTCStream } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
 import { useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -9,7 +9,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
-	selectGotifyToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
@@ -48,8 +47,6 @@ const ClanEffects: React.FC<{
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const { handleChannelClick, disconnect } = useWebRTCStream();
-	const gotifyToken = useSelector(selectGotifyToken);
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {

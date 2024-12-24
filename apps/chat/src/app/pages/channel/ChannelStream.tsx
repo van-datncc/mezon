@@ -330,6 +330,7 @@ export default function ChannelStream({
 			})
 		);
 		dispatch(videoStreamActions.setIsJoin(true));
+		disconnect();
 		handleChannelClick(
 			currentClan?.id as string,
 			currentChannel?.channel_id as string,
