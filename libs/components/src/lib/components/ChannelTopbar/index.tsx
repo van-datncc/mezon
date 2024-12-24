@@ -328,7 +328,6 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
-	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));

@@ -299,6 +299,14 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	inviteChannelId: undefined
 });
 
+type UpdateClanBadgeCountPayload = {
+	clanId: string;
+	channels: {
+		channelId: string;
+		count: number;
+	}[];
+};
+
 export const clansSlice = createSlice({
 	name: CLANS_FEATURE_KEY,
 	initialState: initialClansState,
@@ -343,6 +351,15 @@ export const clansSlice = createSlice({
 						}
 					});
 				}
+			}
+		},
+		updateClanBadgeCount2: (state, action: PayloadAction<UpdateClanBadgeCountPayload>) => {
+			const { clanId, channels } = action.payload;
+			const clan = state.entities[clanId];
+
+			if (clan) {
+				const totalCount = channels.reduce((sum, { count }) => sum + count, 0);
+				clan.badge_count = Math.max(0, (clan.badge_count ?? 0) + totalCount);
 			}
 		},
 		refreshStatus(state) {
