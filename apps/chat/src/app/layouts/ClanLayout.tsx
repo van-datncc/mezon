@@ -13,13 +13,12 @@ import {
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
+	selectIsJoin,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectStatusMenu,
-	selectStatusStream,
 	useAppDispatch,
-	videoStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
@@ -68,32 +67,6 @@ const ClanEffects: React.FC<{
 	}, [isShowChatStream]);
 
 	useEffect(() => {
-		if (
-			currentClan &&
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING &&
-			currentStreamInfo?.clanId !== currentClan.id &&
-			currentStreamInfo?.streamId !== currentChannel.channel_id
-		) {
-			disconnect();
-			handleChannelClick(
-				currentClan?.id as string,
-				currentChannel.channel_id as string,
-				userId as string,
-				currentChannel.channel_id as string,
-				userName as string,
-				gotifyToken as string
-			);
-			dispatch(
-				videoStreamActions.startStream({
-					clanId: currentClan.id || '',
-					clanName: currentClan.clan_name || '',
-					streamId: currentChannel.channel_id || '',
-					streamName: currentChannel.channel_label || '',
-					parentId: currentChannel.parrent_id || ''
-				})
-			);
-			dispatch(appActions.setIsShowChatStream(false));
-		}
 		if (!canvasId) {
 			dispatch(appActions.setIsShowCanvas(false));
 		}
@@ -120,7 +93,6 @@ const ClanLayout = () => {
 	const userProfile = useSelector(selectAllAccount);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const streamPlay = useSelector(selectStatusStream);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
@@ -132,6 +104,7 @@ const ClanLayout = () => {
 	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannel?.id as string));
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
+	const isJoin = useSelector(selectIsJoin);
 
 	return (
 		<>
@@ -142,7 +115,7 @@ const ClanLayout = () => {
 				<ChannelList />
 				<div id="clan-footer">
 					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
-					{streamPlay && <StreamInfo type={ESummaryInfo.STREAM} />}
+					{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 					<div style={{ height: 56, width: '100%' }}>
 						<FooterProfile
