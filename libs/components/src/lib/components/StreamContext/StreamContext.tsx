@@ -214,7 +214,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 								pcRef.current?.addIceCandidate(data.Value);
 								break;
 							default:
-								console.log('Unhandled message:', data);
+								break;
 						}
 					}
 				};

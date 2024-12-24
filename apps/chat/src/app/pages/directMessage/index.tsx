@@ -6,8 +6,8 @@ import {
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
-	selectStatusMenu,
-	selectStatusStream
+	selectIsJoin,
+	selectStatusMenu
 } from '@mezon/store';
 import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { memo, useEffect } from 'react';
@@ -20,10 +20,10 @@ const Direct = () => {
 	const { userProfile } = useAuth();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const streamPlay = useSelector(selectStatusStream);
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
 	const isInCall = useSelector(selectIsInCall);
+	const isJoin = useSelector(selectIsJoin);
 
 	useEffect(() => {
 		dispatch(clansActions.setCurrentClanId('0'));
@@ -41,7 +41,7 @@ const Direct = () => {
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
-				{streamPlay && <StreamInfo type={ESummaryInfo.STREAM} />}
+				{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 				<div style={{ height: 56, width: '100%' }}>
 					<FooterProfile
