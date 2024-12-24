@@ -91,7 +91,7 @@ export const compareTime = (start: string, end: string, equal?: boolean) => {
 	if (totalStart < totalEnd) {
 		return true;
 	}
-	return true;
+	return false;
 };
 
 export const differenceTime = (end: string) => {

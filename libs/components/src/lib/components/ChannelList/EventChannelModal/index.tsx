@@ -4,7 +4,6 @@ import ModalCreate from './ModalCreate';
 import { StartEventModal } from './StartEvent';
 
 export type EventModalProps = {
-	// numberEventManagement: number;
 	onClose: () => void;
 	openModalDetail: boolean;
 	setOpenModalDetail: Dispatch<SetStateAction<boolean>>;
@@ -44,7 +43,6 @@ const EventModal = (props: EventModalProps) => {
 								onClose={onClose}
 								onOpenCreate={() => setOpenModal(true)}
 								onOpenDetailItem={handleModalDetail}
-								// numberEventManagement={numberEventManagement}
 								onEventUpdateId={onEventUpdateId}
 							/>
 						</div>

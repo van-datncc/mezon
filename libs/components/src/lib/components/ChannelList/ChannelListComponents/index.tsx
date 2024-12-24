@@ -60,14 +60,7 @@ export const Events = memo(() => {
 	});
 
 	const [openEventModal, closeEventModal] = useModal(() => {
-		return (
-			<EventModal
-				onClose={closeModal}
-				// numberEventManagement={numberEventManagement}
-				openModalDetail={openModalDetail}
-				setOpenModalDetail={setOpenModalDetail}
-			/>
-		);
+		return <EventModal onClose={closeModal} openModalDetail={openModalDetail} setOpenModalDetail={setOpenModalDetail} />;
 	}, []);
 
 	const dispatch = useAppDispatch();

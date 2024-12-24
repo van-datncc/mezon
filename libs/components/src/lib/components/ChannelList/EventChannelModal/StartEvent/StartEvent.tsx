@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 import ListEventManagement from './ListEventManagement';
 
 type StartEventModalProps = {
-	// numberEventManagement: number;
 	onClose: () => void;
 	onOpenCreate: () => void;
 	onOpenDetailItem: (status: boolean) => void;
