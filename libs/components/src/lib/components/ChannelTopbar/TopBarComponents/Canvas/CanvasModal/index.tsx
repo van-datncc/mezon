@@ -1,7 +1,6 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
-	canvasAPIActions,
 	canvasActions,
 	selectCanvasIdsByChannelId,
 	selectCurrentChannel,
@@ -12,7 +11,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
-import { RefObject, useEffect, useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
@@ -31,12 +30,6 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
-
-	useEffect(() => {
-		const { channel_id, clan_id } = currentChannel || {};
-		if (!channel_id || !clan_id) return;
-		dispatch(canvasAPIActions.getChannelCanvasList({ channel_id, clan_id }));
-	}, []);
 
 	const handleCreateCanvas = () => {
 		dispatch(appActions.setIsShowCanvas(true));
