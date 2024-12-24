@@ -811,7 +811,8 @@ export const messagesSlice = createSlice({
 		},
 
 		updateMessageReactions: (state, action: PayloadAction<ReactionEntity>) => {
-			const { channel_id, message_id, emoji_id, sender_id } = action.payload;
+			const { channel_id, message_id, emoji_id, sender_id, action: remove } = action.payload;
+
 			if (!state.channelMessages[channel_id]?.entities[message_id]) return;
 			const message = state.channelMessages[channel_id].entities[message_id];
 			if (!message.reactions) {
@@ -819,7 +820,7 @@ export const messagesSlice = createSlice({
 			}
 			const existingReactionIndex = message.reactions.findIndex((r) => r.emoji_id === emoji_id && r.sender_id === sender_id);
 			if (existingReactionIndex !== -1) {
-				message.reactions[existingReactionIndex].count++;
+				!remove ? message.reactions[existingReactionIndex].count++ : (message.reactions[existingReactionIndex].count = 0);
 			} else {
 				message.reactions.push(action.payload);
 			}
