@@ -158,9 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			wrapper.appendChild(thumbnail);
 			thumbnailContainer.appendChild(wrapper);
 
-			if (index === data.selectedImageIndex) {
-				updateSelectedImage(image, index);
-			}
+			// SET FIRST SELECT IMAGE WHEN OPEN IMAGE WINDOW
+			// if (index === data.selectedImageIndex) {
+			// 	updateSelectedImage(image, index);
+			// }
 		});
 	}
 
