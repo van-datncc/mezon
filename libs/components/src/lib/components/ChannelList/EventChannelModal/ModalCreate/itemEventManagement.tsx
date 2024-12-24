@@ -71,8 +71,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
-	const eventIsUpcomming = Number(event?.event_status) === EEventStatus.UPCOMING;
-	const eventIsOngoing = Number(event?.event_status) === EEventStatus.ONGOING;
+	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
+	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();

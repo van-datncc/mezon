@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 export const useEventManagementQuantity = () => {
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
-
 	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 
 	const eventsByUser = allEventManagement.filter(

@@ -9,7 +9,6 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
-	event_status?: EEventStatus | null;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
@@ -242,20 +241,20 @@ export const eventManagementSlice = createSlice({
 			state.chooseEvent = action.payload;
 		},
 		updateStatusEvent: (state, action) => {
-			if (Number(action.payload.event_status) === EEventStatus.CREATED) {
+			if (action.payload.event_status === EEventStatus.CREATED) {
 				eventManagementAdapter.addOne(state, {
 					id: action.payload.event_id,
-					event_status: Number(action.payload.event_status),
+					event_status: action.payload.event_status,
 					...action.payload
 				});
 			} else {
 				eventManagementAdapter.updateOne(state, {
 					id: action.payload.event_id,
 					changes: {
-						event_status: Number(action.payload.event_status)
+						event_status: action.payload.event_status
 					}
 				});
-				if (Number(action.payload.event_status) === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
+				if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
 					state.ongoingEvent = null;
 				}
 			}
