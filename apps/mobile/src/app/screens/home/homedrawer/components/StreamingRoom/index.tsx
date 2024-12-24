@@ -6,9 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { SafeAreaView, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../InviteToChannel';
 import { style } from './StreamingRoom.styles';
+import { StreamingScreenComponent } from './StreamingScreen';
 import UserStreamingRoom from './UserStreamingRoom';
 
 function StreamingRoom({
@@ -24,17 +26,20 @@ function StreamingRoom({
 	const bottomSheetInviteRef = useRef(null);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
+	const { disconnect } = useWebRTCStream();
 
 	const handleLeaveChannel = useCallback(async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
+		disconnect();
 		const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
-		dispatch(usersStreamActions.remove(idStreamByMe || ''));
-	}, [currentStreamInfo, dispatch, streamChannelMember, userProfile?.user?.id]);
+		dispatch(usersStreamActions.remove(idStreamByMe));
+	}, [currentStreamInfo, disconnect, streamChannelMember, dispatch, userProfile]);
 
 	const handleEndCall = useCallback(() => {
 		requestAnimationFrame(async () => {
@@ -85,7 +90,7 @@ function StreamingRoom({
 						</Block>
 					)}
 
-					{/* <Block
+					<Block
 						style={{
 							...styles.userStreamingRoomContainer,
 							width: isAnimationComplete ? (isFullScreen ? '100%' : '100%') : '100%',
@@ -97,7 +102,7 @@ function StreamingRoom({
 							isAnimationComplete={isAnimationComplete}
 							onFullScreenVideo={handelFullScreenVideo}
 						/>
-					</Block> */}
+					</Block>
 					{!isFullScreen && isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
 					{!isFullScreen && isAnimationComplete && (
 						<Block style={[styles.menuFooter]}>

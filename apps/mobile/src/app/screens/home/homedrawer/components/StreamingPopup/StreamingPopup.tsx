@@ -1,9 +1,20 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectHiddenBottomTabMobile, selectStatusStream, useAppDispatch } from '@mezon/store';
-import { appActions } from '@mezon/store-mobile';
+import {
+	appActions,
+	selectAllAccount,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectHiddenBottomTabMobile,
+	selectStatusStream,
+	useAppDispatch,
+	videoStreamActions
+} from '@mezon/store';
+import messaging from '@react-native-firebase/messaging';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
 import StreamingRoom from '../StreamingRoom';
 import { style } from './styles';
 const { width, height } = Dimensions.get('window');
@@ -19,6 +30,11 @@ export const StreamingPopup = () => {
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const dispatch = useAppDispatch();
 	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
+	const currentClan = useSelector(selectCurrentClan);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
+	const userProfile = useSelector(selectAllAccount);
+
 	const panResponder = useRef(
 		PanResponder.create({
 			onMoveShouldSetPanResponder: () => true,
@@ -38,6 +54,32 @@ export const StreamingPopup = () => {
 				duration: 100,
 				useNativeDriver: false
 			}).start();
+		}
+		handleJoinStreamingRoom();
+	}, []);
+
+	const handleJoinStreamingRoom = useCallback(async () => {
+		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			const token = await messaging().getToken();
+			disconnect();
+			handleChannelClick(
+				currentClan?.id as string,
+				currentChannel.channel_id as string,
+				userProfile?.user?.id as string,
+				currentChannel.channel_id as string,
+				userProfile?.user?.username as string,
+				token as string
+			);
+			dispatch(
+				videoStreamActions.startStream({
+					clanId: currentClan.id || '',
+					clanName: currentClan.clan_name || '',
+					streamId: currentChannel.channel_id || '',
+					streamName: currentChannel.channel_label || '',
+					parentId: currentChannel.parrent_id || ''
+				})
+			);
+			dispatch(appActions.setIsShowChatStream(false));
 		}
 	}, []);
 
@@ -59,7 +101,6 @@ export const StreamingPopup = () => {
 				]).start(() => {
 					setIsAnimationComplete(true);
 				});
-				dispatch(appActions.setHiddenBottomTabMobile(true));
 			} else {
 				Animated.timing(windowSize, {
 					toValue: { x: 100, y: 100 },
@@ -68,7 +109,6 @@ export const StreamingPopup = () => {
 				}).start(() => {
 					setIsAnimationComplete(false);
 				});
-				dispatch(appActions.setHiddenBottomTabMobile(isHiddenTab));
 			}
 			setIsFullScreen(isFullScreen);
 			Keyboard.dismiss();

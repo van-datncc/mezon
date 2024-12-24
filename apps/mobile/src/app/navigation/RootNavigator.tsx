@@ -17,6 +17,7 @@ import Toast from 'react-native-toast-message';
 import VersionInfo from 'react-native-version-info';
 import MezonUpdateVersionModal from '../componentUI/MezonUpdateVersionModal';
 import NetInfoComp from '../components/NetworkInfo';
+import { WebRTCStreamProvider } from '../components/StreamContext/StreamContext';
 import { toastConfig } from '../configs/toastConfig';
 import RootListener from './RootListener';
 import RootStack from './RootStack';
@@ -88,7 +89,9 @@ const RootNavigation = () => {
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 			<CustomStatusBar />
 			<ChatContextProvider>
-				<NavigationMain />
+				<WebRTCStreamProvider>
+					<NavigationMain />
+				</WebRTCStreamProvider>
 			</ChatContextProvider>
 			<Toast config={toastConfig} />
 		</MezonStoreProvider>
