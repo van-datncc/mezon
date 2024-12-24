@@ -214,6 +214,7 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 
 export interface EventManagementState extends EntityState<EventManagementEntity, string> {
 	loadingStatus: LoadingStatus;
+	creatingStatus: LoadingStatus;
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
 	ongoingEvent: EventManagementOnGogoing | null;
@@ -223,7 +224,8 @@ export const initialEventManagementState: EventManagementState = eventManagement
 	loadingStatus: 'not loaded',
 	error: null,
 	chooseEvent: null,
-	ongoingEvent: null
+	ongoingEvent: null,
+	creatingStatus: 'not loaded'
 });
 
 export const eventManagementSlice = createSlice({
@@ -240,15 +242,22 @@ export const eventManagementSlice = createSlice({
 			state.chooseEvent = action.payload;
 		},
 		updateStatusEvent: (state, action) => {
-			eventManagementAdapter.updateOne(state, {
-				id: action.payload.event_id,
-				changes: {
-					event_status: action.payload.event_status
+			if (Number(action.payload.event_status) === EEventStatus.CREATED) {
+				eventManagementAdapter.addOne(state, {
+					id: action.payload.event_id,
+					event_status: Number(action.payload.event_status),
+					...action.payload
+				});
+			} else {
+				eventManagementAdapter.updateOne(state, {
+					id: action.payload.event_id,
+					changes: {
+						event_status: Number(action.payload.event_status)
+					}
+				});
+				if (Number(action.payload.event_status) === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
+					state.ongoingEvent = null;
 				}
-			});
-
-			if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
-				state.ongoingEvent = null;
 			}
 		},
 		clearOngoingEvent: (state, action) => {
@@ -267,6 +276,19 @@ export const eventManagementSlice = createSlice({
 			.addCase(fetchEventManagement.rejected, (state: EventManagementState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			});
+		builder
+			.addCase(fetchCreateEventManagement.pending, (state) => {
+				state.creatingStatus = 'loading';
+				state.error = null;
+			})
+			.addCase(fetchCreateEventManagement.fulfilled, (state) => {
+				state.creatingStatus = 'loaded';
+				state.error = null;
+			})
+			.addCase(fetchCreateEventManagement.rejected, (state, action) => {
+				state.creatingStatus = 'error';
+				state.error = action.payload as string;
 			});
 	}
 });
@@ -295,6 +317,8 @@ export const selectNumberEvent = createSelector(selectAllEventManagement, (event
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
 
 export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);
+
+export const selectCreatingLoaded = createSelector(getEventManagementState, (state) => state.creatingStatus);
 
 export const selectEventById = (eventId: string) =>
 	createSelector(getEventManagementState, (state) => {
