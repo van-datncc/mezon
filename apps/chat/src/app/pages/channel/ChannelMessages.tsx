@@ -3,7 +3,6 @@ import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
 import { useIdleRender } from '@mezon/core';
 import {
 	MessagesEntity,
-	mapMessageChannelToEntity,
 	messagesActions,
 	pinMessageActions,
 	selectAllAccount,
@@ -29,11 +28,10 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
+import { Direction_Mode, convertInitialMessageOfTopic, toggleDisableHover } from '@mezon/utils';
 import { Action } from '@reduxjs/toolkit';
 import classNames from 'classnames';
-// eslint-disable-next-line prettier/prettier
-import { ChannelMessage as ChannelMessageType, ChannelType, safeJSONParse } from 'mezon-js';
+import { ChannelMessage as ChannelMessageType, ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -358,25 +356,14 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
 
-		const firstMsg = useSelector(selectFirstMessageOfCurrentTopic);
+		const firstMsgOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
 
 		const convertedFirstMsgOfThisTopic = useMemo(() => {
-			if (firstMsg?.message) {
-				const convertedMessage = mapMessageChannelToEntity(firstMsg?.message as ChannelMessageType) as MessagesEntity;
-				convertedMessage.mentions = Array.isArray(convertedMessage.mentions)
-					? convertedMessage.mentions
-					: safeJSONParse(convertedMessage.mentions || '');
-				convertedMessage.attachments = Array.isArray(convertedMessage.attachments)
-					? convertedMessage.attachments
-					: safeJSONParse(convertedMessage.attachments || '');
-				convertedMessage.references = Array.isArray(convertedMessage.references)
-					? convertedMessage.references
-					: safeJSONParse(convertedMessage.references || '');
-				convertedMessage.content = safeJSONParse(convertedMessage.content || '');
-				return convertedMessage;
+			if (!firstMsgOfThisTopic?.message) {
+				return firstMsgOfThisTopic as MessagesEntity;
 			}
-			return firstMsg as MessagesEntity;
-		}, [firstMsg]);
+			return convertInitialMessageOfTopic(firstMsgOfThisTopic.message as ChannelMessageType);
+		}, [firstMsgOfThisTopic]);
 
 		const rowVirtualizer = useVirtualizer({
 			count: messages.length,
