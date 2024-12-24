@@ -21,7 +21,7 @@ import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, getAvatarForPrioritize, IChannelMember, IStreamInfo } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface MediaPlayerProps {
@@ -322,11 +322,11 @@ export default function ChannelStream({
 		if (currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING) return;
 		dispatch(
 			videoStreamActions.startStream({
-				clanId: currentClan.id || '',
-				clanName: currentClan.clan_name || '',
-				streamId: currentChannel.channel_id || '',
-				streamName: currentChannel.channel_label || '',
-				parentId: currentChannel.parrent_id || ''
+				clanId: currentClan.id as string,
+				clanName: currentClan.clan_name as string,
+				streamId: currentChannel.channel_id as string,
+				streamName: currentChannel.channel_label as string,
+				parentId: currentChannel.parrent_id as string
 			})
 		);
 		dispatch(videoStreamActions.setIsJoin(true));
@@ -370,13 +370,9 @@ export default function ChannelStream({
 		};
 	}, []);
 
-	const checkShowJoin = useMemo(() => {
-		return currentStreamInfo?.streamId !== currentChannel?.channel_id || !isJoin;
-	}, [currentStreamInfo?.streamId, currentChannel?.channel_id, isJoin]);
-
 	return (
 		<>
-			{checkShowJoin && (
+			{(currentStreamInfo?.streamId !== currentChannel?.channel_id || !isJoin) && (
 				<div className="w-full h-full bg-black flex justify-center items-center">
 					<div className="flex flex-col justify-center items-center gap-4 w-full">
 						<div className="w-full flex gap-2 justify-center p-2">
@@ -399,7 +395,7 @@ export default function ChannelStream({
 				</div>
 			)}
 			<div
-				className={`${checkShowJoin ? 'w-0 h-0 overflow-hidden' : 'w-full h-full'} flex relative group`}
+				className={`${currentStreamInfo?.streamId !== currentChannel?.channel_id || !isJoin ? 'w-0 h-0 overflow-hidden' : 'w-full h-full'} flex relative group`}
 				onMouseMove={handleMouseMoveOrClick}
 				onClick={handleMouseMoveOrClick}
 			>
