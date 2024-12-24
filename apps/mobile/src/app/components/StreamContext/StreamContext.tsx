@@ -73,7 +73,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 			if (wsRef.current?.readyState === WebSocket.OPEN) {
 				wsRef.current.send(jsonStr);
 			} else {
-				debug('ws: send not ready, skipping...', jsonStr);
+				addError('ws: send not ready, skipping...');
 			}
 		},
 		[wsRef.current, debug]
@@ -90,15 +90,8 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		});
 
 		peerConnection.addEventListener('iceconnectionstatechange', (event) => {
-			debug('ICE state:', peerConnection.iceConnectionState);
 			setConnectionState(peerConnection.iceConnectionState);
 			setIsConnected(peerConnection.iceConnectionState === 'connected');
-			// Handle spinner visibility based on connection state
-			const states = ['new', 'checking', 'failed', 'disconnected', 'closed', 'completed', 'connected'];
-			if (states.includes(peerConnection.iceConnectionState)) {
-				// You might want to handle spinner visibility through a state
-				debug(`ICE connection state changed to: ${peerConnection.iceConnectionState}`);
-			}
 		});
 
 		peerConnection.addEventListener('icecandidate', (event) => {
@@ -188,8 +181,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		wsRef.current = null;
 		setIsConnected(false);
 		setConnectionState('closed');
-		debug('WebRTC connection closed');
-	}, [debug]);
+	}, []);
 	const handleChannelClick = useCallback(
 		(clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => {
 			const wsUrl = process.env.NX_CHAT_APP_STREAM_WS_URL;
