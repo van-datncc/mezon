@@ -77,7 +77,7 @@ export const observeElementRect = <T extends Element>(instance: Virtualizer<T, a
 	handler(element.getBoundingClientRect());
 
 	if (!targetWindow.ResizeObserver) {
-		return () => {};
+		return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 	}
 
 	const observer = new targetWindow.ResizeObserver((entries) => {
@@ -354,7 +354,7 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 			horizontal: false,
 			getItemKey: defaultKeyExtractor,
 			rangeExtractor: defaultRangeExtractor,
-			onChange: () => {},
+			onChange: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
 			measureElement,
 			initialRect: { width: 0, height: 0 },
 			scrollMargin: 0,
