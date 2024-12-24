@@ -46,13 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		updateImageTransform();
 	}
 
-	function updateSelectedImage(image, index) {
+	function updateSelectedImage(image, index, firstLoad = false) {
 		const selectedImage = document.getElementById('selectedImage');
 		const userAvatar = document.getElementById('userAvatar');
 		const username = document.getElementById('username');
 		const timestamp = document.getElementById('timestamp');
 
-		selectedImage.src = image.url;
+		if (!firstLoad) {
+			selectedImage.src = image.url;
+		}
 		userAvatar.src = image.uploaderData.avatar;
 		username.textContent = image.uploaderData.name;
 		timestamp.textContent = formatDateTime(image.create_time);
@@ -159,9 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			thumbnailContainer.appendChild(wrapper);
 
 			// SET FIRST SELECT IMAGE WHEN OPEN IMAGE WINDOW
-			// if (index === data.selectedImageIndex) {
-			// 	updateSelectedImage(image, index);
-			// }
+			if (index === data.selectedImageIndex) {
+				updateSelectedImage(image, index, true);
+			}
 		});
 	}
 
