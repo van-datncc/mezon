@@ -29,7 +29,7 @@ export const fetchDefaultNotificationClanCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: 1000 * 60 * 60,
 		normalizer: (args) => {
 			return args[1] + args[0]?.session?.username || '';
 		}

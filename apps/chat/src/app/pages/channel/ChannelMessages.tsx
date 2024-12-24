@@ -265,6 +265,7 @@ function ChannelMessages({
 	return (
 		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<ChatMessageList
+				key={channelId}
 				messages={messages}
 				chatRef={chatRef}
 				userActiveScroll={userActiveScroll}
@@ -355,7 +356,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
-
 		const currentChannelId = useSelector(selectCurrentChannelId);
 		const firstMsgId = useSelector(selectFirstMessageOfCurrentTopic)?.message_id;
 		const firstMsgOfThisTopic = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, firstMsgId as string));

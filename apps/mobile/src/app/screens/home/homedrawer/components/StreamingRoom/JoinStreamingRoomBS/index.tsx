@@ -9,19 +9,28 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, selectClanById, useAppDispatch, videoStreamActions } from '@mezon/store';
-import { selectCurrentClanId, selectCurrentStreamInfo, selectStatusStream } from '@mezon/store-mobile';
+import {
+	appActions,
+	selectAllAccount,
+	selectClanById,
+	selectCurrentClanId,
+	selectCurrentStreamInfo,
+	selectStatusStream,
+	useAppDispatch,
+	videoStreamActions
+} from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
+import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../../../../../../components/StreamContext/StreamContext';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../InviteToChannel';
 import { style } from './JoinStreamingRoomBS.styles';
-
 function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: React.MutableRefObject<BottomSheetModal>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -33,12 +42,22 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
 	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
-
+	const { handleChannelClick } = useWebRTCStream();
+	const userProfile = useSelector(selectAllAccount);
 	const handleJoinVoice = () => {
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				const fcmToken = await messaging().getToken();
 				dispatch(appActions.setHiddenBottomTabMobile(true));
 				if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
+					handleChannelClick(
+						channel?.clan_id as string,
+						channel?.channel_id as string,
+						userProfile?.user?.id as string,
+						channel?.channel_id as string,
+						userProfile?.user?.username,
+						fcmToken
+					);
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: channel?.clan_id || '',

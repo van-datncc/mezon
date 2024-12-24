@@ -14,7 +14,7 @@ export interface EventManagementEntity extends IEventManagement {
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
 
-const EVENT_MANAGEMENT_CACHED_TIME = 1000 * 60 * 3;
+const EVENT_MANAGEMENT_CACHED_TIME = 1000 * 60 * 60;
 const fetchEventManagementCached = memoizeAndTrack((mezon: MezonValueContext, clanId: string) => mezon.client.listEvents(mezon.session, clanId), {
 	promise: true,
 	maxAge: EVENT_MANAGEMENT_CACHED_TIME,

@@ -8,7 +8,7 @@ import { memoizeAndTrack } from '../memoize';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
-const EMOJI_SUGGESTION_CACHE_TIME = 1000 * 60 * 3;
+const EMOJI_SUGGESTION_CACHE_TIME = 1000 * 60 * 60;
 
 export interface EmojiSuggestionEntity extends IEmoji {
 	id: string;
