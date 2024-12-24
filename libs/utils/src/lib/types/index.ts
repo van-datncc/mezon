@@ -1372,3 +1372,9 @@ export interface IImageWindowProps {
 export interface UsersClanEntity extends IUsersClan {
 	id: string; // Primary ID
 }
+
+export enum EEventAction {
+	CREATED = 0,
+	UPDATE = 1,
+	DELETE = 2
+}

@@ -259,6 +259,20 @@ export const eventManagementSlice = createSlice({
 				}
 			}
 		},
+		removeOneEvent: (state, action) => {
+			eventManagementAdapter.removeOne(state, action.payload.event_id);
+		},
+		updateContentEvent: (state, action) => {
+			const eventUpdate = action.payload;
+			const { event_id, ...changes } = eventUpdate;
+
+			eventManagementAdapter.updateOne(state, {
+				id: event_id,
+				changes: {
+					...changes
+				}
+			});
+		},
 		clearOngoingEvent: (state, action) => {
 			state.ongoingEvent = null;
 		}

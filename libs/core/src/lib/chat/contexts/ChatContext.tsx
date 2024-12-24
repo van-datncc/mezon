@@ -62,6 +62,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	EEventAction,
 	EOverriddenPermission,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
@@ -977,7 +978,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
-			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
+			if (eventCreatedEvent.action === EEventAction.CREATED) {
+				dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
+			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
+				dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+			} else if (eventCreatedEvent.action === EEventAction.DELETE) {
+				dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+			}
 		},
 		[dispatch]
 	);
