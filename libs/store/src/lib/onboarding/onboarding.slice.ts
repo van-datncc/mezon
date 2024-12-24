@@ -5,7 +5,7 @@ import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem, ApiOnboardingSteps } from 'mezon-js/api.gen';
 import { clansActions } from '../clans/clans.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
+const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const ONBOARDING_FEATURE_KEY = 'ONBOARDING_FEATURE_KEY';
 
@@ -91,7 +91,6 @@ export const createOnboardingTask = createAsyncThunk(
 			if (!response) {
 				return false;
 			}
-			thunkAPI.dispatch(fetchOnboarding({ clan_id: clan_id, noCache: true }));
 			return { content, clan_id };
 		} catch (error) {
 			captureSentryError(error, 'onboarding/createOnboarding');
@@ -386,12 +385,46 @@ export const onboardingSlice = createSlice({
 				}
 			})
 			.addCase(createOnboardingTask.fulfilled, (state, action) => {
+				if (!action.payload) {
+					return;
+				}
 				state.formOnboarding = {
 					greeting: null,
 					rules: [],
 					questions: [],
 					task: []
 				};
+				const { content, clan_id } = action.payload;
+				if (clan_id) {
+					content.map((onboardingItem) => {
+						const id = Date.now().toString();
+						switch (onboardingItem.guide_type) {
+							case EGuideType.GREETING:
+								state.listOnboarding[clan_id].greeting = onboardingItem;
+								break;
+							case EGuideType.RULE:
+								state.listOnboarding[clan_id].rule.push({
+									...onboardingItem,
+									id: id
+								});
+								break;
+							case EGuideType.QUESTION:
+								state.listOnboarding[clan_id].question.push({
+									...onboardingItem,
+									id: id
+								});
+								break;
+							case EGuideType.TASK:
+								state.listOnboarding[clan_id].mission.push({
+									...onboardingItem,
+									id: id
+								});
+								break;
+							default:
+								break;
+						}
+					});
+				}
 			})
 			.addCase(removeOnboardingTask.fulfilled, (state, action) => {
 				if (action.payload.clan_id) {

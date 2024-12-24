@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import { ActionEmitEvent, changeClan, getUpdateOrAddClanChannelCache, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import {
 	appActions,
@@ -7,15 +8,18 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectCurrentClanId,
+	selectCurrentStreamInfo,
 	selectStatusStream,
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
+import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
 import { DeviceEventEmitter, Linking, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useWebRTCStream } from '../../../components/StreamContext/StreamContext';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { EMessageBSToShow } from './enums';
@@ -27,6 +31,9 @@ const ChannelMessageListener = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const { handleChannelClick, disconnect } = useWebRTCStream();
+	const { userProfile } = useAuth();
 
 	const onMention = useCallback(
 		async (mentionedUser: string) => {
@@ -57,17 +64,29 @@ const ChannelMessageListener = React.memo(() => {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
 				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
-					if (type === ChannelType.CHANNEL_TYPE_STREAMING && !playStream) {
-						dispatch(appActions.setHiddenBottomTabMobile(true));
-						dispatch(
-							videoStreamActions.startStream({
-								clanId: channel?.clan_id || '',
-								clanName: channel?.clan_name || '',
-								streamId: channel?.channel_id || '',
-								streamName: channel?.channel_label || '',
-								parentId: channel?.parrent_id || ''
-							})
-						);
+					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
+						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
+							const token = await messaging().getToken();
+							dispatch(appActions.setHiddenBottomTabMobile(true));
+							disconnect();
+							handleChannelClick(
+								channel?.clan_id as string,
+								channel?.channel_id as string,
+								userProfile?.user?.id as string,
+								channel?.channel_id as string,
+								userProfile?.user?.username as string,
+								token as string
+							);
+							dispatch(
+								videoStreamActions.startStream({
+									clanId: channel?.clan_id || '',
+									clanName: channel?.clan_name || '',
+									streamId: channel?.channel_id || '',
+									streamName: channel?.channel_label || '',
+									parentId: channel?.parrent_id || ''
+								})
+							);
+						}
 					} else {
 						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					}

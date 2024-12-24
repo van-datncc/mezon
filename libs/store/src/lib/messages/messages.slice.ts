@@ -41,7 +41,7 @@ import { ReactionEntity, reactionActions } from '../reactionMessage/reactionMess
 import { RootState } from '../store';
 import { seenMessagePool } from './SeenMessagePool';
 
-const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
+const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -250,14 +250,23 @@ export const fetchMessages = createAsyncThunk(
 				};
 			}
 
+			const oldMessages = channelMessagesAdapter
+				.getSelectors()
+				.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
+
 			if (!response.messages || Date.now() - response.time > 1000) {
-				const messages = channelMessagesAdapter
-					.getSelectors()
-					.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
-				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
+				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
 				return {
 					messages: []
 				};
+			} else if (!isFetchingLatestMessages) {
+				const { entities, ids } = state.messages.channelMessages?.[channelId] || {};
+				if (ids?.length >= response.messages.length && response.messages.every((item) => entities[item.id]?.id === item.id)) {
+					thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
+					return {
+						messages: []
+					};
+				}
 			}
 
 			const firstMessage = response.messages[response.messages.length - 1];
@@ -1349,11 +1358,6 @@ export const selectFirstMessageIdByChannelId = (channelId: string) =>
 	createSelector(getMessagesState, (state) => {
 		return state.firstMessageId[channelId] || '';
 	});
-
-// select lastMessageByChannel
-export const selectLatestMessage = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
-	return messagesState.lastMessageByChannel[channelId] || emptyObject;
-});
 
 // select selectLatestMessage's id
 export const selectLatestMessageId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
