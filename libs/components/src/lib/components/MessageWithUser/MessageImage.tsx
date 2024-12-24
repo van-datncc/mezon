@@ -37,71 +37,80 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
 	const { currentChatUsersEntities } = useCurrentChat();
+	let width = attachmentData.width || 0;
+	let height = attachmentData.height || 150;
+	const handleClick = useCallback(
+		(url: string) => {
+			if (checkImage) return;
 
-	const handleClick = useCallback((url: string) => {
-		if (checkImage) return;
+			if (isElectron()) {
+				const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
+				window.electron.openImageWindow({
+					...attachmentData,
+					uploaderData: {
+						name:
+							currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
+						avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+					}
+				});
 
-		if (isElectron()) {
-			const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
-			window.electron.openImageWindow({
-				...attachmentData,
-				uploaderData: {
-					name: currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
-					avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
-				}
-			});
-
-			if ((currentClanId && currentChannelId) || currentDmGroupId) {
-				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
-					.then((data) => {
-						const attachmentList = data.payload as IAttachmentEntity[];
-						const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
-						const imageListWithUploaderInfo = imageList.map((image) => {
-							const uploader = currentChatUsersEntities?.[image.uploader as string];
-							return {
-								...image,
-								uploaderData: {
-									avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
-									name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-								},
-								url: createImgproxyUrl(image.url || '', { width: 1280, height: 720, resizeType: 'fit' })
+				if ((currentClanId && currentChannelId) || currentDmGroupId) {
+					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
+					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
+						.then((data) => {
+							const attachmentList = data.payload as IAttachmentEntity[];
+							const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
+							const imageListWithUploaderInfo = imageList.map((image) => {
+								const uploader = currentChatUsersEntities?.[image.uploader as string];
+								return {
+									...image,
+									uploaderData: {
+										avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
+										name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
+									},
+									url: createImgproxyUrl(image.url || '', {
+										width: Math.round(width),
+										height: Math.round(height),
+										resizeType: 'fit'
+									})
+								};
+							});
+							const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
+							return { imageListWithUploaderInfo, selectedImageIndex };
+						})
+						.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
+							const channelImagesData: IImageWindowProps = {
+								channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+								images: imageListWithUploaderInfo,
+								selectedImageIndex: selectedImageIndex
 							};
+							window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
 						});
-						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
-						return { imageListWithUploaderInfo, selectedImageIndex };
+				}
+			} else {
+				dispatch(attachmentActions.setMode(mode));
+				setOpenModalAttachment(true);
+				setAttachment(url);
+				dispatch(
+					attachmentActions.setCurrentAttachment({
+						id: attachmentData.message_id as string,
+						uploader: attachmentData.sender_id,
+						create_time: attachmentData.create_time
 					})
-					.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
-						const channelImagesData: IImageWindowProps = {
-							channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
-							images: imageListWithUploaderInfo,
-							selectedImageIndex: selectedImageIndex
-						};
-						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
-					});
-			}
-		} else {
-			dispatch(attachmentActions.setMode(mode));
-			setOpenModalAttachment(true);
-			setAttachment(url);
-			dispatch(
-				attachmentActions.setCurrentAttachment({
-					id: attachmentData.message_id as string,
-					uploader: attachmentData.sender_id,
-					create_time: attachmentData.create_time
-				})
-			);
+				);
 
-			if ((currentClanId && currentChannelId) || currentDmGroupId) {
-				const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-				const channelId = (currentDmGroupId as string) || (currentChannelId as string);
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
-			}
+				if ((currentClanId && currentChannelId) || currentDmGroupId) {
+					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
+					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
+				}
 
-			dispatch(attachmentActions.setMessageId(messageId));
-		}
-	}, []);
+				dispatch(attachmentActions.setMessageId(messageId));
+			}
+		},
+		[width, height]
+	);
 
 	const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -132,9 +141,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 			}
 		};
 	}, [imageLoaded]);
-
-	let width = attachmentData.width || 0;
-	let height = attachmentData.height || 150;
 
 	if (attachmentData.width && attachmentData.height) {
 		const aspectRatio = attachmentData.width / attachmentData.height;

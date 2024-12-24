@@ -280,14 +280,6 @@ const persisteduserChannelsReducer = persistReducer(
 	userChannelsReducer
 );
 
-const persistedStreamReducer = persistReducer(
-	{
-		key: 'stream',
-		storage
-	},
-	videoStreamReducer
-);
-
 const persistedOnboardingReducer = persistReducer(
 	{
 		key: ONBOARDING_FEATURE_KEY,
@@ -340,7 +332,7 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	pushToTalkUsers: pushToTalkMembersReducer,
-	videostream: persistedStreamReducer,
+	videostream: videoStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,

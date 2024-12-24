@@ -53,6 +53,7 @@ const LocationModal = (props: LocationModalProps) => {
 
 	const handleSelectChannelAudience = useCallback(
 		(selectedOption: any) => {
+			setIsClear(false);
 			setContentSubmit((prevContentSubmit) => ({
 				...prevContentSubmit,
 				textChannelId: selectedOption.value
@@ -61,6 +62,14 @@ const LocationModal = (props: LocationModalProps) => {
 		[setContentSubmit]
 	);
 
+	const [isClear, setIsClear] = useState<boolean>(false);
+	const handleClearAudience = () => {
+		setIsClear(true);
+		setContentSubmit((prevContentSubmit) => ({
+			...prevContentSubmit,
+			textChannelId: undefined // Clear the selected channel ID
+		}));
+	};
 	const optionsTextChannel = useMemo(
 		() =>
 			textChannels.map((channel) => {
@@ -96,9 +105,11 @@ const LocationModal = (props: LocationModalProps) => {
 	);
 
 	const selectedOption = useMemo(
-		() => optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId),
-		[optionsTextChannel, contentSubmit.textChannelId]
+		() => (isClear ? undefined : optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId)),
+		[isClear, optionsTextChannel, contentSubmit.textChannelId]
 	);
+
+	const showClearButton = selectedOption ? true : false;
 
 	return (
 		<div>
@@ -157,7 +168,6 @@ const LocationModal = (props: LocationModalProps) => {
 					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 				/>
 			)}
-
 			{choiceLocation && (
 				<div>
 					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Enter a location</h3>
@@ -177,10 +187,17 @@ const LocationModal = (props: LocationModalProps) => {
 			</div>
 			<Select
 				options={optionsTextChannel}
-				value={selectedOption}
+				value={isClear ? null : selectedOption}
 				onChange={handleSelectChannelAudience}
 				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 			/>
+			{showClearButton && (
+				<div className="flex justify-end mt-1">
+					<button onClick={handleClearAudience} className="text-blue-500 hover:underline">
+						Clear audiences
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };

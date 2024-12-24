@@ -6,6 +6,7 @@ export const VIDEO_STREAM_FEATURE_KEY = 'videostream';
 export interface StreamState {
 	streamInfo: IStreamInfo | null;
 	isPlaying: boolean;
+	isJoin: boolean;
 	isRemoteVideoStream: boolean;
 	isRemoteAudioStream: boolean;
 }
@@ -13,6 +14,7 @@ export interface StreamState {
 const initialState: StreamState = {
 	streamInfo: null,
 	isPlaying: false,
+	isJoin: false,
 	isRemoteVideoStream: false,
 	isRemoteAudioStream: false
 };
@@ -34,6 +36,9 @@ const videoStreamSlice = createSlice({
 		},
 		setIsRemoteAudioStream(state, action) {
 			state.isRemoteAudioStream = action.payload;
+		},
+		setIsJoin(state, action) {
+			state.isJoin = action.payload;
 		}
 	}
 });
@@ -53,3 +58,5 @@ export const selectStatusStream = createSelector(getVideoStreamState, (state) =>
 export const selectRemoteVideoStream = createSelector(getVideoStreamState, (state) => state.isRemoteVideoStream);
 
 export const selectRemoteAudioStream = createSelector(getVideoStreamState, (state) => state.isRemoteAudioStream);
+
+export const selectIsJoin = createSelector(getVideoStreamState, (state) => state.isJoin);
