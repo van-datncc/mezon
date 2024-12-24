@@ -7,7 +7,7 @@ import { ApiSdTopic } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
-const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
+const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 60;
 
 export const TOPIC_DISCUSSIONS_FEATURE_KEY = 'topicdiscussions';
 

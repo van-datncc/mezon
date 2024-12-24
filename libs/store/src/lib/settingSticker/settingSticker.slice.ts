@@ -9,7 +9,7 @@ import { memoizeAndTrack } from '../memoize';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 
-const STICKER_CLAN_CACHE_TIME = 1000 * 60 * 3;
+const STICKER_CLAN_CACHE_TIME = 1000 * 60 * 60;
 
 export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
