@@ -47,7 +47,7 @@ export const fetchRolesClanCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: 1000 * 60 * 60,
 		normalizer: (args) => {
 			const username = args[0]?.session?.username || '';
 			return args[1] + username;

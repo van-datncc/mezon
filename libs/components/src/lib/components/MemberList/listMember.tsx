@@ -1,3 +1,4 @@
+import { useWindowSize } from '@mezon/core';
 import {
 	selectAllChannelMembers,
 	selectClanMemberMetaUserId,
@@ -9,7 +10,7 @@ import {
 } from '@mezon/store';
 import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
@@ -76,11 +77,9 @@ const ListMember = () => {
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight - heightTopBar - titleBarHeight);
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	}, []);
+	useWindowSize(() => {
+		setHeight(window.innerHeight - heightTopBar - titleBarHeight);
+	});
 
 	const parentRef = useRef(null);
 	const rowVirtualizer = useVirtualizer({

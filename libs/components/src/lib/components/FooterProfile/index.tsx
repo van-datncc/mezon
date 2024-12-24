@@ -37,11 +37,6 @@ export type FooterProfileProps = {
 };
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
-	const { isJoined, isTalking, toggleTalking, quitPTT } = usePushToTalk();
-	const longPressHandlers = useLongPress<HTMLDivElement>({
-		onStart: () => toggleTalking(true),
-		onFinish: () => toggleTalking(false)
-	});
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
@@ -175,22 +170,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						/>
 					)}
 				</div>
-				{isJoined && (
-					<>
-						<Tippy content="Quit PTT" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
-							<span>
-								<Icons.LeavePtt
-									onClick={quitPTT}
-									className="cursor-pointer size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
-								/>
-							</span>
-						</Tippy>
-
-						<div {...longPressHandlers}>
-							<MicButton isTalking={isTalking} />
-						</div>
-					</>
-				)}
+				<PushToTalkControls />
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
@@ -230,6 +210,35 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					note={note}
 				/>
 			)}
+		</>
+	);
+}
+
+export function PushToTalkControls() {
+	const { isJoined, isTalking, toggleTalking, quitPTT } = usePushToTalk();
+	const appearanceTheme = useSelector(selectTheme);
+
+	const longPressHandlers = useLongPress<HTMLDivElement>({
+		onStart: () => toggleTalking(true),
+		onFinish: () => toggleTalking(false)
+	});
+
+	if (!isJoined) return null;
+
+	return (
+		<>
+			<Tippy content="Quit PTT" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
+				<span>
+					<Icons.LeavePtt
+						onClick={quitPTT}
+						className="cursor-pointer size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode"
+					/>
+				</span>
+			</Tippy>
+
+			<div {...longPressHandlers}>
+				<MicButton isTalking={isTalking} />
+			</div>
 		</>
 	);
 }

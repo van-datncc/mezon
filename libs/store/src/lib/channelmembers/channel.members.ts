@@ -11,7 +11,7 @@ import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../
 import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
 
-const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
+const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 60;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
 
 /*
@@ -299,7 +299,7 @@ export const channelMembers = createSlice({
 			});
 		},
 		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[]; clanId: string }>) => {
-			const { userId, channelIds, clanId } = action.payload;
+			const { userId, channelIds } = action.payload;
 
 			channelIds.forEach((channelId) => {
 				const channelEntity = state.memberChannels[channelId];

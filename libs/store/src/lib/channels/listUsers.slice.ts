@@ -36,7 +36,7 @@ export const fetchListUsersByUserCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: 1000 * 60 * 60,
 		normalizer: (args) => {
 			return args[0].session.username || '';
 		}
