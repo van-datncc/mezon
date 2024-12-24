@@ -104,6 +104,7 @@ const MessageContent = memo(({ message, mode, isSearchMessage, isInTopic }: IMes
 							src={createImgproxyUrl(avatarToDisplay ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 							alt={`${topicCreator?.user?.username}'s avatar`}
 							className="size-7 rounded-md object-cover"
+							title={`${topicCreator?.user?.username}'s avatar`}
 						/>
 						<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>
 						<p>View topic</p>

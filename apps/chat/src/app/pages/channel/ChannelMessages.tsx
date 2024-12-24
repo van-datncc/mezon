@@ -2,6 +2,8 @@ import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
 import { useIdleRender } from '@mezon/core';
 import {
+	MessagesEntity,
+	mapMessageChannelToEntity,
 	messagesActions,
 	pinMessageActions,
 	selectAllAccount,
@@ -18,7 +20,6 @@ import {
 	selectIsViewingOlderMessagesByChannelId,
 	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
-	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
@@ -31,9 +32,10 @@ import {
 import { Direction_Mode, toggleDisableHover } from '@mezon/utils';
 import { Action } from '@reduxjs/toolkit';
 import classNames from 'classnames';
-import { ChannelType } from 'mezon-js';
+// eslint-disable-next-line prettier/prettier
+import { ChannelMessage as ChannelMessageType, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 import { Virtualizer } from './virtual-core/index';
@@ -351,14 +353,30 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 	}) => {
 		const dispatch = useAppDispatch();
 		const idMessageToJump = useSelector(selectIdMessageToJump);
-
 		const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
-		const currentChannelId = useSelector(selectCurrentChannelId);
-		const firstMsgId = useSelector(selectFirstMessageOfCurrentTopic)?.message_id;
-		const firstMsgOfThisTopic = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, firstMsgId as string));
+
+		const firstMsg = useSelector(selectFirstMessageOfCurrentTopic);
+
+		const convertedFirstMsgOfThisTopic = useMemo(() => {
+			if (firstMsg?.message) {
+				const convertedMessage = mapMessageChannelToEntity(firstMsg?.message as ChannelMessageType) as MessagesEntity;
+				convertedMessage.mentions = Array.isArray(convertedMessage.mentions)
+					? convertedMessage.mentions
+					: safeJSONParse(convertedMessage.mentions || '');
+				convertedMessage.attachments = Array.isArray(convertedMessage.attachments)
+					? convertedMessage.attachments
+					: safeJSONParse(convertedMessage.attachments || '');
+				convertedMessage.references = Array.isArray(convertedMessage.references)
+					? convertedMessage.references
+					: safeJSONParse(convertedMessage.references || '');
+				convertedMessage.content = safeJSONParse(convertedMessage.content || '');
+				return convertedMessage;
+			}
+			return firstMsg as MessagesEntity;
+		}, [firstMsg]);
 
 		const rowVirtualizer = useVirtualizer({
 			count: messages.length,
@@ -493,10 +511,17 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					])}
 				>
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
-					{isTopic && (
+					{isTopic && convertedFirstMsgOfThisTopic && (
 						<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
-							<div className={`fullBoxText relative group ${firstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
-								<MessageWithUser isTopic={isTopic} allowDisplayShortProfile={true} message={firstMsgOfThisTopic} mode={mode} />
+							<div
+								className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
+							>
+								<MessageWithUser
+									isTopic={isTopic}
+									allowDisplayShortProfile={true}
+									message={convertedFirstMsgOfThisTopic}
+									mode={mode}
+								/>
 							</div>
 						</div>
 					)}

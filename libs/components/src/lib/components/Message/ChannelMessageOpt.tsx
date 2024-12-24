@@ -74,7 +74,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 	const addToNote = useAddToNoteBuilder(message, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
 	const createTopicMenu = useTopicMenuBuilder(message);
-	const items = useMenuBuilder([giveACoffeeMenu, createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
+	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
 
 	return (
 		<div
@@ -132,7 +132,8 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 		dispatch(topicsActions.setOpenTopicMessageState(true));
 		setValueTopic(realTimeMessage);
 		dispatch(topicsActions.setCurrentTopicId(''));
-	}, [dispatch, realTimeMessage, setIsShowCreateTopic, setValueTopic]);
+		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
+	}, [dispatch, message, realTimeMessage, setIsShowCreateTopic, setValueTopic]);
 
 	const menuPlugin = useMemo(() => {
 		const plugin = {
