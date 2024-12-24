@@ -6,7 +6,7 @@ import { Notification } from 'mezon-js';
 import { ChannelMetaEntity } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
-const LIST_NOTIFICATION_CACHED_TIME = 1000 * 60 * 3;
+const LIST_NOTIFICATION_CACHED_TIME = 1000 * 60 * 60;
 const LIMIT_NOTIFICATION = 50;
 
 export const mapNotificationToEntity = (notifyRes: Notification): INotification => {

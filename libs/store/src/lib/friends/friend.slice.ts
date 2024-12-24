@@ -8,7 +8,7 @@ import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const FRIEND_FEATURE_KEY = 'friends';
-const LIST_FRIEND_CACHED_TIME = 1000 * 60 * 3;
+const LIST_FRIEND_CACHED_TIME = 1000 * 60 * 60;
 
 export interface FriendsEntity extends Friend {
 	id: string;

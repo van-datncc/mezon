@@ -2,7 +2,7 @@ import { useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions, referencesActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { SubPanelName } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 type ReactionBottomProps = {
@@ -52,4 +52,4 @@ const ReactionBottom = ({ smileButtonRef, messageIdRefReaction }: ReactionBottom
 	);
 };
 
-export default ReactionBottom;
+export default memo(ReactionBottom);

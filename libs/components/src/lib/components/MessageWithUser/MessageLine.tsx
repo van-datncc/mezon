@@ -1,9 +1,8 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
+import { selectAllChannels, useAppSelector } from '@mezon/store';
 import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
 type MessageLineProps = {
@@ -35,8 +34,6 @@ const MessageLineComponent = ({
 	code,
 	onCopy
 }: MessageLineProps) => {
-	const allChannels = useSelector(selectChannelsEntities);
-	const allChannelVoice = Object.values(allChannels).flat();
 	return (
 		<div
 			onClick={
@@ -55,7 +52,6 @@ const MessageLineComponent = ({
 				isJumMessageEnabled={isJumMessageEnabled}
 				data={content as IExtendedMessage}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
-				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
 				isEditted={isEditted}
 				isInPinMsg={isInPinMsg}
@@ -71,7 +67,6 @@ export const MessageLine = memo(MessageLineComponent);
 interface RenderContentProps {
 	data: IExtendedMessage;
 	mode: number;
-	allChannelVoice?: ChannelsEntity[];
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
 	isHideLinkOneImage?: boolean;
@@ -99,7 +94,6 @@ const RenderContent = memo(
 	({
 		data,
 		mode,
-		allChannelVoice,
 		isSearchMessage,
 		isJumMessageEnabled,
 		parentWidth,
@@ -125,7 +119,6 @@ const RenderContent = memo(
 			...lkm,
 			...vkm
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
-		const { allUserIdsInChannel, allRolesInClan } = useMessageContextMenu();
 
 		let lastindex = 0;
 		const content = useMemo(() => {
@@ -152,53 +145,31 @@ const RenderContent = memo(
 							channelHastagId={`<#${element.channelid}>`}
 						/>
 					);
-				}
-
-				if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
-					if (allUserIdsInChannel.indexOf(element.user_id) !== -1 || contentInElement === '@here') {
-						formattedContent.push(
-							<MentionUser
-								isTokenClickAble={isTokenClickAble}
-								isJumMessageEnabled={isJumMessageEnabled}
-								key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-								tagUserName={contentInElement ?? ''}
-								tagUserId={element.user_id}
-								mode={mode}
-							/>
-						);
-					} else {
-						formattedContent.push(
-							<PlainText
-								isSearchMessage={false}
-								key={`userDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-								text={contentInElement ?? ''}
-							/>
-						);
-					}
-				}
-				if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
-					if (allRolesInClan.indexOf(element.role_id) !== -1) {
-						formattedContent.push(
-							<MentionUser
-								isTokenClickAble={isTokenClickAble}
-								isJumMessageEnabled={isJumMessageEnabled}
-								key={`roleMention-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-								tagRoleName={contentInElement ?? ''}
-								tagRoleId={element.role_id}
-								mode={mode}
-							/>
-						);
-					} else {
-						formattedContent.push(
-							<PlainText
-								isSearchMessage={false}
-								key={`roleDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-								text={contentInElement ?? ''}
-							/>
-						);
-					}
-				}
-				if (element.kindOf === ETokenMessage.EMOJIS) {
+				} else if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
+					formattedContent.push(
+						<MentionContent
+							element={element}
+							contentInElement={contentInElement}
+							isTokenClickAble={isTokenClickAble}
+							isJumMessageEnabled={isJumMessageEnabled}
+							mode={mode}
+							index={index}
+							s={s}
+						/>
+					);
+				} else if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
+					formattedContent.push(
+						<RoleMentionContent
+							element={element}
+							contentInElement={contentInElement}
+							isTokenClickAble={isTokenClickAble}
+							isJumMessageEnabled={isJumMessageEnabled}
+							mode={mode}
+							index={index}
+							s={s}
+						/>
+					);
+				} else if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
 							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s)}
@@ -208,9 +179,7 @@ const RenderContent = memo(
 							emojiId={element.emojiid ?? ''}
 						/>
 					);
-				}
-
-				if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
+				} else if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
 							isLink={true}
@@ -220,32 +189,19 @@ const RenderContent = memo(
 							content={contentInElement}
 						/>
 					);
-				}
-
-				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
+				} else if (element.kindOf === ETokenMessage.VOICE_LINKS) {
 					const meetingCode = contentInElement?.split('/').pop();
-					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-					voiceChannelFound
-						? formattedContent.push(
-								<ChannelHashtag
-									isTokenClickAble={isTokenClickAble}
-									isJumMessageEnabled={isJumMessageEnabled}
-									key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
-									channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
-								/>
-							)
-						: formattedContent.push(
-								<MarkdownContent
-									isLink={true}
-									isTokenClickAble={isTokenClickAble}
-									isJumMessageEnabled={isJumMessageEnabled}
-									key={`voicelink-${index}-${s}-${contentInElement}`}
-									content={contentInElement}
-								/>
-							);
-				}
-
-				if (element.kindOf === ETokenMessage.MARKDOWNS) {
+					formattedContent.push(
+						<VoiceLinkContent
+							meetingCode={meetingCode}
+							isTokenClickAble={isTokenClickAble}
+							isJumMessageEnabled={isJumMessageEnabled}
+							index={index}
+							s={s}
+							contentInElement={contentInElement}
+						/>
+					);
+				} else if (element.kindOf === ETokenMessage.MARKDOWNS) {
 					let content = contentInElement ?? '';
 
 					if (isJumMessageEnabled) {
@@ -368,6 +324,117 @@ const RenderContent = memo(
 			>
 				{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content}</span> : <span>{content}</span>}
 			</div>
+		);
+	}
+);
+
+interface VoiceLinkContentProps {
+	meetingCode: string | undefined;
+	isTokenClickAble: boolean;
+	isJumMessageEnabled: boolean;
+	index: number;
+	s: number;
+	contentInElement: string | undefined;
+}
+
+export const VoiceLinkContent = memo(({ meetingCode, isTokenClickAble, isJumMessageEnabled, index, s, contentInElement }: VoiceLinkContentProps) => {
+	const allChannelVoice = useAppSelector(selectAllChannels);
+	const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+
+	if (voiceChannelFound) {
+		return (
+			<ChannelHashtag
+				isTokenClickAble={isTokenClickAble}
+				isJumMessageEnabled={isJumMessageEnabled}
+				key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
+				channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
+			/>
+		);
+	}
+
+	return (
+		<MarkdownContent
+			isLink={true}
+			isTokenClickAble={isTokenClickAble}
+			isJumMessageEnabled={isJumMessageEnabled}
+			key={`voicelink-${index}-${s}-${contentInElement}`}
+			content={contentInElement}
+		/>
+	);
+});
+
+interface MentionContentProps {
+	element: ElementToken;
+	contentInElement: string | undefined;
+	isTokenClickAble: boolean;
+	isJumMessageEnabled: boolean;
+	mode: number;
+	index: number;
+	s: number;
+}
+
+export const MentionContent = memo(({ element, contentInElement, isTokenClickAble, isJumMessageEnabled, mode, index, s }: MentionContentProps) => {
+	const { allUserIdsInChannel } = useMessageContextMenu();
+
+	const isValidMention = allUserIdsInChannel.indexOf(element.user_id ?? '') !== -1 || contentInElement === '@here';
+
+	if (isValidMention) {
+		return (
+			<MentionUser
+				isTokenClickAble={isTokenClickAble}
+				isJumMessageEnabled={isJumMessageEnabled}
+				key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+				tagUserName={contentInElement ?? ''}
+				tagUserId={element.user_id}
+				mode={mode}
+			/>
+		);
+	}
+
+	return (
+		<PlainText
+			isSearchMessage={false}
+			key={`userDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+			text={contentInElement ?? ''}
+		/>
+	);
+});
+
+interface RoleMentionContentProps {
+	element: ElementToken;
+	contentInElement: string | undefined;
+	isTokenClickAble: boolean;
+	isJumMessageEnabled: boolean;
+	mode: number;
+	index: number;
+	s: number;
+}
+
+export const RoleMentionContent = memo(
+	({ element, contentInElement, isTokenClickAble, isJumMessageEnabled, mode, index, s }: RoleMentionContentProps) => {
+		const { allRolesInClan } = useMessageContextMenu();
+
+		const isValidRole = allRolesInClan.indexOf(element.role_id ?? '') !== -1;
+
+		if (isValidRole) {
+			return (
+				<MentionUser
+					isTokenClickAble={isTokenClickAble}
+					isJumMessageEnabled={isJumMessageEnabled}
+					key={`roleMention-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+					tagRoleName={contentInElement ?? ''}
+					tagRoleId={element.role_id}
+					mode={mode}
+				/>
+			);
+		}
+
+		return (
+			<PlainText
+				isSearchMessage={false}
+				key={`roleDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+				text={contentInElement ?? ''}
+			/>
 		);
 	}
 );

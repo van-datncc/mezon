@@ -21,7 +21,7 @@ import {
 	isValidEmojiData
 } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { MessageLine } from './MessageLine';
 import { MessageLineSystem } from './MessageLineSystem';
@@ -38,7 +38,7 @@ type IMessageContentProps = {
 	isInTopic?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageContentProps) => {
+const MessageContent = memo(({ message, mode, isSearchMessage, isInTopic }: IMessageContentProps) => {
 	const dispatch = useAppDispatch();
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
@@ -116,75 +116,77 @@ const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageC
 			)}
 		</div>
 	);
-};
+});
 
 export default MessageContent;
 
-const MessageText = ({
-	message,
-	lines,
-	mode,
-	content,
-	isOnlyContainEmoji,
-	isSearchMessage,
-	onCopy
-}: {
-	message: IMessageWithUser;
-	lines: string;
-	mode?: number;
-	content?: IExtendedMessage;
-	isSearchMessage?: boolean;
-	isOnlyContainEmoji?: boolean;
-	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
-}) => {
-	const attachmentOnMessage = message.attachments;
+const MessageText = memo(
+	({
+		message,
+		lines,
+		mode,
+		content,
+		isOnlyContainEmoji,
+		isSearchMessage,
+		onCopy
+	}: {
+		message: IMessageWithUser;
+		lines: string;
+		mode?: number;
+		content?: IExtendedMessage;
+		isSearchMessage?: boolean;
+		isOnlyContainEmoji?: boolean;
+		onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
+	}) => {
+		const attachmentOnMessage = message.attachments;
 
-	const contentToMessage = message.content?.t;
+		const contentToMessage = message.content?.t;
 
-	const checkOneLinkImage =
-		attachmentOnMessage?.length === 1 &&
-		attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-		attachmentOnMessage[0].url === contentToMessage?.trim();
-	const showEditted = !message.hide_editted;
-	const messageTime = convertTimeString(message?.create_time as string);
-	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<>
-			{lines?.length > 0 ? (
-				<div className="flex w-full">
-					<div className="w-full flex gap-4">
-						{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
-							<MessageLineSystem
-								message={message}
-								isHideLinkOneImage={checkOneLinkImage}
-								isTokenClickAble={true}
-								isSearchMessage={isSearchMessage}
-								isJumMessageEnabled={false}
-								content={content}
-								mode={mode}
-							/>
-						) : (
-							<MessageLine
-								isEditted={showEditted}
-								isHideLinkOneImage={checkOneLinkImage}
-								isTokenClickAble={true}
-								isSearchMessage={isSearchMessage}
-								isOnlyContainEmoji={isOnlyContainEmoji}
-								isJumMessageEnabled={false}
-								content={content}
-								mode={mode}
-								code={message.code}
-								onCopy={onCopy}
-							/>
-						)}
-						{(message.code === TypeMessage.Welcome ||
-							message.code === TypeMessage.CreateThread ||
-							message.code === TypeMessage.CreatePin) && (
-							<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
-						)}
+		const checkOneLinkImage =
+			attachmentOnMessage?.length === 1 &&
+			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+			attachmentOnMessage[0].url === contentToMessage?.trim();
+		const showEditted = !message.hide_editted;
+		const messageTime = convertTimeString(message?.create_time as string);
+		return (
+			// eslint-disable-next-line react/jsx-no-useless-fragment
+			<>
+				{lines?.length > 0 ? (
+					<div className="flex w-full">
+						<div className="w-full flex gap-4">
+							{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
+								<MessageLineSystem
+									message={message}
+									isHideLinkOneImage={checkOneLinkImage}
+									isTokenClickAble={true}
+									isSearchMessage={isSearchMessage}
+									isJumMessageEnabled={false}
+									content={content}
+									mode={mode}
+								/>
+							) : (
+								<MessageLine
+									isEditted={showEditted}
+									isHideLinkOneImage={checkOneLinkImage}
+									isTokenClickAble={true}
+									isSearchMessage={isSearchMessage}
+									isOnlyContainEmoji={isOnlyContainEmoji}
+									isJumMessageEnabled={false}
+									content={content}
+									mode={mode}
+									code={message.code}
+									onCopy={onCopy}
+								/>
+							)}
+							{(message.code === TypeMessage.Welcome ||
+								message.code === TypeMessage.CreateThread ||
+								message.code === TypeMessage.CreatePin) && (
+								<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
+							)}
+						</div>
 					</div>
-				</div>
-			) : null}
-		</>
-	);
-};
+				) : null}
+			</>
+		);
+	}
+);

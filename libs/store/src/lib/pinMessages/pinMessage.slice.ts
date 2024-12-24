@@ -30,7 +30,7 @@ type fetchChannelPinMessagesPayload = {
 	noCache?: boolean;
 };
 
-const CHANNEL_PIN_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
+const CHANNEL_PIN_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 export const fetchChannelPinMessagesCached = memoizeAndTrack(
 	(mezon: MezonValueContext, channelId: string) => mezon.client.pinMessagesList(mezon.session, '', channelId, ''),
 	{

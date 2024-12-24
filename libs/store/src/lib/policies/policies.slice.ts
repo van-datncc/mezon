@@ -43,7 +43,7 @@ export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPa
 		return response.roles.map(mapPermissionUserToEntity);
 	}
 );
-const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 3;
+const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 60;
 export const fetchPermissionCached = memoizeAndTrack((mezon: MezonValueContext) => mezon.client.getListPermission(mezon.session), {
 	promise: true,
 	maxAge: LIST_PERMISSION_CACHED_TIME,
