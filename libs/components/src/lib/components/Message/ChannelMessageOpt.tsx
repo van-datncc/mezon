@@ -1,7 +1,7 @@
 import { useAuth, useChatReaction, useEmojiConverted } from '@mezon/core';
 import {
+	CanvasAPIEntity,
 	ChannelsEntity,
-	canvasAPIActions,
 	createEditCanvas,
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
@@ -30,7 +30,7 @@ import {
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ReactionPart from '../ContextMenu/ReactionPart';
 
@@ -62,12 +62,13 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 	const currentChannel = useSelector(selectCurrentChannel);
 	const refOpt = useRef<HTMLDivElement>(null);
 	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
+	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const replyMenu = useMenuReplyMenuBuilder(message);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
 	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
-	const addToNote = useAddToNoteBuilder(message, currentChannel, mode);
+	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
 	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
 
@@ -162,19 +163,8 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	});
 }
 
-function useAddToNoteBuilder(message: IMessageWithUser, currentChannel: ChannelsEntity | null, mode: number) {
+function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPIEntity | null, currentChannel: ChannelsEntity | null, mode: number) {
 	const dispatch = useAppDispatch();
-	useEffect(() => {
-		if (message && message.channel_id && message.clan_id) {
-			dispatch(
-				canvasAPIActions.getChannelCanvasList({
-					channel_id: message.channel_id,
-					clan_id: message.clan_id || ''
-				})
-			);
-		}
-	}, [dispatch, message.channel_id, message.clan_id]);
-	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const { userId } = useAuth();
 
 	const handleItemClick = useCallback(
