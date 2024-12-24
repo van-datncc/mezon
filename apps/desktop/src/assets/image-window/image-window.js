@@ -235,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	document.getElementById('close-window').addEventListener('click', () => {
+		selectedImage.src = null;
 		closeImageWindow();
 	});
 

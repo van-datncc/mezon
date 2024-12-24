@@ -1,6 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import { useAppNavigation, useDragAndDrop, usePermissionChecker, useSearchMessages, useSeenMessagePool, useWindowFocusState } from '@mezon/core';
+import {
+	useAppNavigation,
+	useAuth,
+	useDragAndDrop,
+	usePermissionChecker,
+	useSearchMessages,
+	useSeenMessagePool,
+	useWindowFocusState
+} from '@mezon/core';
 import {
 	ChannelsEntity,
 	ETypeMission,
@@ -9,6 +17,7 @@ import {
 	clansActions,
 	directMetaActions,
 	gifsStickerEmojiActions,
+	giveCoffeeActions,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMembers,
@@ -49,7 +58,7 @@ import {
 	titleMission
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
@@ -217,6 +226,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, channelId));
 	const miniAppRef = useRef<HTMLIFrameElement>(null);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
+	const currentUser = useAuth();
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -264,17 +274,47 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					return false;
 				}
 			};
-			const handleMessage = (event: MessageEvent) => {
+			const handleMessage = async (event: MessageEvent) => {
 				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
 					const eventData = safeJSONParse(event.data ?? '{}');
 					// eslint-disable-next-line no-console
 					console.log('[MEZON] < ', eventData);
+
 					if (eventData?.eventType === 'PING') {
 						// send event to mini app
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
 							appChannel.url ?? ''
 						);
+
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'CURRENT_USER_INFO', eventData: currentUser?.userProfile }),
+							appChannel.url ?? ''
+						);
+					}
+
+					if (eventData?.eventType === 'SEND_TOKEN') {
+						const { amount, note, receiver_id } = (eventData.eventData || {}) as any;
+						const tokenEvent: ApiTokenSentEvent = {
+							sender_id: currentUser.userId as string,
+							sender_name: currentUser?.userProfile?.user?.username as string,
+							receiver_id,
+							amount,
+							note
+						};
+						try {
+							const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
+							miniAppRef.current?.contentWindow?.postMessage(
+								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: response }),
+								appChannel.url ?? ''
+							);
+						} catch (err) {
+							console.error(err);
+							miniAppRef.current?.contentWindow?.postMessage(
+								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: err }),
+								appChannel.url ?? ''
+							);
+						}
 					}
 				}
 			};

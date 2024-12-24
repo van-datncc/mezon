@@ -1,4 +1,4 @@
-import { selectBuzzStateByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { selectBuzzStateByChannelId, selectEventByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -9,6 +9,7 @@ import BuzzBadge from '../BuzzBadge';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
+import EventSchedule from '../EventSchedule';
 import PanelChannel from '../PanelChannel';
 
 type ThreadLinkProps = {
@@ -35,6 +36,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 
 	const channelPath = `/chat/clans/${thread.clan_id}/channels/${thread.channel_id}`;
 	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, thread?.channel_id ?? ''));
+	const events = useAppSelector((state) => selectEventByChannelId(state, thread?.channel_id ?? ''));
 
 	const state = isActive ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
 
@@ -124,6 +126,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					mode={ChannelStreamMode.STREAM_MODE_THREAD}
 				/>
 			) : null}
+			<EventSchedule event={events[0]} className={'absolute top-2 right-14 z-20'} />
 		</div>
 	);
 });
