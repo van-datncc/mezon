@@ -29,7 +29,8 @@ const ClanSettingOverview = () => {
 		welcome_random: systemMessage?.welcome_random ?? '',
 		welcome_sticker: systemMessage?.welcome_sticker ?? '',
 		boost_message: systemMessage?.boost_message ?? '',
-		setup_tips: systemMessage?.setup_tips ?? ''
+		setup_tips: systemMessage?.setup_tips ?? '',
+		hide_audit_log: systemMessage?.hide_audit_log ?? ''
 	});
 
 	const dispatch = useAppDispatch();
@@ -81,6 +82,10 @@ const ClanSettingOverview = () => {
 		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, setup_tips: setupTips ?? '' });
 	};
 
+	const handleChangeHideAuditLog = (hideAuditLog: string) => {
+		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, hide_audit_log: hideAuditLog ?? '' });
+	};
+
 	const handleSave = async () => {
 		await updateClan(clanRequest);
 		await updateSystemMessages();
@@ -126,6 +131,7 @@ const ClanSettingOverview = () => {
 					onGetBoostMessage={handleChangeBoostMessage}
 					onGetSetupTips={handleChangeSetupTips}
 					onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
+					onHideAuditLog={handleChangeHideAuditLog}
 				/>
 			)}
 
