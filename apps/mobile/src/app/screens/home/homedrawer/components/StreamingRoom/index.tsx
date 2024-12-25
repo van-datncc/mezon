@@ -3,7 +3,7 @@ import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { SafeAreaView, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
@@ -13,14 +13,7 @@ import { style } from './StreamingRoom.styles';
 import { StreamingScreenComponent } from './StreamingScreen';
 import UserStreamingRoom from './UserStreamingRoom';
 
-function StreamingRoom({
-	onPressMinimizeRoom,
-	isAnimationComplete
-}: {
-	onPressMinimizeRoom: (isAnimationComplete: boolean) => void;
-	isAnimationComplete: boolean;
-}) {
-	const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMinimizeRoom: () => void; isAnimationComplete: boolean }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
@@ -50,32 +43,30 @@ function StreamingRoom({
 	const handleAddPeopleToVoice = () => {
 		bottomSheetInviteRef.current.present();
 	};
-	const handelFullScreenVideo = useCallback(() => {
-		setIsFullScreen(!isFullScreen);
-	}, [isFullScreen]);
 
 	const handleShowChat = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
 		});
+		onPressMinimizeRoom();
 	};
 
 	return (
 		<SafeAreaView>
 			<Block
 				style={{
-					width: isAnimationComplete ? (isFullScreen ? Metrics.screenHeight : Metrics.screenWidth) : 200,
-					height: isAnimationComplete ? (isFullScreen ? Metrics.screenWidth : Metrics.screenHeight) : 100,
+					width: isAnimationComplete ? Metrics.screenWidth : 200,
+					height: isAnimationComplete ? Metrics.screenHeight : 100,
 					backgroundColor: themeValue?.primary
 				}}
 			>
 				<Block style={styles.container}>
-					{!isFullScreen && isAnimationComplete && (
+					{isAnimationComplete && (
 						<Block style={[styles.menuHeader]}>
 							<Block flexDirection="row" alignItems="center" gap={size.s_20}>
 								<TouchableOpacity
 									onPress={() => {
-										onPressMinimizeRoom(false);
+										onPressMinimizeRoom();
 									}}
 									style={styles.buttonCircle}
 								>
@@ -93,18 +84,14 @@ function StreamingRoom({
 					<Block
 						style={{
 							...styles.userStreamingRoomContainer,
-							width: isAnimationComplete ? (isFullScreen ? '100%' : '100%') : '100%',
-							height: isAnimationComplete ? (isFullScreen ? '100%' : '60%') : '100%'
+							width: isAnimationComplete ? '100%' : '100%',
+							height: isAnimationComplete ? '60%' : '100%'
 						}}
 					>
-						<StreamingScreenComponent
-							streamID={currentStreamInfo?.streamId}
-							isAnimationComplete={isAnimationComplete}
-							onFullScreenVideo={handelFullScreenVideo}
-						/>
+						<StreamingScreenComponent />
 					</Block>
-					{!isFullScreen && isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
-					{!isFullScreen && isAnimationComplete && (
+					{isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
+					{isAnimationComplete && (
 						<Block style={[styles.menuFooter]}>
 							<Block borderRadius={size.s_40} backgroundColor={themeValue.secondary}>
 								<Block gap={size.s_40} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>

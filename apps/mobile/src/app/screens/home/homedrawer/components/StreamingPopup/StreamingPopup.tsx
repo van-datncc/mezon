@@ -1,65 +1,77 @@
-import { useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentClan,
-	selectHiddenBottomTabMobile,
 	selectStatusStream,
 	useAppDispatch,
 	videoStreamActions
-} from '@mezon/store';
+} from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
+import { Animated, PanResponder } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
 import StreamingRoom from '../StreamingRoom';
-import { style } from './styles';
-const { width, height } = Dimensions.get('window');
 
-export const StreamingPopup = () => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-	const [isFullScreen, setIsFullScreen] = useState(true);
-	const streamPlay = useSelector(selectStatusStream);
-
-	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
+const StreamingPopup = () => {
+	const pan = useRef(new Animated.ValueXY()).current;
+	const isDragging = useRef(false);
+	const isFullScreen = useRef(false);
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
-	const dispatch = useAppDispatch();
-	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
+	const streamPlay = useSelector(selectStatusStream);
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { handleChannelClick, disconnect } = useWebRTCStream();
 	const userProfile = useSelector(selectAllAccount);
+	const dispatch = useAppDispatch();
 
 	const panResponder = useRef(
 		PanResponder.create({
-			onMoveShouldSetPanResponder: () => true,
-			onPanResponderMove: (event, gestureState) => {
-				Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false })(event, gestureState);
+			onStartShouldSetPanResponder: () => true,
+			onPanResponderGrant: () => {
+				isDragging.current = false;
+				if (!isFullScreen.current) {
+					pan.setOffset({
+						x: (pan?.x as any)?._value,
+						y: (pan?.y as any)?._value
+					});
+					pan.setValue({ x: 0, y: 0 });
+				}
 			},
-			onPanResponderRelease: () => {
-				pan.extractOffset();
+			onPanResponderMove: (e, gestureState) => {
+				if (!isFullScreen.current) {
+					if (Math.abs(gestureState?.dx) > 10 || Math.abs(gestureState?.dy) > 10) {
+						isDragging.current = true;
+					}
+					Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false })(e, gestureState);
+				}
+			},
+			onPanResponderRelease: (e, gestureState) => {
+				const totalDistance = Math.sqrt(gestureState?.dx ** 2 + gestureState?.dy ** 2);
+				if (totalDistance > 10) {
+					isDragging.current = true;
+				}
+
+				if (!isDragging.current) {
+					isFullScreen.current = !isFullScreen.current;
+					handleResizeStreamRoom();
+				}
+
+				if (!isFullScreen.current) {
+					pan.flattenOffset();
+				}
 			}
 		})
 	).current;
 
 	useEffect(() => {
-		if (isFullScreen) {
-			Animated.timing(windowSize, {
-				toValue: { x: width, y: height },
-				duration: 100,
-				useNativeDriver: false
-			}).start();
-		}
 		handleJoinStreamingRoom();
 	}, []);
 
 	const handleJoinStreamingRoom = useCallback(async () => {
-		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && streamPlay) {
 			const token = await messaging().getToken();
 			disconnect();
 			handleChannelClick(
@@ -83,55 +95,48 @@ export const StreamingPopup = () => {
 		}
 	}, []);
 
-	const handleResizeStreamRoom = useCallback(
-		(isFullScreen: boolean) => {
-			if (isFullScreen) {
-				pan.setOffset({ x: 0, y: 0 });
+	const handleResizeStreamRoom = () => {
+		if (isFullScreen.current) {
+			pan.flattenOffset();
+			Animated.timing(pan, {
+				toValue: { x: 0, y: 0 },
+				duration: 300,
+				useNativeDriver: false
+			}).start(() => {
+				setIsAnimationComplete(true);
+			});
+		} else {
+			pan.flattenOffset();
+			Animated.timing(pan, {
+				toValue: { x: 0, y: 0 },
+				duration: 300,
+				useNativeDriver: false
+			}).start(() => {
+				setIsAnimationComplete(false);
+			});
+		}
+	};
 
-				Animated.parallel([
-					Animated.spring(pan, {
-						toValue: { x: 0, y: 0 },
-						useNativeDriver: false
-					}),
-					Animated.timing(windowSize, {
-						toValue: { x: width, y: height },
-						duration: 100,
-						useNativeDriver: false
-					})
-				]).start(() => {
-					setIsAnimationComplete(true);
-				});
-			} else {
-				Animated.timing(windowSize, {
-					toValue: { x: 100, y: 100 },
-					duration: 100,
-					useNativeDriver: false
-				}).start(() => {
-					setIsAnimationComplete(false);
-				});
-			}
-			setIsFullScreen(isFullScreen);
-			Keyboard.dismiss();
-		},
-		[isHiddenTab]
-	);
+	const handlePressMinimizeRoom = useCallback(() => {
+		isFullScreen.current = false;
+		handleResizeStreamRoom();
+	}, []);
+
 	if (!streamPlay) return null;
 	return (
 		<Animated.View
+			{...panResponder.panHandlers}
 			style={[
-				styles.animatedView,
+				pan.getLayout(),
 				{
-					width: windowSize.x,
-					height: windowSize.y,
-					transform: [{ translateX: pan.x }, { translateY: pan.y }],
+					zIndex: 999999,
 					position: 'absolute'
 				}
 			]}
-			{...(!isFullScreen ? panResponder.panHandlers : {})}
 		>
-			<TouchableOpacity activeOpacity={1} onPress={() => !isFullScreen && handleResizeStreamRoom(true)}>
-				<StreamingRoom isAnimationComplete={isAnimationComplete} onPressMinimizeRoom={handleResizeStreamRoom} />
-			</TouchableOpacity>
+			<StreamingRoom isAnimationComplete={isAnimationComplete} onPressMinimizeRoom={handlePressMinimizeRoom} />
 		</Animated.View>
 	);
 };
+
+export default StreamingPopup;

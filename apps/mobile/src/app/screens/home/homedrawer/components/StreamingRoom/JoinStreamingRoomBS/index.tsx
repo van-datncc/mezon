@@ -10,7 +10,6 @@ import {
 } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
-	appActions,
 	selectAllAccount,
 	selectClanById,
 	selectCurrentClanId,
@@ -48,7 +47,6 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				const fcmToken = await messaging().getToken();
-				dispatch(appActions.setHiddenBottomTabMobile(true));
 				if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 					handleChannelClick(
 						channel?.clan_id as string,

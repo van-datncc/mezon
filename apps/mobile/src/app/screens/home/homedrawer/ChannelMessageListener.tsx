@@ -1,7 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent, changeClan, getUpdateOrAddClanChannelCache, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import {
-	appActions,
 	channelsActions,
 	ChannelsEntity,
 	getStoreAsync,
@@ -67,7 +66,6 @@ const ChannelMessageListener = React.memo(() => {
 					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
 						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 							const token = await messaging().getToken();
-							dispatch(appActions.setHiddenBottomTabMobile(true));
 							disconnect();
 							handleChannelClick(
 								channel?.clan_id as string,
