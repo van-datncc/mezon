@@ -6,6 +6,7 @@ import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
+import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
 
 export type LocationModalProps = {
@@ -18,6 +19,13 @@ export type LocationModalProps = {
 	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
 	onClose: () => void;
 };
+
+type OptionType = {
+	value: string;
+	label: JSX.Element;
+};
+
+type FilterOptionType = (option: FilterOptionOption<OptionType>, inputValue: string) => boolean;
 
 const LocationModal = (props: LocationModalProps) => {
 	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels, onClose } = props;
@@ -114,6 +122,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const showClearButton = selectedOption ? true : false;
 	useEscapeKey(() => onClose());
 
+	const memoizedFilterOption = useMemo<FilterOptionType>(() => (option, inputValue) => filterOptionReactSelect(option, inputValue), []);
 	return (
 		<div>
 			<div className="flex flex-col mb-4">
@@ -170,7 +179,7 @@ const LocationModal = (props: LocationModalProps) => {
 					onChange={handleChangeVoice}
 					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 					placeholder="Search voice channels..."
-					filterOption={(option, inputValue) => filterOptionReactSelect(option, inputValue)}
+					filterOption={memoizedFilterOption}
 				/>
 			)}
 			{choiceLocation && (
@@ -196,7 +205,7 @@ const LocationModal = (props: LocationModalProps) => {
 				onChange={handleSelectChannelAudience}
 				styles={customStyles}
 				placeholder="Search channels..."
-				filterOption={(option, inputValue) => filterOptionReactSelect(option, inputValue)}
+				filterOption={memoizedFilterOption}
 			/>
 
 			{showClearButton && (
