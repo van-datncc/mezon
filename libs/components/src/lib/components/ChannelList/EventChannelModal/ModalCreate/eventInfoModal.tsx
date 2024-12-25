@@ -1,4 +1,4 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKeyClose } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
@@ -142,10 +142,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			setErrorTime(false);
 		}
 	}, [errorEnd, errorStart, setErrorTime]);
-	useEscapeKey(() => onClose());
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
 
 	return (
-		<div className="max-h-[500px] overflow-y-auto hide-scrollbar">
+		<div ref={modalRef} className="max-h-[500px] overflow-y-auto hide-scrollbar">
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
 					Event Topic

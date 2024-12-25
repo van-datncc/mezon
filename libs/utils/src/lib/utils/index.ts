@@ -15,7 +15,7 @@ import isElectron from 'is-electron';
 import { ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
-import { RefObject } from 'react';
+import React, { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { MentionItem } from 'react-mentions';
 import { electronBridge } from '../bridge';
@@ -50,6 +50,7 @@ export * from './file';
 export * from './mergeRefs';
 export * from './message';
 export * from './schedulers';
+export * from './select';
 export * from './transform';
 export * from './windowSize';
 

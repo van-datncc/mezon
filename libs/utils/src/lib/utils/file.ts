@@ -1,6 +1,5 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React from 'react';
 import { MentionItem } from 'react-mentions';
 import { IMentionOnMessage, IRolesClan, IStartEndIndex, MentionDataProps, MentionReactInputProps, RequestInput } from '../types';
 
@@ -202,15 +201,4 @@ export const handleProcessTextAndLinks = ({
 		.catch((error) => {
 			console.error('Cannot get images from link:', error);
 		});
-};
-
-export const filterOptionReactSelect = (option: { label: JSX.Element | string; value: string }, inputValue: string) => {
-	let label = '';
-
-	if (React.isValidElement(option.label)) {
-		label = (option.label as JSX.Element).props.children[1]?.toString() || '';
-	} else if (typeof option.label === 'string') {
-		label = option.label;
-	}
-	return label.toLowerCase().includes(inputValue.toLowerCase());
 };

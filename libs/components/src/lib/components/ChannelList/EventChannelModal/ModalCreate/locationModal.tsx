@@ -1,9 +1,9 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKeyClose } from '@mezon/core';
 import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ContenSubmitEventProps, OptionEvent, filterOptionReactSelect } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
@@ -120,11 +120,11 @@ const LocationModal = (props: LocationModalProps) => {
 	);
 
 	const showClearButton = selectedOption ? true : false;
-	useEscapeKey(() => onClose());
-
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
 	const memoizedFilterOption = useMemo<FilterOptionType>(() => (option, inputValue) => filterOptionReactSelect(option, inputValue), []);
 	return (
-		<div>
+		<div ref={modalRef}>
 			<div className="flex flex-col mb-4">
 				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Where is your event?</h3>
 				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
