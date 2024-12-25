@@ -6,6 +6,7 @@ import {
 	MessageModalImage,
 	ModalCall,
 	ModalCreateClan,
+	ModalSendCode,
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
@@ -260,6 +261,7 @@ function MyApp() {
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
+	const [showPopup, setShowPopup] = useState(true);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -315,7 +317,7 @@ function MyApp() {
 				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-
+			{showPopup && <ModalSendCode onClose={() => setShowPopup(false)} />}
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 					<MessageModalImage />
