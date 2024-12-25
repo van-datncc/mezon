@@ -12,9 +12,10 @@ import {
 	processFile
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, memo, useCallback } from 'react';
+import { Fragment, ReactElement, memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AttachmentPreviewThumbnail from './AttachmentPreviewThumbnail';
+import AudioRecorderControl from './AudioRecorder/AudioRecorderControl';
 import FileSelectionButton from './FileSelectionButton';
 import { MentionReactInput } from './ReactionMentionInput';
 
@@ -116,17 +117,30 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	};
 
 	const shouldRender = useIdleRender();
+	const [isRecording, setIsRecording] = useState(false);
+
+	const handleStartRecording = useCallback(() => {
+		setIsRecording(true);
+	}, []);
+	
+	const handleEndRecording = useCallback(() => {
+		setIsRecording(false);
+	}, []);
 
 	if (!shouldRender) return <></>;
 
 	return (
-		<div className="relative max-sm:-pb-2  ">
+		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
 				<div
-					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${
+						checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
+					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
 					<div
-						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
+						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${
+							appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
+						}`}
 					>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
@@ -144,36 +158,43 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				</div>
 			)}
 
-			<div
-				className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
-				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
-				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
-			>
-				<FileSelectionButton
-					currentClanId={currentClanId || ''}
-					currentChannelId={currentChannelId || ''}
-					hasPermissionEdit={canSendMessage}
+			{isRecording ? (
+				<AudioRecorderControl
+					onSendRecord={handleEndRecording}
 				/>
+			) : (
+				<div
+					className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
+			dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
+			${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
+				>
+					<FileSelectionButton
+						currentClanId={currentClanId || ''}
+						currentChannelId={currentChannelId || ''}
+						hasPermissionEdit={canSendMessage}
+					/>
 
-				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
-					<div
-						className={`w-full rounded-r-lg dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
-						onContextMenu={handleChildContextMenu}
-					>
-						<MentionReactInput
-							handlePaste={onPastedFiles}
-							listMentions={props.listMentions}
-							onSend={props.onSend}
-							onTyping={props.onTyping}
-							currentChannelId={props.currentChannelId ?? ''}
-							handleConvertToFile={onConvertToFiles}
-							currentClanId={currentClanId}
-							mode={props.mode}
-							hasPermissionEdit={canSendMessage}
-						/>
+					<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md`}>
+						<div
+							className={`w-full rounded-r-lg dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
+							onContextMenu={handleChildContextMenu}
+						>
+							<MentionReactInput
+								handlePaste={onPastedFiles}
+								listMentions={props.listMentions}
+								onSend={props.onSend}
+								onTyping={props.onTyping}
+								currentChannelId={props.currentChannelId ?? ''}
+								handleConvertToFile={onConvertToFiles}
+								currentClanId={currentClanId}
+								mode={props.mode}
+								hasPermissionEdit={canSendMessage}
+								onStartRecord={handleStartRecording}
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };
