@@ -122,6 +122,10 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const handleStartRecording = useCallback(() => {
 		setIsRecording(true);
 	}, []);
+	
+	const handleEndRecording = useCallback(() => {
+		setIsRecording(false);
+	}, []);
 
 	if (!shouldRender) return <></>;
 
@@ -156,9 +160,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 
 			{isRecording ? (
 				<AudioRecorderControl
-					onSendRecord={() => {
-						setIsRecording(false);
-					}}
+					onSendRecord={handleEndRecording}
 				/>
 			) : (
 				<div
