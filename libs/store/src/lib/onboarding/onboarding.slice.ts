@@ -88,10 +88,10 @@ export const createOnboardingTask = createAsyncThunk(
 				clan_id,
 				contents: [...content]
 			});
-			if (!response) {
+			if (!response || !response.list_onboarding) {
 				return false;
 			}
-			return { content, clan_id };
+			return { content: response.list_onboarding, clan_id };
 		} catch (error) {
 			captureSentryError(error, 'onboarding/createOnboarding');
 			return thunkAPI.rejectWithValue(error);
@@ -397,27 +397,23 @@ export const onboardingSlice = createSlice({
 				const { content, clan_id } = action.payload;
 				if (clan_id) {
 					content.map((onboardingItem) => {
-						const id = Date.now().toString();
 						switch (onboardingItem.guide_type) {
 							case EGuideType.GREETING:
 								state.listOnboarding[clan_id].greeting = onboardingItem;
 								break;
 							case EGuideType.RULE:
 								state.listOnboarding[clan_id].rule.push({
-									...onboardingItem,
-									id: id
+									...onboardingItem
 								});
 								break;
 							case EGuideType.QUESTION:
 								state.listOnboarding[clan_id].question.push({
-									...onboardingItem,
-									id: id
+									...onboardingItem
 								});
 								break;
 							case EGuideType.TASK:
 								state.listOnboarding[clan_id].mission.push({
-									...onboardingItem,
-									id: id
+									...onboardingItem
 								});
 								break;
 							default:
