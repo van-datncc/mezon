@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import BuzzBadge from '../../../../../../components/BuzzBadge/BuzzBadge';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
+import { EventBadge } from '../ChannelEventBadge';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { style } from '../ChannelListItem/styles';
 import { ChannelStatusIcon } from '../ChannelStatusIcon';
@@ -39,6 +40,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 				{isUnRead && <View style={styles.dotIsNew} />}
 
 				<ChannelStatusIcon channel={data} isUnRead={isUnRead} />
+				<EventBadge channelId={data.channel_id} />
 				<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 					{data?.channel_label}
 				</Text>

@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import MezonButton from '../../../componentUI/MezonButton2';
+import { EventChannelDetail } from '../EventChannelTitle';
 import { EventLocation } from '../EventLocation';
 import { EventTime } from '../EventTime';
 import { style } from './styles';
@@ -23,8 +24,8 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 	const userCreate = useAppSelector((state) => selectMemberClanByUserId2(state, event?.creator_id || ''));
 
 	const eventStatus = useMemo(() => {
-		if (event?.status) {
-			return event.status;
+		if (event?.event_status) {
+			return event.event_status;
 		}
 		if (start) {
 			const currentTime = Date.now();
@@ -42,7 +43,7 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 		}
 
 		return EEventStatus.UNKNOWN;
-	}, [start, event?.status]);
+	}, [start, event?.event_status]);
 
 	function handlePress() {
 		onPress && onPress();
@@ -70,6 +71,12 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 					</View>
 				</View>
 
+				{!!event?.channel_id && event.channel_id !== '0' && (
+					<View style={styles.privatePanel}>
+						<Text style={styles.privateText}>Private Event</Text>
+					</View>
+				)}
+
 				<View style={styles.mainSec}>
 					<Text style={{ color: themeValue.textStrong }}>{event.title}</Text>
 					{event.description && <Text style={styles.description}>{event.description}</Text>}
@@ -87,6 +94,7 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 						<MezonButton icon={<Icons.ShareIcon height={size.s_20} width={size.s_20} color={themeValue.text} />} />
 					</View>
 				)}
+				{!!event.channel_id && event.channel_id !== '0' && <EventChannelDetail event={event} />}
 			</View>
 		</Pressable>
 	);

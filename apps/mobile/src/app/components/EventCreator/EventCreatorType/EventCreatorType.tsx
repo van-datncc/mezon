@@ -1,7 +1,8 @@
-import { Icons, SpeakerIcon } from '@mezon/mobile-components';
+import { Icons, SpeakerIcon, ThreadIcon } from '@mezon/mobile-components';
 import { Fonts, useTheme } from '@mezon/mobile-ui';
-import { selectVoiceChannelAll } from '@mezon/store-mobile';
+import { selectAllTextChannel, selectVoiceChannelAll } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -20,6 +21,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 
 	const { t } = useTranslation(['eventCreator']);
 	const voicesChannel = useSelector(selectVoiceChannelAll);
+	const textChannels = useSelector(selectAllTextChannel);
 
 	navigation.setOptions({
 		headerTitle: t('screens.eventType.headerTitle'),
@@ -27,7 +29,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 			fontSize: Fonts.size.h7,
 			color: themeValue.textDisabled
 		},
-		headerLeft: () => <></>,
+		headerLeft: () => <View />,
 		headerRight: () => (
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
 				<Icons.CloseLargeIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
@@ -70,6 +72,22 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 		[]
 	);
 
+	const optionsTextChannel = useMemo(() => {
+		if (textChannels) {
+			return textChannels.map((item) => ({
+				title: item.channel_label,
+				value: item.channel_id,
+				icon:
+					item.type === ChannelType.CHANNEL_TYPE_THREAD ? (
+						<ThreadIcon height={20} width={20} color={themeValue.text} />
+					) : (
+						<Icons.TextLockIcon height={20} width={20} color={themeValue.text} />
+					)
+			}));
+		}
+		return [];
+	}, []);
+
 	const channels = voicesChannel?.map((item) => ({
 		title: item.channel_label,
 		value: item.channel_id,
@@ -79,9 +97,14 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	const [eventType, setEventType] = useState<OptionEvent>();
 	const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || '');
 	const [location, setLocation] = useState<string>('');
+	const [eventChannelId, setEventChannelId] = useState<string>('');
 
 	function handleEventTypeChange(value: OptionEvent) {
 		setEventType(value);
+	}
+
+	function handleEventChannelChange(value: string | number) {
+		setEventChannelId(value as string);
 	}
 
 	function handlePressNext() {
@@ -99,6 +122,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 			type: eventType,
 			channelId: eventType === OptionEvent.OPTION_SPEAKER ? channelID : null,
 			location: eventType === OptionEvent.OPTION_LOCATION ? location : null,
+			eventChannelId: eventChannelId,
 			onGoBack
 		});
 	}
@@ -140,6 +164,19 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					)}
 
 					<Text style={styles.bottomDescription}>{t('screens.eventType.description')}</Text>
+
+					<View style={styles.headerSection}>
+						<Text style={styles.title}>{t('screens.channelSelection.title')}</Text>
+						<Text style={styles.subtitle}>{t('screens.channelSelection.subtitle')}</Text>
+					</View>
+
+					<MezonSelect
+						prefixIcon={<Icons.TextLockIcon height={20} width={20} color={themeValue.textStrong} />}
+						title={t('fields.channel.title')}
+						titleUppercase
+						onChange={handleEventChannelChange}
+						data={optionsTextChannel}
+					/>
 				</ScrollView>
 			</View>
 

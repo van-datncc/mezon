@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../componentUI';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonButton from '../../../componentUI/MezonButton2';
+import { EventChannelDetail } from '../EventChannelTitle';
 import { EventLocation } from '../EventLocation';
 import { EventMenu } from '../EventMenu';
 import { EventTime } from '../EventTime';
@@ -31,7 +32,12 @@ export function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 
 	return (
 		<View style={styles.container}>
-			<EventTime event={event} eventStatus={''} />
+			<EventTime event={event} eventStatus={0} />
+			{!!event?.channel_id && event.channel_id !== '0' && (
+				<View style={styles.privatePanel}>
+					<Text style={styles.privateText}>Private Event</Text>
+				</View>
+			)}
 			<Text style={styles.title}>{event.title}</Text>
 
 			<View>
@@ -72,6 +78,8 @@ export function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 				<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
 				<MezonButton icon={<Icons.MoreVerticalIcon height={20} width={20} color={themeValue.text} />} onPress={handlePress} />
 			</View>
+
+			{!!event?.channel_id && event.channel_id !== '0' && <EventChannelDetail event={event} />}
 
 			<MezonBottomSheet ref={menuBottomSheet}>
 				<EventMenu event={event} eventDetailRef={eventDetailRef} />
