@@ -1,9 +1,8 @@
-import { useAppParams, useAttachments, useCurrentChat } from '@mezon/core';
+import { useAttachments, useCurrentChat } from '@mezon/core';
 import {
 	attachmentActions,
 	selectAllListAttachmentByChannel,
 	selectCurrentChannel,
-	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentDM,
 	useAppDispatch
@@ -32,19 +31,17 @@ export type MessageImage = {
 };
 
 const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
-	const imageUrlKey = `${attachmentData.url}?timestamp=${new Date().getTime()}`;
-	const { directId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const { setImageURL, setPositionShow } = useMessageContextMenu();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { directId: currentDmGroupId } = useAppParams();
 	const [showLoader, setShowLoader] = useState(false);
-	const fadeIn = useRef(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
+	const currentChannelId = currentChannel?.id;
+	const currentDmGroupId = currentDm?.id;
+
 	const { currentChatUsersEntities } = useCurrentChat();
 	const listAttachmentsByChannel = useSelector((state) => selectAllListAttachmentByChannel(state, currentChannelId || currentDmGroupId || ''));
 	let width = attachmentData.width || 0;
@@ -77,7 +74,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						);
 						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
 						const channelImagesData: IImageWindowProps = {
-							channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+							channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
 							images: imageListWithUploaderInfo,
 							selectedImageIndex: selectedImageIndex
 						};
@@ -95,7 +92,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						})
 						.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
 							const channelImagesData: IImageWindowProps = {
-								channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+								channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
 								images: imageListWithUploaderInfo,
 								selectedImageIndex: selectedImageIndex
 							};
@@ -145,7 +142,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		loaderTimeoutRef.current = setTimeout(() => {
 			if (!imageLoaded) {
 				setShowLoader(true);
-				fadeIn.current = true;
 			}
 		}, 500);
 
@@ -186,9 +182,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
 						draggable="false"
-						key={imageUrlKey}
 						onContextMenu={handleContextMenu}
-						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						className={` flex object-cover object-left-top rounded cursor-default`}
 						style={{ width: width || 'auto', height, cursor: 'pointer' }}
 						src={createImgproxyUrl(attachmentData.url ?? '', { width: 600, height: 300, resizeType: 'fit' })}
 						alt={'message'}

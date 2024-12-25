@@ -35,8 +35,10 @@ export function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 		<View style={styles.container}>
 			<EventTime event={event} eventStatus={EEventStatus.CREATED} />
 			{!!event?.channel_id && event.channel_id !== '0' && (
-				<View style={styles.privatePanel}>
-					<Text style={styles.privateText}>Private Event</Text>
+				<View style={styles.privateArea}>
+					<View style={styles.privatePanel}>
+						<Text style={styles.privateText}>Private Event</Text>
+					</View>
 				</View>
 			)}
 			<Text style={styles.title}>{event.title}</Text>

@@ -3,6 +3,7 @@ import { Icons, SpeakerIcon, ThreadIcon, ThreadIconLocker } from '@mezon/mobile-
 import { Block, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectAllTextChannel, selectVoiceChannelAll } from '@mezon/store-mobile';
 import { ChannelStatusEnum, OptionEvent } from '@mezon/utils';
+import debounce from 'lodash.debounce';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -140,7 +141,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 			type: eventType,
 			channelId: eventType === OptionEvent.OPTION_SPEAKER ? channelID : null,
 			location: eventType === OptionEvent.OPTION_LOCATION ? location : null,
-			eventChannelId: eventChannel.channel_id,
+			eventChannelId: eventChannel.channel_id || '',
 			onGoBack
 		});
 	}
@@ -149,9 +150,9 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 		setChannelID(value as string);
 	}
 
-	function handleSearchText(value: string): void {
+	const handleSearchText = debounce((value: string) => {
 		setSearchText(value);
-	}
+	}, 500);
 
 	const handleOpenSelectChannel = () => {
 		BottomSheetRef?.current?.present();
@@ -202,8 +203,11 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					</View>
 
 					<TouchableOpacity style={styles.fakeInput} onPress={handleOpenSelectChannel}>
-						{!!eventChannel && channelIcon(eventChannel.type, eventChannel.channel_private === ChannelStatusEnum.isPrivate)}
-						<Text style={styles.inputValue}>{eventChannel?.channel_label || ''} </Text>
+						{!!eventChannel && channelIcon(eventChannel?.type, eventChannel?.channel_private === ChannelStatusEnum.isPrivate)}
+						<Text style={styles.inputValue}>{eventChannel?.channel_label || 'Select channel'} </Text>
+						<View style={styles.chevronDownIcon}>
+							<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						</View>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>
