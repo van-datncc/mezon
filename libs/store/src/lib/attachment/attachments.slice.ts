@@ -123,7 +123,7 @@ export const attachmentSlice = createSlice({
 			const currentChannelId = action?.payload?.channelId;
 
 			if (!state.listAttachmentsByChannel[currentChannelId]) {
-				state.listAttachmentsByChannel[currentChannelId] = [];
+				return;
 			}
 
 			action?.payload?.listAttachments?.forEach((attachment) => {
