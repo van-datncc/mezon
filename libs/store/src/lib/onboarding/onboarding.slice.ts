@@ -88,7 +88,7 @@ export const createOnboardingTask = createAsyncThunk(
 				clan_id,
 				contents: [...content]
 			});
-			if (!response || !response.list_onboarding) {
+			if (!response || !response?.list_onboarding) {
 				return false;
 			}
 			return { content: response.list_onboarding, clan_id };
