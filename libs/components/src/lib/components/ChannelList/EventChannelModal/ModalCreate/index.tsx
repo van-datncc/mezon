@@ -189,6 +189,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			<div>
 				{currentModal === Tabs_Option.LOCATION && (
 					<LocationModal
+						onClose={onClose}
 						contentSubmit={contentSubmit}
 						choiceSpeaker={choiceSpeaker}
 						choiceLocation={choiceLocation}
@@ -200,6 +201,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				)}
 				{currentModal === Tabs_Option.EVENT_INFO && (
 					<EventInfoModal
+						onClose={onClose}
 						contentSubmit={contentSubmit}
 						choiceLocation={choiceLocation}
 						timeStartDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.start_time || '') : defaultTimeStart}
@@ -208,7 +210,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						setErrorTime={(status: boolean) => setErrorTime(status)}
 					/>
 				)}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal contentSubmit={contentSubmit} option={option} />}
+				{currentModal === Tabs_Option.REVIEW && <ReviewModal onClose={onClose} contentSubmit={contentSubmit} option={option} />}
 			</div>
 			<div className="flex justify-between mt-4 w-full text-white">
 				<button

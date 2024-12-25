@@ -913,6 +913,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					activeTab={SubPanelName.NONE}
 					currentClanId={props.currentClanId}
 					hasPermissionEdit={props.hasPermissionEdit || true}
+					onStartRecord={props.onStartRecord}
 				/>
 			)}
 			{request?.content?.length > MIN_THRESHOLD_CHARS && (
