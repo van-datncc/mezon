@@ -1,7 +1,7 @@
 import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, isMediaTypeNotSupported, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { MessageAudio } from './MessageAudio/MessageAudio';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
@@ -76,7 +76,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 			{videos.length > 0 && (
 				<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 					{videos.map((video, index) => (
-						<div key={`${video.url}_${index}`} className="w-fit max-h-[350px] gap-y-2">
+						<div key={index} className="w-fit max-h-[350px] gap-y-2">
 							<MessageVideo attachmentData={video} />
 						</div>
 					))}
@@ -88,7 +88,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 					{images.map((image, index) => {
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
-							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'h-auto'}  `}>
+							<div key={index} className={`${checkImage ? '' : 'h-auto'}  `}>
 								<MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
 							</div>
 						);
@@ -113,7 +113,7 @@ const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentPr
 	}, [message.attachments]);
 	if (!validateAttachment) return null;
 
-	return <Attachments mode={mode} message={message} attachments={validateAttachment ?? []} onContextMenu={onContextMenu} />;
+	return <Attachments mode={mode} message={message} attachments={validateAttachment} onContextMenu={onContextMenu} />;
 };
 
-export default MessageAttachment;
+export default memo(MessageAttachment);

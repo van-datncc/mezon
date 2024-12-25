@@ -140,8 +140,6 @@ function MessageWithUser({
 		// }
 	);
 
-	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
 			if (checkAnonymous) {
@@ -282,7 +280,10 @@ function MessageWithUser({
 										)}
 
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat select-text">
-											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+											<div
+												className="flex flex-col whitespace-pre-wrap text-base w-full cursor-text"
+												style={{ wordBreak: 'break-word' }}
+											>
 												{isEditing && (
 													<MessageInput
 														messageId={message?.id}
@@ -302,7 +303,10 @@ function MessageWithUser({
 														isInTopic={isTopic}
 													/>
 												)}
-												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+
+												{(message?.attachments?.length as number) > 0 && (
+													<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												)}
 
 												{/* show html canvas */}
 												{message?.content?.canvas && <HtmlCanvasView response={message?.content?.canvas} />}
@@ -406,4 +410,4 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	);
 };
 
-export default MessageWithUser;
+export default memo(MessageWithUser);

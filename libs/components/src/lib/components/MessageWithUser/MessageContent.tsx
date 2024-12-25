@@ -1,7 +1,7 @@
 import {
 	getFirstMessageOfTopic,
 	selectCurrentChannelId,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	selectMessageByMessageId,
 	selectTheme,
 	threadsActions,
@@ -45,7 +45,7 @@ const MessageContent = memo(({ message, mode, isSearchMessage, isInTopic }: IMes
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannelId, message.id || ''));
-	const topicCreator = useSelector(selectMemberClanByUserId(currentMessage?.content?.cid as string));
+	const topicCreator = useAppSelector((state) => selectMemberClanByUserId2(state, currentMessage?.content?.cid as string));
 	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return safeJSONParse(message.content).t;
