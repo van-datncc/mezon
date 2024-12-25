@@ -1,7 +1,8 @@
 import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { ChannelType } from 'mezon-js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
@@ -9,6 +10,7 @@ import { customStyles, lightCustomStyles } from '../../../notificationSetting';
 export type LocationModalProps = {
 	contentSubmit: ContenSubmitEventProps;
 	voicesChannel: ChannelsEntity[];
+	textChannels: ChannelsEntity[];
 	choiceLocation: boolean;
 	choiceSpeaker: boolean;
 	handleOption: (optionEvent: string) => void;
@@ -16,7 +18,7 @@ export type LocationModalProps = {
 };
 
 const LocationModal = (props: LocationModalProps) => {
-	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker } = props;
+	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels } = props;
 	const [errorVoice, setErrorVoice] = useState(false);
 
 	const handleChangeVoice = (selectedOption: any) => {
@@ -48,6 +50,67 @@ const LocationModal = (props: LocationModalProps) => {
 			setErrorVoice(false);
 		}
 	}, [voicesChannel]);
+
+	const handleSelectChannelAudience = useCallback(
+		(selectedOption: any) => {
+			setIsClear(false);
+			setContentSubmit((prevContentSubmit) => ({
+				...prevContentSubmit,
+				textChannelId: selectedOption.value
+			}));
+		},
+		[setContentSubmit]
+	);
+
+	const [isClear, setIsClear] = useState<boolean>(false);
+	const handleClearAudience = () => {
+		setIsClear(true);
+		setContentSubmit((prevContentSubmit) => ({
+			...prevContentSubmit,
+			textChannelId: undefined // Clear the selected channel ID
+		}));
+	};
+	const optionsTextChannel = useMemo(
+		() =>
+			textChannels.map((channel) => {
+				const isTextChannel = channel.type === ChannelType.CHANNEL_TYPE_TEXT;
+				const isThread = channel.type === ChannelType.CHANNEL_TYPE_THREAD;
+				const isPrivateChannel = channel.channel_private;
+
+				const icon = isTextChannel ? (
+					isPrivateChannel ? (
+						<Icons.HashtagLocked />
+					) : (
+						<Icons.Hashtag />
+					)
+				) : isThread ? (
+					isPrivateChannel ? (
+						<Icons.ThreadIconLocker />
+					) : (
+						<Icons.ThreadIcon />
+					)
+				) : null;
+
+				return {
+					value: channel.id,
+					label: (
+						<div className="flex items-center gap-x-2 dark:text-white text-black">
+							{icon}
+							{channel.channel_label}
+						</div>
+					)
+				};
+			}),
+		[textChannels]
+	);
+
+	const selectedOption = useMemo(
+		() => (isClear ? undefined : optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId)),
+		[isClear, optionsTextChannel, contentSubmit.textChannelId]
+	);
+
+	const showClearButton = selectedOption ? true : false;
+
 	return (
 		<div>
 			<div className="flex flex-col mb-4">
@@ -105,7 +168,6 @@ const LocationModal = (props: LocationModalProps) => {
 					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
 				/>
 			)}
-
 			{choiceLocation && (
 				<div>
 					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Enter a location</h3>
@@ -117,6 +179,23 @@ const LocationModal = (props: LocationModalProps) => {
 						placeholder="Add a location, link or something."
 						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
 					/>
+				</div>
+			)}
+			<div className="flex flex-col mb-2 mt-3">
+				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Who are audiences?</h3>
+				<p className="text-slate-400 text-center">Choose members in the specified channel.</p>
+			</div>
+			<Select
+				options={optionsTextChannel}
+				value={isClear ? null : selectedOption}
+				onChange={handleSelectChannelAudience}
+				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+			/>
+			{showClearButton && (
+				<div className="flex justify-end mt-1">
+					<button onClick={handleClearAudience} className="text-blue-500 hover:underline">
+						Clear audiences
+					</button>
 				</div>
 			)}
 		</div>

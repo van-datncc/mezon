@@ -69,7 +69,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				content: formOnboardingData
 			})
 		);
-	}, [formOnboarding.rules.length, formOnboarding?.task?.length, formOnboarding?.questions?.length]);
+	}, [formOnboarding.rules.length, formOnboarding?.task?.length, formOnboarding?.questions]);
 
 	const checkCreateValidate = useMemo(() => {
 		return formOnboarding.questions.length > 0 || formOnboarding.rules.length > 0 || formOnboarding.task.length > 0;

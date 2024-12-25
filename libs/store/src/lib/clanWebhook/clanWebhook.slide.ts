@@ -25,7 +25,7 @@ export const initialClanWebhookState: IClanWebHookState = {
 	clanWebhookList: []
 };
 
-const LIST_CLAN_WEBHOOK_CACHED_TIME = 1000 * 60 * 3;
+const LIST_CLAN_WEBHOOK_CACHED_TIME = 1000 * 60 * 60;
 
 const fetchClanWebhooksCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanWebhook(mezon.session, clanId), {
 	promise: true,

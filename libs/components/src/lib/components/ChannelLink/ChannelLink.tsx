@@ -9,6 +9,7 @@ import {
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
+	selectEventByChannelId,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -17,7 +18,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
@@ -27,6 +28,7 @@ import { Link } from 'react-router-dom';
 import BuzzBadge from '../BuzzBadge';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
 import SettingChannel from '../ChannelSetting';
+import EventSchedule from '../EventSchedule';
 import ModalConfirm from '../ModalConfirm';
 import PanelChannel from '../PanelChannel';
 
@@ -79,6 +81,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const theme = useSelector(selectTheme);
 
 		const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
+		const events = useAppSelector((state) => selectEventByChannelId(state, channel?.channel_id ?? ''));
+
 		const handleOpenCreate = () => {
 			openSettingModal();
 			closeProfileItem();
@@ -160,12 +164,12 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const openModalJoinVoiceChannel = useCallback(
 			(url: string) => {
 				if (channel.status === 1) {
-					const urlVoice = `https://meet.google.com/${url}`;
-					window.open(urlVoice, '_blank', 'noreferrer');
+					openVoiceChannel(url);
 				}
 			},
 			[channel.status]
 		);
+
 		const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 
 		const notVoiceOrAppOrStreamChannel =
@@ -191,7 +195,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					setIsShowPanelChannel={closeProfileItem}
 				/>
 			);
-		}, []);
+		}, [channel]);
 
 		const [openDeleteModal, closeDeleteModal] = useModal(() => {
 			return (
@@ -202,7 +206,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					modalName={`${channel.channel_label}`}
 				/>
 			);
-		}, []);
+		}, [channel.channel_id]);
 
 		const [openSettingModal, closeSettingModal] = useModal(() => {
 			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
@@ -287,6 +291,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							/>
 						) : null}
+						<EventSchedule event={events[0]} className={'absolute top-2 right-14 z-20'} />
 					</Link>
 				)}
 
@@ -345,7 +350,8 @@ export const ChannelLink = memo(
 		prev.numberNotification === curr.numberNotification &&
 		prev.isUnReadChannel === curr.isUnReadChannel &&
 		prev.channel?.channel_label === curr?.channel?.channel_label &&
-		prev.channel?.channel_private === curr?.channel?.channel_private
+		prev.channel?.channel_private === curr?.channel?.channel_private &&
+		(prev.channel as ChannelThreads)?.threads === (curr?.channel as ChannelThreads)?.threads
 );
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;

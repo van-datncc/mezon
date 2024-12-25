@@ -2,7 +2,7 @@ import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
-const REGIS_FCM_TOKEN_CACHED_TIME = 1000 * 60 * 3;
+const REGIS_FCM_TOKEN_CACHED_TIME = 1000 * 60 * 60;
 
 export const FCM_FEATURE_KEY = 'fcm';
 export interface fcm {

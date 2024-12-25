@@ -6,7 +6,7 @@ import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const AUDIT_LOG_FEATURE_KEY = 'auditlog';
-const FETCH_AUDIT_LOG_CACHED_TIME = 1000 * 60 * 3;
+const FETCH_AUDIT_LOG_CACHED_TIME = 1000 * 60 * 60;
 
 export interface AuditLogEntity extends ApiAuditLog {
 	id: string;

@@ -48,7 +48,10 @@ import {
 } from '../types';
 export * from './file';
 export * from './mergeRefs';
+export * from './message';
+export * from './schedulers';
 export * from './transform';
+export * from './windowSize';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -1052,6 +1055,11 @@ export const parseThreadInfo = (messageContent: string) => {
 		threadId: '',
 		threadContent: messageContent.replace(/^@\w+\s*/, '')
 	};
+};
+
+export const openVoiceChannel = (url: string) => {
+	const urlVoice = `https://meet.google.com/${url}`;
+	window.open(urlVoice, '_blank', 'noreferrer');
 };
 
 export const getBlobDuration = async (blob: string | Blob): Promise<number> => {

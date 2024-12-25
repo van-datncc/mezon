@@ -10,7 +10,9 @@ import {
 	referencesActions,
 	selectChannelById,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	selectDefaultCanvasByChannelId,
+	selectMessageByMessageId,
 	selectTheme,
 	threadsActions,
 	topicsActions,
@@ -21,7 +23,9 @@ import { Icons } from '@mezon/ui';
 import {
 	EMOJI_GIVE_COFFEE,
 	IMessageWithUser,
+	MenuBuilder,
 	SubPanelName,
+	TypeMessage,
 	findParentByClass,
 	isPublicChannel,
 	useMenuBuilder,
@@ -60,9 +64,9 @@ enum EMessageOpt {
 
 const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDifferentDay }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const refOpt = useRef<HTMLDivElement>(null);
 	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
+	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const replyMenu = useMenuReplyMenuBuilder(message);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
@@ -70,7 +74,8 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
-	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, optionMenu]);
+	const createTopicMenu = useTopicMenuBuilder(message);
+	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
 
 	return (
 		<div
@@ -99,6 +104,56 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 };
 
 export default memo(ChannelMessageOpt);
+
+function useTopicMenuBuilder(message: IMessageWithUser) {
+	const currentChannel = useSelector(selectCurrentChannel);
+	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
+	const dispatch = useAppDispatch();
+	const clanId = useSelector(selectCurrentClanId);
+
+	const setIsShowCreateTopic = useCallback(
+		(isShowCreateTopic: boolean, channelId?: string) => {
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateTopic }));
+			dispatch(
+				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread: false })
+			);
+		},
+		[currentChannel?.id, dispatch]
+	);
+
+	const setValueTopic = useCallback(
+		(value: IMessageWithUser | null) => {
+			dispatch(topicsActions.setValueTopic(value));
+		},
+		[dispatch]
+	);
+
+	const handleCreateTopic = useCallback(() => {
+		setIsShowCreateTopic(true);
+		dispatch(topicsActions.setOpenTopicMessageState(true));
+		setValueTopic(realTimeMessage);
+		dispatch(topicsActions.setCurrentTopicId(''));
+		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
+	}, [dispatch, message, realTimeMessage, setIsShowCreateTopic, setValueTopic]);
+
+	const menuPlugin = useMemo(() => {
+		const plugin = {
+			setup: (builder: MenuBuilder) => {
+				builder.when(clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
+					builder.addMenuItem(
+						'topic',
+						'topic',
+						handleCreateTopic,
+						<Icons.TopicIcon2 className="w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode" />
+					);
+				});
+			}
+		};
+		return plugin;
+	}, [clanId, handleCreateTopic, realTimeMessage?.code]);
+
+	return menuPlugin;
+}
 
 interface RecentEmojiProps {
 	message: IMessageWithUser;

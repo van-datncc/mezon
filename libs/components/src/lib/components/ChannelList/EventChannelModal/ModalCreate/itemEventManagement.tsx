@@ -3,6 +3,7 @@ import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMem
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -28,6 +29,7 @@ export type ItemEventManagementProps = {
 	setOpenModalDetail?: (status: boolean) => void;
 	openModelUpdate?: () => void;
 	onEventUpdateId?: (id: string) => void;
+	textChannelId?: string;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
@@ -46,12 +48,15 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		isReviewEvent,
 		setOpenModalDetail,
 		openModelUpdate,
-		onEventUpdateId
+		onEventUpdateId,
+		textChannelId
 	} = props;
+	const isPrivateEvent = textChannelId && textChannelId !== '0';
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
-
+	const textChannel = useAppSelector((state) => selectChannelById(state, textChannelId ?? '')) || {};
+	const isThread = textChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const appearanceTheme = useSelector(selectTheme);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
@@ -66,26 +71,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
-	const eventStatus = useMemo(() => {
-		if (event?.status) {
-			return event.status;
-		} else if (start) {
-			const currentTime = Date.now();
-			const startTimeLocal = new Date(start);
-			const startTimeUTC = startTimeLocal.getTime() + startTimeLocal.getTimezoneOffset() * 60000;
-			const leftTime = startTimeUTC - currentTime;
+	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
+	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 
-			if (leftTime > 0 && leftTime <= 1000 * 60 * 10) {
-				return EEventStatus.UPCOMING;
-			}
-
-			if (leftTime <= 0) {
-				return EEventStatus.ONGOING;
-			}
-		}
-
-		return EEventStatus.UNKNOWN;
-	}, [start, event?.status]);
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
@@ -114,12 +102,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	}, []);
 
 	const cssEventStatus = useMemo(() => {
-		return eventStatus === EEventStatus.UPCOMING
-			? 'text-purple-500'
-			: eventStatus === EEventStatus.ONGOING
-				? 'text-green-500'
-				: 'dark:text-zinc-400 text-colorTextLightMode';
-	}, [eventStatus]);
+		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
+	}, [event?.event_status]);
 
 	return (
 		<div
@@ -141,12 +125,13 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
 						<p className={`font-semibold ${cssEventStatus}`}>
-							{eventStatus === EEventStatus.UPCOMING
+							{eventIsUpcomming
 								? '10 minutes left. Join in!'
-								: eventStatus === EEventStatus.ONGOING
+								: eventIsOngoing
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
+						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
 					</div>
 					{event?.creator_id && (
 						<Tippy content={<p style={{ width: 'max-content' }}>{`Created by ${userCreate?.user?.username}`}</p>}>
@@ -201,6 +186,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</>
 					)}
 				</div>
+
 				{event && (
 					<div
 						className="flex gap-x-2 items-center"
@@ -218,14 +204,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							Share
 						</button>
 
-						{eventStatus === EEventStatus.ONGOING && isClanOwner ? (
+						{eventIsOngoing && isClanOwner ? (
 							<button
 								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
 								onClick={() => setOpenModalDelEvent(true)}
 							>
 								End event
 							</button>
-						) : eventStatus !== EEventStatus.ONGOING ? (
+						) : !eventIsOngoing ? (
 							<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
 								<Icons.MuteBell defaultSize="size-4 text-white" />
 								Interested
@@ -236,7 +222,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					</div>
 				)}
 			</div>
-
+			<div className="flex gap-x-2 mx-4 mb-2">
+				{textChannelId && textChannelId !== '0' && (
+					<span className="flex flex-row">
+						<p className="text-slate-400">
+							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
+							<strong className="text-slate-100">{textChannel.channel_label}</strong>
+						</p>
+					</span>
+				)}
+			</div>
 			{openPanel && (
 				<PanelEventItem
 					event={event}

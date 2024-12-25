@@ -48,9 +48,9 @@ import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
 import { selectListThreadId, threadsActions } from '../threads/threads.slice';
 import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
-import { fetchListChannelsByUser, LIST_CHANNELS_USER_FEATURE_KEY, ListChannelsByUserState, selectAllChannelsByUser } from './channelUser.slice';
+import { fetchListChannelsByUser, LIST_CHANNELS_USER_FEATURE_KEY, ListChannelsByUserState, selectEntitiesChannelsByUser } from './channelUser.slice';
 
-const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
+const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 60;
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -860,6 +860,33 @@ export const channelsSlice = createSlice({
 				}
 			}
 		},
+		resetChannelsCount: (
+			state: ChannelsState,
+			action: PayloadAction<{
+				clanId: string;
+				channelIds: string[];
+			}>
+		) => {
+			const { clanId, channelIds } = action.payload;
+			const clanChannels = state.byClans[clanId];
+
+			if (!clanChannels) return;
+
+			const updates = channelIds.reduce<Array<{ id: string; changes: { count_mess_unread: number } }>>((acc, channelId) => {
+				const entity = clanChannels.entities.entities[channelId];
+				if (!entity || entity.count_mess_unread === 0) return acc;
+				acc.push({
+					id: channelId,
+					changes: {
+						count_mess_unread: 0
+					}
+				});
+				return acc;
+			}, []);
+			if (updates.length > 0) {
+				channelsAdapter.updateMany(state.byClans[clanId].entities, updates);
+			}
+		},
 
 		updateAppChannel: (state, action: PayloadAction<{ clanId: string; channelId: string; changes: Partial<ApiChannelAppResponse> }>) => {
 			const { clanId, channelId, changes } = action.payload;
@@ -1091,29 +1118,20 @@ export const selectCurrentVoiceChannelId = createSelector(
 	(state, clanId) => state.byClans[clanId]?.currentVoiceChannelId
 );
 
-export const selectChannelUserByChannelId = createSelector(
-	[selectAllChannelsByUser, (state, channelId: string) => channelId],
-	(channels, channelId) => channels.find((ch) => ch.channel_id === channelId) || null
-);
-
 export const selectChannelById = createSelector(
-	[selectChannelsEntities, selectAllChannelsByUser, (state, id: string) => id],
+	[selectChannelsEntities, selectEntitiesChannelsByUser, (state, id: string) => id],
 	(channelsEntities, userChannels, id) => {
-		const channel = channelsEntities[id];
-		const channelFromUserChannel = userChannels.find((ch) => ch.channel_id === id);
-		return channel || channelFromUserChannel || null;
+		return channelsEntities[id] || userChannels[id] || null;
 	}
 );
 
 export const selectCurrentChannel = createSelector(
 	selectChannelsEntities,
 	selectCurrentChannelId,
-	selectAllChannelsByUser,
-	(clansEntities, clanId, userChannels) => {
-		if (!clanId) return null;
-		const currentChannel = clansEntities[clanId];
-		const channelFromUserChannel = userChannels.find((ch) => ch.channel_id === clanId);
-		return currentChannel || channelFromUserChannel || null;
+	selectEntitiesChannelsByUser,
+	(channels, channelId, userChannels) => {
+		if (!channelId) return null;
+		return channels[channelId] || userChannels[channelId] || null;
 	}
 );
 
@@ -1129,6 +1147,13 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
 	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE)
+);
+export const selectAllTextChannel = createSelector(selectAllChannels, (channels) =>
+	channels.filter(
+		(channel) =>
+			(channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private) ||
+			(channel.type === ChannelType.CHANNEL_TYPE_THREAD && channel.channel_private)
+	)
 );
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);

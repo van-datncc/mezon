@@ -15,6 +15,7 @@ type SystemMessagesManagementProps = {
 	onGetBoostMessage: (boostMessage: string) => void;
 	onGetSetupTips: (setupTips: string) => void;
 	onHasChanges: (hasChanges: boolean) => void;
+	onHideAuditLog: (hideLog: string) => void;
 };
 
 const SystemMessagesManagement = ({
@@ -26,7 +27,8 @@ const SystemMessagesManagement = ({
 	onGetWelcomeSticker,
 	onGetBoostMessage,
 	onGetSetupTips,
-	onHasChanges
+	onHasChanges,
+	onHideAuditLog
 }: SystemMessagesManagementProps) => {
 	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
@@ -40,7 +42,8 @@ const SystemMessagesManagement = ({
 	const [isBoostMessageInitial, setIsBoostMessageInitial] = useState<boolean>(systemMessage?.boost_message == '1' ? true : false);
 	const [isSetupTips, setIsSetupTips] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
 	const [isSetupTipsInitial, setIsSetupTipsInitial] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
-
+	const [hideAuditLog, setHideAuditLog] = useState<boolean>(systemMessage?.hide_audit_log == '1' ? true : false);
+	const [hideAuditLogIntial, setHideAuditLogIntial] = useState<boolean>(systemMessage?.hide_audit_log == '1' ? true : false);
 	useEffect(() => {
 		if (systemMessage && channelsList.length > 0) {
 			const channelsListWithoutVoiceChannel = channelsList.filter(
@@ -54,7 +57,8 @@ const SystemMessagesManagement = ({
 					welcome_random: isWelcomeRandom ? '1' : '0',
 					welcome_sticker: isWelcomeSticker ? '1' : '0',
 					boost_message: isBoostMessage ? '1' : '0',
-					setup_tips: isSetupTips ? '1' : '0'
+					setup_tips: isSetupTips ? '1' : '0',
+					hide_audit_log: hideAuditLog ? '1' : '0'
 				};
 				if (createSystemMessageRequest && createSystemMessageRequest.channel_id) {
 					onGetCreateSystemMessageRequest(createSystemMessageRequest);
@@ -73,16 +77,17 @@ const SystemMessagesManagement = ({
 			setIsBoostMessageInitial(systemMessage?.boost_message == '1' ? true : false);
 			setIsSetupTipsInitial(systemMessage?.setup_tips == '1' ? true : false);
 			onGetChannelId(systemMessageChannel?.channel_id ?? '');
+			setHideAuditLogIntial(systemMessage?.hide_audit_log == '1' ? true : false);
 		}
 	}, [systemMessage, channelsList, currentClanId]);
-
 	useEffect(() => {
 		if (
 			selectedChannel?.channel_id !== initialChannelId ||
 			isWelcomeRandom !== isWelcomeRandomInitial ||
 			isWelcomeSticker !== isWelcomeStickerInitial ||
 			isBoostMessage !== isBoostMessageInitial ||
-			isSetupTips !== isSetupTipsInitial
+			isSetupTips !== isSetupTipsInitial ||
+			hideAuditLog !== hideAuditLogIntial
 		) {
 			onHasChanges(true);
 		} else {
@@ -98,7 +103,9 @@ const SystemMessagesManagement = ({
 		isWelcomeRandom,
 		isWelcomeSticker,
 		isBoostMessage,
-		isSetupTips
+		isSetupTips,
+		hideAuditLogIntial,
+		hideAuditLog
 	]);
 
 	useEffect(() => {
@@ -113,7 +120,17 @@ const SystemMessagesManagement = ({
 		handleWelcomeStickerToggle(isWelcomeStickerInitial);
 		handleBoostMessageToggle(isBoostMessageInitial);
 		handleSetupTipsToggle(isSetupTipsInitial);
-	}, [hasChanges, initialChannelId, channelsList, isWelcomeRandomInitial, isWelcomeStickerInitial, isBoostMessageInitial, isSetupTipsInitial]);
+		handleHideAuditLog(hideAuditLogIntial);
+	}, [
+		hasChanges,
+		initialChannelId,
+		channelsList,
+		isWelcomeRandomInitial,
+		isWelcomeStickerInitial,
+		isBoostMessageInitial,
+		isSetupTipsInitial,
+		hideAuditLogIntial
+	]);
 
 	const handleSelectChannel = async (channel: ChannelsEntity) => {
 		setSelectedChannel(channel);
@@ -140,6 +157,11 @@ const SystemMessagesManagement = ({
 	const handleSetupTipsToggle = (checked: boolean) => {
 		setIsSetupTips(checked);
 		onGetSetupTips(checked ? '1' : '0');
+	};
+
+	const handleHideAuditLog = (checked: boolean) => {
+		setHideAuditLog(checked);
+		onHideAuditLog(checked ? '1' : '0');
 	};
 
 	return (
@@ -208,6 +230,7 @@ const SystemMessagesManagement = ({
 			/>
 			<ToggleItem label={'Send a message when someone Boosts this server.'} value={isBoostMessage} handleToggle={handleBoostMessageToggle} />
 			<ToggleItem label={'Send helpful tips for server setup.'} value={isSetupTips} handleToggle={handleSetupTipsToggle} />
+			<ToggleItem label={'Hide send audit log in channel'} value={hideAuditLog} handleToggle={handleHideAuditLog} />
 		</div>
 	);
 };

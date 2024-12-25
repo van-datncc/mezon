@@ -5,7 +5,7 @@ import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
+const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const THREADS_FEATURE_KEY = 'threads';
 

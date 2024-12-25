@@ -6,7 +6,7 @@ import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
-const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
+const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 
 /*
  * Update these interfaces according to your requirements.
@@ -97,6 +97,11 @@ export const getChannelCanvasList = createAsyncThunk(
 				fetchCanvasCached.delete(mezon, channel_id, clan_id, limit, page);
 			}
 			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
+			if (Date.now() - response.time > 100) {
+				return {
+					fromCache: true
+				};
+			}
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'canvas/getChannelCanvasList');
@@ -193,6 +198,7 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(getChannelCanvasList.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
+				if (action.payload.fromCache) return;
 				const channelId = (action as any)?.meta?.arg?.channel_id;
 				const reversedCanvas = action.payload.channel_canvases;
 				handleSetManyCanvas({

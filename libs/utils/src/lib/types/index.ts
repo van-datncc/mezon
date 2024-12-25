@@ -772,6 +772,7 @@ export type ContenSubmitEventProps = {
 	voiceChannel: string;
 	logo: string;
 	description: string;
+	textChannelId?: string;
 };
 
 export enum SHOW_POSITION {
@@ -1003,10 +1004,11 @@ export enum EFailAttachment {
 }
 
 export enum EEventStatus {
-	UPCOMING = 'UPCOMING',
-	ONGOING = 'ONGOING',
-	COMPLETED = 'COMPLETED',
-	UNKNOWN = 'UNKNOWN'
+	CREATED = 0,
+	UPCOMING = 1,
+	ONGOING = 2,
+	COMPLETED = 3,
+	UNKNOWN = 4
 }
 
 export enum TypeCheck {
