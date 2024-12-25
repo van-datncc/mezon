@@ -16,6 +16,11 @@
             "title": "Here's a preview of your event",
             "subtitle": "This event will auto start when it's time",
             "subtitleVoice": "When it's time, visit to channel voice to start the event!"
+        }, 
+        "channelSelection": {
+            "title": "Who are aidiences?",
+            "description": "Choose members in the specified channel.",
+            "channel": "The audience consists of members from {{channel}}: "
         }
     },
     "fields": {

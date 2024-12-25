@@ -1,4 +1,4 @@
-import { Attributes, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -57,5 +57,20 @@ export const style = (colors: Attributes) =>
 		mainSec: {
 			gap: 5,
 			marginBottom: Metrics.size.m
+		},
+
+		privatePanel: {
+			backgroundColor: baseColor.redStrong,
+			justifyContent: 'center',
+			alignItems: 'center',
+			padding: size.s_2,
+			borderRadius: size.s_2,
+			width: '20%'
+		},
+
+		privateText: {
+			color: baseColor.white,
+			fontSize: Fonts.size.h9,
+			lineHeight: Fonts.size.h8
 		}
 	});

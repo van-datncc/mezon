@@ -69,6 +69,7 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 						aboutMe={userProfile?.user?.about_me || ''}
 						isDM={isDM}
 						dob={userProfile?.user?.dob || ''}
+						logo={userProfile?.logo || ''}
 					/>
 				) : (
 					<SettingRightClan clanId={clanId || ''} />
