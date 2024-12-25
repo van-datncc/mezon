@@ -122,6 +122,7 @@ export const fetchDirectMessage = createAsyncThunk(
 			}
 			const response = await fetchChannelsCached(mezon, 500, 1, '', channelType);
 			if (!response.channeldesc) {
+				thunkAPI.dispatch(directActions.setAll([]));
 				return [];
 			}
 			if (Date.now() - response.time < 100) {
@@ -133,6 +134,10 @@ export const fetchDirectMessage = createAsyncThunk(
 					return { dmId: channel.channel_id ?? '', isUnread: status };
 				});
 				thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
+			}
+
+			if (Date.now() - response.time > 100) {
+				return [];
 			}
 
 			const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
@@ -154,6 +159,7 @@ export const fetchDirectMessage = createAsyncThunk(
 			});
 			const channels = sorted.map(mapDmGroupToEntity).filter((item) => item.active);
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
+			thunkAPI.dispatch(directActions.setAll(channels));
 			return channels;
 		} catch (error) {
 			captureSentryError(error, 'direct/fetchDirectMessage');
@@ -355,6 +361,7 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		upsertOne: directAdapter.upsertOne,
 		update: directAdapter.updateOne,
+		setAll: directAdapter.setAll,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
@@ -482,7 +489,6 @@ export const directSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchDirectMessage.fulfilled, (state: DirectState, action: PayloadAction<IChannel[]>) => {
-				directAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchDirectMessage.rejected, (state: DirectState, action) => {
