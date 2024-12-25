@@ -773,6 +773,7 @@ export type ContenSubmitEventProps = {
 	logo: string;
 	description: string;
 	textChannelId?: string;
+	address?: string;
 };
 
 export enum SHOW_POSITION {

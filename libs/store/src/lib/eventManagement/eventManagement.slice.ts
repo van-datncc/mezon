@@ -23,7 +23,7 @@ const fetchEventManagementCached = memoizeAndTrack((mezon: MezonValueContext, cl
 });
 
 export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?: string) => {
-	return { ...eventRes, id: eventRes.id || '' };
+	return { ...eventRes, id: eventRes.id || '', channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id };
 };
 
 type fetchEventManagementPayload = {
@@ -116,11 +116,7 @@ export const fetchCreateEventManagement = createAsyncThunk(
 				channel_id: channel_id
 			};
 			const response = await mezon.client.createEvent(mezon.session, body);
-			if (response) {
-				thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true }));
-			} else {
-				return thunkAPI.rejectWithValue([]);
-			}
+
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'CreatEventManagement/fetchCreateEventManagement');
@@ -182,12 +178,8 @@ export const updateEventManagement = createAsyncThunk(
 				creator_id: creator_id,
 				channel_id: channel_id
 			};
-
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateEvent(mezon.session, event_id, body);
-			if (response) {
-				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clan_id || '', noCache: true }));
-			}
 		} catch (error) {
 			captureSentryError(error, 'updateEventManagement/updateEventManagement');
 			return thunkAPI.rejectWithValue(error);
@@ -201,9 +193,6 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId, body.creatorId, body.eventLabel);
-			if (response) {
-				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
-			}
 		} catch (error) {
 			captureSentryError(error, 'deleteEventManagement/fetchDeleteEventManagement');
 			return thunkAPI.rejectWithValue(error);
@@ -240,27 +229,48 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		updateStatusEvent: (state, action) => {
-			if (action.payload.event_status === EEventStatus.CREATED) {
-				eventManagementAdapter.addOne(state, {
-					id: action.payload.event_id,
-					event_status: action.payload.event_status,
-					...action.payload
-				});
-			} else {
-				eventManagementAdapter.updateOne(state, {
-					id: action.payload.event_id,
-					changes: {
-						event_status: action.payload.event_status
-					}
-				});
-				if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
-					state.ongoingEvent = null;
-				}
-			}
+		addCreatedEvent: (state, action) => {
+			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
+			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
+
+			eventManagementAdapter.addOne(state, {
+				id: event_id,
+				channel_id: normalizedChannelId,
+				event_status,
+				...restPayload
+			});
 		},
+
+		updateStatusEvent: (state, action) => {
+			const { event_id, channel_id, event_status } = action.payload;
+			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
+
+			// const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			// if (!existingEvent) {
+			// 	return;
+			// }
+
+			if (event_status === EEventStatus.COMPLETED) {
+				eventManagementAdapter.removeOne(state, event_id);
+			}
+
+			eventManagementAdapter.updateOne(state, {
+				id: event_id,
+				changes: {
+					channel_id: normalizedChannelId,
+					event_status
+				}
+			});
+		},
+
 		removeOneEvent: (state, action) => {
-			eventManagementAdapter.removeOne(state, action.payload.event_id);
+			const { event_id } = action.payload;
+			// const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			// if (!existingEvent) {
+			// 	return;
+			// }
+
+			eventManagementAdapter.removeOne(state, event_id);
 		},
 		updateContentEvent: (state, action) => {
 			const eventUpdate = action.payload;

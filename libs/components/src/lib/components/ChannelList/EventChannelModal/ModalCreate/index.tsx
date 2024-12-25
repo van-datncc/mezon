@@ -43,34 +43,41 @@ const ModalCreate = (props: ModalCreateProps) => {
 		timeEnd: currentEvent ? currentEvent.end_time || '00:00' : '00:00',
 		selectedDateStart: currentEvent ? new Date(formatToLocalDateString(currentEvent.start_time || '')) : new Date(),
 		selectedDateEnd: currentEvent ? new Date(formatToLocalDateString(currentEvent.end_time || '')) : new Date(),
-		voiceChannel: currentEvent ? currentEvent.channel_id || '' : '',
+		voiceChannel: currentEvent ? currentEvent?.channel_voice_id || '' : '',
 		logo: currentEvent ? currentEvent.logo || '' : '',
-		description: currentEvent ? currentEvent.description || '' : ''
+		description: currentEvent ? currentEvent.description || '' : '',
+		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
+		address: currentEvent ? currentEvent?.address || '' : ''
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);
-	const [option, setOption] = useState('');
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
 
 	const { createEventManagement, updateEventManagement } = useEventManagement();
 
-	useEffect(() => {
-		if (currentEvent) {
-			if (currentEvent.channel_id === '0') {
-				setOption('Location');
-			}
+	const [option, setOption] = useState<string>('');
 
-			if (eventChannel) {
-				if (eventChannel.type === 4) {
-					setOption('Speaker');
-				}
+	const isExistChannelVoice = Boolean(currentEvent?.channel_voice_id);
+	const isExistAddress = Boolean(currentEvent?.address);
+
+	useEffect(() => {
+		if (currentEvent && eventChannel) {
+			if (isExistChannelVoice) {
+				setOption(OptionEvent.OPTION_SPEAKER);
+			} else if (isExistAddress) {
+				setOption(OptionEvent.OPTION_LOCATION);
 			}
 		}
 	}, [currentEvent, eventChannel]);
 
-	const choiceSpeaker = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
-	const choiceLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
+	const choiceSpeaker = useMemo(() => {
+		return isExistChannelVoice || option === OptionEvent.OPTION_SPEAKER;
+	}, [isExistChannelVoice, option]);
+
+	const choiceLocation = useMemo(() => {
+		return isExistAddress || option === OptionEvent.OPTION_LOCATION;
+	}, [isExistAddress, option]);
 
 	const handleNext = (currentModal: number) => {
 		if (buttonWork && currentModal < tabs.length - 1 && !errorTime && !errorOption) {
@@ -121,7 +128,6 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const handleUpdate = async () => {
 		const title = choiceLocation ? contentSubmit.titleEvent : '';
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
-
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
 		const creatorId = currentEvent?.creator_id;

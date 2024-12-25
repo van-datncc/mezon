@@ -77,7 +77,7 @@ const LocationModal = (props: LocationModalProps) => {
 		setIsClear(true);
 		setContentSubmit((prevContentSubmit) => ({
 			...prevContentSubmit,
-			textChannelId: undefined
+			textChannelId: ''
 		}));
 	};
 	const optionsTextChannel = useMemo(
@@ -188,7 +188,7 @@ const LocationModal = (props: LocationModalProps) => {
 					<input
 						type="text"
 						name="location"
-						value={contentSubmit.titleEvent}
+						value={contentSubmit.address}
 						onChange={onChangeTitle}
 						placeholder="Add a location, link or something."
 						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
