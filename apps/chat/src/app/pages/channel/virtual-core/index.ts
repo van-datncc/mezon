@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { approxEqual, debounce, memo, notUndefined } from './utils';
 
-// export * from './utils';
+export * from './utils';
 
 //
 
@@ -78,7 +77,7 @@ export const observeElementRect = <T extends Element>(instance: Virtualizer<T, a
 	handler(element.getBoundingClientRect());
 
 	if (!targetWindow.ResizeObserver) {
-		return () => {};
+		return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 	}
 
 	const observer = new targetWindow.ResizeObserver((entries) => {
@@ -355,7 +354,7 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 			horizontal: false,
 			getItemKey: defaultKeyExtractor,
 			rangeExtractor: defaultRangeExtractor,
-			onChange: () => {},
+			onChange: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
 			measureElement,
 			initialRect: { width: 0, height: 0 },
 			scrollMargin: 0,
@@ -731,22 +730,13 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 		const scrollOffset = this.getScrollOffset();
 
 		if (align === 'auto') {
-			if (toOffset <= scrollOffset) {
-				align = 'start';
-			} else if (toOffset >= scrollOffset + size) {
+			if (toOffset >= scrollOffset + size) {
 				align = 'end';
-			} else {
-				align = 'start';
 			}
 		}
 
-		if (align === 'start') {
-			// eslint-disable-next-line no-self-assign
-			toOffset = toOffset;
-		} else if (align === 'end') {
-			toOffset = toOffset - size;
-		} else if (align === 'center') {
-			toOffset = toOffset - size / 2;
+		if (align === 'end') {
+			toOffset -= size;
 		}
 
 		const scrollSizeProp = this.options.horizontal ? 'scrollWidth' : 'scrollHeight';
@@ -782,9 +772,16 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 			}
 		}
 
-		const toOffset = align === 'end' ? item.end + this.options.scrollPaddingEnd : item.start - this.options.scrollPaddingStart;
+		const centerOffset = item.start - this.options.scrollPaddingStart + (item.size - size) / 2;
 
-		return [this.getOffsetForAlignment(toOffset, align), align] as const;
+		switch (align) {
+			case 'center':
+				return [this.getOffsetForAlignment(centerOffset, align), align] as const;
+			case 'end':
+				return [this.getOffsetForAlignment(item.end + this.options.scrollPaddingEnd, align), align] as const;
+			default:
+				return [this.getOffsetForAlignment(item.start - this.options.scrollPaddingStart, align), align] as const;
+		}
 	};
 
 	private isDynamicMode = () => this.elementsCache.size > 0;
@@ -825,7 +822,6 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 
 		this._scrollToOffset(offset, { adjustments: undefined, behavior });
 
-		// Remove the recursive call to prevent UI jitter
 		if (behavior !== 'smooth' && this.isDynamicMode() && this.targetWindow) {
 			this.scrollToIndexTimeoutId = this.targetWindow.setTimeout(() => {
 				this.scrollToIndexTimeoutId = null;
@@ -835,7 +831,6 @@ export class Virtualizer<TScrollElement extends Element | Window, TItemElement e
 				if (elementInDOM) {
 					const [latestOffset] = notUndefined(this.getOffsetForIndex(index, align));
 
-					// Check if the current scroll offset is already correct
 					if (!approxEqual(latestOffset, this.getScrollOffset())) {
 						// Only scroll if the offset is incorrect
 						this._scrollToOffset(latestOffset, { adjustments: undefined, behavior });

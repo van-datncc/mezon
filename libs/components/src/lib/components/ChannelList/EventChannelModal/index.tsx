@@ -4,14 +4,13 @@ import ModalCreate from './ModalCreate';
 import { StartEventModal } from './StartEvent';
 
 export type EventModalProps = {
-	numberEventManagement: number;
 	onClose: () => void;
 	openModalDetail: boolean;
 	setOpenModalDetail: Dispatch<SetStateAction<boolean>>;
 };
 
 const EventModal = (props: EventModalProps) => {
-	const { numberEventManagement, onClose, openModalDetail, setOpenModalDetail } = props;
+	const { onClose, openModalDetail, setOpenModalDetail } = props;
 	const [openModal, setOpenModal] = useState(false);
 	const [eventUpdateId, setEventUpdatedId] = useState<string>('');
 
@@ -44,7 +43,6 @@ const EventModal = (props: EventModalProps) => {
 								onClose={onClose}
 								onOpenCreate={() => setOpenModal(true)}
 								onOpenDetailItem={handleModalDetail}
-								numberEventManagement={numberEventManagement}
 								onEventUpdateId={onEventUpdateId}
 							/>
 						</div>

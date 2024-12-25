@@ -39,7 +39,6 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
-	selectGotifyToken,
 	selectGroupCallId,
 	selectIsInCall,
 	selectIsShowChatStream,
@@ -50,7 +49,6 @@ import {
 	selectOpenModalAttachment,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
-	selectStatusStream,
 	selectStreamMembersByChannelId,
 	selectTheme,
 	useAppDispatch,
@@ -94,8 +92,6 @@ function MyApp() {
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
-	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
@@ -260,6 +256,8 @@ function MyApp() {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 
@@ -282,21 +280,6 @@ function MyApp() {
 	const previewMode = useSelector(selectOnboardingMode);
 
 	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
-	const streamPlay = useSelector(selectStatusStream);
-	const gotifyToken = useSelector(selectGotifyToken);
-	useEffect(() => {
-		if (!gotifyToken) return;
-		if (streamPlay) {
-			handleChannelClick(
-				currentStreamInfo?.clanId as string,
-				currentStreamInfo?.streamId as string,
-				userProfile?.user?.id as string,
-				currentStreamInfo?.streamId as string,
-				userProfile?.user?.username as string,
-				gotifyToken as string
-			);
-		}
-	}, [gotifyToken]);
 
 	return (
 		<div
@@ -314,7 +297,7 @@ function MyApp() {
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
 					memberJoin={streamChannelMember}
-					channelName={currentChannel?.channel_label}
+					currentChannel={currentChannel}
 					currentStreamInfo={currentStreamInfo}
 					handleChannelClick={handleChannelClick}
 					streamVideoRef={streamVideoRef}

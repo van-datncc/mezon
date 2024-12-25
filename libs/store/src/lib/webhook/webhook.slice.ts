@@ -26,7 +26,7 @@ export const initialWebhookState: IWebHookState = {
 	webhookList: []
 };
 
-const LIST_WEBHOOK_CACHED_TIME = 1000 * 60 * 3;
+const LIST_WEBHOOK_CACHED_TIME = 1000 * 60 * 60;
 
 const fetchWebhooksCached = memoizee(
 	(mezon: MezonValueContext, channelId: string, clanId: string) => mezon.client.listWebhookByChannelId(mezon.session, channelId, clanId),

@@ -42,7 +42,7 @@ type fetchChannelAttachmentsPayload = {
 	noCache?: boolean;
 };
 
-const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
+const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 60;
 const fetchChannelAttachmentsCached = memoizeAndTrack(
 	(mezon: MezonValueContext, clanId: string, channelId: string) => mezon.client.listChannelAttachments(mezon.session, clanId, channelId, ''),
 	{

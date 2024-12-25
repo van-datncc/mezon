@@ -1,5 +1,4 @@
 import { captureSentryError } from '@mezon/logger';
-import { threadsActions } from '@mezon/store';
 import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -7,7 +6,8 @@ import { ApiSdTopic } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
-const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
+import { threadsActions } from '../threads/threads.slice';
+const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 60;
 
 export const TOPIC_DISCUSSIONS_FEATURE_KEY = 'topicdiscussions';
 
@@ -173,6 +173,9 @@ export const topicsSlice = createSlice({
 		},
 		setCurrentTopicId: (state, action: PayloadAction<string>) => {
 			state.currentTopicId = action.payload;
+		},
+		setFirstMessageOfCurrentTopic(state, action) {
+			state.firstMessageOfCurrentTopic = action.payload;
 		},
 		setTopicLastSent: (state, action: PayloadAction<{ topicId: string; lastSentMess: ApiChannelMessageHeader }>) => {
 			const topic = state.entities[action.payload.topicId];

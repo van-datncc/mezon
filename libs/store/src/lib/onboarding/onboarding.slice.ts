@@ -5,7 +5,7 @@ import memoizee from 'memoizee';
 import { ApiOnboardingContent, ApiOnboardingItem, ApiOnboardingSteps } from 'mezon-js/api.gen';
 import { clansActions } from '../clans/clans.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
+const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const ONBOARDING_FEATURE_KEY = 'ONBOARDING_FEATURE_KEY';
 

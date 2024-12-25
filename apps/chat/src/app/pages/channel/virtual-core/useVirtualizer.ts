@@ -1,16 +1,7 @@
-import { PartialKeys } from '@tanstack/react-virtual';
 import * as React from 'react';
 import { flushSync } from 'react-dom';
-import {
-	elementScroll,
-	observeElementOffset,
-	observeElementRect,
-	observeWindowOffset,
-	observeWindowRect,
-	Virtualizer,
-	VirtualizerOptions,
-	windowScroll
-} from '.';
+import type { PartialKeys, VirtualizerOptions } from './index';
+import { Virtualizer, elementScroll, observeElementOffset, observeElementRect, observeWindowOffset, observeWindowRect, windowScroll } from './index';
 
 const useIsomorphicLayoutEffect = typeof document !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
@@ -35,7 +26,7 @@ function useVirtualizerBase<TScrollElement extends Element | Window, TItemElemen
 
 	instance.setOptions(resolvedOptions);
 
-	React.useEffect(() => {
+	useIsomorphicLayoutEffect(() => {
 		return instance._didMount();
 	}, []);
 

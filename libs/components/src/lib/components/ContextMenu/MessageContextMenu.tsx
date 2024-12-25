@@ -387,6 +387,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(topicsActions.setOpenTopicMessageState(true));
 		setValueTopic(message);
 		dispatch(topicsActions.setCurrentTopicId(''));
+		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
 	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
 
 	const checkPos = useMemo(() => {

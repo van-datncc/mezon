@@ -47,6 +47,16 @@ export const channelMetaSlice = createSlice({
 				channel.lastSeenTimestamp = action.payload.timestamp;
 			}
 		},
+		setChannelsLastSeenTimestamp: (state, action: PayloadAction<string[]>) => {
+			const timestamp = Date.now();
+			const updates = action.payload.map((channelId) => ({
+				id: channelId,
+				changes: {
+					lastSeenTimestamp: timestamp
+				}
+			}));
+			channelMetaAdapter.updateMany(state, updates);
+		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
 			state = channelMetaAdapter.upsertMany(state, action.payload);
 		}

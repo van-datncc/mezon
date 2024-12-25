@@ -48,7 +48,10 @@ import {
 } from '../types';
 export * from './file';
 export * from './mergeRefs';
+export * from './message';
+export * from './schedulers';
 export * from './transform';
+export * from './windowSize';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);

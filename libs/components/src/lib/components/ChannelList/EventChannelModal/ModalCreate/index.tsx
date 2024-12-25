@@ -1,5 +1,13 @@
 import { useEventManagement } from '@mezon/core';
-import { selectAllTextChannel, selectChannelById, selectCurrentClanId, selectEventById, selectVoiceChannelAll, useAppSelector } from '@mezon/store';
+import {
+	selectAllTextChannel,
+	selectChannelById,
+	selectCreatingLoaded,
+	selectCurrentClanId,
+	selectEventById,
+	selectVoiceChannelAll,
+	useAppSelector
+} from '@mezon/store';
 import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,6 +34,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const [currentModal, setCurrentModal] = useState(0);
 	const currentEvent = useSelector(selectEventById(eventId || ''));
 	const eventChannel = useAppSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : '')) || {};
+	const createStatus = useSelector(selectCreatingLoaded);
 
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
 		topic: currentEvent ? currentEvent.title || '' : '',
@@ -229,6 +238,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 							</button>
 						) : (
 							<button
+								disabled={createStatus === 'loading'}
 								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
 								onClick={option === '' || errorOption ? () => {} : () => handleSubmit()}

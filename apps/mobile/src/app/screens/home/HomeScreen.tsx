@@ -9,7 +9,6 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeWrapper from './homedrawer/HomeWrapper';
-import { StreamingPopup } from './homedrawer/components/StreamingPopup';
 import { styles } from './styles';
 
 const Drawer = createDrawerNavigator();
@@ -54,7 +53,6 @@ const HomeScreen = React.memo((props: any) => {
 
 	return (
 		<View style={{ flex: 1, position: 'relative' }}>
-			<StreamingPopup />
 			<Drawer.Navigator
 				screenOptions={{
 					drawerPosition: 'left',

@@ -60,7 +60,7 @@ type SetCategoryExpandStatePayload = {
 	expandState: boolean;
 };
 
-const CATEGORIES_CACHED_TIME = 1000 * 60 * 3;
+const CATEGORIES_CACHED_TIME = 1000 * 60 * 60;
 
 const fetchCategoriesCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string) => {

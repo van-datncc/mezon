@@ -25,7 +25,7 @@ export const initialAccountState: AccountState = {
 	anonymousMode: false
 };
 
-const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 3;
+const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 60;
 const fetchUserProfileCached = memoizeAndTrack((mezon: MezonValueContext) => mezon.client.getAccount(mezon.session), {
 	promise: true,
 	maxAge: CHANNEL_PROFILE_CACHED_TIME,

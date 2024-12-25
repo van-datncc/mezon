@@ -1,4 +1,4 @@
-import { useAppNavigation, useClans, usePathMatch, usePermissionChecker } from '@mezon/core';
+import { useAppNavigation, useClans, useEventManagementQuantity, usePathMatch, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
 	eventManagementActions,
@@ -7,12 +7,12 @@ import {
 	selectCurrentClanId,
 	selectMissionDone,
 	selectMissionSum,
-	selectNumberEvent,
 	selectOnboardingByClan,
 	selectOnboardingMode,
 	selectOngoingEvent,
 	selectProcessingByClan,
 	selectShowNumEvent,
+	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -24,7 +24,6 @@ import { Link } from 'react-router-dom';
 import EventModal from '../EventChannelModal';
 
 export const Events = memo(() => {
-	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
 	const previewMode = useSelector(selectOnboardingMode);
@@ -34,7 +33,9 @@ export const Events = memo(() => {
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const onboardingByClan = useSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
+	const appearanceTheme = useSelector(selectTheme);
 
+	const { numberEventManagement, numberEventUpcoming } = useEventManagementQuantity();
 	const closeModal = () => {
 		closeEventModal();
 	};
@@ -59,14 +60,7 @@ export const Events = memo(() => {
 	});
 
 	const [openEventModal, closeEventModal] = useModal(() => {
-		return (
-			<EventModal
-				onClose={closeModal}
-				numberEventManagement={numberEventManagement}
-				openModalDetail={openModalDetail}
-				setOpenModalDetail={setOpenModalDetail}
-			/>
-		);
+		return <EventModal onClose={closeModal} openModalDetail={openModalDetail} setOpenModalDetail={setOpenModalDetail} />;
 	}, []);
 
 	const dispatch = useAppDispatch();
@@ -123,12 +117,13 @@ export const Events = memo(() => {
 						{numberEventManagement > 1 && `${numberEventManagement} Events`}
 					</div>
 				</div>
-				{numberEventManagement !== 0 && showNumEvent && (
+				{numberEventUpcoming > 0 && (
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
-						<div className="text-white text-xs font-medium">{numberEventManagement}</div>
+						<div className="text-white text-xs font-medium">{numberEventUpcoming}</div>
 					</div>
 				)}
 			</div>
+
 			<Link
 				to={memberPath}
 				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isMemberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}

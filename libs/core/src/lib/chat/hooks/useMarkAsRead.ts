@@ -9,7 +9,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelThreads, ICategoryChannel, TIME_OFFSET } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -31,35 +31,6 @@ export function useMarkAsRead() {
 		[dispatch]
 	);
 
-	const resetCountChannelBadge = useCallback(
-		(channel: ChannelsEntity) => {
-			const timestamp = Date.now() / 1000;
-			dispatch(
-				channelMetaActions.setChannelLastSeenTimestamp({
-					channelId: channel?.channel_id ?? '',
-					timestamp: timestamp + TIME_OFFSET
-				})
-			);
-
-			dispatch(
-				clansActions.updateClanBadgeCount({
-					clanId: channel?.clan_id ?? '',
-					count: (channel?.count_mess_unread ?? 0) * -1
-				})
-			);
-
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: channel?.clan_id as string,
-					channelId: channel?.channel_id as string,
-					count: 0,
-					isReset: true
-				})
-			);
-		},
-		[dispatch]
-	);
-
 	const handleMarkAsReadChannel = useCallback(
 		async (channel: ChannelsEntity) => {
 			const body: ApiMarkAsReadRequest = {
@@ -71,22 +42,33 @@ export function useMarkAsRead() {
 			setStatusMarkAsReadChannel('pending');
 
 			try {
-				const result = await actionMarkAsRead(body);
+				await actionMarkAsRead(body);
 
 				setStatusMarkAsReadChannel('success');
-				resetCountChannelBadge(channel);
-
-				const allThreadsInChannel = getThreadWithBadgeCount(channel);
-				if (allThreadsInChannel && allThreadsInChannel.length > 0)
-					allThreadsInChannel.forEach((channel: ChannelsEntity) => {
-						resetCountChannelBadge(channel);
-					});
+				const allThreadsInChannel = [channel, ...getThreadWithBadgeCount(channel)];
+				const channelIds = allThreadsInChannel.map((item) => item.id);
+				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+				dispatch(
+					channelsActions.resetChannelsCount({
+						clanId: channel?.clan_id as string,
+						channelIds
+					})
+				);
+				dispatch(
+					clansActions.updateClanBadgeCount2({
+						clanId: channel.clan_id as string,
+						channels: allThreadsInChannel.map((channel) => ({
+							channelId: channel.id,
+							count: (channel.count_mess_unread ?? 0) * -1
+						}))
+					})
+				);
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadChannel('error');
 			}
 		},
-		[actionMarkAsRead, resetCountChannelBadge]
+		[actionMarkAsRead]
 	);
 
 	const handleMarkAsReadCategory = useCallback(
@@ -98,18 +80,23 @@ export function useMarkAsRead() {
 
 			setStatusMarkAsReadCategory('pending');
 			try {
-				const result = await actionMarkAsRead(body);
+				await actionMarkAsRead(body);
 				const allChannelsAndThreads = getChannelsWithBadgeCountCategory(category);
 				setStatusMarkAsReadCategory('success');
-				allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
-					resetCountChannelBadge(channel);
-				});
+				const channelIds = allChannelsAndThreads.map((item) => item.id);
+				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+				dispatch(
+					channelsActions.resetChannelsCount({
+						clanId: category.clan_id as string,
+						channelIds
+					})
+				);
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadCategory('error');
 			}
 		},
-		[actionMarkAsRead, resetCountChannelBadge]
+		[actionMarkAsRead]
 	);
 
 	const handleMarkAsReadClan = useCallback(
@@ -117,26 +104,29 @@ export function useMarkAsRead() {
 			const body: ApiMarkAsReadRequest = {
 				clan_id: clanId ?? ''
 			};
-
 			setStatusMarkAsReadClan('pending');
 			try {
-				const allChannelsAndThreads = getChannelsWithBadgeCountClan(channelsInClan);
+				await actionMarkAsRead(body);
 				setStatusMarkAsReadClan('success');
-				allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
-					resetCountChannelBadge(channel);
-				});
+				const channelIds = channelsInClan.map((item) => item.id);
+				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+				dispatch(
+					channelsActions.resetChannelsCount({
+						clanId,
+						channelIds
+					})
+				);
 				dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: 0, isReset: true }));
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadClan('error');
 			}
 		},
-		[actionMarkAsRead, resetCountChannelBadge]
+		[actionMarkAsRead, channelsInClan]
 	);
 
 	return useMemo(
 		() => ({
-			resetCountChannelBadge,
 			handleMarkAsReadChannel,
 			statusMarkAsReadChannel,
 			handleMarkAsReadCategory,
@@ -145,7 +135,6 @@ export function useMarkAsRead() {
 			statusMarkAsReadClan
 		}),
 		[
-			resetCountChannelBadge,
 			handleMarkAsReadChannel,
 			statusMarkAsReadChannel,
 			handleMarkAsReadCategory,
@@ -172,65 +161,6 @@ function getChannelsWithBadgeCountCategory(cat: ICategoryChannel) {
 	return channelsWithBadge;
 }
 
-function getChannelsWithBadgeCountClan(channels: ChannelsEntity[]) {
-	const channelsWithBadge = channels
-		.flat()
-		.filter(
-			(item: ChannelsEntity) =>
-				item?.last_seen_message?.timestamp_seconds &&
-				item?.last_sent_message?.timestamp_seconds &&
-				item.last_seen_message?.timestamp_seconds <= item.last_sent_message?.timestamp_seconds
-		);
-
-	return channelsWithBadge;
-}
-
 function getThreadWithBadgeCount(channel: ChannelThreads) {
-	const getThreads = channel.threads;
-	const getThreadsWithBadge = getThreads
-		?.flat()
-		.filter(
-			(item: ChannelsEntity) =>
-				item?.last_seen_message?.timestamp_seconds &&
-				item?.last_sent_message?.timestamp_seconds &&
-				item.last_seen_message?.timestamp_seconds <= item.last_sent_message?.timestamp_seconds
-		);
-
-	return getThreadsWithBadge;
-}
-
-export function useResetCountChannelBadge() {
-	const dispatch = useAppDispatch();
-
-	const resetCountChannelBadge = useCallback(
-		(channel: ChannelsEntity) => {
-			if (!channel) return;
-			const timestamp = Date.now() / 1000;
-			dispatch(
-				channelMetaActions.setChannelLastSeenTimestamp({
-					channelId: channel?.channel_id ?? '',
-					timestamp: timestamp + TIME_OFFSET
-				})
-			);
-
-			dispatch(
-				clansActions.updateClanBadgeCount({
-					clanId: channel?.clan_id ?? '',
-					count: (channel?.count_mess_unread ?? 0) * -1
-				})
-			);
-
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: channel?.clan_id as string,
-					channelId: channel?.channel_id as string,
-					count: 0,
-					isReset: true
-				})
-			);
-		},
-		[dispatch]
-	);
-
-	return resetCountChannelBadge;
+	return channel.threads || [];
 }

@@ -16,7 +16,7 @@ const ListEventManagement = (props: ListEventManagementProps) => {
 	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 
 	return allEventManagement
-		.filter((event) => event.channel_id === '0' || allThreadChannelPrivateIds.includes(event.channel_id))
+		.filter((event) => !event.channel_id || event.channel_id === '0' || allThreadChannelPrivateIds.includes(event.channel_id))
 		.map((event, index) => {
 			return (
 				<div key={index}>

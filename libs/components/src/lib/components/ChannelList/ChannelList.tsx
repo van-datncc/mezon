@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, useIdleRender } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -19,7 +19,7 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { default as SimpleBarReact } from 'simplebar-react';
 import 'simplebar/src/simplebar.css';
@@ -104,17 +104,21 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const [height, setHeight] = useState(0);
 	const clanTopbarEle = 60;
-	useEffect(() => {
-		const calculateHeight = () => {
-			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
-			const outsideHeight = totalHeight;
-			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
-			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
-		};
+
+	const calculateHeight = useCallback(() => {
+		const clanFooterEle = document.getElementById('clan-footer');
+		const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
+		const outsideHeight = totalHeight;
+		const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
+		setHeight(window.innerHeight - outsideHeight - titleBarHeight);
+	}, []);
+
+	useWindowSize(() => {
 		calculateHeight();
-		window.addEventListener('resize', calculateHeight);
-		return () => window.removeEventListener('resize', calculateHeight);
+	});
+
+	useEffect(() => {
+		calculateHeight();
 	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
 	const channelFavorites = useSelector(selectAllChannelsFavorite);

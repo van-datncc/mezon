@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { useAppDispatch, videoStreamActions } from '@mezon/store';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { MediaStream, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 
 interface WebRTCContextType {
 	isSupported: boolean;
@@ -8,9 +8,13 @@ interface WebRTCContextType {
 	connectionState: RTCIceConnectionState;
 	connect: () => Promise<void>;
 	disconnect: () => void;
+	sendMessage: (message: Record<string, unknown>) => void;
+	errors: string[];
+	messages: string[];
 	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
-	streamVideoRef: React.RefObject<HTMLVideoElement>;
+	remoteStream: MediaStream;
 	isStream: boolean;
+	isRemoteVideoStream: boolean;
 }
 
 interface WebRTCProviderProps {
@@ -20,14 +24,29 @@ interface WebRTCProviderProps {
 const WebRTCStreamContext = createContext<WebRTCContextType | null>(null);
 
 export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
-	const dispatch = useAppDispatch();
 	const [isSupported, setIsSupported] = useState(true);
 	const [isConnected, setIsConnected] = useState(false);
 	const [connectionState, setConnectionState] = useState<RTCIceConnectionState>('new');
-	const streamVideoRef = useRef<HTMLVideoElement>(null);
+	const [errors, setErrors] = useState<string[]>([]);
+	const [messages, setMessages] = useState<string[]>([]);
+	const [remoteStream, setRemoteStream] = useState<MediaStream>(null);
+	const [isRemoteVideoStream, setIsRemoteVideoStream] = useState(false);
 	const pcRef = useRef<RTCPeerConnection | null>(null);
-	const wsRef = useRef<WebSocket | null>(null);
+	const wsRef = useRef<any | null>(null);
 	const [isStream, setIsStream] = useState(false);
+
+	const debug = useCallback((...args: string[]) => {
+		addMessage(args.join(' '));
+	}, []);
+
+	const addError = useCallback((...msgs: string[]) => {
+		setErrors((prev) => [...prev, ...msgs]);
+	}, []);
+
+	const addMessage = useCallback((message: string) => {
+		const timestamp = new Date().toISOString();
+		setMessages((prev) => [`${timestamp} ${message}`, ...prev]);
+	}, []);
 
 	useEffect(() => {
 		const checkSupport = () => {
@@ -36,20 +55,29 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				(navigator as any).webkitGetUserMedia ||
 				(navigator as any).mozGetUserMedia ||
 				(navigator as any).msGetUserMedia ||
-				window.RTCPeerConnection
+				RTCPeerConnection
 			);
 			setIsSupported(supported);
+
+			if (!supported) {
+				addError('WebRTC is not supported in your browser');
+			}
 		};
 		checkSupport();
-	}, []);
+	}, [addError]);
 
 	// WebSocket handling
-	const wsSend = useCallback((message: Record<string, unknown>) => {
-		const jsonStr = JSON.stringify(message);
-		if (wsRef.current?.readyState === WebSocket.OPEN) {
-			wsRef.current.send(jsonStr);
-		}
-	}, []);
+	const wsSend = useCallback(
+		(message: Record<string, unknown>) => {
+			const jsonStr = JSON.stringify(message);
+			if (wsRef.current?.readyState === WebSocket.OPEN) {
+				wsRef.current.send(jsonStr);
+			} else {
+				addError('ws: send not ready, skipping...');
+			}
+		},
+		[wsRef.current, debug]
+	);
 
 	// RTCPeerConnection handling
 	const initPeerConnection = useCallback(() => {
@@ -61,12 +89,12 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 			]
 		});
 
-		peerConnection.oniceconnectionstatechange = () => {
+		peerConnection.addEventListener('iceconnectionstatechange', (event) => {
 			setConnectionState(peerConnection.iceConnectionState);
 			setIsConnected(peerConnection.iceConnectionState === 'connected');
-		};
+		});
 
-		peerConnection.onicecandidate = (event) => {
+		peerConnection.addEventListener('icecandidate', (event) => {
 			if (event.candidate && event.candidate.candidate !== '') {
 				const message = {
 					Key: 'ice_candidate',
@@ -74,50 +102,55 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				};
 				wsSend(message);
 			}
-		};
+		});
 
-		peerConnection.ontrack = (event) => {
+		peerConnection.addEventListener('track', (event) => {
 			const remoteStream = event.streams[0];
-			if (streamVideoRef.current) {
-				streamVideoRef.current.srcObject = remoteStream;
-				streamVideoRef.current.autoplay = true;
-				streamVideoRef.current.controls = true;
+			const newStream = new MediaStream();
+			remoteStream.getTracks().forEach((track) => {
+				newStream.addTrack(track);
+			});
+			if (remoteStream) {
+				setRemoteStream(newStream);
 			}
-			remoteStream.getVideoTracks().forEach((track) => {
-				track.onmute = () => {
-					dispatch(videoStreamActions.setIsRemoteVideoStream(false));
-				};
-
-				track.onunmute = () => {
-					dispatch(videoStreamActions.setIsRemoteVideoStream(true));
-				};
+			event?.streams[0]?.getVideoTracks()?.forEach((track) => {
+				track.addEventListener('mute', () => {
+					setIsRemoteVideoStream(true);
+				});
+				track.addEventListener('unmute', () => {
+					setIsRemoteVideoStream(true);
+				});
 			});
 
-			remoteStream.getAudioTracks().forEach((track) => {
-				track.onmute = () => {
-					dispatch(videoStreamActions.setIsRemoteAudioStream(false));
-				};
-				track.onunmute = () => {
-					dispatch(videoStreamActions.setIsRemoteAudioStream(true));
-				};
+			event?.streams[0]?.getAudioTracks()?.forEach((track) => {
+				track.addEventListener('mute', () => {
+					setIsRemoteVideoStream(false);
+				});
+				track.addEventListener('unmute', () => {
+					setIsRemoteVideoStream(false);
+				});
 			});
-		};
+		});
 
-		peerConnection.addTransceiver('audio');
+		peerConnection.addTransceiver('audio', {});
 
 		pcRef.current = peerConnection;
-		return peerConnection;
-	}, [dispatch, wsSend]);
 
-	const startSession = useCallback((sd: string) => {
-		if (pcRef.current) {
-			try {
-				pcRef.current.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sd }));
-			} catch (e) {
-				alert(e);
+		return peerConnection;
+	}, [wsSend, debug]);
+
+	const startSession = useCallback(
+		(sd: string) => {
+			if (pcRef.current) {
+				try {
+					pcRef.current.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: sd }));
+				} catch (e) {
+					alert(e);
+				}
 			}
-		}
-	}, []);
+		},
+		[pcRef.current]
+	);
 
 	const connect = useCallback(async () => {
 		if (!isSupported) {
@@ -127,7 +160,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		const peerConnection = pcRef.current || initPeerConnection();
 
 		try {
-			const offer = await peerConnection.createOffer();
+			const offer = await peerConnection.createOffer({});
 			await peerConnection.setLocalDescription(offer);
 
 			wsSend({
@@ -135,10 +168,11 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				Value: offer
 			});
 		} catch (error) {
-			console.log(error, 'error');
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error during connection';
+			addError(errorMessage);
 			throw error;
 		}
-	}, [wsSend, isSupported, initPeerConnection]);
+	}, [pcRef.current, wsSend, isSupported, initPeerConnection, addError]);
 
 	const disconnect = useCallback(() => {
 		wsRef.current?.close();
@@ -148,17 +182,16 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		setIsConnected(false);
 		setConnectionState('closed');
 	}, []);
-
 	const handleChannelClick = useCallback(
 		(clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => {
 			const wsUrl = process.env.NX_CHAT_APP_STREAM_WS_URL;
-			const websocket = new WebSocket(`${wsUrl}/ws?username=${userName}&token=${gotifyToken}`);
+			const websocket = new WebSocket(`${wsUrl}/ws`);
 			try {
 				const peerConnection = initPeerConnection();
 				websocket.onopen = () => {
 					const f = () => {
 						peerConnection
-							?.createOffer()
+							?.createOffer({})
 							.then((d) => {
 								peerConnection?.setLocalDescription(d);
 								websocket.send(
@@ -170,6 +203,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 										Value: d
 									})
 								);
+
 								websocket.send(
 									JSON.stringify({
 										Key: 'get_channels'
@@ -185,6 +219,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 
 				websocket.onmessage = (event) => {
 					const data = JSON.parse(event.data);
+
 					if ('Key' in data) {
 						switch (data.Key) {
 							case 'channels':
@@ -214,7 +249,7 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 								pcRef.current?.addIceCandidate(data.Value);
 								break;
 							default:
-								break;
+								console.log('Unhandled message:', data);
 						}
 					}
 				};
@@ -237,8 +272,12 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		connectionState,
 		connect,
 		disconnect,
+		sendMessage: wsSend,
+		errors,
+		messages,
 		handleChannelClick,
-		streamVideoRef,
+		isRemoteVideoStream,
+		remoteStream,
 		isStream
 	};
 

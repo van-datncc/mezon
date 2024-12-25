@@ -4,6 +4,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
 import CallingModal from '../../components/CallingModal';
+import { StreamingPopup } from '../../screens/home/homedrawer/components/StreamingPopup/StreamingPopup';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigator from './BottomNavigator';
@@ -47,6 +48,7 @@ export const Authentication = () => {
 			</RootStack.Navigator>
 			<AuthenticationLoader />
 			<CallingModal />
+			<StreamingPopup />
 		</BottomSheetModalProvider>
 	);
 };

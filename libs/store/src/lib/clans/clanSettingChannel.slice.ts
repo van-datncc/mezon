@@ -8,7 +8,7 @@ import { memoizeAndTrack } from '../memoize';
 
 export const SETTING_CLAN_CHANNEL = 'settingClanChannel';
 
-const CHANNEL_SETTING_CLAN_CACHE_TIME = 1000 * 60 * 3;
+const CHANNEL_SETTING_CLAN_CACHE_TIME = 1000 * 60 * 60;
 
 export interface SettingClanChannelState extends EntityState<ApiChannelSettingItem, string> {
 	loadingStatus: LoadingStatus;
