@@ -12,10 +12,10 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
-import { RefObject } from 'react';
+import React, { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { MentionItem } from 'react-mentions';
 import { electronBridge } from '../bridge';
@@ -46,10 +46,12 @@ import {
 	SenderInfoOptionals,
 	UsersClanEntity
 } from '../types';
+export * from './audio';
 export * from './file';
 export * from './mergeRefs';
 export * from './message';
 export * from './schedulers';
+export * from './select';
 export * from './transform';
 export * from './windowSize';
 
@@ -1060,4 +1062,19 @@ export const parseThreadInfo = (messageContent: string) => {
 export const openVoiceChannel = (url: string) => {
 	const urlVoice = `https://meet.google.com/${url}`;
 	window.open(urlVoice, '_blank', 'noreferrer');
+};
+
+export const getChannelMode = (chatType: number) => {
+	switch (chatType) {
+		case ChannelType.CHANNEL_TYPE_TEXT:
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		case ChannelType.CHANNEL_TYPE_THREAD:
+			return ChannelStreamMode.STREAM_MODE_THREAD;
+		case ChannelType.CHANNEL_TYPE_DM:
+			return ChannelStreamMode.STREAM_MODE_DM;
+		case ChannelType.CHANNEL_TYPE_GROUP:
+			return ChannelStreamMode.STREAM_MODE_GROUP;
+		default:
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+	}
 };

@@ -7,7 +7,7 @@ import { timeFomat } from '../ChannelList/EventChannelModal/timeFomatEvent';
 
 type EventScheduleProps = {
 	event: EventManagementEntity;
-	className: string;
+	className?: string;
 };
 
 const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
@@ -41,7 +41,7 @@ const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
 			}
 		>
 			<div className={className} onClick={handleOpenVoiceChannel}>
-				<Icons.IconEvents defaultSize={`w-4 h-4 ${cssEventStatus}`} />
+				<Icons.IconEvents defaultSize={`w-5 h-5 ${cssEventStatus}`} />
 			</div>
 		</Tippy>
 	);

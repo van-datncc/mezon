@@ -8,9 +8,10 @@ export type GifStickerEmojiButtonsProps = {
 	activeTab: SubPanelName;
 	currentClanId?: string;
 	hasPermissionEdit: boolean;
+	onStartRecord?: () => void;
 };
 
-const GifStickerEmojiButtons = memo(({ activeTab, currentClanId, hasPermissionEdit }: GifStickerEmojiButtonsProps) => {
+const GifStickerEmojiButtons = memo(({ activeTab, currentClanId, hasPermissionEdit, onStartRecord }: GifStickerEmojiButtonsProps) => {
 	const dispatch = useAppDispatch();
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setShowCategories } = useGifs();
@@ -73,6 +74,10 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId, hasPermissionEd
 
 	return (
 		<div className="flex flex-row absolute h-11 items-center gap-1 mr-3 top-0 right-0">
+			<div onClick={onStartRecord} className={`w-6 h-6 ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}>
+				<Icons.MicEnable className="w-6 h-6 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black " />
+			</div>
+			
 			<div onClick={handleOpenGifs} className={`block max-sm:hidden w-6 h-6 ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}>
 				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>
