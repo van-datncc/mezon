@@ -122,7 +122,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const handleStartRecording = useCallback(() => {
 		setIsRecording(true);
 	}, []);
-	
+
 	const handleEndRecording = useCallback(() => {
 		setIsRecording(false);
 	}, []);
@@ -159,9 +159,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			)}
 
 			{isRecording ? (
-				<AudioRecorderControl
-					onSendRecord={handleEndRecording}
-				/>
+				<AudioRecorderControl onSendRecord={handleEndRecording} />
 			) : (
 				<div
 					className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0

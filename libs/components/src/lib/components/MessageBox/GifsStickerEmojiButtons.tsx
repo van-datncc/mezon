@@ -77,7 +77,7 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId, hasPermissionEd
 			<div onClick={onStartRecord} className={`w-6 h-6 ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}>
 				<Icons.MicEnable className="w-6 h-6 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black " />
 			</div>
-			
+
 			<div onClick={handleOpenGifs} className={`block max-sm:hidden w-6 h-6 ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}>
 				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>

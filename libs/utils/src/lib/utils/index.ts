@@ -28,6 +28,7 @@ import {
 	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
+	IAttachmentEntity,
 	IChannel,
 	IEmojiOnMessage,
 	IExtendedMessage,
@@ -1077,4 +1078,27 @@ export const getChannelMode = (chatType: number) => {
 		default:
 			return ChannelStreamMode.STREAM_MODE_CHANNEL;
 	}
+};
+
+export const getAttachmentDataForWindow = (
+	imageList: IAttachmentEntity[],
+	currentChatUsersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>,
+	height: number,
+	width: number
+) => {
+	return imageList.map((image) => {
+		const uploader = currentChatUsersEntities?.[image.uploader as string];
+		return {
+			...image,
+			uploaderData: {
+				avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
+				name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
+			},
+			url: createImgproxyUrl(image.url || '', {
+				width: Math.round(width),
+				height: Math.round(height),
+				resizeType: 'fit'
+			})
+		};
+	});
 };
