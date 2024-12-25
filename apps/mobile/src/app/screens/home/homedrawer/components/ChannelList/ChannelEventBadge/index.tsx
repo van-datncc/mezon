@@ -21,11 +21,11 @@ export const EventBadge = memo(({ channelId }: EventBadgeProps) => {
 		}
 	};
 
-	if (events?.length && !!events?.[0]?.event_status) {
+	if (events?.length && (events?.[0]?.event_status === EEventStatus.UPCOMING || events?.[0]?.event_status === EEventStatus.ONGOING)) {
 		return (
 			<Block marginLeft={size.s_8}>
 				<Pressable onPress={hanleEventChannel}>
-					<Icons.CalendarIcon height={size.s_20} width={size.s_20} color={colorStatusEvent} />
+					<Icons.CalendarIcon height={size.s_16} width={size.s_16} color={colorStatusEvent} />
 				</Pressable>
 			</Block>
 		);

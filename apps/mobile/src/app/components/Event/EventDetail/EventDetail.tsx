@@ -2,6 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectClanById, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { EEventStatus } from '@mezon/utils';
 import { useRef } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -32,7 +33,7 @@ export function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 
 	return (
 		<View style={styles.container}>
-			<EventTime event={event} eventStatus={0} />
+			<EventTime event={event} eventStatus={EEventStatus.CREATED} />
 			{!!event?.channel_id && event.channel_id !== '0' && (
 				<View style={styles.privatePanel}>
 					<Text style={styles.privateText}>Private Event</Text>

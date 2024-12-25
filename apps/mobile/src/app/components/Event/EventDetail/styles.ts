@@ -51,11 +51,13 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: size.s_2,
+			borderRadius: size.s_2,
 			width: '20%'
 		},
 
 		privateText: {
 			color: baseColor.white,
-			fontSize: Fonts.size.h9
+			fontSize: Fonts.size.h9,
+			lineHeight: Fonts.size.h8
 		}
 	});
