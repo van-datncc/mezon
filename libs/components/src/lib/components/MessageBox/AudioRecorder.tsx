@@ -106,8 +106,9 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendRecord }) => {
 		const client = clientRef.current;
 		const session = sessionRef.current;
 		if (!client || !session) return;
-
-		const fileUploaded = await handleUploadFile(client, session, '', '', 'record', blobToFile(blob));
+		
+		const timestamp = new Date().getTime();
+		const fileUploaded = await handleUploadFile(client, session, '', `${currentChat?.id}`, `${currentChat?.id}` + timestamp + 'voice_record', blobToFile(blob));
 
 		const attachmentsArray = [fileUploaded];
 		setAudioList(attachmentsArray);
