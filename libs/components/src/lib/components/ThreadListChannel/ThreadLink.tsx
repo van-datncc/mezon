@@ -109,7 +109,10 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					handleClick(thread);
 				}}
 			>
-				{thread.channel_label}
+				<div className="flex items-center gap-2">
+					<EventSchedule event={events[0]} className="inline" />
+					<span>{thread.channel_label}</span>
+				</div>
 			</Link>
 
 			{numberNotification > 0 && (
@@ -126,7 +129,6 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					mode={ChannelStreamMode.STREAM_MODE_THREAD}
 				/>
 			) : null}
-			<EventSchedule event={events[0]} className={'absolute top-2 right-14 z-20'} />
 		</div>
 	);
 });

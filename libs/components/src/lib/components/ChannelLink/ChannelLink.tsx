@@ -252,6 +252,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					<Link to={channelPath} onClick={handleClick} className="channel-link" draggable="false">
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
+							<EventSchedule event={events[0]} className="" />
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
 								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
@@ -291,7 +292,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							/>
 						) : null}
-						<EventSchedule event={events[0]} className={'absolute top-2 right-14 z-20'} />
 					</Link>
 				)}
 

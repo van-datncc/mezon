@@ -1,8 +1,9 @@
+import { useEscapeKey } from '@mezon/core';
 import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
+import { ContenSubmitEventProps, OptionEvent, filterOptionReactSelect } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
@@ -15,10 +16,11 @@ export type LocationModalProps = {
 	choiceSpeaker: boolean;
 	handleOption: (optionEvent: string) => void;
 	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
+	onClose: () => void;
 };
 
 const LocationModal = (props: LocationModalProps) => {
-	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels } = props;
+	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels, onClose } = props;
 	const [errorVoice, setErrorVoice] = useState(false);
 
 	const handleChangeVoice = (selectedOption: any) => {
@@ -67,7 +69,7 @@ const LocationModal = (props: LocationModalProps) => {
 		setIsClear(true);
 		setContentSubmit((prevContentSubmit) => ({
 			...prevContentSubmit,
-			textChannelId: undefined // Clear the selected channel ID
+			textChannelId: undefined
 		}));
 	};
 	const optionsTextChannel = useMemo(
@@ -110,6 +112,7 @@ const LocationModal = (props: LocationModalProps) => {
 	);
 
 	const showClearButton = selectedOption ? true : false;
+	useEscapeKey(() => onClose());
 
 	return (
 		<div>
@@ -166,6 +169,8 @@ const LocationModal = (props: LocationModalProps) => {
 					value={options.find((option) => option.value === contentSubmit.voiceChannel)}
 					onChange={handleChangeVoice}
 					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+					placeholder="Search voice channels..."
+					filterOption={(option, inputValue) => filterOptionReactSelect(option, inputValue)}
 				/>
 			)}
 			{choiceLocation && (
@@ -189,8 +194,11 @@ const LocationModal = (props: LocationModalProps) => {
 				options={optionsTextChannel}
 				value={isClear ? null : selectedOption}
 				onChange={handleSelectChannelAudience}
-				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+				styles={customStyles}
+				placeholder="Search channels..."
+				filterOption={(option, inputValue) => filterOptionReactSelect(option, inputValue)}
 			/>
+
 			{showClearButton && (
 				<div className="flex justify-end mt-1">
 					<button onClick={handleClearAudience} className="text-blue-500 hover:underline">

@@ -1,3 +1,4 @@
+import { useEscapeKey } from '@mezon/core';
 import { ContenSubmitEventProps } from '@mezon/utils';
 import { useMemo } from 'react';
 import { handleTimeISO } from '../timeFomatEvent';
@@ -6,11 +7,13 @@ import ItemEventManagement from './itemEventManagement';
 export type ReviewModalProps = {
 	contentSubmit: ContenSubmitEventProps;
 	option: string;
+	onClose: () => void;
 };
 
 const ReviewModal = (props: ReviewModalProps) => {
-	const { option, contentSubmit } = props;
+	const { option, contentSubmit, onClose } = props;
 	const time = useMemo(() => handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart), []);
+	useEscapeKey(() => onClose());
 
 	return (
 		<div className="dark:text-white text-black">
