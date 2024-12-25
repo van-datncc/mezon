@@ -204,6 +204,9 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					<TouchableOpacity style={styles.fakeInput} onPress={handleOpenSelectChannel}>
 						{!!eventChannel && channelIcon(eventChannel.type, eventChannel.channel_private === ChannelStatusEnum.isPrivate)}
 						<Text style={styles.inputValue}>{eventChannel?.channel_label || ''} </Text>
+						<View style={styles.chevronDownIcon}>
+							<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						</View>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>

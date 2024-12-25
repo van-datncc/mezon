@@ -48,10 +48,11 @@ export const style = (colors: Attributes) =>
 		mezonBtn: { backgroundColor: baseColor.blurple },
 		searchText: { paddingHorizontal: size.s_10 },
 		fakeInput: {
-			backgroundColor: colors.bgInputPrimary,
+			backgroundColor: colors.secondary,
 			borderRadius: size.s_10,
 			alignItems: 'center',
-			padding: size.s_12,
+			paddingHorizontal: size.s_12,
+			paddingVertical: size.s_16,
 			flexDirection: 'row'
 		},
 		inputValue: {
@@ -68,5 +69,9 @@ export const style = (colors: Attributes) =>
 			borderColor: colors.border,
 			alignItems: 'center',
 			backgroundColor: colors.secondary
+		},
+		chevronDownIcon: {
+			position: 'absolute',
+			right: size.s_10
 		}
 	});
