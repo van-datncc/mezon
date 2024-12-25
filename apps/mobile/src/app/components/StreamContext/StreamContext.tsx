@@ -11,7 +11,7 @@ interface WebRTCContextType {
 	sendMessage: (message: Record<string, unknown>) => void;
 	errors: string[];
 	messages: string[];
-	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken?: string) => void;
 	remoteStream: MediaStream;
 	isStream: boolean;
 	isRemoteVideoStream: boolean;

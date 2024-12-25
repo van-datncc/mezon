@@ -5,6 +5,7 @@ import {
 	onboardingActions,
 	selectCurrentClan,
 	selectCurrentClanId,
+	selectEventLoading,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
@@ -79,6 +80,8 @@ export const Events = memo(() => {
 		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && onboardingByClan?.mission.length > 0;
 	}, [selectUserProcessing?.onboarding_step, onboardingByClan?.mission.length, previewMode]);
 
+	const eventLoading = useSelector(selectEventLoading);
+
 	return (
 		<>
 			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} clanId={currentClanId as string} />}
@@ -117,7 +120,7 @@ export const Events = memo(() => {
 						{numberEventManagement > 1 && `${numberEventManagement} Events`}
 					</div>
 				</div>
-				{numberEventUpcoming > 0 && (
+				{eventLoading === 'loaded' && numberEventUpcoming > 0 && (
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
 						<div className="text-white text-xs font-medium">{numberEventUpcoming}</div>
 					</div>

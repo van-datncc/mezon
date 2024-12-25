@@ -1,5 +1,6 @@
 import { useClans, usePermissionChecker } from '@mezon/core';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -80,7 +81,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		}
 
 		await updateClan({
-			banner: banner || (currentClan?.banner ?? ''),
+			banner: banner,
 			clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
 			clan_id: currentClan?.clan_id ?? '',
 			creator_id: currentClan?.creator_id ?? '',
@@ -99,6 +100,10 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	function handleLoad(url: string) {
 		setBanner(url);
 	}
+
+	const handleClearBanner = () => {
+		setBanner('');
+	};
 
 	const inactiveMenu: IMezonMenuItemProps[] = [
 		{
@@ -205,6 +210,10 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 					showHelpText
 					autoUpload
 				/>
+
+				<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_34 }} onPress={handleClearBanner}>
+					<Icons.CircleXIcon height={25} width={25} color={themeValue.white} />
+				</Pressable>
 
 				<View style={{ marginVertical: 10 }}>
 					<MezonInput

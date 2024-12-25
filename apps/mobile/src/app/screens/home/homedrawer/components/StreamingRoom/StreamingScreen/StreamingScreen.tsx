@@ -9,16 +9,7 @@ import FastImage from 'react-native-fast-image';
 import { RTCView } from 'react-native-webrtc';
 import Images from '../../../../../../../assets/Images';
 import { useWebRTCStream } from '../../../../../../components/StreamContext/StreamContext';
-export function StreamingScreen({
-	streamID,
-	onFullScreenVideo,
-	isAnimationComplete
-}: {
-	isAnimationComplete: boolean;
-	onFullScreenVideo: () => void;
-	streamID: string;
-}) {
-	// const channelStream = useSelector(selectStreamChannelByChannelId(streamID || ''));
+export function StreamingScreen() {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { isStream, isRemoteVideoStream, remoteStream } = useWebRTCStream();

@@ -68,9 +68,9 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					rel="noopener noreferrer"
 					style={{
 						color: 'rgb(59,130,246)',
-						cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
+						cursor: 'pointer',
 						wordBreak: 'break-word',
-						textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
+						textDecoration: 'underline'
 					}}
 					className="tagLink"
 				>

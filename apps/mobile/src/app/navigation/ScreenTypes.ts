@@ -204,6 +204,7 @@ type MenuClanStackParamList = {
 		type: OptionEvent;
 		channelId: string;
 		location: string;
+		eventChannelId: string;
 		onGoBack?: () => void;
 	};
 	[APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW]: {
@@ -215,6 +216,7 @@ type MenuClanStackParamList = {
 		title: string;
 		description: string;
 		frequency: number;
+		eventChannelId: string;
 		onGoBack?: () => void;
 	};
 	[APP_SCREEN.MENU_CLAN.SETTINGS]: { inviteRef: React.MutableRefObject<any> };

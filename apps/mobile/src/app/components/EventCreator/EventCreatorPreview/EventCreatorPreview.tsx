@@ -18,7 +18,7 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 	const myUser = useAuth();
 	const { createEventManagement } = useEventManagement();
 	const { currentClanId } = useClans();
-	const { type, channelId, location, startTime, endTime, title, description, frequency, onGoBack } = route.params || {};
+	const { type, channelId, location, startTime, endTime, title, description, frequency, eventChannelId, onGoBack } = route.params || {};
 
 	navigation.setOptions({
 		headerTitle: t('screens.eventPreview.headerTitle'),
@@ -51,9 +51,29 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 		const timeValueStart = convertToLocalTime(startTime);
 		const timeValueEnd = convertToLocalTime(endTime);
 		if (type === OptionEvent.OPTION_SPEAKER) {
-			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueStart, description, '');
+			await createEventManagement(
+				currentClanId || '',
+				channelId,
+				location,
+				title,
+				timeValueStart,
+				timeValueStart,
+				description,
+				'',
+				eventChannelId
+			);
 		} else {
-			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueEnd, description, '');
+			await createEventManagement(
+				currentClanId || '',
+				channelId,
+				location,
+				title,
+				timeValueStart,
+				timeValueEnd,
+				description,
+				'',
+				eventChannelId
+			);
 		}
 		onGoBack?.();
 		navigation.navigate(APP_SCREEN.HOME);
@@ -66,12 +86,13 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 					event={{
 						id: '',
 						start_time: convertToLocalTime(startTime),
+						channel_voice_id: channelId,
 						address: location,
 						user_ids: [],
 						creator_id: myUser.userId,
 						title: title,
 						description: description,
-						channel_id: channelId
+						channel_id: eventChannelId
 					}}
 					showActions={false}
 					start={convertToLocalTime(startTime)}

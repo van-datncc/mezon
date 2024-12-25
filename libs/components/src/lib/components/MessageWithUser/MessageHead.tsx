@@ -21,7 +21,6 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
 	const userRolesClan = useMemo(() => {
 		const activeRole: Array<RolesClanEntity> = [];
-		let userRoleLength = 0;
 		let highestPermissionRole = null;
 		let maxLevelPermission = 0;
 		for (const key in rolesClanEntity) {
@@ -29,7 +28,6 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === message?.sender_id);
 			if (checkHasRole) {
 				activeRole.push(role);
-				userRoleLength++;
 				if (role.max_level_permission !== undefined && role.max_level_permission > maxLevelPermission) {
 					maxLevelPermission = role.max_level_permission;
 					highestPermissionRole = role;
@@ -37,8 +35,6 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 			}
 		}
 		return {
-			usersRole: activeRole,
-			length: userRoleLength,
 			highestPermissionRoleColor: highestPermissionRole?.color || activeRole[0]?.color || DEFAULT_ROLE_COLOR
 		};
 	}, [message?.sender_id, rolesClanEntity]);

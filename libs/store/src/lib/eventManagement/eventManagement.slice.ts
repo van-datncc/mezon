@@ -343,6 +343,8 @@ export const selectOngoingEvent = createSelector(getEventManagementState, (state
 
 export const selectCreatingLoaded = createSelector(getEventManagementState, (state) => state.creatingStatus);
 
+export const selectEventLoading = createSelector(getEventManagementState, (state) => state.loadingStatus);
+
 export const selectEventById = (eventId: string) =>
 	createSelector(getEventManagementState, (state) => {
 		const entities = selectEventManagementEntities({ eventmanagement: state });
