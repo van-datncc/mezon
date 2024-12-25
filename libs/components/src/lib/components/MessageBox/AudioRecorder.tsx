@@ -1,34 +1,50 @@
+import { useChatSending, useCurrentChat } from '@mezon/core';
+import { handleUploadFile, useMezon } from '@mezon/transport';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiChannelDescription, ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useEffect, useRef, useState } from 'react';
-import { handleUploadFile, useMezon } from "@mezon/transport";
-import { useChatSending, useCurrentChat } from "@mezon/core";
-import { ApiChannelDescription } from "mezon-js/api.gen";
+import { MessageAudio } from '../MessageWithUser/MessageAudio';
 
 type AudioRecorderProps = {
 	onSendRecord: () => void;
-}
+};
 
-const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
-	const [isRecording, setIsRecording] = useState(false);
+const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendRecord }) => {
+	const [isRecording, setIsRecording] = useState(true);
 	const [audioUrl, setAudioUrl] = useState('');
 	const [seconds, setSeconds] = useState(0);
+	const [audioList, setAudioList] = useState<ApiMessageAttachment[]>([]);
+	const [isStopping, setIsStopping] = useState(false);
 	const recorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<BlobPart[]>([]);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChat } = useCurrentChat();
-	const { sendMessage } = useChatSending({channelOrDirect: currentChat as ApiChannelDescription, mode: 2});
-	
-	
+
+	const getChannelMode = () => {
+		switch (currentChat?.type) {
+			case ChannelType.CHANNEL_TYPE_TEXT:
+				return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			case ChannelType.CHANNEL_TYPE_THREAD:
+				return ChannelStreamMode.STREAM_MODE_THREAD;
+			case ChannelType.CHANNEL_TYPE_DM:
+				return ChannelStreamMode.STREAM_MODE_DM;
+			case ChannelType.CHANNEL_TYPE_GROUP:
+				return ChannelStreamMode.STREAM_MODE_GROUP;
+			default:
+				return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		}
+	};
+
+	const { sendMessage } = useChatSending({ channelOrDirect: currentChat as ApiChannelDescription, mode: getChannelMode() });
+
 	const blobToFile = (blob: Blob): File => {
-		// Generate a timestamp for unique filename
 		const timestamp = new Date().getTime();
 		return new File([blob], `audio-${timestamp}.ogg`, { type: 'audio/mp3' });
 	};
 
 	const startRecording = async () => {
-		if (isRecording) return;
-
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			streamRef.current = stream;
@@ -41,12 +57,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 			};
 
 			recorder.onstop = () => {
-				const blob = new Blob(chunksRef.current, { type: 'audio/ogg; codecs=opus' });
-				chunksRef.current = [];
+				const blob = new Blob(chunksRef.current, { type: 'audio/mp3; codecs=opus' });
 				const audioUrl = URL.createObjectURL(blob);
 				setAudioUrl(audioUrl);
-				
-				sendRecording();
+				setIsStopping(true);
+				generateAudioList();
 			};
 
 			recorder.start();
@@ -73,6 +88,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 	const resetRecording = () => {
 		setAudioUrl('');
 		setSeconds(0);
+		setIsStopping(false);
 		setIsRecording(false);
 		if (timerRef.current) clearInterval(timerRef.current);
 		if (streamRef.current) {
@@ -80,55 +96,65 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 		}
 		streamRef.current = null;
 		recorderRef.current = null;
+
+		onSendRecord();
 	};
 
-	const sendRecording = async() => {
-		if (isRecording && recorderRef.current) {
+	const generateAudioList = async () => {
+		const blob = new Blob(chunksRef.current, { type: 'audio/mp3; codecs=opus' });
+
+		const client = clientRef.current;
+		const session = sessionRef.current;
+		if (!client || !session) return;
+
+		const fileUploaded = await handleUploadFile(client, session, '', '', 'record', blobToFile(blob));
+
+		const attachmentsArray = [fileUploaded];
+		setAudioList(attachmentsArray);
+
+		return attachmentsArray;
+	};
+
+	const sendRecording = async () => {
+		if (isStopping) {
+			await sendMessage({}, [], [...audioList]);
+			resetRecording();
+			onSendRecord();
+
+			return;
+		}
+
+		if (recorderRef.current) {
 			recorderRef.current.stop();
 			recorderRef.current.onstop = async () => {
-				const blob = new Blob (chunksRef.current, { type: 'audio/ogg; codecs=opus' });
-				chunksRef.current = [];
-				const client = clientRef.current;
-				const session = sessionRef.current;
-				if (!client || !session) return;
-				
-				const fileUploaded = await handleUploadFile (client, session, '', '', 'record', blobToFile (blob))
-				const audioUrl = URL.createObjectURL (blob);
-				
-				setAudioUrl (fileUploaded.url || 'abc');
-				
-				const attachmentsArray = [fileUploaded];
-				
-				await sendMessage ({}, [], [...attachmentsArray])
-				
-				// alert (`Audio URL đã được gửi: ${audioUrl}`);
-				
-				resetRecording ();
+				const attachmentsArray = await generateAudioList();
+				if (!attachmentsArray) return;
+
+				await sendMessage({}, [], [...attachmentsArray]);
+
+				resetRecording();
 				onSendRecord();
 			};
 		} else if (audioUrl) {
-			// alert(`Audio URL đã được gửi: ${audioUrl}`);
-
 			resetRecording();
 		}
 	};
-	
-	useEffect (() => {
+
+	useEffect(() => {
 		startRecording();
-		return (() => {
-			resetRecording ();
+		return () => {
+			resetRecording();
 			onSendRecord();
-		})
+		};
 	}, []);
 
 	return (
-		<div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+		<div style={{ paddingBottom: '10px', fontFamily: 'Arial, sans-serif' }}>
 			<div
 				style={{
 					display: 'flex',
 					alignItems: 'center',
 					gap: '10px',
-					// backgroundColor: '#ff5252',
 					padding: '10px',
 					borderRadius: '5px',
 					color: 'white',
@@ -139,7 +165,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 					onClick={resetRecording}
 					style={{
 						backgroundColor: 'white',
-						color: '#ff5252',
+						color: '#505cdc',
 						border: 'none',
 						borderRadius: '50%',
 						width: '30px',
@@ -161,30 +187,33 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 				>
 					{isRecording ? (
 						<span>{new Date(seconds * 1000).toISOString().substring(14, 19)}</span>
-					) : (
-						<audio src={audioUrl} controls style={{ flex: 1 }} className={'w-full'}/>
+					) : audioUrl ? (
+						<MessageAudio audioUrl={audioUrl} />
+					) : null}
+
+					{isRecording && (
+						<button
+							onClick={stopRecording}
+							style={{
+								backgroundColor: 'white',
+								color: '#505cdc',
+								border: 'none',
+								borderRadius: '50%',
+								width: '30px',
+								height: '30px',
+								cursor: 'pointer'
+							}}
+						>
+							⏹
+						</button>
 					)}
-					<button
-						onClick={stopRecording}
-						style={{
-							backgroundColor: 'white',
-							color: '#ff5252',
-							border: 'none',
-							borderRadius: '50%',
-							width: '30px',
-							height: '30px',
-							cursor: 'pointer'
-						}}
-					>
-						⏹
-					</button>
 				</div>
 
 				<button
 					onClick={sendRecording}
 					style={{
 						backgroundColor: 'white',
-						color: '#ff5252',
+						color: '#505cdc',
 						border: 'none',
 						borderRadius: '50%',
 						width: '30px',
@@ -195,23 +224,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({onSendRecord}) => {
 					➤
 				</button>
 			</div>
-
-			{/*{!isRecording && !audioUrl && (*/}
-			{/*	<button*/}
-			{/*		onClick={startRecording}*/}
-			{/*		style={{*/}
-			{/*			padding: '10px 20px',*/}
-			{/*			backgroundColor: '#ff5252',*/}
-			{/*			color: 'white',*/}
-			{/*			border: 'none',*/}
-			{/*			borderRadius: '5px',*/}
-			{/*			cursor: 'pointer',*/}
-			{/*			marginTop: '20px'*/}
-			{/*		}}*/}
-			{/*	>*/}
-			{/*		Start Recording*/}
-			{/*	</button>*/}
-			{/*)}*/}
 		</div>
 	);
 };

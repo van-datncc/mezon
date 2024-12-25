@@ -159,7 +159,11 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			)}
 
 			{isRecording ? (
-				<AudioRecorder onSendRecord={() => {setIsRecording(false)}} />
+				<AudioRecorder
+					onSendRecord={() => {
+						setIsRecording(false);
+					}}
+				/>
 			) : (
 				<div
 					className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
@@ -171,11 +175,6 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 						currentChannelId={currentChannelId || ''}
 						hasPermissionEdit={canSendMessage}
 					/>
-					{/*<div>*/}
-					{/*	<button onClick={startRecordingHandler} style={{ cursor: 'pointer', padding: '10px' }}>*/}
-					{/*		Start*/}
-					{/*	</button>*/}
-					{/*</div>*/}
 
 					<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md`}>
 						<div
@@ -192,7 +191,9 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 								currentClanId={currentClanId}
 								mode={props.mode}
 								hasPermissionEdit={canSendMessage}
-								onStartRecord={() => {setIsRecording(true)}}
+								onStartRecord={() => {
+									setIsRecording(true);
+								}}
 							/>
 						</div>
 					</div>

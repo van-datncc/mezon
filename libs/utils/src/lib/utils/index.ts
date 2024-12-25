@@ -1053,3 +1053,31 @@ export const parseThreadInfo = (messageContent: string) => {
 		threadContent: messageContent.replace(/^@\w+\s*/, '')
 	};
 };
+
+export const getBlobDuration = async (blob: string | Blob): Promise<number> => {
+	const videoElement = document.createElement('video');
+
+	const durationPromise = new Promise<number>((resolve, reject) => {
+		videoElement.addEventListener('loadedmetadata', () => {
+			if (videoElement.duration === Infinity) {
+				videoElement.currentTime = Number.MAX_SAFE_INTEGER;
+				videoElement.ontimeupdate = () => {
+					videoElement.ontimeupdate = null;
+					resolve(videoElement.duration);
+					videoElement.currentTime = 0;
+				};
+			} else {
+				resolve(videoElement.duration);
+			}
+		});
+
+		videoElement.onerror = (errorEvent) => {
+			const eventAsEvent = errorEvent as Event;
+			reject((eventAsEvent.target as HTMLVideoElement).error);
+		};
+	});
+
+	videoElement.src = typeof blob === 'string' || blob instanceof String ? (blob as string) : window.URL.createObjectURL(blob as Blob);
+
+	return durationPromise;
+};

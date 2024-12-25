@@ -2,6 +2,7 @@ import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, isMediaTypeNotSupported, 
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
+import { MessageAudio } from './MessageAudio';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
@@ -17,27 +18,26 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 	const images: (ApiMessageAttachment & { create_time?: string })[] = [];
 	const documents: ApiMessageAttachment[] = [];
 	const audio: ApiMessageAttachment[] = [];
-	
+
 	attachments.forEach((attachment) => {
 		if (isMediaTypeNotSupported(attachment.filetype)) {
 			documents.push(attachment);
 			return;
 		}
-		
+
 		if (
-			(attachment.filetype?.includes(EMimeTypes.mp4) ||
-				attachment.filetype?.includes(EMimeTypes.mov)) &&
+			(attachment.filetype?.includes(EMimeTypes.mp4) || attachment.filetype?.includes(EMimeTypes.mov)) &&
 			!attachment.url?.includes(EMimeTypes.tenor)
 		) {
 			videos.push(attachment);
 			return;
 		}
-		
+
 		if (attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)) {
 			videos.push(attachment);
 			return;
 		}
-		
+
 		if (
 			(attachment.filetype?.includes(EMimeTypes.png) ||
 				attachment.filetype?.includes(EMimeTypes.jpeg) ||
@@ -47,20 +47,20 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
 				...attachment,
 				sender_id: message.sender_id,
-				create_time: message.create_time,
+				create_time: message.create_time
 			};
 			images.push(resultAttach);
 			return;
 		}
-		
-		if(attachment.filetype?.includes(EMimeTypes.audio)) {
+
+		if (attachment.filetype?.includes(EMimeTypes.audio)) {
 			audio.push(attachment);
 			return;
 		}
-		
+
 		documents.push(attachment);
 	});
-	
+
 	return { videos, images, documents, audio };
 };
 
@@ -100,12 +100,8 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 				documents.map((document, index) => (
 					<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
 				))}
-			
-			{audio.length > 0 &&
-				audio.map((audio, index) => (
-					<audio key={`${index}_${audio.url}`} controls src={audio.url}/>
-				))
-			}
+
+			{audio.length > 0 && audio.map((audio, index) => <MessageAudio key={`${index}_${audio.url}`} audioUrl={audio.url || ''} />)}
 		</>
 	);
 };
