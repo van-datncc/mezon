@@ -83,7 +83,7 @@
   },
   "newMessages": "TIN NHẮN MỚI",
   "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
-  "messageInputPlaceHolder": "Viết suy nghĩ của bạn ở đây",
+  "messageInputPlaceHolder": "Nhập tin nhắn...",
   "shareLocationModal": {
       "sendThisLocation": "Gửi vị trí này tới",
       "send": "Gửi",

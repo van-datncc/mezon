@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text } from 'react-native';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
+import { RecordAudioMessage } from './components/ChatBox/RecordAudioMessage';
 import { EMessageActionType } from './enums';
 import { IMessageActionNeedToResolve } from './types';
 
@@ -60,6 +61,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 				flexDirection="column"
 				justifyContent="space-between"
 			>
+				<RecordAudioMessage channelId={props?.channelId} mode={props?.mode} />
 				{messageActionNeedToResolve && (
 					<ActionMessageSelected
 						messageActionNeedToResolve={messageActionNeedToResolve}
