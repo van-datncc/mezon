@@ -1,11 +1,20 @@
 import { useAppParams, useAttachments, useCurrentChat } from '@mezon/core';
-import { attachmentActions, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, selectCurrentDM, useAppDispatch } from '@mezon/store';
+import {
+	attachmentActions,
+	selectAllListAttachmentByChannel,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectCurrentDM,
+	useAppDispatch
+} from '@mezon/store';
 import {
 	IAttachmentEntity,
 	IImageWindowProps,
 	SEND_ATTACHMENT_DATA,
 	SHOW_POSITION,
 	createImgproxyUrl,
+	getAttachmentDataForWindow,
 	notImplementForGifOrStickerSendFromPanel
 } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -37,8 +46,10 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
 	const { currentChatUsersEntities } = useCurrentChat();
+	const listAttachmentsByChannel = useSelector((state) => selectAllListAttachmentByChannel(state, currentChannelId || currentDmGroupId || ''));
 	let width = attachmentData.width || 0;
 	let height = attachmentData.height || 150;
+
 	const handleClick = useCallback(
 		(url: string) => {
 			if (checkImage) return;
@@ -57,25 +68,28 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
-					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
+					if (listAttachmentsByChannel) {
+						const imageListWithUploaderInfo = getAttachmentDataForWindow(
+							listAttachmentsByChannel,
+							currentChatUsersEntities,
+							height,
+							width
+						);
+						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
+						const channelImagesData: IImageWindowProps = {
+							channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+							images: imageListWithUploaderInfo,
+							selectedImageIndex: selectedImageIndex
+						};
+
+						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+						return;
+					}
+					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }))
 						.then((data) => {
 							const attachmentList = data.payload as IAttachmentEntity[];
 							const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
-							const imageListWithUploaderInfo = imageList.map((image) => {
-								const uploader = currentChatUsersEntities?.[image.uploader as string];
-								return {
-									...image,
-									uploaderData: {
-										avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
-										name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-									},
-									url: createImgproxyUrl(image.url || '', {
-										width: Math.round(width),
-										height: Math.round(height),
-										resizeType: 'fit'
-									})
-								};
-							});
+							const imageListWithUploaderInfo = getAttachmentDataForWindow(imageList, currentChatUsersEntities, height, width);
 							const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
 							return { imageListWithUploaderInfo, selectedImageIndex };
 						})
@@ -109,7 +123,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				dispatch(attachmentActions.setMessageId(messageId));
 			}
 		},
-		[width, height]
+		[width, height, listAttachmentsByChannel?.length]
 	);
 
 	const [imageLoaded, setImageLoaded] = useState(false);

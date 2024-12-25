@@ -1,3 +1,4 @@
+import { useEscapeKeyClose } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
@@ -17,10 +18,11 @@ export type EventInfoModalProps = {
 	timeEndDefault: string;
 	setErrorTime: (status: boolean) => void;
 	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
+	onClose: () => void;
 };
 
 const EventInfoModal = (props: EventInfoModalProps) => {
-	const { contentSubmit, timeStartDefault, setErrorTime, setContentSubmit, choiceLocation } = props;
+	const { contentSubmit, timeStartDefault, setErrorTime, setContentSubmit, choiceLocation, onClose } = props;
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1000);
 	const [errorStart, setErrorStart] = useState(false);
 	const [errorEnd, setErrorEnd] = useState(false);
@@ -140,9 +142,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			setErrorTime(false);
 		}
 	}, [errorEnd, errorStart, setErrorTime]);
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
 
 	return (
-		<div className="max-h-[500px] overflow-y-auto hide-scrollbar">
+		<div ref={modalRef} className="max-h-[500px] overflow-y-auto hide-scrollbar">
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
 					Event Topic
