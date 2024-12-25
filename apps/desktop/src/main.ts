@@ -155,12 +155,14 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
-			if (autoUpdater.isUpdaterActive()) {
-				forceQuit.enable();
-				return autoUpdater.quitAndInstall();
-			} else {
-				window.close();
-			}
+			autoUpdater.checkForUpdates().then((data) => {
+				if (!data?.updateInfo) {
+					window.close();
+				} else {
+					forceQuit.enable();
+					return autoUpdater.quitAndInstall();
+				}
+			});
 			break;
 	}
 };
