@@ -19,7 +19,7 @@ export const MessageAudio: React.FC<MessageAudioProps> = React.memo(({ audioUrl 
 	};
 
 	return (
-		<div>
+		<>
 			<MessageAudioControl
 				ref={audioControlRef}
 				audioUrl={audioUrl}
@@ -29,6 +29,6 @@ export const MessageAudio: React.FC<MessageAudioProps> = React.memo(({ audioUrl 
 				isPlaying={isPlaying}
 			/>
 			<MessageAudioUI isPlaying={isPlaying} currentTime={currentTime} duration={duration} togglePlay={handleTogglePlay} />
-		</div>
+		</>
 	);
 });
