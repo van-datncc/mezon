@@ -40,6 +40,7 @@ import {
 	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
+	selectAllTextChannel,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
@@ -156,6 +157,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
+
+	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
+	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -990,7 +994,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (eventCreatedEvent.action === EEventAction.CREATED) {
 				dispatch(eventManagementActions.addCreatedEvent(eventCreatedEvent));
 			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
-				dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+				const newChannelId = eventCreatedEvent.channel_id;
+				const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
+				if (userHasChannel) {
+					dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+				} else {
+					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+				}
 			} else if (eventCreatedEvent.action === EEventAction.DELETE) {
 				dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 			}

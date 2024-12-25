@@ -232,7 +232,6 @@ export const eventManagementSlice = createSlice({
 		addCreatedEvent: (state, action) => {
 			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-
 			eventManagementAdapter.addOne(state, {
 				id: event_id,
 				channel_id: normalizedChannelId,
@@ -241,47 +240,34 @@ export const eventManagementSlice = createSlice({
 			});
 		},
 
-		updateStatusEvent: (state, action) => {
-			const { event_id, channel_id, event_status } = action.payload;
-			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-
-			// const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
-			// if (!existingEvent) {
-			// 	return;
-			// }
-
-			if (event_status === EEventStatus.COMPLETED) {
-				eventManagementAdapter.removeOne(state, event_id);
-			}
-
-			eventManagementAdapter.updateOne(state, {
-				id: event_id,
-				changes: {
-					channel_id: normalizedChannelId,
-					event_status
-				}
-			});
-		},
-
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
-			// const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
-			// if (!existingEvent) {
-			// 	return;
-			// }
-
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			if (!existingEvent) {
+				return;
+			}
 			eventManagementAdapter.removeOne(state, event_id);
 		},
 		updateContentEvent: (state, action) => {
 			const eventUpdate = action.payload;
-			const { event_id, ...changes } = eventUpdate;
-
-			eventManagementAdapter.updateOne(state, {
-				id: event_id,
-				changes: {
-					...changes
-				}
-			});
+			const { event_id, channel_id, event_status, ...changes } = eventUpdate;
+			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			if (!existingEvent) {
+				return;
+			}
+			if (event_status === EEventStatus.COMPLETED) {
+				eventManagementAdapter.removeOne(state, event_id);
+			} else {
+				eventManagementAdapter.updateOne(state, {
+					id: event_id,
+					changes: {
+						channel_id: normalizedChannelId,
+						event_status: event_status,
+						...changes
+					}
+				});
+			}
 		},
 		clearOngoingEvent: (state, action) => {
 			state.ongoingEvent = null;
