@@ -7,6 +7,8 @@ export function logger(): string {
 }
 
 export async function captureSentryError(error: unknown, actionName: string): Promise<void> {
+	// disabled
+	return;
 	const errorDetail = await getErrorMessage(error);
 	if (errorDetail === SKIP_LOG) return;
 	const errorLabel = (actionName || 'unknown') + ' - ' + new Date().toLocaleTimeString('en-GB', { hour12: false });
