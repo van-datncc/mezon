@@ -53,6 +53,7 @@ import {
 	selectUserCallId,
 	stickerSettingActions,
 	toastActions,
+	topicsActions,
 	useAppDispatch,
 	useAppSelector,
 	userChannelsActions,
@@ -117,7 +118,7 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -206,7 +207,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelleaved = useCallback(
 		(user: StreamingLeavedEvent) => {
-			dispatch(usersStreamActions.remove(user.id));
+			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
 	);
@@ -273,6 +274,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (message: ChannelMessage) => {
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
+			}
+			if (message.topic_id !== '0') {
+				const lastMsg: ApiChannelMessageHeader = {
+					content: message.content,
+					sender_id: message.sender_id,
+					timestamp_seconds: message.create_time_seconds
+				};
+				dispatch(topicsActions.setTopicLastSent({ topicId: message.topic_id || '', lastSentMess: lastMsg }));
 			}
 
 			try {

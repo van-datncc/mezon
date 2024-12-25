@@ -36,7 +36,7 @@ export const fetchListChannelsByUserCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: 1000 * 60 * 60,
 		normalizer: (args) => {
 			return args[0].session.username || '';
 		}
@@ -171,12 +171,13 @@ import { mess } from '@mezon/store';
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll } = listChannelsByUserAdapter.getSelectors();
+const { selectAll, selectEntities } = listChannelsByUserAdapter.getSelectors();
 
 export const getChannelsByUserState = (rootState: { [LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState }): ListChannelsByUserState =>
 	rootState[LIST_CHANNELS_USER_FEATURE_KEY];
 
 export const selectAllChannelsByUser = createSelector(getChannelsByUserState, selectAll);
+export const selectEntitiesChannelsByUser = createSelector(getChannelsByUserState, selectEntities);
 
 export const selectAllInfoChannels = createSelector(selectAllChannelsByUser, (channels = []) =>
 	channels?.map(({ channel_id, channel_label, channel_private, clan_name, clan_id, type, parrent_id, meeting_code, id }) => ({

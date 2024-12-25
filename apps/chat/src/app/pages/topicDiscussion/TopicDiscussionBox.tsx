@@ -8,6 +8,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentTopicId,
+	selectFirstMessageOfCurrentTopic,
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -127,9 +128,11 @@ const TopicDiscussionBox = () => {
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
 
+	const firstMessageOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
+
 	return (
 		<>
-			{isFetchMessageDone && (
+			{(isFetchMessageDone || firstMessageOfThisTopic) && (
 				<MemoizedChannelMessages
 					channelId={currentTopicId as string}
 					clanId={currentClanId as string}

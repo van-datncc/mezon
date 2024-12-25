@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
@@ -12,7 +12,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
@@ -75,7 +75,7 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const userLogin = useAuth();
 	const userId = userLogin?.userId;
-	const user = useAppSelector(selectMemberClanByUserId(userLogin.userProfile?.user?.id || ''));
+	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userLogin.userProfile?.user?.id as string));
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
@@ -353,7 +353,7 @@ function MessageWithUser({
 	);
 }
 
-function MessageDateDivider({ message }: { message: MessagesEntity }) {
+const MessageDateDivider = memo(({ message }: { message: MessagesEntity }) => {
 	const messageDate = !message?.create_time ? '' : convertDateString(message?.create_time as string);
 	return (
 		<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent">
@@ -362,7 +362,7 @@ function MessageDateDivider({ message }: { message: MessagesEntity }) {
 			<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 		</div>
 	);
-}
+});
 
 interface HoverStateWrapperProps {
 	children: ReactNode;

@@ -45,6 +45,10 @@ export const isVideo = (url?: string) => {
 	return /\.(mp4|webm|ogg|mov)/.test(url);
 };
 
+export const isAudio = (url?: string) => {
+	return /\.(mp3)$/i.test(url || '');
+};
+
 export const normalizeString = (str: string) => {
 	if (!str) {
 		return '';

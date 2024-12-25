@@ -18,7 +18,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
@@ -195,7 +195,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					setIsShowPanelChannel={closeProfileItem}
 				/>
 			);
-		}, []);
+		}, [channel]);
 
 		const [openDeleteModal, closeDeleteModal] = useModal(() => {
 			return (
@@ -206,7 +206,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					modalName={`${channel.channel_label}`}
 				/>
 			);
-		}, []);
+		}, [channel.channel_id]);
 
 		const [openSettingModal, closeSettingModal] = useModal(() => {
 			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
@@ -350,7 +350,8 @@ export const ChannelLink = memo(
 		prev.numberNotification === curr.numberNotification &&
 		prev.isUnReadChannel === curr.isUnReadChannel &&
 		prev.channel?.channel_label === curr?.channel?.channel_label &&
-		prev.channel?.channel_private === curr?.channel?.channel_private
+		prev.channel?.channel_private === curr?.channel?.channel_private &&
+		(prev.channel as ChannelThreads)?.threads === (curr?.channel as ChannelThreads)?.threads
 );
 type ModalConfirmComponentProps = {
 	handleCancel: () => void;

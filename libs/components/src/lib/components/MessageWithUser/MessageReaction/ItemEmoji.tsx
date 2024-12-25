@@ -2,7 +2,7 @@ import { useAuth, useChatReaction } from '@mezon/core';
 import { selectCurrentChannel, selectTheme } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
-import { forwardRef, useMemo, useRef } from 'react';
+import { forwardRef, memo, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -78,7 +78,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	);
 }
 
-export default ItemEmoji;
+export default memo(ItemEmoji);
 
 type ItemDetailProps = {
 	ref: React.RefObject<HTMLDivElement>;

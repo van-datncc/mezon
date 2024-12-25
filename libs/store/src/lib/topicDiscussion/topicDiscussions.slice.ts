@@ -3,9 +3,11 @@ import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiSdTopic } from 'mezon-js/api.gen';
-import { ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 3;
+import { RootState } from '../store';
+import { threadsActions } from '../threads/threads.slice';
+const LIST_TOPIC_DISCUSSIONS_CACHED_TIME = 1000 * 60 * 60;
 
 export const TOPIC_DISCUSSIONS_FEATURE_KEY = 'topicdiscussions';
 
@@ -112,6 +114,30 @@ export const createTopic = createAsyncThunk('topics/createTopic', async (body: A
 	}
 });
 
+export const handleTopicNotification = createAsyncThunk('topics/handleTopicNotification', async ({ msg }: any, thunkAPI) => {
+	const state = thunkAPI.getState() as RootState;
+	const currentTopicId = state.topicdiscussions.currentTopicId;
+	const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
+	const isShowCreateTopic = currentChannelId ? !!state.topicdiscussions.isShowCreateTopic?.[currentChannelId] : false;
+
+	if (msg?.extras?.topicId && msg?.extras?.topicId !== '0' && (currentTopicId !== msg?.extras?.topicId || !isShowCreateTopic)) {
+		thunkAPI.dispatch(
+			topicsActions.setIsShowCreateTopic({
+				channelId: msg.channel_id as string,
+				isShowCreateTopic: true
+			})
+		);
+		thunkAPI.dispatch(
+			threadsActions.setIsShowCreateThread({
+				channelId: msg.channel_id as string,
+				isShowCreateThread: false
+			})
+		);
+		thunkAPI.dispatch(topicsActions.setCurrentTopicId(msg?.extras?.topicId || ''));
+		thunkAPI.dispatch(getFirstMessageOfTopic(msg?.extras?.topicId || ''));
+	}
+});
+
 export const topicsSlice = createSlice({
 	name: TOPIC_DISCUSSIONS_FEATURE_KEY,
 	initialState: initialTopicsState,
@@ -147,6 +173,23 @@ export const topicsSlice = createSlice({
 		},
 		setCurrentTopicId: (state, action: PayloadAction<string>) => {
 			state.currentTopicId = action.payload;
+		},
+		setFirstMessageOfCurrentTopic(state, action) {
+			state.firstMessageOfCurrentTopic = action.payload;
+		},
+		setTopicLastSent: (state, action: PayloadAction<{ topicId: string; lastSentMess: ApiChannelMessageHeader }>) => {
+			const topic = state.entities[action.payload.topicId];
+			if (topic) {
+				if (!topic.last_sent_message) {
+					topic.last_sent_message = {} as ApiChannelMessageHeader;
+				}
+
+				const { content, sender_id, timestamp_seconds } = action.payload.lastSentMess;
+
+				topic.last_sent_message.content = typeof content === 'object' ? JSON.stringify(content) : content || '';
+				topic.last_sent_message.sender_id = sender_id;
+				topic.last_sent_message.timestamp_seconds = timestamp_seconds;
+			}
 		}
 	},
 	extraReducers: (builder) => {

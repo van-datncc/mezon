@@ -8,7 +8,7 @@ import { ChannelMembersEntity } from './channel.members';
 
 export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
 
-const ADD_CHANNEL_USERS_CACHE_TIME = 1000 * 60 * 3;
+const ADD_CHANNEL_USERS_CACHE_TIME = 1000 * 60 * 60;
 
 export interface UsersByAddChannelState extends EntityState<string, string> {
 	loadingStatus: LoadingStatus;
