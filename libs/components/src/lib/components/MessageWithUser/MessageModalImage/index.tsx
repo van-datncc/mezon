@@ -31,7 +31,7 @@ const MessageModalImage = () => {
 
 	const [showList, setShowList] = useState(true);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const attachments = useSelector(selectAllListAttachmentByChannel((directId ?? currentChannelId) as string));
+	const attachments = useSelector((state) => selectAllListAttachmentByChannel(state, (directId ?? currentChannelId) as string));
 	const { setOpenModalAttachment } = useAttachments();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 	const attachment = useSelector(selectAttachment);
@@ -57,7 +57,7 @@ const MessageModalImage = () => {
 			const indexImage = attachments.findIndex((img) => img.url === urlImg);
 			setCurrentIndexAtt(indexImage);
 		}
-	}, [attachments, attachments?.length]);
+	}, [attachments]);
 
 	const handleDrag = (e: any) => {
 		e.preventDefault();

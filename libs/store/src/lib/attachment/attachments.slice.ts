@@ -226,13 +226,12 @@ export const selectMessageIdAttachment = createSelector(getAttachmentState, (sta
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
 
-export const selectAllListAttachmentByChannel = (channelId: string) =>
-	createSelector(getAttachmentState, (state) => {
-		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
-			return undefined;
-		}
-		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
-	});
+export const selectAllListAttachmentByChannel = createSelector([getAttachmentState, (state, channelId: string) => channelId], (state, channelId) => {
+	if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
+		return undefined;
+	}
+	return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
+});
 
 export const selectAllListDocumentByChannel = (channelId: string) =>
 	createSelector(getAttachmentState, (state) => {
