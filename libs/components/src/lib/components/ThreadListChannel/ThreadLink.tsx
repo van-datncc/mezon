@@ -110,7 +110,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				}}
 			>
 				<div className="flex items-center gap-2">
-					<EventSchedule event={events[0]} className="inline" />
+					{events[0] && <EventSchedule event={events[0]} className="inline" />}
 					<span>{thread.channel_label}</span>
 				</div>
 			</Link>

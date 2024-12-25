@@ -7,7 +7,7 @@ import { timeFomat } from '../ChannelList/EventChannelModal/timeFomatEvent';
 
 type EventScheduleProps = {
 	event: EventManagementEntity;
-	className: string;
+	className?: string;
 };
 
 const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
