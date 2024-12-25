@@ -15,7 +15,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { Fragment, ReactElement, memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AttachmentPreviewThumbnail from './AttachmentPreviewThumbnail';
-import AudioRecorder from './AudioRecorder';
+import AudioRecorderControl from './AudioRecorder/AudioRecorderControl';
 import FileSelectionButton from './FileSelectionButton';
 import { MentionReactInput } from './ReactionMentionInput';
 
@@ -119,13 +119,9 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const shouldRender = useIdleRender();
 	const [isRecording, setIsRecording] = useState(false);
 
-	const startRecordingHandler = () => {
+	const handleStartRecording = useCallback(() => {
 		setIsRecording(true);
-	};
-
-	const stopRecordingHandler = () => {
-		setIsRecording(false);
-	};
+	}, []);
 
 	if (!shouldRender) return <></>;
 
@@ -159,7 +155,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			)}
 
 			{isRecording ? (
-				<AudioRecorder
+				<AudioRecorderControl
 					onSendRecord={() => {
 						setIsRecording(false);
 					}}
@@ -191,9 +187,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 								currentClanId={currentClanId}
 								mode={props.mode}
 								hasPermissionEdit={canSendMessage}
-								onStartRecord={() => {
-									setIsRecording(true);
-								}}
+								onStartRecord={handleStartRecording}
 							/>
 						</div>
 					</div>

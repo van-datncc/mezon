@@ -12,7 +12,7 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import { ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
@@ -46,6 +46,7 @@ import {
 	SenderInfoOptionals,
 	UsersClanEntity
 } from '../types';
+export * from './audio';
 export * from './file';
 export * from './mergeRefs';
 export * from './message';
@@ -1062,30 +1063,17 @@ export const openVoiceChannel = (url: string) => {
 	window.open(urlVoice, '_blank', 'noreferrer');
 };
 
-export const getBlobDuration = async (blob: string | Blob): Promise<number> => {
-	const videoElement = document.createElement('video');
-
-	const durationPromise = new Promise<number>((resolve, reject) => {
-		videoElement.addEventListener('loadedmetadata', () => {
-			if (videoElement.duration === Infinity) {
-				videoElement.currentTime = Number.MAX_SAFE_INTEGER;
-				videoElement.ontimeupdate = () => {
-					videoElement.ontimeupdate = null;
-					resolve(videoElement.duration);
-					videoElement.currentTime = 0;
-				};
-			} else {
-				resolve(videoElement.duration);
-			}
-		});
-
-		videoElement.onerror = (errorEvent) => {
-			const eventAsEvent = errorEvent as Event;
-			reject((eventAsEvent.target as HTMLVideoElement).error);
-		};
-	});
-
-	videoElement.src = typeof blob === 'string' || blob instanceof String ? (blob as string) : window.URL.createObjectURL(blob as Blob);
-
-	return durationPromise;
+export const getChannelMode = (chatType: number) => {
+	switch (chatType) {
+		case ChannelType.CHANNEL_TYPE_TEXT:
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		case ChannelType.CHANNEL_TYPE_THREAD:
+			return ChannelStreamMode.STREAM_MODE_THREAD;
+		case ChannelType.CHANNEL_TYPE_DM:
+			return ChannelStreamMode.STREAM_MODE_DM;
+		case ChannelType.CHANNEL_TYPE_GROUP:
+			return ChannelStreamMode.STREAM_MODE_GROUP;
+		default:
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+	}
 };

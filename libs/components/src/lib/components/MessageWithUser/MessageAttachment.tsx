@@ -2,7 +2,7 @@ import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, isMediaTypeNotSupported, 
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
-import { MessageAudio } from './MessageAudio';
+import { MessageAudio } from './MessageAudio/MessageAudio';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
