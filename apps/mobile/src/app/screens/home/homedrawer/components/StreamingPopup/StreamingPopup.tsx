@@ -7,7 +7,6 @@ import {
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
-import messaging from '@react-native-firebase/messaging';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, PanResponder } from 'react-native';
@@ -33,11 +32,11 @@ const StreamingPopup = () => {
 			onPanResponderGrant: () => {
 				isDragging.current = false;
 				if (!isFullScreen.current) {
-					pan.setOffset({
+					pan?.setOffset({
 						x: (pan?.x as any)?._value,
 						y: (pan?.y as any)?._value
 					});
-					pan.setValue({ x: 0, y: 0 });
+					pan?.setValue({ x: 0, y: 0 });
 				}
 			},
 			onPanResponderMove: (e, gestureState) => {
@@ -45,7 +44,7 @@ const StreamingPopup = () => {
 					if (Math.abs(gestureState?.dx) > 10 || Math.abs(gestureState?.dy) > 10) {
 						isDragging.current = true;
 					}
-					Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false })(e, gestureState);
+					Animated.event([null, { dx: pan?.x, dy: pan?.y }], { useNativeDriver: false })(e, gestureState);
 				}
 			},
 			onPanResponderRelease: (e, gestureState) => {
@@ -60,7 +59,7 @@ const StreamingPopup = () => {
 				}
 
 				if (!isFullScreen.current) {
-					pan.flattenOffset();
+					pan?.flattenOffset();
 				}
 			}
 		})
@@ -72,15 +71,13 @@ const StreamingPopup = () => {
 
 	const handleJoinStreamingRoom = useCallback(async () => {
 		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && streamPlay) {
-			const token = await messaging().getToken();
 			disconnect();
 			handleChannelClick(
 				currentClan?.id as string,
-				currentChannel.channel_id as string,
+				currentChannel?.channel_id as string,
 				userProfile?.user?.id as string,
 				currentChannel.channel_id as string,
-				userProfile?.user?.username as string,
-				token as string
+				userProfile?.user?.username as string
 			);
 			dispatch(
 				videoStreamActions.startStream({
@@ -97,7 +94,7 @@ const StreamingPopup = () => {
 
 	const handleResizeStreamRoom = () => {
 		if (isFullScreen.current) {
-			pan.flattenOffset();
+			pan?.flattenOffset();
 			Animated.timing(pan, {
 				toValue: { x: 0, y: 0 },
 				duration: 300,
@@ -106,7 +103,7 @@ const StreamingPopup = () => {
 				setIsAnimationComplete(true);
 			});
 		} else {
-			pan.flattenOffset();
+			pan?.flattenOffset();
 			Animated.timing(pan, {
 				toValue: { x: 0, y: 0 },
 				duration: 300,
@@ -127,7 +124,7 @@ const StreamingPopup = () => {
 		<Animated.View
 			{...panResponder.panHandlers}
 			style={[
-				pan.getLayout(),
+				pan?.getLayout(),
 				{
 					zIndex: 999999,
 					position: 'absolute'

@@ -19,7 +19,6 @@ import {
 	videoStreamActions
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
-import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useRef } from 'react';
@@ -46,15 +45,13 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 	const handleJoinVoice = () => {
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				const fcmToken = await messaging().getToken();
 				if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 					handleChannelClick(
 						channel?.clan_id as string,
 						channel?.channel_id as string,
 						userProfile?.user?.id as string,
 						channel?.channel_id as string,
-						userProfile?.user?.username,
-						fcmToken
+						userProfile?.user?.username
 					);
 					dispatch(
 						videoStreamActions.startStream({

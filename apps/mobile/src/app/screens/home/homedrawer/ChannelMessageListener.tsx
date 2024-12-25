@@ -12,7 +12,6 @@ import {
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
-import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
@@ -65,15 +64,13 @@ const ChannelMessageListener = React.memo(() => {
 				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
 					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
 						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
-							const token = await messaging().getToken();
 							disconnect();
 							handleChannelClick(
 								channel?.clan_id as string,
 								channel?.channel_id as string,
 								userProfile?.user?.id as string,
 								channel?.channel_id as string,
-								userProfile?.user?.username as string,
-								token as string
+								userProfile?.user?.username as string
 							);
 							dispatch(
 								videoStreamActions.startStream({
