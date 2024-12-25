@@ -4,7 +4,8 @@ import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import React from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { openUrl } from 'react-native-markdown-display';
-import { isImage, isVideo } from '../../../../../utils/helpers';
+import { isAudio, isImage, isVideo } from '../../../../../utils/helpers';
+import RenderAudioChat from '../RenderAudioChat/RenderAudioChat';
 import { RenderImageChat } from '../RenderImageChat';
 import { RenderVideoChat } from '../RenderVideoChat';
 import { style } from './styles';
@@ -23,6 +24,11 @@ export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressI
 
 	if (checkIsVideo) {
 		return <RenderVideoChat videoURL={document.url} />;
+	}
+
+	const checkIsAudio = isAudio(document?.url?.toLowerCase());
+	if (checkIsAudio) {
+		return <RenderAudioChat audioURL={document?.url} />;
 	}
 
 	const isUploading = !document?.url?.includes('http');

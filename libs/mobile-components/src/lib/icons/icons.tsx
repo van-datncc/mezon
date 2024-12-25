@@ -395,6 +395,27 @@ export function PlayIcon({ width = 16, height = 16, color = 'white', ...props }:
 		</Svg>
 	);
 }
+
+export function PauseIcon({ width = 16, height = 16, color = 'currentColor', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="-1 0 8 8" {...props}>
+			<G id="SVGRepo_bgCarrier" strokeWidth="0"></G>
+			<G id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></G>
+			<G id="SVGRepo_iconCarrier">
+				<G id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+					<G id="Dribbble-Light-Preview" transform="translate(-227.000000, -3765.000000)" fill={color}>
+						<G id="icons" transform="translate(56.000000, 160.000000)">
+							<Path
+								d="M172,3605 C171.448,3605 171,3605.448 171,3606 L171,3612 C171,3612.552 171.448,3613 172,3613 C172.552,3613 173,3612.552 173,3612 L173,3606 C173,3605.448 172.552,3605 172,3605 M177,3606 L177,3612 C177,3612.552 176.552,3613 176,3613 C175.448,3613 175,3612.552 175,3612 L175,3606 C175,3605.448 175.448,3605 176,3605 C176.552,3605 177,3605.448 177,3606"
+								id="pause-[#1006]"
+							/>
+						</G>
+					</G>
+				</G>
+			</G>
+		</Svg>
+	);
+}
 export function CloseIcon({ width = 16, height = 16, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg width={width} height={height} fill={color} viewBox="0 0 384 512" {...props}>

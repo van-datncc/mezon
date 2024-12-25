@@ -37,5 +37,8 @@ export const style = (colors: Attributes) =>
 		iconSend: {
 			marginLeft: size.s_6,
 			backgroundColor: baseColor.blurple
+		},
+		iconVoice: {
+			marginLeft: size.s_6
 		}
 	});
