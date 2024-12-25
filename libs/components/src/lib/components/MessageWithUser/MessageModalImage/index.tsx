@@ -53,11 +53,11 @@ const MessageModalImage = () => {
 	}, [openModalAttachment]);
 
 	useEffect(() => {
-		if (attachments.length > 0) {
+		if (attachments && attachments.length > 0) {
 			const indexImage = attachments.findIndex((img) => img.url === urlImg);
 			setCurrentIndexAtt(indexImage);
 		}
-	}, [attachments.length]);
+	}, [attachments, attachments?.length]);
 
 	const handleDrag = (e: any) => {
 		e.preventDefault();
@@ -114,12 +114,18 @@ const MessageModalImage = () => {
 		}
 	};
 	const handleSelectPreviousImage = () => {
+		if (!attachments) {
+			return;
+		}
 		const newIndex = currentIndexAtt < attachments.length - 1 ? currentIndexAtt + 1 : currentIndexAtt;
 		if (newIndex !== currentIndexAtt) {
 			handleSelectImage(newIndex);
 		}
 	};
 	const handleSelectImage = (newIndex: number) => {
+		if (!attachments) {
+			return;
+		}
 		setUrlImg(attachments[newIndex]?.url || '');
 		setCurrentIndexAtt(newIndex);
 		dispatch(attachmentActions.setCurrentAttachment(attachments[newIndex]));
@@ -249,7 +255,7 @@ const MessageModalImage = () => {
 				</div>
 				{showList && (
 					<ListAttachment
-						attachments={attachments}
+						attachments={attachments ? attachments : []}
 						urlImg={urlImg}
 						setUrlImg={setUrlImg}
 						handleDrag={handleDrag}

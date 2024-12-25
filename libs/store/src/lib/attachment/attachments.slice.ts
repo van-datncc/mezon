@@ -229,7 +229,7 @@ export const selectAttachmentPhoto = () =>
 export const selectAllListAttachmentByChannel = (channelId: string) =>
 	createSelector(getAttachmentState, (state) => {
 		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
-			return [];
+			return undefined;
 		}
 		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
 	});
