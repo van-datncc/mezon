@@ -16,7 +16,12 @@
           "title": "Dưới đây là một bản xem trước sự kiện của bạn",
           "subtitle": "Sự kiện này sẽ tự động bắt đầu khi đến giờ",
           "subtitleVoice": "Khi đến giờ, hãy đến kênh thoại để bắt đầu sự kiện!"
-      }
+      }, 
+      "channelSelection": {
+            "title": "Khán giả là ai?",
+            "description": "Chọn thành viên trong kênh đã chỉ định.",
+            "channel": "Khán giả bao gồm các thành viên từ {{channel}}: "
+        }
   },
   "fields": {
       "channelType": {

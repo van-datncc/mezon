@@ -1,13 +1,17 @@
-import { Icons, SpeakerIcon } from '@mezon/mobile-components';
-import { Fonts, useTheme } from '@mezon/mobile-ui';
-import { selectVoiceChannelAll } from '@mezon/store-mobile';
-import { OptionEvent } from '@mezon/utils';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { Icons, SpeakerIcon, ThreadIcon, ThreadIconLocker } from '@mezon/mobile-components';
+import { Block, Fonts, size, useTheme } from '@mezon/mobile-ui';
+import { ChannelsEntity, selectAllTextChannel, selectVoiceChannelAll } from '@mezon/store-mobile';
+import { ChannelStatusEnum, OptionEvent } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IMezonOptionData, MezonInput, MezonOption, MezonSelect } from '../../../componentUI';
+import Backdrop from '../../../componentUI/MezonBottomSheet/backdrop';
 import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -20,6 +24,9 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 
 	const { t } = useTranslation(['eventCreator']);
 	const voicesChannel = useSelector(selectVoiceChannelAll);
+	const textChannels = useSelector(selectAllTextChannel);
+	const BottomSheetRef = useRef<BottomSheetModal>(null);
+	const [searchText, setSearchText] = useState<string>('');
 
 	navigation.setOptions({
 		headerTitle: t('screens.eventType.headerTitle'),
@@ -27,7 +34,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 			fontSize: Fonts.size.h7,
 			color: themeValue.textDisabled
 		},
-		headerLeft: () => <></>,
+		headerLeft: () => <View />,
 		headerRight: () => (
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
 				<Icons.CloseLargeIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
@@ -70,6 +77,39 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 		[]
 	);
 
+	const filteredOptionsChannels = useMemo(() => {
+		return textChannels.filter((user) => user.channel_label.toLowerCase().includes(searchText.toLowerCase()));
+	}, [searchText, textChannels]);
+
+	const renderItem = ({ item }: { item: ChannelsEntity }) => {
+		return (
+			<Pressable onPress={() => hanleSelectChannel(item)} style={styles.items}>
+				{channelIcon(item.type, item.channel_private === ChannelStatusEnum.isPrivate)}
+				<Text style={styles.inputValue} numberOfLines={1} ellipsizeMode="tail">
+					{item.channel_label}
+				</Text>
+			</Pressable>
+		);
+	};
+
+	const channelIcon = (type: ChannelType, isPrivate: boolean) => {
+		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+			if (isPrivate) {
+				return <Icons.TextLockIcon height={size.s_24} width={size.s_24} />;
+			}
+			return <Icons.TextIcon height={size.s_24} width={size.s_24} />;
+		} else {
+			if (isPrivate) {
+				return <ThreadIconLocker height={size.s_24} width={size.s_24} />;
+			}
+			return <ThreadIcon height={size.s_24} width={size.s_24} />;
+		}
+	};
+
+	const snapPoints = useMemo(() => {
+		return ['90%'];
+	}, []);
+
 	const channels = voicesChannel?.map((item) => ({
 		title: item.channel_label,
 		value: item.channel_id,
@@ -79,6 +119,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	const [eventType, setEventType] = useState<OptionEvent>();
 	const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || '');
 	const [location, setLocation] = useState<string>('');
+	const [eventChannel, setEventChannel] = useState<ChannelsEntity>();
 
 	function handleEventTypeChange(value: OptionEvent) {
 		setEventType(value);
@@ -99,6 +140,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 			type: eventType,
 			channelId: eventType === OptionEvent.OPTION_SPEAKER ? channelID : null,
 			location: eventType === OptionEvent.OPTION_LOCATION ? location : null,
+			eventChannelId: eventChannel.channel_id,
 			onGoBack
 		});
 	}
@@ -106,6 +148,19 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	function handleChannelIDChange(value: string | number) {
 		setChannelID(value as string);
 	}
+
+	function handleSearchText(value: string): void {
+		setSearchText(value);
+	}
+
+	const handleOpenSelectChannel = () => {
+		BottomSheetRef?.current?.present();
+	};
+
+	const hanleSelectChannel = (item: ChannelsEntity) => {
+		setEventChannel(item);
+		BottomSheetRef?.current?.dismiss();
+	};
 
 	return (
 		<View style={styles.container}>
@@ -140,6 +195,16 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					)}
 
 					<Text style={styles.bottomDescription}>{t('screens.eventType.description')}</Text>
+
+					<View style={styles.headerSection}>
+						<Text style={styles.title}>{t('screens.channelSelection.title')}</Text>
+						<Text style={styles.subtitle}>{t('screens.channelSelection.description')}</Text>
+					</View>
+
+					<TouchableOpacity style={styles.fakeInput} onPress={handleOpenSelectChannel}>
+						{!!eventChannel && channelIcon(eventChannel.type, eventChannel.channel_private === ChannelStatusEnum.isPrivate)}
+						<Text style={styles.inputValue}>{eventChannel?.channel_label || ''} </Text>
+					</TouchableOpacity>
 				</ScrollView>
 			</View>
 
@@ -152,6 +217,24 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					onPress={handlePressNext}
 				/>
 			</View>
+			<BottomSheetModal
+				ref={BottomSheetRef}
+				snapPoints={snapPoints}
+				backdropComponent={Backdrop}
+				backgroundStyle={{ backgroundColor: themeValue.primary }}
+			>
+				<Block paddingHorizontal={size.s_20} paddingVertical={size.s_10} flex={1} gap={size.s_10}>
+					<MezonInput
+						inputWrapperStyle={styles.searchText}
+						placeHolder={'Select user to send token'}
+						onTextChange={handleSearchText}
+						prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+					/>
+					<Block flex={1} borderRadius={size.s_8}>
+						<BottomSheetFlatList data={filteredOptionsChannels} renderItem={renderItem} />
+					</Block>
+				</Block>
+			</BottomSheetModal>
 		</View>
 	);
 });
