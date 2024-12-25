@@ -8,7 +8,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			paddingRight: Metrics.size.l
+			paddingRight: Metrics.size.xl
 		},
 
 		channelListItemActive: {

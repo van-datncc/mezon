@@ -46,13 +46,18 @@ export const style = (colors: Attributes) =>
 			marginLeft: 1
 		},
 
+		privateArea: {
+			marginBottom: size.s_8
+		},
+
 		privatePanel: {
 			backgroundColor: baseColor.redStrong,
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: size.s_2,
 			borderRadius: size.s_2,
-			width: '20%'
+			paddingHorizontal: size.s_2,
+			position: 'absolute'
 		},
 
 		privateText: {

@@ -72,8 +72,10 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 				</View>
 
 				{!!event?.channel_id && event.channel_id !== '0' && (
-					<View style={styles.privatePanel}>
-						<Text style={styles.privateText}>Private Event</Text>
+					<View style={styles.privateArea}>
+						<View style={styles.privatePanel}>
+							<Text style={styles.privateText}>Private Event</Text>
+						</View>
 					</View>
 				)}
 
