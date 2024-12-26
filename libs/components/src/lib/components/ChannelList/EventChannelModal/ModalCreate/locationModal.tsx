@@ -38,8 +38,8 @@ const LocationModal = (props: LocationModalProps) => {
 		});
 	};
 
-	const onChangeTitle = (e: any) => {
-		setContentSubmit((prev) => ({ ...prev, titleEvent: e.target.value }));
+	const onChangeAddress = (e: any) => {
+		setContentSubmit((prev) => ({ ...prev, address: e.target.value }));
 	};
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -189,7 +189,7 @@ const LocationModal = (props: LocationModalProps) => {
 						type="text"
 						name="location"
 						value={contentSubmit.address}
-						onChange={onChangeTitle}
+						onChange={onChangeAddress}
 						placeholder="Add a location, link or something."
 						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
 					/>

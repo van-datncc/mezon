@@ -1,7 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
-import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
+import { ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -23,7 +24,12 @@ const fetchEventManagementCached = memoizeAndTrack((mezon: MezonValueContext, cl
 });
 
 export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?: string) => {
-	return { ...eventRes, id: eventRes.id || '', channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id };
+	return {
+		...eventRes,
+		id: eventRes.id || '',
+		channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id,
+		channel_voice_id: eventRes.channel_voice_id === '0' || eventRes.channel_voice_id === '' ? '' : eventRes.channel_voice_id
+	};
 };
 
 type fetchEventManagementPayload = {
@@ -56,18 +62,6 @@ export const fetchEventManagement = createAsyncThunk(
 	}
 );
 
-type CreateEventManagementpayload = {
-	clan_id: string;
-	channel_voice_id: string;
-	address: string;
-	title: string;
-	start_time: string;
-	end_time: string;
-	description: string;
-	logo: string;
-	channel_id: string;
-};
-
 export type UpdateEventManagementPayload = {
 	event_id: string;
 	clan_id: string;
@@ -99,7 +93,7 @@ export type EventManagementOnGogoing = {
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async (
-		{ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, channel_id }: CreateEventManagementpayload,
+		{ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, channel_id, repeat_type }: ApiCreateEventRequest,
 		thunkAPI
 	) => {
 		try {
@@ -113,7 +107,8 @@ export const fetchCreateEventManagement = createAsyncThunk(
 				end_time: end_time,
 				description: description || '',
 				logo: logo || '',
-				channel_id: channel_id
+				channel_id: channel_id,
+				repeat_type: repeat_type || ERepeatType.DOES_NOT_REPEAT
 			};
 			const response = await mezon.client.createEvent(mezon.session, body);
 
@@ -132,20 +127,6 @@ type fetchDeleteEventManagementPayload = {
 	eventLabel: string;
 };
 
-export interface MezonUpdateEventBody {
-	event_id?: string;
-	address?: string;
-	channel_voice_id?: string;
-	clan_id?: string;
-	creator_id?: string;
-	description?: string;
-	end_time?: string;
-	logo?: string;
-	start_time?: string;
-	title?: string;
-	channel_id?: string;
-}
-
 export const updateEventManagement = createAsyncThunk(
 	'updateEventManagement/updateEventManagement',
 	async (
@@ -160,8 +141,9 @@ export const updateEventManagement = createAsyncThunk(
 			description,
 			logo,
 			creator_id,
-			channel_id
-		}: UpdateEventManagementPayload,
+			channel_id,
+			channel_id_old
+		}: MezonUpdateEventBody,
 		thunkAPI
 	) => {
 		try {
@@ -176,10 +158,11 @@ export const updateEventManagement = createAsyncThunk(
 				title: title,
 				clan_id: clan_id,
 				creator_id: creator_id,
-				channel_id: channel_id
+				channel_id: channel_id,
+				channel_id_old: channel_id_old
 			};
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateEvent(mezon.session, event_id, body);
+			const response = await mezon.client.updateEvent(mezon.session, event_id ?? '', body);
 		} catch (error) {
 			captureSentryError(error, 'updateEventManagement/updateEventManagement');
 			return thunkAPI.rejectWithValue(error);
@@ -229,16 +212,6 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		addCreatedEvent: (state, action) => {
-			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
-			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-			eventManagementAdapter.addOne(state, {
-				id: event_id,
-				channel_id: normalizedChannelId,
-				event_status,
-				...restPayload
-			});
-		},
 
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
@@ -248,27 +221,20 @@ export const eventManagementSlice = createSlice({
 			}
 			eventManagementAdapter.removeOne(state, event_id);
 		},
-		updateContentEvent: (state, action) => {
-			const eventUpdate = action.payload;
-			const { event_id, channel_id, event_status, ...changes } = eventUpdate;
+		upsertEvent: (state, action) => {
+			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
-			if (!existingEvent) {
-				return;
-			}
-			if (event_status === EEventStatus.COMPLETED) {
-				eventManagementAdapter.removeOne(state, event_id);
-			} else {
-				eventManagementAdapter.updateOne(state, {
-					id: event_id,
-					changes: {
-						channel_id: normalizedChannelId,
-						event_status: event_status,
-						...changes
-					}
-				});
-			}
+			const normalizedVoiceChannelId = channel_voice_id === '0' || channel_voice_id === '' ? '' : channel_voice_id;
+
+			eventManagementAdapter.upsertOne(state, {
+				id: event_id,
+				channel_id: normalizedChannelId,
+				channel_voice_id: normalizedVoiceChannelId,
+				event_status,
+				...restPayload
+			});
 		},
+
 		clearOngoingEvent: (state, action) => {
 			state.ongoingEvent = null;
 		}

@@ -2,7 +2,7 @@ import { useEscapeKeyClose } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
-import { ContenSubmitEventProps, fileTypeImage } from '@mezon/utils';
+import { ContenSubmitEventProps, ERepeatType, fileTypeImage } from '@mezon/utils';
 import { format } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
@@ -34,6 +34,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 
 	const startDate = contentSubmit.selectedDateStart.getDate();
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 	const startMonth = months[contentSubmit.selectedDateStart.getMonth()];
 	const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	const startDayOfWeek = weekdays[contentSubmit.selectedDateStart.getDay()];
@@ -51,17 +52,35 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 
 	const frequencies = useMemo(() => {
 		const options = [
-			'Does not repeat',
-			`Weekly on ${startDayOfWeek}`,
-			`Every other ${startDayOfWeek}`,
-			`Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`,
-			`Annually on ${startDate} ${startMonth}`
+			{ value: ERepeatType.DOES_NOT_REPEAT, label: 'Does not repeat' },
+			{ value: ERepeatType.WEEKLY_ON_DAY, label: `Weekly on ${startDayOfWeek}` },
+			{ value: ERepeatType.EVERY_OTHER_DAY, label: `Every other ${startDayOfWeek}` },
+			{
+				value: ERepeatType.MONTHLY,
+				label: `Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`
+			},
+			{ value: ERepeatType.ANNUALLY, label: `Annually on ${startDate} ${startMonth}` }
 		];
+
 		if (startDayOfWeek !== 'Sunday' && startDayOfWeek !== 'Saturday') {
-			options.push('Every weekday (Monday to Friday)');
+			options.push({
+				value: ERepeatType.EVERY_WEEKDAY,
+				label: 'Every weekday (Monday to Friday)'
+			});
 		}
+
 		return options;
 	}, [startDate, startDayOfWeek, startMonth, weekdayOccurrence]);
+
+	const [selectedFrequency, setSelectedFrequency] = useState(0);
+	const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const value = Number(e.target.value);
+		setSelectedFrequency(value);
+		setContentSubmit((prevContentSubmit) => ({
+			...prevContentSubmit,
+			repeatType: value
+		}));
+	};
 
 	const handleDateChangeStart = (date: Date) => {
 		setContentSubmit((prev) => ({ ...prev, selectedDateStart: date }));
@@ -82,8 +101,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
 		const formatDate = format(contentSubmit.selectedDateStart, 'yyyyMMdd');
 		const today = format(Date.now(), 'yyyyMMdd');
+		const currentTime = format(new Date(), 'HH:mm');
 		if (Number(formatDate) === Number(today)) {
-			setErrorStart(!compareTime(timeStartDefault, time, true));
+			setErrorStart(!compareTime(currentTime, time, true));
 		}
 	};
 
@@ -213,14 +233,14 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<select
 					name="frequency"
 					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					value={selectedFrequency}
+					onChange={handleFrequencyChange}
 				>
-					{frequencies.map((frequency) => {
-						return (
-							<option key={frequency} value={frequency}>
-								{frequency}
-							</option>
-						);
-					})}
+					{frequencies.map((frequency) => (
+						<option key={frequency.value} value={frequency.value}>
+							{frequency.label}
+						</option>
+					))}
 				</select>
 				{errorStart && <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p>}
 				{errorEnd && <p className="text-[#e44141] text-xs font-thin">The end time must be bigger than start time.</p>}
