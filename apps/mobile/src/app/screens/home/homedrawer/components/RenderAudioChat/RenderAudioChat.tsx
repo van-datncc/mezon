@@ -39,7 +39,7 @@ const RenderAudioChat = React.memo(({ audioURL }: { audioURL: string }) => {
 	}, [audioURL]);
 
 	const handlePlaybackStatusUpdate = useCallback((status: AVPlaybackStatusSuccess) => {
-		setTotalTime(status.durationMillis - status?.positionMillis);
+		setTotalTime(status?.durationMillis - status?.positionMillis);
 		if (status?.isLoaded && status?.didJustFinish) {
 			soundRef.current?.setPositionAsync(0);
 			soundRef.current.pauseAsync();
