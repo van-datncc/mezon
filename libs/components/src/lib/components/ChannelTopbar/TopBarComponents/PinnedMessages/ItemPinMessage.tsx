@@ -8,6 +8,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { convertTimeString } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -25,6 +26,7 @@ type ItemPinMessageProps = {
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage, onClose } = props;
+	const messageTime = convertTimeString(pinMessage?.create_time as string);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || '');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
@@ -80,10 +82,11 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				</div>
 
 				<div className="flex flex-col gap-1 text-left w-[85%] enableSelectText cursor-text">
-					<div>
-						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
+					<div className="flex items-center gap-4">
+						<div className="font-medium dark:text-textDarkTheme text-textLightTheme">
 							{namePriority ? namePriority : pinMessage.username || ''}
-						</span>
+						</div>
+						<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 					</div>
 					<div className="leading-6">
 						<MessageLine
