@@ -106,7 +106,7 @@ ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	}
 });
 
-const handleWindowAction = (window: BrowserWindow, action: string) => {
+const handleWindowAction = async (window: BrowserWindow, action: string) => {
 	if (!window || window.isDestroyed()) {
 		return;
 	}
@@ -155,6 +155,16 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
+			try {
+				const updateCheckResult = await autoUpdater.checkForUpdates();
+				if (updateCheckResult?.downloadPromise) {
+					await updateCheckResult.downloadPromise;
+					forceQuit.enable();
+					return autoUpdater.quitAndInstall();
+				}
+			} catch (error) {
+				console.error('Update check failed:', error);
+			}
 			window.close();
 			break;
 	}
