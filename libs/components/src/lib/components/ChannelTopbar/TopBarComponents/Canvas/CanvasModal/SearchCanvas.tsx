@@ -1,7 +1,11 @@
+import { useTopbarContext } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 
 const SearchCanvas = () => {
-	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {};
+	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchQuery(event.target.value.trim());
+	};
+	const { searchQuery, setSearchQuery } = useTopbarContext();
 
 	return (
 		<div className="relative">
@@ -11,6 +15,7 @@ const SearchCanvas = () => {
 					placeholder="Search for Canvas Name"
 					className="dark:text-contentTertiary text-black text-sm dark:placeholder-contentTertiary placeholder-bgPrimary placeholder:text-sm outline-none bg-transparent w-full"
 					onChange={(event) => hanldeChange(event)}
+					value={searchQuery}
 				/>
 			</div>
 			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">

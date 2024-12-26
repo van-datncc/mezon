@@ -1,5 +1,5 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
-import { useApp, useAppParams } from '@mezon/core';
+import { TopbarContextProvider, useApp, useAppParams } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -131,7 +131,9 @@ const ClanLayout = () => {
 				<div
 					className={`flex flex-col flex-1 shrink ${isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'max-sm:hidden' : ''} min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 				>
-					<ChannelTopbar channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+					<TopbarContextProvider>
+						<ChannelTopbar channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+					</TopbarContextProvider>
 					{(currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING || memberPath === currentURL) && <Outlet />}
 				</div>
 
