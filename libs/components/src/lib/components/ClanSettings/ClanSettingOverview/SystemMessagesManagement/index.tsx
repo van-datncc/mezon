@@ -42,8 +42,8 @@ const SystemMessagesManagement = ({
 	const [isBoostMessageInitial, setIsBoostMessageInitial] = useState<boolean>(systemMessage?.boost_message == '1' ? true : false);
 	const [isSetupTips, setIsSetupTips] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
 	const [isSetupTipsInitial, setIsSetupTipsInitial] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
-	const [hideAuditLog, setHideAuditLog] = useState<boolean>(systemMessage?.hide_audit_log == '1' ? true : false);
-	const [hideAuditLogIntial, setHideAuditLogIntial] = useState<boolean>(systemMessage?.hide_audit_log == '1' ? true : false);
+	const [hideAuditLog, setHideAuditLog] = useState<boolean>(systemMessage?.hide_audit_log == '0' ? true : false);
+	const [hideAuditLogIntial, setHideAuditLogIntial] = useState<boolean>(systemMessage?.hide_audit_log == '0' ? true : false);
 	useEffect(() => {
 		if (systemMessage && channelsList.length > 0) {
 			const channelsListWithoutVoiceChannel = channelsList.filter(
@@ -58,7 +58,7 @@ const SystemMessagesManagement = ({
 					welcome_sticker: isWelcomeSticker ? '1' : '0',
 					boost_message: isBoostMessage ? '1' : '0',
 					setup_tips: isSetupTips ? '1' : '0',
-					hide_audit_log: hideAuditLog ? '1' : '0'
+					hide_audit_log: hideAuditLog ? '0' : '1'
 				};
 				if (createSystemMessageRequest && createSystemMessageRequest.channel_id) {
 					onGetCreateSystemMessageRequest(createSystemMessageRequest);
@@ -77,7 +77,7 @@ const SystemMessagesManagement = ({
 			setIsBoostMessageInitial(systemMessage?.boost_message == '1' ? true : false);
 			setIsSetupTipsInitial(systemMessage?.setup_tips == '1' ? true : false);
 			onGetChannelId(systemMessageChannel?.channel_id ?? '');
-			setHideAuditLogIntial(systemMessage?.hide_audit_log == '1' ? true : false);
+			setHideAuditLogIntial(systemMessage?.hide_audit_log == '0' ? true : false);
 		}
 	}, [systemMessage, channelsList, currentClanId]);
 	useEffect(() => {
@@ -161,7 +161,7 @@ const SystemMessagesManagement = ({
 
 	const handleHideAuditLog = (checked: boolean) => {
 		setHideAuditLog(checked);
-		onHideAuditLog(checked ? '1' : '0');
+		onHideAuditLog(checked ? '0' : '1');
 	};
 
 	return (
@@ -230,7 +230,7 @@ const SystemMessagesManagement = ({
 			/>
 			<ToggleItem label={'Send a message when someone Boosts this server.'} value={isBoostMessage} handleToggle={handleBoostMessageToggle} />
 			<ToggleItem label={'Send helpful tips for server setup.'} value={isSetupTips} handleToggle={handleSetupTipsToggle} />
-			<ToggleItem label={'Hide send audit log in channel'} value={hideAuditLog} handleToggle={handleHideAuditLog} />
+			<ToggleItem label={'Send a log when an action is applied to the clan'} value={hideAuditLog} handleToggle={handleHideAuditLog} />
 		</div>
 	);
 };

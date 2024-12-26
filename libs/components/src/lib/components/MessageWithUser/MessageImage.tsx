@@ -64,14 +64,9 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+					const channelId = (currentChannelId as string) || (currentDmGroupId as string);
 					if (listAttachmentsByChannel) {
-						const imageListWithUploaderInfo = getAttachmentDataForWindow(
-							listAttachmentsByChannel,
-							currentChatUsersEntities,
-							height,
-							width
-						);
+						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
 						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
 						const channelImagesData: IImageWindowProps = {
 							channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
@@ -86,7 +81,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						.then((data) => {
 							const attachmentList = data.payload as IAttachmentEntity[];
 							const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
-							const imageListWithUploaderInfo = getAttachmentDataForWindow(imageList, currentChatUsersEntities, height, width);
+							const imageListWithUploaderInfo = getAttachmentDataForWindow(imageList, currentChatUsersEntities);
 							const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
 							return { imageListWithUploaderInfo, selectedImageIndex };
 						})
@@ -120,7 +115,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				dispatch(attachmentActions.setMessageId(messageId));
 			}
 		},
-		[width, height, listAttachmentsByChannel?.length]
+		[listAttachmentsByChannel?.length]
 	);
 
 	const [imageLoaded, setImageLoaded] = useState(false);

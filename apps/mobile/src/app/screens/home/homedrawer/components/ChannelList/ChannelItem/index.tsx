@@ -49,7 +49,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 				<ActivityIndicator color={themeValue.white} />
 			)}
 
-			<BuzzBadge channelId={data?.channel_id as string} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+			<BuzzBadge channelId={data?.channel_id as string} clanId={data?.clan_id as string} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 
 			{Number(numberNotification || 0) > 0 && <ChannelBadgeUnread countMessageUnread={Number(numberNotification || 0)} />}
 		</TouchableOpacity>

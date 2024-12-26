@@ -1,10 +1,10 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectCurrentTopicId, topicsActions, useAppDispatch } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StatusBar, View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
@@ -17,13 +17,32 @@ import TopicHeader from './TopicHeader/TopicHeader';
 import { style } from './styles';
 
 export default function TopicDiscussion() {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelKeyboardRef = useRef(null);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
+
+	useEffect(() => {
+		const focusedListener = navigation.addListener('focus', () => {
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.primary);
+			}
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		const blurListener = navigation.addListener('blur', () => {
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.secondary);
+			}
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		return () => {
+			focusedListener();
+			blurListener();
+		};
+	}, [navigation, themeBasic, themeValue.primary, themeValue.secondary]);
 
 	const styles = style(themeValue);
 	useEffect(() => {

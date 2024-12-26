@@ -161,6 +161,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					</Text>
 					<BuzzBadge
 						channelId={directMessage?.channel_id}
+						clanId={'0'}
 						mode={
 							directMessage?.type === ChannelType.CHANNEL_TYPE_DM
 								? ChannelStreamMode.STREAM_MODE_DM

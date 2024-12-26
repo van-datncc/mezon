@@ -10,6 +10,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
+import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
@@ -140,6 +141,7 @@ const HomeDefault = React.memo((props: any) => {
 					/>
 				</KeyboardAvoidingView>
 			)}
+			<AgeRestrictedModal />
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />

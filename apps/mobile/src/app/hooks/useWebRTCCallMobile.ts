@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
@@ -126,6 +126,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		const pc = new RTCPeerConnection(RTCConfig);
 		pc.addEventListener('icecandidate', async (event) => {
 			if (event?.candidate && pc?.signalingState !== 'have-local-offer') {
+				await new Promise((resolve) => setTimeout(resolve, 1000));
 				await mezon.socketRef.current?.forwardWebrtcSignaling(
 					dmUserId,
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
@@ -307,6 +308,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 						channelId,
 						userId
 					);
+					if (Platform.OS === 'android') {
+						await updatePeerConnectionOffer();
+					}
 
 					// Add stored ICE candidates
 					if (callState.storedIceCandidates) {
