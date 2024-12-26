@@ -86,8 +86,11 @@ android {
         applicationId "com.mobile.mezon"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 34
-        versionName "1.0.19"
+        versionCode 236
+        versionName "1.1.23"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
     signingConfigs {
         debug {
@@ -122,10 +125,12 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("com.facebook.react:flipper-integration")
     // If your app supports Android versions before Ice Cream Sandwich (API level 14)
     implementation 'com.facebook.fresco:animated-base-support:1.3.0'
     implementation 'com.google.mlkit:barcode-scanning:17.2.0'
+    implementation 'com.google.firebase:firebase-messaging:23.4.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation "com.airbnb.android:lottie:5.1.1"
 
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:3.1.3'
@@ -144,7 +149,8 @@ dependencies {
 }
 
 project.ext.react = [
-    enableHermes: true  // Enable Hermes
+    enableHermes: true,
+    enableFlipper: false
 ]
 
 project.ext.vectoricons = [

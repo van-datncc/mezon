@@ -18,7 +18,6 @@ import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from
 import RNCallKeep from 'react-native-callkeep';
 import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
-import uuid from 'react-native-uuid';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
@@ -347,7 +346,7 @@ export const setupCallKeep = async () => {
 	const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
 	if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED && Platform.OS === 'android') return false;
 	try {
-		await RNCallKeep.setup({
+		const options = {
 			ios: {
 				appName: 'Mezon',
 				supportsVideo: false,
@@ -370,54 +369,16 @@ export const setupCallKeep = async () => {
 					notificationIcon: 'ic_notification'
 				}
 			}
-		});
+		};
+		await RNCallKeep.setup(options);
+		if (Platform.OS === 'android') {
+			RNCallKeep.registerPhoneAccount(options);
+			RNCallKeep.registerAndroidEvents();
+			RNCallKeep.setAvailable(true);
+		}
 		return true;
 	} catch (error) {
 		console.error('initializeCallKeep error:', (error as Error)?.message);
-	}
-};
-
-const showRNNotificationCall = async (bodyData: any, callID: string) => {
-	try {
-		await notifee.cancelAllNotifications();
-		const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
-		if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED) return;
-		const answerOption = {
-			channelId: 'com.mezon.mobile',
-			channelName: 'Incoming Call',
-			notificationIcon: 'ic_notification',
-			notificationTitle: 'Incoming Call',
-			notificationBody: `${bodyData?.callerName} is calling you`,
-			answerText: 'Answer',
-			declineText: 'Decline',
-			isVideo: false,
-			displayCallReachabilityTimeout: 30000,
-			notificationColor: 'colorAccent',
-			notificationSound: 'ringing',
-			payload: {
-				offer: bodyData?.offer,
-				callerId: bodyData?.callerId,
-				callerAvatar: bodyData?.callerAvatar,
-				callerName: bodyData?.callerName
-			}
-		};
-		RNNotificationCall.displayNotification(callID, bodyData?.callerAvatar, 30000, answerOption);
-		RNNotificationCall.addEventListener('endCall', (data: any) => {
-			const { payload = {} } = data || {};
-			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}'), isDecline: true });
-			}, 3000);
-		});
-		RNNotificationCall.addEventListener('answer', (data: any) => {
-			RNNotificationCall.hideNotification();
-			RNNotificationCall.backToApp();
-			const { payload = {} } = data || {};
-			setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: safeJSONParse(payload || '{}') });
-			}, 3000);
-		});
-	} catch (error) {
-		/* empty */
 	}
 };
 
@@ -430,7 +391,7 @@ const listRNCallKeep = async (bodyData: any) => {
 			setTimeout(() => {
 				RNCallKeep.endCall(callUUID);
 				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
-			}, 3000);
+			}, 2000);
 		});
 		RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
 			RNCallKeep.endCall(callUUID);
@@ -443,7 +404,7 @@ export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = safeJSONParse(body || '{}');
 		if (bodyData?.offer === 'CANCEL_CALL') {
-			const callID = load('callID');
+			const callID = '6cb67209-4ef9-48c0-a8dc-2cec6cd6261d';
 			if (callID) {
 				if (Platform.OS === 'android') {
 					RNNotificationCall.hideNotification();
@@ -454,21 +415,17 @@ export const setupIncomingCall = async (body: string) => {
 			}
 			return;
 		}
-		// const statusSetup = await setupCallKeep();
-		// if (!statusSetup) return;
-		const options = {
-			playSound: true,
-			vibration: true,
-			sound: 'ringing',
-			vibrationPattern: [0, 500, 1000],
-			timeout: 30000
-		};
-		const callID = uuid.v4()?.toString();
-		save('callID', callID);
-		if (Platform.OS === 'android') {
-			await showRNNotificationCall(bodyData, callID);
-		} else {
-			RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', false, options);
+		if (Platform.OS === 'ios') {
+			const options = {
+				playSound: true,
+				vibration: true,
+				sound: 'ringing',
+				vibrationPattern: [0, 500, 1000],
+				timeout: 30000
+			};
+			const callID = '6cb67209-4ef9-48c0-a8dc-2cec6cd6261d';
+			save('callID', callID);
+			RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', true, options);
 			await listRNCallKeep(bodyData);
 		}
 	} catch (error) {
