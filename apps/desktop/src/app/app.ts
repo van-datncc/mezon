@@ -323,7 +323,6 @@ export default class App {
 
 			loadContent();
 			this.imageViewerWindow?.show();
-			this.imageViewerWindow?.focus();
 		}
 
 		if (!App.application.isPackaged) {
@@ -348,6 +347,7 @@ export default class App {
 		ipcMain.on(GET_ATTACHMENT_DATA, () => {
 			this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
 		});
+		this.imageViewerWindow?.focus();
 
 		return this.imageViewerWindow;
 	}

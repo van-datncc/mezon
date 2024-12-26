@@ -1093,8 +1093,8 @@ export const getAttachmentDataForWindow = (
 				name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
 			},
 			url: createImgproxyUrl(image.url || '', {
-				width: Math.round(image.width || 0),
-				height: Math.round(image.hight || 0),
+				width: image.width ? (image.width > 1920 ? 1920 : image.width) : 0,
+				height: image.height ? (image.height > 1080 ? 1080 : image.height) : 0,
 				resizeType: 'fit'
 			})
 		};
