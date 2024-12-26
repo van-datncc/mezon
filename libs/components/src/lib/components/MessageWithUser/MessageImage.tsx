@@ -64,7 +64,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+					const channelId = (currentChannelId as string) || (currentDmGroupId as string);
 					if (listAttachmentsByChannel) {
 						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
 						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
