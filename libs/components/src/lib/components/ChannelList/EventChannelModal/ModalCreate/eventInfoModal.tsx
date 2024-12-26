@@ -82,8 +82,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
 		const formatDate = format(contentSubmit.selectedDateStart, 'yyyyMMdd');
 		const today = format(Date.now(), 'yyyyMMdd');
+		const currentTime = format(new Date(), 'HH:mm');
 		if (Number(formatDate) === Number(today)) {
-			setErrorStart(!compareTime(timeStartDefault, time, true));
+			setErrorStart(!compareTime(currentTime, time, true));
 		}
 	};
 
