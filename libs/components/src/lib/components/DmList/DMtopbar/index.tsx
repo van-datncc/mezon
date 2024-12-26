@@ -17,7 +17,8 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	toastActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
@@ -249,7 +250,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
-	const isShowPinBadge = useSelector(selectIsShowPinBadgeByDmId(directId as string));
+	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, directId as string));
 
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);

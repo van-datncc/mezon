@@ -485,6 +485,7 @@ export const directSlice = createSlice({
 		},
 		setShowPinBadgeOfDM: (state, action: PayloadAction<{ dmId: string; isShow: boolean }>) => {
 			const { dmId, isShow } = action.payload;
+			if (!state.entities?.[dmId]) return;
 			state.entities[dmId].showPinBadge = isShow;
 		}
 	},
@@ -626,4 +627,7 @@ export const selectBuzzStateByDirectId = createSelector(
 	(state, channelId) => state.buzzStateDirect?.[channelId]
 );
 
-export const selectIsShowPinBadgeByDmId = (dmId: string) => createSelector(getDirectState, (state) => state.entities[dmId].showPinBadge);
+export const selectIsShowPinBadgeByDmId = createSelector(
+	[getDirectState, (state, dmId: string) => dmId],
+	(state, dmId) => state?.entities[dmId]?.showPinBadge
+);

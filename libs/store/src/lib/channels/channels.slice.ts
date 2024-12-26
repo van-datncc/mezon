@@ -930,6 +930,10 @@ export const channelsSlice = createSlice({
 
 		setShowPinBadgeOfChannel: (state, action: PayloadAction<{ clanId: string; channelId: string; isShow: boolean }>) => {
 			const { clanId, channelId, isShow } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			if (!state.byClans[clanId].entities.entities?.[channelId]) return;
 			state.byClans[clanId].entities.entities[channelId].showPinBadge = isShow;
 		}
 	},
