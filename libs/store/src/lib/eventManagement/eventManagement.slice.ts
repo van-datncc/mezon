@@ -1,7 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
-import { IEventManagement, LoadingStatus } from '@mezon/utils';
+import { ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -61,18 +62,6 @@ export const fetchEventManagement = createAsyncThunk(
 	}
 );
 
-type CreateEventManagementpayload = {
-	clan_id: string;
-	channel_voice_id: string;
-	address: string;
-	title: string;
-	start_time: string;
-	end_time: string;
-	description: string;
-	logo: string;
-	channel_id: string;
-};
-
 export type UpdateEventManagementPayload = {
 	event_id: string;
 	clan_id: string;
@@ -104,7 +93,7 @@ export type EventManagementOnGogoing = {
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async (
-		{ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, channel_id }: CreateEventManagementpayload,
+		{ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, channel_id, repeat_type }: ApiCreateEventRequest,
 		thunkAPI
 	) => {
 		try {
@@ -118,7 +107,8 @@ export const fetchCreateEventManagement = createAsyncThunk(
 				end_time: end_time,
 				description: description || '',
 				logo: logo || '',
-				channel_id: channel_id
+				channel_id: channel_id,
+				repeat_type: repeat_type || ERepeatType.DOES_NOT_REPEAT
 			};
 			const response = await mezon.client.createEvent(mezon.session, body);
 
@@ -265,27 +255,6 @@ export const eventManagementSlice = createSlice({
 				});
 			}
 		},
-
-		// if (event_status === EEventStatus.COMPLETED) {
-		// 	eventManagementAdapter.removeOne(state, event_id);
-		// 	action.dispatch(
-		// 		fetchDeleteEventManagement({
-		// 			eventID: event_id,
-		// 			clanId: restPayload.clan_id,
-		// 			creatorId: restPayload.creator_id,
-		// 			eventLabel: restPayload.event_label
-		// 		})
-		// 	);
-		// } else {
-		// 	eventManagementAdapter.updateOne(state, {
-		// 		id: event_id,
-		// 		changes: {
-		// 			channel_id: normalizedChannelId,
-		// 			event_status,
-		// 			...restPayload
-		// 		}
-		// 	});
-		// }
 
 		updateContentEvent: (state, action) => {
 			const eventUpdate = action.payload;

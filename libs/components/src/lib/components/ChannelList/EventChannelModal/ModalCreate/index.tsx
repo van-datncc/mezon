@@ -8,7 +8,7 @@ import {
 	selectVoiceChannelAll,
 	useAppSelector
 } from '@mezon/store';
-import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
+import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatTimeStringToHourFormat, formatToLocalDateString, getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
@@ -118,7 +118,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 			timeValueEnd,
 			contentSubmit.description,
 			contentSubmit.logo,
-			contentSubmit.textChannelId as string
+			contentSubmit.textChannelId as string,
+			contentSubmit.repeatType as ERepeatType
 		);
 
 		hanldeCloseModal();
