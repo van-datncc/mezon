@@ -816,7 +816,8 @@ export enum NotificationCode {
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
 	USER_REPLIED = -11,
-	NOTIFICATION_CLAN = -12
+	NOTIFICATION_CLAN = -12,
+	NOTIFICATION_TOPIC = -13
 }
 
 export enum ChannelIsNotThread {
