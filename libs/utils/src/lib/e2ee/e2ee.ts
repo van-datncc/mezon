@@ -274,6 +274,77 @@ export class PrivateKeyMaterial {
 			await keyStore.close();
 		}
 	}
+
+	async encryptWithPIN(pin: string): Promise<string> {
+		const salt = window.crypto.getRandomValues(new Uint8Array(16));
+		const keyMaterial = await subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
+
+		const key = await subtle.deriveKey(
+			{
+				name: 'PBKDF2',
+				salt: salt,
+				iterations: 100000,
+				hash: 'SHA-256'
+			},
+			keyMaterial,
+			{ name: 'AES-GCM', length: 256 },
+			false,
+			['encrypt']
+		);
+
+		const iv = window.crypto.getRandomValues(new Uint8Array(12));
+		const privateKeyData = await this.jsonable(true);
+		const encryptedData = await subtle.encrypt(
+			{
+				name: 'AES-GCM',
+				iv: iv
+			},
+			key,
+			new TextEncoder().encode(JSON.stringify(privateKeyData))
+		);
+
+		const encryptedArray = new Uint8Array(salt.length + iv.length + encryptedData.byteLength);
+		encryptedArray.set(salt, 0);
+		encryptedArray.set(iv, salt.length);
+		encryptedArray.set(new Uint8Array(encryptedData), salt.length + iv.length);
+
+		return base64Encode(encryptedArray);
+	}
+
+	static async decryptWithPIN(encryptedData: string, pin: string): Promise<PrivateKeyMaterial> {
+		const encryptedArray = new Uint8Array(base64Decode(encryptedData));
+
+		const salt = encryptedArray.slice(0, 16);
+		const iv = encryptedArray.slice(16, 28);
+		const data = encryptedArray.slice(28);
+
+		const keyMaterial = await subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
+
+		const key = await subtle.deriveKey(
+			{
+				name: 'PBKDF2',
+				salt: salt,
+				iterations: 100000,
+				hash: 'SHA-256'
+			},
+			keyMaterial,
+			{ name: 'AES-GCM', length: 256 },
+			false,
+			['decrypt']
+		);
+
+		const decryptedData = await subtle.decrypt(
+			{
+				name: 'AES-GCM',
+				iv: iv
+			},
+			key,
+			data
+		);
+
+		const privateKeyData = JSON.parse(new TextDecoder().decode(decryptedData));
+		return PrivateKeyMaterial.fromJsonable(privateKeyData, true, true);
+	}
 }
 
 export async function getECPubkeyID(pubkey: CryptoKey): Promise<ArrayBuffer> {
@@ -507,6 +578,29 @@ export class MessageCrypt {
 		}
 
 		return pubKeyMaterial;
+	}
+
+	static async encryptPrivateKeyWithPIN(userID: string, pin: string): Promise<string> {
+		const keyStore = await KeyStore.open();
+		try {
+			const ecdhKey = await keyStore.loadKey('ecdh_' + userID);
+			const ecdsaKey = await keyStore.loadKey('ecdsa_' + userID);
+			const privateKeyMaterial = new PrivateKeyMaterial(ecdhKey, ecdsaKey);
+			return privateKeyMaterial.encryptWithPIN(pin);
+		} finally {
+			await keyStore.close();
+		}
+	}
+
+	static async decryptPrivateKeyWithPIN(encryptedKey: string, pin: string, userID: string): Promise<void> {
+		const privateKeyMaterial = await PrivateKeyMaterial.decryptWithPIN(encryptedKey, pin);
+		const keyStore = await KeyStore.open();
+		try {
+			await keyStore.saveKey('ecdh_' + userID, privateKeyMaterial.ecdh, true);
+			await keyStore.saveKey('ecdsa_' + userID, privateKeyMaterial.ecdsa, true);
+		} finally {
+			await keyStore.close();
+		}
 	}
 
 	static async encryptMessage(message: string, recipients: PublicKeyMaterial[], userID: string) {
