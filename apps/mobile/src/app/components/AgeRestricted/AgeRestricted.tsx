@@ -16,11 +16,14 @@ const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
 
 	const styles = style(themeValue);
 	const handleSaveChannel = () => {
-		const channelIds = load(STORAGE_AGE_RESTRICTED_CHANNEL_IDS) || [];
-		if (!channelIds?.includes(currentChannelId) && currentChannelId) {
+		const storedData = load(STORAGE_AGE_RESTRICTED_CHANNEL_IDS) || '[]';
+		const channelIds = JSON.parse(storedData);
+
+		if (currentChannelId && !channelIds.includes(currentChannelId)) {
 			channelIds.push(currentChannelId);
+			save(STORAGE_AGE_RESTRICTED_CHANNEL_IDS, JSON.stringify(channelIds));
 		}
-		save(STORAGE_AGE_RESTRICTED_CHANNEL_IDS, JSON.stringify(channelIds));
+
 		onClose();
 	};
 
@@ -29,7 +32,7 @@ const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
 	};
 
 	return (
-		<Block backgroundColor={themeValue.secondaryWeight} borderRadius={size.s_10} padding={size.s_20}>
+		<Block backgroundColor={themeValue.secondary} borderRadius={size.s_10} padding={size.s_20}>
 			<Block flexDirection="row" alignItems="center" justifyContent="center">
 				<Icons.AgeRestrictedWarningIcon width={size.s_100} height={size.s_100} />
 			</Block>

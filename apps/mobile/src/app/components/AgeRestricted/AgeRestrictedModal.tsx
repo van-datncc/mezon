@@ -1,5 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { STORAGE_AGE_RESTRICTED_CHANNEL_IDS, load } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectCurrentChannel } from '@mezon/store-mobile';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, View } from 'react-native';
@@ -12,9 +13,9 @@ const AgeRestrictedModal = () => {
 	const [isShowAgeRestricted, setIsShowAgeRestricted] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { userProfile } = useAuth();
-
+	const { themeValue } = useTheme();
 	useEffect(() => {
-		const savedChannelIds = load(STORAGE_AGE_RESTRICTED_CHANNEL_IDS);
+		const savedChannelIds = load(STORAGE_AGE_RESTRICTED_CHANNEL_IDS) || [];
 		if (!savedChannelIds?.includes(currentChannel?.channel_id) && (currentChannel as ChannelsEntity)?.age_restricted === 1) {
 			setIsShowAgeRestricted(true);
 		} else {
@@ -29,12 +30,13 @@ const AgeRestrictedModal = () => {
 
 	return (
 		<Modal
-			isVisible={true}
+			isVisible={isShowAgeRestricted}
 			animationIn={'bounceIn'}
 			animationOut={'bounceOut'}
 			hasBackdrop={true}
 			avoidKeyboard={false}
-			backdropColor={'rgba(0,0,0, 0.7)'}
+			backdropOpacity={1}
+			backdropColor={themeValue.secondary}
 			coverScreen={false}
 			deviceHeight={Dimensions.get('screen').height}
 		>
