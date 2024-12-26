@@ -990,7 +990,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[channelId]
 	);
-
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
@@ -1003,13 +1002,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const shouldRemoveEvent = isActionCreating && isEventRepeat && isEventCompleted;
 
 			try {
+				// Handling remove event logic
 				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+					return;
 				}
 
-				if (isActionCreating) {
+				// Handling event creation
+				if (isActionCreating && !isActionDeleting) {
 					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+					return;
 				}
+
+				// Handling event update
 				if (isActionUpdating) {
 					const newChannelId = eventCreatedEvent.channel_id;
 					const notUpdateChannelId = !newChannelId || newChannelId === '0';
@@ -1017,15 +1022,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 					if (notUpdateChannelId || userHasChannel) {
 						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+						return;
 					} else {
 						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+						return;
 					}
 				}
 			} catch (error) {
 				console.error('Error handling eventCreatedEvent:', error);
 			}
 		},
-		[dispatch, allThreadChannelPrivateIds]
+		[dispatch, allThreadChannelPrivateIds] // Add dependencies if applicable
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
