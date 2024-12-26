@@ -47,7 +47,7 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 	}, [usernames, userIds]);
 
 	const handlePressNotify = async () => {
-		onPressNotify(notify);
+		await onPressNotify(notify);
 		const store = await getStoreAsync();
 		const promises = [];
 		promises.push(store.dispatch(topicsActions.setValueTopic(message)));
