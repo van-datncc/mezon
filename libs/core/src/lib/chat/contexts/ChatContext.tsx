@@ -67,6 +67,7 @@ import {
 	EEventAction,
 	EEventStatus,
 	EOverriddenPermission,
+	ERepeatType,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
 	ModeResponsive,
@@ -992,30 +993,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
-			if (eventCreatedEvent.action === EEventAction.CREATED) {
-				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
-				if (isEventCompleted) {
+			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
+			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
+			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+			// check repeat
+			const isEventRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
+			// check status
+			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+			const shouldRemoveEvent = isActionCreating && isEventRepeat && isEventCompleted;
+
+			try {
+				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
-				} else {
+				}
+
+				if (isActionCreating) {
 					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
 				}
-			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
-				const newChannelId = eventCreatedEvent.channel_id;
-				if (!newChannelId || newChannelId === '0') {
-					dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
-				} else {
+				if (isActionUpdating) {
+					const newChannelId = eventCreatedEvent.channel_id;
+					const notUpdateChannelId = !newChannelId || newChannelId === '0';
 					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
-					if (userHasChannel) {
-						dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+
+					if (notUpdateChannelId || userHasChannel) {
+						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
 					} else {
 						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 					}
 				}
-			} else if (eventCreatedEvent.action === EEventAction.DELETE) {
-				dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+			} catch (error) {
+				console.error('Error handling eventCreatedEvent:', error);
 			}
 		},
-		[dispatch]
+		[dispatch, allThreadChannelPrivateIds]
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
