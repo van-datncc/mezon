@@ -22,7 +22,8 @@
         "thread": {
           "title": "",
           "threads": "Threads",
-          "searchThreads": "Search Thread"
+          "searchThreads": "Search Thread",
+          "searchFiles": "Search Files"
         },
         "organizationMenu": {
             "title": "",

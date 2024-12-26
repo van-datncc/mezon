@@ -8,11 +8,12 @@ import { style } from './styles';
 
 type BuzzBadgeProps = {
 	channelId: string;
+	clanId: string;
 	mode: ChannelStreamMode;
 	customStyles?: TextStyle;
 };
 
-function BuzzBadge({ channelId, mode, customStyles }: BuzzBadgeProps) {
+function BuzzBadge({ channelId, clanId, mode, customStyles }: BuzzBadgeProps) {
 	const dispatch = useDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -24,7 +25,7 @@ function BuzzBadge({ channelId, mode, customStyles }: BuzzBadgeProps) {
 
 	const resetBuzzState = useCallback(() => {
 		if (isChannelOrThread) {
-			dispatch(channelsActions.setBuzzState({ channelId, buzzState: null }));
+			dispatch(channelsActions.setBuzzState({ channelId, clanId, buzzState: null }));
 		} else if (isPosDmOrGr) {
 			dispatch(directActions.setBuzzStateDirect({ channelId, buzzState: null }));
 		}
