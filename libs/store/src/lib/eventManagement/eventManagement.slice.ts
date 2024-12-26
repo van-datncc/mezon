@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
+import { IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -229,16 +229,6 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		addCreatedEvent: (state, action) => {
-			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
-			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-			eventManagementAdapter.addOne(state, {
-				id: event_id,
-				channel_id: normalizedChannelId,
-				event_status,
-				...restPayload
-			});
-		},
 
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
@@ -248,26 +238,68 @@ export const eventManagementSlice = createSlice({
 			}
 			eventManagementAdapter.removeOne(state, event_id);
 		},
-		updateContentEvent: (state, action) => {
-			const eventUpdate = action.payload;
-			const { event_id, channel_id, event_status, ...changes } = eventUpdate;
+		upsertEvent: (state, action) => {
+			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
 			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
 			if (!existingEvent) {
-				return;
-			}
-			if (event_status === EEventStatus.COMPLETED) {
-				eventManagementAdapter.removeOne(state, event_id);
+				eventManagementAdapter.addOne(state, {
+					id: event_id,
+					channel_id: normalizedChannelId,
+					event_status,
+					...restPayload
+				});
 			} else {
 				eventManagementAdapter.updateOne(state, {
 					id: event_id,
 					changes: {
 						channel_id: normalizedChannelId,
-						event_status: event_status,
-						...changes
+						event_status,
+						...restPayload
 					}
 				});
 			}
+		},
+
+		// if (event_status === EEventStatus.COMPLETED) {
+		// 	eventManagementAdapter.removeOne(state, event_id);
+		// 	action.dispatch(
+		// 		fetchDeleteEventManagement({
+		// 			eventID: event_id,
+		// 			clanId: restPayload.clan_id,
+		// 			creatorId: restPayload.creator_id,
+		// 			eventLabel: restPayload.event_label
+		// 		})
+		// 	);
+		// } else {
+		// 	eventManagementAdapter.updateOne(state, {
+		// 		id: event_id,
+		// 		changes: {
+		// 			channel_id: normalizedChannelId,
+		// 			event_status,
+		// 			...restPayload
+		// 		}
+		// 	});
+		// }
+
+		updateContentEvent: (state, action) => {
+			const eventUpdate = action.payload;
+			const { event_id, channel_id, event_status, ...changes } = eventUpdate;
+			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+
+			if (!existingEvent) {
+				return;
+			}
+
+			eventManagementAdapter.updateOne(state, {
+				id: event_id,
+				changes: {
+					channel_id: normalizedChannelId,
+					event_status: event_status,
+					...changes
+				}
+			});
 		},
 		clearOngoingEvent: (state, action) => {
 			state.ongoingEvent = null;

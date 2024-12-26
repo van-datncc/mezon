@@ -65,6 +65,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import {
 	EEventAction,
+	EEventStatus,
 	EOverriddenPermission,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
@@ -118,7 +119,7 @@ import {
 	VoiceLeavedEvent,
 	WebrtcSignalingFwd
 } from 'mezon-js';
-import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -990,9 +991,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventcreated = useCallback(
-		(eventCreatedEvent: ApiCreateEventRequest) => {
+		(eventCreatedEvent: any) => {
 			if (eventCreatedEvent.action === EEventAction.CREATED) {
-				dispatch(eventManagementActions.addCreatedEvent(eventCreatedEvent));
+				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+				if (isEventCompleted) {
+					const eventClanId = eventCreatedEvent.clan_id;
+					const eventId = eventCreatedEvent.event_id;
+					const eventCreatorId = eventCreatedEvent.creator_id;
+					const eventLabel = eventCreatedEvent.title;
+					dispatch(
+						eventManagementActions.fetchDeleteEventManagement({
+							clanId: eventClanId,
+							eventID: eventId,
+							creatorId: eventCreatorId,
+							eventLabel: eventLabel
+						})
+					);
+					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+				} else {
+					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+				}
 			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
 				const newChannelId = eventCreatedEvent.channel_id;
 				const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
