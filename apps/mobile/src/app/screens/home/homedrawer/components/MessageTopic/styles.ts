@@ -11,6 +11,7 @@ export const style = (colors: Attributes) =>
 		},
 		container: {
 			marginVertical: size.s_2,
+			marginBottom: size.s_4,
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_4

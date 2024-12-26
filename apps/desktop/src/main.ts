@@ -1,5 +1,6 @@
 import { BrowserWindow, app, dialog, ipcMain, screen, shell } from 'electron';
 import log from 'electron-log/main';
+import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -19,6 +20,7 @@ import {
 } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
+import { forceQuit } from './app/utils';
 import openImagePopup from './assets/image-window/image_window_2';
 import { environment } from './environments/environment';
 export type ImageWindowProps = {
@@ -154,7 +156,14 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
-			window.close();
+			autoUpdater.checkForUpdates().then((data) => {
+				if (!data?.updateInfo) {
+					window.close();
+				} else {
+					forceQuit.enable();
+					return autoUpdater.quitAndInstall();
+				}
+			});
 			break;
 	}
 };

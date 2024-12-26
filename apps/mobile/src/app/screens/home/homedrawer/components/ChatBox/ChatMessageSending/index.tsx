@@ -338,22 +338,25 @@ export const ChatMessageSending = memo(
 			[currentChannel?.channel_id, currentChannel?.clan_id, currentTopicId, dispatch, sendMessageTopic, valueTopic?.id, userProfile?.user?.id]
 		);
 
+		const startRecording = async () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_START_RECORD_MESSAGE);
+		};
+
+		const stopRecording = async () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_STOP_RECORD_MESSAGE);
+		};
+
 		return (
 			<Block alignItems="center" justifyContent="center">
-				{(isAvailableSending || !!attachmentDataRef?.length) && (
+				{isAvailableSending || !!attachmentDataRef?.length ? (
 					<TouchableOpacity activeOpacity={0.8} onPress={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 						<Icons.SendMessageIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
 					</TouchableOpacity>
+				) : (
+					<TouchableOpacity onLongPress={startRecording} onPressOut={stopRecording} style={[styles.btnIcon, styles.iconVoice]}>
+						<Icons.MicrophoneIcon width={size.s_18} height={size.s_18} color={themeValue.textStrong} />
+					</TouchableOpacity>
 				)}
-				{/*{isAvailableSending || !!attachmentDataRef?.length ? (*/}
-				{/*	<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>*/}
-				{/*		<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />*/}
-				{/*	</View>*/}
-				{/*) : (*/}
-				{/*	<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })} style={styles.btnIcon}>*/}
-				{/*		<Icons.MicrophoneIcon width={22} height={22} color={themeValue.textStrong} />*/}
-				{/*	</TouchableOpacity>*/}
-				{/*)}*/}
 			</Block>
 		);
 	}

@@ -10,7 +10,7 @@ import { style } from './styles';
 
 interface IEventTimeProps {
 	event: EventManagementEntity;
-	eventStatus: string;
+	eventStatus: number;
 }
 
 export function EventTime({ event, eventStatus }: IEventTimeProps) {
