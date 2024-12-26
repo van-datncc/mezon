@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useChatSending, useIdleRender, useMenu } from '@mezon/core';
+import { useChatSending, useIdleRender, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
@@ -9,6 +9,7 @@ import {
 	directActions,
 	pinMessageActions,
 	selectCloseMenu,
+	selectCurrentDM,
 	selectDmGroupCurrent,
 	selectIsInCall,
 	selectIsShowMemberListDM,
@@ -249,17 +250,17 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
-	const { directId } = useAppParams();
-	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, directId as string));
+	const currentDm = useSelector(selectCurrentDM);
+	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, currentDm?.id as string));
 
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
 
 	const handleShowPinMessage = async () => {
-		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directId as string }));
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentDm?.id as string }));
 		setIsShowPinMessage(!isShowPinMessage);
 		if (isShowPinBadge) {
-			dispatch(directActions.setShowPinBadgeOfDM({ dmId: directId as string, isShow: false }));
+			dispatch(directActions.setShowPinBadgeOfDM({ dmId: currentDm?.id as string, isShow: false }));
 		}
 	};
 
