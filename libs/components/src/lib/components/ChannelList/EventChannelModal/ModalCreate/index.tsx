@@ -72,11 +72,11 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentEvent, eventChannel]);
 
 	const choiceSpeaker = useMemo(() => {
-		return isExistChannelVoice || option === OptionEvent.OPTION_SPEAKER;
+		return (isExistChannelVoice || option === OptionEvent.OPTION_SPEAKER) && option !== OptionEvent.OPTION_LOCATION;
 	}, [isExistChannelVoice, option]);
 
 	const choiceLocation = useMemo(() => {
-		return isExistAddress || option === OptionEvent.OPTION_LOCATION;
+		return (isExistAddress || option === OptionEvent.OPTION_LOCATION) && option !== OptionEvent.OPTION_SPEAKER;
 	}, [isExistAddress, option]);
 
 	const handleNext = (currentModal: number) => {

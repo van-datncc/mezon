@@ -188,7 +188,7 @@ const LocationModal = (props: LocationModalProps) => {
 					<input
 						type="text"
 						name="location"
-						value={contentSubmit.address}
+						value={contentSubmit.titleEvent}
 						onChange={onChangeTitle}
 						placeholder="Add a location, link or something."
 						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}

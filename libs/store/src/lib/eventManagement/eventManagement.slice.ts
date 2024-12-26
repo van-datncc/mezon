@@ -23,7 +23,12 @@ const fetchEventManagementCached = memoizeAndTrack((mezon: MezonValueContext, cl
 });
 
 export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?: string) => {
-	return { ...eventRes, id: eventRes.id || '', channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id };
+	return {
+		...eventRes,
+		id: eventRes.id || '',
+		channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id,
+		channel_voice_id: eventRes.channel_voice_id === '0' || eventRes.channel_voice_id === '' ? '' : eventRes.channel_voice_id
+	};
 };
 
 type fetchEventManagementPayload = {
