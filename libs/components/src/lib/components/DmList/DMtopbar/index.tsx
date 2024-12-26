@@ -6,11 +6,13 @@ import {
 	RootState,
 	appActions,
 	audioCallActions,
+	directActions,
 	pinMessageActions,
 	selectCloseMenu,
 	selectDmGroupCurrent,
 	selectIsInCall,
 	selectIsShowMemberListDM,
+	selectIsShowPinBadgeByDmId,
 	selectIsUseProfileDM,
 	selectStatusMenu,
 	selectTheme,
@@ -246,6 +248,8 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
+	const { directId } = useAppParams();
+	const isShowPinBadge = useSelector(selectIsShowPinBadgeByDmId(directId as string));
 
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
@@ -253,20 +257,24 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleShowPinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directId as string }));
 		setIsShowPinMessage(!isShowPinMessage);
+		if (isShowPinBadge) {
+			dispatch(directActions.setShowPinBadgeOfDM({ dmId: directId as string, isShow: false }));
+		}
 	};
 
 	const handleClose = useCallback(() => {
 		setIsShowPinMessage(false);
 	}, []);
 
-	const { directId } = useAppParams();
-
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
 			<Tippy className={`${isShowPinMessage && 'hidden'} w-[142px] ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Pinned Messages">
 				<div>
-					<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+					<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 						<Icons.PinRight isWhite={isShowPinMessage} />
+						{isShowPinBadge && (
+							<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
+						)}
 					</button>
 				</div>
 			</Tippy>

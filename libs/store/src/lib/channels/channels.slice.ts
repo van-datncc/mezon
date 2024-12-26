@@ -59,6 +59,7 @@ export const CHANNELS_FEATURE_KEY = 'channels';
  */
 export interface ChannelsEntity extends IChannel {
 	id: string; // Primary ID
+	showPinBadge?: boolean;
 }
 
 function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
@@ -925,6 +926,11 @@ export const channelsSlice = createSlice({
 				state.byClans[clanId] = getInitialClanState();
 			}
 			state.byClans[clanId].buzzState[channelId] = buzzState;
+		},
+
+		setShowPinBadgeOfChannel: (state, action: PayloadAction<{ clanId: string; channelId: string; isShow: boolean }>) => {
+			const { clanId, channelId, isShow } = action.payload;
+			state.byClans[clanId].entities.entities[channelId].showPinBadge = isShow;
 		}
 	},
 	extraReducers: (builder) => {
@@ -1203,6 +1209,12 @@ export const selectFetchChannelStatus = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => state.byClans[clanId]?.fetchChannelSuccess ?? false
 );
+
+export const selectIsShowPinBadgeByChannelId = (channelId: string) =>
+	createSelector(
+		[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+		(state, clanId) => state.byClans[clanId]?.entities.entities[channelId]?.showPinBadge
+	);
 
 export const selectAnyUnreadChannels = createSelector(
 	[getChannelsState, selectEntiteschannelCategorySetting, (state: RootState) => state.clans.currentClanId as string],
