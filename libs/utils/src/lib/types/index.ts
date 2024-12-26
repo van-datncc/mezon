@@ -764,7 +764,6 @@ export enum MentionTypeEnum {
 
 export type ContenSubmitEventProps = {
 	topic: string;
-	titleEvent: string;
 	timeStart: string;
 	timeEnd: string;
 	selectedDateStart: Date;

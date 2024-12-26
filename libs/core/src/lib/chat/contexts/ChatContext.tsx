@@ -994,11 +994,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(eventCreatedEvent: any) => {
 			if (eventCreatedEvent.action === EEventAction.CREATED) {
 				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+
 				if (isEventCompleted) {
 					const eventClanId = eventCreatedEvent.clan_id;
 					const eventId = eventCreatedEvent.event_id;
 					const eventCreatorId = eventCreatedEvent.creator_id;
 					const eventLabel = eventCreatedEvent.title;
+
 					dispatch(
 						eventManagementActions.fetchDeleteEventManagement({
 							clanId: eventClanId,
@@ -1013,11 +1015,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
 				const newChannelId = eventCreatedEvent.channel_id;
-				const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
-				if (userHasChannel) {
+				if (!newChannelId || newChannelId === '0') {
 					dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
 				} else {
-					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
+					if (userHasChannel) {
+						dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+					} else {
+						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+					}
 				}
 			} else if (eventCreatedEvent.action === EEventAction.DELETE) {
 				dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));

@@ -38,7 +38,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
 		topic: currentEvent ? currentEvent.title || '' : '',
-		titleEvent: currentEvent ? currentEvent.title || '' : '',
+		address: currentEvent ? currentEvent?.address || '' : '',
 		timeStart: currentEvent ? currentEvent.start_time || '00:00' : '00:00',
 		timeEnd: currentEvent ? currentEvent.end_time || '00:00' : '00:00',
 		selectedDateStart: currentEvent ? new Date(formatToLocalDateString(currentEvent.start_time || '')) : new Date(),
@@ -46,8 +46,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		voiceChannel: currentEvent ? currentEvent?.channel_voice_id || '' : '',
 		logo: currentEvent ? currentEvent.logo || '' : '',
 		description: currentEvent ? currentEvent.description || '' : '',
-		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
-		address: currentEvent ? currentEvent?.address || '' : ''
+		textChannelId: currentEvent ? currentEvent.channel_id || '' : ''
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);
@@ -105,7 +104,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const handleSubmit = async () => {
 		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
-		const title = choiceLocation ? contentSubmit.titleEvent : '';
+		const address = choiceLocation ? contentSubmit.address : '';
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
@@ -113,7 +112,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		await createEventManagement(
 			currentClanId || '',
 			voice,
-			title,
+			address as string,
 			contentSubmit.topic,
 			timeValueStart,
 			timeValueEnd,
@@ -126,7 +125,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	};
 
 	const handleUpdate = async () => {
-		const title = choiceLocation ? contentSubmit.titleEvent : '';
+		const address = choiceLocation ? contentSubmit.address : '';
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
@@ -136,7 +135,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			eventId || '',
 			currentClanId || '',
 			voiceChannel,
-			title,
+			address as string,
 			contentSubmit.topic,
 			timeValueStart,
 			timeValueEnd,
@@ -166,12 +165,12 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentModal, contentSubmit.topic]);
 
 	useEffect(() => {
-		if ((choiceLocation && contentSubmit.titleEvent === '') || (choiceSpeaker && contentSubmit.voiceChannel === '')) {
+		if ((choiceLocation && contentSubmit.address === '') || (choiceSpeaker && contentSubmit.voiceChannel === '')) {
 			setErrorOption(true);
 		} else {
 			setErrorOption(false);
 		}
-	}, [choiceLocation, choiceSpeaker, contentSubmit.titleEvent, contentSubmit.voiceChannel, option]);
+	}, [choiceLocation, choiceSpeaker, contentSubmit.address, contentSubmit.voiceChannel, option]);
 
 	const defaultTimeStart = useMemo(() => getCurrentTimeRounded(), []);
 	const defaultTimeEnd = useMemo(() => getCurrentTimeRounded(true), []);
