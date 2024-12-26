@@ -994,21 +994,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(eventCreatedEvent: any) => {
 			if (eventCreatedEvent.action === EEventAction.CREATED) {
 				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
-
 				if (isEventCompleted) {
-					const eventClanId = eventCreatedEvent.clan_id;
-					const eventId = eventCreatedEvent.event_id;
-					const eventCreatorId = eventCreatedEvent.creator_id;
-					const eventLabel = eventCreatedEvent.title;
-
-					dispatch(
-						eventManagementActions.fetchDeleteEventManagement({
-							clanId: eventClanId,
-							eventID: eventId,
-							creatorId: eventCreatorId,
-							eventLabel: eventLabel
-						})
-					);
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 				} else {
 					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
