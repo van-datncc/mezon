@@ -1,5 +1,6 @@
 import accountSetting from './accountSetting.json';
 import activityApp from './activityApp.json';
+import ageRestricted from './ageRestricted.json';
 import appThemeSetting from './appThemeSetting.json';
 import appearanceSetting from './appearanceSetting.json';
 import auditLog from './auditLog.json';
@@ -89,5 +90,6 @@ export default {
 	streamingRoom,
 	clanIntegrationsSetting,
 	activityApp,
-	auditLog
+	auditLog,
+	ageRestricted
 };
