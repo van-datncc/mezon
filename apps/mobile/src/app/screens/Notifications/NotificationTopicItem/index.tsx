@@ -1,6 +1,6 @@
 import { useAuth, useGetPriorityNameFromUserClan } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
-import { getStoreAsync, selectAllUserClans, topicsActions, useAppSelector } from '@mezon/store-mobile';
+import { getStoreAsync, selectAllUserClans, selectMemberClanByUserId, topicsActions, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -26,6 +26,7 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 	const initMessage = JSON.parse(notify?.subject)?.t;
 	const userIds = notify.content.repliers;
 	const [subjectTopic, setSubjectTopic] = useState('');
+	const lastSentUser = useAppSelector(selectMemberClanByUserId(notify.sender_id ?? ''));
 
 	const usernames = useMemo(() => {
 		return memberClan
@@ -85,7 +86,7 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 							{data.content.t}
 						</Text>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							<Text style={styles.username}>{`${usernames[usernames.length - 1]}: `} </Text>
+							<Text style={styles.username}>{`${lastSentUser ? lastSentUser?.user?.username : 'Sender'}: `} </Text>
 							{initMessage}
 						</Text>
 					</View>
