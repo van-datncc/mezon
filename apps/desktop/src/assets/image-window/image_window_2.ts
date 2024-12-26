@@ -1,10 +1,25 @@
+import { IImageWindowProps } from '@mezon/utils';
 import { BrowserWindow, ipcMain, screen } from 'electron';
 import { join } from 'path';
-import { format } from 'url';
 import App from '../../app/app';
-import { electronAppName } from '../../app/constants';
-import { SET_ATTACHMENT_DATA } from '../../app/events/constants';
-function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.mainWindow, params?: Record<string, string>) {
+
+type ImageData = {
+	filename: string;
+	size: number;
+	url: string;
+	filetype: string;
+	width: number;
+	height: number;
+	sender_id: string;
+	create_time: string;
+	uploaderData: {
+		name: string;
+		avatar: string;
+	};
+	channelImagesData: IImageWindowProps;
+};
+
+function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.mainWindow, params?: Record<string, string>) {
 	const parentBounds = parentWindow.getBounds();
 	const screenBounds = screen.getPrimaryDisplay().workAreaSize;
 
@@ -21,7 +36,6 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
 		height,
 		x,
 		y,
-		parent: parentWindow,
 		frame: false,
 		alwaysOnTop: true,
 		transparent: true,
@@ -38,14 +52,6 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
 		movable: true, // Allow moving
 		hasShadow: true
 	});
-
-	const filePath = App.application.isPackaged ? 'assets/image-window/image-window.js' : 'apps/desktop/src/assets/image-window/image-window.js';
-	const baseUrl = App.application.isPackaged ? join(__dirname, '..', electronAppName, filePath) : join(__dirname, '..', '..', '..', filePath);
-	let fullUrl = baseUrl;
-	if (params) {
-		const queryString = generateQueryString(params);
-		fullUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-	}
 
 	const imageViewerHtml = `
      <!DOCTYPE html>
@@ -96,10 +102,12 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
   <div id="channel-label" class="channel-label"></div>
   <div class="image-view">
     <div class="selected-image-wrapper">
-      <img id="selectedImage" class="selected-image" src="${imageUrl}" />
+      <img id="selectedImage" class="selected-image" src="${imageData.url}" />
     </div>
     <div id="thumbnails" class="thumbnail-container">
-      <div id="thumbnails-content" class="thumbnails-content"></div>
+      <div id="thumbnails-content" class="thumbnails-content">
+      ${listThumnails(imageData.channelImagesData.images)}
+      </div>
     </div>
   </div>
   <div class="bottom-bar">
@@ -176,14 +184,6 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
 </body>
 </html>
   `;
-	popupWindow.loadFile(
-		format({
-			pathname: fullUrl,
-			protocol: 'file:',
-			slashes: true,
-			query: params
-		})
-	);
 	// Load the HTML content
 	popupWindow.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(imageViewerHtml));
 
@@ -203,7 +203,6 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
 	// Show window when ready with fade-in effect
 	popupWindow.once('ready-to-show', () => {
 		popupWindow.show();
-		popupWindow.webContents.send(SET_ATTACHMENT_DATA, App.attachmentData);
 
 		popupWindow.setOpacity(0);
 		setTimeout(() => {
@@ -228,20 +227,7 @@ function openImagePopup(imageUrl: string, parentWindow: BrowserWindow = App.main
 		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW');
 	});
 
-window.electron.on('APP::SET_ATTACHMENT_DATA', (event, data) => {
-console.log("Herre");
-		handleAttachmentData(data);
-	});
-
-	window.electron.on('APP::SET_CURRENT_IMAGE', (event, data) => {
-		selectedImage.src = data.url;
-	});
-
-	window.electron.on('APP::CHANGE_ATTACHMENT_LIST', () => {
-		window.electron.send('APP::GET_ATTACHMENT_DATA');
-	});
-
-	window.electron.send('APP::GET_ATTACHMENT_DATA');
+      ${scriptThumnails(imageData.channelImagesData.images)}
 
 
       `);
@@ -264,13 +250,41 @@ const generateQueryString = (params: Record<string, string>): string => {
 		.join('&');
 };
 
+function formatDate(dateString) {
+	return new Date(dateString).toLocaleDateString();
+}
+
+const listThumnails = (listImage) => {
+	return listImage
+		.map((image, index) => {
+			const currentDate = formatDate(image.create_time);
+			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
+			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
+			return ` <div class="thumbnail-wrapper" id="thumbnail-${index}"> ${dateLabel} <img class="thumbnail" src="${image.url}" alt="${image.filename}" /> </div> `;
+		})
+		.join('');
+};
+
+const scriptThumnails = (listImage) => {
+	return listImage
+		.map((image, index) => {
+			const currentDate = formatDate(image.create_time);
+			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
+			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
+			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
+        selectedImage.src = '${image.url}';
+      });`;
+		})
+		.join('');
+};
+
 const css = `
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     height: 100vh;
     /*display: flex;*/
-    /* background-color: #1a1a1a;*/
+    background-color: #1a1a1a;
     color: white;
     overflow: hidden;
 }

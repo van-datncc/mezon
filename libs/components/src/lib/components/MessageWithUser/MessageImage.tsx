@@ -53,14 +53,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 			if (isElectron()) {
 				const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
-				window.electron.openImageWindow({
-					...attachmentData,
-					uploaderData: {
-						name:
-							currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
-						avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
-					}
-				});
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
@@ -79,7 +71,18 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 							selectedImageIndex: selectedImageIndex
 						};
 
-						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+						window.electron.openImageWindow({
+							...attachmentData,
+							uploaderData: {
+								name:
+									currentImageUploader?.clan_nick ||
+									currentImageUploader?.user?.display_name ||
+									currentImageUploader?.user?.username ||
+									'',
+								avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+							},
+							channelImagesData
+						});
 						return;
 					}
 					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }))
@@ -97,6 +100,18 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 								selectedImageIndex: selectedImageIndex
 							};
 							window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+							window.electron.openImageWindow({
+								...attachmentData,
+								uploaderData: {
+									name:
+										currentImageUploader?.clan_nick ||
+										currentImageUploader?.user?.display_name ||
+										currentImageUploader?.user?.username ||
+										'',
+									avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+								},
+								channelImagesData
+							});
 						});
 				}
 			} else {
