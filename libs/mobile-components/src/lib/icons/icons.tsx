@@ -390,8 +390,11 @@ export function CameraIcon({ width = 16, height = 16, color = 'white', ...props 
 
 export function PlayIcon({ width = 16, height = 16, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
-			<Path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80v352c0 17.4 9.4 33.4 24.5 41.9S58.2 482 73 473l288-176c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z" />
+		<Svg width={width} height={height} viewBox="0 0 28 32" fill={color} {...props}>
+			<Path
+				d="M26.525 13.419L4.525.412C2.737-.644 0 .382 0 2.994V29c0 2.344 2.544 3.756 4.525 2.581l22-13c1.963-1.156 1.969-4.006 0-5.162z"
+				fill={color}
+			/>
 		</Svg>
 	);
 }
