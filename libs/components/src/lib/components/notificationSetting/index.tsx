@@ -26,7 +26,7 @@ export type ModalParam = {
 export const customStyles = {
 	control: (provided: any) => ({
 		...provided,
-		backgroundColor: 'black'
+		backgroundColor: '#2B2D31'
 	}),
 	menu: (provided: any) => ({
 		...provided,
@@ -52,6 +52,10 @@ export const customStyles = {
 			backgroundColor: '#36393e',
 			color: 'white'
 		}
+	}),
+	input: (provided: any) => ({
+		...provided,
+		color: '#FFFFFF'
 	})
 };
 

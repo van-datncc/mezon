@@ -1,10 +1,12 @@
+import { useEscapeKeyClose } from '@mezon/core';
 import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
+import { ContenSubmitEventProps, OptionEvent, filterOptionReactSelect } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
+import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
 
 export type LocationModalProps = {
@@ -15,10 +17,18 @@ export type LocationModalProps = {
 	choiceSpeaker: boolean;
 	handleOption: (optionEvent: string) => void;
 	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
+	onClose: () => void;
 };
 
+type OptionType = {
+	value: string;
+	label: JSX.Element;
+};
+
+type FilterOptionType = (option: FilterOptionOption<OptionType>, inputValue: string) => boolean;
+
 const LocationModal = (props: LocationModalProps) => {
-	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels } = props;
+	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels, onClose } = props;
 	const [errorVoice, setErrorVoice] = useState(false);
 
 	const handleChangeVoice = (selectedOption: any) => {
@@ -67,7 +77,7 @@ const LocationModal = (props: LocationModalProps) => {
 		setIsClear(true);
 		setContentSubmit((prevContentSubmit) => ({
 			...prevContentSubmit,
-			textChannelId: undefined // Clear the selected channel ID
+			textChannelId: undefined
 		}));
 	};
 	const optionsTextChannel = useMemo(
@@ -110,9 +120,11 @@ const LocationModal = (props: LocationModalProps) => {
 	);
 
 	const showClearButton = selectedOption ? true : false;
-
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+	const memoizedFilterOption = useMemo<FilterOptionType>(() => (option, inputValue) => filterOptionReactSelect(option, inputValue), []);
 	return (
-		<div>
+		<div ref={modalRef}>
 			<div className="flex flex-col mb-4">
 				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Where is your event?</h3>
 				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
@@ -166,6 +178,8 @@ const LocationModal = (props: LocationModalProps) => {
 					value={options.find((option) => option.value === contentSubmit.voiceChannel)}
 					onChange={handleChangeVoice}
 					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+					placeholder="Search voice channels..."
+					filterOption={memoizedFilterOption}
 				/>
 			)}
 			{choiceLocation && (
@@ -189,8 +203,11 @@ const LocationModal = (props: LocationModalProps) => {
 				options={optionsTextChannel}
 				value={isClear ? null : selectedOption}
 				onChange={handleSelectChannelAudience}
-				styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+				styles={customStyles}
+				placeholder="Search channels..."
+				filterOption={memoizedFilterOption}
 			/>
+
 			{showClearButton && (
 				<div className="flex justify-end mt-1">
 					<button onClick={handleClearAudience} className="text-blue-500 hover:underline">

@@ -1,5 +1,6 @@
 import { BrowserWindow, app, dialog, ipcMain, screen, shell } from 'electron';
 import log from 'electron-log/main';
+import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -19,6 +20,7 @@ import {
 } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
+import { forceQuit } from './app/utils';
 import { environment } from './environments/environment';
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
@@ -104,7 +106,7 @@ ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	}
 });
 
-const handleWindowAction = (window: BrowserWindow, action: string) => {
+const handleWindowAction = async (window: BrowserWindow, action: string) => {
 	if (!window || window.isDestroyed()) {
 		return;
 	}
@@ -153,6 +155,16 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
+			try {
+				const updateCheckResult = await autoUpdater.checkForUpdates();
+				if (updateCheckResult?.downloadPromise) {
+					await updateCheckResult.downloadPromise;
+					forceQuit.enable();
+					return autoUpdater.quitAndInstall();
+				}
+			} catch (error) {
+				console.error('Update check failed:', error);
+			}
 			window.close();
 			break;
 	}

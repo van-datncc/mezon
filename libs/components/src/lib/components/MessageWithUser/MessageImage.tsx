@@ -1,11 +1,19 @@
-import { useAppParams, useAttachments, useCurrentChat } from '@mezon/core';
-import { attachmentActions, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, selectCurrentDM, useAppDispatch } from '@mezon/store';
+import { useAttachments, useCurrentChat } from '@mezon/core';
+import {
+	attachmentActions,
+	selectAllListAttachmentByChannel,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectCurrentDM,
+	useAppDispatch
+} from '@mezon/store';
 import {
 	IAttachmentEntity,
 	IImageWindowProps,
 	SEND_ATTACHMENT_DATA,
 	SHOW_POSITION,
 	createImgproxyUrl,
+	getAttachmentDataForWindow,
 	notImplementForGifOrStickerSendFromPanel
 } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -23,22 +31,22 @@ export type MessageImage = {
 };
 
 const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
-	const imageUrlKey = `${attachmentData.url}?timestamp=${new Date().getTime()}`;
-	const { directId } = useAppParams();
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const { setImageURL, setPositionShow } = useMessageContextMenu();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { directId: currentDmGroupId } = useAppParams();
 	const [showLoader, setShowLoader] = useState(false);
-	const fadeIn = useRef(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
+	const currentChannelId = currentChannel?.id;
+	const currentDmGroupId = currentDm?.id;
+
 	const { currentChatUsersEntities } = useCurrentChat();
+	const listAttachmentsByChannel = useSelector((state) => selectAllListAttachmentByChannel(state, currentChannelId || currentDmGroupId || ''));
 	let width = attachmentData.width || 0;
 	let height = attachmentData.height || 150;
+
 	const handleClick = useCallback(
 		(url: string) => {
 			if (checkImage) return;
@@ -57,31 +65,29 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
-					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId, noCache: true }))
+					if (listAttachmentsByChannel) {
+						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
+						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
+						const channelImagesData: IImageWindowProps = {
+							channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+							images: imageListWithUploaderInfo,
+							selectedImageIndex: selectedImageIndex
+						};
+
+						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+						return;
+					}
+					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }))
 						.then((data) => {
 							const attachmentList = data.payload as IAttachmentEntity[];
 							const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
-							const imageListWithUploaderInfo = imageList.map((image) => {
-								const uploader = currentChatUsersEntities?.[image.uploader as string];
-								return {
-									...image,
-									uploaderData: {
-										avatar: (uploader?.clan_avatar || uploader?.user?.avatar_url) as string,
-										name: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username || ''
-									},
-									url: createImgproxyUrl(image.url || '', {
-										width: Math.round(width),
-										height: Math.round(height),
-										resizeType: 'fit'
-									})
-								};
-							});
+							const imageListWithUploaderInfo = getAttachmentDataForWindow(imageList, currentChatUsersEntities);
 							const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
 							return { imageListWithUploaderInfo, selectedImageIndex };
 						})
 						.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
 							const channelImagesData: IImageWindowProps = {
-								channelLabel: (directId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+								channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
 								images: imageListWithUploaderInfo,
 								selectedImageIndex: selectedImageIndex
 							};
@@ -109,7 +115,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				dispatch(attachmentActions.setMessageId(messageId));
 			}
 		},
-		[width, height]
+		[listAttachmentsByChannel?.length]
 	);
 
 	const [imageLoaded, setImageLoaded] = useState(false);
@@ -131,7 +137,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		loaderTimeoutRef.current = setTimeout(() => {
 			if (!imageLoaded) {
 				setShowLoader(true);
-				fadeIn.current = true;
 			}
 		}, 500);
 
@@ -172,9 +177,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
 						draggable="false"
-						key={imageUrlKey}
 						onContextMenu={handleContextMenu}
-						className={` flex object-cover object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						className={` flex object-cover object-left-top rounded cursor-default`}
 						style={{ width: width || 'auto', height, cursor: 'pointer' }}
 						src={createImgproxyUrl(attachmentData.url ?? '', { width: 600, height: 300, resizeType: 'fit' })}
 						alt={'message'}

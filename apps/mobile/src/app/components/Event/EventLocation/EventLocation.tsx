@@ -14,7 +14,7 @@ export function EventLocation({ event }: IEventLocation) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
-	const channelVoice = useAppSelector((state) => selectChannelById(state, event?.channel_id || ''));
+	const channelVoice = useAppSelector((state) => selectChannelById(state, event?.channel_voice_id || ''));
 	// const channelFirst = useSelector(selectChannelFirst);
 
 	const joinVoiceChannel = async () => {
