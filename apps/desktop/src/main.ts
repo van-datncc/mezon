@@ -155,14 +155,7 @@ const handleWindowAction = (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
-			autoUpdater.checkForUpdates().then((data) => {
-				if (!data?.updateInfo) {
-					window.close();
-				} else {
-					forceQuit.enable();
-					return autoUpdater.quitAndInstall();
-				}
-			});
+			window.close();
 			break;
 	}
 };
