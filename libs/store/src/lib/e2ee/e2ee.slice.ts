@@ -17,6 +17,7 @@ export interface PubKeyEntity {
 export interface E2eeState extends EntityState<PubKeyEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	openModalE2ee: boolean;
 }
 
 export interface E2eeRootState {
@@ -61,13 +62,18 @@ export const getPubKeys = createAsyncThunk(
 export const initialE2eeState: E2eeState = e2eeAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
-	error: null
+	error: null,
+	openModalE2ee: false
 });
 
 export const e2eeSlice = createSlice({
 	name: E2EE_FEATURE_KEY,
 	initialState: initialE2eeState,
-	reducers: {},
+	reducers: {
+		setOpenModalE2ee(state, action) {
+			state.openModalE2ee = action.payload;
+		}
+	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(getPubKeys.pending, (state: E2eeState) => {
@@ -129,3 +135,5 @@ export const checkE2EE = (clanId: string, channelId: string, thunkAPI: GetThunkA
 	const enableE2ee = currentDM?.e2ee === 1;
 	return isEnableE2EE(enableE2ee, clanId);
 };
+
+export const selectOpenModalE2ee = createSelector(getE2eeState, (state) => state.openModalE2ee);

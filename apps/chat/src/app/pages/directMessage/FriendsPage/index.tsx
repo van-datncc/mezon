@@ -1,8 +1,9 @@
-import { useEscapeKey, useFriends, useMenu } from '@mezon/core';
+import { useAuth, useEscapeKey, useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
 	RootState,
 	channelsActions,
+	e2eeActions,
 	friendsActions,
 	requestAddFriendParam,
 	selectCloseMenu,
@@ -11,7 +12,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Button, Icons, Image, InputField } from '@mezon/ui';
-import { isMacDesktop } from '@mezon/utils';
+import { MessageCrypt, isMacDesktop } from '@mezon/utils';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ActivityList from './ActivityList';
@@ -31,6 +32,18 @@ const FriendsPage = () => {
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
+	const [isShowBtnPin, setIsShowBtnPin] = useState(false);
+	const { userProfile } = useAuth();
+
+	useEffect(() => {
+		if (userProfile?.encrypt_private_key) {
+			MessageCrypt.checkExistingKeys(userProfile?.user?.id as string).then((found) => {
+				if (found) {
+					setIsShowBtnPin(true);
+				}
+			});
+		}
+	}, [userProfile?.encrypt_private_key, userProfile?.user?.id]);
 
 	const handleChangeTab = (valueTab: string) => {
 		dispatch(friendsActions.changeCurrentStatusTab(valueTab));
@@ -39,6 +52,10 @@ const FriendsPage = () => {
 
 	const handleOpenRequestFriend = () => {
 		setOpenModalAddFriend(true);
+	};
+
+	const handleOpenModalE2ee = () => {
+		dispatch(e2eeActions.setOpenModalE2ee(true));
 	};
 
 	const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
@@ -169,6 +186,15 @@ const FriendsPage = () => {
 					>
 						Add Friend
 					</button>
+					{!isShowBtnPin && (
+						<button
+							className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 font-medium text-white bg-[#248046]`}
+							onClick={handleOpenModalE2ee}
+							style={{ whiteSpace: 'nowrap' }}
+						>
+							{!userProfile?.encrypt_private_key ? 'Create PIN' : 'Confirm PIN'}
+						</button>
+					)}
 				</div>
 			</div>
 			<div className="flex-1 flex w-full h-full">

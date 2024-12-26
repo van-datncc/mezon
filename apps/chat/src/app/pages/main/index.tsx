@@ -6,7 +6,6 @@ import {
 	MessageModalImage,
 	ModalCall,
 	ModalCreateClan,
-	ModalSendCode,
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
@@ -19,6 +18,7 @@ import {
 	audioCallActions,
 	channelsActions,
 	clansActions,
+	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
 	listChannelsByUserActions,
@@ -48,6 +48,7 @@ import {
 	selectLogoCustom,
 	selectOnboardingMode,
 	selectOpenModalAttachment,
+	selectOpenModalE2ee,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectStreamMembersByChannelId,
@@ -69,6 +70,7 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
+import MultiStepModal from 'libs/components/src/lib/components/ModalSendCode';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -261,7 +263,7 @@ function MyApp() {
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
-	const [showPopup, setShowPopup] = useState(true);
+	const openModalE2ee = useSelector(selectOpenModalE2ee);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -282,6 +284,10 @@ function MyApp() {
 	const previewMode = useSelector(selectOnboardingMode);
 
 	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
+
+	const handleClose = () => {
+		dispatch(e2eeActions.setOpenModalE2ee(false));
+	};
 
 	return (
 		<div
@@ -317,7 +323,7 @@ function MyApp() {
 				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{showPopup && <ModalSendCode onClose={() => setShowPopup(false)} />}
+			{openModalE2ee && <MultiStepModal onClose={handleClose} />}
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 					<MessageModalImage />
