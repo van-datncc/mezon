@@ -119,7 +119,7 @@ import {
 	VoiceLeavedEvent,
 	WebrtcSignalingFwd
 } from 'mezon-js';
-import { ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -991,7 +991,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventcreated = useCallback(
-		(eventCreatedEvent: any) => {
+		(eventCreatedEvent: ApiCreateEventRequest) => {
 			if (eventCreatedEvent.action === EEventAction.CREATED) {
 				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
 				if (isEventCompleted) {
