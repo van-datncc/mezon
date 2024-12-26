@@ -17,14 +17,14 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 			notify?.code !== NotificationCode.USER_MENTIONED &&
 			notify?.code !== NotificationCode.NOTIFICATION_CLAN &&
 			notify?.code !== NotificationCode.NOTIFICATION_TOPIC,
-		[notify]
+		[notify?.code]
 	);
 
-	const isNotificationTopicItem = useMemo(() => notify.code === NotificationCode.NOTIFICATION_TOPIC, [notify]);
+	const isNotificationTopicItem = useMemo(() => notify.code === NotificationCode.NOTIFICATION_TOPIC, [notify.code]);
 
 	const isNotificationMentionItem = useMemo(
 		() => notify?.code === NotificationCode.USER_REPLIED || notify?.code === NotificationCode.USER_MENTIONED,
-		[notify]
+		[notify.code]
 	);
 
 	const isNotificationWebhookClan = useMemo(() => notify?.code === NotificationCode.NOTIFICATION_CLAN, [notify]);

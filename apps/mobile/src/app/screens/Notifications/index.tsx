@@ -74,7 +74,7 @@ const Notifications = () => {
 	}, [allTopics]);
 
 	const mergeNotifications = useMemo(() => {
-		return [...notification, ...topicsNotification];
+		return [...(notification || []), ...(topicsNotification || [])];
 	}, [notification, topicsNotification]);
 
 	useFocusEffect(
