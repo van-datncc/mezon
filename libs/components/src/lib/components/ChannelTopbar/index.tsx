@@ -1,6 +1,7 @@
 import { useAppNavigation, useIdleRender, usePathMatch } from '@mezon/core';
 import {
 	appActions,
+	channelsActions,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
@@ -16,6 +17,7 @@ import {
 	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
+	selectIsShowPinBadgeByChannelId,
 	selectIsThreadModalVisible,
 	selectStatusMenu,
 	selectTheme,
@@ -302,10 +304,14 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const isShowPinMessage = useSelector(selectIsPinModalVisible);
 	const pinRef = useRef<HTMLDivElement | null>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
-
+	const currentClanId = useSelector(selectCurrentClanId) as string;
+	const isShowPinBadge = useSelector(selectIsShowPinBadgeByChannelId(currentChannelId));
 	const handleTogglePinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
 		dispatch(pinMessageActions.togglePinModal());
+		if (isShowPinBadge) {
+			dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: currentClanId, channelId: currentChannelId, isShow: false }));
+		}
 	};
 
 	return (
@@ -316,6 +322,9 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 			>
 				<button className="focus-visible:outline-none relative" onClick={handleTogglePinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
+					{isShowPinBadge && (
+						<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
+					)}
 				</button>
 			</Tippy>
 			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleTogglePinMessage} />}
