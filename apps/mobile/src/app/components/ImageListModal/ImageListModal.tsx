@@ -1,5 +1,5 @@
 import { Block, Colors, size, Text } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
+import { AttachmentEntity, selectAllListAttachmentByChannel, selectCurrentChannelId } from '@mezon/store-mobile';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -35,7 +35,8 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const [currentScale, setCurrentScale] = useState(1);
 	const [showSavedImage, setShowSavedImage] = useState(false);
 	const [isLoadingSaveImage, setIsLoadingSaveImage] = useState(false);
-	const allImageList = useSelector(selectAttachmentPhoto());
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const allImageList = useSelector((state) => selectAllListAttachmentByChannel(state, currentChannelId));
 	const ref = useRef<GalleryRef>(null);
 	const footerTimeoutRef = useRef<NodeJS.Timeout>(null);
 	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
