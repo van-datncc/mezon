@@ -1002,11 +1002,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
-			// check repeat
-			const isEventRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
-			// check status
+			// Check repeat
+			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
+			// Check status
 			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
-			const shouldRemoveEvent = isActionCreating && isEventRepeat && isEventCompleted;
+			const shouldRemoveEvent = isActionCreating && isEventNotRepeat && isEventCompleted;
 
 			try {
 				// Handling remove event logic
@@ -1039,7 +1039,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				console.error('Error handling eventCreatedEvent:', error);
 			}
 		},
-		[dispatch, allThreadChannelPrivateIds] // Add dependencies if applicable
+		[dispatch, allThreadChannelPrivateIds]
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {

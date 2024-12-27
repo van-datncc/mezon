@@ -225,7 +225,6 @@ export const eventManagementSlice = createSlice({
 			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
 			const normalizedVoiceChannelId = channel_voice_id === '0' || channel_voice_id === '' ? '' : channel_voice_id;
-
 			eventManagementAdapter.upsertOne(state, {
 				id: event_id,
 				channel_id: normalizedChannelId,
