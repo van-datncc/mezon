@@ -471,6 +471,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onpinmessage = useCallback(
 		(pin: LastPinMessageEvent) => {
 			if (!pin?.channel_id) return;
+
+			if (pin.clan_id) {
+				dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: pin.clan_id, channelId: pin.channel_id, isShow: true }));
+			} else {
+				dispatch(directActions.setShowPinBadgeOfDM({ dmId: pin?.channel_id, isShow: true }));
+			}
+
 			if (pin.operation === 1) {
 				dispatch(pinMessageActions.clearPinMessagesCacheThunk(pin.channel_id));
 			}

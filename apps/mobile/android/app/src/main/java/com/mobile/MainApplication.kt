@@ -14,6 +14,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
+import com.mezon.mobile.SharedPreferencesPackage;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -25,7 +26,9 @@ class MainApplication : Application(), ReactApplication {
         override fun getPackages(): List<ReactPackage> {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
-          return PackageList(this).packages
+          val packages = PackageList(this).packages.toMutableList()
+          packages.add(SharedPreferencesPackage())
+          return packages;
         }
 
         override fun getJSMainModuleName(): String = "src/main"
@@ -52,5 +55,8 @@ class MainApplication : Application(), ReactApplication {
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig)
+  }
+  fun getReactNativeHostInstance(): ReactNativeHost {
+    return reactNativeHost
   }
 }

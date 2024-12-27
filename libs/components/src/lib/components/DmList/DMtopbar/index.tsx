@@ -1,21 +1,25 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useAppParams, useChatSending, useIdleRender, useMenu } from '@mezon/core';
+import { useChatSending, useIdleRender, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
 	RootState,
 	appActions,
 	audioCallActions,
+	directActions,
 	pinMessageActions,
 	selectCloseMenu,
+	selectCurrentDM,
 	selectDmGroupCurrent,
 	selectIsInCall,
 	selectIsShowMemberListDM,
+	selectIsShowPinBadgeByDmId,
 	selectIsUseProfileDM,
 	selectStatusMenu,
 	selectTheme,
 	toastActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Icons } from '@mezon/ui';
@@ -246,27 +250,33 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
+	const currentDm = useSelector(selectCurrentDM);
+	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, currentDm?.id as string));
 
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement>(null);
 
 	const handleShowPinMessage = async () => {
-		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directId as string }));
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentDm?.id as string }));
 		setIsShowPinMessage(!isShowPinMessage);
+		if (isShowPinBadge) {
+			dispatch(directActions.setShowPinBadgeOfDM({ dmId: currentDm?.id as string, isShow: false }));
+		}
 	};
 
 	const handleClose = useCallback(() => {
 		setIsShowPinMessage(false);
 	}, []);
 
-	const { directId } = useAppParams();
-
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
 			<Tippy className={`${isShowPinMessage && 'hidden'} w-[142px] ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Pinned Messages">
 				<div>
-					<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+					<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 						<Icons.PinRight isWhite={isShowPinMessage} />
+						{isShowPinBadge && (
+							<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
+						)}
 					</button>
 				</div>
 			</Tippy>

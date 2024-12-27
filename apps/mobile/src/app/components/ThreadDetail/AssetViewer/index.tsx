@@ -39,9 +39,9 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 
 	const headerTablist = useMemo(() => {
 		if (
-			currentChannel.parrent_id === '0' &&
-			currentChannel.type !== ChannelType.CHANNEL_TYPE_DM &&
-			currentChannel.type !== ChannelType.CHANNEL_TYPE_GROUP
+			currentChannel?.parrent_id === '0' &&
+			currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM &&
+			currentChannel?.type !== ChannelType.CHANNEL_TYPE_GROUP
 		) {
 			return TabList;
 		}
