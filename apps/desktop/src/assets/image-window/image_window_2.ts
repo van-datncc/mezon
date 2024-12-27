@@ -1,8 +1,27 @@
-import { IImageWindowProps } from '@mezon/utils';
 import { BrowserWindow, ipcMain, screen } from 'electron';
 import { join } from 'path';
 import App from '../../app/app';
 import image_window_css from './image-window-css';
+
+import { ApiChannelAttachment } from 'mezon-js/api.gen';
+
+interface IAttachmentEntity extends ApiChannelAttachment {
+	id: string;
+	channelId?: string;
+	clanId?: string;
+}
+
+interface IAttachmentEntityWithUploader extends IAttachmentEntity {
+	uploaderData: {
+		avatar: string;
+		name: string;
+	};
+}
+interface IImageWindowProps {
+	channelLabel: string;
+	selectedImageIndex: number;
+	images: Array<IAttachmentEntityWithUploader>;
+}
 
 export type ImageData = {
 	filename: string;
@@ -214,7 +233,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 	});
 
 	popupWindow.webContents.on('did-finish-load', () => {
-		popupWindow.webContents.openDevTools();
 		popupWindow.webContents.executeJavaScript(`
 
 	    const selectedImage = document.getElementById('selectedImage');
@@ -240,7 +258,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
  document.getElementById('downloadBtn').addEventListener('click', () => {
 
   window.electron.dowloadImage(currentImageUrl.url);
-
 
 });
 
@@ -343,14 +360,6 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
  });
 
-
-
-
-
-
-
-
-
  `;
 };
 
@@ -401,13 +410,7 @@ const scriptDrag = () => {
 		currentZoom = Math.max(1, Math.min(currentZoom + delta, 5));
  selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom}) \`;
 
-
-
   }, { passive: false });
-
-
-
-
 
   `;
 };
