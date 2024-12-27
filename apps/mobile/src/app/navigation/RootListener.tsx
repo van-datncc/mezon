@@ -216,7 +216,7 @@ const RootListener = () => {
 						await jumpToChannel(currentChannelId, clanId);
 					} else {
 						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
-						if (clanResp && !clanId) {
+						if (clanResp) {
 							await setCurrentClanLoader(clanResp.payload);
 						}
 					}

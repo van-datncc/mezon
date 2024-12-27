@@ -69,7 +69,9 @@ export const AuthenticationLoader = () => {
 	}, [loadFRMConfig, userProfile?.user?.username]);
 
 	useEffect(() => {
-		setupCallKeep();
+		if (Platform.OS === 'ios') {
+			setupCallKeep();
+		}
 		setupNotificationListeners(navigation);
 	}, [navigation]);
 
@@ -121,7 +123,7 @@ export const AuthenticationLoader = () => {
 						isAnswerCall: true
 					}
 				});
-			}, 2000);
+			}, 1000);
 		});
 
 		return () => {
@@ -198,7 +200,13 @@ export const AuthenticationLoader = () => {
 		const timestamp = Math.round(Date.now() / 1000);
 		if (linkMatch) {
 			const channelId = linkMatch?.[2];
-			dispatch(channelsActions.setBuzzState({ channelId: channelId, buzzState: { isReset: true, senderId: '', timestamp } }));
+			dispatch(
+				channelsActions.setBuzzState({
+					clanId: channelId as string,
+					channelId,
+					buzzState: null
+				})
+			);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
 			const channelId = linkDirectMessageMatch[1];

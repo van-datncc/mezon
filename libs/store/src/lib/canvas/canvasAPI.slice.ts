@@ -284,7 +284,11 @@ export const selectAllCanvas = createSelector(getCanvasApiState, (canvasState) =
 });
 
 export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (state, channelId) => {
-	return state?.channelCanvas[channelId]?.ids || [];
+	const entities = state?.channelCanvas[channelId]?.entities || {};
+	return Object.values(entities).map((entity) => ({
+		...entity,
+		title: entity.title || 'Untitled'
+	}));
 });
 
 export const selectCanvasEntityById = createSelector(

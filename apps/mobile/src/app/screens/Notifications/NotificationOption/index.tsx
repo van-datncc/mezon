@@ -47,6 +47,11 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 					title: t('tabNotify.messages'),
 					icon: <Icons.ChatIcon color={themeValue.textStrong} />,
 					component: <Btn val={EActionDataNotify.Messages} />
+				},
+				{
+					title: t('tabNotify.topics'),
+					icon: <Icons.DiscussionIcon color={themeValue.textStrong} />,
+					component: <Btn val={EActionDataNotify.Topics} />
 				}
 			] satisfies IMezonMenuItemProps[],
 		[]

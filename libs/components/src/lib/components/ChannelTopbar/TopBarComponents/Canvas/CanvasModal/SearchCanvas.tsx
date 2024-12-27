@@ -1,8 +1,9 @@
 import { Icons } from '@mezon/ui';
 
-const SearchCanvas = () => {
-	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {};
-
+const SearchCanvas = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<React.SetStateAction<string>> }) => {
+	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setKeywordSearch(event.target.value.trim());
+	};
 	return (
 		<div className="relative">
 			<div className={`transition-all duration-300 w-56 h-6 pl-4 pr-2 py-3 dark:bg-[#151515] bg-bgLightMode rounded items-center inline-flex`}>
