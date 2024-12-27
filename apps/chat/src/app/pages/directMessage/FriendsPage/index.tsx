@@ -7,12 +7,13 @@ import {
 	friendsActions,
 	requestAddFriendParam,
 	selectCloseMenu,
+	selectIsShowBtnPin,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Button, Icons, Image, InputField } from '@mezon/ui';
-import { MessageCrypt, isMacDesktop } from '@mezon/utils';
+import { isMacDesktop } from '@mezon/utils';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ActivityList from './ActivityList';
@@ -32,18 +33,8 @@ const FriendsPage = () => {
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
-	const [isShowBtnPin, setIsShowBtnPin] = useState(false);
+	const isShowBtnPin = useSelector(selectIsShowBtnPin);
 	const { userProfile } = useAuth();
-
-	useEffect(() => {
-		if (userProfile?.encrypt_private_key) {
-			MessageCrypt.checkExistingKeys(userProfile?.user?.id as string).then((found) => {
-				if (found) {
-					setIsShowBtnPin(true);
-				}
-			});
-		}
-	}, [userProfile?.encrypt_private_key, userProfile?.user?.id]);
 
 	const handleChangeTab = (valueTab: string) => {
 		dispatch(friendsActions.changeCurrentStatusTab(valueTab));
@@ -186,7 +177,7 @@ const FriendsPage = () => {
 					>
 						Add Friend
 					</button>
-					{!isShowBtnPin && (
+					{(isShowBtnPin || !userProfile?.encrypt_private_key) && (
 						<button
 							className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 font-medium text-white bg-[#248046]`}
 							onClick={handleOpenModalE2ee}

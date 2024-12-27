@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { clansActions, useAppDispatch } from '@mezon/store';
+import { clansActions, clearAllMemoizedFunctions, e2eeActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MessageCrypt } from '@mezon/utils';
 import { ApiAccount } from 'mezon-js/api.gen';
@@ -223,6 +223,8 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 			if (userProfile?.encrypt_private_key) {
 				await MessageCrypt.decryptPrivateKeyWithPIN(userProfile?.encrypt_private_key, otpCode, userProfile?.user?.id as string);
 				onClose();
+				clearAllMemoizedFunctions();
+				dispatch(e2eeActions.setIsShowBtnPin(false));
 			} else {
 				if (otpCode === pinCode) {
 					const encryptWithPIN = await MessageCrypt.encryptPrivateKeyWithPIN(userProfile?.user?.id as string, otpCode);
@@ -300,7 +302,7 @@ interface ModalSendCodeProps {
 	onClose: () => void;
 }
 
-const MultiStepModal = ({ onClose }: ModalSendCodeProps) => {
+const MultiStepModalE2ee = ({ onClose }: ModalSendCodeProps) => {
 	const [step, setStep] = useState(1);
 	const [pin, setPin] = useState<string[]>(Array(6).fill(''));
 	const { userProfile } = useAuth();
@@ -326,4 +328,4 @@ const MultiStepModal = ({ onClose }: ModalSendCodeProps) => {
 	);
 };
 
-export default MultiStepModal;
+export default MultiStepModalE2ee;

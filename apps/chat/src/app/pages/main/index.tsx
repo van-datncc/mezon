@@ -6,6 +6,7 @@ import {
 	MessageModalImage,
 	ModalCall,
 	ModalCreateClan,
+	MultiStepModalE2ee,
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
@@ -70,7 +71,6 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
-import MultiStepModal from 'libs/components/src/lib/components/ModalSendCode';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -323,7 +323,7 @@ function MyApp() {
 				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{openModalE2ee && <MultiStepModal onClose={handleClose} />}
+			{openModalE2ee && <MultiStepModalE2ee onClose={handleClose} />}
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 					<MessageModalImage />
