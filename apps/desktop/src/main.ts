@@ -21,8 +21,8 @@ import {
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { forceQuit } from './app/utils';
-import openImagePopup from './assets/image-window/image_window_2';
-import updateImagePopup from './assets/image-window/update_window_2';
+import updateImagePopup from './assets/image-window/update_window_image';
+import openImagePopup from './assets/image-window/window_image';
 import { environment } from './environments/environment';
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };

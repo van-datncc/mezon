@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { ImageData, listThumnails, scriptThumnails } from './image_window_2';
+import { ImageData, listThumnails, scriptThumnails } from './window_image';
 
 function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 	const activeIndex = imageData.channelImagesData.selectedImageIndex;

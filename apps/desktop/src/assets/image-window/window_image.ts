@@ -4,6 +4,7 @@ import App from '../../app/app';
 import image_window_css from './image-window-css';
 
 import { ApiChannelAttachment } from 'mezon-js/api.gen';
+import menu from '../menu-context';
 
 interface IAttachmentEntity extends ApiChannelAttachment {
 	id: string;
@@ -264,6 +265,16 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
       ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
       ${scriptRotateAndZoom()}
       ${scriptDrag()}
+
+
+
+      document.body.insertAdjacentHTML('beforeend', '${menu}');
+
+
+
+
+
+
       `);
 	});
 
