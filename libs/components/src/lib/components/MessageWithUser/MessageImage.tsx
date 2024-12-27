@@ -63,7 +63,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				});
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
-					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
+					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
 					const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 					if (listAttachmentsByChannel) {
 						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
@@ -107,7 +107,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				);
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
-					const clanId = currentClanId !== '0' ? '0' : (currentClanId as string);
+					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
 					const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 				}
