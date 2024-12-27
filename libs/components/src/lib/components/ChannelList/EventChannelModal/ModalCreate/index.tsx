@@ -7,6 +7,8 @@ import {
 	selectCurrentClanId,
 	selectEventById,
 	selectVoiceChannelAll,
+	toastActions,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
@@ -42,6 +44,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const currentEvent = useSelector(selectEventById(eventId || ''));
 	const eventChannel = useAppSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : '')) || {};
 	const createStatus = useSelector(selectCreatingLoaded);
+	const dispatch = useAppDispatch();
 
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
 		topic: currentEvent ? currentEvent.title || '' : '',
@@ -133,76 +136,60 @@ const ModalCreate = (props: ModalCreateProps) => {
 		hanldeCloseModal();
 	};
 
-	const address = choiceLocation ? contentSubmit.address : '';
-	const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
-	const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-	const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
-	const creatorId = currentEvent?.creator_id;
-	const commonFields: Partial<Record<string, string | number>> = useMemo(
-		() => ({
-			event_id: eventId,
-			clan_id: currentClanId as string,
-			creator_id: creatorId as string,
-			channel_id_old: currentEvent.channel_id
-		}),
-		[eventId, currentClanId, creatorId, currentEvent.channel_id]
-	);
-
-	const conditionalFields: Partial<Record<string, string | number | undefined>> = useMemo(
-		() => ({
-			channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
-			address: contentSubmit.address === currentEvent.address ? undefined : address,
-			title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
-			start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
-			end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
-			description: contentSubmit.description === currentEvent.description ? undefined : contentSubmit.description,
-			logo: contentSubmit.logo === currentEvent.logo ? undefined : contentSubmit.logo,
-			channel_id: contentSubmit.textChannelId === currentEvent.channel_id ? undefined : contentSubmit.textChannelId,
-			repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? undefined : contentSubmit.repeatType
-		}),
-		[
-			contentSubmit.voiceChannel,
-			contentSubmit.address,
-			contentSubmit.topic,
-			contentSubmit.description,
-			contentSubmit.logo,
-			contentSubmit.textChannelId,
-			contentSubmit.repeatType,
-			currentEvent.channel_voice_id,
-			currentEvent.address,
-			currentEvent.title,
-			currentEvent.start_time,
-			currentEvent.end_time,
-			currentEvent.description,
-			currentEvent.logo,
-			currentEvent.channel_id,
-			currentEvent.repeat_type,
-			voiceChannel,
-			address,
-			timeValueStart,
-			timeValueEnd
-		]
-	);
-
-	// Memoize the check for empty conditionalFields
-	const isConditionalFieldsEmpty = useMemo(() => Object.values(conditionalFields).every((value) => value === undefined), [conditionalFields]);
-
-	const updateEventFields: Partial<Record<string, string | number>> = {
-		...commonFields,
-		...conditionalFields
-	};
 	const handleUpdate = async () => {
 		try {
+			const address = choiceLocation ? contentSubmit.address : '';
+			const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+			const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
+			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+			const creatorId = currentEvent?.creator_id;
+
+			const commonFields: Partial<Record<string, string | number>> = currentEvent
+				? {
+						event_id: eventId,
+						clan_id: currentClanId as string,
+						creator_id: creatorId as string,
+						channel_id_old: currentEvent?.channel_id
+					}
+				: {};
+			console.log('commonFields', commonFields);
+			// Conditional fields (no useMemo)
+			const conditionalFields: Partial<Record<string, string | number | undefined>> = currentEvent
+				? {
+						channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
+						address: contentSubmit.address === currentEvent.address ? undefined : address,
+						title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
+						start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
+						end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
+						description: contentSubmit.description === currentEvent.description ? undefined : contentSubmit.description,
+						logo: contentSubmit.logo === currentEvent.logo ? undefined : contentSubmit.logo,
+						channel_id: contentSubmit.textChannelId === currentEvent.channel_id ? undefined : contentSubmit.textChannelId,
+						repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? undefined : contentSubmit.repeatType
+					}
+				: {};
+			console.log('conditionalFields', conditionalFields);
+			const isConditionalFieldsEmpty = Object.values(conditionalFields).every((value) => value === undefined || value === '');
+			console.log('isConditionalFieldsEmpty: ', isConditionalFieldsEmpty);
+
+			const updateEventFields: Partial<Record<string, string | number>> = {
+				...commonFields,
+				...conditionalFields
+			};
+			console.log('updateEventFields', updateEventFields);
 			const fieldsToPass = Object.entries(updateEventFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
 				if (value) {
 					acc[key] = value;
 				}
 				return acc;
 			}, {});
-
-			await eventManagementActions.updateEventManagement(fieldsToPass);
-
-			hanldeCloseModal();
+			if (!isConditionalFieldsEmpty) {
+				console.log('fieldsToPass', fieldsToPass);
+				await dispatch(eventManagementActions.updateEventManagement(fieldsToPass));
+				hanldeCloseModal();
+			} else {
+				dispatch(toastActions.addToast({ message: 'Nothing has changed', type: 'warning', autoClose: 3000 }));
+				hanldeCloseModal();
+			}
 		} catch (error) {
 			console.error('Error in handleUpdate:', error);
 		}
@@ -297,9 +284,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 					{currentModal === Tabs_Option.REVIEW ? (
 						eventId !== '' ? (
 							<button
-								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption || isConditionalFieldsEmpty) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								onClick={option === '' || errorOption || isConditionalFieldsEmpty ? () => {} : () => handleUpdate()}
+								onClick={option === '' || errorOption ? () => {} : () => handleUpdate()}
 							>
 								Update Event
 							</button>

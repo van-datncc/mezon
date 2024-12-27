@@ -163,6 +163,7 @@ export const updateEventManagement = createAsyncThunk(
 				channel_id_old: channel_id_old,
 				repeat_type: repeat_type
 			};
+			console.log(body);
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateEvent(mezon.session, event_id ?? '', body);
 		} catch (error) {
