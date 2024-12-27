@@ -1,5 +1,6 @@
 import { useEventManagement } from '@mezon/core';
 import {
+	eventManagementActions,
 	selectAllTextChannel,
 	selectChannelById,
 	selectCreatingLoaded,
@@ -11,7 +12,13 @@ import {
 import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { formatTimeStringToHourFormat, formatToLocalDateString, getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
+import {
+	convertToLongUTCFormat,
+	formatTimeStringToHourFormat,
+	formatToLocalDateString,
+	getCurrentTimeRounded,
+	handleTimeISO
+} from '../timeFomatEvent';
 import EventInfoModal from './eventInfoModal';
 import HeaderEventCreate from './headerEventCreate';
 import LocationModal from './locationModal';
@@ -46,14 +53,15 @@ const ModalCreate = (props: ModalCreateProps) => {
 		voiceChannel: currentEvent ? currentEvent?.channel_voice_id || '' : '',
 		logo: currentEvent ? currentEvent.logo || '' : '',
 		description: currentEvent ? currentEvent.description || '' : '',
-		textChannelId: currentEvent ? currentEvent.channel_id || '' : ''
+		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
+		repeatType: currentEvent ? currentEvent.repeat_type || 0 : 0
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
 
-	const { createEventManagement, updateEventManagement } = useEventManagement();
+	const { createEventManagement } = useEventManagement();
 
 	const [option, setOption] = useState<string>('');
 
@@ -125,31 +133,74 @@ const ModalCreate = (props: ModalCreateProps) => {
 		hanldeCloseModal();
 	};
 
+	const address = choiceLocation ? contentSubmit.address : '';
+	const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+	const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
+	const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+	const creatorId = currentEvent?.creator_id;
+	const commonFields: Partial<Record<string, string | number>> = useMemo(
+		() => ({
+			event_id: eventId,
+			clan_id: currentClanId as string,
+			creator_id: creatorId as string,
+			channel_id_old: currentEvent.channel_id
+		}),
+		[eventId, currentClanId, creatorId, currentEvent.channel_id]
+	);
+
+	const conditionalFields: Partial<Record<string, string | number | undefined>> = useMemo(
+		() => ({
+			channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
+			address: contentSubmit.address === currentEvent.address ? undefined : address,
+			title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
+			start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
+			end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
+			description: contentSubmit.description === currentEvent.description ? undefined : contentSubmit.description,
+			logo: contentSubmit.logo === currentEvent.logo ? undefined : contentSubmit.logo,
+			channel_id: contentSubmit.textChannelId === currentEvent.channel_id ? undefined : contentSubmit.textChannelId,
+			repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? undefined : contentSubmit.repeatType
+		}),
+		[
+			contentSubmit.voiceChannel,
+			contentSubmit.address,
+			contentSubmit.topic,
+			contentSubmit.description,
+			contentSubmit.logo,
+			contentSubmit.textChannelId,
+			contentSubmit.repeatType,
+			currentEvent.channel_voice_id,
+			currentEvent.address,
+			currentEvent.title,
+			currentEvent.start_time,
+			currentEvent.end_time,
+			currentEvent.description,
+			currentEvent.logo,
+			currentEvent.channel_id,
+			currentEvent.repeat_type,
+			voiceChannel,
+			address,
+			timeValueStart,
+			timeValueEnd
+		]
+	);
+
+	// Memoize the check for empty conditionalFields
+	const isConditionalFieldsEmpty = useMemo(() => Object.values(conditionalFields).every((value) => value === undefined), [conditionalFields]);
+
+	const updateEventFields: Partial<Record<string, string | number>> = {
+		...commonFields,
+		...conditionalFields
+	};
 	const handleUpdate = async () => {
 		try {
-			const address = choiceLocation ? contentSubmit.address : '';
+			const fieldsToPass = Object.entries(updateEventFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
+				if (value) {
+					acc[key] = value;
+				}
+				return acc;
+			}, {});
 
-			const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
-			const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-
-			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
-
-			const creatorId = currentEvent?.creator_id;
-
-			await updateEventManagement(
-				eventId || '',
-				currentClanId || '',
-				voiceChannel,
-				address as string,
-				contentSubmit.topic,
-				timeValueStart,
-				timeValueEnd,
-				contentSubmit.description,
-				contentSubmit.logo,
-				creatorId || '',
-				contentSubmit.textChannelId as string,
-				currentEvent.channel_id as string
-			);
+			await eventManagementActions.updateEventManagement(fieldsToPass);
 
 			hanldeCloseModal();
 		} catch (error) {
@@ -246,9 +297,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 					{currentModal === Tabs_Option.REVIEW ? (
 						eventId !== '' ? (
 							<button
-								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption || isConditionalFieldsEmpty) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								onClick={option === '' || errorOption ? () => {} : () => handleUpdate()}
+								onClick={option === '' || errorOption || isConditionalFieldsEmpty ? () => {} : () => handleUpdate()}
 							>
 								Update Event
 							</button>

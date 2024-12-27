@@ -142,7 +142,8 @@ export const updateEventManagement = createAsyncThunk(
 			logo,
 			creator_id,
 			channel_id,
-			channel_id_old
+			channel_id_old,
+			repeat_type
 		}: MezonUpdateEventBody,
 		thunkAPI
 	) => {
@@ -159,7 +160,8 @@ export const updateEventManagement = createAsyncThunk(
 				clan_id: clan_id,
 				creator_id: creator_id,
 				channel_id: channel_id,
-				channel_id_old: channel_id_old
+				channel_id_old: channel_id_old,
+				repeat_type: repeat_type
 			};
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateEvent(mezon.session, event_id ?? '', body);
@@ -220,6 +222,32 @@ export const eventManagementSlice = createSlice({
 				return;
 			}
 			eventManagementAdapter.removeOne(state, event_id);
+		},
+		updateEventStatus: (state, action) => {
+			const { event_id, event_status } = action.payload;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			if (!existingEvent) {
+				return;
+			}
+			eventManagementAdapter.updateOne(state, {
+				id: event_id,
+				changes: {
+					event_status
+				}
+			});
+		},
+		addOneEvent: (state, action) => {
+			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;
+			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
+			const normalizedVoiceChannelId = channel_voice_id === '0' || channel_voice_id === '' ? '' : channel_voice_id;
+
+			eventManagementAdapter.addOne(state, {
+				id: event_id,
+				channel_id: normalizedChannelId,
+				channel_voice_id: normalizedVoiceChannelId,
+				event_status,
+				...restPayload
+			});
 		},
 		upsertEvent: (state, action) => {
 			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;

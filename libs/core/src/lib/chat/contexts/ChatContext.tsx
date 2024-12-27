@@ -1005,19 +1005,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// Check repeat
 			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
 			// Check status
+			const isEventUpcoming = eventCreatedEvent.event_status === EEventStatus.UPCOMING;
+			const isEventOngoing = eventCreatedEvent.event_status === EEventStatus.ONGOING;
 			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+			// Check action remove
 			const shouldRemoveEvent = isActionCreating && isEventNotRepeat && isEventCompleted;
+			const onlyUpdateStatus = isEventUpcoming || isEventOngoing;
 
 			try {
-				// Handling remove event logic
-				if (shouldRemoveEvent || isActionDeleting) {
-					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+				// Handling event creation
+				if (isActionCreating) {
+					dispatch(eventManagementActions.addOneEvent(eventCreatedEvent));
 					return;
 				}
+				// Handling change the status
 
-				// Handling event creation
-				if (isActionCreating && !isActionDeleting) {
-					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+				if (onlyUpdateStatus) {
+					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
 					return;
 				}
 
@@ -1034,6 +1038,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 						return;
 					}
+				}
+
+				// Handling remove event logic
+				if (shouldRemoveEvent || isActionDeleting) {
+					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+					return;
 				}
 			} catch (error) {
 				console.error('Error handling eventCreatedEvent:', error);

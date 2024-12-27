@@ -73,6 +73,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	}, [startDate, startDayOfWeek, startMonth, weekdayOccurrence]);
 
 	const [selectedFrequency, setSelectedFrequency] = useState(0);
+	useEffect(() => {
+		setSelectedFrequency(contentSubmit.repeatType ?? 0);
+	}, []);
 	const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = Number(e.target.value);
 		setSelectedFrequency(value);

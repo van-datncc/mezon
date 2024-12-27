@@ -773,7 +773,7 @@ export type ContenSubmitEventProps = {
 	description: string;
 	textChannelId?: string;
 	address?: string;
-	repeatType?: number;
+	repeatType?: number | undefined;
 };
 
 export enum SHOW_POSITION {
@@ -1383,10 +1383,10 @@ export enum EEventAction {
 }
 
 export enum ERepeatType {
-	DOES_NOT_REPEAT = 0,
-	WEEKLY_ON_DAY = 1,
-	EVERY_OTHER_DAY = 2,
-	MONTHLY = 3,
-	ANNUALLY = 4,
-	EVERY_WEEKDAY = 5
+	DOES_NOT_REPEAT = 1,
+	WEEKLY_ON_DAY = 2,
+	EVERY_OTHER_DAY = 3,
+	MONTHLY = 4,
+	ANNUALLY = 5,
+	EVERY_WEEKDAY = 6
 }
