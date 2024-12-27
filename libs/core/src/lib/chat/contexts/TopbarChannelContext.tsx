@@ -10,7 +10,7 @@ const TopbarContext = createContext<TopbarChannelContextType | undefined>(undefi
 export const useTopbarContext = () => {
 	const context = useContext(TopbarContext);
 	if (!context) {
-		throw new Error('useMemberContext must be used within a MemberProvider');
+		throw new Error('useTopbarContext must be used within a TopbarContextProvider');
 	}
 	return context;
 };
