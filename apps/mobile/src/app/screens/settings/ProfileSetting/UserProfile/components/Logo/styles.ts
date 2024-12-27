@@ -16,7 +16,7 @@ export const style = (colors: Attributes) =>
 
 		title: {
 			color: colors.textStrong,
-			fontSize: size.s_18,
+			fontSize: size.medium,
 			fontWeight: '500'
 		},
 
