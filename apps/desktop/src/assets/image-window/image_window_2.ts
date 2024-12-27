@@ -2,8 +2,9 @@ import { IImageWindowProps } from '@mezon/utils';
 import { BrowserWindow, ipcMain, screen } from 'electron';
 import { join } from 'path';
 import App from '../../app/app';
+import image_window_css from './image-window-css';
 
-type ImageData = {
+export type ImageData = {
 	filename: string;
 	size: number;
 	url: string;
@@ -63,7 +64,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   <link rel="stylesheet" href="image-window.css">
   <link rel="stylesheet" href="../menu-context/index.css">
   <style>
-    ${css}
+    ${image_window_css}
   </style>
 </head>
 <body>
@@ -188,10 +189,12 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 	popupWindow.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(imageViewerHtml));
 
 	// Add IPC handlers for window controls
+	ipcMain.removeHandler('minimize-window');
 	ipcMain.handle('minimize-window', () => {
 		popupWindow.minimize();
 	});
 
+	ipcMain.removeHandler('maximize-window');
 	ipcMain.handle('maximize-window', () => {
 		if (popupWindow.isMaximized()) {
 			popupWindow.unmaximize();
@@ -215,21 +218,35 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 		popupWindow.webContents.executeJavaScript(`
 
 	    const selectedImage = document.getElementById('selectedImage');
-     document.getElementById('close-window').addEventListener('click', () => {
+      let currentImageUrl = {
+        fileName : '${imageData.filename}',
+        url : '${imageData.url}'
+      };
+
+      document.getElementById('close-window').addEventListener('click', () => {
 		selectedImage.src = null;
     	window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
 	});
+
 	document.getElementById('minimize-window').addEventListener('click', () => {
 		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MINIMIZE_WINDOW');
 	});
+  document.getElementById('channel-label').innerHTML = '${imageData.channelImagesData.channelLabel}';
 
 	document.getElementById('maximize-window').addEventListener('click', () => {
 		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW');
 	});
 
+ document.getElementById('downloadBtn').addEventListener('click', () => {
+
+  window.electron.dowloadImage(currentImageUrl.url);
+
+
+});
+
       ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
-
-
+      ${scriptRotateAndZoom()}
+      ${scriptDrag()}
       `);
 	});
 
@@ -237,8 +254,9 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 	popupWindow.on('closed', () => {
 		ipcMain.removeHandler('minimize-window');
 		ipcMain.removeHandler('maximize-window');
+		App.imageViewerWindow = null;
 	});
-
+	App.imageViewerWindow = popupWindow;
 	return popupWindow;
 }
 
@@ -266,7 +284,7 @@ function formatDateTime(dateString) {
 	return new Date(dateString).toLocaleString('vi-VN');
 }
 
-const listThumnails = (listImage, indexSelect) => {
+export const listThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
 			const currentDate = formatDate(image.create_time);
@@ -277,13 +295,10 @@ const listThumnails = (listImage, indexSelect) => {
 		.join('');
 };
 
-const scriptThumnails = (listImage, indexSelect) => {
+export const scriptThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
-			const currentDate = formatDate(image.create_time);
-			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
 			const time = formatDateTime(image.create_time);
-			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
 			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
         selectedImage.src = '${image.url}';
         document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
@@ -291,317 +306,110 @@ const scriptThumnails = (listImage, indexSelect) => {
         document.getElementById('userAvatar').src = "${image.uploaderData.avatar}"
         document.getElementById('username').innerHTML  = "${image.uploaderData.name}"
         document.getElementById('timestamp').innerHTML  = "${time}"
-        
+      currentImageUrl = {
+        fileName : '${image.fileName}',
+        url : '${image.url}'
+      }
 
       });`;
 		})
 		.join('');
 };
 
-const css = `
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    height: 100vh;
-    /*display: flex;*/
-    background-color: #1a1a1a;
-    color: white;
-    overflow: hidden;
-}
+const scriptRotateAndZoom = () => {
+	return `
+ let currentRotation = 0;
+ let currentZoom = 1;
+ document.getElementById('rotateRightBtn').addEventListener('click', () => {
+ currentRotation = currentRotation + 90;
+ selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom})\`; });
 
-.title-bar {
-    height: 21px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-    background-color: #1E1F22;
-    width: 100vw;
-    z-index: 2;
-    position: fixed;
-}
+  document.getElementById('rotateLeftBtn').addEventListener('click', () => {
+ currentRotation = currentRotation - 90;
+ selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom}) \`; });
 
-.app-title {
-    width: fit-content;
-    margin-left: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 26px;
-    -webkit-app-region: drag;
-    flex: 1;
-}
+ document.getElementById('zoomInBtn').addEventListener('click', () => {
+  currentZoom = currentZoom + 0.25
+ selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0)  scale(\${currentZoom}) \`; });
 
-.functional-bar {
-    display: grid;
-    grid-template-columns: repeat(3, 27px);
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 21px;
-}
+document.getElementById('resetBtn').addEventListener('click', () => {
+  currentRotation = 0;
+	currentZoom = 1;
+		currenPosition = {
+			x: 0,
+			y: 0
+		};
+ selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom}) \`;
 
-.function-button {
-    cursor: pointer !important;
-    z-index: 10 !important;
-    color: #a8a6a6;
-    gap: 4px;
-    width: fit-content;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
+ });
 
-.function-button:hover {
-    background-color: #5b5959 !important;
-}
 
-.function-button:active {
-    background-color: #989797 !important;
-}
 
-.svg-button {
-    width: 14px;
-}
 
-.zoom-button {
-    width: 10px;
-}
 
-.functional-bar .function-button {
-    grid-row: 1 / span 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 21px;
-    -webkit-app-region: no-drag;
-}
 
-#minimize-window {
-    grid-column: 1;
-}
 
-#maximize-window,
-#restore-button {
-    grid-column: 2;
-}
 
-#close-window {
-    grid-column: 3;
-}
 
-.main-container {
-    display: flex;
-    width: 100%;
-    height: calc(100vh - 21px);
-    overflow: hidden;
-    flex-direction: column;
-    position: relative;
-    top: 21px;
-}
+ `;
+};
 
-.channel-label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #2e2e2e;
-    color: white;
-    height: 30px;
-    z-index: 2;
-}
+const scriptDrag = () => {
+	return `
+  let currenPosition = {
+		x: 0,
+		y: 0
+	};
+	let dragstart = {
+		x: 0,
+		y: 0
+	};
+	let dragStatus = false;
 
-.image-view {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  selectedImage.addEventListener('mousemove', (e)=>{
+    if (currentZoom > 1 && dragStatus) {
+			currenPosition = {
+				x: e.clientX - dragstart.x,
+				y: e.clientY - dragstart.y
+        };
+			selectedImage.style.transform = \`scale(\${currentZoom}) translate(\${currenPosition.x / currentZoom}px, \${currenPosition.y / currentZoom}px) \`;
+		}
+  });
 
-    height: calc(100% - 56px - 30px);
-    flex-direction: row;
-}
+  selectedImage.addEventListener('mousedown', (event)=>{
+    dragStatus = true;
+		dragstart = {
+			x: event.clientX - currenPosition.x,
+			y: event.clientY - currenPosition.y
+      };
+    console.log('dragstart: ', dragstart);
+  });
 
-.selected-image-wrapper {
-    flex: 1;
-    box-sizing: border-box;
-    padding: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
+	document.addEventListener('mouseup', (event)=>{
+  		dragStatus = false;
+		event.stopPropagation();
 
-.selected-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-}
+  });
 
-.thumbnail-container {
-    width: fit-content;
-    height: 100%;
-    background-color: #0B0B0B;
-    padding:  0 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    transition: width 0.3s ease;
-    z-index: 2;
-}
+  selectedImage.addEventListener('dragstart', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	});
 
-.thumbnails-content {
-    width: fit-content;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    transition: width 0.3s ease;
-    z-index: 2;
-}
+  selectedImage.addEventListener('wheel', (e)=>{
+  	const delta = e.deltaY * -0.001;
+		currentZoom = Math.max(1, Math.min(currentZoom + delta, 5));
+ selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom}) \`;
 
-.thumbnails-content::-webkit-scrollbar {
-    display: none;
-}
 
-.thumbnail-container::-webkit-scrollbar {
-    display: none;
-}
 
-.thumbnail-container.hidden {
-    width: 0;
-    padding: 0;
-}
+  }, { passive: false });
 
-.thumbnail-wrapper {
-    width: fit-content;
-    height: fit-content;
-}
 
-.date-label {
-    color: white;
-    margin-bottom: 4px;
-    text-align: center;
-}
 
-.thumbnail {
-    width: 88px;
-    max-width: 88px;
-    overflow: hidden;
-    aspect-ratio: 1/1;
-    height: 88px;
-    object-fit: cover;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 2px solid transparent;
-}
 
-.thumbnail.active {
-    border-color: white;
-}
 
-.thumbnail-overlay {
-    display: none;
-}
-
-.bottom-bar {
-    /*position: fixed;*/
-    /*bottom: 0;*/
-    /*left: 0;*/
-    /*right: 0;*/
-    height: 56px;
-    background-color: #2e2e2e;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /*padding: 0 16px;*/
-    z-index: 2;
-    width: 100vw;
-}
-
-.sender-info {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    margin-left: 16px;
-}
-
-.image-controls {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-}
-
-.control-button {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.control-button:hover {
-    background-color: #434343;
-}
-
-.control-button svg {
-    width: 20px;
-    height: 20px;
-}
-
-.divider {
-    width: 1px;
-    height: 20px;
-    background-color: #ffffff;
-    opacity: 0.5;
-}
-
-.toggle-list {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 16px;
-}
-
-@media (max-width: 480px) {
-    .thumbnail-container {
-        width: 100%;
-        height: 100px;
-        flex-direction: row;
-        overflow-x: scroll;
-        overflow-y: hidden;
-    }
-
-    .thumbnail {
-        width: 64px;
-        height: 64px;
-    }
-
-    .bottom-bar {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 8px;
-    }
-
-    .image-controls {
-        order: -1;
-        width: 100%;
-        justify-content: space-around;
-        margin-bottom: 8px;
-    }
-}
-`;
+  `;
+};
 
 export default openImagePopup;

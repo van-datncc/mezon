@@ -68,7 +68,11 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 						window.electron.openImageWindow({
 							...attachmentData,
-							url: createImgproxyUrl(attachmentData.url || ''),
+							url: createImgproxyUrl(attachmentData.url || '', {
+								width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
+								height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+								resizeType: 'fit'
+							}),
 							uploaderData: {
 								name:
 									currentImageUploader?.clan_nick ||
@@ -98,7 +102,11 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 							window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
 							window.electron.openImageWindow({
 								...attachmentData,
-								url: createImgproxyUrl(attachmentData.url || '', { width: 1920, height: 1080, resizeType: 'fit' }),
+								url: createImgproxyUrl(attachmentData.url || '', {
+									width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
+									height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+									resizeType: 'fit'
+								}),
 								uploaderData: {
 									name:
 										currentImageUploader?.clan_nick ||

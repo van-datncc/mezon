@@ -22,6 +22,7 @@ import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { forceQuit } from './app/utils';
 import openImagePopup from './assets/image-window/image_window_2';
+import updateImagePopup from './assets/image-window/update_window_2';
 import { environment } from './environments/environment';
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
@@ -173,8 +174,11 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 
 ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
 	// const newWindow = App.openImageWindow(props, options, params);
+	if (App.imageViewerWindow) {
+		updateImagePopup(props, App.imageViewerWindow);
+		return;
+	}
 	const newWindow = openImagePopup(props, App.mainWindow);
-
 	// Remove the existing listener if it exists
 	ipcMain.removeAllListeners(IMAGE_WINDOW_TITLE_BAR_ACTION);
 
