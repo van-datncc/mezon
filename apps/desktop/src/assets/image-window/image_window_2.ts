@@ -22,7 +22,7 @@ type ImageData = {
 function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.mainWindow, params?: Record<string, string>) {
 	const parentBounds = parentWindow.getBounds();
 	const screenBounds = screen.getPrimaryDisplay().workAreaSize;
-
+	const activeIndex = imageData.channelImagesData.selectedImageIndex;
 	// Calculate initial size (80% of parent window)
 	const width = Math.floor(parentBounds.width * 0.8);
 	const height = Math.floor(parentBounds.height * 0.8);
@@ -99,23 +99,23 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   </div>
 </div>
 <div class="main-container">
-  <div id="channel-label" class="channel-label"></div>
+  <div id="channel-label" class="channel-label">${imageData.channelImagesData.channelLabel}</div>
   <div class="image-view">
     <div class="selected-image-wrapper">
       <img id="selectedImage" class="selected-image" src="${imageData.url}" />
     </div>
     <div id="thumbnails" class="thumbnail-container">
       <div id="thumbnails-content" class="thumbnails-content">
-      ${listThumnails(imageData.channelImagesData.images)}
+      ${listThumnails(imageData.channelImagesData.images, activeIndex)}
       </div>
     </div>
   </div>
   <div class="bottom-bar">
     <div class="sender-info">
-      <img id="userAvatar" class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+      <img id="userAvatar" src="${imageData.uploaderData.avatar}" class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
       <div>
-        <div id="username" class="username" style="font-weight: bold;"></div>
-        <div id="timestamp" class="timestamp" style="font-size: 0.8em; color: #ccc;"></div>
+        <div id="username" class="username" style="font-weight: bold;">${imageData.uploaderData.name}</div>
+        <div id="timestamp" class="timestamp" style="font-size: 0.8em; color: #ccc;">${formatDateTime(imageData.create_time)}</div>
       </div>
     </div>
     <div class="image-controls">
@@ -227,7 +227,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 		window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::MAXIMIZE_WINDOW');
 	});
 
-      ${scriptThumnails(imageData.channelImagesData.images)}
+      ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
 
 
       `);
@@ -254,25 +254,45 @@ function formatDate(dateString) {
 	return new Date(dateString).toLocaleDateString();
 }
 
-const listThumnails = (listImage) => {
+function formatDateTime(dateString) {
+	const options = {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false
+	};
+	return new Date(dateString).toLocaleString('vi-VN');
+}
+
+const listThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
 			const currentDate = formatDate(image.create_time);
 			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
 			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
-			return ` <div class="thumbnail-wrapper" id="thumbnail-${index}"> ${dateLabel} <img class="thumbnail" src="${image.url}" alt="${image.filename}" /> </div> `;
+			return ` <div class="thumbnail-wrapper" id="thumbnail-${index}"> ${dateLabel} <img class="thumbnail ${indexSelect === index ? 'active' : ''}"  src="${image.url}" alt="${image.filename}" /> </div> `;
 		})
 		.join('');
 };
 
-const scriptThumnails = (listImage) => {
+const scriptThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
 			const currentDate = formatDate(image.create_time);
 			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
+			const time = formatDateTime(image.create_time);
 			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
 			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
         selectedImage.src = '${image.url}';
+        document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        document.getElementById('thumbnail-${index}').querySelector('.thumbnail').classList.add('active');
+        document.getElementById('userAvatar').src = "${image.uploaderData.avatar}"
+        document.getElementById('username').innerHTML  = "${image.uploaderData.name}"
+        document.getElementById('timestamp').innerHTML  = "${time}"
+        
+
       });`;
 		})
 		.join('');

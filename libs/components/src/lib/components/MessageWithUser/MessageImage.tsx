@@ -73,6 +73,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 						window.electron.openImageWindow({
 							...attachmentData,
+							url: createImgproxyUrl(attachmentData.url || ''),
 							uploaderData: {
 								name:
 									currentImageUploader?.clan_nick ||
@@ -102,6 +103,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 							window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
 							window.electron.openImageWindow({
 								...attachmentData,
+								url: createImgproxyUrl(attachmentData.url || '', { width: 1920, height: 1080, resizeType: 'fit' }),
 								uploaderData: {
 									name:
 										currentImageUploader?.clan_nick ||
