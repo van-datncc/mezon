@@ -55,7 +55,8 @@ export function useEventManagement() {
 			description: string,
 			logo: string,
 			creator_id: string,
-			channel_id: string
+			channel_id: string,
+			channel_id_old: string
 		) => {
 			await dispatch(
 				eventManagementActions.updateEventManagement({
@@ -69,7 +70,8 @@ export function useEventManagement() {
 					description,
 					logo,
 					creator_id,
-					channel_id
+					channel_id,
+					channel_id_old
 				})
 			);
 		},

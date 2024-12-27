@@ -2,7 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement } from 'mezon-js/api.gen';
-import { ApiCreateEventRequest } from 'mezon-js/dist/api.gen';
+import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -127,20 +127,6 @@ type fetchDeleteEventManagementPayload = {
 	eventLabel: string;
 };
 
-export interface MezonUpdateEventBody {
-	event_id?: string;
-	address?: string;
-	channel_voice_id?: string;
-	clan_id?: string;
-	creator_id?: string;
-	description?: string;
-	end_time?: string;
-	logo?: string;
-	start_time?: string;
-	title?: string;
-	channel_id?: string;
-}
-
 export const updateEventManagement = createAsyncThunk(
 	'updateEventManagement/updateEventManagement',
 	async (
@@ -155,8 +141,9 @@ export const updateEventManagement = createAsyncThunk(
 			description,
 			logo,
 			creator_id,
-			channel_id
-		}: UpdateEventManagementPayload,
+			channel_id,
+			channel_id_old
+		}: MezonUpdateEventBody,
 		thunkAPI
 	) => {
 		try {
@@ -171,10 +158,11 @@ export const updateEventManagement = createAsyncThunk(
 				title: title,
 				clan_id: clan_id,
 				creator_id: creator_id,
-				channel_id: channel_id
+				channel_id: channel_id,
+				channel_id_old: channel_id_old
 			};
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateEvent(mezon.session, event_id, body);
+			const response = await mezon.client.updateEvent(mezon.session, event_id ?? '', body);
 		} catch (error) {
 			captureSentryError(error, 'updateEventManagement/updateEventManagement');
 			return thunkAPI.rejectWithValue(error);
@@ -234,47 +222,18 @@ export const eventManagementSlice = createSlice({
 			eventManagementAdapter.removeOne(state, event_id);
 		},
 		upsertEvent: (state, action) => {
-			const { event_id, channel_id, event_status, ...restPayload } = action.payload;
+			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
-			if (!existingEvent) {
-				eventManagementAdapter.addOne(state, {
-					id: event_id,
-					channel_id: normalizedChannelId,
-					event_status,
-					...restPayload
-				});
-			} else {
-				eventManagementAdapter.updateOne(state, {
-					id: event_id,
-					changes: {
-						channel_id: normalizedChannelId,
-						event_status,
-						...restPayload
-					}
-				});
-			}
-		},
-
-		updateContentEvent: (state, action) => {
-			const eventUpdate = action.payload;
-			const { event_id, channel_id, event_status, ...changes } = eventUpdate;
-			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;
-			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
-
-			if (!existingEvent) {
-				return;
-			}
-
-			eventManagementAdapter.updateOne(state, {
+			const normalizedVoiceChannelId = channel_voice_id === '0' || channel_voice_id === '' ? '' : channel_voice_id;
+			eventManagementAdapter.upsertOne(state, {
 				id: event_id,
-				changes: {
-					channel_id: normalizedChannelId,
-					event_status: event_status,
-					...changes
-				}
+				channel_id: normalizedChannelId,
+				channel_voice_id: normalizedVoiceChannelId,
+				event_status,
+				...restPayload
 			});
 		},
+
 		clearOngoingEvent: (state, action) => {
 			state.ongoingEvent = null;
 		}

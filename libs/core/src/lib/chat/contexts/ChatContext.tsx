@@ -67,6 +67,7 @@ import {
 	EEventAction,
 	EEventStatus,
 	EOverriddenPermission,
+	ERepeatType,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
 	ModeResponsive,
@@ -996,33 +997,49 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[channelId]
 	);
-
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
-			if (eventCreatedEvent.action === EEventAction.CREATED) {
-				const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
-				if (isEventCompleted) {
+			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
+			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
+			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+			// Check repeat
+			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
+			// Check status
+			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+			const shouldRemoveEvent = isActionCreating && isEventNotRepeat && isEventCompleted;
+
+			try {
+				// Handling remove event logic
+				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
-				} else {
-					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+					return;
 				}
-			} else if (eventCreatedEvent.action === EEventAction.UPDATE) {
-				const newChannelId = eventCreatedEvent.channel_id;
-				if (!newChannelId || newChannelId === '0') {
-					dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
-				} else {
+
+				// Handling event creation
+				if (isActionCreating && !isActionDeleting) {
+					dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+					return;
+				}
+
+				// Handling event update
+				if (isActionUpdating) {
+					const newChannelId = eventCreatedEvent.channel_id;
+					const notUpdateChannelId = !newChannelId || newChannelId === '0';
 					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
-					if (userHasChannel) {
-						dispatch(eventManagementActions.updateContentEvent(eventCreatedEvent));
+
+					if (notUpdateChannelId || userHasChannel) {
+						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+						return;
 					} else {
 						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+						return;
 					}
 				}
-			} else if (eventCreatedEvent.action === EEventAction.DELETE) {
-				dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+			} catch (error) {
+				console.error('Error handling eventCreatedEvent:', error);
 			}
 		},
-		[dispatch]
+		[dispatch, allThreadChannelPrivateIds]
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {

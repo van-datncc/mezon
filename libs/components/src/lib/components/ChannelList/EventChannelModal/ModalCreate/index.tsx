@@ -126,27 +126,35 @@ const ModalCreate = (props: ModalCreateProps) => {
 	};
 
 	const handleUpdate = async () => {
-		const address = choiceLocation ? contentSubmit.address : '';
-		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
-		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
-		const creatorId = currentEvent?.creator_id;
+		try {
+			const address = choiceLocation ? contentSubmit.address : '';
 
-		await updateEventManagement(
-			eventId || '',
-			currentClanId || '',
-			voiceChannel,
-			address as string,
-			contentSubmit.topic,
-			timeValueStart,
-			timeValueEnd,
-			contentSubmit.description,
-			contentSubmit.logo,
-			creatorId || '',
-			contentSubmit.textChannelId as string
-		);
+			const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+			const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 
-		hanldeCloseModal();
+			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+
+			const creatorId = currentEvent?.creator_id;
+
+			await updateEventManagement(
+				eventId || '',
+				currentClanId || '',
+				voiceChannel,
+				address as string,
+				contentSubmit.topic,
+				timeValueStart,
+				timeValueEnd,
+				contentSubmit.description,
+				contentSubmit.logo,
+				creatorId || '',
+				contentSubmit.textChannelId as string,
+				currentEvent.channel_id as string
+			);
+
+			hanldeCloseModal();
+		} catch (error) {
+			console.error('Error in handleUpdate:', error);
+		}
 	};
 
 	const hanldeCloseModal = () => {
