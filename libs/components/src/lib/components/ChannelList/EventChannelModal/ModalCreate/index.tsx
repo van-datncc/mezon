@@ -152,6 +152,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						channel_id_old: currentEvent?.channel_id
 					}
 				: {};
+			const changeToPublic = contentSubmit.textChannelId === '' && currentEvent.channel_id && currentEvent.channel_id !== '0';
 			const conditionalFields: Partial<Record<string, string | number | undefined>> = currentEvent
 				? {
 						channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
@@ -178,7 +179,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				}
 				return acc;
 			}, {});
-			if (!isConditionalFieldsEmpty) {
+			if (!isConditionalFieldsEmpty || changeToPublic) {
 				await dispatch(eventManagementActions.updateEventManagement(fieldsToPass));
 				hanldeCloseModal();
 			} else {
