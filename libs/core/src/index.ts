@@ -6,7 +6,6 @@ export * from './lib/auth/hooks/useMemberStatus';
 export * from './lib/chat/contexts/ChatContext';
 export * from './lib/chat/contexts/EmojiSuggestionContext';
 export * from './lib/chat/contexts/MemberClanContext';
-export * from './lib/chat/contexts/TopbarChannelContext';
 export * from './lib/chat/hooks/useAccount';
 export * from './lib/chat/hooks/useApp';
 export * from './lib/chat/hooks/useAttachment';

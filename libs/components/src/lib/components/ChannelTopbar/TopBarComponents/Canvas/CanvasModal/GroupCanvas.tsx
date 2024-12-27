@@ -1,20 +1,21 @@
 import { useAuth } from '@mezon/core';
-import { appActions, canvasActions, canvasAPIActions, selectCanvasEntityById, selectIdCanvas, useAppDispatch } from '@mezon/store';
+import { appActions, canvasActions, canvasAPIActions, selectIdCanvas, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { ICanvas } from '@mezon/utils';
 import { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 type GroupCanvasProps = {
-	canvasId: string;
+	canvas: ICanvas;
 	channelId?: string;
 	clanId: string;
 	creatorIdChannel?: string;
 	onClose: () => void;
 };
 
-const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }: GroupCanvasProps) => {
-	const canvas = useSelector((state) => selectCanvasEntityById(state, channelId, canvasId));
+const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: GroupCanvasProps) => {
+	const canvasId = canvas.id;
 	const currentIdCanvas = useSelector(selectIdCanvas);
 	const { userProfile } = useAuth();
 	const [isCopied, setIsCopied] = useState(false);
@@ -25,7 +26,7 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }:
 
 	const handleOpenCanvas = async () => {
 		dispatch(appActions.setIsShowCanvas(true));
-		dispatch(canvasActions.setIdCanvas(canvasId));
+		dispatch(canvasActions.setIdCanvas(canvasId || ''));
 		onClose();
 		if (canvasId && channelId && clanId) {
 			const body = {

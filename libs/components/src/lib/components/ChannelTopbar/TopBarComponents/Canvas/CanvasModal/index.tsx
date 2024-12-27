@@ -1,4 +1,4 @@
-import { useEscapeKeyClose, useOnClickOutside, useTopbarContext } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
 	canvasActions,
@@ -11,7 +11,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
-import { RefObject, useMemo, useRef } from 'react';
+import { RefObject, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
@@ -27,14 +27,14 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const appearanceTheme = useSelector(selectTheme);
-	const { searchQuery } = useTopbarContext();
+	const [keywordSearch, setKeywordSearch] = useState('');
 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
 	const filteredCanvases = useMemo(() => {
-		if (!searchQuery) return canvases;
-		const lowerCaseQuery = searchQuery.toLowerCase().trim();
+		if (!keywordSearch) return canvases;
+		const lowerCaseQuery = keywordSearch.toLowerCase().trim();
 		return canvases.filter((entity) => entity.title.toLowerCase().includes(lowerCaseQuery));
-	}, [canvases, searchQuery]);
+	}, [canvases, keywordSearch]);
 
 	const handleCreateCanvas = () => {
 		dispatch(appActions.setIsShowCanvas(true));
@@ -60,7 +60,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 						<Icons.CanvasIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Canvas</span>
 					</div>
-					<SearchCanvas />
+					<SearchCanvas setKeywordSearch={setKeywordSearch} />
 					<div className="flex flex-row items-center gap-4">
 						<Button
 							onClick={handleCreateCanvas}
@@ -82,7 +82,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 							<GroupCanvas
 								onClose={onClose}
 								key={canvas.id}
-								canvasId={canvas.id}
+								canvas={canvas}
 								channelId={currentChannel?.channel_id}
 								clanId={currentClanId || ''}
 								creatorIdChannel={currentChannel?.creator_id}
