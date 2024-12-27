@@ -1,8 +1,10 @@
 import { useChatSending, useCurrentInbox } from '@mezon/core';
+import { referencesActions } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { blobToFile, getChannelMode } from '@mezon/utils';
+import { blobToFile, getChannelMode, processFile } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { AudioRecorderUI } from './AudioRecorderUI';
 
 type AudioRecorderProps = {
@@ -21,6 +23,7 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 	const streamRef = useRef<MediaStream | null>(null);
 	const { sessionRef, clientRef } = useMezon();
 	const currentInbox = useCurrentInbox();
+	const dispatch = useDispatch();
 	const { sendMessage } = useChatSending({
 		channelOrDirect: currentInbox as ApiChannelDescription,
 		mode: getChannelMode(currentInbox?.type as number)
@@ -55,7 +58,7 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 		}
 	}, []);
 
-	const stopRecording = useCallback(() => {
+	const stopRecording = useCallback(async () => {
 		if (!isRecording || !recorderRef.current) return;
 
 		recorderRef.current.stop();
@@ -65,7 +68,26 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track) => track.stop());
 		}
-	}, [isRecording]);
+		onSendRecord();
+
+		recorderRef.current.onstop = async () => {
+			if (chunksRef.current.length === 0) {
+				console.error('No audio data available');
+				return;
+			}
+
+			const blob = new Blob(chunksRef.current, { type: 'audio/mp3; codecs=opus' });
+			const convertedFile = blobToFile(blob);
+			const filesArray = Array.from([convertedFile]);
+			const updatedFiles = await Promise.all(filesArray.map(processFile<ApiMessageAttachment>));
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentInbox?.id as string,
+					files: updatedFiles
+				})
+			);
+		};
+	}, [currentInbox?.id, dispatch, isRecording, onSendRecord]);
 
 	const resetRecording = useCallback(() => {
 		// Revoke blob URL
