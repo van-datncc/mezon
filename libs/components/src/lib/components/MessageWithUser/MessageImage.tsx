@@ -63,8 +63,8 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				});
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
-					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-					const channelId = (currentChannelId as string) || (currentDmGroupId as string);
+					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
+					const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 					if (listAttachmentsByChannel) {
 						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
 						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
@@ -107,15 +107,15 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				);
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
-					const clanId = currentDmGroupId ? '0' : (currentClanId as string);
-					const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
+					const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 				}
 
 				dispatch(attachmentActions.setMessageId(messageId));
 			}
 		},
-		[listAttachmentsByChannel?.length]
+		[listAttachmentsByChannel?.length, currentChannelId, currentDmGroupId]
 	);
 
 	const [imageLoaded, setImageLoaded] = useState(false);
