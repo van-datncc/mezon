@@ -14,7 +14,8 @@ export enum EActionDataNotify {
 	All = 'all',
 	Individual = 'individual',
 	Mention = 'mention',
-	Messages = 'messages'
+	Messages = 'messages',
+	Topics = 'topics'
 }
 
 export enum ENotifyBsToShow {

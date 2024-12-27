@@ -12,8 +12,10 @@ import {
 	messagesActions,
 	notificationActions,
 	RootState,
+	selectAllTopics,
 	selectCurrentClanId,
 	selectLastNotificationId,
+	topicsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
@@ -38,6 +40,7 @@ import { EActionDataNotify, ENotifyBsToShow } from './types';
 const Notifications = () => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const allTopics = useSelector(selectAllTopics);
 	const { notification, deleteNotify } = useNotification();
 	const [notify, setNotify] = useState<INotification>();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -52,13 +55,31 @@ const Notifications = () => {
 	const timeoutRef = useRef(null);
 	const [isLoadMore, setIsLoadMore] = useState(true);
 	const [firstLoading, setFirstLoading] = useState(true);
-	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true, messages: true });
+	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true, messages: true, topics: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 	const lastNotificationId = useSelector(selectLastNotificationId);
 
+	const topicsNotification = useMemo(() => {
+		return allTopics?.map((topic) => {
+			const topicNotification: NotificationEntity = {
+				code: NotificationCode.NOTIFICATION_TOPIC,
+				content: Object.assign({}, topic.message, { repliers: topic?.last_sent_message?.repliers }),
+				id: topic.id,
+				subject: topic?.last_sent_message?.content,
+				sender_id: topic?.last_sent_message?.sender_id,
+				create_time: topic?.create_time
+			};
+			return topicNotification;
+		});
+	}, [allTopics]);
+
+	const mergeNotifications = useMemo(() => {
+		return [...(notification || []), ...(topicsNotification || [])];
+	}, [notification, topicsNotification]);
+
 	useFocusEffect(
 		React.useCallback(() => {
-			setSelectedTabs({ individual: true, mention: true, messages: true });
+			setSelectedTabs({ individual: true, mention: true, messages: true, topics: true });
 			setIsLoadMore(true);
 			if (currentClanId && currentClanId !== '0') {
 				initLoader();
@@ -73,13 +94,13 @@ const Notifications = () => {
 
 	const handleFilterNotify = useCallback(
 		(selectedTabs) => {
-			const sortNotifications = notification?.sort((a, b) => {
+			const sortNotifications = mergeNotifications?.sort((a, b) => {
 				const dateA = new Date(a.create_time || '').getTime();
 				const dateB = new Date(b.create_time || '').getTime();
 				return dateB - dateA;
 			});
 
-			const allTabs = [EActionDataNotify.Individual, EActionDataNotify.Mention, EActionDataNotify.Messages];
+			const allTabs = [EActionDataNotify.Individual, EActionDataNotify.Mention, EActionDataNotify.Messages, EActionDataNotify.Topics];
 			const isAllSelected = allTabs.every((tab) => selectedTabs.includes(tab));
 			if (isAllSelected) {
 				setNotificationsFilter(sortNotifications);
@@ -93,12 +114,15 @@ const Notifications = () => {
 							return (
 								notification?.code !== NotificationCode.USER_REPLIED &&
 								notification?.code !== NotificationCode.USER_MENTIONED &&
-								notification?.code !== NotificationCode.NOTIFICATION_CLAN
+								notification?.code !== NotificationCode.NOTIFICATION_CLAN &&
+								notification?.code !== NotificationCode.NOTIFICATION_TOPIC
 							);
 						case EActionDataNotify.Mention:
 							return notification?.code === NotificationCode.USER_REPLIED || notification?.code === NotificationCode.USER_MENTIONED;
 						case EActionDataNotify.Messages:
 							return notification?.code === NotificationCode.NOTIFICATION_CLAN;
+						case EActionDataNotify.Topics:
+							return notification?.code === NotificationCode.NOTIFICATION_TOPIC;
 						default:
 							return false;
 					}
@@ -114,6 +138,7 @@ const Notifications = () => {
 	const initLoader = async () => {
 		const store = await getStoreAsync();
 		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
+		store.dispatch(topicsActions.fetchTopics({ clanId: currentClanId }));
 	};
 
 	const handleTabChange = (value, isSelected) => {
@@ -134,6 +159,8 @@ const Notifications = () => {
 						return EActionDataNotify.Mention;
 					case EActionDataNotify.Messages:
 						return EActionDataNotify.Messages;
+					case EActionDataNotify.Topics:
+						return EActionDataNotify.Topics;
 					default:
 						return null;
 				}

@@ -11,7 +11,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
-import { RefObject, useRef } from 'react';
+import { RefObject, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
@@ -26,10 +26,15 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-
 	const appearanceTheme = useSelector(selectTheme);
+	const [keywordSearch, setKeywordSearch] = useState('');
 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
+	const filteredCanvases = useMemo(() => {
+		if (!keywordSearch) return canvases;
+		const lowerCaseQuery = keywordSearch.toLowerCase().trim();
+		return canvases.filter((entity) => entity.title.toLowerCase().includes(lowerCaseQuery));
+	}, [canvases, keywordSearch]);
 
 	const handleCreateCanvas = () => {
 		dispatch(appActions.setIsShowCanvas(true));
@@ -55,7 +60,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 						<Icons.CanvasIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Canvas</span>
 					</div>
-					<SearchCanvas />
+					<SearchCanvas setKeywordSearch={setKeywordSearch} />
 					<div className="flex flex-row items-center gap-4">
 						<Button
 							onClick={handleCreateCanvas}
@@ -72,12 +77,12 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 				<div
 					className={`flex flex-col gap-2 py-2 dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
-					{canvases?.map((canvasId) => {
+					{filteredCanvases?.map((canvas) => {
 						return (
 							<GroupCanvas
 								onClose={onClose}
-								key={canvasId}
-								canvasId={canvasId}
+								key={canvas.id}
+								canvas={canvas}
 								channelId={currentChannel?.channel_id}
 								clanId={currentClanId || ''}
 								creatorIdChannel={currentChannel?.creator_id}

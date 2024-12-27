@@ -18,6 +18,7 @@ export const DIRECT_FEATURE_KEY = 'direct';
 
 export interface DirectEntity extends IChannel {
 	id: string;
+	showPinBadge?: boolean;
 }
 
 export interface DirectState extends EntityState<DirectEntity, string> {
@@ -481,6 +482,11 @@ export const directSlice = createSlice({
 		},
 		setBuzzStateDirect: (state, action: PayloadAction<{ channelId: string; buzzState: BuzzArgs | null }>) => {
 			state.buzzStateDirect[action.payload.channelId] = action.payload.buzzState;
+		},
+		setShowPinBadgeOfDM: (state, action: PayloadAction<{ dmId: string; isShow: boolean }>) => {
+			const { dmId, isShow } = action.payload;
+			if (!state.entities?.[dmId]) return;
+			state.entities[dmId].showPinBadge = isShow;
 		}
 	},
 	extraReducers: (builder) => {
@@ -619,4 +625,9 @@ export const selectMemberDMByUserId = createSelector([selectAllUserDM, (state, u
 export const selectBuzzStateByDirectId = createSelector(
 	[getDirectState, (state, channelId: string) => channelId],
 	(state, channelId) => state.buzzStateDirect?.[channelId]
+);
+
+export const selectIsShowPinBadgeByDmId = createSelector(
+	[getDirectState, (state, dmId: string) => dmId],
+	(state, dmId) => state?.entities[dmId]?.showPinBadge
 );

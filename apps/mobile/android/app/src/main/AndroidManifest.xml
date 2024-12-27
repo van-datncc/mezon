@@ -44,6 +44,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_TYPE" />
 
     <application
       android:name=".MainApplication"
@@ -56,36 +57,35 @@
       android:theme="@style/BootTheme"
       android:launchMode="singleTask"
       android:networkSecurityConfig="@xml/network_security_config">
-        <activity android:name="com.reactnativefullscreennotificationincomingcall.IncomingCallActivity"
+        <activity android:name=".IncomingCallActivity"
           android:theme="@style/incomingCall"
           android:launchMode="singleTask"
           android:excludeFromRecents="true"
           android:exported="true"
-          android:foregroundServiceType="phoneCall"
+          android:foregroundServiceType="phoneCall|dataSync|camera|microphone"
           android:showWhenLocked="true"
           android:turnScreenOn="true"
         />
-        <activity android:name="com.reactnativefullscreennotificationincomingcall.NotificationReceiverActivity"
+        <activity android:name=".NotificationReceiverActivity"
           android:theme="@style/incomingCall"
           android:launchMode="singleTask"
           android:excludeFromRecents="true"
           android:exported="true"
           android:showWhenLocked="true"
-          android:foregroundServiceType="phoneCall"
+          android:foregroundServiceType="phoneCall|dataSync|camera|microphone"
           android:turnScreenOn="true"
         />
         <service
-            android:name="com.reactnativefullscreennotificationincomingcall.IncomingCallService"
+            android:name=".IncomingCallService"
             android:enabled="true"
-            android:stopWithTask="false"
-            android:foregroundServiceType="phoneCall"
             android:exported="true"
-        />
+            android:foregroundServiceType="phoneCall|dataSync|camera|microphone">
+        </service>
         <!--callkeep-->
         <service android:name="io.wazo.callkeep.VoiceConnectionService"
              android:label="Wazo"
              android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
-             android:foregroundServiceType="phoneCall"
+             android:foregroundServiceType="phoneCall|dataSync|camera|microphone"
              android:exported="true"
         >
             <intent-filter>
@@ -93,6 +93,15 @@
             </intent-filter>
         </service>
       <service android:name="io.wazo.callkeep.RNCallKeepBackgroundMessagingService" android:exported="true"/>
+        <service
+            android:name=".CustomFirebaseMessagingReceiver"
+            android:enabled="true"
+            android:exported="true"
+        >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
@@ -156,9 +165,6 @@
               <action android:name="android.intent.action.SEND_MULTIPLE" />
               <category android:name="android.intent.category.DEFAULT" />
               <data android:mimeType="*/*" />
-          </intent-filter>
-          <intent-filter>
-              <action android:name="com.google.firebase.MESSAGING_EVENT"/>
           </intent-filter>
       </activity>
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>

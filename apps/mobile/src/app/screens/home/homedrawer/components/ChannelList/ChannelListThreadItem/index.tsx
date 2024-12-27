@@ -69,7 +69,12 @@ const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, is
 						{thread?.channel_label}
 					</Text>
 				</TouchableOpacity>
-				<BuzzBadge channelId={thread?.channel_id as string} mode={ChannelStreamMode.STREAM_MODE_THREAD} customStyles={styles.buzzBadge} />
+				<BuzzBadge
+					channelId={thread?.channel_id as string}
+					clanId={thread?.clan_id as string}
+					mode={ChannelStreamMode.STREAM_MODE_THREAD}
+					customStyles={styles.buzzBadge}
+				/>
 			</View>
 
 			{Number(numberNotification || 0) > 0 && isUnReadChannel && (

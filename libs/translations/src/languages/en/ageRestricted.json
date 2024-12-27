@@ -1,0 +1,11 @@
+{
+  "title": "Age-Restricted Channel",
+  "des": "This channel contains adult content marked as age-restricted. Do you wish to proceed?",
+  "continue": "Continue",
+  "nope":"Nope",
+  "ageRestrictedForm": {
+    "title": "Please confirm your birthday",
+    "description": "To keep our users safe, we need to verify your age. We will only ask you for this once.",
+    "submit": "Submit"
+  }
+}

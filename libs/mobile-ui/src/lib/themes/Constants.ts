@@ -52,7 +52,8 @@ export const baseColor = {
 	bgButtonPrimary: '#5865F2',
 	bgButtonSecondary: '#4E5057',
 	bgSuccess: '#16A34A',
-	bgDanger: '#DA373C'
+	bgDanger: '#DA373C',
+	bgDeepLavender: '#505cdc'
 } satisfies Colors;
 
 export const brandColors = {
