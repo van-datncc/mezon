@@ -40,12 +40,19 @@ export const handleTimeISO = (fullDateStr: Date, timeStr: string) => {
 	return isoDate.toISOString();
 };
 
-export function convertToLongUTCFormat(isoString: string) {
-	if (isoString.endsWith('Z') && !isoString.endsWith('.000Z')) {
-		return isoString.slice(0, -1) + '.000Z';
+export function convertToLongUTCFormat(dateString: string): string {
+	const date = new Date(dateString);
+	if (isNaN(date.getTime())) {
+		throw new Error('Invalid date string format');
 	}
+	let isoString = date.toISOString();
+	if (isoString.endsWith('Z') && !isoString.endsWith('.000Z')) {
+		isoString = isoString.slice(0, -1) + '.000Z';
+	}
+
 	return isoString;
 }
+
 export const getCurrentTimeRounded = (addMinute?: boolean) => {
 	const now = new Date();
 	const minuteNow = now.getMinutes();

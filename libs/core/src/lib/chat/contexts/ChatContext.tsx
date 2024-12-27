@@ -999,7 +999,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
-			console.log('eventCreatedEvent: ', eventCreatedEvent);
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
@@ -1025,18 +1024,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					return;
 				}
 				// Handling event update
-				// if (isActionUpdating) {
-				// 	const newChannelId = eventCreatedEvent.channel_id;
-				// 	const notUpdateChannelId = !newChannelId || newChannelId === '0';
-				// 	const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
-				// 	if (notUpdateChannelId || userHasChannel) {
-				// 		dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
-				// 		return;
-				// 	} else {
-				// 		dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
-				// 		return;
-				// 	}
-				// }
+				if (isActionUpdating) {
+					const newChannelId = eventCreatedEvent.channel_id;
+					const notUpdateChannelId = !newChannelId || newChannelId === '0';
+					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
+					if (notUpdateChannelId || userHasChannel) {
+						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+						return;
+					} else {
+						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+						return;
+					}
+				}
 				// Handling remove event logic
 				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));

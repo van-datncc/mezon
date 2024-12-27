@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
 	convertToLongUTCFormat,
@@ -113,7 +113,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = useCallback(async () => {
 		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
 		const address = choiceLocation ? contentSubmit.address : '';
 
@@ -134,9 +134,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 		);
 
 		hanldeCloseModal();
-	};
+	}, [choiceSpeaker, contentSubmit, choiceLocation, currentClanId, createEventManagement]);
 
-	const handleUpdate = async () => {
+	const handleUpdate = useCallback(async () => {
 		try {
 			const address = choiceLocation ? contentSubmit.address : '';
 			const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
@@ -152,8 +152,6 @@ const ModalCreate = (props: ModalCreateProps) => {
 						channel_id_old: currentEvent?.channel_id
 					}
 				: {};
-			console.log('commonFields', commonFields);
-			// Conditional fields (no useMemo)
 			const conditionalFields: Partial<Record<string, string | number | undefined>> = currentEvent
 				? {
 						channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
@@ -167,15 +165,13 @@ const ModalCreate = (props: ModalCreateProps) => {
 						repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? undefined : contentSubmit.repeatType
 					}
 				: {};
-			console.log('conditionalFields', conditionalFields);
+
 			const isConditionalFieldsEmpty = Object.values(conditionalFields).every((value) => value === undefined || value === '');
-			console.log('isConditionalFieldsEmpty: ', isConditionalFieldsEmpty);
 
 			const updateEventFields: Partial<Record<string, string | number>> = {
 				...commonFields,
 				...conditionalFields
 			};
-			console.log('updateEventFields', updateEventFields);
 			const fieldsToPass = Object.entries(updateEventFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
 				if (value) {
 					acc[key] = value;
@@ -183,7 +179,6 @@ const ModalCreate = (props: ModalCreateProps) => {
 				return acc;
 			}, {});
 			if (!isConditionalFieldsEmpty) {
-				console.log('fieldsToPass', fieldsToPass);
 				await dispatch(eventManagementActions.updateEventManagement(fieldsToPass));
 				hanldeCloseModal();
 			} else {
@@ -193,7 +188,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		} catch (error) {
 			console.error('Error in handleUpdate:', error);
 		}
-	};
+	}, [choiceLocation, contentSubmit, currentEvent, eventChannel, eventId, choiceSpeaker, currentClanId, dispatch]);
 
 	const hanldeCloseModal = () => {
 		onClose();

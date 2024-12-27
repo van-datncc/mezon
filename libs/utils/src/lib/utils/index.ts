@@ -1100,3 +1100,24 @@ export const getAttachmentDataForWindow = (
 		};
 	});
 };
+
+type Payload = Record<string, any>;
+type CommonFields = Record<string, any>;
+
+export function splitPayload(
+	payload: Payload,
+	commonKeys: readonly (keyof Payload)[]
+): { commonFields: CommonFields; conditionalFields: CommonFields } {
+	const commonFields: CommonFields = {};
+	const conditionalFields: CommonFields = {};
+
+	Object.keys(payload).forEach((key) => {
+		if (commonKeys.includes(key as keyof Payload)) {
+			commonFields[key] = payload[key];
+		} else {
+			conditionalFields[key] = payload[key];
+		}
+	});
+
+	return { commonFields, conditionalFields };
+}
