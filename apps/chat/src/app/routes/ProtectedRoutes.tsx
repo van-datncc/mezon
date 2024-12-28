@@ -1,4 +1,4 @@
-import { selectIsLogin, stickerSettingActions, useAppDispatch } from '@mezon/store';
+import { authActions, selectIsLogin, stickerSettingActions, useAppDispatch } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet, useLoaderData } from 'react-router-dom';
@@ -13,6 +13,7 @@ const ProtectedRoutes = () => {
 		dispatch(stickerSettingActions.fetchStickerByUserId({}));
 	}, [dispatch]);
 	if (!isLogin) {
+		dispatch(authActions.setLogout());
 		return <Navigate to={redirect || '/desktop/login'} replace />;
 	}
 
