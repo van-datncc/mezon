@@ -144,46 +144,58 @@ const ModalCreate = (props: ModalCreateProps) => {
 			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
 			const creatorId = currentEvent?.creator_id;
 
-			const commonFields: Partial<Record<string, string | number>> = currentEvent
-				? {
-						event_id: eventId,
-						clan_id: currentClanId as string,
-						creator_id: creatorId as string,
-						channel_id_old: currentEvent?.channel_id
-					}
-				: {};
-			const changeToPublic = contentSubmit.textChannelId === '' && currentEvent.channel_id && currentEvent.channel_id !== '0';
-			const conditionalFields: Partial<Record<string, string | number | undefined>> = currentEvent
-				? {
-						channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
-						address: contentSubmit.address === currentEvent.address ? undefined : address,
-						title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
-						start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
-						end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
-						description: contentSubmit.description === currentEvent.description ? undefined : contentSubmit.description,
-						logo: contentSubmit.logo === currentEvent.logo ? undefined : contentSubmit.logo,
-						channel_id: contentSubmit.textChannelId === currentEvent.channel_id ? undefined : contentSubmit.textChannelId,
-						repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? undefined : contentSubmit.repeatType
-					}
-				: {};
-
-			const isConditionalFieldsEmpty = Object.values(conditionalFields).every((value) => value === undefined || value === '');
-
-			const updateEventFields: Partial<Record<string, string | number>> = {
-				...commonFields,
-				...conditionalFields
+			const baseEventFields: Partial<Record<string, string | number>> = {
+				event_id: eventId,
+				clan_id: currentClanId as string,
+				creator_id: creatorId as string,
+				previous_channel_id: currentEvent?.channel_id
 			};
-			const fieldsToPass = Object.entries(updateEventFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
+
+			const updatedEventFields: Partial<Record<string, string | number | undefined>> = {
+				channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
+				address: contentSubmit.address === currentEvent.address ? undefined : address,
+				title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
+				start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
+				end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
+				repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? ERepeatType.DEFAULT : contentSubmit.repeatType
+			};
+
+			const additionalFields: Partial<Record<string, string | number | undefined>> = {
+				description: contentSubmit.description,
+				logo: contentSubmit.logo,
+				channel_id: contentSubmit.textChannelId
+			};
+
+			const areUpdatedFieldsEmpty = Object.values(updatedEventFields).every((value) => value === undefined || value === '');
+
+			const combinedUpdatedFields: Partial<Record<string, string | number>> = {
+				...baseEventFields,
+				...updatedEventFields
+			};
+
+			const validatedFieldsToUpdate = Object.entries(combinedUpdatedFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
 				if (value) {
 					acc[key] = value;
 				}
 				return acc;
 			}, {});
-			if (!isConditionalFieldsEmpty || changeToPublic) {
-				await dispatch(eventManagementActions.updateEventManagement(fieldsToPass));
+
+			const finalFieldsToSubmit: Partial<Record<string, string | number>> = {
+				...validatedFieldsToUpdate,
+				...additionalFields
+			};
+
+			if (!areUpdatedFieldsEmpty) {
+				await dispatch(eventManagementActions.updateEventManagement(finalFieldsToSubmit));
 				hanldeCloseModal();
 			} else {
-				dispatch(toastActions.addToast({ message: 'Nothing has changed', type: 'warning', autoClose: 3000 }));
+				dispatch(
+					toastActions.addToast({
+						message: 'Nothing has changed',
+						type: 'warning',
+						autoClose: 3000
+					})
+				);
 				hanldeCloseModal();
 			}
 		} catch (error) {

@@ -999,35 +999,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
+			// Check actions
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+
 			// Check repeat
-			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
+			const isEventNotRepeat =
+				eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT || eventCreatedEvent.repeat_type === ERepeatType.DEFAULT;
+
 			// Check status
 			const isEventUpcoming = eventCreatedEvent.event_status === EEventStatus.UPCOMING;
 			const isEventOngoing = eventCreatedEvent.event_status === EEventStatus.ONGOING;
 			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+
 			// Check action remove
-			const shouldRemoveEvent = isActionCreating && isEventNotRepeat && isEventCompleted;
+			const shouldRemoveEvent = isEventNotRepeat && isEventCompleted;
 			const onlyUpdateStatus = isEventUpcoming || isEventOngoing;
 
 			try {
-				// Handling event creation
 				if (isActionCreating) {
 					dispatch(eventManagementActions.addOneEvent(eventCreatedEvent));
 					return;
 				}
-				// Handling change the status
+
 				if (onlyUpdateStatus) {
 					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
 					return;
 				}
-				// Handling event update
+
 				if (isActionUpdating) {
 					const newChannelId = eventCreatedEvent.channel_id;
 					const notUpdateChannelId = !newChannelId || newChannelId === '0';
 					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
+
 					if (notUpdateChannelId || userHasChannel) {
 						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
 						return;
@@ -1036,7 +1041,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						return;
 					}
 				}
-				// Handling remove event logic
+
 				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 					return;
