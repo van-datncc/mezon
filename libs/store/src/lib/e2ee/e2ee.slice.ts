@@ -18,7 +18,7 @@ export interface E2eeState extends EntityState<PubKeyEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	openModalE2ee: boolean;
-	isShowBtnPin: boolean;
+	hasKeyE2ee: boolean;
 }
 
 export interface E2eeRootState {
@@ -65,7 +65,7 @@ export const initialE2eeState: E2eeState = e2eeAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	openModalE2ee: false,
-	isShowBtnPin: false
+	hasKeyE2ee: false
 });
 
 export const e2eeSlice = createSlice({
@@ -75,8 +75,8 @@ export const e2eeSlice = createSlice({
 		setOpenModalE2ee(state, action) {
 			state.openModalE2ee = action.payload;
 		},
-		setIsShowBtnPin(state, action) {
-			state.isShowBtnPin = action.payload;
+		setHasKey(state, action) {
+			state.hasKeyE2ee = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -143,4 +143,4 @@ export const checkE2EE = (clanId: string, channelId: string, thunkAPI: GetThunkA
 
 export const selectOpenModalE2ee = createSelector(getE2eeState, (state) => state.openModalE2ee);
 
-export const selectIsShowBtnPin = createSelector(getE2eeState, (state) => state.isShowBtnPin);
+export const selectHasKeyE2ee = createSelector(getE2eeState, (state) => state.hasKeyE2ee);

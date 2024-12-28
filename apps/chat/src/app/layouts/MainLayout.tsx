@@ -80,8 +80,8 @@ const GlobalEventListener = () => {
 	useEffect(() => {
 		if (user?.encrypt_private_key) {
 			MessageCrypt.checkExistingKeys(user?.user?.id as string).then((found) => {
-				if (!found) {
-					dispatch(e2eeActions.setIsShowBtnPin(true));
+				if (found) {
+					dispatch(e2eeActions.setHasKey(true));
 				}
 			});
 		} else {
