@@ -4,11 +4,11 @@ import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import Tippy from '@tippy.js/react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
-import { differenceTime, timeFomat } from '../timeFomatEvent';
+import { timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
 import PanelEventItem from './panelEventItem';
 
@@ -90,17 +90,6 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const panelRef = useRef(null);
 	useOnClickOutside(panelRef, () => setOpenPanel(false));
 
-	const checkTimeVoice = useMemo(() => differenceTime(end || '') + 30 < 0, [end]);
-	const checkTimeLocation = useMemo(() => differenceTime(end || '') < 0, [end]);
-	useEffect(() => {
-		if (checkTimeVoice && checkOptionVoice) {
-			deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '', event?.title || '');
-		}
-		if (checkTimeLocation && checkOptionLocation && !isReviewEvent) {
-			deleteEventManagement(event?.clan_id || '', event?.id || '', event?.creator_id || '', event?.title || '');
-		}
-	}, []);
-
 	const cssEventStatus = useMemo(() => {
 		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
 	}, [event?.event_status]);
@@ -176,7 +165,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					{checkOptionLocation && (
 						<>
 							<Icons.Location />
-							<p>{address}</p>
+							<p>{titleEvent}</p>
 						</>
 					)}
 					{option === '' && !address && !channelVoice && (

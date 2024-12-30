@@ -5,6 +5,7 @@ import {
 	AttachmentEntity,
 	DMCallActions,
 	JoinPTTActions,
+	RootState,
 	TalkPTTActions,
 	acitvitiesActions,
 	appActions,
@@ -41,6 +42,7 @@ import {
 	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
+	selectAllTextChannel,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
@@ -65,7 +67,10 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	EEventAction,
+	EEventStatus,
 	EOverriddenPermission,
+	ERepeatType,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
 	ModeResponsive,
@@ -121,7 +126,7 @@ import {
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -141,6 +146,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 	const { socketRef, reconnectWithTimeout } = useMezon();
 	const { userId } = useAuth();
+	const store = useStore();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId, channelId, clanId } = useAppParams();
 	const dispatch = useAppDispatch();
@@ -996,10 +1002,60 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[channelId]
 	);
-
 	const oneventcreated = useCallback(
 		(eventCreatedEvent: ApiCreateEventRequest) => {
-			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
+			// Check actions
+			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
+			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
+			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+
+			// Check repeat
+			const isEventNotRepeat =
+				eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT || eventCreatedEvent.repeat_type === ERepeatType.DEFAULT;
+
+			// Check status
+			const isEventUpcoming = eventCreatedEvent.event_status === EEventStatus.UPCOMING;
+			const isEventOngoing = eventCreatedEvent.event_status === EEventStatus.ONGOING;
+			const isEventCompleted = eventCreatedEvent.event_status === EEventStatus.COMPLETED;
+
+			// Check action remove
+			const shouldRemoveEvent = isEventNotRepeat && isEventCompleted;
+			const onlyUpdateStatus = isEventUpcoming || isEventOngoing;
+
+			try {
+				if (isActionCreating) {
+					dispatch(eventManagementActions.addOneEvent(eventCreatedEvent));
+					return;
+				}
+
+				if (onlyUpdateStatus) {
+					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
+					return;
+				}
+
+				if (isActionUpdating) {
+					const allThreadChannelPrivate = selectAllTextChannel(store.getState() as RootState);
+					const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
+					const newChannelId = eventCreatedEvent.channel_id;
+					const notUpdateChannelId = !newChannelId || newChannelId === '0';
+					const userHasChannel = allThreadChannelPrivateIds.includes(newChannelId);
+
+					if (notUpdateChannelId || userHasChannel) {
+						dispatch(eventManagementActions.upsertEvent(eventCreatedEvent));
+						return;
+					} else {
+						dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+						return;
+					}
+				}
+
+				if (shouldRemoveEvent || isActionDeleting) {
+					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
+					return;
+				}
+			} catch (error) {
+				console.error('Error handling eventCreatedEvent:', error);
+			}
 		},
 		[dispatch]
 	);

@@ -20,7 +20,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 			<ItemEventManagement
 				topic={contentSubmit.topic}
 				voiceChannel={contentSubmit.voiceChannel || ''}
-				titleEvent={contentSubmit.titleEvent}
+				titleEvent={contentSubmit.address || ''}
 				option={option}
 				logo={contentSubmit.logo}
 				start={time}
