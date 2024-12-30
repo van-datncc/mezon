@@ -77,7 +77,7 @@ const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, is
 				/>
 			</View>
 
-			{Number(numberNotification || 0) > 0 && isUnReadChannel && (
+			{Number(numberNotification || 0) > 0 && (
 				<View style={[styles.channelDotWrapper]}>
 					<Text style={styles.channelDot}>{numberNotification}</Text>
 				</View>
