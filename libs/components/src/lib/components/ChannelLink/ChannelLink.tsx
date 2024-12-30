@@ -9,7 +9,7 @@ import {
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
-	selectEventByChannelId,
+	selectEventsByChannelId,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -81,7 +81,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const theme = useSelector(selectTheme);
 
 		const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
-		const events = useAppSelector((state) => selectEventByChannelId(state, channel?.channel_id ?? ''));
+		const events = useAppSelector((state) => selectEventsByChannelId(state, channel?.channel_id ?? ''));
 
 		const handleOpenCreate = () => {
 			openSettingModal();

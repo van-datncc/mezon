@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
+import { EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
@@ -337,12 +337,20 @@ export const selectNumberEventPrivate = createSelector(
 	selectAllEventManagement,
 	(events) => events.filter((event) => event.channel_id && event.channel_id !== '0' && event.channel_id !== '').length
 );
-export const selectEventByChannelId = createSelector([selectAllEventManagement, (_, channelId: string) => channelId], (events, channelId) =>
-	events
-		.filter((event) => event.channel_id === channelId)
-		.sort((a, b) => {
-			const startTimeA = a.start_time ? new Date(a.start_time).getTime() : 0;
-			const startTimeB = b.start_time ? new Date(b.start_time).getTime() : 0;
-			return startTimeA - startTimeB;
-		})
-);
+export const selectEventsByChannelId = createSelector([selectAllEventManagement, (_, channelId: string) => channelId], (events, channelId) => {
+	const filteredEvents = events.filter((event) => event.channel_id === channelId);
+
+	const ongoingEvents = filteredEvents.filter((event) => event.event_status === EEventStatus.ONGOING);
+	if (ongoingEvents.length > 0) {
+		const oldestOngoingTime = Math.min(...ongoingEvents.map((event) => (event.start_time ? new Date(event.start_time).getTime() : Infinity)));
+		return ongoingEvents.filter((event) => new Date(event.start_time as string).getTime() === oldestOngoingTime);
+	}
+
+	const upcomingEvents = filteredEvents.filter((event) => event.event_status === EEventStatus.UPCOMING);
+	if (upcomingEvents.length > 0) {
+		const nearestUpcomingTime = Math.min(...upcomingEvents.map((event) => (event.start_time ? new Date(event.start_time).getTime() : Infinity)));
+		return upcomingEvents.filter((event) => new Date(event.start_time as string).getTime() === nearestUpcomingTime);
+	}
+
+	return [];
+});
