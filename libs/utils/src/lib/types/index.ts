@@ -1363,6 +1363,7 @@ export interface IAttachmentEntityWithUploader extends IAttachmentEntity {
 		avatar: string;
 		name: string;
 	};
+	realUrl: string;
 }
 
 export interface IImageWindowProps {

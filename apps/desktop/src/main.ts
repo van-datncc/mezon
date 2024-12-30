@@ -1,4 +1,4 @@
-import { BrowserWindow, app, dialog, ipcMain, screen, shell } from 'electron';
+import { BrowserWindow, app, clipboard, dialog, ipcMain, nativeImage, screen, shell } from 'electron';
 import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
@@ -6,9 +6,9 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import App from './app/app';
 import {
+	ACTION_SHOW_IMAGE,
 	CLOSE_APP,
 	DOWNLOAD_FILE,
-	DOWN_LOAD_IMAGE,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
@@ -191,11 +191,37 @@ ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
 	handleWindowAction(App.mainWindow, action);
 });
 
-ipcMain.handle(DOWN_LOAD_IMAGE, (event, action, data) => {
+ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, data) => {
 	const win = BrowserWindow.getFocusedWindow();
 	const fileURL = action?.payload?.fileURL;
-	if (fileURL) {
-		win.webContents.downloadURL(fileURL);
+	const actionImage = action?.payload?.action;
+
+	switch (actionImage) {
+		case 'copyLink': {
+			clipboard.writeText(fileURL);
+			break;
+		}
+		case 'copyImage': {
+			const blobImage = await fetch(fileURL).then((response) => response.blob());
+			const base64data = await blobImage.arrayBuffer();
+			const uint8Array = new Uint8Array(base64data);
+
+			let base64String = '';
+			const chunkSize = 8192; // Adjust the chunk size as needed
+			for (let i = 0; i < uint8Array.length; i += chunkSize) {
+				const chunk = uint8Array.subarray(i, i + chunkSize);
+				base64String += String.fromCharCode.apply(null, chunk);
+			}
+
+			const base64DataUrl = `data:image/png;base64,${btoa(base64String)}`;
+			clipboard.write({ image: nativeImage.createFromDataURL(base64DataUrl) });
+
+			break;
+		}
+		case 'saveImage': {
+			win.webContents.downloadURL(fileURL);
+			break;
+		}
 	}
 });
 

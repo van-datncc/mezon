@@ -18,6 +18,7 @@ export type MezonElectronAPI = {
 		currentImage: ApiMessageAttachment & {
 			create_time?: string;
 			uploaderData: { name: string; avatar: string };
+			realUrl: string;
 			channelImagesData: IImageWindowProps;
 		}
 	) => Promise<void>;

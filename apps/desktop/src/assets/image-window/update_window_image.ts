@@ -9,12 +9,13 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
     	document.getElementById('thumbnails-content').innerHTML = '${listThumnails(imageData.channelImagesData.images, activeIndex)}';
       selectedImage.src = '${imageData.url}';
         document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        document.getElementById('thumbnail-${activeIndex}').querySelector('.thumbnail').classList.add('active');
+        document.getElementById('thumbnail-${activeIndex}')?.querySelector('.thumbnail').classList.add('active');
         document.getElementById('userAvatar').src = "${imageData.uploaderData.avatar}"
         document.getElementById('username').innerHTML  = "${imageData.uploaderData.name}"
         document.getElementById('timestamp').innerHTML  = "${time}"
       ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
   `);
+	imageWindow.focus();
 }
 
 function formatDateTime(dateString) {
