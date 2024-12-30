@@ -487,20 +487,7 @@ document.addEventListener('contextmenu', (e) => {
 						break;
 					}
 					case 'copyImage': {
-
-          // const img = new Image(); 
-          // // img.crossOrigin = 'anonymous'; 
-          // img.src = currentImageUrl.realUrl;
-          // const canvas = document.createElement('canvas');
-          //  canvas.width = selectedImage.naturalWidth;
-          //  canvas.height = selectedImage.naturalHeight;
-          //  const ctx = canvas.getContext('2d');
-          //  ctx.drawImage(img, 0, 0);
-          //  canvas.toBlob((blob) => {
-
 						window.electron.handleActionShowImage(action,currentImageUrl.realUrl );
-        
-
 						break;
 					}
 					case 'saveImage': {
