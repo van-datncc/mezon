@@ -9,7 +9,6 @@ import {
 	directActions,
 	emojiSuggestionActions,
 	friendsActions,
-	getStoreAsync,
 	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,

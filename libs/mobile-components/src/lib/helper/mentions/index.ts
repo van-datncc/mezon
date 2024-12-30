@@ -1,4 +1,5 @@
-import { ChannelsEntity, HashtagDmEntity } from '@mezon/store-mobile';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { ChannelsEntity } from '@mezon/store-mobile';
 import {
 	ETokenMessage,
 	IEmojiOnMessage,
@@ -10,7 +11,7 @@ import {
 	IMentionOnMessage,
 	IMessageWithUser
 } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, HashtagDm } from 'mezon-js';
 
 export const convertMentionsToText = (text: string) => {
 	if (!text) {
@@ -46,7 +47,7 @@ export const convertMentionsToData = (text: string) => {
 	return result;
 };
 
-export const getChannelHashtag = (hashtagDmEntities: HashtagDmEntity[], channelsEntities: ChannelsEntity[], mode: number, channelLabel: string) => {
+export const getChannelHashtag = (hashtagDmEntities: HashtagDm[], channelsEntities: ChannelsEntity[], mode: number, channelLabel: string) => {
 	if ([ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
 		return hashtagDmEntities?.find((item) => item?.channel_label === channelLabel);
 	} else {

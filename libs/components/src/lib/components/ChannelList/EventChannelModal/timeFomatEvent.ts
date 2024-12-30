@@ -30,7 +30,6 @@ export const timeFomat = (start: string) => {
 
 export const handleTimeISO = (fullDateStr: Date, timeStr: string) => {
 	const date = new Date(fullDateStr);
-
 	const year = date.getFullYear();
 	const month = (date.getMonth() + 1).toString().padStart(2, '0');
 	const day = date.getDate().toString().padStart(2, '0');
@@ -40,6 +39,19 @@ export const handleTimeISO = (fullDateStr: Date, timeStr: string) => {
 
 	return isoDate.toISOString();
 };
+
+export function convertToLongUTCFormat(dateString: string): string {
+	const date = new Date(dateString);
+	if (isNaN(date.getTime())) {
+		throw new Error('Invalid date string format');
+	}
+	let isoString = date.toISOString();
+	if (isoString.endsWith('Z') && !isoString.endsWith('.000Z')) {
+		isoString = isoString.slice(0, -1) + '.000Z';
+	}
+
+	return isoString;
+}
 
 export const getCurrentTimeRounded = (addMinute?: boolean) => {
 	const now = new Date();
@@ -125,6 +137,25 @@ export const formatTimeStringToHourFormat = (timeString: string) => {
 	return `${hours}:${minutes}`;
 };
 
-export const formatToLocalDateString = (timeString: string) => {
-	return timeString.slice(0, -1);
+export const formatToLocalDateString = (timeString: string | Date) => {
+	if (timeString instanceof Date) {
+		if (isNaN(timeString.getTime())) {
+			throw new Error(`Invalid Date object: Unable to parse ${timeString}`);
+		}
+		return timeString.toISOString().slice(0, -1);
+	}
+
+	if (typeof timeString === 'string') {
+		if (timeString.includes('T') && timeString.endsWith('Z')) {
+			return timeString.slice(0, -1);
+		}
+
+		const date = new Date(timeString);
+		if (isNaN(date.getTime())) {
+			throw new Error(`Invalid timeString: Unable to parse ${timeString}`);
+		}
+		return date.toISOString().slice(0, -1);
+	}
+
+	throw new Error(`Invalid input: timeString must be a string or Date object`);
 };
