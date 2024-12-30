@@ -226,8 +226,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 	// Show window when ready with fade-in effect
 	popupWindow.once('ready-to-show', () => {
-		popupWindow.webContents.openDevTools();
-
 		popupWindow.webContents.executeJavaScript(`
 
 	    const selectedImage = document.getElementById('selectedImage');
