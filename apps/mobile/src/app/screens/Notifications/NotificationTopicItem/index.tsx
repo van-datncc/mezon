@@ -71,7 +71,7 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 		const promises = [];
 		promises.push(store.dispatch(topicsActions.setValueTopic(message)));
 		promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.id || '')));
-		promises.push(store.dispatch(topicsActions.setIsShowCreateTopic({ channelId: notify?.id as string, isShowCreateTopic: true })));
+		promises.push(store.dispatch(topicsActions.setIsShowCreateTopic({ channelId: notify?.channel_id as string, isShowCreateTopic: true })));
 
 		await Promise.all(promises);
 
