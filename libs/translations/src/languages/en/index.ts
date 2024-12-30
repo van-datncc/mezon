@@ -37,6 +37,7 @@ import notificationSetting from './notificationSetting.json';
 import pinMessage from './pinMessage.json';
 import profile from './profile.json';
 import profileSetting from './profileSetting.json';
+import recordChatMessage from './recordChatMessage.json';
 import screen from './screen.json';
 import screenStack from './screenStack.json';
 import searchMessageChannel from './searchMessageChannel.json';
@@ -44,7 +45,6 @@ import setting from './setting.json';
 import streamingRoom from './streamingRoom.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
-
 export default {
 	inviteToChannel,
 	notification,
@@ -91,5 +91,6 @@ export default {
 	clanIntegrationsSetting,
 	activityApp,
 	auditLog,
-	ageRestricted
+	ageRestricted,
+	recordChatMessage
 };
