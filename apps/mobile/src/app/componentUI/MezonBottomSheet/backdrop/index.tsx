@@ -23,7 +23,7 @@ const Backdrop = ({ onBackdropPress, ...props }: CustomBackdropProps) => {
 		[props.style, containerAnimatedStyle]
 	);
 	return (
-		<TouchableWithoutFeedback onPress={onBackdropPress}>
+		<TouchableWithoutFeedback onPress={onBackdropPress ? onBackdropPress : null}>
 			<BottomSheetBackdrop
 				{...props}
 				style={containerStyle}

@@ -235,18 +235,14 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 		setIsDisplay(false);
 		recordingBsRef?.current?.dismiss();
 	};
-
+	const handleBackdropBS = useCallback(() => {
+		setIsConfirmRecordModalVisible(true);
+	}, []);
 	if (!isDisplay) return null;
 	return (
 		<Block>
 			<ModalConfirmRecord visible={isConfirmRecordModalVisible} onBack={handleBackRecord} onConfirm={handleQuitRecord} />
-			<MezonBottomSheet
-				snapPoints={['50%']}
-				ref={recordingBsRef}
-				onBackdropPress={() => {
-					setIsConfirmRecordModalVisible(true);
-				}}
-			>
+			<MezonBottomSheet snapPoints={['50%']} ref={recordingBsRef} onBackdropPress={handleBackdropBS}>
 				<Block alignItems="center" justifyContent="center" paddingHorizontal={size.s_40} paddingVertical={size.s_20}>
 					{isPreviewRecord && recordUrl ? (
 						<RenderAudioChat audioURL={recordUrl} stylesContainerCustom={styles.containerAudioCustom} styleLottie={styles.customLottie} />
