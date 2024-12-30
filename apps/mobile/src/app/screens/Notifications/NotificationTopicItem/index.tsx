@@ -2,6 +2,7 @@ import { useAuth, useGetPriorityNameFromUserClan } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { getStoreAsync, selectAllUserClans, selectMemberClanByUserId, topicsActions, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -23,10 +24,10 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 	const { priorityAvatar: priorityAvatarContentSender } = useGetPriorityNameFromUserClan(notify?.content?.sender_id);
 	const message = Object.assign({}, data, { create_time: notify?.create_time, avatar: priorityAvatarContentSender });
 	const { messageTimeDifference } = useMessageParser(message);
-	const initMessage = JSON.parse(notify?.subject)?.t;
+	const initMessage = safeJSONParse(notify?.subject || '')?.t;
 	const userIds = notify.content.repliers;
 	const [subjectTopic, setSubjectTopic] = useState('');
-	const lastSentUser = useAppSelector(selectMemberClanByUserId(notify.sender_id ?? ''));
+	const lastSentUser = useAppSelector(selectMemberClanByUserId(notify?.sender_id ?? ''));
 
 	const usernames = useMemo(() => {
 		return memberClan
@@ -51,7 +52,7 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 		const store = await getStoreAsync();
 		const promises = [];
 		promises.push(store.dispatch(topicsActions.setValueTopic(message)));
-		promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify.id || '')));
+		promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.id || '')));
 		promises.push(
 			store.dispatch(topicsActions.setIsShowCreateTopic({ channelId: notify?.content?.channel_id as string, isShowCreateTopic: true }))
 		);
@@ -83,11 +84,11 @@ const NotificationTopicItem = React.memo(({ notify, onLongPressNotify, onPressNo
 						</Text>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
 							<Text style={styles.username}>{'Replied To: '}</Text>
-							{data.content.t}
+							{data?.content?.t || 'Unreachable message'}
 						</Text>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
 							<Text style={styles.username}>{`${lastSentUser ? lastSentUser?.user?.username : 'Sender'}: `} </Text>
-							{initMessage}
+							{initMessage || 'Unreachable message'}
 						</Text>
 					</View>
 					<Text style={styles.notifyDuration}>{messageTimeDifference}</Text>
