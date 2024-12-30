@@ -1,4 +1,5 @@
 import { EventManagementEntity, eventManagementActions, useAppDispatch } from '@mezon/store';
+import { ERepeatType } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 
 export function useEventManagement() {
@@ -21,7 +22,8 @@ export function useEventManagement() {
 			end_time: string,
 			description: string,
 			logo: string,
-			channel_id: string
+			channel_id: string,
+			repeat_type: ERepeatType
 		) => {
 			await dispatch(
 				eventManagementActions.fetchCreateEventManagement({
@@ -33,40 +35,8 @@ export function useEventManagement() {
 					end_time,
 					description,
 					logo,
-					channel_id
-				})
-			);
-		},
-		[dispatch]
-	);
-
-	const updateEventManagement = useCallback(
-		async (
-			event_id: string,
-			clan_id: string,
-			channel_voice_id: string,
-			address: string,
-			title: string,
-			start_time: string,
-			end_time: string,
-			description: string,
-			logo: string,
-			creator_id: string,
-			channel_id: string
-		) => {
-			await dispatch(
-				eventManagementActions.updateEventManagement({
-					event_id,
-					clan_id,
-					channel_voice_id,
-					address,
-					title,
-					start_time,
-					end_time,
-					description,
-					logo,
-					creator_id,
-					channel_id
+					channel_id,
+					repeat_type
 				})
 			);
 		},
@@ -86,9 +56,8 @@ export function useEventManagement() {
 		() => ({
 			createEventManagement,
 			deleteEventManagement,
-			setChooseEvent,
-			updateEventManagement
+			setChooseEvent
 		}),
-		[createEventManagement, deleteEventManagement, setChooseEvent, updateEventManagement]
+		[createEventManagement, deleteEventManagement, setChooseEvent]
 	);
 }

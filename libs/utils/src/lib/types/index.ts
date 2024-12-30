@@ -765,7 +765,6 @@ export enum MentionTypeEnum {
 
 export type ContenSubmitEventProps = {
 	topic: string;
-	titleEvent: string;
 	timeStart: string;
 	timeEnd: string;
 	selectedDateStart: Date;
@@ -774,6 +773,8 @@ export type ContenSubmitEventProps = {
 	logo: string;
 	description: string;
 	textChannelId?: string;
+	address?: string;
+	repeatType?: number | undefined;
 };
 
 export enum SHOW_POSITION {
@@ -1009,8 +1010,7 @@ export enum EEventStatus {
 	CREATED = 0,
 	UPCOMING = 1,
 	ONGOING = 2,
-	COMPLETED = 3,
-	UNKNOWN = 4
+	COMPLETED = 3
 }
 
 export enum TypeCheck {
@@ -1375,4 +1375,20 @@ export interface IImageWindowProps {
 
 export interface UsersClanEntity extends IUsersClan {
 	id: string; // Primary ID
+}
+
+export enum EEventAction {
+	CREATED = 1,
+	UPDATE = 2,
+	DELETE = 3
+}
+
+export enum ERepeatType {
+	DEFAULT = 0, // is not select
+	DOES_NOT_REPEAT = 1,
+	WEEKLY_ON_DAY = 2,
+	EVERY_OTHER_DAY = 3,
+	MONTHLY = 4,
+	ANNUALLY = 5,
+	EVERY_WEEKDAY = 6
 }
