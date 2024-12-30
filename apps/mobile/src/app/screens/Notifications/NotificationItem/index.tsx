@@ -20,11 +20,11 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 		[notify?.code]
 	);
 
-	const isNotificationTopicItem = useMemo(() => !notify.code, [notify.code]);
+	const isNotificationTopicItem = useMemo(() => !notify?.code, [notify?.code]);
 
 	const isNotificationMentionItem = useMemo(
 		() => notify?.code === NotificationCode.USER_REPLIED || notify?.code === NotificationCode.USER_MENTIONED,
-		[notify.code]
+		[notify?.code]
 	);
 
 	const isNotificationWebhookClan = useMemo(() => notify?.code === NotificationCode.NOTIFICATION_CLAN, [notify]);
