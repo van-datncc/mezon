@@ -9,9 +9,10 @@ import { AudioRecorderUI } from './AudioRecorderUI';
 
 type AudioRecorderProps = {
 	onSendRecord: () => void;
+	outerRecording: boolean;
 };
 
-const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendRecord }) => {
+const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendRecord, outerRecording }) => {
 	const [isRecording, setIsRecording] = useState(true);
 	const [audioUrl, setAudioUrl] = useState('');
 	const [seconds, setSeconds] = useState(0);
@@ -68,7 +69,6 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track) => track.stop());
 		}
-		onSendRecord();
 
 		recorderRef.current.onstop = async () => {
 			if (chunksRef.current.length === 0) {
@@ -87,7 +87,7 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 				})
 			);
 		};
-	}, [currentInbox?.id, dispatch, isRecording, onSendRecord]);
+	}, [currentInbox?.id, dispatch, isRecording]);
 
 	const resetRecording = useCallback(() => {
 		// Revoke blob URL
@@ -159,25 +159,29 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 	}, [audioUrl, audioList, isStopping, generateAudioList, sendMessage, resetRecording, onSendRecord]);
 
 	useEffect(() => {
-		startRecording();
-		return () => {
-			if (audioUrl) {
-				URL.revokeObjectURL(audioUrl);
-			}
-			resetRecording();
-			onSendRecord();
-		};
-	}, []);
+		if (outerRecording) {
+			startRecording();
+			return () => {
+				if (audioUrl) {
+					URL.revokeObjectURL(audioUrl);
+				}
+			};
+		}
+		stopRecording();
+		resetRecording();
+	}, [outerRecording]);
 
 	return (
-		<AudioRecorderUI
-			isRecording={isRecording}
-			seconds={seconds}
-			audioUrl={audioUrl}
-			onStopRecording={stopRecording}
-			onSendRecording={sendRecording}
-			onResetRecording={resetRecording}
-		/>
+		<div className="hidden">
+			<AudioRecorderUI
+				isRecording={isRecording}
+				seconds={seconds}
+				audioUrl={audioUrl}
+				onStopRecording={stopRecording}
+				onSendRecording={sendRecording}
+				onResetRecording={resetRecording}
+			/>
+		</div>
 	);
 });
 
