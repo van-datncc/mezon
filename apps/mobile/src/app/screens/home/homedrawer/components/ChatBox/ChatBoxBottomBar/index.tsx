@@ -32,12 +32,12 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
-import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
+import { ChatBoxListener } from '../ChatBoxListener';
 import { ChatMessageInput } from '../ChatMessageInput';
 import { ChatMessageLeftArea } from '../ChatMessageLeftArea';
 import useProcessedContent from './useProcessedContent';
@@ -89,6 +89,7 @@ export const ChatBoxBottomBar = memo(
 		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
 		const [mentionTextValue, setMentionTextValue] = useState('');
+		const [listMentions, setListMentions] = useState<MentionDataProps[]>([]);
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -98,10 +99,18 @@ export const ChatBoxBottomBar = memo(
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
 		const { sessionRef, clientRef } = useMezon();
-		const listMentions = UseMentionList({
-			channelID: mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel?.parrent_id : channelId || '',
-			channelMode: mode
-		});
+		useEffect(() => {
+			const eventDataMention = DeviceEventEmitter.addListener(
+				ActionEmitEvent.ON_SET_LIST_MENTION_DATA,
+				({ data }: { data: MentionDataProps[] }) => {
+					setListMentions(data);
+				}
+			);
+			return () => {
+				eventDataMention.remove();
+			};
+		}, []);
+
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
@@ -462,7 +471,7 @@ export const ChatBoxBottomBar = memo(
 				{triggers?.hashtag?.keyword !== undefined && <HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />}
 				{triggers?.emoji?.keyword !== undefined && <EmojiSuggestion {...triggers.emoji} />}
 				<AttachmentPreview channelId={channelId} />
-
+				<ChatBoxListener mode={mode} channelId={channelId} parentId={currentChannel?.parrent_id} />
 				<Block
 					flexDirection="row"
 					justifyContent="space-between"
