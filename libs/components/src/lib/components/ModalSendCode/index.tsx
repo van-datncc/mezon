@@ -24,9 +24,9 @@ const ModalIntro = ({ onNext, onClose }: ModalProps) => {
 					</button>
 				</div>
 				<div className="flex flex-col items-center gap-2 px-4 pb-4 dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black rounded-b">
-					<h2 className="text-lg font-semibold">Set up a way to access your chat history</h2>
+					<h2 className="text-lg font-semibold">Set up a way to access your encrypted chats</h2>
 					<p className="text-gray-600 text-center">
-						With the upgrade, access to chat history is changing. You can create a PIN to access your chat history if you switch devices.
+						With the upgrade, the content of the chat will be encrypted. You can create a PIN to access your chats if you switch devices.
 					</p>
 					<div className="flex justify-end w-full">
 						<button onClick={onNext} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
@@ -122,6 +122,7 @@ const ModalCreatePin = ({ onNext, onBack, onClose, setPin }: ModalProps & { setP
 				</div>
 				<div className="flex flex-col items-center gap-2 px-4 pb-4 dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black rounded-b">
 					<h2 className="text-lg font-semibold">Create Your PIN</h2>
+					<p className="text-gray-600 text-center">Make it memorable. You'll need it when you switch to a new device</p>
 					<div className="flex space-x-2 mt-4">
 						{pin.map((value, index) => (
 							<input
@@ -224,7 +225,7 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 				await MessageCrypt.decryptPrivateKeyWithPIN(userProfile?.encrypt_private_key, otpCode, userProfile?.user?.id as string);
 				onClose();
 				clearAllMemoizedFunctions();
-				dispatch(e2eeActions.setIsShowBtnPin(false));
+				dispatch(e2eeActions.setHasKey(true));
 			} else {
 				if (otpCode === pinCode) {
 					const encryptWithPIN = await MessageCrypt.encryptPrivateKeyWithPIN(userProfile?.user?.id as string, otpCode);
@@ -274,6 +275,11 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 				</div>
 				<div className="flex flex-col items-center gap-2 px-4 pb-4 dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black rounded-b">
 					<h2 className="text-lg font-semibold">Confirm Your PIN</h2>
+					{!userProfile?.encrypt_private_key ? (
+						<p className="text-gray-600 text-center">Make it memorable. You'll need it when you switch to a new device</p>
+					) : (
+						<p className="text-gray-600 text-center">Enter pin to decrypt conversation</p>
+					)}
 					<div className="flex space-x-2 mt-4">
 						{otp.map((value, index) => (
 							<input

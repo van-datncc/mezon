@@ -1,3 +1,4 @@
+const image_window_css = `
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -301,3 +302,5 @@ body {
         margin-bottom: 8px;
     }
 }
+`;
+export default image_window_css;
