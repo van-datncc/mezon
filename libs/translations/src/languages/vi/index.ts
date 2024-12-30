@@ -36,6 +36,7 @@ import notificationSetting from './notificationSetting.json';
 import pinMessage from './pinMessage.json';
 import profile from './profile.json';
 import profileSetting from './profileSetting.json';
+import recordChatMessage from './recordChatMessage.json';
 import screen from './screen.json';
 import screenStack from './screenStack.json';
 import searchMessageChannel from './searchMessageChannel.json';
@@ -90,5 +91,6 @@ export default {
 	clanIntegrationsSetting,
 	activityApp,
 	auditLog,
-	ageRestricted
+	ageRestricted,
+	recordChatMessage
 };
