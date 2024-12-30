@@ -1,4 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Block, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectDmGroupCurrent, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -10,9 +10,14 @@ import LottieView from 'lottie-react-native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter } from 'react-native';
+import { Alert, DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { RECORDING, RECORD_WAVE } from '../../../../../../../assets/lottie';
+import { SOUND_WAVES_CIRCLE } from '../../../../../../../assets/lottie';
+import { MezonBottomSheet } from '../../../../../../componentUI';
+import RenderAudioChat from '../../RenderAudioChat/RenderAudioChat';
+import ModalConfirmRecord from '../ModalConfirmRecord/ModalConfirmRecord';
+import { RecordingAudioMessage } from '../RecordingAudioMessage/RecordingAudioMessage';
+import { style } from './styles';
 
 interface IRecordAudioMessageProps {
 	channelId: string;
@@ -21,7 +26,8 @@ interface IRecordAudioMessageProps {
 
 export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
 	const { themeValue } = useTheme();
-	const { t } = useTranslation(['message']);
+	const styles = style(themeValue);
+	const { t } = useTranslation(['recordChatMessage']);
 	const [recording, setRecording] = useState(null);
 	const [isDisplay, setIsDisplay] = useAnimatedState(false);
 
@@ -30,7 +36,12 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 	const { sessionRef, clientRef, socketRef } = useMezon();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId || ''));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
-
+	const recordingBsRef = useRef(null);
+	const [recordUrl, setRecordUrl] = useState<string>('');
+	const [durationRecord, setDurationRecord] = useState(0);
+	const [isPreviewRecord, setIsPreviewRecord] = useState<boolean>(false);
+	const meterSoundRef = useRef(null);
+	const [isConfirmRecordModalVisible, setIsConfirmRecordModalVisible] = useAnimatedState(false);
 	const currentChannelDM = useMemo(
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup),
 		[mode, currentChannel, currentDmGroup]
@@ -54,7 +65,8 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 			const isPermissionGranted = await getPermissions();
 			if (!isPermissionGranted) return;
 			setIsDisplay(true);
-			// Configure audio
+			setIsPreviewRecord(false);
+			recordingBsRef.current?.present();
 			await Audio.setAudioModeAsync({
 				allowsRecordingIOS: true,
 				playsInSilentModeIOS: true
@@ -87,8 +99,10 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 					bitsPerSecond: 128000
 				}
 			});
+
 			recordingRef.current?.play();
-			recordingWaveRef.current?.play();
+			recordingWaveRef.current?.play(0, 45);
+			meterSoundRef.current?.play();
 
 			setRecording(newRecording);
 		} catch (error) {
@@ -97,42 +111,12 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 		}
 	};
 
-	const sendMessage = useCallback(
-		async (url: string) => {
-			try {
-				const session = sessionRef.current;
-				const client = clientRef.current;
-				const socket = socketRef.current;
-				const clanId = currentChannelDM?.clan_id;
-				const channelId = currentChannelDM?.channel_id;
-				const isPublic = !currentChannelDM?.channel_private;
-
-				const attachments = await getAudioFileInfo(url);
-				const uploadedFiles = await getMobileUploadedAttachments({
-					attachments,
-					channelId,
-					clanId,
-					client,
-					session
-				});
-				await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '');
-				setIsDisplay(false);
-			} catch (error) {
-				console.error('Failed to send message:', error);
-				setIsDisplay(false);
-			}
-		},
-		[
-			sessionRef,
-			clientRef,
-			socketRef,
-			currentChannelDM?.clan_id,
-			currentChannelDM?.channel_id,
-			currentChannelDM?.channel_private,
-			mode,
-			setIsDisplay
-		]
-	);
+	useEffect(() => {
+		if (!recording) return;
+		recording.setOnRecordingStatusUpdate(async (status) => {
+			setDurationRecord(status?.durationMillis);
+		});
+	}, [recording]);
 
 	const stopRecording = useCallback(async () => {
 		try {
@@ -142,18 +126,65 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 
 			// Get recording URI
 			const uri = recording.getURI();
+
 			if (uri) {
-				sendMessage(uri);
+				setRecordUrl(uri);
 			}
 
 			recordingRef.current?.reset();
-			recordingWaveRef.current?.reset();
+			meterSoundRef.current?.reset();
 			setRecording(null);
+			return uri;
 		} catch (error) {
 			setIsDisplay(false);
 			console.error('Failed to stop recording:', error);
 		}
-	}, [recording, sendMessage, setIsDisplay]);
+	}, [recording, setIsDisplay]);
+
+	const sendMessage = useCallback(async () => {
+		try {
+			let recordingUrl;
+			if (isPreviewRecord) {
+				recordingUrl = recordUrl;
+			} else {
+				recordingUrl = await stopRecording();
+			}
+			if (!recordingUrl) return;
+			const session = sessionRef.current;
+			const client = clientRef.current;
+			const socket = socketRef.current;
+			const clanId = currentChannelDM?.clan_id;
+			const channelId = currentChannelDM?.channel_id;
+			const isPublic = !currentChannelDM?.channel_private;
+
+			const attachments = await getAudioFileInfo(recordingUrl);
+			const uploadedFiles = await getMobileUploadedAttachments({
+				attachments,
+				channelId,
+				clanId,
+				client,
+				session
+			});
+			await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '');
+			setIsDisplay(false);
+			recordingBsRef?.current?.dismiss();
+		} catch (error) {
+			console.error('Failed to send message:', error);
+			setIsDisplay(false);
+		}
+	}, [
+		isPreviewRecord,
+		sessionRef,
+		clientRef,
+		socketRef,
+		currentChannelDM?.clan_id,
+		currentChannelDM?.channel_id,
+		currentChannelDM?.channel_private,
+		mode,
+		setIsDisplay,
+		recordUrl,
+		stopRecording
+	]);
 
 	const getAudioFileInfo = async (uri) => {
 		try {
@@ -177,32 +208,76 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 
 	useEffect(() => {
 		const eventStartRecord = DeviceEventEmitter.addListener(ActionEmitEvent.ON_START_RECORD_MESSAGE, startRecording);
-		const eventStopRecord = DeviceEventEmitter.addListener(ActionEmitEvent.ON_STOP_RECORD_MESSAGE, stopRecording);
 
 		return () => {
 			eventStartRecord.remove();
-			eventStopRecord.remove();
 		};
-	}, [stopRecording]);
+	}, []);
+
+	const handlePreviewRecord = async () => {
+		meterSoundRef.current?.pause();
+		await stopRecording();
+		setIsPreviewRecord(true);
+	};
+
+	const handleBackRecord = useCallback(() => {
+		setIsConfirmRecordModalVisible(false);
+	}, []);
+
+	const handleQuitRecord = useCallback(() => {
+		recordingBsRef?.current?.dismiss();
+		setIsConfirmRecordModalVisible(false);
+		stopRecording();
+	}, [recording]);
+
+	const handleRemoveRecord = async () => {
+		await stopRecording();
+		setIsDisplay(false);
+		recordingBsRef?.current?.dismiss();
+	};
 
 	if (!isDisplay) return null;
-
 	return (
-		<Block
-			position={'absolute'}
-			paddingHorizontal={size.s_10}
-			left={0}
-			width={'88%'}
-			height={'100%'}
-			flex={1}
-			backgroundColor={themeValue.primary}
-			top={0}
-			flexDirection={'row'}
-			alignItems={'center'}
-			zIndex={100}
-		>
-			<LottieView source={RECORDING} ref={recordingRef} resizeMode="cover" style={{ width: size.s_70, height: size.s_70 }} />
-			<LottieView source={RECORD_WAVE} ref={recordingWaveRef} resizeMode="cover" style={{ width: size.s_60 * 2, height: size.s_30 }} />
+		<Block>
+			<ModalConfirmRecord visible={isConfirmRecordModalVisible} onBack={handleBackRecord} onConfirm={handleQuitRecord} />
+			<MezonBottomSheet
+				snapPoints={['50%']}
+				ref={recordingBsRef}
+				onBackdropPress={() => {
+					setIsConfirmRecordModalVisible(true);
+				}}
+			>
+				<Block alignItems="center" justifyContent="center" paddingHorizontal={size.s_40} paddingVertical={size.s_20}>
+					{isPreviewRecord && recordUrl ? (
+						<RenderAudioChat audioURL={recordUrl} stylesContainerCustom={styles.containerAudioCustom} styleLottie={styles.customLottie} />
+					) : (
+						<RecordingAudioMessage durationRecord={durationRecord} ref={recordingWaveRef} />
+					)}
+
+					<Block marginTop={size.s_20}>
+						<Text style={styles.title}>{t('handsFreeMode')}</Text>
+						<Block flexDirection="row" alignItems="center" justifyContent="space-between" marginVertical={size.s_20} width={'80%'}>
+							<TouchableOpacity onPress={handleRemoveRecord} style={styles.boxIcon}>
+								<Icons.TrashIcon color={themeValue.white} />
+							</TouchableOpacity>
+							<TouchableOpacity onPress={sendMessage} style={styles.soundContainer}>
+								<Icons.SendMessageIcon style={styles.iconOverlay} color={themeValue.white} />
+								<LottieView
+									ref={meterSoundRef}
+									source={SOUND_WAVES_CIRCLE}
+									resizeMode="cover"
+									style={styles.soundLottie}
+								></LottieView>
+							</TouchableOpacity>
+							{!isPreviewRecord && (
+								<TouchableOpacity onPress={handlePreviewRecord} style={styles.boxIcon}>
+									<Icons.RecordIcon color={themeValue.white} />
+								</TouchableOpacity>
+							)}
+						</Block>
+					</Block>
+				</Block>
+			</MezonBottomSheet>
 		</Block>
 	);
 });
