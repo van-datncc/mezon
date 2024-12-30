@@ -70,31 +70,35 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 				<Text style={styles.title}>Topic</Text>
 				<Block width={size.s_50} />
 			</Block>
-			<Block flexDirection="row" alignItems="center" gap={size.s_10} marginVertical={size.s_10}>
-				<MezonAvatar avatarUrl={messageAvatar} username={senderDisplayName} />
+			{!valueTopic ? null : (
 				<Block>
-					<Text style={styles.name} color={colorSenderName}>
-						{senderDisplayName}
-					</Text>
-					<Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>
+					<Block flexDirection="row" alignItems="center" gap={size.s_10} marginVertical={size.s_10}>
+						<MezonAvatar avatarUrl={messageAvatar} username={senderDisplayName} />
+						<Block>
+							<Text style={styles.name} color={colorSenderName}>
+								{senderDisplayName}
+							</Text>
+							<Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>
+						</Block>
+					</Block>
+					<RenderTextMarkdownContent
+						content={{
+							...(typeof valueTopic.content === 'object' ? valueTopic.content : {}),
+							mentions: valueTopic.mentions
+						}}
+						translate={t}
+						isMessageReply={false}
+						onMention={onMention}
+						onChannelMention={onChannelMention}
+					/>
+					{valueTopic?.attachments?.length > 0 && (
+						<MessageAttachment
+							attachments={valueTopic?.attachments || []}
+							senderId={valueTopic?.sender_id}
+							createTime={valueTopic?.create_time}
+						/>
+					)}
 				</Block>
-			</Block>
-			<RenderTextMarkdownContent
-				content={{
-					...(typeof valueTopic.content === 'object' ? valueTopic.content : {}),
-					mentions: valueTopic.mentions
-				}}
-				translate={t}
-				isMessageReply={false}
-				onMention={onMention}
-				onChannelMention={onChannelMention}
-			/>
-			{valueTopic?.attachments?.length > 0 && (
-				<MessageAttachment
-					attachments={valueTopic?.attachments || []}
-					senderId={valueTopic?.sender_id}
-					createTime={valueTopic?.create_time}
-				/>
 			)}
 		</Block>
 	);
