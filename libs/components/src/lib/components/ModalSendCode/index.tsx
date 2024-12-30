@@ -1,5 +1,5 @@
-import { useAuth } from '@mezon/core';
-import { clansActions, clearAllMemoizedFunctions, e2eeActions, useAppDispatch } from '@mezon/store';
+import { useAppParams, useAuth } from '@mezon/core';
+import { clansActions, clearAllMemoizedFunctions, e2eeActions, messagesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MessageCrypt } from '@mezon/utils';
 import { ApiAccount } from 'mezon-js/api.gen';
@@ -151,6 +151,7 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 	const dispatch = useAppDispatch();
+	const { directId } = useAppParams();
 	useEffect(() => {
 		if (inputsRef.current[activeIndex]) {
 			inputsRef.current[activeIndex]?.focus();
@@ -226,6 +227,9 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 				onClose();
 				clearAllMemoizedFunctions();
 				dispatch(e2eeActions.setHasKey(true));
+				if (directId) {
+					dispatch(messagesActions.fetchMessages({ clanId: '0', channelId: directId as string, foundE2ee: true }));
+				}
 			} else {
 				if (otpCode === pinCode) {
 					const encryptWithPIN = await MessageCrypt.encryptPrivateKeyWithPIN(userProfile?.user?.id as string, otpCode);
