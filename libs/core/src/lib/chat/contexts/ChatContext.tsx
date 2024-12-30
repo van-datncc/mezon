@@ -22,6 +22,7 @@ import {
 	directActions,
 	directMetaActions,
 	directSlice,
+	e2eeActions,
 	emojiSuggestionActions,
 	eventManagementActions,
 	friendsActions,
@@ -47,6 +48,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
+	selectHasKeyE2ee,
 	selectModeResponsive,
 	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
@@ -155,6 +157,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -869,6 +872,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (channelUpdated.clan_id === '0') {
+				if (channelUpdated?.e2ee && !hasKeyE2ee) {
+					dispatch(e2eeActions.setOpenModalE2ee(true));
+				}
 				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
 

@@ -1,5 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity, RootState, selectAttachmentPhoto } from '@mezon/store-mobile';
+import { AttachmentEntity, RootState, selectAllListAttachmentByChannel, selectCurrentChannelId } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Dimensions, FlatList, Platform, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,8 @@ import MediaSkeleton from './MediaSkeleton/MediaSkeleton';
 const MediaChannel = memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const attachments = useSelector(selectAttachmentPhoto());
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const attachments = useSelector((state) => selectAllListAttachmentByChannel(state, currentChannelId));
 	const loadStatus = useSelector((state: RootState) => state?.attachments?.loadingStatus);
 	const [imageSelected, setImageSelected] = useState<AttachmentEntity>();
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);

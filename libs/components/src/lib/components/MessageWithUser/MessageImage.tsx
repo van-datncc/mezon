@@ -53,14 +53,6 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 			if (isElectron()) {
 				const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
-				window.electron.openImageWindow({
-					...attachmentData,
-					uploaderData: {
-						name:
-							currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
-						avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
-					}
-				});
 
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
@@ -74,7 +66,23 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 							selectedImageIndex: selectedImageIndex
 						};
 
-						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+						window.electron.openImageWindow({
+							...attachmentData,
+							url: createImgproxyUrl(attachmentData.url || '', {
+								width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
+								height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+								resizeType: 'fit'
+							}),
+							uploaderData: {
+								name:
+									currentImageUploader?.clan_nick ||
+									currentImageUploader?.user?.display_name ||
+									currentImageUploader?.user?.username ||
+									'',
+								avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+							},
+							channelImagesData
+						});
 						return;
 					}
 					dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }))
@@ -92,6 +100,23 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 								selectedImageIndex: selectedImageIndex
 							};
 							window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
+							window.electron.openImageWindow({
+								...attachmentData,
+								url: createImgproxyUrl(attachmentData.url || '', {
+									width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
+									height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+									resizeType: 'fit'
+								}),
+								uploaderData: {
+									name:
+										currentImageUploader?.clan_nick ||
+										currentImageUploader?.user?.display_name ||
+										currentImageUploader?.user?.username ||
+										'',
+									avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+								},
+								channelImagesData
+							});
 						});
 				}
 			} else {
