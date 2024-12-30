@@ -53,7 +53,25 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 			if (isElectron()) {
 				const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
-
+				window.electron.openImageWindow({
+					...attachmentData,
+					url: createImgproxyUrl(attachmentData.url || '', {
+						width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
+						height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+						resizeType: 'fit'
+					}),
+					uploaderData: {
+						name:
+							currentImageUploader?.clan_nick || currentImageUploader?.user?.display_name || currentImageUploader?.user?.username || '',
+						avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
+					},
+					realUrl: attachmentData.url || '',
+					channelImagesData: {
+						channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+						images: [],
+						selectedImageIndex: 0
+					}
+				});
 				if ((currentClanId && currentChannelId) || currentDmGroupId) {
 					const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
 					const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
@@ -81,6 +99,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 									'',
 								avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
 							},
+							realUrl: attachmentData.url || '',
 							channelImagesData
 						});
 						return;
@@ -115,6 +134,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 										'',
 									avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
 								},
+								realUrl: attachmentData.url || '',
 								channelImagesData
 							});
 						});

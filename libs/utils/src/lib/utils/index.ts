@@ -1096,7 +1096,8 @@ export const getAttachmentDataForWindow = (
 				width: image.width ? (image.width > 1920 ? 1920 : image.width) : 0,
 				height: image.height ? (image.height > 1080 ? 1080 : image.height) : 0,
 				resizeType: 'fit'
-			})
+			}),
+			realUrl: image.url || ''
 		};
 	});
 };
