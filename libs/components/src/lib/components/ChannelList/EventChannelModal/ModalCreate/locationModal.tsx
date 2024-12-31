@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
-import { customStyles, lightCustomStyles } from '../../../notificationSetting';
+import { customStyles, lightCustomStyles } from '../../../NotificationSetting';
 
 export type LocationModalProps = {
 	contentSubmit: ContenSubmitEventProps;

@@ -22,7 +22,7 @@ export const PushToTalkBtn: React.FC<IPushToTalkBtnProps> = ({ isLightMode }) =>
 	const { isJoined, startJoinPTT, quitPTT } = usePushToTalk();
 
 	const shouldShowPtt = useMemo(() => {
-		return isJoined === false || channelId === currentChannelId;
+		return false; //isJoined === false || channelId === currentChannelId;
 	}, [channelId, currentChannelId, isJoined]);
 
 	return (
