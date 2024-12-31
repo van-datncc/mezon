@@ -67,9 +67,6 @@ const Notifications = () => {
 		React.useCallback(() => {
 			setSelectedTabs({ individual: true, mention: true, messages: true, topics: true });
 			setIsLoadMore(true);
-			if (currentClanId && currentClanId !== '0') {
-				initLoader();
-			}
 			return () => {
 				dispatch(notificationActions.refreshStatus());
 				setNotificationsFilter([]);
@@ -77,6 +74,12 @@ const Notifications = () => {
 			};
 		}, [currentClanId])
 	);
+
+	useEffect(() => {
+		if (currentClanId && currentClanId !== '0') {
+			initLoader();
+		}
+	}, [currentClanId]);
 
 	const handleFilterNotify = useCallback(
 		(selectedTabs) => {
