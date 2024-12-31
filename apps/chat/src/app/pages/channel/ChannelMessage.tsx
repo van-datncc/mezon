@@ -48,7 +48,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	messageReplyHighlight,
 	message,
 	previousMessage,
-	isTopic
+	isTopic = false
 }: Readonly<MessageProps>) => {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
@@ -67,7 +67,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 
 	const handleContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
-			showMessageContextMenu(event, messageId, mode, props);
+			showMessageContextMenu(event, messageId, mode, isTopic as boolean, props);
 		},
 		[showMessageContextMenu, messageId, mode]
 	);
