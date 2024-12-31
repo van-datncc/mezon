@@ -1,4 +1,5 @@
 import {
+	Coords,
 	DmCalling,
 	FirstJoinPopup,
 	ForwardMessageModal,
@@ -71,6 +72,7 @@ import {
 	isMacDesktop,
 	isWindowsDesktop
 } from '@mezon/utils';
+import PanelClan from 'libs/components/src/lib/components/PanelClan';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -424,6 +426,24 @@ const SidebarMenu = memo(
 				}
 			}
 		};
+		const { userProfile } = useAuth();
+		const [coords, setCoords] = useState<Coords>({
+			mouseX: 0,
+			mouseY: 0,
+			distanceToBottom: 0
+		});
+
+		const [openRightClickModal, closeRightClickModal] = useModal(() => {
+			return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} userProfile={userProfile || undefined} />;
+		}, [coords]);
+		const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+			const mouseX = event.clientX;
+			const mouseY = event.clientY;
+			const windowHeight = window.innerHeight;
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
+			openRightClickModal();
+		};
 
 		return (
 			<div
@@ -444,7 +464,7 @@ const SidebarMenu = memo(
 								draggable="false"
 							>
 								<NavLinkComponent active={!isClanView}>
-									<div>
+									<div onContextMenu={handleMouseClick}>
 										<Image
 											src={
 												logoCustom
