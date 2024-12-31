@@ -57,7 +57,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId || '', count: 0, isReset: true }));
+			dispatch(channelsActions.updateChannelBadgeCount({ clanId: '0', channelId: channelId || '', count: 0, isReset: true }));
 			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, []);

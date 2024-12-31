@@ -98,6 +98,7 @@ export default function TopicDiscussion() {
 					<View style={{ flex: 1 }}>
 						<ChannelMessagesWrapper
 							channelId={currentTopicId}
+							topicId={currentTopicId}
 							clanId={currentClanId}
 							isDisableLoadMore={true}
 							isPublic={isPublicChannel(currentChannel)}

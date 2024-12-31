@@ -41,8 +41,8 @@ const NavigationMain = memo(
 				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 				await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 				await sleep(100);
-				await BootSplash.hide({ fade: true });
-			}, 200);
+				BootSplash.hide({ fade: true });
+			}, 500);
 			return () => {
 				clearTimeout(timer);
 			};
@@ -52,8 +52,12 @@ const NavigationMain = memo(
 			const update = await codePush.checkForUpdate(
 				Platform.OS === 'ios' ? process.env.NX_CODE_PUSH_KEY_IOS_MOBILE : (process.env.NX_CODE_PUSH_KEY_ANDROID_MOBILE as string)
 			);
-			if (VersionInfo.appVersion === update?.appVersion) {
-				setIsShowUpdateModal(true);
+			if (update) {
+				if (update.failedInstall) {
+					/* empty */
+				} else if (VersionInfo.appVersion === update.appVersion) {
+					setIsShowUpdateModal(true);
+				}
 			}
 		};
 		return (

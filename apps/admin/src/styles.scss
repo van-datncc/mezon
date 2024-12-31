@@ -346,6 +346,7 @@ input:-webkit-autofill:active {
 .message-container {
 	&.is-sending {
 		opacity: 0.6;
+    pointer-events: none;
 	}
 
 	&.is-error {
