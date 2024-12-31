@@ -64,6 +64,7 @@ type MessageContextMenuProps = {
 	messageId: string;
 	elementTarget?: boolean | HTMLElement | null;
 	activeMode: number | undefined;
+	isTopic: boolean;
 };
 
 type JsonObject = {
@@ -85,7 +86,7 @@ const useIsOwnerGroupDM = () => {
 	return isOwnerGroupDM;
 };
 
-function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
+function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic }: MessageContextMenuProps) {
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -637,6 +638,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 		message?.code !== TypeMessage.Topic &&
+			!isTopic &&
 			builder.when(checkPos, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});
@@ -727,6 +729,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		return builder.build();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		checkPos,
 		enableViewReactionItem,
@@ -756,11 +759,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		handleForwardAllMessage,
 		urlImage,
 		handleItemClick,
-		handleCreateTopic
+		handleCreateTopic,
+		isTopic
 	]);
 	/* eslint-disable no-console */
 
-	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
+	return <DynamicContextMenu key={messageId} menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }
 
 export default MessageContextMenu;
