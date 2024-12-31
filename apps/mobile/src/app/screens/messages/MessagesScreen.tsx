@@ -93,7 +93,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 							right={-size.s_8}
 							top={-size.s_8}
 						>
-							<Text style={{ fontSize: size.s_14, color: themeValue.white, fontWeight: 'bold' }}>{quantityPendingRequest}</Text>
+							<Text style={styles.textQuantityPending}>{quantityPendingRequest}</Text>
 						</Block>
 					)}
 				</Pressable>
