@@ -35,7 +35,6 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
         currentIndex--;
         document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
         document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
         selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
 
       }
