@@ -48,9 +48,9 @@ export { default as MessageModalImage } from './components/MessageWithUser/Messa
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
+export { default as ModalNotificationSetting } from './components/NotificationSetting';
 export { default as SearchModal } from './components/SearchModal';
 export { default as ToastController } from './components/ToastController/ToastController';
-export { default as ModalNotificationSetting } from './components/notificationSetting';
 
 export * from './components/AvatarImage/AvatarImage';
 export { default as AppDirectoryList } from './components/ClanSettings/AppDirectory/AppDirectoryList';
