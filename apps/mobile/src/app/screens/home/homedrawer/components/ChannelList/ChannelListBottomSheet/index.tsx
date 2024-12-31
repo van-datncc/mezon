@@ -51,6 +51,20 @@ const ChannelListBottomSheet = () => {
 			setCurrentPressedCategory(category);
 		});
 
+		const eventOpenEvent = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_EVENT_CHANNEL, () => {
+			bottomSheetEventRef?.current?.present();
+		});
+
+		const eventOpenClanChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENU_CLAN_CHANNEL, (isDismiss = false) => {
+			if (isDismiss) {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_STATUS_OPEN_BOTTOM_SHEET, { isOpen: false });
+				bottomSheetMenuRef.current?.dismiss();
+				return;
+			}
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_STATUS_OPEN_BOTTOM_SHEET, { isOpen: true });
+			bottomSheetMenuRef.current?.present();
+		});
+
 		const eventLongPressCateChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, ({ channel, isThread = false }) => {
 			bottomSheetChannelMenuRef.current?.present();
 			setCurrentPressedChannel(channel);
@@ -68,6 +82,8 @@ const ChannelListBottomSheet = () => {
 			eventLongPressCate.remove();
 			eventLongPressCateChannel.remove();
 			eventOpenInvite.remove();
+			eventOpenEvent.remove();
+			eventOpenClanChannel.remove();
 		};
 	}, [dispatch]);
 

@@ -42,7 +42,7 @@ export const isImage = (url?: string) => {
 };
 
 export const isVideo = (url?: string) => {
-	return /\.(mp4|webm|ogg|mov)/.test(url);
+	return /\.(mp4|webm|mov)/.test(url);
 };
 
 export const isAudio = (url?: string) => {

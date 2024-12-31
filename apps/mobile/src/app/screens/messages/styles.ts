@@ -207,5 +207,6 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			alignItems: 'flex-end',
 			flexWrap: 'nowrap',
 			overflow: 'hidden'
-		}
+		},
+		textQuantityPending: { fontSize: size.s_12, color: colors.white }
 	});

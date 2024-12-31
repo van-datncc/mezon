@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import LeftDrawerContent from './homedrawer/DrawerContent';
-import HomeWrapper from './homedrawer/HomeWrapper';
+import HomeDefault from './homedrawer/HomeDefault';
 import { styles } from './styles';
 
 const Drawer = createDrawerNavigator();
@@ -45,7 +45,7 @@ const HomeScreen = React.memo((props: any) => {
 					<LeftDrawerContent />
 				</View>
 				<View style={styles.containerHomeDefault}>
-					<HomeWrapper navigation={navigation} />
+					<HomeDefault navigation={navigation} />
 				</View>
 			</View>
 		);
@@ -78,7 +78,7 @@ const HomeScreen = React.memo((props: any) => {
 			>
 				<Drawer.Screen
 					name={APP_SCREEN.HOME_DEFAULT}
-					component={HomeWrapper}
+					component={HomeDefault}
 					options={{
 						drawerType: 'back',
 						swipeEdgeWidth: Metrics.screenWidth,

@@ -11,10 +11,9 @@ import { style } from './styles';
 
 interface IProps {
 	onPress: () => void;
-	onOpenEvent: () => void;
 }
 
-const ChannelListHeader = ({ onPress, onOpenEvent }: IProps) => {
+const ChannelListHeader = ({ onPress }: IProps) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['clanMenu']);
@@ -44,6 +43,11 @@ const ChannelListHeader = ({ onPress, onOpenEvent }: IProps) => {
 	const onOpenInvite = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_INVITE_CHANNEL);
 	};
+
+	const onOpenEvent = () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_EVENT_CHANNEL);
+	};
+
 	return (
 		<View style={[styles.container]}>
 			<TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.listHeader}>
