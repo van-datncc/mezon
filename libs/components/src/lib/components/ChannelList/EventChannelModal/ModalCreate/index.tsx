@@ -1,17 +1,26 @@
 import { useEventManagement } from '@mezon/core';
 import {
+	eventManagementActions,
 	selectAllTextChannel,
 	selectChannelById,
 	selectCreatingLoaded,
 	selectCurrentClanId,
 	selectEventById,
 	selectVoiceChannelAll,
+	toastActions,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { formatTimeStringToHourFormat, formatToLocalDateString, getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
+import {
+	convertToLongUTCFormat,
+	formatTimeStringToHourFormat,
+	formatToLocalDateString,
+	getCurrentTimeRounded,
+	handleTimeISO
+} from '../timeFomatEvent';
 import EventInfoModal from './eventInfoModal';
 import HeaderEventCreate from './headerEventCreate';
 import LocationModal from './locationModal';
@@ -35,42 +44,50 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const currentEvent = useSelector(selectEventById(eventId || ''));
 	const eventChannel = useAppSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : '')) || {};
 	const createStatus = useSelector(selectCreatingLoaded);
+	const dispatch = useAppDispatch();
 
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
 		topic: currentEvent ? currentEvent.title || '' : '',
-		titleEvent: currentEvent ? currentEvent.title || '' : '',
+		address: currentEvent ? currentEvent?.address || '' : '',
 		timeStart: currentEvent ? currentEvent.start_time || '00:00' : '00:00',
 		timeEnd: currentEvent ? currentEvent.end_time || '00:00' : '00:00',
 		selectedDateStart: currentEvent ? new Date(formatToLocalDateString(currentEvent.start_time || '')) : new Date(),
 		selectedDateEnd: currentEvent ? new Date(formatToLocalDateString(currentEvent.end_time || '')) : new Date(),
-		voiceChannel: currentEvent ? currentEvent.channel_id || '' : '',
+		voiceChannel: currentEvent ? currentEvent?.channel_voice_id || '' : '',
 		logo: currentEvent ? currentEvent.logo || '' : '',
-		description: currentEvent ? currentEvent.description || '' : ''
+		description: currentEvent ? currentEvent.description || '' : '',
+		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
+		repeatType: currentEvent ? currentEvent.repeat_type || 0 : 0
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);
-	const [option, setOption] = useState('');
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
 
-	const { createEventManagement, updateEventManagement } = useEventManagement();
+	const { createEventManagement } = useEventManagement();
+
+	const [option, setOption] = useState<string>('');
+
+	const isExistChannelVoice = Boolean(currentEvent?.channel_voice_id);
+	const isExistAddress = Boolean(currentEvent?.address);
 
 	useEffect(() => {
-		if (currentEvent) {
-			if (currentEvent.channel_id === '0') {
-				setOption('Location');
-			}
-
-			if (eventChannel) {
-				if (eventChannel.type === 4) {
-					setOption('Speaker');
-				}
+		if (currentEvent && eventChannel) {
+			if (isExistChannelVoice) {
+				setOption(OptionEvent.OPTION_SPEAKER);
+			} else if (isExistAddress) {
+				setOption(OptionEvent.OPTION_LOCATION);
 			}
 		}
 	}, [currentEvent, eventChannel]);
 
-	const choiceSpeaker = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
-	const choiceLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
+	const choiceSpeaker = useMemo(() => {
+		return (isExistChannelVoice || option === OptionEvent.OPTION_SPEAKER) && option !== OptionEvent.OPTION_LOCATION;
+	}, [isExistChannelVoice, option]);
+
+	const choiceLocation = useMemo(() => {
+		return (isExistAddress || option === OptionEvent.OPTION_LOCATION) && option !== OptionEvent.OPTION_SPEAKER;
+	}, [isExistAddress, option]);
 
 	const handleNext = (currentModal: number) => {
 		if (buttonWork && currentModal < tabs.length - 1 && !errorTime && !errorOption) {
@@ -96,9 +113,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = useCallback(async () => {
 		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
-		const title = choiceLocation ? contentSubmit.titleEvent : '';
+		const address = choiceLocation ? contentSubmit.address : '';
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
@@ -106,42 +123,85 @@ const ModalCreate = (props: ModalCreateProps) => {
 		await createEventManagement(
 			currentClanId || '',
 			voice,
-			title,
+			address as string,
 			contentSubmit.topic,
 			timeValueStart,
 			timeValueEnd,
 			contentSubmit.description,
 			contentSubmit.logo,
-			contentSubmit.textChannelId as string
+			contentSubmit.textChannelId as string,
+			contentSubmit.repeatType as ERepeatType
 		);
 
 		hanldeCloseModal();
-	};
+	}, [choiceSpeaker, contentSubmit, choiceLocation, currentClanId, createEventManagement]);
 
-	const handleUpdate = async () => {
-		const title = choiceLocation ? contentSubmit.titleEvent : '';
-		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+	const handleUpdate = useCallback(async () => {
+		try {
+			const address = choiceLocation ? contentSubmit.address : '';
+			const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+			const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
+			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+			const creatorId = currentEvent?.creator_id;
 
-		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
-		const creatorId = currentEvent?.creator_id;
+			const baseEventFields: Partial<Record<string, string | number>> = {
+				event_id: eventId,
+				clan_id: currentClanId as string,
+				creator_id: creatorId as string,
+				previous_channel_id: currentEvent?.channel_id
+			};
 
-		await updateEventManagement(
-			eventId || '',
-			currentClanId || '',
-			voiceChannel,
-			title,
-			contentSubmit.topic,
-			timeValueStart,
-			timeValueEnd,
-			contentSubmit.description,
-			contentSubmit.logo,
-			creatorId || '',
-			contentSubmit.textChannelId as string
-		);
+			const updatedEventFields: Partial<Record<string, string | number | undefined>> = {
+				channel_voice_id: contentSubmit.voiceChannel === currentEvent.channel_voice_id ? undefined : voiceChannel,
+				address: contentSubmit.address === currentEvent.address ? undefined : address,
+				title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
+				start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
+				end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
+				repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? ERepeatType.DEFAULT : contentSubmit.repeatType
+			};
 
-		hanldeCloseModal();
-	};
+			const additionalFields: Partial<Record<string, string | number | undefined>> = {
+				description: contentSubmit.description,
+				logo: contentSubmit.logo,
+				channel_id: contentSubmit.textChannelId
+			};
+
+			const areUpdatedFieldsEmpty = Object.values(updatedEventFields).every((value) => value === undefined || value === '');
+
+			const combinedUpdatedFields: Partial<Record<string, string | number>> = {
+				...baseEventFields,
+				...updatedEventFields
+			};
+
+			const validatedFieldsToUpdate = Object.entries(combinedUpdatedFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
+				if (value) {
+					acc[key] = value;
+				}
+				return acc;
+			}, {});
+
+			const finalFieldsToSubmit: Partial<Record<string, string | number>> = {
+				...validatedFieldsToUpdate,
+				...additionalFields
+			};
+
+			if (!areUpdatedFieldsEmpty) {
+				await dispatch(eventManagementActions.updateEventManagement(finalFieldsToSubmit));
+				hanldeCloseModal();
+			} else {
+				dispatch(
+					toastActions.addToast({
+						message: 'Nothing has changed',
+						type: 'warning',
+						autoClose: 3000
+					})
+				);
+				hanldeCloseModal();
+			}
+		} catch (error) {
+			console.error('Error in handleUpdate:', error);
+		}
+	}, [choiceLocation, contentSubmit, currentEvent, eventChannel, eventId, choiceSpeaker, currentClanId, dispatch]);
 
 	const hanldeCloseModal = () => {
 		onClose();
@@ -160,12 +220,12 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentModal, contentSubmit.topic]);
 
 	useEffect(() => {
-		if ((choiceLocation && contentSubmit.titleEvent === '') || (choiceSpeaker && contentSubmit.voiceChannel === '')) {
+		if ((choiceLocation && contentSubmit.address === '') || (choiceSpeaker && contentSubmit.voiceChannel === '')) {
 			setErrorOption(true);
 		} else {
 			setErrorOption(false);
 		}
-	}, [choiceLocation, choiceSpeaker, contentSubmit.titleEvent, contentSubmit.voiceChannel, option]);
+	}, [choiceLocation, choiceSpeaker, contentSubmit.address, contentSubmit.voiceChannel, option]);
 
 	const defaultTimeStart = useMemo(() => getCurrentTimeRounded(), []);
 	const defaultTimeEnd = useMemo(() => getCurrentTimeRounded(true), []);

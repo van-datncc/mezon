@@ -1096,7 +1096,29 @@ export const getAttachmentDataForWindow = (
 				width: image.width ? (image.width > 1920 ? 1920 : image.width) : 0,
 				height: image.height ? (image.height > 1080 ? 1080 : image.height) : 0,
 				resizeType: 'fit'
-			})
+			}),
+			realUrl: image.url || ''
 		};
 	});
 };
+
+type Payload = Record<string, any>;
+type CommonFields = Record<string, any>;
+
+export function splitPayload(
+	payload: Payload,
+	commonKeys: readonly (keyof Payload)[]
+): { commonFields: CommonFields; conditionalFields: CommonFields } {
+	const commonFields: CommonFields = {};
+	const conditionalFields: CommonFields = {};
+
+	Object.keys(payload).forEach((key) => {
+		if (commonKeys.includes(key as keyof Payload)) {
+			commonFields[key] = payload[key];
+		} else {
+			conditionalFields[key] = payload[key];
+		}
+	});
+
+	return { commonFields, conditionalFields };
+}

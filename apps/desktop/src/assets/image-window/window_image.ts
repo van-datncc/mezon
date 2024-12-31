@@ -17,6 +17,7 @@ interface IAttachmentEntityWithUploader extends IAttachmentEntity {
 		avatar: string;
 		name: string;
 	};
+	realUrl: string;
 }
 interface IImageWindowProps {
 	channelLabel: string;
@@ -37,6 +38,7 @@ export type ImageData = {
 		name: string;
 		avatar: string;
 	};
+	realUrl: string;
 	channelImagesData: IImageWindowProps;
 };
 
@@ -58,7 +60,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 		x,
 		y,
 		frame: false,
-		alwaysOnTop: true,
 		transparent: true,
 		show: false,
 		backgroundColor: '#00000000',
@@ -225,21 +226,13 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 	// Show window when ready with fade-in effect
 	popupWindow.once('ready-to-show', () => {
-		popupWindow.show();
-
-		popupWindow.setOpacity(0);
-		setTimeout(() => {
-			popupWindow.setOpacity(1);
-		}, 100);
-	});
-
-	popupWindow.webContents.on('did-finish-load', () => {
 		popupWindow.webContents.executeJavaScript(`
 
 	    const selectedImage = document.getElementById('selectedImage');
       let currentImageUrl = {
         fileName : '${imageData.filename}',
-        url : '${imageData.url}'
+        url : '${imageData.url}',
+          realUrl : '${imageData.realUrl}'
       };
 
       document.getElementById('close-window').addEventListener('click', () => {
@@ -257,18 +250,38 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 	});
 
  document.getElementById('downloadBtn').addEventListener('click', () => {
-
-  window.electron.dowloadImage(currentImageUrl.url);
-
+window.electron.handleActionShowImage('saveImage',currentImageUrl.url);
 });
+
+document.addEventListener('keydown', (e) => {
+		switch (e.key) {
+			case 'ArrowUp':
+				navigateImage(-1);
+				break;
+			case 'ArrowLeft':
+				navigateImage(-1);
+				break;
+			case 'ArrowDown':
+				navigateImage(1);
+				break;
+			case 'ArrowRight':
+				navigateImage(1);
+				break;
+			case 'Escape':
+				selectedImage.src = null;
+    	  window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
+				break;
+		}
+	});
+
 
       ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
       ${scriptRotateAndZoom()}
       ${scriptDrag()}
 
-
-
       document.body.insertAdjacentHTML('beforeend', '${menu}');
+
+      ${scriptMenu()}
 
 
 
@@ -276,6 +289,10 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 
       `);
+	});
+
+	popupWindow.webContents.on('did-finish-load', () => {
+		popupWindow.show();
 	});
 
 	// Clean up on close
@@ -336,7 +353,8 @@ export const scriptThumnails = (listImage, indexSelect) => {
         document.getElementById('timestamp').innerHTML  = "${time}"
       currentImageUrl = {
         fileName : '${image.fileName}',
-        url : '${image.url}'
+        url : '${image.url}',
+        realUrl : '${image.realUrl || ''}'
       }
 
       });`;
@@ -402,7 +420,6 @@ const scriptDrag = () => {
 			x: event.clientX - currenPosition.x,
 			y: event.clientY - currenPosition.y
       };
-    console.log('dragstart: ', dragstart);
   });
 
 	document.addEventListener('mouseup', (event)=>{
@@ -422,6 +439,66 @@ const scriptDrag = () => {
  selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom}) \`;
 
   }, { passive: false });
+
+  `;
+};
+
+const scriptMenu = () => {
+	return `
+
+document.addEventListener('contextmenu', (e) => {
+	if (e.target.matches('#selectedImage')) {
+		e.preventDefault();
+		const menu = document.getElementById('contextMenu');
+		if (!menu) return;
+
+		menu.style.left = e.pageX + 'px';
+		menu.style.top = e.pageY + 'px';
+		menu.classList.add('visible');
+
+		// Adjust position if menu goes outside viewport
+		const rect = menu.getBoundingClientRect();
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+
+		if (rect.right > viewportWidth) {
+			menu.style.left = '\${e.pageX - rect.width}px';
+		}
+		if (rect.bottom > viewportHeight) {
+			menu.style.top = '\${e.pageY - rect.height}px';
+		}
+
+		menu.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			const action = e.target.closest('.menu-item')?.dataset.action;
+
+			if (action) {
+				if (!e.currentTarget) return;
+
+				switch (action) {
+					case 'copyLink': {
+						window.electron.handleActionShowImage(action, selectedImage.src);
+						break;
+					}
+					case 'openLink': {
+						window.electron.shell.openExternal(selectedImage.src);
+						break;
+					}
+					case 'copyImage': {
+						window.electron.handleActionShowImage(action,currentImageUrl.realUrl );
+						break;
+					}
+					case 'saveImage': {
+						window.electron.handleActionShowImage(action, selectedImage.src);
+						break;
+					}
+				}
+				if (!menu) return;
+				menu.classList.remove('visible');
+			}
+		});
+	}
+})
 
   `;
 };
