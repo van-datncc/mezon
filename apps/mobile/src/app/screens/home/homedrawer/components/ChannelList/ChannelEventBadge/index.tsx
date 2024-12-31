@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, size } from '@mezon/mobile-ui';
-import { selectChannelById, selectEventByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { selectChannelById, selectEventsByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { EEventStatus } from '@mezon/utils';
 import { memo } from 'react';
 import { Linking, Pressable, View } from 'react-native';
@@ -10,7 +10,7 @@ type EventBadgeProps = {
 	channelId: string;
 };
 export const EventBadge = memo(({ channelId }: EventBadgeProps) => {
-	const events = useAppSelector((state) => selectEventByChannelId(state, channelId ?? ''));
+	const events = useAppSelector((state) => selectEventsByChannelId(state, channelId ?? ''));
 	const channelVoice = useAppSelector((state) => selectChannelById(state, events?.[0]?.channel_voice_id ?? ''));
 	const colorStatusEvent = events?.[0]?.event_status === EEventStatus.UPCOMING ? baseColor.blurple : baseColor.bgSuccess;
 

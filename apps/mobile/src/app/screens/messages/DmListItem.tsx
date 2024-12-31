@@ -56,7 +56,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	}, [directMessage]);
 
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
-		if (!content) return null;
+		if (!content || Object.keys(content).length === 0) return null;
 		const text = typeof content === 'string' ? safeJSONParse(content)?.t : safeJSONParse(JSON.stringify(content) || '{}')?.t;
 		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
