@@ -18,12 +18,14 @@ import {
 	channelUsersActions,
 	channelsActions,
 	directMetaActions,
+	e2eeActions,
 	notificationSettingActions,
 	removeChannelUsersPayload,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrent,
 	selectFriendStatus,
+	selectHasKeyE2ee,
 	selectSelectedChannelNotificationSetting,
 	useAppDispatch
 } from '@mezon/store';
@@ -89,6 +91,8 @@ const PanelMember = ({
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const [nameChildren, setNameChildren] = useState('');
 	const [mutedUntil, setmutedUntil] = useState('');
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
+
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -188,6 +192,10 @@ const PanelMember = ({
 	);
 
 	const handleEnableE2ee = useCallback(async (directId?: string, e2ee?: number) => {
+		if (!hasKeyE2ee && !e2ee) {
+			dispatch(e2eeActions.setOpenModalE2ee(true));
+			return;
+		}
 		if (!directId) return;
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: directId,

@@ -1,9 +1,22 @@
-import { useAppParams, useAuth } from '@mezon/core';
-import { clansActions, clearAllMemoizedFunctions, e2eeActions, messagesActions, useAppDispatch } from '@mezon/store';
+import { useAuth } from '@mezon/core';
+import {
+	channelsActions,
+	clansActions,
+	clearAllMemoizedFunctions,
+	e2eeActions,
+	messagesActions,
+	selectDirectById,
+	selectDmGroupCurrent,
+	selectDmGroupCurrentId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MessageCrypt } from '@mezon/utils';
+import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { ApiAccount } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 interface ModalProps {
 	onClose: () => void;
@@ -151,7 +164,10 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 	const dispatch = useAppDispatch();
-	const { directId } = useAppParams();
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const directMessageValue = useAppSelector((state) => selectDirectById(state, currentDmId));
+	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.id ?? ''));
+
 	useEffect(() => {
 		if (inputsRef.current[activeIndex]) {
 			inputsRef.current[activeIndex]?.focus();
@@ -218,6 +234,18 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 		e.preventDefault();
 	};
 
+	const handleEnableE2ee = useCallback(async (directId?: string, e2ee?: number) => {
+		if (!directId) return;
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: directId,
+			channel_label: '',
+			category_id: currentDmGroup.category_id,
+			app_url: currentDmGroup.app_url,
+			e2ee: !currentDmGroup.e2ee ? 1 : 0
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
+	}, []);
+
 	const handleSubmit = async () => {
 		const otpCode = otp.join('');
 		const pinCode = pin.join('');
@@ -227,8 +255,11 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 				onClose();
 				clearAllMemoizedFunctions();
 				dispatch(e2eeActions.setHasKey(true));
-				if (directId) {
-					dispatch(messagesActions.fetchMessages({ clanId: '0', channelId: directId as string, foundE2ee: true }));
+				if (currentDmId) {
+					if (!directMessageValue?.e2ee) {
+						handleEnableE2ee(directMessageValue?.id, directMessageValue?.e2ee);
+					}
+					dispatch(messagesActions.fetchMessages({ clanId: '0', channelId: currentDmId as string, foundE2ee: true }));
 				}
 			} else {
 				if (otpCode === pinCode) {
@@ -251,6 +282,7 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 				}
 			}
 		} catch (error) {
+			console.error(error);
 			setOtp(Array(6).fill(''));
 			setActiveIndex(0);
 			setErrorMessage('Invalid code. Please try again.');
