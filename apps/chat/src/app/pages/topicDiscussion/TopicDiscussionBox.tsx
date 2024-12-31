@@ -1,9 +1,11 @@
-import { MentionReactInput, UserMentionList } from '@mezon/components';
+import { MentionReactInput, MessageContextMenuProvider, UserMentionList } from '@mezon/components';
 import { useAuth, useTopics } from '@mezon/core';
 import {
 	RootState,
 	fetchMessages,
 	messagesActions,
+	selectAllRoleIds,
+	selectAllUserIdChannels,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -28,6 +30,8 @@ const TopicDiscussionBox = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const allUserIdsInChannel = useSelector(selectAllUserIdChannels);
+	const allRolesIdsInClan = useSelector(selectAllRoleIds);
 	const { valueTopic } = useTopics();
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -135,14 +139,20 @@ const TopicDiscussionBox = () => {
 		<>
 			{(isFetchMessageDone || firstMessageOfThisTopic) && (
 				<div className={isElectron() ? 'h-[calc(100%_-_60px_-_80px)]' : 'h-full'}>
-					<MemoizedChannelMessages
-						channelId={currentTopicId as string}
-						clanId={currentClanId as string}
-						type={ChannelType.CHANNEL_TYPE_TEXT}
-						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-						isTopicBox
-						topicId={currentTopicId}
-					/>
+					<MessageContextMenuProvider
+						channelId={currentChannelId as string}
+						allUserIdsInChannel={allUserIdsInChannel as string[]}
+						allRolesInClan={allRolesIdsInClan}
+					>
+						<MemoizedChannelMessages
+							channelId={currentTopicId as string}
+							clanId={currentClanId as string}
+							type={ChannelType.CHANNEL_TYPE_TEXT}
+							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							isTopicBox
+							topicId={currentTopicId}
+						/>
+					</MessageContextMenuProvider>
 				</div>
 			)}
 			<div className="flex flex-col flex-1">
