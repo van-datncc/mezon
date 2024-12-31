@@ -1,19 +1,31 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlistOrder } from '@mezon/store-mobile';
+import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
+import {
+	directActions,
+	DirectEntity,
+	getStoreAsync,
+	RootState,
+	selectAllClans,
+	selectAllFriends,
+	selectDirectsOpenlistOrder
+} from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppState, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
+import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import { DmListItem } from './DmListItem';
 import SearchDmList from './SearchDmList';
 import { style } from './styles';
+
+const FriendState = {
+	PENDING: 2
+};
 
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
@@ -23,6 +35,11 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const friends = useSelector(selectAllFriends);
+
+	const quantityPendingRequest = useMemo(() => {
+		return friends?.filter((friend) => friend?.state === FriendState.PENDING)?.length || 0;
+	}, [friends]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -64,6 +81,21 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
 					<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
+					{!!quantityPendingRequest && (
+						<Block
+							backgroundColor={baseColor.redStrong}
+							width={size.s_20}
+							height={size.s_20}
+							alignItems="center"
+							justifyContent="center"
+							borderRadius={size.s_20}
+							position="absolute"
+							right={-size.s_8}
+							top={-size.s_8}
+						>
+							<Text style={{ fontSize: size.s_14, color: themeValue.white, fontWeight: 'bold' }}>{quantityPendingRequest}</Text>
+						</Block>
+					)}
 				</Pressable>
 			</View>
 			<SearchDmList />

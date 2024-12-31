@@ -83,3 +83,6 @@ export const WIDTH_CHANNEL_LIST_BOX = 272;
 
 export const DEFAULT_ROLE_COLOR = '#99aab5';
 export const DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR = '#17ac86';
+
+export const CHANNEL_INPUT_ID = 'editorReactMentionChannel';
+export const GENERAL_INPUT_ID = 'editorReactMention';

@@ -201,6 +201,10 @@ ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, data) => {
 			clipboard.writeText(fileURL);
 			break;
 		}
+		case 'openLink': {
+			shell.openExternal(fileURL);
+			break;
+		}
 		case 'copyImage': {
 			const blobImage = await fetch(fileURL).then((response) => response.blob());
 			const base64data = await blobImage.arrayBuffer();

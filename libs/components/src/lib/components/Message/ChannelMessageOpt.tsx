@@ -12,6 +12,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDefaultCanvasByChannelId,
+	selectIsMessageChannelIdMatched,
 	selectMessageByMessageId,
 	selectTheme,
 	threadsActions,
@@ -74,7 +75,10 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
-	const createTopicMenu = useTopicMenuBuilder(message);
+	const checkMessageOnTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.channel_id ?? ''));
+	const checkMessageHasTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.topic_id ?? ''));
+	const doNotAllowCreateTopic = checkMessageOnTopic || checkMessageHasTopic;
+	const createTopicMenu = useTopicMenuBuilder(message, doNotAllowCreateTopic);
 	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
 
 	return (
@@ -105,7 +109,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDiff
 
 export default memo(ChannelMessageOpt);
 
-function useTopicMenuBuilder(message: IMessageWithUser) {
+function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: boolean) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
 	const dispatch = useAppDispatch();
@@ -139,18 +143,21 @@ function useTopicMenuBuilder(message: IMessageWithUser) {
 	const menuPlugin = useMemo(() => {
 		const plugin = {
 			setup: (builder: MenuBuilder) => {
-				builder.when(clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic, (builder: MenuBuilder) => {
-					builder.addMenuItem(
-						'topic',
-						'topic',
-						handleCreateTopic,
-						<Icons.TopicIcon2 className="w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode" />
-					);
-				});
+				builder.when(
+					clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic && !doNotAllowCreateTopic,
+					(builder: MenuBuilder) => {
+						builder.addMenuItem(
+							'topic',
+							'topic',
+							handleCreateTopic,
+							<Icons.TopicIcon2 className="w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode" />
+						);
+					}
+				);
 			}
 		};
 		return plugin;
-	}, [clanId, handleCreateTopic, realTimeMessage?.code]);
+	}, [doNotAllowCreateTopic, clanId, handleCreateTopic, realTimeMessage?.code]);
 
 	return menuPlugin;
 }

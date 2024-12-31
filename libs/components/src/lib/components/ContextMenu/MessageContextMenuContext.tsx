@@ -19,6 +19,7 @@ type MessageContextMenuContextValue = {
 		event: React.MouseEvent<HTMLElement>,
 		messageId: string,
 		mode: ChannelStreamMode,
+		isTopic: boolean,
 		props?: Partial<MessageContextMenuProps>
 	) => void;
 	setPositionShow: (showPostion: SHOW_POSITION) => void;
@@ -78,6 +79,7 @@ export const MessageContextMenuProvider = ({
 	const [posShowMenu, setPosShowMenu] = useState<string>(SHOW_POSITION.NONE);
 	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
 	const [posShortProfile, setPosShortProfile] = useState<posShortProfileOpt>({});
+	const [isTopic, setIsTopic] = useState<boolean>(false);
 
 	const { show } = useContextMenu({
 		id: MESSAGE_CONTEXT_MENU_ID
@@ -88,9 +90,15 @@ export const MessageContextMenuProvider = ({
 	const menu = useMemo(() => {
 		if (!isMenuVisible) return null;
 		return (
-			<MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageIdRef.current} elementTarget={elementTarget} activeMode={activeMode} />
+			<MessageContextMenu
+				id={MESSAGE_CONTEXT_MENU_ID}
+				messageId={messageIdRef.current}
+				elementTarget={elementTarget}
+				activeMode={activeMode}
+				isTopic={isTopic}
+			/>
 		);
-	}, [elementTarget, activeMode, isMenuVisible]);
+	}, [elementTarget, activeMode, isMenuVisible, isTopic]);
 
 	const setPositionShow = useCallback((pos: string) => {
 		setPosShowMenu(pos);
@@ -123,17 +131,25 @@ export const MessageContextMenuProvider = ({
 	);
 
 	const showMessageContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLElement>, messageId: string, mode: ChannelStreamMode, props?: Partial<MessageContextMenuProps>) => {
+		(
+			event: React.MouseEvent<HTMLElement>,
+			messageId: string,
+			mode: ChannelStreamMode,
+			isTopic: boolean,
+			props?: Partial<MessageContextMenuProps>
+		) => {
 			messageIdRef.current = messageId;
 			setElementTarget(event.target as HTMLElement);
 			setActiveMode(mode);
+			setIsTopic(isTopic);
+
 			const niceProps = {
 				messageId,
 				...props
 			};
 			showContextMenu(event, niceProps);
 		},
-		[]
+		[setElementTarget, setActiveMode, setIsTopic]
 	);
 
 	const value = useMemo(

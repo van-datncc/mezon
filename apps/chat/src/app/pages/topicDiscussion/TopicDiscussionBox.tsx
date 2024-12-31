@@ -14,6 +14,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, sleep } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
@@ -133,16 +134,18 @@ const TopicDiscussionBox = () => {
 	return (
 		<>
 			{(isFetchMessageDone || firstMessageOfThisTopic) && (
-				<MemoizedChannelMessages
-					channelId={currentTopicId as string}
-					clanId={currentClanId as string}
-					type={ChannelType.CHANNEL_TYPE_TEXT}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isTopicBox
-					topicId={currentTopicId}
-				/>
+				<div className={isElectron() ? 'h-[calc(100%_-_60px_-_80px)]' : 'h-full'}>
+					<MemoizedChannelMessages
+						channelId={currentTopicId as string}
+						clanId={currentClanId as string}
+						type={ChannelType.CHANNEL_TYPE_TEXT}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						isTopicBox
+						topicId={currentTopicId}
+					/>
+				</div>
 			)}
-			<div className="flex flex-col flex-1 justify-end">
+			<div className="flex flex-col flex-1">
 				<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 					<MentionReactInput
 						onSend={handleSend}
