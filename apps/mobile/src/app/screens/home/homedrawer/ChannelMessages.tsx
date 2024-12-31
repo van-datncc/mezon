@@ -1,11 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
-import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	messagesActions,
-	RootState,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -19,17 +18,19 @@ import {
 import { Direction_Mode, LIMIT_MESSAGE, sleep } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, LayoutAnimation, Platform, TouchableOpacity, UIManager, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
 import uuid from 'react-native-uuid';
 import { useSelector } from 'react-redux';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import ChannelMessageList from './components/ChannelMessageList';
-import { MessageUserTyping } from './components/MessageUserTyping';
 import MessageItem from './MessageItem';
+import ChannelMessageList from './components/ChannelMessageList';
+import { ChannelMessageLoading } from './components/ChannelMessageLoading';
+import { MessageUserTyping } from './components/MessageUserTyping';
 import { style } from './styles';
 
 type ChannelMessagesProps = {
 	channelId: string;
+	topicId: string;
 	clanId: string;
 	mode: ChannelStreamMode;
 	isDM?: boolean;
@@ -48,14 +49,12 @@ if (Platform.OS === 'android') {
 	}
 }
 
-const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, isDisableLoadMore }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, isPublic, isDisableLoadMore }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
-	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 	const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(true);
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
@@ -66,7 +65,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id));
-
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const timeOutRef2 = useRef(null);
@@ -86,10 +84,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 	}, [hasMoreBottom, isViewingOldMessage]);
 
 	useEffect(() => {
-		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
-			setIsShowSkeleton(isShow);
-		});
-
 		const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
 			if (time) {
 				setIsReadyShowChannelMsg(false);
@@ -98,7 +92,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 			}
 		});
 		return () => {
-			showSKlListener.remove();
 			onSwitchChannel.remove();
 		};
 	}, []);
@@ -145,25 +138,15 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 			if (direction === ELoadMoreDirection.top && !hasMoreTop) {
 				return;
 			}
-			LayoutAnimation.configureNext({
-				duration: 200,
-				create: {
-					type: LayoutAnimation.Types.easeInEaseOut,
-					property: LayoutAnimation.Properties.opacity
-				},
-				update: {
-					type: LayoutAnimation.Types.easeInEaseOut
-				}
-			});
 			isLoadMore.current[direction] = true;
-			setTriggerRender(uuid.v4());
 			if (direction === ELoadMoreDirection.bottom) {
 				await dispatch(
 					messagesActions.loadMoreMessage({
 						clanId,
 						channelId,
 						direction: Direction_Mode.AFTER_TIMESTAMP,
-						fromMobile: true
+						fromMobile: true,
+						topicId: topicId || ''
 					})
 				);
 				isLoadMore.current[direction] = false;
@@ -176,7 +159,8 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 					clanId,
 					channelId,
 					direction: Direction_Mode.BEFORE_TIMESTAMP,
-					fromMobile: true
+					fromMobile: true,
+					topicId: topicId || ''
 				})
 			);
 			isLoadMore.current[direction] = false;
@@ -187,7 +171,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 
 			return true;
 		},
-		[isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, scrollChannelMessageToIndex, isDisableLoadMore]
+		[isDisableLoadMore, isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, topicId, scrollChannelMessageToIndex]
 	);
 
 	const renderItem = useCallback(
@@ -197,19 +181,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 		},
 		[messages, mode, channelId]
 	);
-
-	const checkChannelCacheLoading = useMemo(() => {
-		let isCached = false;
-		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-
-		// have cached
-		if (channelsCache?.includes(channelId)) {
-			isCached = true;
-		} else {
-			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-		}
-		return isCached;
-	}, [channelId]);
 
 	const handleJumpToPresent = useCallback(async () => {
 		// Jump to present
@@ -224,6 +195,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 				isClearMessage: true
 			})
 		);
+		dispatch(messagesActions.setIdMessageToJump(null));
 		timeOutRef.current = setTimeout(() => {
 			flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
 			setIsLoadingScrollBottom(false);
@@ -235,9 +207,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, mode, isDM, isPublic, i
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			{isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
-				<MessageItemSkeleton skeletonNumber={15} />
-			)}
+			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} />
 
 			{isReadyShowChannelMsg ? (
 				<ChannelMessageList

@@ -4,12 +4,13 @@ import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	directActions,
 	DirectEntity,
-	getStoreAsync,
 	RootState,
 	selectAllClans,
 	selectAllFriends,
-	selectDirectsOpenlistOrder
+	selectDirectsOpenlistOrder,
+	useAppDispatch
 } from '@mezon/store-mobile';
+import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +41,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const quantityPendingRequest = useMemo(() => {
 		return friends?.filter((friend) => friend?.state === FriendState.PENDING)?.length || 0;
 	}, [friends]);
+	const dispatch = useAppDispatch();
+
+	useFocusEffect(
+		useCallback(() => {
+			dispatch(directActions.fetchDirectMessage({ noCache: true }));
+		}, [dispatch])
+	);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -52,8 +60,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
 			try {
-				const store = await getStoreAsync();
-				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				await dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
 				console.error('error messageLoaderBackground', error);
 			}

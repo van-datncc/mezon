@@ -150,7 +150,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					onPress={handleRouteData}
 					onLongPress={props?.onLongPress}
 					data={props?.data}
-					isUnRead={isUnRead}
+					isUnRead={false}
 					isActive={isActive}
 				/>
 			)}

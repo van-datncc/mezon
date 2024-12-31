@@ -63,7 +63,11 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		while (endIndex !== -1) {
 			const textPart = formatEmojiInText.slice(startIndex, endIndex);
 			if (textPart) {
-				parts.push(<Text style={[styles.message, props?.styleText && props?.styleText]}>{textPart}</Text>);
+				parts.push(
+					<Text key={`${endIndex}_${textPart}`} style={[styles.message, props?.styleText && props?.styleText]}>
+						{textPart}
+					</Text>
+				);
 			}
 
 			startIndex = endIndex + EMOJI_KEY.length;
@@ -78,7 +82,11 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		}
 
 		if (startIndex < formatEmojiInText.length) {
-			parts.push(<Text style={[styles.message, props?.styleText && props?.styleText]}>{formatEmojiInText.slice(startIndex)}</Text>);
+			parts.push(
+				<Text key={`${endIndex}_${formatEmojiInText.slice(startIndex)}`} style={[styles.message, props?.styleText && props?.styleText]}>
+					{formatEmojiInText.slice(startIndex)}
+				</Text>
+			);
 		}
 
 		return parts;

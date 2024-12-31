@@ -1,4 +1,3 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
 	ActionEmitEvent,
 	getUpdateOrAddClanChannelCache,
@@ -40,19 +39,14 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
-	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
-	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 	const dispatch = useAppDispatch();
-	const handlePress = useCallback(() => {
-		bottomSheetMenuRef.current?.present();
-	}, []);
 
-	const onOpenEvent = useCallback(() => {
-		bottomSheetEventRef?.current?.present();
+	const handlePress = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_MENU_CLAN_CHANNEL);
 	}, []);
 
 	const handleLongPressCategory = useCallback((category: ICategoryChannel) => {
@@ -80,9 +74,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	);
 
 	const renderItemChannelList = useCallback(
-		({ item }) => {
+		({ item, index }) => {
 			return (
-				<View onLayout={(e) => handleLayout(e, item)} key={item?.category_id}>
+				<View onLayout={(e) => handleLayout(e, item)} key={`${item?.category_id}_${index}_ItemChannelList}`}>
 					<ChannelListSection
 						channelsPositionRef={channelsPositionRef}
 						data={item}
@@ -133,13 +127,13 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					bounces={false}
 				>
 					<ChannelListBackground onPress={handlePress} />
-					<ChannelListHeader onPress={handlePress} onOpenEvent={onOpenEvent} />
+					<ChannelListHeader onPress={handlePress} />
 					<ChannelListFavorite onPress={handleScrollToChannelFavorite} />
 					<ChannelListLoading isNonChannel={hasNonEmptyChannels(categorizedChannels || [])} />
 					<ChannelListScroll channelsPositionRef={channelsPositionRef} flashListRef={flashListRef} />
 					{!!categorizedChannels?.length &&
-						categorizedChannels?.map((item) => {
-							return renderItemChannelList({ item });
+						categorizedChannels?.map((item, index) => {
+							return renderItemChannelList({ item, index });
 						})}
 					<Block height={80} />
 				</ScrollView>
