@@ -148,7 +148,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				event_id: eventId,
 				clan_id: currentClanId as string,
 				creator_id: creatorId as string,
-				previous_channel_id: currentEvent?.channel_id
+				channel_id_old: currentEvent?.channel_id
 			};
 
 			const updatedEventFields: Partial<Record<string, string | number | undefined>> = {
