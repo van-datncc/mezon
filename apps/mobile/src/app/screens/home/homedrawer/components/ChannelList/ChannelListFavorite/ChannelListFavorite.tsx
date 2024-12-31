@@ -35,7 +35,9 @@ export const ChannelListFavorite = React.memo(({ onPress }: { onPress?: (channel
 					</TouchableOpacity>
 					<Block display={isCollapse ? 'none' : 'flex'}>
 						{channelFavorites?.length
-							? channelFavorites?.map((channelId: string) => <ChannelFavoriteItem onPress={onPress} channelId={channelId} />)
+							? channelFavorites?.map((channelId: string, index: number) => (
+									<ChannelFavoriteItem onPress={onPress} channelId={channelId} key={`${index}_${channelId}_ChannelItemFavorite`} />
+								))
 							: null}
 					</Block>
 				</Block>

@@ -20,7 +20,6 @@ const TabStack = createBottomTabNavigator();
 const BottomNavigator = () => {
 	const isTabletLandscape = useTabletLandscape();
 	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
-	const hiddenBottomTab = isHiddenTab;
 	const { themeValue } = useTheme();
 	const tabBarTranslateY = useRef(new Animated.Value(0)).current;
 	const routesNavigation = useNavigationState((state) => state?.routes?.[state?.index]);
@@ -34,11 +33,11 @@ const BottomNavigator = () => {
 
 	useEffect(() => {
 		Animated.timing(tabBarTranslateY, {
-			toValue: hiddenBottomTab ? 80 : 0,
+			toValue: isHiddenTab ? 80 : 0,
 			duration: 150,
 			useNativeDriver: true
 		}).start();
-	}, [hiddenBottomTab, tabBarTranslateY]);
+	}, [isHiddenTab, tabBarTranslateY]);
 
 	const AnimatedIcon = ({ color, Icon, focused }) => {
 		const scaleValue = useRef(new Animated.Value(1)).current;
@@ -95,7 +94,7 @@ const BottomNavigator = () => {
 					tabBarHideOnKeyboard: true,
 					tabBarStyle: {
 						position: 'absolute',
-						zIndex: hiddenBottomTab ? -1 : 100,
+						zIndex: isHiddenTab ? -1 : 100,
 						height: size.s_80,
 						paddingHorizontal: 0,
 						transform: [{ translateY: tabBarTranslateY }],

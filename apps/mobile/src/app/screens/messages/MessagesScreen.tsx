@@ -1,7 +1,8 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlistOrder } from '@mezon/store-mobile';
+import { DirectEntity, RootState, directActions, selectAllClans, selectDirectsOpenlistOrder, useAppDispatch } from '@mezon/store-mobile';
+import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const dispatch = useAppDispatch();
+
+	useFocusEffect(
+		useCallback(() => {
+			dispatch(directActions.fetchDirectMessage({ noCache: true }));
+		}, [dispatch])
+	);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -35,8 +43,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
 			try {
-				const store = await getStoreAsync();
-				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				await dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
 				console.error('error messageLoaderBackground', error);
 			}
