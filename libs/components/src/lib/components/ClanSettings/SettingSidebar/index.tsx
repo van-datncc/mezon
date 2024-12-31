@@ -48,11 +48,6 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	};
 
 	const handleClickButtonSidebar = (settingItem: ItemObjProps) => {
-		if (settingItem.id === ItemSetting.APP_DIRECTORY) {
-			navigate('/application-directory');
-			return;
-		}
-
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};

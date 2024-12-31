@@ -67,7 +67,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					},
 					realUrl: attachmentData.url || '',
 					channelImagesData: {
-						channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+						channelLabel: (currentChannelId ? currentChannel?.channel_label : currentDm.channel_label) as string,
 						images: [],
 						selectedImageIndex: 0
 					}
@@ -79,7 +79,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
 						const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
 						const channelImagesData: IImageWindowProps = {
-							channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+							channelLabel: (currentChannelId ? currentChannel?.channel_label : currentDm.channel_label) as string,
 							images: imageListWithUploaderInfo,
 							selectedImageIndex: selectedImageIndex
 						};
@@ -114,7 +114,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						})
 						.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
 							const channelImagesData: IImageWindowProps = {
-								channelLabel: (currentDmGroupId ? currentDm.channel_label : currentChannel?.channel_label) as string,
+								channelLabel: (currentChannelId ? currentChannel?.channel_label : currentDm.channel_label) as string,
 								images: imageListWithUploaderInfo,
 								selectedImageIndex: selectedImageIndex
 							};

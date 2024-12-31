@@ -141,7 +141,7 @@ body {
 }
 
 .thumbnail-container {
-    width: fit-content;
+    width : 112px;
     height: 100%;
     background-color: #0B0B0B;
     padding:  0 10px;
@@ -336,6 +336,7 @@ body {
     background-color: #434343;
     margin: 4px 0;
 }
+
 
 `;
 export default image_window_css;

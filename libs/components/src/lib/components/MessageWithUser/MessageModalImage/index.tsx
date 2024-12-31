@@ -87,7 +87,7 @@ const MessageModalImage = () => {
 
 	const handleContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
-			showMessageContextMenu(event, messageId, mode ?? 2, props);
+			showMessageContextMenu(event, messageId, mode ?? 2, false, props);
 			setPositionShow(SHOW_POSITION.IN_VIEWER);
 			setImageURL(urlImg);
 		},
