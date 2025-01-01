@@ -13,6 +13,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	appActions,
 	e2eeActions,
 	emojiSuggestionActions,
 	messagesActions,
@@ -33,6 +34,7 @@ import {
 	selectDmGroupCurrentId,
 	selectHasKeyE2ee,
 	selectIdMessageRefEdit,
+	selectIsFocusOnChannelInput,
 	selectIsFocused,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
@@ -53,7 +55,9 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	CHANNEL_INPUT_ID,
 	ChannelMembersEntity,
+	GENERAL_INPUT_ID,
 	IMentionOnMessage,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -79,7 +83,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
-import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, ReactElement, RefObject, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
@@ -146,9 +150,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
+	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
 	const { currentChatUsersEntities } = useCurrentChat();
 	const isNotChannel = props.isThread || props.isTopic;
-	const inputElementId = isNotChannel ? `editorReactMention` : `editorReactMentionChannel`;
+	const inputElementId = isNotChannel ? GENERAL_INPUT_ID : CHANNEL_INPUT_ID;
 	const isShowEmojiPicker = !props.isThread;
 
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
@@ -580,7 +585,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 		if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(editorRef.current, `::[${emojiKey}](${emojiValue})${' '}`);
+				const targetInputId = isFocusOnChannelInput ? CHANNEL_INPUT_ID : GENERAL_INPUT_ID;
+
+				if (editorRef.current?.id === targetInputId) {
+					textFieldEdit.insert(editorRef.current, `::[${emojiKey}](${emojiValue})${' '}`);
+				}
 			}
 		}
 	}
@@ -621,28 +630,30 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	};
 
+	const handleFocusInput = () => {
+		dispatch(appActions.setIsFocusOnChannelInput(!isNotChannel));
+	};
+
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 
-	const emojiPickedKeyValue = useMemo(() => {
-		const entries = Object.entries(emojiPicked || {});
-
-		if (entries.length === 0) {
-			return '';
+	const handleFocusOnEditorElement = (
+		isFocusOnChannelInput: boolean,
+		editorRef: RefObject<HTMLInputElement | HTMLDivElement | HTMLUListElement>
+	) => {
+		const targetEditorId = isFocusOnChannelInput ? CHANNEL_INPUT_ID : GENERAL_INPUT_ID;
+		if (editorRef.current?.id === targetEditorId) {
+			focusToElement(editorRef);
 		}
-
-		const timestampNow = Date.now().toString();
-
-		return entries.map(([key, value]) => `${key}=${value}`).join(' ') + ' ' + timestampNow;
-	}, [emojiPicked]);
+	};
 
 	useEffect(() => {
 		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
 			return editorRef?.current?.blur();
 		}
 		if (dataReferences.message_ref_id || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
-			return focusToElement(editorRef);
+			handleFocusOnEditorElement(isFocusOnChannelInput, editorRef);
 		}
-	}, [dataReferences.message_ref_id, emojiPickedKeyValue, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
+	}, [dataReferences.message_ref_id, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -651,13 +662,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
 		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu) {
-			focusToElement(editorRef);
+			handleFocusOnEditorElement(isFocusOnChannelInput, editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId]);
 
 	useEffect(() => {
 		if (isFocused || attachmentFilteredByChannelId?.files.length > 0) {
-			editorRef.current?.focus();
+			handleFocusOnEditorElement(isFocusOnChannelInput, editorRef);
 			dispatch(messagesActions.setIsFocused(false));
 		}
 	}, [dispatch, isFocused, attachmentFilteredByChannelId?.files]);
@@ -793,6 +804,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			)}
 
 			<MentionsInput
+				onFocus={handleFocusInput}
 				onPaste={(event) => {
 					const pastedData = event.clipboardData.getData('text/mezon-mentions');
 					if (pastedData) {

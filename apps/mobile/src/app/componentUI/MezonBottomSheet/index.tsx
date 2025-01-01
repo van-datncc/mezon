@@ -16,6 +16,7 @@ export interface IMezonBottomSheetProps extends BottomSheetModalProps {
 	heightFitContent?: boolean;
 	snapPoints?: string[];
 	footer?: ReactNode;
+	onBackdropPress?: () => void;
 }
 
 const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
@@ -34,6 +35,7 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 				</View>
 			);
 		}
+
 		return null;
 	}, [title, headerLeft, headerRight, styles, titleSize]);
 
@@ -45,7 +47,7 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 			index={0}
 			animateOnMount
 			backgroundStyle={styles.backgroundStyle}
-			backdropComponent={Backdrop}
+			backdropComponent={(prop) => <Backdrop {...prop} onBackdropPress={props?.onBackdropPress} />}
 			enableDynamicSizing={heightFitContent}
 			handleIndicatorStyle={styles.handleIndicator}
 			style={styles.container}

@@ -581,7 +581,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						directActions.addGroupUserWS({
 							channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
-							users: [caller, ...users].filter((item) => item.user_id !== userId)
+							users: [...users].filter((item) => item.user_id !== userId)
 						})
 					);
 				}

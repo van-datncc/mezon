@@ -25,7 +25,7 @@ export const ThreadHeader = memo(() => {
 	const isTabletLandscape = useTabletLandscape();
 
 	const snapPointsMenuCustom = useMemo(() => {
-		return [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type) ? ['30%'] : ['15%'];
+		return [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type) ? ['25%'] : ['15%'];
 	}, [currentChannel?.type]);
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);

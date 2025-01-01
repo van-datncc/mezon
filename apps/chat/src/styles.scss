@@ -376,6 +376,7 @@ input:-webkit-autofill:active {
 	&.is-sending {
 		.textChat {
 			opacity: 0.6;
+      pointer-events: none;
 		}
 	}
 

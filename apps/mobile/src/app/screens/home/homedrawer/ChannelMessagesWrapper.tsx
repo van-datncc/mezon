@@ -1,6 +1,5 @@
-import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import ChannelMessageActionListener from './ChannelMessageActionListener';
 import ChannelMessageListener from './ChannelMessageListener';
@@ -9,6 +8,7 @@ import ChannelMessages from './ChannelMessages';
 
 type ChannelMessagesProps = {
 	channelId: string;
+	topicId?: string;
 	clanId: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
@@ -17,22 +17,12 @@ type ChannelMessagesProps = {
 	isDisableLoadMore?: boolean;
 };
 
-const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, isDM, isDisableLoadMore }: ChannelMessagesProps) => {
-	const dispatch = useAppDispatch();
-	useEffect(() => {
-		return () => {
-			dispatch(
-				messagesActions.UpdateChannelLastMessage({
-					channelId
-				})
-			);
-		};
-	}, [channelId, dispatch]);
-
+const ChannelMessagesWrapper = React.memo(({ channelId, topicId, clanId, mode, isPublic, isDM, isDisableLoadMore }: ChannelMessagesProps) => {
 	return (
 		<View style={{ flex: 1 }}>
 			<ChannelMessages
 				channelId={channelId}
+				topicId={topicId}
 				clanId={clanId}
 				mode={mode}
 				isDM={isDM}

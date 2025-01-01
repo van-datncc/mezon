@@ -75,7 +75,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 	const handleCreateDM = async () => {
 		const listGroupDM = selectedFriends;
 		if (currentDM?.type === ChannelType.CHANNEL_TYPE_DM) {
-			listGroupDM.push(currentDM.creator_id as string);
+			listGroupDM.push(currentDM.user_id?.at(0) as string);
 		}
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,

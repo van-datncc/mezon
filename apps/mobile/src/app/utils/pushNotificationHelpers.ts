@@ -8,7 +8,7 @@ import {
 	save,
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -185,6 +185,7 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 
 export const navigateToNotification = async (store: any, notification: any, navigation: any, time?: number) => {
 	const link = notification?.data?.link;
+	const topicId = notification?.data?.topicId;
 	if (link) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
@@ -224,6 +225,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			await joinAndChangeClan(store, clanId);
 			if (!isExistChannel) {
 				await setDefaultChannelLoader(respChannel.payload, clanId);
+			}
+			if (topicId && topicId !== '0' && !!topicId) {
+				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
 			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -276,6 +280,19 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}, 4000);
 	}
+};
+
+const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId: string, navigation: any) => {
+	const promises = [];
+	promises.push(store.dispatch(topicsActions.setValueTopic(null)));
+	promises.push(store.dispatch(topicsActions.setCurrentTopicId(topicId || '')));
+	promises.push(store.dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId as string, isShowCreateTopic: true })));
+
+	await Promise.all(promises);
+
+	navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+		screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
+	});
 };
 
 const processNotification = async ({ notification, navigation, time = 0 }) => {

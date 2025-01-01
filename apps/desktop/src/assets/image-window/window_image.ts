@@ -200,9 +200,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 </div>
 
-<script src="/apps/desktop/src/assets/image-window/image-window.js"></script>
-<script src="../menu-context/index.js"></script>
-
 </body>
 </html>
   `;
@@ -226,8 +223,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 	// Show window when ready with fade-in effect
 	popupWindow.once('ready-to-show', () => {
-		popupWindow.webContents.openDevTools();
-
+		popupWindow.show();
 		popupWindow.webContents.executeJavaScript(`
 
 	    const selectedImage = document.getElementById('selectedImage');
@@ -236,7 +232,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
         url : '${imageData.url}',
           realUrl : '${imageData.realUrl}'
       };
-
+      let currentIndex = ${activeIndex}
       document.getElementById('close-window').addEventListener('click', () => {
 		selectedImage.src = null;
     	window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
@@ -257,18 +253,6 @@ window.electron.handleActionShowImage('saveImage',currentImageUrl.url);
 
 document.addEventListener('keydown', (e) => {
 		switch (e.key) {
-			case 'ArrowUp':
-				navigateImage(-1);
-				break;
-			case 'ArrowLeft':
-				navigateImage(-1);
-				break;
-			case 'ArrowDown':
-				navigateImage(1);
-				break;
-			case 'ArrowRight':
-				navigateImage(1);
-				break;
 			case 'Escape':
 				selectedImage.src = null;
     	  window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
@@ -276,8 +260,6 @@ document.addEventListener('keydown', (e) => {
 		}
 	});
 
-
-      ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
       ${scriptRotateAndZoom()}
       ${scriptDrag()}
 
@@ -293,10 +275,6 @@ document.addEventListener('keydown', (e) => {
       `);
 	});
 
-	popupWindow.webContents.on('did-finish-load', () => {
-		popupWindow.show();
-	});
-
 	// Clean up on close
 	popupWindow.on('closed', () => {
 		ipcMain.removeHandler('minimize-window');
@@ -306,14 +284,6 @@ document.addEventListener('keydown', (e) => {
 	App.imageViewerWindow = popupWindow;
 	return popupWindow;
 }
-
-const generateQueryString = (params: Record<string, string>): string => {
-	return Object.keys(params)
-		.map((key) => {
-			return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
-		})
-		.join('&');
-};
 
 function formatDate(dateString) {
 	return new Date(dateString).toLocaleDateString();
@@ -350,6 +320,7 @@ export const scriptThumnails = (listImage, indexSelect) => {
         selectedImage.src = '${image.url}';
         document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
         document.getElementById('thumbnail-${index}').querySelector('.thumbnail').classList.add('active');
+         document.getElementById('thumbnail-${index}').querySelector('.thumbnail').scrollIntoView({ behavior: 'smooth', block: 'center' })
         document.getElementById('userAvatar').src = "${image.uploaderData.avatar}"
         document.getElementById('username').innerHTML  = "${image.uploaderData.name}"
         document.getElementById('timestamp').innerHTML  = "${time}"
@@ -359,6 +330,7 @@ export const scriptThumnails = (listImage, indexSelect) => {
         realUrl : '${image.realUrl || ''}'
       }
 
+        currentIndex = ${index}
       });`;
 		})
 		.join('');
@@ -478,22 +450,13 @@ document.addEventListener('contextmenu', (e) => {
 				if (!e.currentTarget) return;
 
 				switch (action) {
-					case 'copyLink': {
-						window.electron.handleActionShowImage(action, selectedImage.src);
-						break;
-					}
-					case 'openLink': {
-						window.electron.shell.openExternal(selectedImage.src);
-						break;
-					}
 					case 'copyImage': {
 						window.electron.handleActionShowImage(action,currentImageUrl.realUrl );
 						break;
 					}
-					case 'saveImage': {
-						window.electron.handleActionShowImage(action, selectedImage.src);
+          default : 
+          window.electron.handleActionShowImage(action, selectedImage.src);
 						break;
-					}
 				}
 				if (!menu) return;
 				menu.classList.remove('visible');
