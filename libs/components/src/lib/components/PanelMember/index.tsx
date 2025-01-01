@@ -193,6 +193,7 @@ const PanelMember = ({
 
 	const handleEnableE2ee = useCallback(async (directId?: string, e2ee?: number) => {
 		if (!hasKeyE2ee && !e2ee) {
+			dispatch(e2eeActions.setDirectMesIdE2ee(directId));
 			dispatch(e2eeActions.setOpenModalE2ee(true));
 			return;
 		}

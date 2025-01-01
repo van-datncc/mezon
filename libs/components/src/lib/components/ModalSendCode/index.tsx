@@ -6,8 +6,8 @@ import {
 	e2eeActions,
 	messagesActions,
 	selectDirectById,
+	selectDirectMesIdE2ee,
 	selectDmGroupCurrent,
-	selectDmGroupCurrentId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -164,7 +164,7 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 	const dispatch = useAppDispatch();
-	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentDmId = useSelector(selectDirectMesIdE2ee);
 	const directMessageValue = useAppSelector((state) => selectDirectById(state, currentDmId));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.id ?? ''));
 
@@ -274,6 +274,7 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 							encrypt_private_key: encryptWithPIN
 						})
 					);
+					handleEnableE2ee(directMessageValue?.id, directMessageValue?.e2ee);
 					onClose();
 				} else {
 					setOtp(Array(6).fill(''));
