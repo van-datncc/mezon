@@ -162,7 +162,7 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 				if (updateCheckResult?.downloadPromise) {
 					await updateCheckResult.downloadPromise;
 					forceQuit.enable();
-					return autoUpdater.quitAndInstall(true, true);
+					return autoUpdater.quitAndInstall(true, false);
 				}
 			} catch (error) {
 				console.error('Update check failed:', error);
@@ -172,7 +172,7 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 	}
 };
 
-ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
+ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, _options?: Electron.BrowserWindowConstructorOptions, _params?: Record<string, string>) => {
 	// const newWindow = App.openImageWindow(props, options, params);
 	if (App.imageViewerWindow) {
 		updateImagePopup(props, App.imageViewerWindow);
@@ -182,16 +182,16 @@ ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, options?: Electron.BrowserWi
 	// Remove the existing listener if it exists
 	ipcMain.removeAllListeners(IMAGE_WINDOW_TITLE_BAR_ACTION);
 
-	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, data) => {
+	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, _data) => {
 		handleWindowAction(newWindow, action);
 	});
 });
 
-ipcMain.on(TITLE_BAR_ACTION, (event, action, data) => {
+ipcMain.on(TITLE_BAR_ACTION, (event, action, _data) => {
 	handleWindowAction(App.mainWindow, action);
 });
 
-ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, data) => {
+ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, _data) => {
 	const win = BrowserWindow.getFocusedWindow();
 	const fileURL = action?.payload?.fileURL;
 	const actionImage = action?.payload?.action;
