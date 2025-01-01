@@ -24,6 +24,8 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const getTokenSocket = useSelector(selectUpdateToken(user?.id ?? ''));
+	const tokenToAmount = getTokenSocket * 1000;
+	console.log('getTokenSocket :', getTokenSocket);
 	const userStatus = useSelector(selectUserStatus);
 	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
@@ -31,6 +33,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		const parse = safeJSONParse(userProfile?.wallet ?? '').value;
 		return parse;
 	}, [userProfile?.wallet]);
+	console.log('tokenInWallet :', tokenInWallet);
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
 
@@ -74,7 +77,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					renderTrigger={() => (
 						<div>
 							<ItemStatus
-								children={`Token: ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}
+								children={`Token: ${formatNumber(Number(tokenInWallet) + Number(tokenToAmount), 'vi-VN', 'VND')}`}
 								dropdown
 								startIcon={<Icons.Check />}
 							/>

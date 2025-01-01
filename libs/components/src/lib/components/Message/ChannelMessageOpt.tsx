@@ -198,7 +198,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 					message_ref_id: message.id,
 					receiver_id: message.sender_id,
 					sender_id: userId,
-					token_count: 1
+					token_count: 2
 				})
 			).unwrap();
 

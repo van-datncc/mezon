@@ -763,6 +763,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const ontokensent = useCallback(
 		(tokenEvent: ApiTokenSentEvent) => {
+			console.log('tokenEvent :', tokenEvent);
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
 		},
 		[dispatch, userId]
@@ -1061,6 +1062,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
+		console.log('coffeeEvent :', coffeeEvent);
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
 	}, []);
 
