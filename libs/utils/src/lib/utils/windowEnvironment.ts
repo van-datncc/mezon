@@ -19,6 +19,11 @@ export function getPlatform() {
 }
 
 export const PLATFORM_ENV = getPlatform();
-export const IS_ANDROID = PLATFORM_ENV === 'Android';
+export const IS_MAC_OS = PLATFORM_ENV === 'macOS';
+export const IS_WINDOWS = PLATFORM_ENV === 'Windows';
+export const IS_LINUX = PLATFORM_ENV === 'Linux';
 export const IS_IOS = PLATFORM_ENV === 'iOS';
+export const IS_ANDROID = PLATFORM_ENV === 'Android';
+export const IS_MOBILE = IS_IOS || IS_ANDROID;
+export const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 export const IS_MULTITAB_SUPPORTED = true;

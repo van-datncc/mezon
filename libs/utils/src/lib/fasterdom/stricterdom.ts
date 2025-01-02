@@ -42,7 +42,7 @@ export function disableStrict() {
 
 export function forceMeasure(cb: () => any) {
 	if (phase !== 'mutate') {
-		throw new Error("The current phase is 'measure'");
+		// throw new Error("The current phase is 'measure'");
 	}
 
 	phase = 'measure';
@@ -56,7 +56,7 @@ const forcedMutationAllowedFor = new Set<Node>();
 
 export function forceMutation(cb: () => any, nodes: Node | Node[]) {
 	if (phase !== 'measure') {
-		throw new Error("The current phase is 'mutate'");
+		// throw new Error("The current phase is 'mutate'");
 	}
 
 	if (isStrict) {

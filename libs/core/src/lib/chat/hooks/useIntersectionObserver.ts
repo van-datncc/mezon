@@ -176,8 +176,6 @@ export function useIntersectionObserver(
 		}
 
 		const controller = controllerRef.current!;
-		console.log(controller, 'controller');
-		console.log(target, 'target');
 
 		controller.observer.observe(target);
 

@@ -1,6 +1,16 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
-import { LoadMoreDirection, useContainerHeight, useCurrentInbox, useIdleRender, useScrollHooks } from '@mezon/core';
+import {
+	LoadMoreDirection,
+	isBackgroundModeActive,
+	useContainerHeight,
+	useCurrentInbox,
+	useIdleRender,
+	useLayoutEffectWithPrevDeps,
+	useScrollHooks,
+	useStateRef,
+	useSyncEffect
+} from '@mezon/core';
 import {
 	MessagesEntity,
 	messagesActions,
@@ -28,15 +38,24 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode, convertInitialMessageOfTopic, toggleDisableHover } from '@mezon/utils';
+import {
+	Direction_Mode,
+	animateScroll,
+	convertInitialMessageOfTopic,
+	forceMeasure,
+	isAnimatingScroll,
+	requestForcedReflow,
+	requestMeasure,
+	resetScroll,
+	restartCurrentScrollAnimation,
+	toggleDisableHover
+} from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelMessage as ChannelMessageType, ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
-
-const SCROLL_THRESHOLD = 500; // 500px
 
 type ChannelMessagesProps = {
 	clanId: string;
@@ -95,7 +114,7 @@ function ChannelMessages({
 	const hasMoreTopRef = useRef<boolean>(false);
 	const hasMoreBottomRef = useRef<boolean>(false);
 
-	useEffect(() => {
+	useSyncEffect(() => {
 		userActiveScroll.current = false;
 	}, [channelId]);
 
@@ -179,10 +198,6 @@ function ChannelMessages({
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 
-	// maintain scroll position
-	const firsRowCached = useRef<string>('');
-	const lastRowCached = useRef<string>('');
-
 	const handleOnChange = useCallback(
 		async (direction: LoadMoreDirection) => {
 			if (!userActiveScroll.current) return;
@@ -191,22 +206,18 @@ function ChannelMessages({
 				case LoadMoreDirection.Backwards:
 					currentScrollDirection.current = ELoadMoreDirection.top;
 					isLoadMore.current = true;
-					firsRowCached.current = messageIds[1];
 					await loadMoreMessage(ELoadMoreDirection.top);
 					setTimeout(() => {
 						isLoadMore.current = false;
-					}, 1000);
-					return;
-
+					}, 200);
 					break;
 				case LoadMoreDirection.Forwards:
 					currentScrollDirection.current = ELoadMoreDirection.bottom;
 					isLoadMore.current = true;
-					lastRowCached.current = messageIds[messageIds.length - 1];
 					await loadMoreMessage(ELoadMoreDirection.bottom);
 					setTimeout(() => {
 						isLoadMore.current = false;
-					}, 100);
+					}, 200);
 					break;
 			}
 		},
@@ -271,10 +282,6 @@ function ChannelMessages({
 				mode={mode}
 				channelLabel={channelLabel}
 				onChange={handleOnChange}
-				isLoadMore={isLoadMore}
-				firsRowCached={firsRowCached}
-				lastRowCached={lastRowCached}
-				currentScrollDirection={currentScrollDirection}
 				isTopic={isTopicBox}
 			/>
 		</MessageContextMenuProvider>
@@ -311,10 +318,6 @@ type ChatMessageListProps = {
 	mode: number;
 	channelLabel?: string;
 	onChange: (direction: LoadMoreDirection) => void;
-	isLoadMore: React.MutableRefObject<boolean>;
-	firsRowCached: React.MutableRefObject<string>;
-	lastRowCached: React.MutableRefObject<string>;
-	currentScrollDirection: React.MutableRefObject<ELoadMoreDirection | null>;
 	isTopic?: boolean;
 };
 
@@ -334,10 +337,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		mode,
 		channelLabel,
 		onChange,
-		isLoadMore,
-		firsRowCached,
-		lastRowCached,
-		currentScrollDirection,
 		isTopic
 	}) => {
 		const dispatch = useAppDispatch();
@@ -350,7 +349,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const [getContainerHeight, prevContainerHeightRef] = useContainerHeight(chatRef, true);
 
-		const isViewportNewest = false;
+		const isViewportNewest = true;
 		const isUnread = true;
 		const isReady = true;
 
@@ -388,130 +387,153 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		// }, [focusingId]);
 
 		// Handles updated message list, takes care of scroll repositioning
-		// useLayoutEffectWithPrevDeps(
-		// 	([prevMessageIds, prevIsViewportNewest]) => {
-		// 		const containerHeight = getContainerHeight();
-		// 		const prevContainerHeight = prevContainerHeightRef.current;
-		// 		prevContainerHeightRef.current = containerHeight;
+		useLayoutEffectWithPrevDeps(
+			([prevMessageIds, prevIsViewportNewest]) => {
+				const containerHeight = getContainerHeight();
+				const prevContainerHeight = prevContainerHeightRef.current;
+				prevContainerHeightRef.current = containerHeight;
 
-		// 		// Skip initial resize observer callback
-		// 		if (
-		// 			messageIds === prevMessageIds &&
-		// 			isViewportNewest === prevIsViewportNewest &&
-		// 			containerHeight !== prevContainerHeight &&
-		// 			prevContainerHeight === undefined
-		// 		) {
-		// 			return;
-		// 		}
+				// Skip initial resize observer callback
+				if (
+					messageIds === prevMessageIds &&
+					isViewportNewest === prevIsViewportNewest &&
+					containerHeight !== prevContainerHeight &&
+					prevContainerHeight === undefined
+				) {
+					return;
+				}
 
-		// 		const container = chatRef.current!;
-		// 		listItemElementsRef.current = Array.from(container.querySelectorAll<HTMLDivElement>('.message-list-item'));
-		// 		const lastItemElement = listItemElementsRef.current[listItemElementsRef.current.length - 1];
-		// 		// const firstUnreadElement = memoFirstUnreadIdRef.current
-		// 		// 	? container.querySelector<HTMLDivElement>(`#${getMessageHtmlId(memoFirstUnreadIdRef.current)}`)
-		// 		// 	: undefined;
+				const container = chatRef.current!;
+				listItemElementsRef.current = Array.from(container.querySelectorAll<HTMLDivElement>('.message-list-item'));
+				const lastItemElement = listItemElementsRef.current[listItemElementsRef.current.length - 1];
+				// const firstUnreadElement = memoFirstUnreadIdRef.current
+				// 	? container.querySelector<HTMLDivElement>(`#${getMessageHtmlId(memoFirstUnreadIdRef.current)}`)
+				// 	: undefined;
 
-		// 		const hasLastMessageChanged =
-		// 			messageIds && prevMessageIds && messageIds[messageIds.length - 1] !== prevMessageIds[prevMessageIds.length - 1];
-		// 		const hasViewportShifted = messageIds?.[0] !== prevMessageIds?.[0] && messageIds?.length === MESSAGE_LIST_SLICE / 2 + 1;
-		// 		const wasMessageAdded = hasLastMessageChanged && !hasViewportShifted;
+				const hasLastMessageChanged =
+					messageIds && prevMessageIds && messageIds[messageIds.length - 1] !== prevMessageIds[prevMessageIds.length - 1];
+				const hasViewportShifted = messageIds?.[0] !== prevMessageIds?.[0] && messageIds?.length === MESSAGE_LIST_SLICE / 2 + 1;
+				const wasMessageAdded = hasLastMessageChanged && !hasViewportShifted;
 
-		// 		// Add extra height when few messages to allow scroll animation
-		// 		if (
-		// 			isViewportNewest &&
-		// 			wasMessageAdded &&
-		// 			messageIds &&
-		// 			messageIds.length < MESSAGE_LIST_SLICE / 2 &&
-		// 			!container.parentElement!.classList.contains('force-messages-scroll') &&
-		// 			forceMeasure(() => (container.firstElementChild as HTMLDivElement)!.clientHeight <= container.offsetHeight * 2)
-		// 		) {
-		// 			// addExtraClass(container.parentElement!, 'force-messages-scroll');
-		// 			container.parentElement!.classList.add('force-messages-scroll');
+				// Add extra height when few messages to allow scroll animation
+				if (
+					isViewportNewest &&
+					wasMessageAdded &&
+					messageIds &&
+					messageIds.length < MESSAGE_LIST_SLICE / 2 &&
+					!container.parentElement!.classList.contains('force-messages-scroll') &&
+					forceMeasure(() => (container.firstElementChild as HTMLDivElement)!.clientHeight <= container.offsetHeight * 2)
+				) {
+					// addExtraClass(container.parentElement!, 'force-messages-scroll');
+					container.parentElement!.classList.add('force-messages-scroll');
 
-		// 			setTimeout(() => {
-		// 				if (container.parentElement) {
-		// 					// removeExtraClass(container.parentElement!, 'force-messages-scroll');
-		// 					container.parentElement!.classList.remove('force-messages-scroll');
-		// 				}
-		// 			}, MESSAGE_ANIMATION_DURATION);
-		// 		}
+					setTimeout(() => {
+						if (container.parentElement) {
+							// removeExtraClass(container.parentElement!, 'force-messages-scroll');
+							container.parentElement!.classList.remove('force-messages-scroll');
+						}
+					}, MESSAGE_ANIMATION_DURATION);
+				}
 
-		// 		requestForcedReflow(() => {
-		// 			const { scrollTop, scrollHeight, offsetHeight } = container;
-		// 			const scrollOffset = scrollOffsetRef.current;
+				requestForcedReflow(() => {
+					const { scrollTop, scrollHeight, offsetHeight } = container;
+					const scrollOffset = scrollOffsetRef.current;
+					let bottomOffset = scrollOffset - (prevContainerHeight || offsetHeight);
+					if (wasMessageAdded) {
+						// If two new messages come at once (e.g. when bot responds) then the first message will update `scrollOffset`
+						// right away (before animation) which creates inconsistency until the animation completes. To work around that,
+						// we calculate `isAtBottom` with a "buffer" of the latest message height (this is approximate).
+						const lastItemHeight = lastItemElement ? lastItemElement.offsetHeight : 0;
+						bottomOffset -= lastItemHeight;
+					}
+					const isAtBottom = isViewportNewest && prevIsViewportNewest && bottomOffset <= BOTTOM_THRESHOLD;
+					// const isAlreadyFocusing = messageIds && memoFocusingIdRef.current === messageIds[messageIds.length - 1];
+					const isAlreadyFocusing = false;
+					// Animate incoming message, but if app is in background mode, scroll to the first unread
+					if (wasMessageAdded && isAtBottom && !isAlreadyFocusing) {
+						// Break out of `forceLayout`
+						requestMeasure(() => {
+							const shouldScrollToBottom = !isBackgroundModeActive();
+							// firstUnreadElement
+							// noMessageSendingAnimation
 
-		// 			let bottomOffset = scrollOffset - (prevContainerHeight || offsetHeight);
-		// 			if (wasMessageAdded) {
-		// 				// If two new messages come at once (e.g. when bot responds) then the first message will update `scrollOffset`
-		// 				// right away (before animation) which creates inconsistency until the animation completes. To work around that,
-		// 				// we calculate `isAtBottom` with a "buffer" of the latest message height (this is approximate).
-		// 				const lastItemHeight = lastItemElement ? lastItemElement.offsetHeight : 0;
-		// 				bottomOffset -= lastItemHeight;
-		// 			}
-		// 			const isAtBottom = isViewportNewest && prevIsViewportNewest && bottomOffset <= BOTTOM_THRESHOLD;
-		// 			// const isAlreadyFocusing = messageIds && memoFocusingIdRef.current === messageIds[messageIds.length - 1];
-		// 			const isAlreadyFocusing = false;
+							animateScroll(
+								container,
+								shouldScrollToBottom ? lastItemElement! : null!,
+								shouldScrollToBottom ? 'end' : 'start',
+								BOTTOM_FOCUS_MARGIN,
+								undefined,
+								undefined,
+								undefined
+							);
+						});
+					}
 
-		// 			// Animate incoming message, but if app is in background mode, scroll to the first unread
-		// 			if (wasMessageAdded && isAtBottom && !isAlreadyFocusing) {
-		// 				// Break out of `forceLayout`
-		// 				requestMeasure(() => {
-		// 					const shouldScrollToBottom = !isBackgroundModeActive();
-		// 					// firstUnreadElement
-		// 					// noMessageSendingAnimation
+					const isResized = prevContainerHeight !== undefined && prevContainerHeight !== containerHeight;
+					if (isResized && isAnimatingScroll()) {
+						return undefined;
+					}
 
-		// 					// animateScroll(
-		// 					// 	container,
-		// 					// 	shouldScrollToBottom ? lastItemElement! : null!,
-		// 					// 	shouldScrollToBottom ? 'end' : 'start',
-		// 					// 	BOTTOM_FOCUS_MARGIN,
-		// 					// 	undefined,
-		// 					// 	undefined,
-		// 					// 	undefined
-		// 					// );
-		// 				});
-		// 			}
+					const anchor = anchorIdRef.current && container.querySelector(`#${anchorIdRef.current}`);
+					// const unreadDivider =
+					// 	!anchor && memoUnreadDividerBeforeIdRef.current && container.querySelector<HTMLDivElement>(`.${UNREAD_DIVIDER_CLASS}`);
 
-		// 			const isResized = prevContainerHeight !== undefined && prevContainerHeight !== containerHeight;
-		// 			if (isResized && isAnimatingScroll()) {
-		// 				return undefined;
-		// 			}
+					let newScrollTop!: number;
+					if (isAtBottom && isResized) {
+						newScrollTop = scrollHeight - offsetHeight;
+					} else if (anchor) {
+						const newAnchorTop = anchor.getBoundingClientRect().top;
+						newScrollTop = scrollTop + (newAnchorTop - (anchorTopRef.current || 0));
+					} else {
+						newScrollTop = scrollHeight - scrollOffset;
+					}
 
-		// 			const anchor = anchorIdRef.current && container.querySelector(`#${anchorIdRef.current}`);
-		// 			// const unreadDivider =
-		// 			// 	!anchor && memoUnreadDividerBeforeIdRef.current && container.querySelector<HTMLDivElement>(`.${UNREAD_DIVIDER_CLASS}`);
+					return () => {
+						resetScroll(container, Math.ceil(newScrollTop));
+						restartCurrentScrollAnimation();
+						scrollOffsetRef.current = Math.max(Math.ceil(scrollHeight - newScrollTop), offsetHeight);
+						// if (!memoFocusingIdRef.current) {
+						// 	isScrollTopJustUpdatedRef.current = true;
+						// 	requestMeasure(() => {
+						// 		isScrollTopJustUpdatedRef.current = false;
+						// 	});
+						// }
+					};
+				});
+				// This should match deps for `useSyncEffect` above
+			},
+			[messageIds, isViewportNewest, getContainerHeight, prevContainerHeightRef]
+		);
 
-		// 			let newScrollTop!: number;
-		// 			if (isAtBottom && isResized) {
-		// 				newScrollTop = scrollHeight - offsetHeight;
-		// 			} else if (anchor) {
-		// 				const newAnchorTop = anchor.getBoundingClientRect().top;
-		// 				newScrollTop = scrollTop + (newAnchorTop - (anchorTopRef.current || 0));
-		// 			} else {
-		// 				newScrollTop = scrollHeight - scrollOffset;
-		// 			}
+		const rememberScrollPositionRef = useStateRef(() => {
+			if (!messageIds || !listItemElementsRef.current || !userActiveScroll.current) {
+				return;
+			}
 
-		// 			console.log(newScrollTop, 'newScrollTop');
+			const preservedItemElements = listItemElementsRef.current.filter((element) => messageIds.includes(element.id.replace('msg-', '')));
 
-		// 			return () => {
-		// 				resetScroll(container, Math.ceil(newScrollTop));
-		// 				restartCurrentScrollAnimation();
+			// We avoid the very first item as it may be a partly-loaded album
+			// and also because it may be removed when messages limit is reached
+			const anchor = preservedItemElements[1] || preservedItemElements[0];
 
-		// 				scrollOffsetRef.current = Math.max(Math.ceil(scrollHeight - newScrollTop), offsetHeight);
+			if (!anchor) {
+				return;
+			}
+			anchorIdRef.current = anchor.id;
+			anchorTopRef.current = anchor.getBoundingClientRect().top;
+		});
 
-		// 				// if (!memoFocusingIdRef.current) {
-		// 				// 	isScrollTopJustUpdatedRef.current = true;
+		useSyncEffect(
+			() => forceMeasure(() => rememberScrollPositionRef.current()),
+			// This will run before modifying content and should match deps for `useLayoutEffectWithPrevDeps` below
+			[messageIds, isViewportNewest, rememberScrollPositionRef]
+		);
 
-		// 				// 	requestMeasure(() => {
-		// 				// 		isScrollTopJustUpdatedRef.current = false;
-		// 				// 	});
-		// 				// }
-		// 			};
-		// 		});
-		// 		// This should match deps for `useSyncEffect` above
-		// 	},
-		// 	[messageIds, isViewportNewest, getContainerHeight, prevContainerHeightRef]
-		// );
+		useEffect(
+			() => rememberScrollPositionRef.current(),
+			// This is only needed to react on signal updates
+			[getContainerHeight, rememberScrollPositionRef]
+		);
 
 		const convertedFirstMsgOfThisTopic = useMemo(() => {
 			if (!firstMsgOfThisTopic?.message) {
@@ -519,13 +541,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			}
 			return convertInitialMessageOfTopic(firstMsgOfThisTopic.message as ChannelMessageType);
 		}, [firstMsgOfThisTopic]);
-
-		// Initial scroll to bottom
-		useLayoutEffect(() => {
-			if (chatRef.current && messageIds?.length && !userActiveScroll.current) {
-				chatRef.current.scrollTop = chatRef.current.scrollHeight;
-			}
-		});
 
 		// Handle scroll to specific message (jump/pin)
 		const timerRef = useRef<number | null>(null);
@@ -619,39 +634,37 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							</div>
 						</div>
 					)}
-					<div className="w-full">
-						{withHistoryTriggers && <div ref={backwardsTriggerRef} key="backwards-trigger" className="backwards-trigger" />}
-						{messageIds.map((messageId, index) => {
-							const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
-							const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
+					{withHistoryTriggers && <div ref={backwardsTriggerRef} key="backwards-trigger" className="backwards-trigger" />}
+					{messageIds.map((messageId, index) => {
+						const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
+						const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
 
-							return (
-								<div className="message-list-item" key={messageId} id={messageId}>
-									<MemorizedChannelMessage
-										index={index}
-										message={entities[messageId]}
-										previousMessage={entities[messageIds[index - 1]]}
-										avatarDM={avatarDM}
-										userName={userName}
-										messageId={messageId}
-										nextMessageId={messageIds[index + 1]}
-										channelId={channelId}
-										isHighlight={messageId === idMessageNotified}
-										mode={mode}
-										channelLabel={channelLabel ?? ''}
-										isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
-										checkMessageTargetToMoved={checkMessageTargetToMoved}
-										messageReplyHighlight={messageReplyHighlight}
-										isTopic={isTopic}
-									/>
-								</div>
-							);
-						})}
-						{withHistoryTriggers && <div ref={forwardsTriggerRef} key="forwards-trigger" className="forwards-trigger" />}
+						return (
+							<div className="message-list-item" key={messageId} id={'msg-' + messageId}>
+								<MemorizedChannelMessage
+									index={index}
+									message={entities[messageId]}
+									previousMessage={entities[messageIds[index - 1]]}
+									avatarDM={avatarDM}
+									userName={userName}
+									messageId={messageId}
+									nextMessageId={messageIds[index + 1]}
+									channelId={channelId}
+									isHighlight={messageId === idMessageNotified}
+									mode={mode}
+									channelLabel={channelLabel ?? ''}
+									isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
+									checkMessageTargetToMoved={checkMessageTargetToMoved}
+									messageReplyHighlight={messageReplyHighlight}
+									isTopic={isTopic}
+								/>
+							</div>
+						);
+					})}
+					{withHistoryTriggers && <div ref={forwardsTriggerRef} key="forwards-trigger" className="forwards-trigger" />}
 
-						<div ref={fabTriggerRef} key="fab-trigger" className="fab-trigger" />
-						<div className="h-[20px] w-[1px] pointer-events-none"></div>
-					</div>
+					<div ref={fabTriggerRef} key="fab-trigger" className="fab-trigger" />
+					<div className="h-[20px] w-[1px] pointer-events-none"></div>
 				</div>
 			</div>
 		);
