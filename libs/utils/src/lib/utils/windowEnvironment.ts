@@ -21,3 +21,4 @@ export function getPlatform() {
 export const PLATFORM_ENV = getPlatform();
 export const IS_ANDROID = PLATFORM_ENV === 'Android';
 export const IS_IOS = PLATFORM_ENV === 'iOS';
+export const IS_MULTITAB_SUPPORTED = true;

@@ -47,12 +47,18 @@ import {
 	SenderInfoOptionals,
 	UsersClanEntity
 } from '../types';
+export * from './animateScroll';
 export * from './audio';
+export * from './callbacks';
 export * from './file';
+export * from './forceReflow';
+export * from './heavyAnimation';
 export * from './mergeRefs';
 export * from './message';
+export * from './resetScroll';
 export * from './schedulers';
 export * from './select';
+export * from './signals';
 export * from './transform';
 export * from './windowSize';
 
