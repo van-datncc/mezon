@@ -61,7 +61,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
-	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], props.channelId);
 	const navigation = useNavigation<any>();
 	const { sendMessage } = useChatSending({
 		mode,
@@ -69,8 +68,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup
 	});
 
-	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
-		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+	const [isCanManageThread, isCanManageChannel, canSendMessage] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel, EOverriddenPermission.sendMessage],
 		currentChannelId ?? ''
 	);
 	const [isAllowDelMessage] = usePermissionChecker([EOverriddenPermission.deleteMessage], message?.channel_id ?? '');
@@ -438,7 +437,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
-		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM || !canSendMessage;
+		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM || !canSendMessage || currentChannelId !== message?.channel_id;
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
