@@ -313,23 +313,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
-				const attachmentList: AttachmentEntity[] = (message.attachments || [])?.map((attachment) => {
-					const dateTime = new Date();
-					return {
-						...attachment,
-						id: attachment.url as string,
-						message_id: message?.message_id,
-						create_time: dateTime.toISOString(),
-						uploader: message?.sender_id
-					};
-				});
+				const attachmentList: AttachmentEntity[] =
+					message.attachments && message.attachments.length > 0
+						? message.attachments.map((attachment) => {
+								const dateTime = new Date();
+								return {
+									...attachment,
+									id: attachment.url as string,
+									message_id: message?.message_id,
+									create_time: dateTime.toISOString(),
+									uploader: message?.sender_id
+								};
+							})
+						: [];
 
-				if (attachmentList?.length) {
-					if (message?.code === TypeMessage.Chat) {
-						dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
-					} else if (message?.code === TypeMessage.ChatRemove) {
-						dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
-					}
+				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
+					dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
+				} else if (message?.code === TypeMessage.ChatRemove && message?.attachments) {
+					dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
 				}
 
 				dispatch(messagesActions.addNewMessage(mess));
@@ -673,7 +674,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
 			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === 0) {
+				if (eventEmoji.action === EEventAction.CREATED) {
 					dispatch(
 						emojiSuggestionActions.add({
 							category: eventEmoji.clan_name,
@@ -686,7 +687,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							clan_name: eventEmoji.clan_name
 						})
 					);
-				} else if (eventEmoji.action === 1) {
+				} else if (eventEmoji.action === EEventAction.UPDATE) {
 					dispatch(
 						emojiSuggestionActions.update({
 							id: eventEmoji.id,
@@ -695,7 +696,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							}
 						})
 					);
-				} else if (eventEmoji.action === 2) {
+				} else if (eventEmoji.action === EEventAction.DELETE) {
 					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 				}
 			}
@@ -1090,7 +1091,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle new role creation
-			if (status === 0 && role) {
+			if (status === EEventAction.CREATED && role) {
 				dispatch(
 					rolesClanActions.add({
 						id: role.id as string,
@@ -1122,7 +1123,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role update
-			if (status === 1) {
+			if (status === EEventAction.UPDATE) {
 				const isUserAffected = user_add_ids.includes(userId as string) || user_remove_ids.includes(userId as string);
 
 				if (isUserAffected) {
@@ -1152,7 +1153,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role deletion
-			if (status === 2) {
+			if (status === EEventAction.DELETE) {
 				const isUserResult = await dispatch(
 					rolesClanActions.updatePermissionUserByRoleId({
 						roleId: role.id as string,

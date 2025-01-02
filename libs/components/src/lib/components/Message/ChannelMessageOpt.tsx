@@ -46,6 +46,8 @@ type ChannelMessageOptProps = {
 	isCombine: boolean;
 	mode: number;
 	isDifferentDay: boolean;
+	hasPermission: boolean;
+	isTopic: boolean;
 };
 
 type JsonObject = {
@@ -64,21 +66,29 @@ enum EMessageOpt {
 	OPTION = 'option'
 }
 
-const ChannelMessageOpt = ({ message, handleContextMenu, isCombine, mode, isDifferentDay }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({
+	message,
+	handleContextMenu,
+	isCombine,
+	mode,
+	isDifferentDay,
+	hasPermission = true,
+	isTopic
+}: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const refOpt = useRef<HTMLDivElement>(null);
 	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
-	const replyMenu = useMenuReplyMenuBuilder(message);
+	const replyMenu = useMenuReplyMenuBuilder(message, hasPermission);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
-	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
+	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread, hasPermission);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
 	const checkMessageOnTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.channel_id ?? ''));
 	const checkMessageHasTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.topic_id ?? ''));
-	const doNotAllowCreateTopic = checkMessageOnTopic || checkMessageHasTopic;
+	const doNotAllowCreateTopic = (isTopic && checkMessageOnTopic) || (isTopic && checkMessageHasTopic) || !hasPermission;
 	const createTopicMenu = useTopicMenuBuilder(message, doNotAllowCreateTopic);
 	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
 
@@ -319,7 +329,7 @@ function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPI
 
 // Menu items plugins
 // maybe should be moved to separate files
-function useMenuReplyMenuBuilder(message: IMessageWithUser) {
+function useMenuReplyMenuBuilder(message: IMessageWithUser, hasPermission: boolean) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const messageId = message.id;
@@ -349,7 +359,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 	}, [dispatch, messageId]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId !== message.sender_id, (builder) => {
+		builder.when(userId !== message.sender_id && hasPermission, (builder) => {
 			builder.addMenuItem('reply', 'reply', handleItemClick, <Icons.Reply />, null, false, false, 'rotate-180');
 		});
 	});
@@ -415,7 +425,7 @@ function useReactMenuBuilder(message: IMessageWithUser) {
 	});
 }
 
-function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
+function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean, hasPermission: boolean) {
 	const [thread, setThread] = useState(false);
 	const dispatch = useAppDispatch();
 
@@ -450,7 +460,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setThread, thread, setValueThread]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(!isThread, (builder) => {
+		builder.when(!isThread && hasPermission, (builder) => {
 			builder.addMenuItem('thread', 'thread', handleItemClick, <Icons.ThreadIcon isWhite={thread} />);
 		});
 	});
