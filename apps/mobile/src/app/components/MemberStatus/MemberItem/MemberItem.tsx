@@ -1,14 +1,6 @@
 import { useAuth, useMemberStatus } from '@mezon/core';
-import {
-	ChannelMembersEntity,
-	DirectEntity,
-	selectClanMemberMetaUserId,
-	selectCurrentClan,
-	selectMemberClanByUserId2,
-	selectUserClanProfileByClanID,
-	useAppSelector
-} from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { ChannelMembersEntity, DirectEntity, selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store-mobile';
+import { IChannel, UsersClanEntity } from '@mezon/utils';
 import { memo, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
@@ -24,19 +16,16 @@ interface IProps {
 }
 
 type MemberItemProps = {
-	id: string;
+	user: ChannelMembersEntity | UsersClanEntity;
 	isDMThread?: boolean;
 	onPress?: (user: ChannelMembersEntity) => void;
 	currentChannel?: IChannel | DirectEntity;
 };
 
 export const MemoizedMemberItem = memo((props: MemberItemProps) => {
-	const { id, ...rest } = props;
+	const { user, ...rest } = props;
 
-	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
-	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
-
-	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!userMeta?.online} />;
+	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!user?.user?.online} />;
 });
 
 export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread }: IProps) {
