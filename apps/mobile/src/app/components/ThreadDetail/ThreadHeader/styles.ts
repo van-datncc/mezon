@@ -5,7 +5,7 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		channelLabelWrapper: {
 			flexDirection: 'row',
-			alignItems: 'center',
+			alignItems: 'flex-start',
 			justifyContent: 'center',
 			gap: size.s_12,
 			paddingVertical: Metrics.size.m
@@ -73,7 +73,6 @@ export const style = (colors: Attributes) =>
 		iconMenuHeader: {
 			position: 'absolute',
 			right: size.s_2,
-			top: size.s_10,
 			padding: size.s_10
 		}
 	});
