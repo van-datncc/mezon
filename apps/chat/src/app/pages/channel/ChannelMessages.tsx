@@ -499,7 +499,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				>
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
 					{isTopic && convertedFirstMsgOfThisTopic && (
-						<div className="sticky top-0 z-[-10] dark:bg-bgPrimary bg-bgLightPrimary">
+						<div className="sticky top-0 z-[1] dark:bg-bgPrimary bg-bgLightPrimary">
 							<div
 								className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
 							>

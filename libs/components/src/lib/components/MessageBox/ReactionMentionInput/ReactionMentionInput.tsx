@@ -840,14 +840,14 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 					'&multiLine': {
 						highlighter: {
-							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 9px',
+							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 120px 9px 9px',
 							border: 'none',
 							maxHeight: '350px',
 							overflow: 'auto',
 							minWidth: '300px'
 						},
 						input: {
-							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 9px',
+							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 120px 9px 9px',
 							border: 'none',
 							outline: 'none',
 							maxHeight: '350px',
