@@ -645,6 +645,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		});
 		message?.code !== TypeMessage.Topic &&
 			!isTopic &&
+			canSendMessage &&
 			builder.when(checkPos && hasPermissionCreateTopic, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});

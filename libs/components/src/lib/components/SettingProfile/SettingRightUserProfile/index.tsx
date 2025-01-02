@@ -1,4 +1,4 @@
-import { useAccount } from '@mezon/core';
+import { useAccount, useAuth } from '@mezon/core';
 import {
 	channelMembersActions,
 	clansActions,
@@ -14,8 +14,11 @@ import { createImgproxyUrl, fetchAndCreateFiles, fileTypeImage } from '@mezon/ut
 import { ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
 import { ChangeEvent, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { Coords } from '../../ChannelLink';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import PanelClan from '../../PanelClan';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 
 const SettingRightUser = ({
@@ -39,7 +42,7 @@ const SettingRightUser = ({
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
-
+	const { userProfile } = useAuth();
 	const [urlImage, setUrlImage] = useState(avatar);
 	const { updateUser } = useAccount();
 	const [flags, setFlags] = useState(true);
@@ -176,6 +179,23 @@ const SettingRightUser = ({
 			}
 		);
 	};
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0
+	});
+
+	const [openRightClickModal, closeRightClickModal] = useModal(() => {
+		return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} userProfile={userProfile || undefined} />;
+	}, [coords]);
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+		const windowHeight = window.innerHeight;
+		const distanceToBottom = windowHeight - event.clientY;
+		setCoords({ mouseX, mouseY, distanceToBottom });
+		openRightClickModal();
+	};
 
 	return (
 		<>
@@ -234,7 +254,7 @@ const SettingRightUser = ({
 						</div>
 					</div>
 
-					<div className="mt-8 flex items-center bg-bgTertiary p-4 rounded justify-between">
+					<div className="mt-8 flex items-center bg-bgTertiary p-4 rounded justify-between" onContextMenu={handleMouseClick}>
 						<p className="font-semibold tracking-wide text-sm">Direct Message Icon</p>
 						<div className="flex gap-x-5">
 							<label
