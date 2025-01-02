@@ -13,6 +13,7 @@ interface IProps {
 	onPress?: (user: ChannelMembersEntity) => void;
 	currentChannel?: IChannel | DirectEntity;
 	isDMThread?: boolean;
+	isMobile?: boolean;
 }
 
 type MemberItemProps = {
@@ -20,16 +21,18 @@ type MemberItemProps = {
 	isDMThread?: boolean;
 	onPress?: (user: ChannelMembersEntity) => void;
 	currentChannel?: IChannel | DirectEntity;
+	isMobile?: boolean;
 };
 
 export const MemoizedMemberItem = memo((props: MemberItemProps) => {
 	const { user, ...rest } = props;
 
-	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!user?.user?.online} />;
+	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!user?.user?.online} isMobile={user?.user?.is_mobile} />;
 });
 
-export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread }: IProps) {
+export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread, isMobile }: IProps) {
 	const userStatus = useMemberStatus(user?.id || '');
+
 	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const { userProfile } = useAuth();
@@ -45,7 +48,7 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 		>
 			<MemberProfile
 				user={user}
-				userStatus={{ status: isMe ? true : !isOffline, isMobile: userStatus?.isMobile }}
+				userStatus={{ status: isMe ? true : !isOffline, isMobile }}
 				numCharCollapse={30}
 				isHideIconStatus={userStatus ? false : true}
 				isOffline={isMe ? false : isOffline}
