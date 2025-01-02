@@ -251,6 +251,17 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 window.electron.handleActionShowImage('saveImage',currentImageUrl.url);
 });
 
+  document.getElementById('toggleListBtn').addEventListener('click', () => {
+  
+  if(document.getElementById('thumbnails').classList.contains('thumbnail-contain-hide')){
+  document.getElementById('thumbnails').classList.remove('thumbnail-contain-hide');    
+  return;
+  }
+  document.getElementById('thumbnails').classList.add('thumbnail-contain-hide');    
+  
+  });
+
+
 document.addEventListener('keydown', (e) => {
 		switch (e.key) {
 			case 'Escape':
@@ -348,6 +359,11 @@ const scriptRotateAndZoom = () => {
  let currentZoom = 1;
  document.getElementById('rotateRightBtn').addEventListener('click', () => {
  currentRotation = currentRotation + 90;
+ if(currentRotation % 180 === 90){
+  selectedImage.classList.add('rotate-width');
+ }else{
+  selectedImage.classList.remove('rotate-width');
+ }
  selectedImage.style.transform = \`rotate(\${currentRotation}deg) translate(0,0) scale(\${currentZoom})\`; });
 
   document.getElementById('rotateLeftBtn').addEventListener('click', () => {
@@ -390,7 +406,7 @@ const scriptDrag = () => {
 				x: e.clientX - dragstart.x,
 				y: e.clientY - dragstart.y
         };
-			selectedImage.style.transform = \`scale(\${currentZoom}) translate(\${currenPosition.x / currentZoom}px, \${currenPosition.y / currentZoom}px) \`;
+			selectedImage.style.transform = \`scale(\${currentZoom}) translate(\${currenPosition.x / currentZoom}px, \${currenPosition.y / currentZoom}px) rotate(\${currentRotation}deg)  \`;
 		}
   });
 
