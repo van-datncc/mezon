@@ -7,6 +7,7 @@ import {
 	JoinPTTActions,
 	RootState,
 	TalkPTTActions,
+	accountActions,
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
@@ -67,6 +68,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
 	EOverriddenPermission,
@@ -76,6 +78,7 @@ import {
 	ModeResponsive,
 	NotificationCode,
 	TIME_OFFSET,
+	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage
 } from '@mezon/utils';
@@ -763,7 +766,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const ontokensent = useCallback(
 		(tokenEvent: ApiTokenSentEvent) => {
-			console.log('tokenEvent :', tokenEvent);
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
 		},
 		[dispatch, userId]
@@ -1062,8 +1064,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
-		console.log('coffeeEvent :', coffeeEvent);
-		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
+		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+		const updateAmount = isReceiverGiveCoffee
+			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+			: isSenderGiveCoffee
+				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+				: 0;
+		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 	}, []);
 
 	const onroleevent = useCallback(

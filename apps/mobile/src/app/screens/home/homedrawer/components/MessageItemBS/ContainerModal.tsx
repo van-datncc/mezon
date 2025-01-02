@@ -21,7 +21,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
+import { AMOUNT_TOKEN, EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -112,7 +112,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					message_ref_id: message.id,
 					receiver_id: message.sender_id,
 					sender_id: userId,
-					token_count: 1
+					token_count: AMOUNT_TOKEN.TEN_TOKENS
 				};
 				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
 				handleReact(

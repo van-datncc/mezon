@@ -89,7 +89,6 @@ export const giveCoffeeSlice = createSlice({
 		},
 		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
 			const { tokenEvent } = action.payload;
-			console.log('action.payload :', action.payload);
 			const userId = tokenEvent.sender_id;
 			if (!userId) return;
 			state.tokenUpdate[userId] = state.tokenUpdate[userId] ?? 0;
@@ -101,7 +100,6 @@ export const giveCoffeeSlice = createSlice({
 		},
 		handleSocketToken: (state, action: PayloadAction<{ currentUserId: string; tokenEvent: ApiTokenSentEvent }>) => {
 			const { currentUserId, tokenEvent } = action.payload;
-			console.log('action.payload :', action.payload);
 			if (!currentUserId) return;
 			if (currentUserId !== tokenEvent.receiver_id) return;
 
@@ -110,20 +108,6 @@ export const giveCoffeeSlice = createSlice({
 
 			if (currentUserId === tokenEvent.receiver_id) {
 				state.tokenUpdate[currentUserId] += tokenEvent.amount || 0;
-			}
-		},
-		setTokenFromSocket: (state, action: PayloadAction<{ userId: string | undefined; coffeeEvent: ApiGiveCoffeeEvent }>) => {
-			const { userId, coffeeEvent } = action.payload;
-
-			if (!userId) return;
-
-			state.tokenUpdate[userId] = state.tokenUpdate[userId] ?? 0;
-			state.tokenSocket[userId] = coffeeEvent ?? {};
-
-			if (userId === coffeeEvent.receiver_id) {
-				state.tokenUpdate[userId] += 2;
-			} else if (userId === coffeeEvent.sender_id) {
-				state.tokenUpdate[userId] -= 2;
 			}
 		}
 	}

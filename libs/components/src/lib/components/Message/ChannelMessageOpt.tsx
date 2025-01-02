@@ -22,6 +22,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	AMOUNT_TOKEN,
 	EMOJI_GIVE_COFFEE,
 	IMessageWithUser,
 	MenuBuilder,
@@ -198,7 +199,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 					message_ref_id: message.id,
 					receiver_id: message.sender_id,
 					sender_id: userId,
-					token_count: 2
+					token_count: AMOUNT_TOKEN.TEN_TOKENS
 				})
 			).unwrap();
 

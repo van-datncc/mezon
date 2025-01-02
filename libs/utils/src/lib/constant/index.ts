@@ -72,8 +72,8 @@ export enum EPermissionId {
 export const ID_MENTION_HERE = '1775731111020111321';
 
 export const EMOJI_GIVE_COFFEE = {
-	emoji: 'cong1',
-	emoji_id: '7239659508431615752'
+	emoji: ':coffee:',
+	emoji_id: '7280417126303261185'
 };
 export const HEIGHT_PANEL_PROFILE = 480;
 export const WIDTH_PANEL_PROFILE = 300;
@@ -86,3 +86,10 @@ export const DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR = '#17ac86';
 
 export const CHANNEL_INPUT_ID = 'editorReactMentionChannel';
 export const GENERAL_INPUT_ID = 'editorReactMention';
+export const AMOUNT_TOKEN = {
+	TEN_TOKENS: 10
+};
+
+export const TOKEN_TO_AMOUNT = {
+	ONE_THOUNSAND: 1000
+};
