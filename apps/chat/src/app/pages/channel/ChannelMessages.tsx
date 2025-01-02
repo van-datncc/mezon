@@ -1,6 +1,6 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
-import { useIdleRender } from '@mezon/core';
+import { useCurrentInbox, useIdleRender } from '@mezon/core';
 import {
 	MessagesEntity,
 	messagesActions,
@@ -69,6 +69,7 @@ function ChannelMessages({
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentInbox = useCurrentInbox();
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
@@ -78,7 +79,7 @@ function ChannelMessages({
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const userId = useSelector(selectAllAccount)?.user?.id;
-	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentInbox?.channel_id as string));
 	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
