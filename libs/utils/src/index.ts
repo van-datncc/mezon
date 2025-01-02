@@ -5,6 +5,7 @@ export * from './lib/contextmenu';
 export * from './lib/dom';
 export * from './lib/e2ee';
 export * from './lib/errors';
+export * from './lib/fasterdom';
 export * from './lib/hooks';
 export * from './lib/types';
 export * from './lib/utils';

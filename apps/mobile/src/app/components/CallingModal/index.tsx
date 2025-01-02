@@ -16,7 +16,6 @@ import LottieView from 'lottie-react-native';
 import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
-import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import Sound from 'react-native-sound';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
@@ -186,7 +185,6 @@ const CallingModal = () => {
 							}
 						});
 					}, 500);
-					RNNotificationCall.declineCall('6cb67209-4ef9-48c0-a8dc-2cec6cd6261d');
 					await SharedPreferences.removeItem('notificationDataCalling');
 				}
 			} catch (error) {
@@ -197,7 +195,7 @@ const CallingModal = () => {
 		if (Platform.OS === 'android') {
 			const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 			if (latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
-				RNNotificationCall.declineCall('6cb67209-4ef9-48c0-a8dc-2cec6cd6261d');
+				// RNNotificationCall.declineCall('6cb67209-4ef9-48c0-a8dc-2cec6cd6261d');
 			} else {
 				getDataCall();
 			}

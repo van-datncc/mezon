@@ -2,10 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
-import type { CustomIncomingActivityProps } from 'react-native-full-screen-notification-incoming-call';
-import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
-
-export default function CustomIncomingCall(props: CustomIncomingActivityProps) {
+export default function CustomIncomingCall(props: any) {
 	useEffect(() => {
 		BootSplash.hide({ fade: true });
 	}, []);
@@ -25,7 +22,7 @@ export default function CustomIncomingCall(props: CustomIncomingActivityProps) {
 				<TouchableOpacity
 					style={[styles.button, styles.declineButton]}
 					onPress={() => {
-						RNNotificationCall?.declineCall?.(props.uuid, props.payload);
+						// RNNotificationCall?.declineCall?.(props.uuid, props.payload);
 					}}
 				>
 					<Text style={styles.buttonText}>Decline</Text>
@@ -34,7 +31,7 @@ export default function CustomIncomingCall(props: CustomIncomingActivityProps) {
 				<TouchableOpacity
 					style={[styles.button, styles.answerButton]}
 					onPress={() => {
-						RNNotificationCall?.answerCall?.(props.uuid, props.payload);
+						// RNNotificationCall?.answerCall?.(props.uuid, props.payload);
 					}}
 				>
 					<Text style={styles.buttonText}>Answer</Text>

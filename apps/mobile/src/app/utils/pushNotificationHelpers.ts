@@ -16,7 +16,6 @@ import { DrawerActions } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
-import RNNotificationCall from 'react-native-full-screen-notification-incoming-call';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
@@ -259,7 +258,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 
 						await setDefaultChannelLoader(respChannel.payload, clanIdCache);
 					};
-					await joinChangeFetchAndSetLoader(store, clanIdCache);
+					setTimeout(async () => {
+						await joinChangeFetchAndSetLoader(store, clanIdCache);
+					}, 1000);
 				}
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -423,12 +424,7 @@ export const setupIncomingCall = async (body: string) => {
 		if (bodyData?.offer === 'CANCEL_CALL') {
 			const callID = '6cb67209-4ef9-48c0-a8dc-2cec6cd6261d';
 			if (callID) {
-				if (Platform.OS === 'android') {
-					RNNotificationCall.hideNotification();
-					RNNotificationCall.declineCall(callID);
-				} else {
-					RNCallKeep.endCall(callID);
-				}
+				RNCallKeep.endCall(callID);
 			}
 			return;
 		}

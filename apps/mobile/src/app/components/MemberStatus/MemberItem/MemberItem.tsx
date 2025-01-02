@@ -1,14 +1,6 @@
 import { useAuth, useMemberStatus } from '@mezon/core';
-import {
-	ChannelMembersEntity,
-	DirectEntity,
-	selectClanMemberMetaUserId,
-	selectCurrentClan,
-	selectMemberClanByUserId2,
-	selectUserClanProfileByClanID,
-	useAppSelector
-} from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { ChannelMembersEntity, DirectEntity, selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store-mobile';
+import { IChannel, UsersClanEntity } from '@mezon/utils';
 import { memo, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
@@ -21,26 +13,26 @@ interface IProps {
 	onPress?: (user: ChannelMembersEntity) => void;
 	currentChannel?: IChannel | DirectEntity;
 	isDMThread?: boolean;
+	isMobile?: boolean;
 }
 
 type MemberItemProps = {
-	id: string;
+	user: ChannelMembersEntity | UsersClanEntity;
 	isDMThread?: boolean;
 	onPress?: (user: ChannelMembersEntity) => void;
 	currentChannel?: IChannel | DirectEntity;
+	isMobile?: boolean;
 };
 
 export const MemoizedMemberItem = memo((props: MemberItemProps) => {
-	const { id, ...rest } = props;
+	const { user, ...rest } = props;
 
-	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
-	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
-
-	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!userMeta?.online} />;
+	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!user?.user?.online} isMobile={user?.user?.is_mobile} />;
 });
 
-export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread }: IProps) {
+export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread, isMobile }: IProps) {
 	const userStatus = useMemberStatus(user?.id || '');
+
 	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const { userProfile } = useAuth();
@@ -56,7 +48,7 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 		>
 			<MemberProfile
 				user={user}
-				userStatus={{ status: isMe ? true : !isOffline, isMobile: userStatus?.isMobile }}
+				userStatus={{ status: isMe ? true : !isOffline, isMobile }}
 				numCharCollapse={30}
 				isHideIconStatus={userStatus ? false : true}
 				isOffline={isMe ? false : isOffline}

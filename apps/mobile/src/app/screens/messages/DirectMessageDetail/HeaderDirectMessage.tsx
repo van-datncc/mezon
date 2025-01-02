@@ -60,7 +60,7 @@ function useChannelSeen(channelId: string) {
 			dispatch(channelsActions.updateChannelBadgeCount({ clanId: '0', channelId: channelId || '', count: 0, isReset: true }));
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, []);
+	}, [lastMessage]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {

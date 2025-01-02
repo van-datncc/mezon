@@ -23,6 +23,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const appearanceTheme = useSelector(selectTheme);
 
+	const scrollRef = useRef<HTMLDivElement>(null);
+
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,
@@ -51,10 +53,16 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	return (
 		<Tippy
-			content={<UserReactionPanel message={message} emojiShowPanel={emoji} mode={mode} />}
+			content={<UserReactionPanel ref={scrollRef} message={message} emojiShowPanel={emoji} mode={mode} />}
 			className={`flex justify-center items-center bg-blackA ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
 			interactive={true}
 			hideOnClick={false}
+			lazy={true}
+			onShow={() => {
+				setTimeout(() => {
+					scrollRef.current?.focus();
+				}, 0);
+			}}
 		>
 			<ItemDetail
 				ref={emojiItemRef}

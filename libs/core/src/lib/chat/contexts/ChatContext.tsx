@@ -286,7 +286,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
-			if (message.topic_id !== '0') {
+			if (message.topic_id) {
 				const lastMsg: ApiChannelMessageHeader = {
 					content: message.content,
 					sender_id: message.sender_id,
