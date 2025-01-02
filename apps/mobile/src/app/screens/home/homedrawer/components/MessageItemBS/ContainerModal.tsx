@@ -61,6 +61,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], props.channelId);
 	const navigation = useNavigation<any>();
 	const { sendMessage } = useChatSending({
 		mode,
@@ -437,7 +438,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
-		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM;
+		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM || !canSendMessage;
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
@@ -486,6 +487,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		userProfile?.user?.id,
 		message?.user?.id,
 		message?.isError,
+		message?.code,
 		message?.attachments,
 		message?.id,
 		listPinMessages,
@@ -494,6 +496,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		isCanManageChannel,
 		currentChannel?.parrent_id,
 		isAllowDelMessage,
+		canSendMessage,
 		isShowForwardAll,
 		t
 	]);
