@@ -10,7 +10,6 @@ import { FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
 import { ChannelItem } from '../ChannelItem';
 import { EmptySearchPage } from '../EmptySearchPage';
@@ -60,7 +59,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 
 	const handleRouteData = useCallback(
 		async (channelData: ChannelThreads) => {
-			if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
+			if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 				navigation.navigate(APP_SCREEN.HOME);
