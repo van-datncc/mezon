@@ -637,6 +637,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 		message?.code !== TypeMessage.Topic &&
+			canSendMessage &&
 			builder.when(checkPos, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});

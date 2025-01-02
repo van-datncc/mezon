@@ -670,7 +670,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
 			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === 0) {
+				if (eventEmoji.action === EEventAction.CREATED) {
 					dispatch(
 						emojiSuggestionActions.add({
 							category: eventEmoji.clan_name,
@@ -683,7 +683,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							clan_name: eventEmoji.clan_name
 						})
 					);
-				} else if (eventEmoji.action === 1) {
+				} else if (eventEmoji.action === EEventAction.UPDATE) {
 					dispatch(
 						emojiSuggestionActions.update({
 							id: eventEmoji.id,
@@ -692,7 +692,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							}
 						})
 					);
-				} else if (eventEmoji.action === 2) {
+				} else if (eventEmoji.action === EEventAction.DELETE) {
 					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 				}
 			}
@@ -1080,7 +1080,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle new role creation
-			if (status === 0 && role) {
+			if (status === EEventAction.CREATED && role) {
 				dispatch(
 					rolesClanActions.add({
 						id: role.id as string,
@@ -1112,7 +1112,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role update
-			if (status === 1) {
+			if (status === EEventAction.UPDATE) {
 				const isUserAffected = user_add_ids.includes(userId as string) || user_remove_ids.includes(userId as string);
 
 				if (isUserAffected) {
@@ -1142,7 +1142,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role deletion
-			if (status === 2) {
+			if (status === EEventAction.DELETE) {
 				const isUserResult = await dispatch(
 					rolesClanActions.updatePermissionUserByRoleId({
 						roleId: role.id as string,
