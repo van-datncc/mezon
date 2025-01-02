@@ -138,6 +138,7 @@ type FetchMessagesPayloadAction = {
 	isFetchingLatestMessages?: boolean;
 	isClearMessage?: boolean;
 	viewingOlder?: boolean;
+	foundE2ee?: boolean;
 };
 
 export interface MessagesRootState {
@@ -209,6 +210,7 @@ type fetchMessageChannelPayload = {
 	directTimeStamp?: DirectTimeStampArg;
 	viewingOlder?: boolean;
 	topicId?: string;
+	foundE2ee?: boolean;
 };
 
 export const fetchMessages = createAsyncThunk(
@@ -224,7 +226,8 @@ export const fetchMessages = createAsyncThunk(
 			isClearMessage,
 			directTimeStamp,
 			viewingOlder,
-			topicId
+			topicId,
+			foundE2ee
 		}: fetchMessageChannelPayload,
 		thunkAPI
 	) => {
@@ -259,7 +262,7 @@ export const fetchMessages = createAsyncThunk(
 				return {
 					messages: []
 				};
-			} else if (!isFetchingLatestMessages) {
+			} else if (!isFetchingLatestMessages && !foundE2ee) {
 				const { entities, ids } = state.messages.channelMessages?.[channelId] || {};
 				if (ids?.length >= response.messages.length && response.messages.every((item) => entities[item.id]?.id === item.id)) {
 					thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
@@ -339,7 +342,8 @@ export const fetchMessages = createAsyncThunk(
 				messages,
 				isFetchingLatestMessages,
 				isClearMessage,
-				viewingOlder
+				viewingOlder,
+				foundE2ee
 			};
 		} catch (error) {
 			captureSentryError(error, 'messages/fetchMessages');
@@ -1102,10 +1106,11 @@ export const messagesSlice = createSlice({
 					const isClearMessage = action.payload.isClearMessage || false;
 					const viewingOlder = action.payload.viewingOlder || false;
 					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId || ''];
+					const foundE2ee = action.payload.foundE2ee || false;
 					state.loadingStatus = 'loaded';
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
-					if ((!isNew || !channelId) && !isClearMessage) return state;
+					if ((!isNew || !channelId) && !isClearMessage && !foundE2ee) return state;
 					// const reversedMessages = action.payload.messages.reverse();
 
 					// remove all messages if clear message is true

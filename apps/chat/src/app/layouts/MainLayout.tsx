@@ -79,17 +79,25 @@ const GlobalEventListener = () => {
 
 	useEffect(() => {
 		if (user?.encrypt_private_key) {
-			MessageCrypt.checkExistingKeys(user?.user?.id as string).then((found) => {
-				if (found) {
-					dispatch(e2eeActions.setHasKey(true));
-				}
-			});
+			MessageCrypt.checkExistingKeys(user?.user?.id as string)
+				.then((found) => {
+					if (found) {
+						dispatch(e2eeActions.setHasKey(true));
+					}
+				})
+				.catch((error) => {
+					console.error(error);
+				});
 		} else {
 			if (!user?.user?.id) return;
-			MessageCrypt.initializeKeys(user?.user?.id as string).then((pubkey) => {
-				if (!pubkey) return;
-				dispatch(e2eeActions.pushPubKey(pubkey as ApiPubKey));
-			});
+			MessageCrypt.initializeKeys(user?.user?.id as string)
+				.then((pubkey) => {
+					if (!pubkey) return;
+					dispatch(e2eeActions.pushPubKey(pubkey as ApiPubKey));
+				})
+				.catch((error) => {
+					console.error(error);
+				});
 		}
 	}, [dispatch, user?.encrypt_private_key, user?.user?.id]);
 

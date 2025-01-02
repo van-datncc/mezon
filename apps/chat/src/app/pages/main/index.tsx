@@ -42,6 +42,7 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectGroupCallId,
+	selectHasKeyE2ee,
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
@@ -264,6 +265,7 @@ function MyApp() {
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 	const openModalE2ee = useSelector(selectOpenModalE2ee);
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -323,7 +325,7 @@ function MyApp() {
 				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{openModalE2ee && <MultiStepModalE2ee onClose={handleClose} />}
+			{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 					<MessageModalImage />

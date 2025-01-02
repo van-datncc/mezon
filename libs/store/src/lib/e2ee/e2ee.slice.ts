@@ -19,6 +19,7 @@ export interface E2eeState extends EntityState<PubKeyEntity, string> {
 	error?: string | null;
 	openModalE2ee: boolean;
 	hasKeyE2ee: boolean;
+	directMesIdE2ee: string;
 }
 
 export interface E2eeRootState {
@@ -65,7 +66,8 @@ export const initialE2eeState: E2eeState = e2eeAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	openModalE2ee: false,
-	hasKeyE2ee: false
+	hasKeyE2ee: false,
+	directMesIdE2ee: ''
 });
 
 export const e2eeSlice = createSlice({
@@ -77,6 +79,9 @@ export const e2eeSlice = createSlice({
 		},
 		setHasKey(state, action) {
 			state.hasKeyE2ee = action.payload;
+		},
+		setDirectMesIdE2ee(state, action) {
+			state.directMesIdE2ee = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -144,3 +149,5 @@ export const checkE2EE = (clanId: string, channelId: string, thunkAPI: GetThunkA
 export const selectOpenModalE2ee = createSelector(getE2eeState, (state) => state.openModalE2ee);
 
 export const selectHasKeyE2ee = createSelector(getE2eeState, (state) => state.hasKeyE2ee);
+
+export const selectDirectMesIdE2ee = createSelector(getE2eeState, (state) => state.directMesIdE2ee);
