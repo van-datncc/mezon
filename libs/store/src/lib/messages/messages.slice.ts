@@ -257,12 +257,7 @@ export const fetchMessages = createAsyncThunk(
 				.getSelectors()
 				.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
 
-			if (!response.messages || Date.now() - response.time > 1000) {
-				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
-				return {
-					messages: []
-				};
-			} else if (!isFetchingLatestMessages && !foundE2ee) {
+			if (!isFetchingLatestMessages) {
 				const { entities, ids } = state.messages.channelMessages?.[channelId] || {};
 				if (ids?.length >= response.messages.length && response.messages.every((item) => entities[item.id]?.id === item.id)) {
 					thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
@@ -370,6 +365,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
+
 			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
