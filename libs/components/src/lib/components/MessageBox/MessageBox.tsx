@@ -177,7 +177,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 					hasPermissionEdit={canSendMessage}
 				/>
 
-				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md`}>
+				<div className={`w-[calc(100%_-_52px)] dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md`}>
 					<div
 						className={`w-full rounded-r-lg dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
 						onContextMenu={handleChildContextMenu}

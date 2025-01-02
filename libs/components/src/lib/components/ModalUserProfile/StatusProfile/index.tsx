@@ -1,13 +1,5 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
-import {
-	ChannelMembersEntity,
-	giveCoffeeActions,
-	selectUpdateToken,
-	selectUserStatus,
-	useAppDispatch,
-	userClanProfileActions,
-	userStatusActions
-} from '@mezon/store';
+import { ChannelMembersEntity, giveCoffeeActions, selectUserStatus, useAppDispatch, userClanProfileActions, userStatusActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -31,7 +23,6 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
-	const getTokenSocket = useSelector(selectUpdateToken(user?.id ?? ''));
 	const userStatus = useSelector(selectUserStatus);
 	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
@@ -91,7 +82,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					renderTrigger={() => (
 						<div>
 							<ItemStatus
-								children={`Token: ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}
+								children={`Token: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
 								dropdown
 								startIcon={<Icons.Check />}
 							/>

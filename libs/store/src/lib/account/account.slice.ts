@@ -74,7 +74,18 @@ export const accountSlice = createSlice({
 					walletData.value = action.payload;
 					state.userProfile.wallet = JSON.stringify(walletData);
 				} catch (error) {
-					console.error('Error updating wallet value:', error);
+					console.error('Error set wallet value:', error);
+				}
+			}
+		},
+		updateWalletByAction(state: AccountState, action: PayloadAction<(currentValue: number) => number>) {
+			if (state.userProfile?.wallet) {
+				try {
+					const walletData = safeJSONParse(state.userProfile.wallet);
+					walletData.value = action.payload(walletData.value);
+					state.userProfile.wallet = JSON.stringify(walletData);
+				} catch (error) {
+					console.error('Error updating wallet by action:', error);
 				}
 			}
 		}
