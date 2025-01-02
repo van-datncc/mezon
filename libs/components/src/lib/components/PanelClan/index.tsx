@@ -2,6 +2,7 @@ import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionCheck
 import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
 import { EPermission, EUserSettings, IClan } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import { ApiAccount } from 'mezon-js/dist/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
@@ -15,15 +16,15 @@ interface IPanelCLanProps {
 	clan?: IClan;
 	onDeleteCategory?: () => void;
 	setShowClanListMenuContext?: () => void;
+	userProfile?: ApiAccount;
 }
 
-const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMenuContext }) => {
+const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMenuContext, userProfile }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
 	const [canManageCLan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
 	const dispatch = useAppDispatch();
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -74,6 +75,20 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		}
 	};
 
+	const handleRemoveLogo = () => {
+		dispatch(
+			clansActions.updateUser({
+				user_name: userProfile?.user?.username || '',
+				avatar_url: userProfile?.user?.avatar_url || '',
+				display_name: userProfile?.user?.display_name || '',
+				about_me: userProfile?.user?.about_me || '',
+				dob: userProfile?.user?.dob || '',
+				logo: ''
+			})
+		);
+		handClosePannel();
+	};
+
 	return (
 		<div
 			ref={panelRef}
@@ -82,48 +97,54 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
 			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
 		>
-			<GroupPanels>
-				<ItemPanel
-					onClick={statusMarkAsReadClan === 'pending' ? undefined : () => handleMarkAsReadClan(clan?.id as string)}
-					disabled={statusMarkAsReadClan === 'pending'}
-				>
-					{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
-				</ItemPanel>
-			</GroupPanels>
-
-			<GroupPanels>
-				<ItemPanel children="Invite People" info onClick={handleInvitePeople} />
-			</GroupPanels>
-			<GroupPanels>
-				<Dropdown
-					trigger="hover"
-					dismissOnClick={false}
-					renderTrigger={() => (
-						<div>
-							<ItemPanel children="Notification Settings" subText={notificationLabel as string} dropdown="change here" />
-						</div>
-					)}
-					label=""
-					placement="right-start"
-					className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
-				>
-					{notificationTypesList.map((notification) => (
+			{userProfile ? (
+				<GroupPanels>
+					<ItemPanel children={'Remove Logo'} onClick={handleRemoveLogo}></ItemPanel>
+				</GroupPanels>
+			) : (
+				<>
+					<GroupPanels>
 						<ItemPanel
-							children={notification.label}
-							notificationId={notification.value}
-							type="radio"
-							name="NotificationSetting"
-							key={notification.value}
-							onClick={() => handleChangeSettingType(notification.value)}
-							checked={defaultNotificationClan?.notification_setting_type === notification.value}
-						/>
-					))}
-				</Dropdown>
-				<ItemPanel children={'Hide Muted Channels'} type={'checkbox'} />
-			</GroupPanels>
-			<GroupPanels>
-				{/* will be add later  */}
-				{/* <UserRestrictionZone policy={canManageCLan}>
+							onClick={statusMarkAsReadClan === 'pending' ? undefined : () => handleMarkAsReadClan(clan?.id as string)}
+							disabled={statusMarkAsReadClan === 'pending'}
+						>
+							{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
+						</ItemPanel>
+					</GroupPanels>
+
+					<GroupPanels>
+						<ItemPanel children="Invite People" info onClick={handleInvitePeople} />
+					</GroupPanels>
+					<GroupPanels>
+						<Dropdown
+							trigger="hover"
+							dismissOnClick={false}
+							renderTrigger={() => (
+								<div>
+									<ItemPanel children="Notification Settings" subText={notificationLabel as string} dropdown="change here" />
+								</div>
+							)}
+							label=""
+							placement="right-start"
+							className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
+						>
+							{notificationTypesList.map((notification) => (
+								<ItemPanel
+									children={notification.label}
+									notificationId={notification.value}
+									type="radio"
+									name="NotificationSetting"
+									key={notification.value}
+									onClick={() => handleChangeSettingType(notification.value)}
+									checked={defaultNotificationClan?.notification_setting_type === notification.value}
+								/>
+							))}
+						</Dropdown>
+						<ItemPanel children={'Hide Muted Channels'} type={'checkbox'} />
+					</GroupPanels>
+					<GroupPanels>
+						{/* will be add later  */}
+						{/* <UserRestrictionZone policy={canManageCLan}>
 					<Dropdown
 						trigger="hover"
 						dismissOnClick={false}
@@ -141,15 +162,17 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 						))}
 					</Dropdown>
 				</UserRestrictionZone> */}
-				<ItemPanel children={'Privacy Settings'} />
-				<ItemPanel children={'Edit Clan Profile'} onClick={handleOpenClanProfileSetting} />
-			</GroupPanels>
+						<ItemPanel children={'Privacy Settings'} />
+						<ItemPanel children={'Edit Clan Profile'} onClick={handleOpenClanProfileSetting} />
+					</GroupPanels>
 
-			<UserRestrictionZone policy={!canManageCLan}>
-				<GroupPanels>
-					<ItemPanel children={'Leave Clan'} danger />
-				</GroupPanels>
-			</UserRestrictionZone>
+					<UserRestrictionZone policy={!canManageCLan}>
+						<GroupPanels>
+							<ItemPanel children={'Leave Clan'} danger />
+						</GroupPanels>
+					</UserRestrictionZone>
+				</>
+			)}
 		</div>
 	);
 };

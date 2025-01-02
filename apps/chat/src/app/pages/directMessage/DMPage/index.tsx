@@ -24,11 +24,14 @@ import {
 	channelsActions,
 	directActions,
 	directMetaActions,
+	e2eeActions,
 	gifsStickerEmojiActions,
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectDirectById,
 	selectDmGroupCurrent,
+	selectHasKeyE2ee,
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
@@ -120,6 +123,8 @@ const DirectMessage = () => {
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, directId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
+	const directMessage = useAppSelector((state) => selectDirectById(state, directId));
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -188,6 +193,12 @@ const DirectMessage = () => {
 	const handleClose = useCallback(() => {}, []);
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+
+	useEffect(() => {
+		if (directMessage && directMessage?.e2ee && !hasKeyE2ee) {
+			dispatch(e2eeActions.setOpenModalE2ee(true));
+		}
+	}, [directMessage, dispatch, hasKeyE2ee]);
 
 	return (
 		<>

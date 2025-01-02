@@ -294,13 +294,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					}
 
 					if (eventData?.eventType === 'SEND_TOKEN') {
-						const { amount, note, receiver_id } = (eventData.eventData || {}) as any;
+						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
 						const tokenEvent: ApiTokenSentEvent = {
 							sender_id: currentUser.userId as string,
 							sender_name: currentUser?.userProfile?.user?.username as string,
 							receiver_id,
 							amount,
-							note
+							note,
+							extra_attribute
 						};
 						try {
 							const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();

@@ -90,6 +90,13 @@ body {
 #close-window {
     grid-column: 3;
 }
+.thumbnail-contain-hide{
+padding : 0 0 !important;
+width : 0 !important;
+}
+.rotate-width{
+  width : calc(100vh - 120px);
+}
 
 .main-container {
     display: flex;
@@ -141,7 +148,7 @@ body {
 }
 
 .thumbnail-container {
-    width : 112px;
+    width : 92px;
     height: 100%;
     background-color: #0B0B0B;
     padding:  0 10px;
@@ -284,10 +291,7 @@ body {
         overflow-y: hidden;
     }
 
-    .thumbnail {
-        width: 64px;
-        height: 64px;
-    }
+    
 
     .bottom-bar {
         flex-wrap: wrap;
@@ -299,9 +303,45 @@ body {
         order: -1;
         width: 100%;
         justify-content: space-around;
-        margin-bottom: 8px;
     }
+
 }
+
+@media (max-width: 480px) {
+  .image-view {
+    flex-direction : column;
+  }
+  .thumbnails-content{
+    flex-direction : row;
+    gap : 4px;
+    height : auto;
+      padding: 16px 0 0 0;
+      height : 64px;
+
+  }
+  .thumbnail {
+        width: 54px;
+        height: 54px;
+    }
+        .date-label{
+        font-size : 10px;
+    position : absolute;
+        top : -14px;
+        left: 4px;
+        }
+        .thumbnail-wrapper{
+    position : relative;
+
+        }
+    .thumbnail-container{
+      padding : 10px 0px;
+      height : 70px;
+    }
+      .sender-info{
+      display : none;
+      }
+}
+
 .context-menu {
     position: fixed;
     background: #2e2e2e;

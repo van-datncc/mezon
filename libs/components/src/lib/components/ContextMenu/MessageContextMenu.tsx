@@ -34,6 +34,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	AMOUNT_TOKEN,
 	ContextMenuItem,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
@@ -146,6 +147,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
 		message?.channel_id ?? ''
 	);
+	const hasPermissionCreateTopic =
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) ||
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_THREAD);
+
 	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
@@ -525,7 +530,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 									message_ref_id: message.id,
 									receiver_id: message.sender_id,
 									sender_id: userId,
-									token_count: 1
+									token_count: AMOUNT_TOKEN.TEN_TOKENS
 								})
 							).unwrap();
 							await reactionMessageDispatch(
@@ -590,7 +595,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		);
 
 		builder.when(
-			checkPos && (canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP),
+			checkPos &&
+				(canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP || isTopic),
 			(builder) => {
 				builder.addMenuItem(
 					'reply',
@@ -639,7 +645,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		});
 		message?.code !== TypeMessage.Topic &&
 			!isTopic &&
-			builder.when(checkPos, (builder) => {
+			canSendMessage &&
+			builder.when(checkPos && hasPermissionCreateTopic, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});
 

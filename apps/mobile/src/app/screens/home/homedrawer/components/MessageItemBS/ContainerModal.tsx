@@ -21,7 +21,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
+import { AMOUNT_TOKEN, EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -68,8 +68,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup
 	});
 
-	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
-		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+	const [isCanManageThread, isCanManageChannel, canSendMessage] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel, EOverriddenPermission.sendMessage],
 		currentChannelId ?? ''
 	);
 	const [isAllowDelMessage] = usePermissionChecker([EOverriddenPermission.deleteMessage], message?.channel_id ?? '');
@@ -112,7 +112,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					message_ref_id: message.id,
 					receiver_id: message.sender_id,
 					sender_id: userId,
-					token_count: 1
+					token_count: AMOUNT_TOKEN.TEN_TOKENS
 				};
 				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
 				handleReact(
@@ -437,7 +437,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
-		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM;
+		const isHideTopicDiscussion = message?.code === TypeMessage.Topic || isDM || !canSendMessage || currentChannelId !== message?.channel_id;
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
@@ -486,6 +486,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		userProfile?.user?.id,
 		message?.user?.id,
 		message?.isError,
+		message?.code,
 		message?.attachments,
 		message?.id,
 		listPinMessages,
@@ -494,6 +495,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		isCanManageChannel,
 		currentChannel?.parrent_id,
 		isAllowDelMessage,
+		canSendMessage,
 		isShowForwardAll,
 		t
 	]);
