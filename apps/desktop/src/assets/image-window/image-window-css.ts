@@ -90,6 +90,13 @@ body {
 #close-window {
     grid-column: 3;
 }
+.thumbnail-contain-hide{
+padding : 0 0 !important;
+width : 0 !important;
+}
+.rotate-width{
+  width : calc(100vh - 120px);
+}
 
 .main-container {
     display: flex;
