@@ -7,6 +7,7 @@ import {
 	JoinPTTActions,
 	RootState,
 	TalkPTTActions,
+	accountActions,
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
@@ -67,6 +68,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
 	EOverriddenPermission,
@@ -76,6 +78,7 @@ import {
 	ModeResponsive,
 	NotificationCode,
 	TIME_OFFSET,
+	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage
 } from '@mezon/utils';
@@ -310,23 +313,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
-				const attachmentList: AttachmentEntity[] = (message.attachments || [])?.map((attachment) => {
-					const dateTime = new Date();
-					return {
-						...attachment,
-						id: attachment.url as string,
-						message_id: message?.message_id,
-						create_time: dateTime.toISOString(),
-						uploader: message?.sender_id
-					};
-				});
+				const attachmentList: AttachmentEntity[] =
+					message.attachments && message.attachments.length > 0
+						? message.attachments.map((attachment) => {
+								const dateTime = new Date();
+								return {
+									...attachment,
+									id: attachment.url as string,
+									message_id: message?.message_id,
+									create_time: dateTime.toISOString(),
+									uploader: message?.sender_id
+								};
+							})
+						: [];
 
-				if (attachmentList?.length) {
-					if (message?.code === TypeMessage.Chat) {
-						dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
-					} else if (message?.code === TypeMessage.ChatRemove) {
-						dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
-					}
+				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
+					dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
+				} else if (message?.code === TypeMessage.ChatRemove && message?.attachments) {
+					dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
 				}
 
 				dispatch(messagesActions.addNewMessage(mess));
@@ -1061,7 +1065,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
-		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
+		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+		const updateAmount = isReceiverGiveCoffee
+			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+			: isSenderGiveCoffee
+				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+				: 0;
+		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 	}, []);
 
 	const onroleevent = useCallback(

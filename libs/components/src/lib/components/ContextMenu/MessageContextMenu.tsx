@@ -34,6 +34,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	AMOUNT_TOKEN,
 	ContextMenuItem,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
@@ -529,7 +530,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 									message_ref_id: message.id,
 									receiver_id: message.sender_id,
 									sender_id: userId,
-									token_count: 1
+									token_count: AMOUNT_TOKEN.TEN_TOKENS
 								})
 							).unwrap();
 							await reactionMessageDispatch(

@@ -265,6 +265,12 @@ document.addEventListener('keydown', (e) => {
 
       document.body.insertAdjacentHTML('beforeend', '${menu}');
 
+		  const menu = document.getElementById('contextMenu');
+
+      document.body.addEventListener('click',()=>{
+				menu.classList.remove('visible');
+
+      })
       ${scriptMenu()}
 
 
@@ -442,7 +448,10 @@ document.addEventListener('contextmenu', (e) => {
 			menu.style.top = '\${e.pageY - rect.height}px';
 		}
 
-		menu.addEventListener('click', async (e) => {
+	}
+})
+
+menu.addEventListener('click', async (e) => {
 			e.stopPropagation();
 			const action = e.target.closest('.menu-item')?.dataset.action;
 
@@ -458,13 +467,9 @@ document.addEventListener('contextmenu', (e) => {
           window.electron.handleActionShowImage(action, selectedImage.src);
 						break;
 				}
-				if (!menu) return;
 				menu.classList.remove('visible');
 			}
 		});
-	}
-})
-
   `;
 };
 

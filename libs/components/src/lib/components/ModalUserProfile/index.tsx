@@ -1,5 +1,6 @@
 import {
 	useAppNavigation,
+	useAuth,
 	useDirect,
 	useEscapeKeyClose,
 	useFormatDate,
@@ -79,6 +80,7 @@ const ModalUserProfile = ({
 	activityByUserId
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
+	const { userId } = useAuth();
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
@@ -114,8 +116,8 @@ const ModalUserProfile = ({
 	const handleContent = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setContent(e.target.value);
 	};
-	const checkOwner = (userId: string) => {
-		return userId === userProfile?.user?.google_id;
+	const checkOwner = (userIdPram: string) => {
+		return userIdPram === userId;
 	};
 
 	const checkUrl = (url: string | undefined) => {
@@ -256,7 +258,7 @@ const ModalUserProfile = ({
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}
 
-					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole && !checkAnonymous ? (
+					{!checkOwner(userID ?? '') && !hiddenRole && !checkAnonymous ? (
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
