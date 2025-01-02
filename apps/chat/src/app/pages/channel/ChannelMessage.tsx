@@ -1,6 +1,7 @@
 import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
+import { usePermissionChecker } from '@mezon/core';
 import { MessagesEntity, selectChannelDraftMessage, selectIdMessageRefEdit, selectOpenEditMessageState, useAppSelector } from '@mezon/store';
-import { TypeMessage } from '@mezon/utils';
+import { EOverriddenPermission, TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback } from 'react';
@@ -48,7 +49,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	messageReplyHighlight,
 	message,
 	previousMessage,
-	isTopic
+	isTopic = false
 }: Readonly<MessageProps>) => {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
@@ -56,6 +57,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	const isEditing = channelDraftMessage?.message_id === messageId ? openEditMessageState : openEditMessageState && idMessageRefEdit === messageId;
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 
 	const isSameUser = message?.user?.id === previousMessage?.user?.id;
 	const isTimeGreaterThan60Minutes =
@@ -67,7 +69,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 
 	const handleContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
-			showMessageContextMenu(event, messageId, mode, props);
+			showMessageContextMenu(event, messageId, mode, isTopic as boolean, props);
 		},
 		[showMessageContextMenu, messageId, mode]
 	);
@@ -79,6 +81,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		return message;
 	})();
 
+	const channelOrThread = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
+
 	const popup = useCallback(() => {
 		return (
 			<ChannelMessageOpt
@@ -87,6 +91,8 @@ export const ChannelMessage: ChannelMessageComponent = ({
 				isCombine={isCombine}
 				mode={mode}
 				isDifferentDay={isDifferentDay}
+				hasPermission={channelOrThread || !isTopic ? canSendMessage : true}
+				isTopic={isTopic}
 			/>
 		);
 	}, [message, handleContextMenu, isCombine, mode]);
@@ -129,7 +135,8 @@ export const MemorizedChannelMessage = memo(
 		prev.messageId + prev?.message?.update_time === curr.messageId + curr?.message?.update_time &&
 		prev.channelId === curr.channelId &&
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
-		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved
+		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
+		prev.message.content === curr.message.content
 );
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

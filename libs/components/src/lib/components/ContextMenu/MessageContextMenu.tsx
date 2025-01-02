@@ -34,6 +34,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	AMOUNT_TOKEN,
 	ContextMenuItem,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
@@ -64,6 +65,7 @@ type MessageContextMenuProps = {
 	messageId: string;
 	elementTarget?: boolean | HTMLElement | null;
 	activeMode: number | undefined;
+	isTopic: boolean;
 };
 
 type JsonObject = {
@@ -85,7 +87,7 @@ const useIsOwnerGroupDM = () => {
 	return isOwnerGroupDM;
 };
 
-function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
+function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic }: MessageContextMenuProps) {
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -145,6 +147,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
 		message?.channel_id ?? ''
 	);
+	const hasPermissionCreateTopic =
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) ||
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_THREAD);
+
 	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
@@ -524,7 +530,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 									message_ref_id: message.id,
 									receiver_id: message.sender_id,
 									sender_id: userId,
-									token_count: 1
+									token_count: AMOUNT_TOKEN.TEN_TOKENS
 								})
 							).unwrap();
 							await reactionMessageDispatch(
@@ -589,7 +595,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		);
 
 		builder.when(
-			checkPos && (canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP),
+			checkPos &&
+				(canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP || isTopic),
 			(builder) => {
 				builder.addMenuItem(
 					'reply',
@@ -637,8 +644,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 		message?.code !== TypeMessage.Topic &&
+			!isTopic &&
 			canSendMessage &&
-			builder.when(checkPos, (builder) => {
+			builder.when(checkPos && hasPermissionCreateTopic, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});
 
@@ -728,6 +736,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		return builder.build();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		checkPos,
 		enableViewReactionItem,
@@ -757,11 +766,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		handleForwardAllMessage,
 		urlImage,
 		handleItemClick,
-		handleCreateTopic
+		handleCreateTopic,
+		isTopic
 	]);
 	/* eslint-disable no-console */
 
-	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
+	return <DynamicContextMenu key={messageId} menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }
 
 export default MessageContextMenu;

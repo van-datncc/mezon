@@ -1,18 +1,44 @@
-import React from 'react';
-import { Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
+import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
+import React, { useEffect, useState } from 'react';
+import { Linking, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { styles } from './styles';
 
-interface ForwardMessageModalProps {
-	show?: boolean;
-	onClose: () => void;
-}
-
-const LicenseAgreement = ({ show, onClose }: ForwardMessageModalProps) => {
+const LicenseAgreement = () => {
+	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
 	const isTabletLandscape = useTabletLandscape();
+
+	const checkShowLicenseAgreement = async () => {
+		const isAgreed = await load(STORAGE_AGREED_POLICY);
+
+		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
+	};
+
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			checkShowLicenseAgreement();
+		}, 500);
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, []);
+
+	const onClose = () => {
+		setIsShowLicenseAgreement(false);
+		save(STORAGE_AGREED_POLICY, 'true');
+	};
+
 	return (
-		<Modal isVisible={show} animationIn={'fadeIn'} hasBackdrop={true} coverScreen={true} avoidKeyboard={false} backdropColor={'rgba(0,0,0, 0.7)'}>
+		<Modal
+			isVisible={isShowLicenseAgreement}
+			animationIn={'fadeIn'}
+			hasBackdrop={true}
+			coverScreen={true}
+			avoidKeyboard={false}
+			backdropColor={'rgba(0,0,0, 0.7)'}
+		>
 			<View style={[styles.sheetContainer, isTabletLandscape && { maxWidth: '40%' }]}>
 				<View style={styles.headerModal}>
 					<Text style={styles.headerText}>License Agreement</Text>

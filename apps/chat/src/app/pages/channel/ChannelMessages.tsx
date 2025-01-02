@@ -68,6 +68,7 @@ function ChannelMessages({
 	topicId
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
@@ -77,7 +78,7 @@ function ChannelMessages({
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const userId = useSelector(selectAllAccount)?.user?.id;
-	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
+	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
 	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
@@ -85,7 +86,6 @@ function ChannelMessages({
 	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const userActiveScroll = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const chatRef = useRef<HTMLDivElement | null>(null);
 
 	const isFetchingRef = useRef<boolean>(false);
@@ -499,7 +499,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				>
 					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
 					{isTopic && convertedFirstMsgOfThisTopic && (
-						<div className="sticky top-0 z-10 dark:bg-bgPrimary bg-bgLightPrimary">
+						<div className="sticky top-0 z-[1] dark:bg-bgPrimary bg-bgLightPrimary">
 							<div
 								className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
 							>

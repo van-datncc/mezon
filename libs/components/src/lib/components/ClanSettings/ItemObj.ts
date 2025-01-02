@@ -16,7 +16,6 @@ export const ItemSetting = {
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
-	APP_DIRECTORY: 'app-directory',
 	CATEGORY_ORDER: 'category-order',
 	AUDIT_LOG: 'audit-log',
 	ON_BOARDING: 'on-boarding'
@@ -31,10 +30,7 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
 ];
 
-export const listItemSettingApp: ItemObjProps[] = [
-	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
-	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' }
-];
+export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
 
 export const listItemSettingModeration: ItemObjProps[] = [{ id: ItemSetting.AUDIT_LOG, name: 'Audit Log' }];
 export const communitySettingsList: ItemObjProps[] = [{ id: ItemSetting.ON_BOARDING, name: 'On Boarding' }];

@@ -1,7 +1,7 @@
 import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
-import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById, selectLastMessageByChannelId } from '@mezon/store-mobile';
+import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -21,7 +21,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const styles = style(themeValue);
 	const { id, navigation, onLongPress, onPress } = props;
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, id));
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
@@ -56,7 +55,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	}, [directMessage]);
 
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
-		if (!content) return null;
+		if (!content || (typeof content === 'object' && Object.keys(content).length === 0) || content === '{}') return null;
 		const text = typeof content === 'string' ? safeJSONParse(content)?.t : safeJSONParse(JSON.stringify(content) || '{}')?.t;
 		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
@@ -175,7 +174,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					) : null}
 				</View>
 
-				{getLastMessageContent(lastMessage?.content || directMessage?.last_sent_message?.content)}
+				{getLastMessageContent(directMessage?.last_sent_message?.content)}
 			</View>
 		</TouchableOpacity>
 	);

@@ -15,6 +15,54 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
         document.getElementById('timestamp').innerHTML  = "${time}"
       ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
   `);
+
+	imageWindow.webContents.executeJavaScript(`
+      document.addEventListener('keydown', (e) => {
+		switch (e.key) {
+			case 'ArrowUp':
+        if(currentIndex > 0){
+          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        currentIndex--;
+        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
+        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
+      
+      }
+				break;
+			case 'ArrowLeft':
+        if(currentIndex > 0){
+          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        currentIndex--;
+        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
+        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
+
+      }
+				break;
+			case 'ArrowDown':
+        if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
+          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        currentIndex++;
+        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
+        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
+        
+      }
+				break;
+			case 'ArrowRight':
+        if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
+          currentIndex++;
+          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
+        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
+
+      }
+				break;
+		}
+	});
+`);
+
 	imageWindow.focus();
 }
 

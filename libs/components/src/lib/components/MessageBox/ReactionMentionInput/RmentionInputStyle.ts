@@ -13,14 +13,14 @@ export default {
 			outline: 'none'
 		},
 		highlighter: {
-			padding: '9px 100px 9px 9px',
+			padding: '9px 120px 9px 9px',
 			border: 'none',
 			maxHeight: '350px',
 			overflow: 'auto',
 			minWidth: '300px'
 		},
 		input: {
-			padding: '9px 100px 9px 9px',
+			padding: '9px 120px 9px 9px',
 			border: 'none',
 			outline: 'none',
 			maxHeight: '350px',

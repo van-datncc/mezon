@@ -4,6 +4,7 @@ import { AVPlaybackStatusSuccess, Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, TouchableOpacity, ViewStyle } from 'react-native';
+import InCallManager from 'react-native-incall-manager';
 import { WAY_AUDIO } from '../../../../../../assets/lottie';
 import { style } from './styles';
 const formatTime = (millis: number) => {
@@ -19,6 +20,11 @@ const RenderAudioChat = React.memo(
 		const [isPlaying, setIsPlaying] = useState(false);
 		const [sound, setSound] = useState<Audio.Sound | null>(null);
 		const [totalTime, setTotalTime] = useState(0);
+
+		useEffect(() => {
+			InCallManager.setSpeakerphoneOn(true);
+		}, []);
+
 		useEffect(() => {
 			const loadSound = async () => {
 				try {
