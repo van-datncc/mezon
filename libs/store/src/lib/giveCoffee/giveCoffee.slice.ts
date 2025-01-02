@@ -62,7 +62,8 @@ export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: 
 		const response = await mezon.client.sendToken(mezon.session, {
 			receiver_id: tokenEvent.receiver_id,
 			amount: tokenEvent.amount,
-			note: tokenEvent.note
+			note: tokenEvent.note,
+			extra_attribute: tokenEvent.extra_attribute
 		});
 
 		if (response) {
