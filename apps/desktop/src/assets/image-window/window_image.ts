@@ -200,9 +200,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 
 </div>
 
-<script src="/apps/desktop/src/assets/image-window/image-window.js"></script>
-<script src="../menu-context/index.js"></script>
-
 </body>
 </html>
   `;

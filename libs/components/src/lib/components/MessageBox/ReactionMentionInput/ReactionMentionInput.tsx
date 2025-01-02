@@ -14,6 +14,7 @@ import {
 import {
 	ChannelsEntity,
 	appActions,
+	e2eeActions,
 	emojiSuggestionActions,
 	messagesActions,
 	referencesActions,
@@ -29,7 +30,9 @@ import {
 	selectCurrentChannelId,
 	selectCurrentTopicId,
 	selectDataReferences,
+	selectDirectById,
 	selectDmGroupCurrentId,
+	selectHasKeyE2ee,
 	selectIdMessageRefEdit,
 	selectIsFocusOnChannelInput,
 	selectIsFocused,
@@ -182,6 +185,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
 	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
 	const [isPasteMulti, setIsPasteMulti] = useState<boolean>(false);
+	const directMessage = useAppSelector((state) => selectDirectById(state, currentDmOrChannelId));
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -752,6 +757,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
 	);
 
+	const handleShowModalE2ee = () => {
+		if (directMessage && directMessage?.e2ee && !hasKeyE2ee) {
+			dispatch(e2eeActions.setOpenModalE2ee(true));
+		}
+	};
+
 	return (
 		<div className="relative">
 			{props.isThread && !props.isTopic && !threadCurrentChannel && (
@@ -852,6 +863,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				customSuggestionsContainer={(children: React.ReactNode) => {
 					return <CustomModalMentions isThreadBox={props.isThread} children={children} titleModalMention={titleModalMention} />;
 				}}
+				onClick={handleShowModalE2ee}
 			>
 				<Mention
 					appendSpaceOnAdd={true}
