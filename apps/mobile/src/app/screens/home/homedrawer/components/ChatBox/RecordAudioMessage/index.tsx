@@ -10,7 +10,7 @@ import LottieView from 'lottie-react-native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { SOUND_WAVES_CIRCLE } from '../../../../../../../assets/lottie';
 import { MezonBottomSheet } from '../../../../../../componentUI';
@@ -62,6 +62,7 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 
 	const startRecording = async () => {
 		try {
+			Keyboard.dismiss();
 			const isPermissionGranted = await getPermissions();
 			if (!isPermissionGranted) return;
 			setIsDisplay(true);

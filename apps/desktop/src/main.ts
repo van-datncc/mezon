@@ -8,6 +8,7 @@ import App from './app/app';
 import {
 	ACTION_SHOW_IMAGE,
 	CLOSE_APP,
+	CLOSE_IMAGE_WINDOW,
 	DOWNLOAD_FILE,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
@@ -167,6 +168,9 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 			} catch (error) {
 				console.error('Update check failed:', error);
 			}
+			window.close();
+			break;
+		case CLOSE_IMAGE_WINDOW:
 			window.close();
 			break;
 	}

@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useAppParams, useAuth, useChatReaction, usePermissionChecker, useReference } from '@mezon/core';
 import {
-	MessagesEntity,
 	createEditCanvas,
 	directActions,
 	gifsStickerEmojiActions,
@@ -21,6 +20,7 @@ import {
 	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
+	selectMessageIdsByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
 	selectTheme,
@@ -34,10 +34,12 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	AMOUNT_TOKEN,
 	ContextMenuItem,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	EPermission,
+	FOR_1_HOUR,
 	IMessageWithUser,
 	MenuBuilder,
 	ModeResponsive,
@@ -100,6 +102,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
+	const allMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, (isClanView ? currentChannel?.id : currentDmId) as string));
 	const dispatch = useAppDispatch();
 
 	const handleItemClick = useCallback(() => {
@@ -107,8 +110,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT));
 	}, [dispatch]);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
-	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
-	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
+	const messagePosition = allMessageIds.findIndex((id: string) => id === messageId);
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
@@ -146,6 +148,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
 		message?.channel_id ?? ''
 	);
+	const hasPermissionCreateTopic =
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) ||
+		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_THREAD);
+
 	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
@@ -245,13 +251,27 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = useMemo(() => {
-		if (messagePosition === -1) return false;
-		return (
-			message?.isStartedMessageGroup &&
-			messagePosition < convertedAllMessagesEntities?.length - 1 &&
-			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
-		);
-	}, [convertedAllMessagesEntities, message?.isStartedMessageGroup, messagePosition]);
+		if (messagePosition === -1 || messagePosition === 0) return false;
+
+		const currentMessage = allMessagesEntities?.[allMessageIds?.[messagePosition]];
+		const nextMessage = allMessagesEntities?.[allMessageIds?.[messagePosition + 1]];
+		const previousMessage = allMessagesEntities?.[allMessageIds?.[messagePosition - 1]];
+
+		const isSameSenderWithNextMessage = currentMessage?.sender_id === nextMessage?.sender_id;
+		const isSameSenderWithPreviousMessage = currentMessage?.sender_id === previousMessage?.sender_id;
+
+		const isNextMessageWithinTimeLimit = nextMessage
+			? Date.parse(nextMessage?.create_time) - Date.parse(currentMessage?.create_time) < FOR_1_HOUR
+			: false;
+
+		const isPreviousMessageWithinTimeLimit = previousMessage
+			? Date.parse(currentMessage?.create_time) - Date.parse(previousMessage?.create_time) < FOR_1_HOUR
+			: false;
+
+		return isSameSenderWithPreviousMessage
+			? isSameSenderWithNextMessage && isNextMessageWithinTimeLimit && !isPreviousMessageWithinTimeLimit
+			: isSameSenderWithNextMessage && isNextMessageWithinTimeLimit;
+	}, [allMessageIds, allMessagesEntities, messagePosition]);
 
 	const handleReplyMessage = useCallback(() => {
 		if (!message) {
@@ -525,7 +545,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 									message_ref_id: message.id,
 									receiver_id: message.sender_id,
 									sender_id: userId,
-									token_count: 1
+									token_count: AMOUNT_TOKEN.TEN_TOKENS
 								})
 							).unwrap();
 							await reactionMessageDispatch(
@@ -590,7 +610,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		);
 
 		builder.when(
-			checkPos && (canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP),
+			checkPos &&
+				(canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP || isTopic),
 			(builder) => {
 				builder.addMenuItem(
 					'reply',
@@ -639,7 +660,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		});
 		message?.code !== TypeMessage.Topic &&
 			!isTopic &&
-			builder.when(checkPos, (builder) => {
+			canSendMessage &&
+			builder.when(checkPos && hasPermissionCreateTopic, (builder) => {
 				builder.addMenuItem('topicDiscussion', 'Topic Discussion', handleCreateTopic, <Icons.TopicIcon defaultSize="w-4 h-4" />);
 			});
 

@@ -42,6 +42,8 @@ import { ILongPressType } from '../hooks';
 import { CanvasDataResponse } from './htmlCanvas';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
+export * from './base';
+export * from './config';
 export * from './htmlCanvas';
 export * from './messageLine';
 export * from './mimeTypes';

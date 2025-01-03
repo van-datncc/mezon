@@ -1,6 +1,16 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
 import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
-import { useIdleRender } from '@mezon/core';
+import {
+	LoadMoreDirection,
+	isBackgroundModeActive,
+	useContainerHeight,
+	useCurrentInbox,
+	useIdleRender,
+	useLayoutEffectWithPrevDeps,
+	useScrollHooks,
+	useStateRef,
+	useSyncEffect
+} from '@mezon/core';
 import {
 	MessagesEntity,
 	messagesActions,
@@ -28,18 +38,24 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode, convertInitialMessageOfTopic, toggleDisableHover } from '@mezon/utils';
-import { Action } from '@reduxjs/toolkit';
+import {
+	Direction_Mode,
+	animateScroll,
+	convertInitialMessageOfTopic,
+	forceMeasure,
+	isAnimatingScroll,
+	requestForcedReflow,
+	requestMeasure,
+	resetScroll,
+	restartCurrentScrollAnimation,
+	toggleDisableHover
+} from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelMessage as ChannelMessageType, ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
-import { Virtualizer } from './virtual-core/index';
-import { useVirtualizer } from './virtual-core/useVirtualizer';
-
-const SCROLL_THRESHOLD = 500; // 500px
 
 type ChannelMessagesProps = {
 	clanId: string;
@@ -55,6 +71,11 @@ type ChannelMessagesProps = {
 	topicId?: string;
 };
 
+const MESSAGE_LIST_SLICE = 50;
+const MESSAGE_ANIMATION_DURATION = 500;
+const BOTTOM_THRESHOLD = 50;
+const BOTTOM_FOCUS_MARGIN = 20;
+
 function ChannelMessages({
 	clanId,
 	channelId,
@@ -69,7 +90,8 @@ function ChannelMessages({
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const currentInbox = useCurrentInbox();
+	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
 	const isViewOlderMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
@@ -78,7 +100,7 @@ function ChannelMessages({
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const userId = useSelector(selectAllAccount)?.user?.id;
-	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentInbox?.channel_id as string));
 	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
@@ -92,7 +114,7 @@ function ChannelMessages({
 	const hasMoreTopRef = useRef<boolean>(false);
 	const hasMoreBottomRef = useRef<boolean>(false);
 
-	useEffect(() => {
+	useSyncEffect(() => {
 		userActiveScroll.current = false;
 	}, [channelId]);
 
@@ -176,50 +198,30 @@ function ChannelMessages({
 	const isLoadMore = useRef<boolean>(false);
 	const currentScrollDirection = useRef<ELoadMoreDirection | null>(null);
 
-	// maintain scroll position
-	const firsRowCached = useRef<string>('');
-	const lastRowCached = useRef<string>('');
-
 	const handleOnChange = useCallback(
-		async (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => {
+		async (direction: LoadMoreDirection) => {
 			if (!userActiveScroll.current) return;
 			if (isLoadMore.current || !chatRef.current?.scrollHeight) return;
-			switch (instance.scrollDirection) {
-				case 'backward':
-					if (chatRef.current.scrollTop <= SCROLL_THRESHOLD && instance.scrollDirection === 'backward') {
-						currentScrollDirection.current = ELoadMoreDirection.top;
-						isLoadMore.current = true;
-						firsRowCached.current = messages[1];
-						await loadMoreMessage(ELoadMoreDirection.top);
-						setTimeout(() => {
-							isLoadMore.current = false;
-						}, 200);
-						return;
-					}
-
+			switch (direction) {
+				case LoadMoreDirection.Backwards:
+					currentScrollDirection.current = ELoadMoreDirection.top;
+					isLoadMore.current = true;
+					await loadMoreMessage(ELoadMoreDirection.top);
+					setTimeout(() => {
+						isLoadMore.current = false;
+					}, 200);
 					break;
-				case 'forward':
-					{
-						const scrollElement = instance.scrollElement;
-						if (!scrollElement) {
-							return;
-						}
-						const isAtBottom =
-							Math.abs(scrollElement?.scrollHeight - scrollElement?.clientHeight - scrollElement?.scrollTop) <= SCROLL_THRESHOLD;
-						if (isAtBottom) {
-							currentScrollDirection.current = ELoadMoreDirection.bottom;
-							isLoadMore.current = true;
-							lastRowCached.current = messages[messages.length - 1];
-							await loadMoreMessage(ELoadMoreDirection.bottom);
-							setTimeout(() => {
-								isLoadMore.current = false;
-							}, 100);
-						}
-					}
+				case LoadMoreDirection.Forwards:
+					currentScrollDirection.current = ELoadMoreDirection.bottom;
+					isLoadMore.current = true;
+					await loadMoreMessage(ELoadMoreDirection.bottom);
+					setTimeout(() => {
+						isLoadMore.current = false;
+					}, 200);
 					break;
 			}
 		},
-		[loadMoreMessage, messages]
+		[loadMoreMessage, messageIds]
 	);
 
 	const scrollToLastMessage = useCallback(() => {
@@ -257,7 +259,7 @@ function ChannelMessages({
 			scrollToLastMessage();
 			return;
 		}
-	}, [userId, messages.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
+	}, [userId, messageIds.length, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	const shouldRender = useIdleRender();
 	if (!shouldRender) return null;
@@ -266,7 +268,7 @@ function ChannelMessages({
 		<MessageContextMenuProvider channelId={channelId} allUserIdsInChannel={allUserIdsInChannel as string[]} allRolesInClan={allRolesInClan}>
 			<ChatMessageList
 				key={channelId}
-				messages={messages}
+				messageIds={messageIds}
 				chatRef={chatRef}
 				userActiveScroll={userActiveScroll}
 				appearanceTheme={appearanceTheme}
@@ -280,10 +282,6 @@ function ChannelMessages({
 				mode={mode}
 				channelLabel={channelLabel}
 				onChange={handleOnChange}
-				isLoadMore={isLoadMore}
-				firsRowCached={firsRowCached}
-				lastRowCached={lastRowCached}
-				currentScrollDirection={currentScrollDirection}
 				isTopic={isTopicBox}
 			/>
 		</MessageContextMenuProvider>
@@ -306,7 +304,7 @@ ChannelMessages.Skeleton = () => {
 };
 
 type ChatMessageListProps = {
-	messages: string[];
+	messageIds: string[];
 	chatRef: React.RefObject<HTMLDivElement>;
 	userActiveScroll: React.MutableRefObject<boolean>;
 	appearanceTheme: string;
@@ -319,17 +317,13 @@ type ChatMessageListProps = {
 	channelId: string;
 	mode: number;
 	channelLabel?: string;
-	onChange: (instance: Virtualizer<HTMLDivElement, HTMLDivElement>) => void;
-	isLoadMore: React.MutableRefObject<boolean>;
-	firsRowCached: React.MutableRefObject<string>;
-	lastRowCached: React.MutableRefObject<string>;
-	currentScrollDirection: React.MutableRefObject<ELoadMoreDirection | null>;
+	onChange: (direction: LoadMoreDirection) => void;
 	isTopic?: boolean;
 };
 
 const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 	({
-		messages,
+		messageIds,
 		chatRef,
 		userActiveScroll,
 		appearanceTheme,
@@ -343,10 +337,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		mode,
 		channelLabel,
 		onChange,
-		isLoadMore,
-		firsRowCached,
-		lastRowCached,
-		currentScrollDirection,
 		isTopic
 	}) => {
 		const dispatch = useAppDispatch();
@@ -355,8 +345,195 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump?.id as string));
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
-
 		const firstMsgOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
+
+		const [getContainerHeight, prevContainerHeightRef] = useContainerHeight(chatRef, true);
+
+		const isViewportNewest = true;
+		const isUnread = true;
+		const isReady = true;
+
+		const [isScrollDownNeeded, setIsScrollDownShown] = useState(false);
+
+		const [isNotchShown, setIsNotchShown] = useState<boolean | undefined>();
+
+		const { withHistoryTriggers, backwardsTriggerRef, forwardsTriggerRef, fabTriggerRef } = useScrollHooks(
+			'thread',
+			chatRef,
+			messageIds,
+			getContainerHeight,
+			isViewportNewest,
+			isUnread,
+			setIsScrollDownShown,
+			setIsNotchShown,
+			isReady,
+			(event: { direction: LoadMoreDirection }) => {
+				onChange(event.direction);
+			}
+		);
+
+		const listItemElementsRef = useRef<HTMLDivElement[]>();
+
+		const scrollOffsetRef = useRef<number>(0);
+
+		const anchorIdRef = useRef<string>();
+
+		const anchorTopRef = useRef<number>();
+
+		const memoFocusingIdRef = useRef<number>();
+
+		// useSyncEffect(() => {
+		// 	memoFocusingIdRef.current = focusingId;
+		// }, [focusingId]);
+
+		// Handles updated message list, takes care of scroll repositioning
+		useLayoutEffectWithPrevDeps(
+			([prevMessageIds, prevIsViewportNewest]) => {
+				const containerHeight = getContainerHeight();
+				const prevContainerHeight = prevContainerHeightRef.current;
+				prevContainerHeightRef.current = containerHeight;
+
+				// Skip initial resize observer callback
+				if (
+					messageIds === prevMessageIds &&
+					isViewportNewest === prevIsViewportNewest &&
+					containerHeight !== prevContainerHeight &&
+					prevContainerHeight === undefined
+				) {
+					return;
+				}
+
+				const container = chatRef.current!;
+				listItemElementsRef.current = Array.from(container.querySelectorAll<HTMLDivElement>('.message-list-item'));
+				const lastItemElement = listItemElementsRef.current[listItemElementsRef.current.length - 1];
+				// const firstUnreadElement = memoFirstUnreadIdRef.current
+				// 	? container.querySelector<HTMLDivElement>(`#${getMessageHtmlId(memoFirstUnreadIdRef.current)}`)
+				// 	: undefined;
+
+				const hasLastMessageChanged =
+					messageIds && prevMessageIds && messageIds[messageIds.length - 1] !== prevMessageIds[prevMessageIds.length - 1];
+				const hasViewportShifted = messageIds?.[0] !== prevMessageIds?.[0] && messageIds?.length === MESSAGE_LIST_SLICE / 2 + 1;
+				const wasMessageAdded = hasLastMessageChanged && !hasViewportShifted;
+
+				// Add extra height when few messages to allow scroll animation
+				if (
+					isViewportNewest &&
+					wasMessageAdded &&
+					messageIds &&
+					messageIds.length < MESSAGE_LIST_SLICE / 2 &&
+					!container.parentElement!.classList.contains('force-messages-scroll') &&
+					forceMeasure(() => (container.firstElementChild as HTMLDivElement)!.clientHeight <= container.offsetHeight * 2)
+				) {
+					// addExtraClass(container.parentElement!, 'force-messages-scroll');
+					container.parentElement!.classList.add('force-messages-scroll');
+
+					setTimeout(() => {
+						if (container.parentElement) {
+							// removeExtraClass(container.parentElement!, 'force-messages-scroll');
+							container.parentElement!.classList.remove('force-messages-scroll');
+						}
+					}, MESSAGE_ANIMATION_DURATION);
+				}
+
+				requestForcedReflow(() => {
+					const { scrollTop, scrollHeight, offsetHeight } = container;
+					const scrollOffset = scrollOffsetRef.current;
+					let bottomOffset = scrollOffset - (prevContainerHeight || offsetHeight);
+					if (wasMessageAdded) {
+						// If two new messages come at once (e.g. when bot responds) then the first message will update `scrollOffset`
+						// right away (before animation) which creates inconsistency until the animation completes. To work around that,
+						// we calculate `isAtBottom` with a "buffer" of the latest message height (this is approximate).
+						const lastItemHeight = lastItemElement ? lastItemElement.offsetHeight : 0;
+						bottomOffset -= lastItemHeight;
+					}
+					const isAtBottom = isViewportNewest && prevIsViewportNewest && bottomOffset <= BOTTOM_THRESHOLD;
+					// const isAlreadyFocusing = messageIds && memoFocusingIdRef.current === messageIds[messageIds.length - 1];
+					const isAlreadyFocusing = false;
+					// Animate incoming message, but if app is in background mode, scroll to the first unread
+					if (wasMessageAdded && isAtBottom && !isAlreadyFocusing) {
+						// Break out of `forceLayout`
+						requestMeasure(() => {
+							const shouldScrollToBottom = !isBackgroundModeActive();
+							// firstUnreadElement
+							// noMessageSendingAnimation
+
+							animateScroll(
+								container,
+								shouldScrollToBottom ? lastItemElement! : null!,
+								shouldScrollToBottom ? 'end' : 'start',
+								BOTTOM_FOCUS_MARGIN,
+								undefined,
+								undefined,
+								undefined
+							);
+						});
+					}
+
+					const isResized = prevContainerHeight !== undefined && prevContainerHeight !== containerHeight;
+					if (isResized && isAnimatingScroll()) {
+						return undefined;
+					}
+
+					const anchor = anchorIdRef.current && container.querySelector(`#${anchorIdRef.current}`);
+					// const unreadDivider =
+					// 	!anchor && memoUnreadDividerBeforeIdRef.current && container.querySelector<HTMLDivElement>(`.${UNREAD_DIVIDER_CLASS}`);
+
+					let newScrollTop!: number;
+					if (isAtBottom && isResized) {
+						newScrollTop = scrollHeight - offsetHeight;
+					} else if (anchor) {
+						const newAnchorTop = anchor.getBoundingClientRect().top;
+						newScrollTop = scrollTop + (newAnchorTop - (anchorTopRef.current || 0));
+					} else {
+						newScrollTop = scrollHeight - scrollOffset;
+					}
+
+					return () => {
+						resetScroll(container, Math.ceil(newScrollTop));
+						restartCurrentScrollAnimation();
+						scrollOffsetRef.current = Math.max(Math.ceil(scrollHeight - newScrollTop), offsetHeight);
+						// if (!memoFocusingIdRef.current) {
+						// 	isScrollTopJustUpdatedRef.current = true;
+						// 	requestMeasure(() => {
+						// 		isScrollTopJustUpdatedRef.current = false;
+						// 	});
+						// }
+					};
+				});
+				// This should match deps for `useSyncEffect` above
+			},
+			[messageIds, isViewportNewest, getContainerHeight, prevContainerHeightRef]
+		);
+
+		const rememberScrollPositionRef = useStateRef(() => {
+			if (!messageIds || !listItemElementsRef.current || !userActiveScroll.current) {
+				return;
+			}
+
+			const preservedItemElements = listItemElementsRef.current.filter((element) => messageIds.includes(element.id.replace('msg-', '')));
+
+			// We avoid the very first item as it may be a partly-loaded album
+			// and also because it may be removed when messages limit is reached
+			const anchor = preservedItemElements[1] || preservedItemElements[0];
+
+			if (!anchor) {
+				return;
+			}
+			anchorIdRef.current = anchor.id;
+			anchorTopRef.current = anchor.getBoundingClientRect().top;
+		});
+
+		useSyncEffect(
+			() => forceMeasure(() => rememberScrollPositionRef.current()),
+			// This will run before modifying content and should match deps for `useLayoutEffectWithPrevDeps` below
+			[messageIds, isViewportNewest, rememberScrollPositionRef]
+		);
+
+		useEffect(
+			() => rememberScrollPositionRef.current(),
+			// This is only needed to react on signal updates
+			[getContainerHeight, rememberScrollPositionRef]
+		);
 
 		const convertedFirstMsgOfThisTopic = useMemo(() => {
 			if (!firstMsgOfThisTopic?.message) {
@@ -365,69 +542,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			return convertInitialMessageOfTopic(firstMsgOfThisTopic.message as ChannelMessageType);
 		}, [firstMsgOfThisTopic]);
 
-		const rowVirtualizer = useVirtualizer({
-			count: messages.length,
-			overscan: 5,
-			getScrollElement: () => chatRef.current,
-			estimateSize: () => 50,
-			onChange
-		});
-
-		useLayoutEffect(() => {
-			if (!rowVirtualizer.getVirtualItems().length) return;
-			if (!rowVirtualizer.getTotalSize()) return;
-			if (chatRef.current && messages?.length && !userActiveScroll.current) {
-				chatRef.current.scrollTop = chatRef.current.scrollHeight;
-			}
-		});
-
-		useLayoutEffect(() => {
-			if (!isLoadMore.current || !chatRef.current || !userActiveScroll.current) return;
-			const firstMessageId = messages[0];
-			const lastMessageId = messages[messages.length - 1];
-			if (firsRowCached.current !== firstMessageId) {
-				if (firsRowCached.current && currentScrollDirection.current === ELoadMoreDirection.top) {
-					const messageId = firsRowCached.current;
-					chatRef.current.style.pointerEvents = 'none';
-					const index = messages.findIndex((item) => item === messageId);
-					if (index !== -1) {
-						rowVirtualizer.scrollToIndex(index, { align: 'start' });
-					}
-					setTimeout(() => {
-						if (!chatRef.current) return;
-						chatRef.current.style.pointerEvents = 'auto';
-					}, 200);
-				}
-				firsRowCached && (firsRowCached.current = messages[1]);
-				lastRowCached.current = messages[messages.length - 1];
-				currentScrollDirection.current = null;
-				return;
-			}
-			if (lastRowCached.current !== lastMessageId) {
-				lastRowCached.current &&
-					currentScrollDirection.current === ELoadMoreDirection.bottom &&
-					rowVirtualizer.scrollToIndex(
-						messages.findIndex((messageId) => messageId === lastRowCached.current),
-						{ align: 'end' }
-					);
-				lastRowCached.current = messages[messages.length - 1];
-			}
-			currentScrollDirection.current = null;
-		}, [messages, rowVirtualizer]);
-
+		// Handle scroll to specific message (jump/pin)
 		const timerRef = useRef<number | null>(null);
 		useEffect(() => {
-			if (!rowVirtualizer.measurementsCache.length) return;
-
-			let index = -1;
-
-			const handleScrollToIndex = () => {
-				if (index >= 0) {
-					userActiveScroll.current = true;
-					rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
-				}
-			};
-
 			const clearTimer = () => {
 				if (timerRef.current) {
 					clearTimeout(timerRef.current);
@@ -435,47 +552,53 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				}
 			};
 
-			clearTimer();
-
-			const setTimer = (action: Action) => {
-				timerRef.current = window.setTimeout(() => {
-					dispatch(action);
-				}, 1000);
+			const scrollToMessage = (messageId: string) => {
+				const messageElement = document.getElementById(messageId);
+				if (messageElement) {
+					userActiveScroll.current = true;
+					messageElement.scrollIntoView({ behavior: 'auto', block: 'center' });
+				}
 			};
 
+			clearTimer();
+
 			if (jumpPinMessageId && isPinMessageExist) {
-				index = messages.findIndex((item) => item === jumpPinMessageId);
-				handleScrollToIndex();
-				setTimer(pinMessageActions.setJumpPinMessageId(null));
+				scrollToMessage(jumpPinMessageId);
+				timerRef.current = window.setTimeout(() => {
+					dispatch(pinMessageActions.setJumpPinMessageId(null));
+				}, 1000);
 			} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
-				index = messages.findIndex((item) => item === idMessageToJump?.id);
 				if (idMessageToJump?.navigate) {
 					setTimeout(() => {
-						handleScrollToIndex();
-						setTimer(messagesActions.setIdMessageToJump(null));
+						scrollToMessage(idMessageToJump.id);
+						timerRef.current = window.setTimeout(() => {
+							dispatch(messagesActions.setIdMessageToJump(null));
+						}, 1000);
 					});
 				} else {
-					handleScrollToIndex();
-					setTimer(messagesActions.setIdMessageToJump(null));
+					scrollToMessage(idMessageToJump.id);
+					timerRef.current = window.setTimeout(() => {
+						dispatch(messagesActions.setIdMessageToJump(null));
+					}, 1000);
 				}
 			}
 
 			return clearTimer;
-		}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages, rowVirtualizer]);
+		}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist]);
 
-		// RESET COMPONENT UNMOUNT
+		// Cleanup on unmount
 		useEffect(() => {
 			return () => {
-				messagesActions.setIdMessageToJump(null);
-				pinMessageActions.setJumpPinMessageId(null);
+				dispatch(messagesActions.setIdMessageToJump(null));
+				dispatch(pinMessageActions.setJumpPinMessageId(null));
 			};
-		}, []);
+		}, [dispatch]);
 
 		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
-
 		return (
-			<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>
+			<div className="w-full h-full relative messages-container">
 				<div
+					// onScroll={handleScroll}
 					onWheelCapture={() => {
 						toggleDisableHover(chatRef.current, scrollTimeoutId2);
 						userActiveScroll.current = true;
@@ -497,9 +620,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						}
 					])}
 				>
-					<div style={{ height: `calc(100% - 20px - ${rowVirtualizer.getTotalSize()}px)` }}></div>
 					{isTopic && convertedFirstMsgOfThisTopic && (
-						<div className="sticky top-0 z-[-10] dark:bg-bgPrimary bg-bgLightPrimary">
+						<div className="sticky top-0 z-[1] dark:bg-bgPrimary bg-bgLightPrimary">
 							<div
 								className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
 							>
@@ -512,59 +634,44 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							</div>
 						</div>
 					)}
-					<div
-						style={{
-							height: `${rowVirtualizer.getTotalSize()}px`,
-							width: '100%',
-							position: 'relative'
-						}}
-					>
-						<div
-							style={{
-								position: 'absolute',
-								top: 0,
-								left: 0,
-								width: '100%',
-								transform: `translateY(${rowVirtualizer.getVirtualItems()[0]?.start ?? 0}px)`
-							}}
-						>
-							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-								const messageId = messages[virtualRow.index];
-								const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
-								const messageReplyHighlight =
-									(dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
-								return (
-									<div key={virtualRow.key} data-index={virtualRow.index} ref={rowVirtualizer.measureElement}>
-										<MemorizedChannelMessage
-											index={virtualRow.index}
-											message={entities[messageId]}
-											previousMessage={entities[messages[virtualRow.index - 1]]}
-											avatarDM={avatarDM}
-											userName={userName}
-											messageId={messageId}
-											nextMessageId={messages[virtualRow.index + 1]}
-											channelId={channelId}
-											isHighlight={messageId === idMessageNotified}
-											mode={mode}
-											channelLabel={channelLabel ?? ''}
-											isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
-											checkMessageTargetToMoved={checkMessageTargetToMoved}
-											messageReplyHighlight={messageReplyHighlight}
-											isTopic={isTopic}
-										/>
-									</div>
-								);
-							})}
-							<div className="h-[20px] w-[1px] pointer-events-none"></div>
-						</div>
-					</div>
+					{withHistoryTriggers && <div ref={backwardsTriggerRef} key="backwards-trigger" className="backwards-trigger" />}
+					{messageIds.map((messageId, index) => {
+						const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
+						const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
+
+						return (
+							<div className="message-list-item" key={messageId} id={'msg-' + messageId}>
+								<MemorizedChannelMessage
+									index={index}
+									message={entities[messageId]}
+									previousMessage={entities[messageIds[index - 1]]}
+									avatarDM={avatarDM}
+									userName={userName}
+									messageId={messageId}
+									nextMessageId={messageIds[index + 1]}
+									channelId={channelId}
+									isHighlight={messageId === idMessageNotified}
+									mode={mode}
+									channelLabel={channelLabel ?? ''}
+									isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
+									checkMessageTargetToMoved={checkMessageTargetToMoved}
+									messageReplyHighlight={messageReplyHighlight}
+									isTopic={isTopic}
+								/>
+							</div>
+						);
+					})}
+					{withHistoryTriggers && <div ref={forwardsTriggerRef} key="forwards-trigger" className="forwards-trigger" />}
+
+					<div ref={fabTriggerRef} key="fab-trigger" className="fab-trigger" />
+					<div className="h-[20px] w-[1px] pointer-events-none"></div>
 				</div>
 			</div>
 		);
 	},
 	(prev, curr) => {
 		return (
-			prev.messages === curr.messages &&
+			prev.messageIds === curr.messageIds &&
 			prev.lastMessageId === curr.lastMessageId &&
 			prev.dataReferences === curr.dataReferences &&
 			prev.idMessageNotified === curr.idMessageNotified &&

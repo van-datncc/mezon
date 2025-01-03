@@ -1,15 +1,15 @@
 import { ChatContext, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
 	clansActions,
 	directActions,
-	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
-	selectDmGroupCurrent
+	selectDmGroupCurrent,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
@@ -25,6 +25,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const directMessageId = route.params?.directMessageId as string;
+	const dispatch = useAppDispatch();
 
 	const from = route.params?.from;
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
@@ -66,17 +67,15 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (!currentChannel) {
 			return;
 		}
-		const store = await getStoreAsync();
-		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
+		dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 		// Rejoin previous clan (other than 0) when exiting the DM detail screen
-		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
+		dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
 	};
 
 	const directMessageLoader = async () => {
-		const store = await getStoreAsync();
 		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId('0')),
-			store.dispatch(
+			dispatch(clansActions.setCurrentClanId('0')),
+			dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: directMessageId,
 					type: dmType,
@@ -86,7 +85,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				})
 			)
 		]);
-		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	};
 
 	useEffect(() => {
@@ -119,6 +117,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	useEffect(() => {
 		return () => {
+			dispatch(directActions.setDmGroupCurrentId(''));
 			if (!isFetchMemberChannelDmRef.current) {
 				requestAnimationFrame(async () => {
 					await fetchMemberChannel();
@@ -147,10 +146,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			if (state === 'active') {
 				try {
 					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
-					const store = await getStoreAsync();
 					handleReconnect('DM detail reconnect attempt');
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-					store.dispatch(
+					dispatch(
 						channelsActions.joinChat({
 							clanId: '0',
 							channelId: directMessageId,
@@ -158,7 +156,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							isPublic: false
 						})
 					);
-					store.dispatch(
+					dispatch(
 						messagesActions.fetchMessages({
 							channelId: directMessageId,
 							noCache: true,
@@ -170,8 +168,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 				} catch (error) {
-					const store = await getStoreAsync();
-					store.dispatch(appActions.setIsFromFCMMobile(false));
+					dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 				}
