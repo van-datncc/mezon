@@ -121,6 +121,7 @@ import {
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
+	UserProfileUpdatedEvent,
 	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
@@ -875,6 +876,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, currentChannelId, clanId, userId]
 	);
 
+	const onuserprofileupdate = useCallback(
+		(userUpdated: UserProfileUpdatedEvent) => {
+			if (userUpdated.user_id === userId) {
+				dispatch(accountActions.setUpdateAccount({ encrypt_private_key: userUpdated?.encrypt_private_key }));
+			}
+		},
+		[dispatch, userId]
+	);
+
 	const onchannelupdated = useCallback(
 		(channelUpdated: ChannelUpdatedEvent) => {
 			if (channelUpdated.is_error) {
@@ -1294,6 +1304,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
+			socket.onuserprofileupdate = onuserprofileupdate;
+
 			socket.onpermissionset = onpermissionset;
 
 			socket.onpermissionchanged = onpermissionchanged;
@@ -1325,6 +1337,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelmessage,
 			onchannelpresence,
 			onchannelupdated,
+			onuserprofileupdate,
 			onpermissionset,
 			onpermissionchanged,
 			onunmuteevent,
@@ -1484,6 +1497,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelcreated,
 		onchanneldeleted,
 		onchannelupdated,
+		onuserprofileupdate,
 		onpermissionset,
 		onpermissionchanged,
 		onunmuteevent,
