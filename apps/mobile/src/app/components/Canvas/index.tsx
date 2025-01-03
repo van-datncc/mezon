@@ -34,7 +34,7 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, channelId));
 
 	const filterCanvas = useMemo(() => {
-		return canvases.filter((canvas) =>
+		return canvases?.filter((canvas) =>
 			normalizeString(canvas?.title ? canvas?.title?.replace(/\n/g, ' ') : 'Untitled').includes(normalizeString(searchText))
 		);
 	}, [canvases, searchText]);
