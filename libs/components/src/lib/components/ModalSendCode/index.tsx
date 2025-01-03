@@ -277,8 +277,11 @@ const ModalConfirmPin = ({ onClose, onBack, pin, userProfile }: ModalProps & { p
 							encrypt_private_key: encryptWithPIN
 						})
 					);
-					if (!directMessageValue?.e2ee) {
-						handleEnableE2ee(directMessageValue?.id, directMessageValue?.e2ee);
+					if (currentDmId) {
+						if (!directMessageValue?.e2ee) {
+							handleEnableE2ee(directMessageValue?.id, directMessageValue?.e2ee);
+						}
+						dispatch(messagesActions.fetchMessages({ clanId: '0', channelId: currentDmId as string, foundE2ee: true }));
 					}
 					dispatch(e2eeActions.pushPubKey(pubkey as ApiPubKey));
 					dispatch(e2eeActions.setHasKey(true));
