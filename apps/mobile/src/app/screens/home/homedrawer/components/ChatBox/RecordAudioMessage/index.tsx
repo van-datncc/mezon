@@ -243,7 +243,7 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 	return (
 		<Block>
 			<ModalConfirmRecord visible={isConfirmRecordModalVisible} onBack={handleBackRecord} onConfirm={handleQuitRecord} />
-			<MezonBottomSheet snapPoints={['50%']} ref={recordingBsRef} onBackdropPress={handleBackdropBS}>
+			<MezonBottomSheet snapPoints={['50%']} ref={recordingBsRef} onBackdropPress={handleBackdropBS} enablePanDownToClose={false}>
 				<Block alignItems="center" justifyContent="center" paddingHorizontal={size.s_40} paddingVertical={size.s_20}>
 					{isPreviewRecord && recordUrl ? (
 						<RenderAudioChat audioURL={recordUrl} stylesContainerCustom={styles.containerAudioCustom} styleLottie={styles.customLottie} />
