@@ -43,6 +43,10 @@ const HomeDefaultHeader = React.memo(
 			});
 		};
 
+		const isAgeRestrictedChannel = useMemo(() => {
+			return currentChannel?.age_restricted === 1;
+		}, [currentChannel?.age_restricted]);
+
 		const navigateToNotifications = () => {
 			navigation.navigate(APP_SCREEN.NOTIFICATION.STACK, {
 				screen: APP_SCREEN.NOTIFICATION.HOME
@@ -58,7 +62,11 @@ const HomeDefaultHeader = React.memo(
 				return <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
-			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			if (
+				currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
+				currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+				!isAgeRestrictedChannel
+			) {
 				return <Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
@@ -68,6 +76,10 @@ const HomeDefaultHeader = React.memo(
 
 			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_APP) {
 				return <Icons.AppChannelIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel) {
+				return <Icons.HashtagWarning width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
 			return <Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;

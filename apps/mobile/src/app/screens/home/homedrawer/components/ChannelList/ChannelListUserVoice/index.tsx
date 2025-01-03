@@ -28,7 +28,7 @@ export default memo(function ChannelListUserVoice({
 }: IUserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(channelId));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channelId));
-	if (!isCategoryExpanded && !voiceChannelMember?.length) return <View />;
+	if (!isCategoryExpanded && !voiceChannelMember?.length && !streamChannelMembers?.length) return <View />;
 
 	return (
 		<View>
