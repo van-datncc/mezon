@@ -23,7 +23,9 @@
         "title": "",
         "threads": "Chuỗi",
         "searchThreads": "Tìm kiếm threads",
-        "searchFiles": "Tìm kiếm files"
+        "searchFiles": "Tìm kiếm files",
+        "searchCanvas": "Tìm kiếm tên Canvas"
+
       },
       "organizationMenu": {
           "title": "",
