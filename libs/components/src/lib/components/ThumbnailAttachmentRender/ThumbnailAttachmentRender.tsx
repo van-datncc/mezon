@@ -1,13 +1,20 @@
 import { Icons } from '@mezon/ui';
 import { SHOW_POSITION, fileTypeImage, fileTypeVideo } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useMessageContextMenu } from '../ContextMenu';
 import { MessageAudioControl } from '../MessageWithUser/MessageAudio/MessageAudioControl';
 import MessageVideo from '../MessageWithUser/MessageVideo';
 import { typeFormats } from './TypeFormats';
 
-export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size?: string, pos?: string) => {
+export interface IRenderAttachmentThumbnailParam {
+	attachment: ApiMessageAttachment;
+	size?: string;
+	pos?: string;
+	isFileList?: boolean;
+}
+
+export const RenderAttachmentThumbnail = ({ attachment, size, pos, isFileList }: IRenderAttachmentThumbnailParam) => {
 	const fileType = attachment.filetype;
 
 	const renderIcon = typeFormats.find((typeFormat: any) => typeFormat.type === fileType);
@@ -27,7 +34,7 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 	}, [attachment.filetype]);
 	return (
 		<div onContextMenu={handleContextMenu}>
-			{isAudioFile && <AudioAttachment attachment={attachment} size={size} />}
+			{isAudioFile && <AudioAttachment attachment={attachment} size={size} isFileList={isFileList} />}
 
 			{hasFileImage && (
 				<img
@@ -45,7 +52,7 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 				</div>
 			)}
 
-			{renderIcon && <renderIcon.icon defaultSize={size} />}
+			{!isAudioFile && renderIcon && <renderIcon.icon defaultSize={size} />}
 
 			{!hasFileImage && !hasFileVideo && !renderIcon && !isAudioFile && <Icons.EmptyType defaultSize={size} />}
 		</div>
@@ -55,26 +62,37 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 interface IAudioAttachmentProps {
 	attachment: ApiMessageAttachment;
 	size?: string;
+	isFileList?: boolean;
 }
 
-const AudioAttachment = ({ attachment, size }: IAudioAttachmentProps) => {
+const AudioAttachment = ({ attachment, size, isFileList }: IAudioAttachmentProps) => {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState<number>(0);
 	const audioControlRef = useRef<{ togglePlay: () => void }>(null);
 
-	const handleTogglePlay = () => {
+	const handleTogglePlay = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation();
 		if (audioControlRef.current) {
 			audioControlRef.current.togglePlay();
 		}
 	};
+
+	const positionAndPadding = useMemo(() => {
+		if (isFileList) {
+			return `border-[2px] top-[10px] right-[3.5px] p-[5px] ${isPlaying ? '' : 'pr-[3px] pl-[7px]'}`;
+		}
+		return `border-[4px] top-[23px] right-[8px] p-[10px] ${isPlaying ? '' : 'pr-[8px] pl-[12px]'}`;
+	}, [isFileList, isPlaying]);
+
 	return (
 		<div className="relative">
-			<div
-				onClick={handleTogglePlay}
-				className={`absolute top-[23px] right-[8px] p-[10px] ${isPlaying ? '' : 'pr-[8px] pl-[12px]'} border-[4px] border-gray-600 bg-gray-400 rounded-full`}
-			>
-				{isPlaying ? <Icons.PauseButton className="w-7" /> : <Icons.PlayButton className="w-7" />}
+			<div onClick={(e) => handleTogglePlay(e)} className={`absolute border-gray-600 bg-gray-400 rounded-full ${positionAndPadding}`}>
+				{isPlaying ? (
+					<Icons.PauseButton className={isFileList ? 'w-3' : 'w-7'} />
+				) : (
+					<Icons.PlayButton className={isFileList ? 'w-3' : 'w-7'} />
+				)}
 			</div>
 			<Icons.EmptyType defaultSize={size} />
 			<MessageAudioControl
