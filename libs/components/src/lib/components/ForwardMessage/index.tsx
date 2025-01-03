@@ -14,6 +14,7 @@ import {
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
+	selectMessageIdsByChannelId,
 	selectModeResponsive,
 	selectTheme,
 	toggleIsShowPopupForwardFalse,
@@ -22,6 +23,7 @@ import {
 } from '@mezon/store';
 import {
 	ChannelThreads,
+	FOR_1_HOUR,
 	ModeResponsive,
 	TypeSearch,
 	UsersClanEntity,
@@ -64,13 +66,14 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const modeResponsive = useSelector(selectModeResponsive);
 	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
+	const allMessageIds = useAppSelector((state) =>
+		selectMessageIdsByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
+	);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
 	);
-	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
-	const allMessagesBySenderId = convertedAllMessagesEntities.filter((message) => message.sender_id === selectedMessage?.user?.id);
 	const startIndex = useMemo(() => {
-		return allMessagesBySenderId.findIndex((message) => message.id === selectedMessage.id);
+		return allMessageIds.findIndex((id) => id === selectedMessage.id);
 	}, [allMessagesEntities, selectedMessage]);
 
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<ObjectSend[]>([]);
@@ -105,11 +108,13 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 
 		let index = startIndex + 1;
 		while (
-			index < allMessagesBySenderId.length &&
-			!allMessagesBySenderId[index].isStartedMessageGroup &&
-			allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id
+			index < allMessageIds.length &&
+			Date.parse(allMessagesEntities?.[allMessageIds[index]]?.create_time) -
+				Date.parse(allMessagesEntities?.[allMessageIds[index]]?.create_time) <
+				FOR_1_HOUR &&
+			allMessagesEntities?.[allMessageIds[index]]?.sender_id === selectedMessage?.user?.id
 		) {
-			combineMessages.push(allMessagesBySenderId[index]);
+			combineMessages.push(allMessagesEntities?.[allMessageIds[index]]);
 			index++;
 		}
 
