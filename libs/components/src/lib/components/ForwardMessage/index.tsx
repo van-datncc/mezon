@@ -121,11 +121,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, message);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, { ...message, references: [] });
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, { ...message, references: [] });
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				for (const message of combineMessages) {
@@ -134,7 +134,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
 						currentChannel ? !currentChannel.channel_private : false,
-						message
+						{ ...message, references: [] }
 					);
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
@@ -144,7 +144,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_THREAD,
 						currentChannel ? !currentChannel.channel_private : false,
-						message
+						{ ...message, references: [] }
 					);
 				}
 			}
@@ -156,16 +156,16 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, { ...selectedMessage, references: [] });
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, { ...selectedMessage, references: [] });
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
 					selectedObjectIdSend.isPublic,
-					selectedMessage
+					{ ...selectedMessage, references: [] }
 				);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
 				sendForwardMessage(
@@ -173,7 +173,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_THREAD,
 					selectedObjectIdSend.isPublic,
-					selectedMessage
+					{ ...selectedMessage, references: [] }
 				);
 			}
 		}
