@@ -53,7 +53,7 @@ const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 			}
 		}
 	};
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
+	const thumbnailAttachment = RenderAttachmentThumbnail({ attachment: attachmentData, size: 'w-8 h-10', isFileList: true });
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
