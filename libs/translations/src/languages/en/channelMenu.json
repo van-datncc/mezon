@@ -23,7 +23,8 @@
           "title": "",
           "threads": "Threads",
           "searchThreads": "Search Thread",
-          "searchFiles": "Search Files"
+          "searchFiles": "Search Files",
+          "searchCanvas": "Search for Canvas name"
         },
         "organizationMenu": {
             "title": "",
