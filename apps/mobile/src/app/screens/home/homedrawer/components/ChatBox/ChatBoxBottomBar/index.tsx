@@ -2,6 +2,7 @@
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
+	STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE,
 	convertMentionsToText,
 	formatContentEditMessage,
 	getChannelHashtag,
@@ -169,6 +170,12 @@ export const ChatBoxBottomBar = memo(
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
 		}, [channelId]);
 
+		const resetCachedMessageActionNeedToResolve = useCallback(async () => {
+			const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+			if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
+			save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+		}, [channelId]);
+
 		useEffect(() => {
 			if (channelId) {
 				setMessageFromCache();
@@ -188,6 +195,7 @@ export const ChatBoxBottomBar = memo(
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
+			resetCachedMessageActionNeedToResolve();
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
@@ -212,6 +220,9 @@ export const ChatBoxBottomBar = memo(
 		const handleTextInputChange = async (text: string) => {
 			setTextChange(text);
 			setText(text);
+			if (messageAction !== EMessageActionType.CreateThread) {
+				saveMessageToCache(text);
+			}
 			if (!text) return;
 
 			if (text?.length > MIN_THRESHOLD_CHARS) {
@@ -276,10 +287,6 @@ export const ChatBoxBottomBar = memo(
 			setMentionTextValue(text);
 			setText(convertedHashtag);
 			setIsShowAttachControl(false);
-
-			if (messageAction !== EMessageActionType.CreateThread) {
-				saveMessageToCache(text);
-			}
 		};
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
