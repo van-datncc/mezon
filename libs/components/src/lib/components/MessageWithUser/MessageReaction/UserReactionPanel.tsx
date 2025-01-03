@@ -10,7 +10,7 @@ import {
 	getSrcEmoji,
 	isPublicChannel
 } from '@mezon/utils';
-import { Fragment, useCallback } from 'react';
+import { ForwardedRef, Fragment, forwardRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
@@ -20,7 +20,7 @@ type UserReactionPanelProps = {
 	message: IMessageWithUser;
 };
 
-const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
+const UserReactionPanel = forwardRef(({ emojiShowPanel, mode, message }: UserReactionPanelProps, ref: ForwardedRef<HTMLDivElement>) => {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userId = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -68,11 +68,11 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 					<div
 						onClick={(e) => e.stopPropagation()}
 						className={`z-50   w-[18rem]
-						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] 
+						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem]
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={getEmojiById?.emojiId} emojiName={getEmojiById?.emoji ?? ''} count={count} />
-						<div className="max-h-40 overflow-y-auto hide-scrollbar">
+						<div ref={ref} tabIndex={-1} className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none">
 							{getEmojiById?.senders.map((sender: SenderInfoOptionals, index: number) => {
 								if (sender.count && sender.count > 0) {
 									return (
@@ -95,7 +95,9 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			)}
 		</>
 	);
-};
+});
+
+UserReactionPanel.displayName = 'UserReactionPanel';
 
 export default UserReactionPanel;
 

@@ -62,7 +62,8 @@ export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: 
 		const response = await mezon.client.sendToken(mezon.session, {
 			receiver_id: tokenEvent.receiver_id,
 			amount: tokenEvent.amount,
-			note: tokenEvent.note
+			note: tokenEvent.note,
+			extra_attribute: tokenEvent.extra_attribute
 		});
 
 		if (response) {
@@ -108,20 +109,6 @@ export const giveCoffeeSlice = createSlice({
 
 			if (currentUserId === tokenEvent.receiver_id) {
 				state.tokenUpdate[currentUserId] += tokenEvent.amount || 0;
-			}
-		},
-		setTokenFromSocket: (state, action: PayloadAction<{ userId: string | undefined; coffeeEvent: ApiGiveCoffeeEvent }>) => {
-			const { userId, coffeeEvent } = action.payload;
-
-			if (!userId) return;
-
-			state.tokenUpdate[userId] = state.tokenUpdate[userId] ?? 0;
-			state.tokenSocket[userId] = coffeeEvent ?? {};
-
-			if (userId === coffeeEvent.receiver_id) {
-				state.tokenUpdate[userId] += 1;
-			} else if (userId === coffeeEvent.sender_id) {
-				state.tokenUpdate[userId] -= 1;
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import {
 	JoinPTTActions,
 	RootState,
 	TalkPTTActions,
+	accountActions,
 	acitvitiesActions,
 	appActions,
 	attachmentActions,
@@ -67,6 +68,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
 	EOverriddenPermission,
@@ -76,6 +78,7 @@ import {
 	ModeResponsive,
 	NotificationCode,
 	TIME_OFFSET,
+	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage
 } from '@mezon/utils';
@@ -283,7 +286,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
-			if (message.topic_id !== '0') {
+			if (message.topic_id) {
 				const lastMsg: ApiChannelMessageHeader = {
 					content: message.content,
 					sender_id: message.sender_id,
@@ -310,23 +313,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
-				const attachmentList: AttachmentEntity[] = (message.attachments || [])?.map((attachment) => {
-					const dateTime = new Date();
-					return {
-						...attachment,
-						id: attachment.url as string,
-						message_id: message?.message_id,
-						create_time: dateTime.toISOString(),
-						uploader: message?.sender_id
-					};
-				});
+				const attachmentList: AttachmentEntity[] =
+					message.attachments && message.attachments.length > 0
+						? message.attachments.map((attachment) => {
+								const dateTime = new Date();
+								return {
+									...attachment,
+									id: attachment.url as string,
+									message_id: message?.message_id,
+									create_time: dateTime.toISOString(),
+									uploader: message?.sender_id
+								};
+							})
+						: [];
 
-				if (attachmentList?.length) {
-					if (message?.code === TypeMessage.Chat) {
-						dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
-					} else if (message?.code === TypeMessage.ChatRemove) {
-						dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
-					}
+				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
+					dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
+				} else if (message?.code === TypeMessage.ChatRemove && message?.attachments) {
+					dispatch(attachmentActions.removeAttachments({ messageId: message?.message_id as string, channelId: message.channel_id }));
 				}
 
 				dispatch(messagesActions.addNewMessage(mess));
@@ -581,7 +585,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						directActions.addGroupUserWS({
 							channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
-							users: [caller, ...users].filter((item) => item.user_id !== userId)
+							users: [...users].filter((item) => item.user_id !== userId)
 						})
 					);
 				}
@@ -670,7 +674,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
 			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === 0) {
+				if (eventEmoji.action === EEventAction.CREATED) {
 					dispatch(
 						emojiSuggestionActions.add({
 							category: eventEmoji.clan_name,
@@ -683,7 +687,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							clan_name: eventEmoji.clan_name
 						})
 					);
-				} else if (eventEmoji.action === 1) {
+				} else if (eventEmoji.action === EEventAction.UPDATE) {
 					dispatch(
 						emojiSuggestionActions.update({
 							id: eventEmoji.id,
@@ -692,7 +696,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							}
 						})
 					);
-				} else if (eventEmoji.action === 2) {
+				} else if (eventEmoji.action === EEventAction.DELETE) {
 					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 				}
 			}
@@ -878,7 +882,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (channelUpdated.clan_id === '0') {
-				if (channelUpdated?.e2ee && !hasKeyE2ee) {
+				if (channelUpdated?.e2ee && channelUpdated.creator_id !== userId) {
 					dispatch(e2eeActions.setOpenModalE2ee(true));
 				}
 				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
@@ -1061,7 +1065,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
-		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
+		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+		const updateAmount = isReceiverGiveCoffee
+			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+			: isSenderGiveCoffee
+				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
+				: 0;
+		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 	}, []);
 
 	const onroleevent = useCallback(
@@ -1080,7 +1091,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle new role creation
-			if (status === 0 && role) {
+			if (status === EEventAction.CREATED && role) {
 				dispatch(
 					rolesClanActions.add({
 						id: role.id as string,
@@ -1112,7 +1123,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role update
-			if (status === 1) {
+			if (status === EEventAction.UPDATE) {
 				const isUserAffected = user_add_ids.includes(userId as string) || user_remove_ids.includes(userId as string);
 
 				if (isUserAffected) {
@@ -1142,7 +1153,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			// Handle role deletion
-			if (status === 2) {
+			if (status === EEventAction.DELETE) {
 				const isUserResult = await dispatch(
 					rolesClanActions.updatePermissionUserByRoleId({
 						roleId: role.id as string,

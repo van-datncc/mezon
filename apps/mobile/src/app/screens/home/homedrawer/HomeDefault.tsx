@@ -1,5 +1,4 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { channelMembersActions, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
@@ -28,7 +27,6 @@ const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
-	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
 	const navigation = useNavigation<any>();
 
 	const dispatch = useAppDispatch();
@@ -90,30 +88,15 @@ const HomeDefault = React.memo((props: any) => {
 	);
 
 	useEffect(() => {
-		const timeout = setTimeout(() => {
-			checkShowLicenseAgreement();
-		}, 500);
 		return () => {
 			timeoutRef?.current && clearTimeout(timeoutRef.current);
-			clearTimeout(timeout);
 		};
 	}, []);
 
-	const checkShowLicenseAgreement = async () => {
-		const isAgreed = await load(STORAGE_AGREED_POLICY);
-
-		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
-	};
-
 	return (
 		<View style={[styles.homeDefault]}>
-			<LicenseAgreement
-				show={isShowLicenseAgreement}
-				onClose={() => {
-					setIsShowLicenseAgreement(false);
-					save(STORAGE_AGREED_POLICY, 'true');
-				}}
-			/>
+			{Platform.OS === 'ios' && <LicenseAgreement />}
+
 			<DrawerListener channelId={currentChannel?.channel_id} />
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}

@@ -19,7 +19,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
-import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -63,20 +63,12 @@ const Notifications = () => {
 		return [...(notification || []), ...(allTopics || [])];
 	}, [allTopics, notification]);
 
-	useFocusEffect(
-		React.useCallback(() => {
-			setSelectedTabs({ individual: true, mention: true, messages: true, topics: true });
+	useEffect(() => {
+		if (currentClanId && currentClanId !== '0') {
+			initLoader();
 			setIsLoadMore(true);
-			if (currentClanId && currentClanId !== '0') {
-				initLoader();
-			}
-			return () => {
-				dispatch(notificationActions.refreshStatus());
-				setNotificationsFilter([]);
-				setFirstLoading(true);
-			};
-		}, [currentClanId])
-	);
+		}
+	}, [currentClanId]);
 
 	const handleFilterNotify = useCallback(
 		(selectedTabs) => {

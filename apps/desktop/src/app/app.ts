@@ -1,21 +1,13 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, ipcMain, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItemConstructorOptions, Notification, app, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import { format } from 'url';
-import { electronAppName, rendererAppName, rendererAppPort } from './constants';
+import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 import setupAutoUpdates from './autoUpdates';
-import {
-	ACTIVE_WINDOW,
-	CHANGE_ATTACHMENT_LIST,
-	GET_ATTACHMENT_DATA,
-	SEND_ATTACHMENT_DATA,
-	SET_ATTACHMENT_DATA,
-	SET_CURRENT_IMAGE,
-	TRIGGER_SHORTCUT
-} from './events/constants';
+import { ACTIVE_WINDOW, TRIGGER_SHORTCUT } from './events/constants';
 import setupRequestPermission from './requestPermission';
 import { initBadge } from './services/badge';
 import { forceQuit } from './utils';
@@ -257,96 +249,6 @@ export default class App {
 
 	static isWindowValid(window: Electron.BrowserWindow | null): boolean {
 		return window !== null && !window.isDestroyed();
-	}
-
-	static openImageWindow(props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) {
-		const defaultOptions: Electron.BrowserWindowConstructorOptions = {
-			width: 1000,
-			height: 800,
-			backgroundColor: '#1a1a1a',
-			show: false,
-			titleBarStyle: 'hidden',
-			frame: false,
-			trafficLightPosition: process.platform == 'darwin' ? { x: -20, y: -20 } : undefined,
-			webPreferences: {
-				nodeIntegration: false,
-				contextIsolation: true,
-				preload: join(__dirname, 'main.preload.js'),
-				backgroundThrottling: false
-			},
-			autoHideMenuBar: true,
-			titleBarOverlay: false,
-			paintWhenInitiallyHidden: true,
-			visualEffectState: 'active'
-		};
-
-		const windowOptions = { ...defaultOptions, ...options };
-
-		if (!this.isWindowValid(this.imageViewerWindow) && !this.listWindowOpen?.[IMAGE_WINDOW_KEY]) {
-			this.imageViewerWindow = new BrowserWindow(windowOptions);
-			this.listWindowOpen = {
-				...this.listWindowOpen,
-				[IMAGE_WINDOW_KEY]: this.imageViewerWindow
-			};
-
-			const emptyMenu = Menu.buildFromTemplate([]);
-			this.imageViewerWindow.setMenu(emptyMenu);
-			this.imageViewerWindow.setMenuBarVisibility(false);
-			// this.imageViewerWindow.setOpacity(0);
-
-			const filePath = App.application.isPackaged
-				? 'assets/image-window/image-window.html'
-				: 'apps/desktop/src/assets/image-window/image-window.html';
-			const baseUrl = App.application.isPackaged
-				? join(__dirname, '..', electronAppName, filePath)
-				: join(__dirname, '..', '..', '..', filePath);
-			const fullUrl = this.generateFullUrl(baseUrl, params);
-
-			const loadContent = async () => {
-				try {
-					this.imageViewerWindow.loadURL(
-						format({
-							pathname: fullUrl,
-							protocol: 'file:',
-							slashes: true,
-							query: params
-						})
-					);
-				} catch (error) {
-					console.error('Failed to load window:', error);
-				}
-			};
-
-			loadContent();
-			this.imageViewerWindow?.show();
-		}
-
-		if (!App.application.isPackaged) {
-			this.imageViewerWindow.webContents.removeAllListeners('did-fail-load');
-			this.imageViewerWindow.webContents.on('did-fail-load', (_, code, description) => {
-				console.error('Window load failed:', code, description);
-			});
-		}
-
-		this.imageViewerWindow?.setOpacity(1);
-		this.imageViewerWindow.removeAllListeners('closed');
-		this.imageViewerWindow.on('closed', () => {
-			this.imageViewerWindow = null;
-			delete this.listWindowOpen[IMAGE_WINDOW_KEY];
-		});
-		ipcMain.removeAllListeners(SEND_ATTACHMENT_DATA);
-		ipcMain.on(SEND_ATTACHMENT_DATA, (event, data) => {
-			this.attachmentData = data;
-			this.imageViewerWindow.webContents.send(CHANGE_ATTACHMENT_LIST);
-		});
-		ipcMain.removeAllListeners(GET_ATTACHMENT_DATA);
-		ipcMain.on(GET_ATTACHMENT_DATA, () => {
-			this.imageViewerWindow.webContents.send(SET_CURRENT_IMAGE, props);
-			this.imageViewerWindow.webContents.send(SET_ATTACHMENT_DATA, this.attachmentData);
-		});
-		this.imageViewerWindow?.focus();
-
-		return this.imageViewerWindow;
 	}
 
 	/**

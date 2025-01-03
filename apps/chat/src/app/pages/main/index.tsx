@@ -10,15 +10,14 @@ import {
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
+	SidebarLogoItem,
 	SidebarTooltip
 } from '@mezon/components';
-import { useAppParams, useAuth, useFriends, useMenu, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
 	DMCallActions,
 	accountActions,
 	audioCallActions,
-	channelsActions,
-	clansActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
@@ -39,14 +38,12 @@ import {
 	selectCurrentStartDmCall,
 	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
-	selectDmGroupCurrentId,
-	selectDmGroupCurrentType,
 	selectGroupCallId,
+	selectHasKeyE2ee,
 	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectJoinedCall,
-	selectLogoCustom,
 	selectOnboardingMode,
 	selectOpenModalAttachment,
 	selectOpenModalE2ee,
@@ -59,23 +56,12 @@ import {
 } from '@mezon/store';
 
 import { useWebRTCStream } from '@mezon/components';
-import { Icons, Image } from '@mezon/ui';
-import {
-	IClan,
-	ModeResponsive,
-	Platform,
-	TIME_OF_SHOWING_FIRST_POPUP,
-	createImgproxyUrl,
-	getPlatform,
-	isLinuxDesktop,
-	isMacDesktop,
-	isWindowsDesktop
-} from '@mezon/utils';
+import { Icons } from '@mezon/ui';
+import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
 import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
@@ -264,6 +250,7 @@ function MyApp() {
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 	const openModalE2ee = useSelector(selectOpenModalE2ee);
+	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -323,7 +310,7 @@ function MyApp() {
 				)}
 
 			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{openModalE2ee && <MultiStepModalE2ee onClose={handleClose} />}
+			{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
 			{openModalAttachment && (
 				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 					<MessageModalImage />
@@ -357,26 +344,11 @@ const SidebarMenu = memo(
 		});
 		const listUnreadDM = useSelector(selectDirectsUnreadlist);
 		const isClanView = useSelector(selectClanView);
-		const appearanceTheme = useSelector(selectTheme);
-		const { quantityPendingRequest } = useFriends();
-		const currentDmId = useSelector(selectDmGroupCurrentId);
-		const currentDmIType = useSelector(selectDmGroupCurrentType);
 		const currentClanId = useSelector(selectCurrentClanId);
 		const closeMenu = useSelector(selectCloseMenu);
 		const statusMenu = useSelector(selectStatusMenu);
-		const logoCustom = useSelector(selectLogoCustom);
 
-		const setModeResponsive = useCallback(
-			(value: ModeResponsive) => {
-				dispatch(channelsActions.setModeResponsive({ clanId: currentClanId as string, mode: value }));
-			},
-			[dispatch]
-		);
 		const { setCloseMenu, setStatusMenu } = useMenu();
-
-		const handleClickToJoinClan = () => {
-			dispatch(clansActions.joinClan({ clanId: '0' }));
-		};
 
 		useEffect(() => {
 			const handleSizeWidth = () => {
@@ -436,36 +408,7 @@ const SidebarMenu = memo(
 				>
 					<div className="flex flex-col gap-3 ">
 						<SidebarTooltip titleTooltip="Direct Message">
-							<NavLink
-								to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-								onClick={() => {
-									setModeResponsive(ModeResponsive.MODE_DM);
-								}}
-								draggable="false"
-							>
-								<NavLinkComponent active={!isClanView}>
-									<div>
-										<Image
-											src={
-												logoCustom
-													? createImgproxyUrl(logoCustom, { width: 44, height: 44, resizeType: 'fit' })
-													: `assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`
-											}
-											alt={'logoMezon'}
-											width={48}
-											height={48}
-											className="clan w-full aspect-square object-cover"
-											onClick={handleClickToJoinClan}
-											draggable="false"
-										/>
-										{quantityPendingRequest !== 0 && (
-											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
-												{quantityPendingRequest}
-											</div>
-										)}
-									</div>
-								</NavLinkComponent>
-							</NavLink>
+							<SidebarLogoItem />
 						</SidebarTooltip>
 						{!!listUnreadDM?.length &&
 							listUnreadDM.map((dmGroupChatUnread) => (

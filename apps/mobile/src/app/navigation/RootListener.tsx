@@ -83,7 +83,7 @@ const RootListener = () => {
 				})
 			);
 		}
-	}, [currentChannelId, currentClanId]);
+	}, [currentChannelId, currentClanId, dispatch]);
 
 	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
@@ -176,7 +176,7 @@ const RootListener = () => {
 		} catch (error) {
 			console.log('error authLoader', error);
 		}
-	}, []);
+	}, [dispatch]);
 
 	const mainLoader = useCallback(async () => {
 		try {
@@ -194,7 +194,7 @@ const RootListener = () => {
 			console.log('error mainLoader', error);
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
-	}, []);
+	}, [dispatch]);
 
 	const mainLoaderTimeout = useCallback(
 		async ({ isFromFCM = false }) => {
@@ -230,7 +230,7 @@ const RootListener = () => {
 				dispatch(appActions.setLoadingMainMobile(false));
 			}
 		},
-		[currentChannelId, currentClanId]
+		[currentChannelId, currentClanId, dispatch]
 	);
 
 	return <View />;

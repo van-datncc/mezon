@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, RootState, selectAllChannelsFavorite } from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllChannelsFavorite } from '@mezon/store-mobile';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
@@ -10,9 +10,7 @@ import { style } from './styles';
 
 export const ChannelListFavorite = React.memo(({ onPress }: { onPress?: (channel: ChannelsEntity) => void }) => {
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
-	const isLoading = useSelector((state: RootState) => {
-		return state.channels?.loadingStatus;
-	});
+
 	const { themeValue } = useTheme();
 	const [isCollapse, setIsCollapse] = useState<boolean>(false);
 	const styles = style(themeValue);
@@ -22,7 +20,7 @@ export const ChannelListFavorite = React.memo(({ onPress }: { onPress?: (channel
 	};
 	return (
 		<Block>
-			{!!channelFavorites?.length && isLoading !== 'loading' ? (
+			{channelFavorites?.length ? (
 				<Block width={'100%'} paddingHorizontal={size.s_8} paddingVertical={size.s_10}>
 					<TouchableOpacity onPress={handleCollapse} style={styles.categoryItem}>
 						<Icons.ChevronSmallDownIcon
@@ -35,7 +33,9 @@ export const ChannelListFavorite = React.memo(({ onPress }: { onPress?: (channel
 					</TouchableOpacity>
 					<Block display={isCollapse ? 'none' : 'flex'}>
 						{channelFavorites?.length
-							? channelFavorites?.map((channelId: string) => <ChannelFavoriteItem onPress={onPress} channelId={channelId} />)
+							? channelFavorites?.map((channelId: string, index: number) => (
+									<ChannelFavoriteItem onPress={onPress} channelId={channelId} key={`${index}_${channelId}_ChannelItemFavorite`} />
+								))
 							: null}
 					</Block>
 				</Block>

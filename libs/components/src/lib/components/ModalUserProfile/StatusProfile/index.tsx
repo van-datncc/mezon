@@ -1,5 +1,5 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
-import { ChannelMembersEntity, giveCoffeeActions, selectUpdateToken, selectUserStatus, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { ChannelMembersEntity, giveCoffeeActions, selectUserStatus, useAppDispatch, userClanProfileActions, userStatusActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -23,7 +23,6 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
-	const getTokenSocket = useSelector(selectUpdateToken(user?.id ?? ''));
 	const userStatus = useSelector(selectUserStatus);
 	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
@@ -64,6 +63,15 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				return <Icons.OnlineStatus />;
 		}
 	};
+	const updateUserStatus = (status: string, minutes: number, untilTurnOn: boolean) => {
+		dispatch(
+			userStatusActions.updateUserStatus({
+				status: status,
+				minutes: minutes,
+				until_turn_on: untilTurnOn
+			})
+		);
+	};
 	return (
 		<>
 			<div>
@@ -74,7 +82,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					renderTrigger={() => (
 						<div>
 							<ItemStatus
-								children={`Token: ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}
+								children={`Token: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
 								dropdown
 								startIcon={<Icons.Check />}
 							/>
@@ -107,7 +115,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					placement="right-start"
 					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
 				>
-					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} />
+					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} onClick={() => updateUserStatus('Online', 0, true)} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
 					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />

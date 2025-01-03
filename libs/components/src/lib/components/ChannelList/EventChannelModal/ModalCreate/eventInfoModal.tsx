@@ -3,12 +3,12 @@ import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
 import { ContenSubmitEventProps, ERepeatType, fileTypeImage } from '@mezon/utils';
-import { format } from 'date-fns';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
+import { checkError } from '../eventHelper';
 import { compareDate, compareTime } from '../timeFomatEvent';
 
 export type EventInfoModalProps = {
@@ -45,8 +45,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 		const offset = (dayOfWeek - firstDayOfMonth + 7) % 7;
 		const occurrence = Math.floor((dayOfMonth - 1 - offset) / 7) + 1;
+
 		return occurrence;
 	};
+
 	const occurrence = ['First', 'Second', 'Third', 'Fourth'];
 	const weekdayOccurrence = occurrence[getWeekdayOccurrence(contentSubmit.selectedDateStart) - 1];
 
@@ -57,7 +59,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			{ value: ERepeatType.EVERY_OTHER_DAY, label: `Every other ${startDayOfWeek}` },
 			{
 				value: ERepeatType.MONTHLY,
-				label: `Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`
+				label: `Monthly on the ${weekdayOccurrence || occurrence[0]} ${startDayOfWeek}`
 			},
 			{ value: ERepeatType.ANNUALLY, label: `Annually on ${startDate} ${startMonth}` }
 		];
@@ -76,14 +78,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	useEffect(() => {
 		setSelectedFrequency(contentSubmit.repeatType ?? 0);
 	}, []);
-	const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const value = Number(e.target.value);
-		setSelectedFrequency(value);
-		setContentSubmit((prevContentSubmit) => ({
-			...prevContentSubmit,
-			repeatType: value
-		}));
-	};
 
 	const handleDateChangeStart = (date: Date) => {
 		setContentSubmit((prev) => ({ ...prev, selectedDateStart: date }));
@@ -99,25 +93,56 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		setCountCharacterDescription(1000 - e.target.value.length);
 	};
 
-	const handleChangeTimeStart = (e: any) => {
-		const time = e.target.value;
-		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
-		const formatDate = format(contentSubmit.selectedDateStart, 'yyyyMMdd');
-		const today = format(Date.now(), 'yyyyMMdd');
-		const currentTime = format(new Date(), 'HH:mm');
-		if (Number(formatDate) === Number(today)) {
-			setErrorStart(!compareTime(currentTime, time, true));
-		}
-	};
+	const handleFrequencyChange = useCallback(
+		(e: React.ChangeEvent<HTMLSelectElement>) => {
+			const value = Number(e.target.value);
+			setSelectedFrequency(value);
+			setContentSubmit((prevContentSubmit) => {
+				const updatedContent = { ...prevContentSubmit, repeatType: value };
+				checkError(updatedContent.timeStart, updatedContent.timeEnd, value, updatedContent.selectedDateStart, setErrorStart, setErrorEnd);
+				return updatedContent;
+			});
+		},
+		[setSelectedFrequency, setContentSubmit, setErrorStart, setErrorEnd]
+	);
 
-	const handleChangeTimeEnd = (e: any) => {
-		setContentSubmit((prev) => ({ ...prev, timeEnd: e.target.value }));
-		if ((checkDaySame && compareTime(contentSubmit.timeStart, e.target.value)) || !checkDaySame) {
-			setErrorEnd(false);
-		} else {
-			setErrorEnd(true);
-		}
-	};
+	const handleChangeTimeStart = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const time = e.target.value;
+			setContentSubmit((prev) => {
+				const updatedContent = { ...prev, timeStart: time };
+				checkError(
+					time,
+					updatedContent.timeEnd,
+					updatedContent.repeatType as ERepeatType,
+					updatedContent.selectedDateStart,
+					setErrorStart,
+					setErrorEnd
+				);
+				return updatedContent;
+			});
+		},
+		[setContentSubmit, setErrorStart, setErrorEnd]
+	);
+
+	const handleChangeTimeEnd = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const time = e.target.value;
+			setContentSubmit((prev) => {
+				const updatedContent = { ...prev, timeEnd: time };
+				checkError(
+					updatedContent.timeStart,
+					time,
+					updatedContent.repeatType as ERepeatType,
+					updatedContent.selectedDateStart,
+					setErrorStart,
+					setErrorEnd
+				);
+				return updatedContent;
+			});
+		},
+		[setContentSubmit, setErrorStart, setErrorEnd]
+	);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const [openModal, setOpenModal] = useState(false);
