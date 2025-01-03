@@ -7,6 +7,7 @@ import {
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
+	resetCachedMessageActionNeedToResolve,
 	save
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
@@ -188,6 +189,7 @@ export const ChatBoxBottomBar = memo(
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
+			resetCachedMessageActionNeedToResolve(channelId);
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
@@ -195,7 +197,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
-		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
+		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -212,6 +214,9 @@ export const ChatBoxBottomBar = memo(
 		const handleTextInputChange = async (text: string) => {
 			setTextChange(text);
 			setText(text);
+			if (messageAction !== EMessageActionType.CreateThread) {
+				saveMessageToCache(text);
+			}
 			if (!text) return;
 
 			if (text?.length > MIN_THRESHOLD_CHARS) {
@@ -276,10 +281,6 @@ export const ChatBoxBottomBar = memo(
 			setMentionTextValue(text);
 			setText(convertedHashtag);
 			setIsShowAttachControl(false);
-
-			if (messageAction !== EMessageActionType.CreateThread) {
-				saveMessageToCache(text);
-			}
 		};
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {

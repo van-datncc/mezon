@@ -17,7 +17,7 @@ import StreamingRoom from '../StreamingRoom';
 const StreamingPopup = () => {
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
-	const isFullScreen = useRef(false);
+	const isFullScreen = useRef(true);
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const streamPlay = useSelector(selectStatusStream);
 	const currentClan = useSelector(selectCurrentClan);

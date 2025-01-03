@@ -266,7 +266,7 @@ document.addEventListener('keydown', (e) => {
 		switch (e.key) {
 			case 'Escape':
 				selectedImage.src = null;
-    	  window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
+    	  window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
 				break;
 		}
 	});
