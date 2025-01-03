@@ -6,6 +6,7 @@ import {
 	channelsActions,
 	getIsFowardAll,
 	getSelectedMessage,
+	getStore,
 	selectAllChannelMembers,
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
@@ -13,8 +14,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
-	selectMessageEntitiesByChannelId,
-	selectMessageIdsByChannelId,
 	selectModeResponsive,
 	selectTheme,
 	toggleIsShowPopupForwardFalse,
@@ -66,16 +65,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const modeResponsive = useSelector(selectModeResponsive);
 	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
-	const allMessageIds = useAppSelector((state) =>
-		selectMessageIdsByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
-	);
-	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
-	);
-	const startIndex = useMemo(() => {
-		return allMessageIds.findIndex((id) => id === selectedMessage.id);
-	}, [allMessagesEntities, selectedMessage]);
-
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<ObjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -103,6 +92,16 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	};
 
 	const handleForwardAllMessage = async () => {
+		const store = getStore();
+		const state = store.getState();
+		const channelMessageEntity =
+			state.messages.channelMessages?.[(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''];
+		if (!channelMessageEntity) return;
+
+		const allMessageIds = channelMessageEntity.ids;
+		const allMessagesEntities = channelMessageEntity.entities;
+		const startIndex = allMessageIds.findIndex((id) => id === selectedMessage.id);
+
 		const combineMessages: MessagesEntity[] = [];
 		combineMessages.push(selectedMessage);
 
@@ -121,15 +120,21 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, { ...message, references: [] });
+					await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, {
+						...message,
+						references: []
+					});
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, { ...message, references: [] });
+					await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, {
+						...message,
+						references: []
+					});
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				for (const message of combineMessages) {
-					sendForwardMessage(
+					await sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -139,7 +144,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
 				for (const message of combineMessages) {
-					sendForwardMessage(
+					await sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_THREAD,
@@ -156,11 +161,17 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, { ...selectedMessage, references: [] });
+				await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, {
+					...selectedMessage,
+					references: []
+				});
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, { ...selectedMessage, references: [] });
+				await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, {
+					...selectedMessage,
+					references: []
+				});
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				sendForwardMessage(
+				await sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -168,7 +179,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					{ ...selectedMessage, references: [] }
 				);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
-				sendForwardMessage(
+				await sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_THREAD,
