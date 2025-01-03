@@ -1,4 +1,4 @@
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, resetCachedMessageActionNeedToResolve } from '@mezon/mobile-components';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ export const ActionMessageSelected = memo(({ messageActionNeedToResolve, onClose
 		switch (type) {
 			case EMessageActionType.EditMessage:
 				onClose();
+				resetCachedMessageActionNeedToResolve(messageActionNeedToResolve?.targetMessage?.channel_id);
 				DeviceEventEmitter.emit(ActionEmitEvent.CLEAR_TEXT_INPUT);
 				break;
 			case EMessageActionType.Reply:

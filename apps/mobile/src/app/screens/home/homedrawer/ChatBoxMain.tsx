@@ -1,4 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, load, resetCachedMessageActionNeedToResolve, save, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -39,12 +39,31 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
 			//NOTE: trigger from message action 'MessageItemBS and MessageItem component'
 			setMessageActionNeedToResolve(value);
+			if (value?.type === EMessageActionType.EditMessage) {
+				saveMessageActionNeedToResolve(value);
+			} else {
+				resetCachedMessageActionNeedToResolve(value?.targetMessage?.channel_id);
+			}
 		});
 		return () => {
 			showKeyboard.remove();
 		};
 	}, []);
 
+	useEffect(() => {
+		if (props?.channelId) {
+			const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+			setMessageActionNeedToResolve(allCachedMessage[props?.channelId] || null);
+		}
+	}, [props?.channelId]);
+
+	const saveMessageActionNeedToResolve = (messageAction: IMessageActionNeedToResolve | null) => {
+		const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+		save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, {
+			...allCachedMessage,
+			[messageAction?.targetMessage?.channel_id]: messageAction
+		});
+	};
 	const deleteMessageActionNeedToResolve = useCallback(() => {
 		setMessageActionNeedToResolve(null);
 	}, []);
