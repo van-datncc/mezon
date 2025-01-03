@@ -2,12 +2,12 @@
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
-	STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE,
 	convertMentionsToText,
 	formatContentEditMessage,
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
+	resetCachedMessageActionNeedToResolve,
 	save
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
@@ -170,12 +170,6 @@ export const ChatBoxBottomBar = memo(
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
 		}, [channelId]);
 
-		const resetCachedMessageActionNeedToResolve = useCallback(async () => {
-			const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
-			if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
-			save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
-		}, [channelId]);
-
 		useEffect(() => {
 			if (channelId) {
 				setMessageFromCache();
@@ -195,7 +189,7 @@ export const ChatBoxBottomBar = memo(
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
-			resetCachedMessageActionNeedToResolve();
+			resetCachedMessageActionNeedToResolve(channelId);
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
@@ -203,7 +197,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
-		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
+		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
