@@ -1,7 +1,12 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
+import {
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE
+} from '../../constant';
 import { load, remove, save } from '../storage';
 
 type ClanChannelPair = {
@@ -123,4 +128,10 @@ export const changeClan = async (clanId: string) => {
 	if (channelResp) {
 		await setDefaultChannelLoader(channelResp.payload, clanId);
 	}
+};
+
+export const resetCachedMessageActionNeedToResolve = (channelId: string) => {
+	const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
+	save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
 };
