@@ -284,7 +284,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		}
 		dispatch(
 			referencesActions.setDataReferences({
-				channelId: message.topic_id ? message.topic_id : message.channel_id,
+				channelId: message.topic_id && message.topic_id !== '0' ? message.topic_id : message.channel_id,
 				dataReferences: {
 					message_ref_id: message.id,
 					ref_type: 0,
@@ -295,7 +295,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 					message_sender_clan_nick: message.clan_nick,
 					message_sender_display_name: message.display_name,
 					has_attachment: (message.attachments && message.attachments?.length > 0) ?? false,
-					channel_id: message.channel_id ?? '',
+					channel_id: message.topic_id && message.topic_id !== '0' ? message.topic_id : message.channel_id,
 					mode: message.mode ?? 0,
 					channel_label: message.channel_label
 				}
