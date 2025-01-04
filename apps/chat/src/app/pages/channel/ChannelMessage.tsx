@@ -107,7 +107,9 @@ export const ChannelMessage: ChannelMessageComponent = ({
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 			{!message.isFirst && (
-				<div className={`fullBoxText relative group ${!isCombine || mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}>
+				<div
+					className={`fullBoxText relative group ${!isCombine || (mess.code !== TypeMessage.CreatePin && mess.references?.[0]?.message_ref_id) ? 'pt-3' : ''}`}
+				>
 					<MessageWithUser
 						allowDisplayShortProfile={true}
 						message={mess}
