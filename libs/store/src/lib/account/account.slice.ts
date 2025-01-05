@@ -101,6 +101,14 @@ export const accountSlice = createSlice({
 					console.error('Error updating user status in metadata:', error);
 				}
 			}
+		},
+		setUpdateAccount(state, action: PayloadAction<IUserAccount>) {
+			state.userProfile = {
+				...state.userProfile,
+				user: { ...state.userProfile?.user, ...action.payload.user },
+				encrypt_private_key: action.payload.encrypt_private_key
+			};
+			state.logo = action.payload.logo;
 		}
 	},
 	extraReducers: (builder) => {

@@ -33,6 +33,7 @@ import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
+import { resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
@@ -188,6 +189,7 @@ export const ChatBoxBottomBar = memo(
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
+			resetCachedMessageActionNeedToResolve(channelId);
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
@@ -195,7 +197,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
-		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
+		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -212,6 +214,9 @@ export const ChatBoxBottomBar = memo(
 		const handleTextInputChange = async (text: string) => {
 			setTextChange(text);
 			setText(text);
+			if (messageAction !== EMessageActionType.CreateThread) {
+				saveMessageToCache(text);
+			}
 			if (!text) return;
 
 			if (text?.length > MIN_THRESHOLD_CHARS) {
@@ -276,10 +281,6 @@ export const ChatBoxBottomBar = memo(
 			setMentionTextValue(text);
 			setText(convertedHashtag);
 			setIsShowAttachControl(false);
-
-			if (messageAction !== EMessageActionType.CreateThread) {
-				saveMessageToCache(text);
-			}
 		};
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
