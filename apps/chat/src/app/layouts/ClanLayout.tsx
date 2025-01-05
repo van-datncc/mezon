@@ -25,7 +25,7 @@ import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
@@ -93,8 +93,8 @@ const ClanLayout = () => {
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
-
-	const currentURL = isElectron() ? window.location.hash : window.location.pathname;
+	const location = useLocation();
+	const currentURL = isElectron() ? location.hash : location.pathname;
 	const memberPath = `/chat/clans/${currentClan?.clan_id}/member-safety`;
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id as string));

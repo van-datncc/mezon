@@ -54,6 +54,31 @@ export const ThreadHeader = memo(() => {
 		}
 	};
 
+	const isAgeRestrictedChannel = useMemo(() => {
+		return currentChannel?.age_restricted === 1;
+	}, [currentChannel?.age_restricted]);
+
+	const renderChannelIcon = () => {
+		const isPrivateChannel = currentChannel?.channel_private === ChannelStatusEnum.isPrivate;
+		const isTextOrThreadChannel = [ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type);
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel) {
+			return <Icons.HashtagWarning width={20} height={20} color={themeValue.text} />;
+		}
+		if (isPrivateChannel && isTextOrThreadChannel) {
+			return isChannel ? (
+				<Icons.TextLockIcon width={20} height={20} color={themeValue.text} />
+			) : (
+				<Icons.ThreadLockIcon width={20} height={20} color={themeValue.text} />
+			);
+		}
+
+		return isChannel ? (
+			<Icons.TextIcon width={20} height={20} color={themeValue.text} />
+		) : (
+			<Icons.ThreadIcon width={20} height={20} color={themeValue.text} />
+		);
+	};
+
 	return (
 		<View style={styles.channelLabelWrapper}>
 			<TouchableOpacity style={styles.iconBackHeader} onPress={handlebackMessageDetail}>
@@ -81,18 +106,7 @@ export const ThreadHeader = memo(() => {
 				</View>
 			) : (
 				<View style={styles.channelText}>
-					{currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-					[ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type) ? (
-						isChannel ? (
-							<Icons.TextLockIcon width={20} height={20} color={themeValue.text} />
-						) : (
-							<Icons.ThreadLockIcon width={20} height={20} color={themeValue.text} />
-						)
-					) : isChannel ? (
-						<Icons.TextIcon width={20} height={20} color={themeValue.text} />
-					) : (
-						<Icons.ThreadIcon width={20} height={20} color={themeValue.text} />
-					)}
+					{renderChannelIcon()}
 					<Text numberOfLines={1} style={styles.channelLabel}>
 						{currentChannel?.channel_label || currentChannel?.usernames}
 					</Text>

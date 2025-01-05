@@ -3,6 +3,7 @@ import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable } from 'react-native';
+import { resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 
@@ -19,6 +20,7 @@ export const ActionMessageSelected = memo(({ messageActionNeedToResolve, onClose
 		switch (type) {
 			case EMessageActionType.EditMessage:
 				onClose();
+				resetCachedMessageActionNeedToResolve(messageActionNeedToResolve?.targetMessage?.channel_id);
 				DeviceEventEmitter.emit(ActionEmitEvent.CLEAR_TEXT_INPUT);
 				break;
 			case EMessageActionType.Reply:

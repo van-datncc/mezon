@@ -1087,7 +1087,8 @@ export enum TypeMessage {
 	CreateThread = 6,
 	CreatePin = 7,
 	MessageBuzz = 8,
-	Topic = 9
+	Topic = 9,
+	AuditLog = 10
 }
 
 export enum ServerSettingsMenuValue {

@@ -154,7 +154,7 @@ const MessageText = memo(
 			<>
 				{lines?.length > 0 ? (
 					<div className="flex w-full">
-						<div className="w-full flex gap-4">
+						<div className="w-full flex gap-4 max-2xl:flex-col max-2xl:gap-0">
 							{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
 								<MessageLineSystem
 									message={message}
@@ -181,6 +181,7 @@ const MessageText = memo(
 							)}
 							{(message.code === TypeMessage.Welcome ||
 								message.code === TypeMessage.CreateThread ||
+								message.code === TypeMessage.AuditLog ||
 								message.code === TypeMessage.CreatePin) && (
 								<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 							)}

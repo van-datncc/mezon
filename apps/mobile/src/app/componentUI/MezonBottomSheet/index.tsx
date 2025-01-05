@@ -17,6 +17,7 @@ export interface IMezonBottomSheetProps extends BottomSheetModalProps {
 	snapPoints?: string[];
 	footer?: ReactNode;
 	onBackdropPress?: () => void;
+	enablePanDownToClose?: boolean;
 }
 
 const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
