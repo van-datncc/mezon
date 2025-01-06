@@ -30,9 +30,9 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 	};
 
 	useEffect(() => {
-		setActiveType(isShowSettingFooter?.profileInitTab || EActiveType.USER_SETTING);
+		setActiveType(currentClanId === '0' && isShowSettingFooter.isUserProfile ? EActiveType.USER_SETTING : EActiveType.CLAN_SETTING);
 		setClanId(isShowSettingFooter.clanId !== '' ? isShowSettingFooter.clanId || '' : currentClanId || '');
-	}, [isShowSettingFooter?.profileInitTab, isShowSettingFooter.clanId]);
+	}, [isShowSettingFooter?.profileInitTab, isShowSettingFooter.clanId, currentClanId]);
 
 	return (
 		<div
@@ -48,7 +48,7 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 						User Profile
 					</button>
 
-					{!isDM ? (
+					{!isDM || !isShowSettingFooter.isUserProfile ? (
 						<button
 							onClick={handleClanProfileClick}
 							className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.CLAN_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}

@@ -128,8 +128,10 @@ const SettingRightUser = ({
 		urlImage: urlImage || ''
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setValueDisplayName(e.target.value);
-		setFlags(true);
+		if (!e.target.value.startsWith(' ')) {
+			setValueDisplayName(e.target.value);
+			setFlags(true);
+		}
 	};
 
 	const handleRemoveButtonClick = () => {
