@@ -820,11 +820,15 @@ export const channelsSlice = createSlice({
 
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
+			if (clanId && channelId) {
+				if (!state.byClans[clanId]) {
+					state.byClans[clanId] = getInitialClanState();
+				}
+				state.byClans[clanId].idChannelSelected[clanId] = channelId;
+				const rememberChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+				rememberChannel[clanId] = channelId;
+				localStorage.setItem('remember_channel', JSON.stringify(rememberChannel));
 			}
-			state.byClans[clanId].idChannelSelected[clanId] = channelId;
-			localStorage.setItem('remember_channel', JSON.stringify(state.byClans[clanId].idChannelSelected));
 		},
 
 		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
