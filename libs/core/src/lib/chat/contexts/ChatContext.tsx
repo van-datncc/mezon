@@ -51,7 +51,6 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
-	selectHasKeyE2ee,
 	selectModeResponsive,
 	selectPttMembersByChannelId,
 	selectStreamMembersByChannelId,
@@ -167,7 +166,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
-	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -287,7 +285,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
-			if (message.topic_id) {
+			if (message.topic_id && message.topic_id !== '0') {
 				const lastMsg: ApiChannelMessageHeader = {
 					content: message.content,
 					sender_id: message.sender_id,
@@ -864,7 +862,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchanneldeleted = useCallback(
 		(channelDeleted: ChannelDeletedEvent) => {
-			if (channelDeleted?.deletor === userId) return;
+			if (channelDeleted?.deletor === userId) {
+				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
+				return;
+			}
 			if (channelDeleted) {
 				if (channelDeleted.channel_id === currentChannelId) {
 					navigate(`/chat/clans/${clanId}`);
