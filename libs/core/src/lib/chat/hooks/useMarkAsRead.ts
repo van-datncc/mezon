@@ -32,6 +32,23 @@ export function useMarkAsRead() {
 		},
 		[dispatch]
 	);
+	const handleMarkAsReadDM = useCallback(
+		async (channelId: string) => {
+			const body: ApiMarkAsReadRequest = {
+				clan_id: '',
+				category_id: '',
+				channel_id: channelId
+			};
+
+			try {
+				await actionMarkAsRead(body);
+			} catch (error) {
+				console.error('Failed to mark as read:', error);
+				setStatusMarkAsReadChannel('error');
+			}
+		},
+		[actionMarkAsRead]
+	);
 
 	const handleMarkAsReadChannel = useCallback(
 		async (channel: ChannelsEntity) => {
@@ -137,7 +154,8 @@ export function useMarkAsRead() {
 			handleMarkAsReadCategory,
 			statusMarkAsReadCategory,
 			handleMarkAsReadClan,
-			statusMarkAsReadClan
+			statusMarkAsReadClan,
+			handleMarkAsReadDM
 		}),
 		[
 			handleMarkAsReadChannel,
@@ -145,7 +163,8 @@ export function useMarkAsRead() {
 			handleMarkAsReadCategory,
 			statusMarkAsReadCategory,
 			handleMarkAsReadClan,
-			statusMarkAsReadClan
+			statusMarkAsReadClan,
+			handleMarkAsReadDM
 		]
 	);
 }
