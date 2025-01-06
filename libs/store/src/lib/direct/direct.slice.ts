@@ -199,7 +199,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 						channelId: directMessageId,
 						noCache: true,
 						isFetchingLatestMessages,
-						isClearMessage
+						isClearMessage: true
 					})
 				);
 				const fetchChannelMembersResult = await thunkAPI.dispatch(
