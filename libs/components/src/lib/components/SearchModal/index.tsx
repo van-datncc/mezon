@@ -274,21 +274,20 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: SearchItemProps) => {
-			if (
-				channel.id &&
-				(channel.type === ChannelType.CHANNEL_TYPE_TEXT ||
-					channel.type === ChannelType.CHANNEL_TYPE_STREAMING ||
-					channel.type === ChannelType.CHANNEL_TYPE_THREAD)
-			) {
-				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
-				const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
+			if (!channel?.id) {
+				return;
+			}
 
-				dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
-				navigate(channelUrl);
-			} else {
+			if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
 				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 				window.open(urlVoice, '_blank', 'noreferrer');
+				return;
 			}
+
+			dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
+			const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
+			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
+			navigate(channelUrl);
 		},
 		[dispatch, navigate, toChannelPage]
 	);
