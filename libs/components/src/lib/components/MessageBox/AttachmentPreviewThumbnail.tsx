@@ -21,7 +21,7 @@ const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({
 
 	const filename = attachment.filename;
 	const displayedFilename = filename && filename.length > 25 ? filename.substring(0, 25) + '...' : filename;
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachment);
+	const thumbnailAttachment = RenderAttachmentThumbnail({ attachment: attachment });
 
 	const handleShowAttachment = () => {
 		setIsHideAttachment(!isHideAttachment);

@@ -49,7 +49,7 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 			a.click();
 		}
 	};
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
+	const thumbnailAttachment = RenderAttachmentThumbnail({ attachment: attachmentData, size: 'w-8 h-10' });
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&

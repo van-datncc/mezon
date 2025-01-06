@@ -11,7 +11,7 @@ import {
 	selectUserStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { createImgproxyUrl } from '@mezon/utils';
+import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
@@ -203,7 +203,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<Block flexDirection="row" alignItems="center" gap={size.s_10} marginTop={size.s_10}>
 						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
 						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
-							<Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
+							<Text
+								style={styles.text}
+							>{`${t('token')} ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}</Text>
 						</TouchableOpacity>
 					</Block>
 					{userCustomStatus ? (

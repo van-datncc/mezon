@@ -6,6 +6,7 @@ import {
 	channelsActions,
 	getIsFowardAll,
 	getSelectedMessage,
+	getStore,
 	selectAllChannelMembers,
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
@@ -13,7 +14,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
-	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectTheme,
 	toggleIsShowPopupForwardFalse,
@@ -22,6 +22,7 @@ import {
 } from '@mezon/store';
 import {
 	ChannelThreads,
+	FOR_1_HOUR,
 	ModeResponsive,
 	TypeSearch,
 	UsersClanEntity,
@@ -64,15 +65,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const modeResponsive = useSelector(selectModeResponsive);
 	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
-	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
-	);
-	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
-	const allMessagesBySenderId = convertedAllMessagesEntities.filter((message) => message.sender_id === selectedMessage?.user?.id);
-	const startIndex = useMemo(() => {
-		return allMessagesBySenderId.findIndex((message) => message.id === selectedMessage.id);
-	}, [allMessagesEntities, selectedMessage]);
-
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<ObjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -100,46 +92,64 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	};
 
 	const handleForwardAllMessage = async () => {
+		const store = getStore();
+		const state = store.getState();
+		const channelMessageEntity =
+			state.messages.channelMessages?.[(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''];
+		if (!channelMessageEntity) return;
+
+		const allMessageIds = channelMessageEntity.ids;
+		const allMessagesEntities = channelMessageEntity.entities;
+		const startIndex = allMessageIds.findIndex((id) => id === selectedMessage.id);
+
 		const combineMessages: MessagesEntity[] = [];
 		combineMessages.push(selectedMessage);
 
 		let index = startIndex + 1;
 		while (
-			index < allMessagesBySenderId.length &&
-			!allMessagesBySenderId[index].isStartedMessageGroup &&
-			allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id
+			index < allMessageIds.length &&
+			Date.parse(allMessagesEntities?.[allMessageIds[index]]?.create_time) -
+				Date.parse(allMessagesEntities?.[allMessageIds[index]]?.create_time) <
+				FOR_1_HOUR &&
+			allMessagesEntities?.[allMessageIds[index]]?.sender_id === selectedMessage?.user?.id
 		) {
-			combineMessages.push(allMessagesBySenderId[index]);
+			combineMessages.push(allMessagesEntities?.[allMessageIds[index]]);
 			index++;
 		}
 
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, message);
+					await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, {
+						...message,
+						references: []
+					});
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
+					await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, {
+						...message,
+						references: []
+					});
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				for (const message of combineMessages) {
-					sendForwardMessage(
+					await sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
 						currentChannel ? !currentChannel.channel_private : false,
-						message
+						{ ...message, references: [] }
 					);
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
 				for (const message of combineMessages) {
-					sendForwardMessage(
+					await sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_THREAD,
 						currentChannel ? !currentChannel.channel_private : false,
-						message
+						{ ...message, references: [] }
 					);
 				}
 			}
@@ -151,24 +161,30 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, selectedMessage);
+				await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, {
+					...selectedMessage,
+					references: []
+				});
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, selectedMessage);
+				await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, {
+					...selectedMessage,
+					references: []
+				});
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				sendForwardMessage(
+				await sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
 					selectedObjectIdSend.isPublic,
-					selectedMessage
+					{ ...selectedMessage, references: [] }
 				);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
-				sendForwardMessage(
+				await sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_THREAD,
 					selectedObjectIdSend.isPublic,
-					selectedMessage
+					{ ...selectedMessage, references: [] }
 				);
 			}
 		}

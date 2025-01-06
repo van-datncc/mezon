@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useAppParams, useAuth, useChatReaction, usePermissionChecker, useReference } from '@mezon/core';
 import {
-	MessagesEntity,
 	createEditCanvas,
 	directActions,
 	gifsStickerEmojiActions,
@@ -22,6 +21,7 @@ import {
 	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
+	selectMessageIdsByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
 	selectTheme,
@@ -40,6 +40,7 @@ import {
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	EPermission,
+	FOR_1_HOUR,
 	IMessageWithUser,
 	MenuBuilder,
 	ModeResponsive,
@@ -106,6 +107,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
+	const allMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, (isClanView ? currentChannel?.id : currentDmId) as string));
 	const dispatch = useAppDispatch();
 
 	const handleItemClick = useCallback(() => {
@@ -113,8 +115,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT));
 	}, [dispatch]);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
-	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
-	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
+	const messagePosition = allMessageIds.findIndex((id: string) => id === messageId);
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
@@ -145,7 +146,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	}, [message?.content.t]);
 
 	const checkMessageInPinnedList = useMemo(() => {
-		return listPinMessages?.some((pinMessage) => pinMessage?.message_id === messageId);
+		return listPinMessages?.some((pinMessage) => pinMessage?.id === messageId);
 	}, [listPinMessages, messageId]);
 
 	const [canManageThread, canDeleteMessage, canSendMessage] = usePermissionChecker(
@@ -255,13 +256,27 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = useMemo(() => {
-		if (messagePosition === -1) return false;
-		return (
-			message?.isStartedMessageGroup &&
-			messagePosition < convertedAllMessagesEntities?.length - 1 &&
-			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
-		);
-	}, [convertedAllMessagesEntities, message?.isStartedMessageGroup, messagePosition]);
+		if (messagePosition === -1 || messagePosition === 0) return false;
+
+		const currentMessage = allMessagesEntities?.[allMessageIds?.[messagePosition]];
+		const nextMessage = allMessagesEntities?.[allMessageIds?.[messagePosition + 1]];
+		const previousMessage = allMessagesEntities?.[allMessageIds?.[messagePosition - 1]];
+
+		const isSameSenderWithNextMessage = currentMessage?.sender_id === nextMessage?.sender_id;
+		const isSameSenderWithPreviousMessage = currentMessage?.sender_id === previousMessage?.sender_id;
+
+		const isNextMessageWithinTimeLimit = nextMessage
+			? Date.parse(nextMessage?.create_time) - Date.parse(currentMessage?.create_time) < FOR_1_HOUR
+			: false;
+
+		const isPreviousMessageWithinTimeLimit = previousMessage
+			? Date.parse(currentMessage?.create_time) - Date.parse(previousMessage?.create_time) < FOR_1_HOUR
+			: false;
+
+		return isSameSenderWithPreviousMessage
+			? isSameSenderWithNextMessage && isNextMessageWithinTimeLimit && !isPreviousMessageWithinTimeLimit
+			: isSameSenderWithNextMessage && isNextMessageWithinTimeLimit;
+	}, [allMessageIds, allMessagesEntities, messagePosition]);
 
 	const handleReplyMessage = useCallback(() => {
 		if (!message) {
@@ -327,7 +342,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode, isTopic 
 	}, [dispatch, dmGroupChatList?.length, message]);
 
 	const handlePinMessage = async () => {
-		dispatch(pinMessageActions.setChannelPinMessage({ clan_id: currentClanId ?? '', channel_id: message?.channel_id, message_id: message?.id }));
+		dispatch(
+			pinMessageActions.setChannelPinMessage({
+				clan_id: currentClanId ?? '',
+				channel_id: message?.channel_id,
+				message_id: message?.id,
+				message: message
+			})
+		);
 		dispatch(
 			pinMessageActions.joinPinMessage({
 				clanId:
