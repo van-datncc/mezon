@@ -48,7 +48,13 @@ import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
 import { selectListThreadId, threadsActions } from '../threads/threads.slice';
 import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
-import { fetchListChannelsByUser, LIST_CHANNELS_USER_FEATURE_KEY, ListChannelsByUserState, selectEntitiesChannelsByUser } from './channelUser.slice';
+import {
+	fetchListChannelsByUser,
+	LIST_CHANNELS_USER_FEATURE_KEY,
+	listChannelsByUserActions,
+	ListChannelsByUserState,
+	selectEntitiesChannelsByUser
+} from './channelUser.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 60;
 
@@ -300,6 +306,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 				return true;
 			}
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
+			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
