@@ -41,7 +41,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Pending',
-						icon: <Icons.IconFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.PendingFriend className="iconWhiteImportant size-4" />
 					}
 				];
 			case EStateFriend.MY_PENDING:
