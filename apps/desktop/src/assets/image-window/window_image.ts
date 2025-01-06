@@ -235,7 +235,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
       let currentIndex = ${activeIndex}
       document.getElementById('close-window').addEventListener('click', () => {
 		selectedImage.src = null;
-    	window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_APP');
+    	window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
 	});
 
 	document.getElementById('minimize-window').addEventListener('click', () => {
