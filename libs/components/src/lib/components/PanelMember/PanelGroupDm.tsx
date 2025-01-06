@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams } from '@mezon/core';
+import { useAppNavigation, useAppParams, useMarkAsRead } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
@@ -64,10 +64,12 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const handleCancelLeave = () => {
 		setPopupLeave(false);
 	};
+	const { handleMarkAsReadDM } = useMarkAsRead();
 	const handleMarkAsRead = useCallback(
 		(directId: string) => {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+			handleMarkAsReadDM(directId);
 		},
 		[dispatch]
 	);
