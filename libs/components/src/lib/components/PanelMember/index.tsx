@@ -6,6 +6,7 @@ import {
 	useDirect,
 	useEscapeKeyClose,
 	useFriends,
+	useMarkAsRead,
 	useMessageValue,
 	useOnClickOutside,
 	usePermissionChecker,
@@ -182,11 +183,12 @@ const PanelMember = ({
 
 	useEscapeKeyClose(panelRef, onClose);
 	useOnClickOutside(panelRef, onClose);
-
+	const { handleMarkAsReadDM } = useMarkAsRead();
 	const handleMarkAsRead = useCallback(
 		(directId: string) => {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+			handleMarkAsReadDM(directId);
 		},
 		[dispatch]
 	);
