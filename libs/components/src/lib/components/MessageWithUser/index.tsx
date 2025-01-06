@@ -8,15 +8,13 @@ import {
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_CLAN_SIDE_BAR,
 	convertDateString,
-	convertTimeHour,
-	createImgproxyUrl
+	convertTimeHour
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { AvatarImage } from '../AvatarImage/AvatarImage';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { HtmlCanvasView } from '../HtmlCanvas';
@@ -251,21 +249,7 @@ function MessageWithUser({
 											{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8" />}
 											{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6" />}
 											{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" />}
-											{message?.code === TypeMessage.AuditLog && (
-												<AvatarImage
-													alt={message.username ?? ''}
-													userName={message.username}
-													data-popover-target="popover-content"
-													srcImgProxy={createImgproxyUrl('https://cdn.mezon.vn/images/system_icon.png', {
-														width: 100,
-														height: 100,
-														resizeType: 'fit'
-													})}
-													src={'https://cdn.mezon.vn/images/system_icon.png'}
-													className="w-6 h-6"
-													classNameText="font-semibold"
-												/>
-											)}
+											{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8" />}
 										</div>
 									) : (
 										<div>
