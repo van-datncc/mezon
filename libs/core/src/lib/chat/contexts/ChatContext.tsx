@@ -1046,8 +1046,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					return;
 				}
 
-				if (onlyUpdateStatus || onlyHidingEvent) {
+				if (onlyUpdateStatus) {
 					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
+					return;
+				}
+
+				if (onlyHidingEvent) {
+					// hide schedule event icon
+					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
+					dispatch(eventManagementActions.updateNewStartTime(eventCreatedEvent));
 					return;
 				}
 
