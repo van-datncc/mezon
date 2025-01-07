@@ -22,6 +22,7 @@ import {
 	clansSlice,
 	defaultNotificationCategoryActions,
 	directActions,
+	directMembersMetaActions,
 	directMetaActions,
 	directSlice,
 	e2eeActions,
@@ -121,6 +122,7 @@ import {
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
 	UserProfileUpdatedEvent,
+	UserStatusEvent,
 	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
@@ -1240,6 +1242,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		}
 	}, []);
 
+	const onuserstatusevent = useCallback(
+		async (userStatusEvent: UserStatusEvent) => {
+			if (userStatusEvent.user_id !== userId) {
+				dispatch(clanMembersMetaActions.updateUserStatus({ userId: userStatusEvent.user_id, user_status: userStatusEvent.custom_status }));
+				dispatch(directMembersMetaActions.updateUserStatus({ userId: userStatusEvent.user_id, user_status: userStatusEvent.custom_status }));
+			}
+		},
+		[userId, dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1322,6 +1334,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onroleevent = onroleevent;
 
+			socket.onuserstatusevent = onuserstatusevent;
+
 			socket.ontokensent = ontokensent;
 
 			socket.onmessagebuttonclicked = onmessagebuttonclicked;
@@ -1369,6 +1383,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent,
+			onuserstatusevent,
 			ontokensent,
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
@@ -1466,6 +1481,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onroleevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserstatusevent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
 		};
 	}, [
@@ -1508,6 +1525,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		setCallbackEventFn,
 		oncoffeegiven,
 		onroleevent,
+		onuserstatusevent,
 		ontokensent,
 		onPTTchannelJoined,
 		onPTTchannelLeaved
