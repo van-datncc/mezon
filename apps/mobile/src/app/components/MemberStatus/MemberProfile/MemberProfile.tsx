@@ -5,6 +5,7 @@ import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { MezonAvatar } from '../../../componentUI';
+import { getUserStatusByMetadata } from '../../../utils/helpers';
 import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
 import { style } from './style';
 interface IProps {
@@ -52,10 +53,13 @@ export function MemberProfile({
 			? userColorRolesClan
 			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
 	}, [userColorRolesClan, currentChannel?.type]);
+
+	const status = getUserStatusByMetadata(user?.user?.metadata);
+
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
-			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={userStatus} />
+			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={userStatus} customStatus={status} />
 
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
