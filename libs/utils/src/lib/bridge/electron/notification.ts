@@ -99,11 +99,12 @@ export class MezonNotificationService {
 
 		ws.onmessage = async (data: MessageEvent<string>) => {
 			try {
-				if (data.data === 'ping') {
+				const objMsg = safeJSONParse(data.data);
+				if (objMsg === 'ping') {
 					this.handlePong();
 					this.startPingMonitoring(token);
 				} else {
-					const msg = safeJSONParse(data.data) as NotificationData;
+					const msg = objMsg as NotificationData;
 					const { title, message, image } = msg ?? {};
 
 					const { link, e2eemess } = msg?.extras ?? {};

@@ -67,7 +67,7 @@ const ClanEffects: React.FC<{
 		if (!canvasId) {
 			dispatch(appActions.setIsShowCanvas(false));
 		}
-	}, [currentStreamInfo, currentClan, currentChannel]);
+	}, [currentStreamInfo, currentClan, currentChannel, canvasId, dispatch]);
 
 	useEffect(() => {
 		if (isShowCreateThread || isShowCreateTopic) {

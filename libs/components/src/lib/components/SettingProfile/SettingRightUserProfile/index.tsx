@@ -58,7 +58,7 @@ const SettingRightUser = ({
 
 	const handleUpdateUser = async () => {
 		if (name || urlImage || valueDisplayName || editAboutUser || dob) {
-			await updateUser(name, urlImage, valueDisplayName, editAboutUser, dob, logo);
+			await updateUser(name, urlImage, valueDisplayName.trim(), editAboutUser, dob, logo);
 			if (currentChannelId && currentClanId) {
 				await dispatch(
 					channelMembersActions.fetchChannelMembers({
@@ -128,8 +128,10 @@ const SettingRightUser = ({
 		urlImage: urlImage || ''
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setValueDisplayName(e.target.value);
-		setFlags(true);
+		if (!e.target.value.startsWith(' ')) {
+			setValueDisplayName(e.target.value);
+			setFlags(true);
+		}
 	};
 
 	const handleRemoveButtonClick = () => {

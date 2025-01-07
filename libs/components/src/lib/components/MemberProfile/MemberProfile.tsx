@@ -5,6 +5,7 @@ import {
 	RolesClanEntity,
 	selectActivityByUserId,
 	selectAllAccount,
+	selectCurrentChannelId,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectRolesClanEntities,
@@ -114,7 +115,7 @@ export function MemberProfile({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const userRolesClan = useMemo(() => {
 		const activeRole: Array<RolesClanEntity> = [];
 		let userRoleLength = 0;
@@ -212,7 +213,7 @@ export function MemberProfile({
 	const handleRemoveMember = async () => {
 		if (user) {
 			const userIds = [user.user?.id ?? ''];
-			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
+			await removeMemberClan({ clanId: currentClanId as string, channelId: currentChannelId as string, userIds });
 
 			setOpenModalRemoveMember(false);
 		}

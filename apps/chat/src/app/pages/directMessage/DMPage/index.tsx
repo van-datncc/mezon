@@ -278,7 +278,7 @@ const DirectMessage = () => {
 							</div>
 						)}
 
-						<div className="flex-shrink-0 flex flex-col z-0 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 							{directId && (
 								<ChannelTyping
 									channelId={directId}

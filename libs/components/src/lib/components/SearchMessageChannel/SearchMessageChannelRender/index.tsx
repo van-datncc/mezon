@@ -149,7 +149,7 @@ const SearchedItem = ({ searchMessage, searchChannel }: ISearchedItemProps) => {
 		dispatch(
 			messagesActions.jumpToMessage({
 				clanId: searchMessage?.clan_id || '',
-				messageId: searchMessage.id,
+				messageId: searchMessage?.message_id || searchMessage.id,
 				channelId: searchMessage?.channel_id as string,
 				navigate
 			})

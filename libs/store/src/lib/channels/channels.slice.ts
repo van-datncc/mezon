@@ -48,7 +48,13 @@ import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
 import { selectListThreadId, threadsActions } from '../threads/threads.slice';
 import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
-import { fetchListChannelsByUser, LIST_CHANNELS_USER_FEATURE_KEY, ListChannelsByUserState, selectEntitiesChannelsByUser } from './channelUser.slice';
+import {
+	fetchListChannelsByUser,
+	LIST_CHANNELS_USER_FEATURE_KEY,
+	listChannelsByUserActions,
+	ListChannelsByUserState,
+	selectEntitiesChannelsByUser
+} from './channelUser.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 60;
 
@@ -300,6 +306,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 				return true;
 			}
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
+			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
@@ -820,11 +827,15 @@ export const channelsSlice = createSlice({
 
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
+			if (clanId && channelId) {
+				if (!state.byClans[clanId]) {
+					state.byClans[clanId] = getInitialClanState();
+				}
+				state.byClans[clanId].idChannelSelected[clanId] = channelId;
+				const rememberChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+				rememberChannel[clanId] = channelId;
+				localStorage.setItem('remember_channel', JSON.stringify(rememberChannel));
 			}
-			state.byClans[clanId].idChannelSelected[clanId] = channelId;
-			localStorage.setItem('remember_channel', JSON.stringify(state.byClans[clanId].idChannelSelected));
 		},
 
 		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
