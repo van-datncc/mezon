@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, OverflowMenuHorizontalIcon } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectDmGroupCurrent } from '@mezon/store-mobile';
+import { selectDmGroupCurrent, selectMemberClanByUserId2 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonBottomSheet } from '../../../componentUI';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { getUserStatusByMetadata } from '../../../utils/helpers';
 import MenuCustomDm from '../../MenuCustomDm';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './styles';
@@ -31,6 +32,10 @@ export const ThreadHeader = memo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
 	const userStatus = useMemberStatus(currentChannel?.user_id?.length === 1 ? currentChannel?.user_id[0] : '');
+
+	const user = useSelector((state) => selectMemberClanByUserId2(state, currentChannel?.user_id?.length === 1 ? currentChannel?.user_id[0] : ''));
+	const status = getUserStatusByMetadata(user?.user?.metadata);
+
 	const navigation = useNavigation<any>();
 	const openMenu = () => {
 		bottomSheetMenuCustom.current?.present();
@@ -97,6 +102,7 @@ export const ThreadHeader = memo(() => {
 								avatarUrl={currentChannel?.channel_avatar?.[0]}
 								username={currentChannel?.channel_label || currentChannel?.usernames}
 								userStatus={userStatus}
+								customStatus={status}
 							/>
 						)}
 					</View>

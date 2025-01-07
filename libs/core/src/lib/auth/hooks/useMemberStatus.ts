@@ -2,6 +2,7 @@ import { selectMemberCustomStatusById, selectMemberStatusById, useAppSelector } 
 
 export function useMemberStatus(memberId: string) {
 	const memberStatus = useAppSelector((state) => selectMemberStatusById(state, memberId));
+
 	return {
 		status: memberStatus.status,
 		isMobile: memberStatus.isMobile

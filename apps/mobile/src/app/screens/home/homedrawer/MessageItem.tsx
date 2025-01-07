@@ -76,7 +76,11 @@ const MessageItem = React.memo(
 		}, [message?.sender_id, message?.username]);
 
 		const isMessageSystem = useMemo(
-			() => message?.code === TypeMessage.Welcome || message?.code === TypeMessage.CreateThread || message?.code === TypeMessage.CreatePin,
+			() =>
+				message?.code === TypeMessage.Welcome ||
+				message?.code === TypeMessage.CreateThread ||
+				message?.code === TypeMessage.CreatePin ||
+				message?.code === TypeMessage.AuditLog,
 			[message?.code]
 		);
 		const translateX = useRef(new Animated.Value(0)).current;
@@ -243,7 +247,7 @@ const MessageItem = React.memo(
 		}, [dispatch, message, preventAction, senderDisplayName]);
 
 		// Message welcome
-		if (message?.sender_id === '0' && !message?.content?.t && message?.username === 'system') {
+		if (message?.sender_id === '0' && !message?.content?.t && message?.username?.toLowerCase() === 'system') {
 			return <WelcomeMessage channelId={props.channelId} />;
 		}
 
