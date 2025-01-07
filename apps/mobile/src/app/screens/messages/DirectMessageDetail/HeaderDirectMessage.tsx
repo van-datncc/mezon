@@ -8,6 +8,7 @@ import {
 	directMetaActions,
 	selectDmGroupCurrent,
 	selectLastMessageByChannelId,
+	selectMemberClanByUserId2,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
@@ -21,6 +22,7 @@ import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../components/UserStatus';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { getUserStatusByMetadata } from '../../../utils/helpers';
 
 interface HeaderProps {
 	handleBack: () => void;
@@ -88,6 +90,8 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 	useChannelSeen(directMessageId || '');
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
+	const user = useSelector((state) => selectMemberClanByUserId2(state, firstUserId));
+	const status = getUserStatusByMetadata(user?.user?.metadata);
 
 	const goToCall = () => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
@@ -130,7 +134,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
 							</View>
 						)}
-						<UserStatus status={userStatus} />
+						<UserStatus status={userStatus} customStatus={status} />
 					</View>
 				)}
 				<Text style={styles.titleText} numberOfLines={1}>

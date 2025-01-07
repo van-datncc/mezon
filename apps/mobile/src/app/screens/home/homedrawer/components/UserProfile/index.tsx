@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import MezonAvatar from '../../../../../componentUI/MezonAvatar';
+import { getUserStatusByMetadata } from '../../../../../utils/helpers';
 import { style } from './UserProfile.styles';
 import ActivityAppComponent from './component/ActivityAppComponent';
 import EditUserProfileBtn from './component/EditUserProfileBtn';
@@ -68,6 +69,8 @@ const UserProfile = React.memo(
 		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type), [currentChannel?.type]);
 		const { dismiss } = useBottomSheetModal();
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
+
+		const status = getUserStatusByMetadata(user?.user?.metadata);
 
 		const isKicked = useMemo(() => {
 			return !userById;
@@ -224,6 +227,7 @@ const UserProfile = React.memo(
 							avatarUrl={messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
 							username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 							userStatus={userStatus}
+							customStatus={status}
 							isBorderBoxImage={true}
 							statusUserStyles={styles.statusUser}
 						/>
