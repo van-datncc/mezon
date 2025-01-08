@@ -13,6 +13,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	RootState,
 	appActions,
 	e2eeActions,
 	emojiSuggestionActions,
@@ -46,6 +47,7 @@ import {
 	selectOpenThreadMessageState,
 	selectOpenTopicMessageState,
 	selectReactionRightState,
+	selectRolesClanEntities,
 	selectStatusMenu,
 	selectTheme,
 	selectThreadCurrentChannel,
@@ -85,7 +87,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, RefObject, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
@@ -126,6 +128,7 @@ type HistoryItem = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
+	const appStore = useStore();
 	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -745,15 +748,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (!pastedData) return;
 
 			const parsedData = parsePastedMentionData(pastedData);
+
 			if (!parsedData) return;
 
 			const { message: pastedContent, startIndex, endIndex } = parsedData;
 			const currentInputValueLength = (request?.valueTextInput ?? '').length;
 			const currentFocusIndex = editorRef.current?.selectionStart as number;
+			const appState = appStore.getState() as RootState;
+			const clanRolesEntities = selectRolesClanEntities(appState);
 
 			const transformedText =
 				pastedContent?.content?.t && pastedContent?.mentions
-					? transformTextWithMentions(pastedContent.content.t, pastedContent.mentions, currentChatUsersEntities)
+					? transformTextWithMentions(pastedContent.content.t, pastedContent.mentions, currentChatUsersEntities, clanRolesEntities)
 					: pastedContent?.content?.t || '';
 
 			const mentionRaw = generateMentionItems(
