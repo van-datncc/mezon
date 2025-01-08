@@ -425,8 +425,8 @@ const MessageItem = React.memo(
 	},
 	(prevProps, nextProps) => {
 		return (
-			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id ===
-			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id
+			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id + prevProps?.message?.code ===
+			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id + nextProps?.message?.code
 		);
 	}
 );
