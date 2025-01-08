@@ -68,6 +68,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	ADD_ROLE_CHANNEL_STATUS,
 	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
@@ -530,6 +531,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 				}
 				dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
+				dispatch(userChannelsActions.remove(userID));
 			});
 		},
 		[channelId, clanId, dispatch, navigate, userId, directId]
@@ -618,8 +620,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					})
 				);
 			}
-
-			dispatch(userChannelsActions.upsertMany(userIds));
+			if (userAdds.status !== ADD_ROLE_CHANNEL_STATUS) {
+				dispatch(userChannelsActions.upsertMany(userIds));
+			}
 		},
 		[userId, clanIdActive, dispatch]
 	);
@@ -1046,8 +1049,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					return;
 				}
 
-				if (onlyUpdateStatus || onlyHidingEvent) {
+				if (onlyUpdateStatus) {
 					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
+					return;
+				}
+
+				if (onlyHidingEvent) {
+					// hide schedule event icon
+					dispatch(eventManagementActions.updateEventStatus(eventCreatedEvent));
+					dispatch(eventManagementActions.updateNewStartTime(eventCreatedEvent));
 					return;
 				}
 
