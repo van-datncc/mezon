@@ -48,10 +48,6 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 		return rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
 	}, [rolesToUse]);
 	const newUserMentionList = useMemo(() => {
-		if (!membersOfParent || membersOfParent.length === 0) {
-			return [];
-		}
-
 		const userMentionRaw = membersOfParent;
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
