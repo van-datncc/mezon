@@ -1,6 +1,12 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { ChannelMembersEntity, selectAllChannelMembers, selectAllRolesClan, selectChannelById, selectRolesByChannelId } from '@mezon/store';
-import { useAppSelector } from '@mezon/store-mobile';
+import {
+	ChannelMembersEntity,
+	selectAllChannelMembers,
+	selectAllRolesClan,
+	selectChannelById,
+	selectRolesByChannelId,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
@@ -18,6 +24,7 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 	const channelparrent = useAppSelector((state) => selectChannelById(state, channel?.parrent_id || ''));
 	const rolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
 	const rolesInClan = useSelector(selectAllRolesClan);
+
 	const rolesToUse = useMemo(() => {
 		if (channel?.parrent_id !== '0' && channelparrent?.channel_private === 1) {
 			return rolesChannel;
@@ -30,10 +37,6 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 		return rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
 	}, [rolesToUse]);
 	const newUserMentionList = useMemo(() => {
-		if (!membersOfParent || membersOfParent.length === 0) {
-			return [];
-		}
-
 		const userMentionRaw = membersOfParent;
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
@@ -71,7 +74,7 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [channelMode, membersOfParent, rolesToUse]);
+	}, [channelMode, filteredRoles, membersOfParent]);
 
 	return newUserMentionList;
 }

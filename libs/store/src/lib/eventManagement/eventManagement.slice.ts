@@ -236,6 +236,19 @@ export const eventManagementSlice = createSlice({
 				}
 			});
 		},
+		updateNewStartTime: (state, action) => {
+			const { event_id, start_time } = action.payload;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state, event_id);
+			if (!existingEvent) {
+				return;
+			}
+			eventManagementAdapter.updateOne(state, {
+				id: event_id,
+				changes: {
+					start_time
+				}
+			});
+		},
 		addOneEvent: (state, action) => {
 			const { event_id, channel_id, event_status, channel_voice_id, ...restPayload } = action.payload;
 			const normalizedChannelId = channel_id === '0' || channel_id === '' ? '' : channel_id;

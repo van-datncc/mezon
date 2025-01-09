@@ -205,10 +205,6 @@ ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, _data) => {
 			clipboard.writeText(fileURL);
 			break;
 		}
-		case 'openLink': {
-			shell.openExternal(fileURL);
-			break;
-		}
 		case 'copyImage': {
 			const blobImage = await fetch(fileURL).then((response) => response.blob());
 			const base64data = await blobImage.arrayBuffer();
@@ -224,6 +220,10 @@ ipcMain.handle(ACTION_SHOW_IMAGE, async (event, action, _data) => {
 			const base64DataUrl = `data:image/png;base64,${btoa(base64String)}`;
 			clipboard.write({ image: nativeImage.createFromDataURL(base64DataUrl) });
 
+			break;
+		}
+		case 'openLink': {
+			shell.openExternal(fileURL);
 			break;
 		}
 		case 'saveImage': {
