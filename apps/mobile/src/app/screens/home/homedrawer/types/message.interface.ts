@@ -18,6 +18,7 @@ export interface IReplyBottomSheet {
 	senderDisplayName?: string;
 	isPublic?: boolean;
 	channelId?: string;
+	handleBottomSheetExpand?: () => void;
 }
 
 export interface IMessageActionPayload {
@@ -53,7 +54,6 @@ export interface IMessageReactionProps {
 	mode: number;
 	openEmojiPicker?: () => void;
 	preventAction?: boolean;
-	userProfile?: IUserAccount;
 	messageReactions?: EmojiDataOptionals[];
 }
 
