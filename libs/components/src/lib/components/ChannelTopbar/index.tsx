@@ -1,5 +1,6 @@
 import { useAppNavigation, useIdleRender, usePathMatch } from '@mezon/core';
 import {
+	RootState,
 	appActions,
 	channelsActions,
 	notificationActions,
@@ -34,7 +35,7 @@ import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -105,9 +106,11 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 
 const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();
-	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, channel?.id as string));
-	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, channel?.id as string));
+	const store = useStore();
+
 	const setTurnOffThreadMessage = useCallback(() => {
+		const isShowCreateThread = selectIsShowCreateThread(store.getState() as RootState, channel?.id as string);
+		const isShowCreateTopic = selectIsShowCreateTopic(store.getState() as RootState, channel?.id as string);
 		if (isShowCreateThread) {
 			dispatch(threadsActions.setOpenThreadMessageState(false));
 			dispatch(threadsActions.setValueThread(null));
@@ -115,10 +118,8 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 		if (isShowCreateTopic) {
 			dispatch(topicsActions.setOpenTopicMessageState(false));
 			dispatch(topicsActions.setValueTopic(null));
-			dispatch(topicsActions.setCurrentTopicId(''));
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channel?.id as string, isShowCreateTopic: false }));
 		}
-	}, [channel?.id, dispatch, isShowCreateThread, isShowCreateTopic]);
+	}, [channel?.id, dispatch, store]);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
