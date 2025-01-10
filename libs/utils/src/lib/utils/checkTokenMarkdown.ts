@@ -1,6 +1,6 @@
-import { IEmojiOnMessage, IHashtagOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '@mezon/utils';
+import { IEmojiOnMessage, IHashtagOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '../types/messageLine';
 
-export const useCheckTokenOnMarkdown = (
+export const checkTokenOnMarkdown = (
 	markdownList: IMarkdownOnMessage[],
 	hashtagList: IHashtagOnMessage[],
 	mentionList: IMentionOnMessage[],

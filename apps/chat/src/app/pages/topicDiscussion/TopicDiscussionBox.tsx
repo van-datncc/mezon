@@ -1,5 +1,5 @@
 import { MentionReactInput, MessageContextMenuProvider, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useAuth, useCheckTokenOnMarkdown, useTopics } from '@mezon/core';
+import { useAuth, useTopics } from '@mezon/core';
 import {
 	RootState,
 	fetchMessages,
@@ -16,7 +16,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, sleep } from '@mezon/utils';
+import { IMessageSendPayload, checkTokenOnMarkdown, sleep } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -79,7 +79,7 @@ const TopicDiscussionBox = () => {
 				throw new Error('Client is not initialized');
 			}
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = useCheckTokenOnMarkdown(
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
 				content.mk ?? [],
 				content.hg ?? [],
 				mentions ?? [],

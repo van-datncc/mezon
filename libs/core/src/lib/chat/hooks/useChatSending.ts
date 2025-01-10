@@ -9,11 +9,10 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, checkTokenOnMarkdown } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useCheckTokenOnMarkdown } from './useCheckTokenOnMarkdown';
 
 export type UseChatSendingOptions = {
 	mode: number;
@@ -46,7 +45,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			code?: number
 		) => {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = useCheckTokenOnMarkdown(
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
 				content.mk ?? [],
 				content.hg ?? [],
 				mentions ?? [],
@@ -130,7 +129,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				throw new Error('Client is not initialized');
 			}
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = useCheckTokenOnMarkdown(
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
 				content.mk ?? [],
 				content.hg ?? [],
 				mentions ?? [],

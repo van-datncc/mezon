@@ -10,13 +10,12 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, uniqueUsers } from '@mezon/utils';
+import { checkTokenOnMarkdown, IMessageSendPayload, uniqueUsers } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChannelMembers } from './useChannelMembers';
-import { useCheckTokenOnMarkdown } from './useCheckTokenOnMarkdown';
 
 export type UseThreadMessage = {
 	channelId: string;
@@ -58,8 +57,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			if (!client || !session || !socket || !thread || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = useCheckTokenOnMarkdown(
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
 				content.mk ?? [],
 				content.hg ?? [],
 				mentions ?? [],
