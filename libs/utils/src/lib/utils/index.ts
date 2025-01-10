@@ -90,6 +90,12 @@ export const convertTimeHour = (dateString: string) => {
 
 export const convertDateString = (dateString: string) => {
 	const codeTime = new Date(dateString);
+	const currentDate = new Date();
+
+	if (codeTime.toDateString() === currentDate.toDateString()) {
+		return `Today, ${format(codeTime, 'dd MMMM yyyy')}`;
+	}
+
 	const formattedDate = format(codeTime, 'eee, dd MMMM yyyy');
 	return formattedDate;
 };
