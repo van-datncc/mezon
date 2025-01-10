@@ -16,7 +16,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, sleep } from '@mezon/utils';
+import { IMessageSendPayload, checkTokenOnMarkdown, sleep } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -78,7 +78,18 @@ const TopicDiscussionBox = () => {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
+				content.mk ?? [],
+				content.hg ?? [],
+				mentions ?? [],
+				content.ej ?? []
+			);
+			const validatedContent = {
+				...content,
+				hg: validHashtagList,
+				ej: validEmojiList
+			};
 			dispatch(
 				topicsActions.handleSendTopic({
 					clanId: currentClanId as string,
@@ -87,10 +98,10 @@ const TopicDiscussionBox = () => {
 					anonymous: false,
 					attachments: attachments,
 					code: 0,
-					content: content,
+					content: validatedContent,
 					isPublic: currentChannel?.channel_private !== 1,
 					mentionEveryone: false,
-					mentions: mentions,
+					mentions: validMentionList,
 					references: references,
 					topicId: topicId as string
 				})
