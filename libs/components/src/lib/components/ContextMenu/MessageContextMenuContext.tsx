@@ -86,6 +86,43 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	}
 });
 
+const getCurrentChannelAndDm = (appState: RootState) => {
+	const currentChannel = selectCurrentChannel(appState);
+	const currentDmId = selectDmGroupCurrentId(appState);
+	const currentDm = selectDmGroupCurrent(currentDmId || '')(appState);
+
+	return { currentChannel, currentDm };
+};
+
+const getMessage = (appState: RootState, isTopic: boolean, messageId: string) => {
+	const isClanView = selectClanView(appState);
+	const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
+	const currentTopicId = selectCurrentTopicId(appState);
+	const message = selectMessageByMessageId(appState, isTopic ? currentTopicId : isClanView ? currentChannel?.id : currentDm?.id, messageId);
+
+	return message;
+};
+
+const getActiveMode = (appState: RootState) => {
+	const isClanView = selectClanView(appState);
+	const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
+
+	if (isClanView) {
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		}
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			return ChannelStreamMode.STREAM_MODE_THREAD;
+		}
+	}
+
+	if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
+		return ChannelStreamMode.STREAM_MODE_DM;
+	}
+
+	return ChannelStreamMode.STREAM_MODE_GROUP;
+};
+
 export const MessageContextMenuProvider = ({
 	children,
 	allUserIdsInChannel,
@@ -107,59 +144,17 @@ export const MessageContextMenuProvider = ({
 
 	const appStore = useStore();
 
-	const getCurrentChannelAndDm = (appState: RootState) => {
-		const currentChannel = selectCurrentChannel(appState);
-		const currentDmId = selectDmGroupCurrentId(appState);
-		const currentDm = selectDmGroupCurrent(currentDmId || '')(appState);
-
-		return { currentChannel, currentDm };
-	};
-
-	const getMessage = () => {
-		const appState = appStore.getState() as RootState;
-		const isClanView = selectClanView(appState);
-		const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
-		const currentTopicId = selectCurrentTopicId(appState);
-		const message = selectMessageByMessageId(
-			appState,
-			isTopic ? currentTopicId : isClanView ? currentChannel?.id : currentDm?.id,
-			messageIdRef.current
-		);
-
-		return message;
-	};
-
-	const getActiveMode = () => {
-		const appState = appStore.getState() as RootState;
-		const isClanView = selectClanView(appState);
-		const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
-
-		if (isClanView) {
-			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				return ChannelStreamMode.STREAM_MODE_CHANNEL;
-			}
-			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
-				return ChannelStreamMode.STREAM_MODE_THREAD;
-			}
-		}
-
-		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
-			return ChannelStreamMode.STREAM_MODE_DM;
-		}
-
-		return ChannelStreamMode.STREAM_MODE_GROUP;
-	};
-
 	const [openDeleteMessageModal, closeDeleteMessageModal] = useModal(() => {
-		const mode = getActiveMode();
-		const message = getMessage();
+		const appState = appStore.getState() as RootState;
+		const mode = getActiveMode(appState);
+		const message = getMessage(appState, isTopic, messageIdRef.current);
 		return <ModalDeleteMess mess={message} closeModal={closeDeleteMessageModal} mode={mode} />;
 	}, []);
 
 	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
 		const appState = appStore.getState() as RootState;
-		const message = getMessage();
-		const mode = getActiveMode();
+		const message = getMessage(appState, isTopic, messageIdRef.current);
+		const mode = getActiveMode(appState);
 		const currentChannel = selectCurrentChannel(appState);
 
 		return (
@@ -176,9 +171,9 @@ export const MessageContextMenuProvider = ({
 	const handlePinMessage = useCallback(async () => {
 		const appState = appStore.getState() as RootState;
 		const currentClanId = selectCurrentClanId(appState);
-		const message = getMessage();
+		const message = getMessage(appState, isTopic, messageIdRef.current);
 		const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
-		const mode = getActiveMode();
+		const mode = getActiveMode(appState);
 
 		dispatch(
 			pinMessageActions.setChannelPinMessage({
@@ -216,7 +211,8 @@ export const MessageContextMenuProvider = ({
 	const menu = useMemo(() => {
 		if (!isMenuVisible) return null;
 
-		const mode = getActiveMode();
+		const appState = appStore.getState() as RootState;
+		const mode = getActiveMode(appState);
 		return (
 			<MessageContextMenu
 				id={MESSAGE_CONTEXT_MENU_ID}
