@@ -1,8 +1,25 @@
 import { useIdleRender } from '@mezon/core';
-import { SHOW_POSITION } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import {
+	pinMessageActions,
+	selectClanView,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectCurrentTopicId,
+	selectDmGroupCurrent,
+	selectDmGroupCurrentId,
+	selectMessageByMessageId,
+	selectModeResponsive,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
+import { ModeResponsive, SHOW_POSITION } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
+import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
+import ModalDeleteMess from '../DeleteMessageModal/ModalDeleteMess';
+import { ModalAddPinMess } from '../PinMessModal';
 import MessageContextMenu from './MessageContextMenu';
 
 const MESSAGE_CONTEXT_MENU_ID = 'message-context-menu';
@@ -31,6 +48,8 @@ type MessageContextMenuContextValue = {
 	posShortProfile: posShortProfileOpt;
 	setPosShortProfile: (pos: posShortProfileOpt) => void;
 	onVisibilityChange: (status: boolean) => void;
+	openDeleteMessageModal: () => void;
+	openPinMessageModal: () => void;
 };
 
 export type MessageContextMenuProps = {
@@ -59,6 +78,12 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	posShortProfile: {},
 	setPosShortProfile: () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
+	openDeleteMessageModal: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
+	openPinMessageModal: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
 	}
 });
 
@@ -73,6 +98,7 @@ export const MessageContextMenuProvider = ({
 	allRolesInClan: string[];
 	channelId?: string;
 }) => {
+	const dispatch = useAppDispatch();
 	const messageIdRef = useRef<string>('');
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
 	const [activeMode, setActiveMode] = useState<ChannelStreamMode>(ChannelStreamMode.STREAM_MODE_CHANNEL);
@@ -80,6 +106,80 @@ export const MessageContextMenuProvider = ({
 	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
 	const [posShortProfile, setPosShortProfile] = useState<posShortProfileOpt>({});
 	const [isTopic, setIsTopic] = useState<boolean>(false);
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const isClanView = useSelector(selectClanView);
+	const currentTopicId = useSelector(selectCurrentTopicId);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const modeResponsive = useSelector(selectModeResponsive);
+	const currentDm = useSelector(selectDmGroupCurrent(currentDmId || ''));
+	const mode = useMemo(() => {
+		if (modeResponsive === ModeResponsive.MODE_CLAN) {
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			}
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				return ChannelStreamMode.STREAM_MODE_THREAD;
+			}
+		}
+
+		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
+			return ChannelStreamMode.STREAM_MODE_DM;
+		}
+
+		return ChannelStreamMode.STREAM_MODE_GROUP;
+	}, [modeResponsive, currentDm?.type, currentChannel?.type]);
+	const message = useAppSelector((state) =>
+		selectMessageByMessageId(state, isTopic ? currentTopicId : isClanView ? channelId : currentDmId, messageIdRef.current)
+	);
+
+	const [openDeleteMessageModal, closeDeleteMessageModal] = useModal(() => {
+		return <ModalDeleteMess mess={message} closeModal={closeDeleteMessageModal} mode={mode} />;
+	}, [message]);
+
+	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
+		return (
+			<ModalAddPinMess
+				mess={message}
+				closeModal={closePinMessageModal}
+				handlePinMessage={handlePinMessage}
+				mode={activeMode || 0}
+				channelLabel={currentChannel?.channel_label || ''}
+			/>
+		);
+	}, [message]);
+
+	const handlePinMessage = async () => {
+		dispatch(
+			pinMessageActions.setChannelPinMessage({
+				clan_id: currentClanId ?? '',
+				channel_id: message?.channel_id,
+				message_id: message?.id,
+				message: message
+			})
+		);
+		dispatch(
+			pinMessageActions.joinPinMessage({
+				clanId:
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
+						? ''
+						: (currentClanId ?? ''),
+				channelId:
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
+						? currentDmId || ''
+						: (currentChannel?.channel_id ?? ''),
+				messageId: message?.id,
+				isPublic:
+					activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL && activeMode !== ChannelStreamMode.STREAM_MODE_THREAD
+						? false
+						: currentChannel
+							? !currentChannel.channel_private
+							: false,
+				mode: activeMode as number
+			})
+		);
+	};
 
 	const { show } = useContextMenu({
 		id: MESSAGE_CONTEXT_MENU_ID
@@ -96,6 +196,8 @@ export const MessageContextMenuProvider = ({
 				elementTarget={elementTarget}
 				activeMode={activeMode}
 				isTopic={isTopic}
+				openDeleteMessageModal={openDeleteMessageModal}
+				openPinMessageModal={openPinMessageModal}
 			/>
 		);
 	}, [elementTarget, activeMode, isMenuVisible, isTopic]);
@@ -117,7 +219,9 @@ export const MessageContextMenuProvider = ({
 		messageIdRef.current = '';
 	}, []);
 
-	const onVisibilityChange = useCallback((status: boolean) => {}, [resetMenuState]);
+	const onVisibilityChange = useCallback((status: boolean) => {
+		setIsMenuVisible(status);
+	}, []);
 	const setImageURL = useCallback((src: string) => {
 		setImageSrc(src);
 	}, []);
@@ -170,7 +274,9 @@ export const MessageContextMenuProvider = ({
 			allRolesInClan,
 			posShortProfile,
 			setPosShortProfile,
-			onVisibilityChange
+			onVisibilityChange,
+			openDeleteMessageModal,
+			openPinMessageModal
 		}),
 		[
 			showMessageContextMenu,
@@ -182,7 +288,9 @@ export const MessageContextMenuProvider = ({
 			allRolesInClan,
 			posShortProfile,
 			setPosShortProfile,
-			onVisibilityChange
+			onVisibilityChange,
+			openDeleteMessageModal,
+			openPinMessageModal
 		]
 	);
 
