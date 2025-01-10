@@ -15,6 +15,8 @@ import {
 	selectDefaultNotificationClan,
 	selectIsPinModalVisible,
 	selectIsShowChatStream,
+	selectIsShowCreateThread,
+	selectIsShowCreateTopic,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectIsShowPinBadgeByChannelId,
@@ -103,10 +105,20 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 
 const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, channel?.id as string));
+	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, channel?.id as string));
 	const setTurnOffThreadMessage = useCallback(() => {
-		dispatch(threadsActions.setOpenThreadMessageState(false));
-		dispatch(threadsActions.setValueThread(null));
-	}, [dispatch]);
+		if (isShowCreateThread) {
+			dispatch(threadsActions.setOpenThreadMessageState(false));
+			dispatch(threadsActions.setValueThread(null));
+		}
+		if (isShowCreateTopic) {
+			dispatch(topicsActions.setOpenTopicMessageState(false));
+			dispatch(topicsActions.setValueTopic(null));
+			dispatch(topicsActions.setCurrentTopicId(''));
+			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channel?.id as string, isShowCreateTopic: false }));
+		}
+	}, [channel?.id, dispatch, isShowCreateThread, isShowCreateTopic]);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
