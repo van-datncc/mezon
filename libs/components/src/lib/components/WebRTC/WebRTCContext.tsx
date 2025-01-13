@@ -74,7 +74,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 		peerConnection.current.onicecandidate = async (event) => {
 			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
-				await mezon.socketRef.current?.joinSFU(
+				await mezon.socketRef.current?.fwdSFUSignaling(
 					clanId.current || '',
 					channelId.current || '',
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
@@ -100,7 +100,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 					// do nothing
 				}
 			});
-			await mezon.socketRef.current?.joinSFU(clanId.current || '', channelId.current || '', WebrtcSignalingType.WEBRTC_SDP_INIT, '');
+			await mezon.socketRef.current?.fwdSFUSignaling(clanId.current || '', channelId.current || '', WebrtcSignalingType.WEBRTC_SDP_INIT, '');
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -149,7 +149,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 						const answer = await peerConnection.current.createAnswer();
 						await peerConnection.current.setLocalDescription(new RTCSessionDescription(answer));
 						const answerEnc = await compress(JSON.stringify(answer));
-						await mezon.socketRef.current?.joinSFU(
+						await mezon.socketRef.current?.fwdSFUSignaling(
 							clanId.current || '',
 							channelId.current || '',
 							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
