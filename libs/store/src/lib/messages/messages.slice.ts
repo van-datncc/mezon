@@ -1186,7 +1186,7 @@ export const messagesSlice = createSlice({
 					if ((!isNew || !channelId) && (!isClearMessage || (isClearMessage && fromCache)) && !foundE2ee) {
 						const messageIds = state.channelMessages[channelId]?.ids as string[];
 						if (messageIds?.length <= 50) {
-							state.channelViewPortMessageIds[channelId] = [];
+							state.channelViewPortMessageIds[channelId] = messageIds;
 							return;
 						}
 					}
@@ -1214,7 +1214,7 @@ export const messagesSlice = createSlice({
 
 					const messageIds = state.channelMessages[channelId]?.ids as string[];
 					if (messageIds?.length <= 50) {
-						state.channelViewPortMessageIds[channelId] = [];
+						state.channelViewPortMessageIds[channelId] = messageIds;
 						const showFab = !!lastSentMessageId && !messageIds.includes(lastSentMessageId as string) && messageIds.length >= 20;
 						state.isViewingOlderMessagesByChannelId[channelId] = showFab;
 						return;
