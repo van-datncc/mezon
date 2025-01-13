@@ -4,7 +4,7 @@ import { useMezon } from '@mezon/transport';
 import { WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { decompress } from '../DmList/DMtopbar';
+import { compress, decompress } from '../DmList/DMtopbar';
 
 // Define the context value type
 interface WebRTCContextType {
@@ -74,7 +74,12 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 		peerConnection.current.onicecandidate = async (event) => {
 			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
-				// TODO: send ptt oncandidate to STN
+				await mezon.socketRef.current?.joinSFU(
+					clanId.current || '',
+					channelId.current || '',
+					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+					JSON.stringify(event.candidate)
+				);
 			}
 		};
 		return peerConnection.current;
@@ -95,7 +100,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 					// do nothing
 				}
 			});
-			// TODO: send join ptt to STN
+			await mezon.socketRef.current?.joinSFU(clanId.current || '', channelId.current || '', WebrtcSignalingType.WEBRTC_SDP_INIT, '');
 		} catch (error) {
 			console.error('Error accessing audio devices: ', error);
 		}
@@ -114,11 +119,6 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
 	const toggleMicrophone = useCallback(
 		async (value: boolean) => {
-			if (peerConnection.current && channelId.current) {
-				if (value === true) {
-					// TODO: send ptt talk to STN
-				}
-			}
 			if (localStream) {
 				localStream?.getAudioTracks().forEach((track) => {
 					track.enabled = value;
@@ -148,7 +148,13 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 						await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
 						const answer = await peerConnection.current.createAnswer();
 						await peerConnection.current.setLocalDescription(new RTCSessionDescription(answer));
-						// TODO: send join ptt to STN
+						const answerEnc = await compress(JSON.stringify(answer));
+						await mezon.socketRef.current?.joinSFU(
+							clanId.current || '',
+							channelId.current || '',
+							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
+							answerEnc
+						);
 					};
 					processData().catch(console.error);
 				}
