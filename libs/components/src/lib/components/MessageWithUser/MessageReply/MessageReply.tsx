@@ -97,6 +97,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 										isJumMessageEnabled={true}
 										onClickToMessage={getIdMessageToJump}
 										content={safeJSONParse(message?.references?.[0]?.content ?? '{}')}
+										messageId={message.message_id}
 									/>
 								</div>
 							)}
