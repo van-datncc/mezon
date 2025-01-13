@@ -139,15 +139,16 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.HASHTAGS) {
 					formattedContent.push(
 						<ChannelHashtag
+							key={`hashtag-${index}-${s}-${element.channelid}`}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`hashtag-${index}-${s}-${element.channelid}`}
 							channelHastagId={`<#${element.channelid}>`}
 						/>
 					);
 				} else if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
 					formattedContent.push(
 						<MentionContent
+							key={`mentionUser-${index}-${s}-${element.user_id}`}
 							element={element}
 							contentInElement={contentInElement}
 							isTokenClickAble={isTokenClickAble}
@@ -160,6 +161,7 @@ const RenderContent = memo(
 				} else if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
 					formattedContent.push(
 						<RoleMentionContent
+							key={`mentionRole-${index}-${s}-${element.role_id}`}
 							element={element}
 							contentInElement={contentInElement}
 							isTokenClickAble={isTokenClickAble}
@@ -172,8 +174,8 @@ const RenderContent = memo(
 				} else if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
-							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s)}
 							key={`emoji-${index}-${s}-${element.emojiid}`}
+							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s)}
 							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
 							emojiId={element.emojiid ?? ''}
@@ -182,10 +184,10 @@ const RenderContent = memo(
 				} else if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
+							key={`link-${index}-${s}-${contentInElement}`}
 							isLink={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`link-${index}-${s}-${contentInElement}`}
 							content={contentInElement}
 						/>
 					);
@@ -193,6 +195,7 @@ const RenderContent = memo(
 					const meetingCode = contentInElement?.split('/').pop();
 					formattedContent.push(
 						<VoiceLinkContent
+							key={`voiceLink-${index}-${s}-${contentInElement}`}
 							meetingCode={meetingCode}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
@@ -215,10 +218,10 @@ const RenderContent = memo(
 					}
 					formattedContent.push(
 						<MarkdownContent
+							key={`markdown-${index}-${s}-${contentInElement}`}
 							isBacktick={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`markdown-${index}-${s}-${contentInElement}`}
 							content={content}
 							isInPinMsg={isInPinMsg}
 							typeOfBacktick={element.type}
