@@ -1,6 +1,15 @@
-import { messagesActions, selectAllAccount, selectAnonymousMode, useAppDispatch } from '@mezon/store';
+import {
+	messagesActions,
+	selectAllAccount,
+	selectAnonymousMode,
+	selectCurrentTopicId,
+	selectIsFocusOnChannelInput,
+	selectIsShowCreateTopic,
+	topicsActions,
+	useAppDispatch
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, checkTokenOnMarkdown } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,11 +25,14 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const getClanId = channelOrDirect?.clan_id;
 	const isPublic = !channelOrDirect?.channel_private;
 	const channelIdOrDirectId = channelOrDirect?.channel_id;
-
+	const currentTopicId = useSelector(selectCurrentTopicId);
+	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, channelIdOrDirectId as string));
+	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const { clientRef, sessionRef, socketRef } = useMezon();
+
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -32,14 +44,46 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			isMobile?: boolean,
 			code?: number
 		) => {
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
+				content.mk ?? [],
+				content.hg ?? [],
+				mentions ?? [],
+				content.ej ?? []
+			);
+			const validatedContent = {
+				...content,
+				hg: validHashtagList,
+				ej: validEmojiList
+			};
+			if (!isFocusOnChannelInput && isShowCreateTopic) {
+				dispatch(
+					topicsActions.handleSendTopic({
+						clanId: getClanId as string,
+						channelId: channelIdOrDirectId as string,
+						mode: mode,
+						anonymous: false,
+						attachments: attachments,
+						code: 0,
+						content: validatedContent,
+						isMobile: isMobile,
+						isPublic: isPublic,
+						mentionEveryone: mentionEveryone,
+						mentions: validMentionList,
+						references: references,
+						topicId: currentTopicId as string
+					})
+				);
+				return;
+			}
 			await dispatch(
 				messagesActions.sendMessage({
 					channelId: channelIdOrDirectId ?? '',
 					clanId: getClanId || '',
 					mode,
 					isPublic: isPublic,
-					content,
-					mentions,
+					content: validatedContent,
+					mentions: validMentionList,
 					attachments,
 					references,
 					anonymous,
@@ -84,15 +128,26 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			if (!client || !session || !socket || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
-
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
+				content.mk ?? [],
+				content.hg ?? [],
+				mentions ?? [],
+				content.ej ?? []
+			);
+			const validatedContent = {
+				...content,
+				hg: validHashtagList,
+				ej: validEmojiList
+			};
 			await socket.updateChatMessage(
 				getClanId || '',
 				channelIdOrDirectId ?? '',
 				mode,
 				isPublic,
 				messageId,
-				content,
-				mentions,
+				validatedContent,
+				validMentionList,
 				attachments,
 				hide_editted,
 				topic_id
