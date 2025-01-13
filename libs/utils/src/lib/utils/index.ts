@@ -928,8 +928,8 @@ export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptio
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;
-	const processingOptions = `rs:${resizeType}:${width}:${height}:1`;
-	const path = `/${processingOptions}/plain/${sourceImageUrl}@png`;
+	const processingOptions = `rs:${resizeType}:${width}:${height}:1/mb:2097152`;
+	const path = `/${processingOptions}/plain/${sourceImageUrl}@webp`;
 
 	return `${process.env.NX_IMGPROXY_BASE_URL}/${process.env.NX_IMGPROXY_KEY}${path}`;
 };
