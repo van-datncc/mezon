@@ -176,14 +176,10 @@ function MessageWithUser({
 			return message?.avatar;
 		}
 
-		if (isDM) {
-			return message?.references?.[0]?.mesages_sender_avatar ?? '';
-		}
-
 		if (shortUserId.current === message?.sender_id) {
 			return message?.clan_avatar || message?.avatar;
 		}
-	}, [isDM, message?.avatar, message?.clan_avatar, message?.references, message?.sender_id]);
+	}, [isDM, message?.avatar, message?.clan_avatar, message?.sender_id]);
 
 	const messageHour = message ? convertTimeHour(message.create_time) : '';
 
