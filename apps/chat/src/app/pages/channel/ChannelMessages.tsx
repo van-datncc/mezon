@@ -630,6 +630,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					dispatch(pinMessageActions.setJumpPinMessageId(null));
 				}, 1000);
 			} else if (idMessageToJump && isMessageExist && !jumpPinMessageId) {
+				if (idMessageToJump.id === 'temp') return;
 				if (idMessageToJump?.navigate) {
 					setTimeout(() => {
 						scrollToMessage(idMessageToJump.id);

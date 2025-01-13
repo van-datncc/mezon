@@ -1181,15 +1181,15 @@ export const messagesSlice = createSlice({
 					const foundE2ee = action.payload.foundE2ee || false;
 					const lastSentMessageId = state.lastMessageByChannel[channelId]?.id;
 					state.loadingStatus = 'loaded';
+					let direction = action.meta.arg.direction;
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
-					if ((!isNew || !channelId) && (!isClearMessage || (isClearMessage && fromCache)) && !foundE2ee) {
-						const messageIds = state.channelMessages[channelId]?.ids as string[];
-						if (messageIds?.length <= 50) {
-							state.channelViewPortMessageIds[channelId] = messageIds;
-							return;
-						}
+					if (!direction && (!isNew || !channelId) && (!isClearMessage || (isClearMessage && fromCache)) && !foundE2ee) {
+						return;
 					}
+
+					direction = direction || Direction_Mode.BEFORE_TIMESTAMP;
+
 					// const reversedMessages = action.payload.messages.reverse();
 
 					// remove all messages if clear message is true
@@ -1201,8 +1201,6 @@ export const messagesSlice = createSlice({
 					if (isFetchingLatestMessages && isViewingOlderMessages) {
 						handleRemoveManyMessages(state, channelId);
 					}
-
-					const direction = action.meta.arg.direction || Direction_Mode.BEFORE_TIMESTAMP;
 
 					handleSetManyMessages({
 						state,
