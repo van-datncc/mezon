@@ -1,45 +1,44 @@
-import { IJoinPtt, LoadingStatus } from '@mezon/utils';
+import { IJoinSFU, LoadingStatus } from '@mezon/utils';
 import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { JoinPTTChannel } from 'mezon-js';
+import { SFUSignalingFwd } from 'mezon-js';
 
-export const JOIN_PTT_FEATURE_KEY = 'joinPTT';
+export const JOIN_SFU_FEATURE_KEY = 'joinSFU';
 
 /*
  * Update these interfaces according to your requirements.
  */
-export interface JoinPTTEntity extends IJoinPtt {
+export interface JoinSFUEntity extends IJoinSFU {
 	id: string; // Primary ID
 }
 
-export interface JoinPTTState extends EntityState<JoinPTTEntity, string> {
+export interface JoinSFUState extends EntityState<JoinSFUEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	joinPttData: JoinPTTChannel;
+	joinSFUData: SFUSignalingFwd;
 }
 
-export const JoinPTTAdapter = createEntityAdapter<JoinPTTEntity>();
+export const JoinSFUAdapter = createEntityAdapter<JoinSFUEntity>();
 
-export const initialJoinPTTState: JoinPTTState = JoinPTTAdapter.getInitialState({
+export const initialJoinSFUState: JoinSFUState = JoinSFUAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	joinPttData: {
+	joinSFUData: {
 		data_type: 0,
 		json_data: '',
 		clan_id: '',
 		channel_id: '',
-		user_id: '',
-		is_talk: false
+		user_id: ''
 	}
 });
 
 export const JoinPTTSlice = createSlice({
-	name: JOIN_PTT_FEATURE_KEY,
-	initialState: initialJoinPTTState,
+	name: JOIN_SFU_FEATURE_KEY,
+	initialState: initialJoinSFUState,
 	reducers: {
-		add: JoinPTTAdapter.addOne,
+		add: JoinSFUAdapter.addOne,
 		clear: (state) => {
-			if (JoinPTTAdapter.getSelectors().selectIds(state).length === 0) return;
-			JoinPTTAdapter.removeAll(state);
+			if (JoinSFUAdapter.getSelectors().selectIds(state).length === 0) return;
+			JoinSFUAdapter.removeAll(state);
 		}
 	}
 });
@@ -85,16 +84,16 @@ export const JoinPTTActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectEntities } = JoinPTTAdapter.getSelectors();
+const { selectEntities } = JoinSFUAdapter.getSelectors();
 
-export const getJoinPTTState = (rootState: { [JOIN_PTT_FEATURE_KEY]: JoinPTTState }): JoinPTTState => {
-	return rootState[JOIN_PTT_FEATURE_KEY];
+export const getJoinSFUState = (rootState: { [JOIN_SFU_FEATURE_KEY]: JoinSFUState }): JoinSFUState => {
+	return rootState[JOIN_SFU_FEATURE_KEY];
 };
 
-export const selectJoinPTTEntities = createSelector(getJoinPTTState, selectEntities);
+export const selectJoinPTTEntities = createSelector(getJoinSFUState, selectEntities);
 
 export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, userId) => userId], (entities, userId) => {
 	const joins = Object.values(entities);
 	if (!joins?.length) return null;
-	return joins.filter((joinptt) => joinptt && joinptt.joinPttData?.user_id === userId);
+	return joins.filter((joinptt) => joinptt && joinptt.joinSFUData?.user_id === userId);
 });

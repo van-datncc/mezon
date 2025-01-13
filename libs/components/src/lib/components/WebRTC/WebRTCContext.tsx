@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { selectCurrentChannelId, selectCurrentClanId, selectJoinPTTByChannelId, useAppSelector } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -32,7 +32,6 @@ interface WebRTCProviderProps {
 export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	const { userId } = useAuth();
 	const mezon = useMezon();
-	const pushToTalkData = useAppSelector((state) => selectJoinPTTByChannelId(state, userId));
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -75,9 +74,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		peerConnection.current.onicecandidate = async (event) => {
 			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
 				await mezon.socketRef.current?.forwardSFUSignaling(
+					'userId',
+					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
 					clanId.current || '',
 					channelId.current || '',
-					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
 					JSON.stringify(event.candidate)
 				);
 			}
@@ -101,9 +101,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 				}
 			});
 			await mezon.socketRef.current?.forwardSFUSignaling(
+				'userId',
+				WebrtcSignalingType.WEBRTC_SDP_INIT,
 				clanId.current || '',
 				channelId.current || '',
-				WebrtcSignalingType.WEBRTC_SDP_INIT,
 				''
 			);
 		} catch (error) {
@@ -155,9 +156,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 						await peerConnection.current.setLocalDescription(new RTCSessionDescription(answer));
 						const answerEnc = await compress(JSON.stringify(answer));
 						await mezon.socketRef.current?.forwardSFUSignaling(
+							'userId',
+							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
 							clanId.current || '',
 							channelId.current || '',
-							WebrtcSignalingType.WEBRTC_SDP_ANSWER,
 							answerEnc
 						);
 					};
