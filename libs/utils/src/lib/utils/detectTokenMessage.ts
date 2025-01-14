@@ -36,13 +36,19 @@ export const processSingleBacktick = (inputString: string, excludeRange: { start
 export const processBacktick = (input: string): { tripleBackticks: IMarkdownOnMessage[]; singleBackticks: IMarkdownOnMessage[] } => {
 	if (!input) return { tripleBackticks: [], singleBackticks: [] };
 	const backtick = '```';
+	const singleBacktick = '`';
 	const firstStart = input.indexOf(backtick);
 	const lastEnd = input.lastIndexOf(backtick);
 
 	const tripleBackticks: IMarkdownOnMessage[] = [];
 	const singleBackticks: IMarkdownOnMessage[] = [];
 
-	if (firstStart !== -1 && lastEnd !== -1 && firstStart !== lastEnd) {
+	const singleStart = input.indexOf(singleBacktick);
+	const singleEnd = input.lastIndexOf(singleBacktick);
+
+	if (singleStart !== -1 && singleEnd !== -1 && singleStart < firstStart && lastEnd + backtick.length < singleEnd) {
+		singleBackticks.push({ s: singleStart, e: singleEnd + 1, type: EBacktickType.SINGLE });
+	} else if (firstStart !== -1 && lastEnd !== -1 && firstStart !== lastEnd) {
 		const contentBetween = input.slice(firstStart + backtick.length, lastEnd).trim();
 		if (contentBetween) {
 			tripleBackticks.push({ s: firstStart, e: lastEnd + backtick.length, type: EBacktickType.TRIPLE });
