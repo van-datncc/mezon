@@ -1,6 +1,6 @@
 import { IJoinSFU, LoadingStatus } from '@mezon/utils';
 import { EntityState, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { SFUSignalingFwd } from 'mezon-js';
+import { SFUSignalingFwd, SFUSignalingType } from 'mezon-js';
 
 export const JOIN_SFU_FEATURE_KEY = 'joinSFU';
 
@@ -101,5 +101,5 @@ export const selectJoinSFUByChannelId = createSelector([selectJoinSFUEntities, (
 export const selectTalkingUser = createSelector([selectJoinSFUEntities, (state, userId) => userId], (entities, userId) => {
 	const talks = Object.values(entities);
 	// TODO: add data type for talking
-	return talks.filter((talk) => talk && talk.joinSFUData?.user_id === userId && talk.joinSFUData?.data_type === 5);
+	return talks.filter((talk) => talk && talk.joinSFUData?.user_id === userId && talk.joinSFUData?.data_type === SFUSignalingType.TALK);
 });

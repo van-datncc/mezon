@@ -39,7 +39,6 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
-	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
 	selectAllTextChannel,
@@ -51,9 +50,10 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
-	selectPttMembersByChannelId,
+	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
+	sfuMembersActions,
 	stickerSettingActions,
 	toastActions,
 	topicsActions,
@@ -159,7 +159,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
+	const pttMembers = useSelector(selectSFUMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
@@ -223,9 +223,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(user: SFUSignalingFwd) => {
 			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
 			if (existingMember) {
-				dispatch(pttMembersActions.remove(existingMember?.id));
+				dispatch(sfuMembersActions.remove(existingMember?.id));
 			}
-			//dispatch(pttMembersActions.add(user));
+			// TODO:
+			//dispatch(sfuMembersActions.add(user));
 		},
 		[dispatch, pttMembers]
 	);

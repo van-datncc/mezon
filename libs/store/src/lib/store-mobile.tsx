@@ -63,7 +63,7 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { JoinSFUReducer } from './sfu/sfu.slice';
-import { pushToTalkMembersReducer } from './sfu/sfuMembers.slice';
+import { sfuMembersReducer } from './sfu/sfuUsers.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
@@ -384,7 +384,7 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
-	pushToTalkUsers: pushToTalkMembersReducer,
+	sfuUsers: sfuMembersReducer,
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,

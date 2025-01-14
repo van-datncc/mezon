@@ -4,10 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
 	clansActions,
-	IPttUsersEntity,
+	ISFUUsersEntity,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
-	selectPttMembersByChannelId,
+	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -80,7 +80,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const inPushToTalkMembers = useSelector(selectPttMembersByChannelId(channel.id));
+	const inPushToTalkMembers = useSelector(selectSFUMembersByChannelId(channel.id));
 
 	const channelHasPushToTalkFeature = useMemo(() => {
 		return channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private === 1;
@@ -187,7 +187,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 };
 
 interface ICollapsedMemberListProps {
-	channelMemberList: VoiceEntity[] | UsersStreamEntity[] | IPttUsersEntity[];
+	channelMemberList: VoiceEntity[] | UsersStreamEntity[] | ISFUUsersEntity[];
 	isPttList?: boolean;
 }
 
