@@ -224,7 +224,7 @@ const RenderContent = memo(
 							content = content.replace(/```/g, '`');
 						}
 					} else {
-						content = convertMarkdown(content);
+						content = convertMarkdown(content, element.type as EBacktickType);
 					}
 					formattedContent.push(
 						<MarkdownContent
