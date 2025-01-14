@@ -53,11 +53,11 @@ export const embedSlice = createSlice({
 			const { message_id, data, multiple } = action.payload;
 			if (state.formDataEmbed[message_id]?.[data.id] && multiple) {
 				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id]].filter((item) => item !== data.value);
-        return
+				return;
 			}
-      if(state.formDataEmbed[message_id][data.id]){
-        state.formDataEmbed[message_id][data.id] = ''
-      }
+			if (state.formDataEmbed[message_id][data.id]) {
+				state.formDataEmbed[message_id][data.id] = '';
+			}
 		}
 	}
 });
