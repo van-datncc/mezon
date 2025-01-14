@@ -75,7 +75,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					id: buttonId,
 					value: option.value
 				},
-				multiple: true
+				multiple: Boolean(select.min_options && select.min_options > 1) || Boolean(select.max_options && select.max_options > 1)
 			})
 		);
 	};
