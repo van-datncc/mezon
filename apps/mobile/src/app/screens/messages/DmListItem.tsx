@@ -1,4 +1,4 @@
-import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
+import { ActionEmitEvent, IS_TABLET, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
@@ -6,7 +6,7 @@ import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/uti
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import BuzzBadge from '../../components/BuzzBadge/BuzzBadge';
@@ -135,12 +135,21 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 			) : (
 				<View style={styles.avatarWrapper}>
 					{directMessage?.channel_avatar?.[0] ? (
-						<FastImage
-							source={{
-								uri: createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
-							}}
-							style={styles.friendAvatar}
-						/>
+						IS_TABLET ? (
+							<Image
+								source={{
+									uri: createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={styles.friendAvatar}
+							/>
+						) : (
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
+								}}
+								style={styles.friendAvatar}
+							/>
+						)
 					) : (
 						<View style={styles.wrapperTextAvatar}>
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>

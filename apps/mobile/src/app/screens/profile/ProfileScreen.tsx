@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useFriends, useMemberStatus } from '@mezon/core';
-import { CheckIcon, DisturbStatusIcon, Icons, IdleStatusIcon, OfflineStatus, OnlineStatus } from '@mezon/mobile-components';
+import { CheckIcon, DisturbStatusIcon, IS_TABLET, Icons, IdleStatusIcon, OfflineStatus, OnlineStatus } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	FriendsEntity,
@@ -16,7 +16,7 @@ import { safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonButton } from '../../componentUI';
@@ -146,12 +146,21 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
-						<FastImage
-							source={{
-								uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
-							}}
-							style={styles.imgWrapper}
-						/>
+						IS_TABLET ? (
+							<Image
+								source={{
+									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+								}}
+								style={styles.imgWrapper}
+							/>
+						) : (
+							<FastImage
+								source={{
+									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+								}}
+								style={styles.imgWrapper}
+							/>
+						)
 					) : (
 						<Block
 							backgroundColor={themeValue.colorAvatarDefault}
