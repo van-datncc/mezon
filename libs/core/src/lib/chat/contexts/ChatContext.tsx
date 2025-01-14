@@ -42,6 +42,7 @@ import {
 	reactionActions,
 	rolesClanActions,
 	selectAllTextChannel,
+	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
@@ -79,7 +80,8 @@ import {
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
-	TypeMessage
+	TypeMessage,
+	electronBridge
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -1081,12 +1083,38 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
 		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+
 		const updateAmount = isReceiverGiveCoffee
 			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 			: isSenderGiveCoffee
 				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 				: 0;
 		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
+		if (isReceiverGiveCoffee && isElectron()) {
+			const senderToken = coffeeEvent.sender_id;
+			const allMembersClan = selectAllUserClans(store.getState() as RootState);
+			let member = null;
+			for (const m of allMembersClan) {
+				if (m.id === senderToken) {
+					member = m;
+					break;
+				}
+			}
+			if (!member) return;
+			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
+			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
+
+			const title = 'Token Received:';
+			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
+
+			electronBridge.pushNotification(title, {
+				body: body,
+				icon: prioritizedAvatar,
+				data: {
+					link: ''
+				}
+			});
+		}
 	}, []);
 
 	const onroleevent = useCallback(
