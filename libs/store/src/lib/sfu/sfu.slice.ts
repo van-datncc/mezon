@@ -97,3 +97,9 @@ export const selectJoinSFUByChannelId = createSelector([selectJoinSFUEntities, (
 	if (!joins?.length) return null;
 	return joins.filter((joinsfu) => joinsfu && joinsfu.joinSFUData?.user_id === userId);
 });
+
+export const selectTalkingUser = createSelector([selectJoinSFUEntities, (state, userId) => userId], (entities, userId) => {
+	const talks = Object.values(entities);
+	// TODO: add data type for talking
+	return talks.filter((talk) => talk && talk.joinSFUData?.user_id === userId && talk.joinSFUData?.data_type === 5);
+});

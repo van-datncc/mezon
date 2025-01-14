@@ -1,4 +1,5 @@
 export * from './lib/MezonStoreProvider';
+export * from './lib/SFUMembers/SFUMembers.slice';
 export * from './lib/account/account.slice';
 export * from './lib/activities/activitiesAPI.slice';
 export * from './lib/app/app.slice';
@@ -58,7 +59,6 @@ export * from './lib/permissionChannel/permissionRoleChannel.slice';
 export * from './lib/pinMessages/pinMessage.slice';
 export * from './lib/policies/overriddenPolicies.slice';
 export * from './lib/policies/policies.slice';
-export * from './lib/pushToTalkMembers/pushToTalkMembers.slice';
 export * from './lib/reactionMessage/reactionMessage.slice';
 export * from './lib/roleclan/roleclan.slice';
 export * from './lib/searchmessages/searchmessage.slice';
