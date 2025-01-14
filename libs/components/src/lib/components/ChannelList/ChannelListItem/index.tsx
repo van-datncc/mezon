@@ -7,7 +7,6 @@ import {
 	ISFUUsersEntity,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
-	selectSfuMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -79,18 +78,13 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const sfuMembers = useSelector(selectSfuMembersByChannelId(channel.id));
-
-	const channelHasPushToTalkFeature = useMemo(() => {
-		return channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private === 1;
-	}, [channel.channel_private, channel.type]);
 
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_APP) return sfuMembers;
 		return [];
-	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, sfuMembers]);
+	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
 
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, channel.category_id as string));
 	const unreadMessageCount = channel?.count_mess_unread || 0;
@@ -133,7 +127,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				<>
 					{renderChannelLink()}
 					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
-					{channelMemberList?.length > 0 && channelHasPushToTalkFeature && (
+					{channelMemberList?.length > 0 && (
 						<div className="flex gap-1 px-4">
 							<div className="flex gap-1 h-fit">
 								<Icons.InPttCall className="w-5 dark:text-channelTextLabel text-colorTextLightMode" />
@@ -160,7 +154,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 			);
 		}
 
-		if (isCategoryExpanded && !channelHasPushToTalkFeature) {
+		if (isCategoryExpanded) {
 			return (
 				<>
 					{renderChannelLink()}
@@ -175,16 +169,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				<CollapsedMemberList channelMemberList={channelMemberList} />
 			</>
 		) : null;
-	}, [
-		channel.type,
-		channel.threads,
-		channel.channel_id,
-		isCategoryExpanded,
-		channelHasPushToTalkFeature,
-		channelMemberList,
-		renderChannelLink,
-		listThreadRef
-	]);
+	}, [channel.type, channel.threads, channel.channel_id, isCategoryExpanded, channelMemberList, renderChannelLink, listThreadRef]);
 
 	return <>{renderChannelContent} </>;
 };

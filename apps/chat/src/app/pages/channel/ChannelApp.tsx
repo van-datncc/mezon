@@ -1,7 +1,7 @@
 import { Loading } from '@mezon/ui';
-import { useWebRTC } from 'libs/components/src/lib/components/WebRTC/WebRTCContext';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
+import { useWebRTC } from '../../../components/WebRTC/WebRTCContext';
 
 export function ChannelApps({
 	appChannel,
