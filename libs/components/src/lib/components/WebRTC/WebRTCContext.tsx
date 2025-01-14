@@ -76,7 +76,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 		peerConnection.current.onicecandidate = async (event) => {
 			if (event && event.candidate && mezon.socketRef.current?.isOpen() === true) {
 				await mezon.socketRef.current?.forwardSFUSignaling(
-					'userId',
+					userId,
 					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
 					clanId.current || '',
 					channelId.current || '',

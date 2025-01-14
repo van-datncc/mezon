@@ -42,17 +42,21 @@ export const embedSlice = createSlice({
 				const listData = [...state.formDataEmbed[message_id][data.id], data.value];
 				if (state.formDataEmbed[message_id][data.id].includes(data.value)) {
 					state.formDataEmbed[message_id][data.id] = listData.filter((item) => item !== data.value);
-          return;
+					return;
 				}
 				state.formDataEmbed[message_id][data.id] = listData;
 				return;
 			}
-			state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id], data.value];
+			state.formDataEmbed[message_id][data.id] = [data.value];
 		},
 		removeEmbedValuel: (state, action: PayloadAction<{ message_id: string; data: FormDataEmbed; multiple?: boolean }>) => {
 			const { message_id, data, multiple } = action.payload;
 			if (state.formDataEmbed[message_id]?.[data.id] && multiple) {
 				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id]].filter((item) => item !== data.value);
+				return;
+			}
+			if (state.formDataEmbed[message_id][data.id]) {
+				state.formDataEmbed[message_id][data.id] = '';
 			}
 		}
 	}

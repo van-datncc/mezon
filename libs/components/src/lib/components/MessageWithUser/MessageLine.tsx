@@ -1,6 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { selectAllChannels, useAppSelector } from '@mezon/store';
-import { EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
+import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
@@ -219,7 +219,7 @@ const RenderContent = memo(
 							content = content.replace(/```/g, '`');
 						}
 					} else {
-						content = convertMarkdown(content);
+						content = convertMarkdown(content, element.type as EBacktickType);
 					}
 					formattedContent.push(
 						<MarkdownContent
@@ -376,8 +376,16 @@ interface MentionContentProps {
 
 export const MentionContent = memo(({ element, contentInElement, isTokenClickAble, isJumMessageEnabled, mode, index, s }: MentionContentProps) => {
 	const { allUserIdsInChannel } = useMessageContextMenu();
+	let isValidMention = false;
 
-	const isValidMention = allUserIdsInChannel.indexOf(element.user_id ?? '') !== -1 || contentInElement === '@here';
+	if (allUserIdsInChannel && allUserIdsInChannel?.length > 0) {
+		if (typeof allUserIdsInChannel?.[0] === 'string') {
+			isValidMention = (allUserIdsInChannel as string[])?.includes(element.user_id ?? '') || contentInElement === '@here';
+		} else {
+			isValidMention =
+				(allUserIdsInChannel as ChannelMembersEntity[])?.some((member) => member.id === element.user_id) || contentInElement === '@here';
+		}
+	}
 
 	if (isValidMention) {
 		return (
