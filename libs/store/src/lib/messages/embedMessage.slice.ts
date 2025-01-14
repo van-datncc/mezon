@@ -42,7 +42,7 @@ export const embedSlice = createSlice({
 				const listData = [...state.formDataEmbed[message_id][data.id], data.value];
 				if (state.formDataEmbed[message_id][data.id].includes(data.value)) {
 					state.formDataEmbed[message_id][data.id] = listData.filter((item) => item !== data.value);
-          return;
+					return;
 				}
 				state.formDataEmbed[message_id][data.id] = listData;
 				return;
