@@ -7,6 +7,7 @@ import {
 	ISFUUsersEntity,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
+	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -78,6 +79,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
+	const sfuMembers = useSelector(selectSFUMembersByChannelId(channel.id));
 
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
