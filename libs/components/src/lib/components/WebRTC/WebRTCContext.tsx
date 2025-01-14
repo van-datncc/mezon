@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId, selectJoinSFUByChannelId, useAppSelector } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -39,6 +39,8 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const clanId = useRef<string | null>(currentClanId || null);
 	const peerConnection = useRef<RTCPeerConnection | null>(null);
+
+	const sfuData = useAppSelector((state) => selectJoinSFUByChannelId(state, userId));
 
 	const servers: RTCConfiguration = useMemo(
 		() => ({
@@ -139,9 +141,9 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			return;
 		}
 
-		const lastData = pushToTalkData?.[pushToTalkData?.length - 1];
+		const lastData = sfuData?.[sfuData?.length - 1];
 		if (!lastData) return;
-		const data = lastData?.joinPttData;
+		const data = lastData?.joinSFUData;
 		switch (data.data_type) {
 			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
 				{
@@ -180,7 +182,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 			default:
 				break;
 		}
-	}, [mezon.socketRef, pushToTalkData]);
+	}, [mezon.socketRef, sfuData]);
 
 	const value: WebRTCContextType = {
 		clanId: clanId.current,

@@ -65,8 +65,7 @@ import { pushToTalkMembersReducer } from './pushToTalkMembers/pushToTalkMembers.
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
-import { JoinPTTReducer } from './sfu/ptt.join.slice';
-import { TalkPTTReducer } from './sfu/ptt.talk.slice';
+import { JoinSFUReducer } from './sfu/sfu.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
@@ -359,8 +358,7 @@ const reducer = {
 	directmembersmeta: directMembersMetaReducer,
 	[ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
 	dmcall: DMCallReducer,
-	joinPTT: JoinPTTReducer,
-	talkPTT: TalkPTTReducer,
+	joinSFU: JoinSFUReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,

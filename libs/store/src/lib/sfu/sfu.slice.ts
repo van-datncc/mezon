@@ -31,7 +31,7 @@ export const initialJoinSFUState: JoinSFUState = JoinSFUAdapter.getInitialState(
 	}
 });
 
-export const JoinPTTSlice = createSlice({
+export const JoinSFUSlice = createSlice({
 	name: JOIN_SFU_FEATURE_KEY,
 	initialState: initialJoinSFUState,
 	reducers: {
@@ -46,7 +46,7 @@ export const JoinPTTSlice = createSlice({
 /*
  * Export reducer for store configuration.
  */
-export const JoinPTTReducer = JoinPTTSlice.reducer;
+export const JoinSFUReducer = JoinSFUSlice.reducer;
 
 /*
  * Export action creators to be dispatched. For use with the `useDispatch` hook.
@@ -66,8 +66,8 @@ export const JoinPTTReducer = JoinPTTSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const JoinPTTActions = {
-	...JoinPTTSlice.actions
+export const JoinSFUActions = {
+	...JoinSFUSlice.actions
 };
 
 /*
@@ -90,10 +90,10 @@ export const getJoinSFUState = (rootState: { [JOIN_SFU_FEATURE_KEY]: JoinSFUStat
 	return rootState[JOIN_SFU_FEATURE_KEY];
 };
 
-export const selectJoinPTTEntities = createSelector(getJoinSFUState, selectEntities);
+export const selectJoinSFUEntities = createSelector(getJoinSFUState, selectEntities);
 
-export const selectJoinPTTByChannelId = createSelector([selectJoinPTTEntities, (state, userId) => userId], (entities, userId) => {
+export const selectJoinSFUByChannelId = createSelector([selectJoinSFUEntities, (state, userId) => userId], (entities, userId) => {
 	const joins = Object.values(entities);
 	if (!joins?.length) return null;
-	return joins.filter((joinptt) => joinptt && joinptt.joinSFUData?.user_id === userId);
+	return joins.filter((joinsfu) => joinsfu && joinsfu.joinSFUData?.user_id === userId);
 });
