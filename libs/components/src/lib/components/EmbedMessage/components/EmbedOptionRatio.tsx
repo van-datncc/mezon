@@ -38,21 +38,19 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 		return true;
 	}, [options]);
 
-	const handleAddEmbedRadioValue = useCallback(
-		(index: number) => {
-			dispatch(
-				embedActions.addEmbedValue({
-					message_id: message_id,
-					data: {
-						id: idRadio,
-						value: options[index].value
-					},
-					multiple: !checkMultiple
-				})
-			);
-		},
-		[checkMultiple]
-	);
+	const handleAddEmbedRadioValue = useCallback((index: number) => {
+		dispatch(
+			embedActions.addEmbedValue({
+				message_id: message_id,
+				data: {
+					id: idRadio,
+					value: options[index].value
+				},
+				multiple: true,
+				onlyChooseOne: checkMultiple
+			})
+		);
+	}, [checkMultiple]);
 	return (
 		<>
 			{options &&
