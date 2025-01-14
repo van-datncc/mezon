@@ -1,5 +1,12 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { selectChannelMemberByUserIds, selectCurrentChannel, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
+import {
+	selectChannelMemberByUserIds,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectDmGroupCurrentId,
+	selectMembersByUsername,
+	useAppSelector
+} from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RefObject, memo, useCallback, useMemo, useState } from 'react';
@@ -15,6 +22,7 @@ type ChannelHashtagProps = {
 	isTokenClickAble: boolean;
 	tagRoleName?: string;
 	tagRoleId?: string;
+	mention?: string;
 };
 
 enum MentionType {
@@ -31,9 +39,19 @@ type UserProfilePopupProps = {
 	isDm?: boolean;
 	rootRef?: RefObject<HTMLElement>;
 	onClose: () => void;
+	username?: string;
 };
 
-const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
+const MentionUser = ({
+	mention,
+	tagUserName,
+	mode,
+	isJumMessageEnabled,
+	isTokenClickAble,
+	tagUserId,
+	tagRoleName,
+	tagRoleId
+}: ChannelHashtagProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const displayToken = useMemo(() => {
 		if (tagRoleId) {
@@ -75,6 +93,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				isDm={isDM}
 				positionShortUser={positionShortUser}
 				onClose={closeProfileItem}
+				username={mention}
 			/>
 		);
 	}, [positionShortUser]);
@@ -136,7 +155,8 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose, rootRef }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ username, userID, channelId, mode, isDm, positionShortUser, onClose, rootRef }: UserProfilePopupProps) => {
+	const getUserByUsername = useAppSelector((state) => selectMembersByUsername(state, channelId ?? '', username ?? ''));
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(
 			state,
@@ -145,17 +165,22 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? '' : '1'
 		)
 	)[0];
+	const userGetByNameOrId = useMemo(() => {
+		return getUserByUserId || getUserByUsername;
+	}, [getUserByUserId, getUserByUsername]);
+	const userId = userGetByNameOrId.id;
+
 	const currentChannel = useSelector(selectCurrentChannel);
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const prioritizeName = getNameForPrioritize(
-		getUserByUserId.clan_nick ?? '',
-		getUserByUserId.user?.display_name ?? '',
-		getUserByUserId.user?.username ?? ''
+		userGetByNameOrId.clan_nick ?? '',
+		userGetByNameOrId.user?.display_name ?? '',
+		userGetByNameOrId.user?.username ?? ''
 	);
-	const prioritizeAvt = getUserByUserId.clan_avatar ? getUserByUserId.clan_avatar : getUserByUserId.user?.avatar_url;
+	const prioritizeAvt = userGetByNameOrId.clan_avatar ? userGetByNameOrId.clan_avatar : userGetByNameOrId.user?.avatar_url;
 
 	const updatedUserByUserId = {
-		...getUserByUserId,
+		...userGetByNameOrId,
 		prioritizeName,
 		prioritizeAvt
 	};
@@ -170,7 +195,7 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 		>
 			<ModalUserProfile
 				onClose={onClose}
-				userID={userID}
+				userID={userId}
 				classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 				mode={mode}
 				positionType={''}
