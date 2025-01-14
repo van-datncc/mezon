@@ -74,7 +74,13 @@ const MentionUser = ({
 				type: MentionType.USER_EXIST
 			};
 		}
-	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
+		if (mention) {
+			return {
+				display: `@${mention}`,
+				type: MentionType.USER_EXIST
+			};
+		}
+	}, [tagUserName, tagRoleName, tagUserId, tagRoleId, mention]);
 
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));

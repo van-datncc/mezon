@@ -394,7 +394,7 @@ export const MentionContent = memo(
 			}
 		}
 
-		if (isValidMention) {
+		if (isValidMention || mention) {
 			return (
 				<MentionUser
 					isTokenClickAble={isTokenClickAble}
