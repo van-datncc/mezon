@@ -11,7 +11,7 @@ import {
 	selectMessageByMessageId,
 	useAppDispatch
 } from '@mezon/store';
-import { SHOW_POSITION } from '@mezon/utils';
+import { ChannelMembersEntity, SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
@@ -42,7 +42,7 @@ type MessageContextMenuContextValue = {
 	posShowMenu: string;
 	setImageURL: (url: string) => void;
 	imageSrc: string;
-	allUserIdsInChannel: string[];
+	allUserIdsInChannel?: string[] | ChannelMembersEntity[];
 	allRolesInClan: string[];
 	posShortProfile: posShortProfileOpt;
 	setPosShortProfile: (pos: posShortProfileOpt) => void;
@@ -72,7 +72,6 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 	},
 	imageSrc: '',
-	allUserIdsInChannel: [],
 	allRolesInClan: [],
 	posShortProfile: {},
 	setPosShortProfile: () => {
@@ -130,7 +129,7 @@ export const MessageContextMenuProvider = ({
 	channelId
 }: {
 	children: React.ReactNode;
-	allUserIdsInChannel: string[];
+	allUserIdsInChannel?: string[] | ChannelMembersEntity[];
 	allRolesInClan: string[];
 	channelId?: string;
 }) => {
