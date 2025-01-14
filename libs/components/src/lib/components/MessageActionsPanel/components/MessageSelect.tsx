@@ -63,7 +63,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 						id: buttonId,
 						value: option.value
 					},
-					multiple: checkMultipleSelect
+					multiple: true
 				})
 			);
 			return;
@@ -75,7 +75,8 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					id: buttonId,
 					value: option.value
 				},
-				multiple: checkMultipleSelect
+				multiple: true,
+				onlyChooseOne: checkMultipleSelect
 			})
 		);
 	};
@@ -107,7 +108,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 					id: buttonId,
 					value: option.value
 				},
-				multiple: checkMultipleSelect
+				multiple: true
 			})
 		);
 	};
