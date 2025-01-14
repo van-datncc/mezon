@@ -4,17 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
 	clansActions,
-	IPttUsersEntity,
+	ISFUUsersEntity,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
-	selectPttMembersByChannelId,
+	selectSfuMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
 	UsersStreamEntity,
 	VoiceEntity
 } from '@mezon/store';
-
 import { Icons } from '@mezon/ui';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -80,7 +79,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const inPushToTalkMembers = useSelector(selectPttMembersByChannelId(channel.id));
+	const sfuMembers = useSelector(selectSfuMembersByChannelId(channel.id));
 
 	const channelHasPushToTalkFeature = useMemo(() => {
 		return channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private === 1;
@@ -89,9 +88,9 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
-		if (channelHasPushToTalkFeature) return inPushToTalkMembers;
+		if (channelHasPushToTalkFeature) return sfuMembers;
 		return [];
-	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, inPushToTalkMembers]);
+	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, sfuMembers]);
 
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, channel.category_id as string));
 	const unreadMessageCount = channel?.count_mess_unread || 0;
@@ -125,7 +124,11 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	};
 
 	const renderChannelContent = useMemo(() => {
-		if (channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (
+			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
+			channel.type !== ChannelType.CHANNEL_TYPE_APP
+		) {
 			return (
 				<>
 					{renderChannelLink()}
@@ -187,7 +190,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 };
 
 interface ICollapsedMemberListProps {
-	channelMemberList: VoiceEntity[] | UsersStreamEntity[] | IPttUsersEntity[];
+	channelMemberList: VoiceEntity[] | UsersStreamEntity[] | ISFUUsersEntity[];
 	isPttList?: boolean;
 }
 
