@@ -88,7 +88,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
-		if (channelHasPushToTalkFeature) return sfuMembers;
+		if (channel.type === ChannelType.CHANNEL_TYPE_APP) return sfuMembers;
 		return [];
 	}, [channel.type, voiceChannelMembers, streamChannelMembers, channelHasPushToTalkFeature, sfuMembers]);
 
