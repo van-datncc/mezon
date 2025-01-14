@@ -16,11 +16,12 @@ export const handleCopyImage = async (urlData: string) => {
 			console.error('Failed to fetch or convert image');
 			return;
 		}
-
-		const file = new File([blob], 'image.png', { type: 'image/png' });
+		const fileName = urlData.split('/').pop() || 'image';
+		const fileType = urlData.split('.').pop() || 'png';
+		const file = new File([blob], fileName, { type: `image/${fileType}` });
 		if (navigator.clipboard && navigator.clipboard.write) {
 			try {
-				const clipboardItem = new ClipboardItem({ 'image/png': file });
+				const clipboardItem = new ClipboardItem({ [`image/${fileType}`]: file });
 				await navigator.clipboard.write([clipboardItem]);
 			} catch (error) {
 				console.error('Failed to write image to clipboard:', error);
@@ -37,10 +38,11 @@ export const handleSaveImage = (urlData: string) => {
 	fetch(urlData)
 		.then((response) => response.blob())
 		.then((blob) => {
+			const fileName = urlData.split('/').pop() || 'image.png';
 			const url = window.URL.createObjectURL(new Blob([blob]));
 			const a = document.createElement('a');
 			a.href = url;
-			a.download = 'image.png';
+			a.download = fileName;
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
