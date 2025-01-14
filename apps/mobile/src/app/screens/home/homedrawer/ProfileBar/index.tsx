@@ -4,8 +4,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAccountCustomStatus } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { memo } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Image, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../../components/UserStatus';
 import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
@@ -26,7 +25,7 @@ const ProfileBar = () => {
 	return (
 		<Pressable style={styles.wrapperProfile} onPress={handleOpenProfileSettings}>
 			<View>
-				<FastImage source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imageWrapper} />
+				<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imageWrapper} />
 				<UserStatus status={userStatus} iconSize={size.s_16} />
 			</View>
 			<View>
