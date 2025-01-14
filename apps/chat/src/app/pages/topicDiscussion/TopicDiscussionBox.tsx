@@ -90,21 +90,21 @@ const TopicDiscussionBox = () => {
 				hg: validHashtagList,
 				ej: validEmojiList
 			};
-			dispatch(
-				topicsActions.handleSendTopic({
-					clanId: currentClanId as string,
-					channelId: currentChannel?.channel_id as string,
-					mode: mode,
-					anonymous: false,
-					attachments: attachments,
-					code: 0,
-					content: validatedContent,
-					isPublic: currentChannel?.channel_private !== 1,
-					mentionEveryone: false,
-					mentions: validMentionList,
-					references: references,
-					topicId: topicId as string
-				})
+
+			await socket.writeChatMessage(
+				currentClanId,
+				currentChannel?.channel_id as string,
+				mode,
+				currentChannel?.channel_private !== 1,
+				validatedContent,
+				validMentionList,
+				attachments,
+				references,
+				false,
+				false,
+				'',
+				0,
+				topicId?.toString()
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
