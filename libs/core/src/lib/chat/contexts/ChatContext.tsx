@@ -657,52 +657,48 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
-			if (userId !== stickerCreated.creator_id) {
-				dispatch(
-					stickerSettingActions.add({
-						category: stickerCreated.category,
-						clan_id: stickerCreated.clan_id,
-						creator_id: stickerCreated.creator_id,
-						id: stickerCreated.sticker_id,
-						shortname: stickerCreated.shortname,
-						source: stickerCreated.source,
-						logo: stickerCreated.logo,
-						clan_name: stickerCreated.clan_name
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.add({
+					category: stickerCreated.category,
+					clan_id: stickerCreated.clan_id,
+					creator_id: stickerCreated.creator_id,
+					id: stickerCreated.sticker_id,
+					shortname: stickerCreated.shortname,
+					source: stickerCreated.source,
+					logo: stickerCreated.logo,
+					clan_name: stickerCreated.clan_name
+				})
+			);
 		},
 		[dispatch, userId]
 	);
 
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
-			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === EEventAction.CREATED) {
-					dispatch(
-						emojiSuggestionActions.add({
-							category: eventEmoji.clan_name,
-							clan_id: eventEmoji.clan_id,
-							creator_id: eventEmoji.user_id,
-							id: eventEmoji.id,
-							shortname: eventEmoji.short_name,
-							src: eventEmoji.source,
-							logo: eventEmoji.logo,
-							clan_name: eventEmoji.clan_name
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.UPDATE) {
-					dispatch(
-						emojiSuggestionActions.update({
-							id: eventEmoji.id,
-							changes: {
-								shortname: eventEmoji.short_name
-							}
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.DELETE) {
-					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
-				}
+			if (eventEmoji.action === EEventAction.CREATED) {
+				dispatch(
+					emojiSuggestionActions.add({
+						category: eventEmoji.clan_name,
+						clan_id: eventEmoji.clan_id,
+						creator_id: eventEmoji.user_id,
+						id: eventEmoji.id,
+						shortname: eventEmoji.short_name,
+						src: eventEmoji.source,
+						logo: eventEmoji.logo,
+						clan_name: eventEmoji.clan_name
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.UPDATE) {
+				dispatch(
+					emojiSuggestionActions.update({
+						id: eventEmoji.id,
+						changes: {
+							shortname: eventEmoji.short_name
+						}
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.DELETE) {
+				dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 			}
 		},
 		[dispatch, userId]
@@ -710,25 +706,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickerdeleted = useCallback(
 		(stickerDeleted: StickerDeleteEvent) => {
-			if (userId !== stickerDeleted.user_id) {
-				dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
-			}
+			dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
 		},
 		[userId, dispatch]
 	);
 
 	const onstickerupdated = useCallback(
 		(stickerUpdated: StickerUpdateEvent) => {
-			if (userId !== stickerUpdated.user_id) {
-				dispatch(
-					stickerSettingActions.update({
-						id: stickerUpdated.sticker_id,
-						changes: {
-							shortname: stickerUpdated.shortname
-						}
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.update({
+					id: stickerUpdated.sticker_id,
+					changes: {
+						shortname: stickerUpdated.shortname
+					}
+				})
+			);
 		},
 		[userId, dispatch]
 	);

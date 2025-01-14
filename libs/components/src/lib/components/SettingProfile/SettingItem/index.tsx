@@ -11,9 +11,10 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 	const handleOpenModal = () => {
 		setOpenModal(true);
 	};
-	const handleLogOut = () => {
-		dispatch(authActions.logOut());
-		dispatch(appActions.setIsShowSettingFooterStatus(false));
+	const handleLogOut = async () => {
+		await dispatch(authActions.logOut());
+		await dispatch(appActions.setIsShowSettingFooterStatus(false));
+		window.location.href = '/desktop/login';
 	};
 	const handleCloseModal = () => {
 		setOpenModal(false);
