@@ -1,5 +1,4 @@
 export * from './lib/MezonStoreProvider';
-export * from './lib/SFUMembers/SFUMembers.slice';
 export * from './lib/account/account.slice';
 export * from './lib/activities/activitiesAPI.slice';
 export * from './lib/app/app.slice';
@@ -64,6 +63,7 @@ export * from './lib/roleclan/roleclan.slice';
 export * from './lib/searchmessages/searchmessage.slice';
 export * from './lib/settingSticker/settingSticker.slice';
 export * from './lib/sfu/sfu.slice';
+export * from './lib/sfu/sfuMembers.slice';
 export * from './lib/store';
 export * from './lib/stream/usersStream.slice';
 export * from './lib/stream/videoStream.slice';
