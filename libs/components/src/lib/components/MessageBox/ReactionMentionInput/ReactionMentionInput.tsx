@@ -372,7 +372,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					anonymousMessage,
 					mentionEveryone
 				);
-		
+
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -393,7 +393,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					anonymousMessage,
 					mentionEveryone
 				);
-			
+
 				setOpenThreadMessageState(false);
 			} else if (isReplyOnTopic) {
 				props.onSend(
@@ -405,7 +405,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					anonymousMessage,
 					mentionEveryone
 				);
-			
+
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -426,7 +426,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					anonymousMessage,
 					mentionEveryone
 				);
-	
+
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
