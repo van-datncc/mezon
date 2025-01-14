@@ -60,6 +60,7 @@ export const embedSlice = createSlice({
 			if (state.formDataEmbed[message_id]?.[data.id] && multiple) {
 				state.formDataEmbed[message_id][data.id] = [...state.formDataEmbed[message_id][data.id]].filter((item) => item !== data.value);
 				return;
+				return;
 			}
 			if (state.formDataEmbed[message_id][data.id]) {
 				state.formDataEmbed[message_id][data.id] = [];
