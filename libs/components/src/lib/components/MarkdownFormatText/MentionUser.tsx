@@ -4,7 +4,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
-	selectMembersByUsername,
+	selectMemberByUsername,
 	useAppSelector
 } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
@@ -162,7 +162,7 @@ const MentionUser = ({
 export default memo(MentionUser);
 
 const UserProfilePopup = ({ username, userID, channelId, mode, isDm, positionShortUser, onClose, rootRef }: UserProfilePopupProps) => {
-	const getUserByUsername = useAppSelector((state) => selectMembersByUsername(state, channelId ?? '', username ?? ''));
+	const getUserByUsername = useAppSelector((state) => selectMemberByUsername(state, channelId ?? '', username ?? ''));
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(
 			state,
