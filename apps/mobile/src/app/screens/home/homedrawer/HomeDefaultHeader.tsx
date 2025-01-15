@@ -64,7 +64,7 @@ const HomeDefaultHeader = React.memo(
 
 			if (
 				currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-				currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+				currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
 				!isAgeRestrictedChannel
 			) {
 				return <Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
@@ -78,7 +78,7 @@ const HomeDefaultHeader = React.memo(
 				return <Icons.AppChannelIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
-			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel) {
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel) {
 				return <Icons.HashtagWarning width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 

@@ -48,7 +48,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 			return <Icons.ThreadIcon defaultSize="w-5 h-5 -mt-1 min-w-5" />;
 		}
 
-		if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+		if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isPrivate) {
 				return <Icons.HashtagLocked defaultSize="w-5 h-5 -mt-1 min-w-5" />;
 			}

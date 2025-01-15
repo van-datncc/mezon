@@ -168,7 +168,7 @@ export interface RemoveChannelFavoriteArgs {
 }
 export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, channelId, channelType, isPublic }: JoinChatPayload, thunkAPI) => {
 	if (
-		channelType !== ChannelType.CHANNEL_TYPE_TEXT &&
+		channelType !== ChannelType.CHANNEL_TYPE_CHANNEL &&
 		channelType !== ChannelType.CHANNEL_TYPE_DM &&
 		channelType !== ChannelType.CHANNEL_TYPE_GROUP &&
 		channelType !== ChannelType.CHANNEL_TYPE_THREAD
@@ -214,11 +214,11 @@ export const joinChannel = createAsyncThunk(
 						channelMembersActions.fetchChannelMembers({
 							clanId,
 							channelId: channel.parrent_id || '',
-							channelType: ChannelType.CHANNEL_TYPE_TEXT
+							channelType: ChannelType.CHANNEL_TYPE_CHANNEL
 						})
 					);
 				}
-				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_CHANNEL }));
 			}
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			thunkAPI.dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
@@ -370,7 +370,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 					clanId: clanID,
 					channelId: body.channel_id || '',
 					noCache: true,
-					channelType: ChannelType.CHANNEL_TYPE_TEXT
+					channelType: ChannelType.CHANNEL_TYPE_CHANNEL
 				})
 			);
 		}
@@ -507,7 +507,7 @@ export const addThreadToChannels = createAsyncThunk(
 
 export const fetchChannels = createAsyncThunk(
 	'channels/fetchChannels',
-	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
+	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_CHANNEL, noCache }: fetchChannelsArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
@@ -1202,7 +1202,7 @@ export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels
 export const selectAllTextChannel = createSelector(selectAllChannels, (channels) =>
 	channels.filter(
 		(channel) =>
-			(channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.channel_private) ||
+			(channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && channel.channel_private) ||
 			(channel.type === ChannelType.CHANNEL_TYPE_THREAD && channel.channel_private)
 	)
 );
@@ -1219,7 +1219,7 @@ export const selectChannelsByClanId = createSelector(
 export const selectDefaultChannelIdByClanId = createSelector(
 	[selectAllChannels, (state: RootState, clanId: string) => clanId],
 	(channels, clanId) => {
-		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT);
+		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL);
 		return defaultChannel ? defaultChannel.id : null;
 	}
 );

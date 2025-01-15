@@ -19,7 +19,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
 	dispatch(channelsActions.fetchListFavoriteChannel({ clanId: clanId }));
 	dispatch(fetchSystemMessageByClanId(clanId));
-	dispatch(getAllSFUMembersInChannel({ channelId: '', channelType: ChannelType.CHANNEL_TYPE_TEXT, clanId: clanId ?? '' }));
+	dispatch(getAllSFUMembersInChannel({ channelId: '', channelType: ChannelType.CHANNEL_TYPE_CHANNEL, clanId: clanId ?? '' }));
 	return {
 		clanId
 	} as ClanLoaderData;

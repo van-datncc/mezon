@@ -35,7 +35,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		() =>
 			listChannelSearch?.filter((channel) =>
 				[
-					ChannelType.CHANNEL_TYPE_TEXT,
+					ChannelType.CHANNEL_TYPE_CHANNEL,
 					ChannelType.CHANNEL_TYPE_THREAD,
 					ChannelType.CHANNEL_TYPE_APP,
 					ChannelType.CHANNEL_TYPE_ANNOUNCEMENT,

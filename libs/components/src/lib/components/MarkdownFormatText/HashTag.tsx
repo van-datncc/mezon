@@ -54,7 +54,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		return <ModalUnknowChannel onClose={closeUnknown} />;
 	}, []);
 
-	const isTextChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT;
+	const isTextChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 	const isStreamingChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isThreadChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 	const existHashtagAndChannelView = channelHastagId && !isClanView;
@@ -77,7 +77,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 						defaultFill="#3297FF"
 					/>
-				) : channel.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+				) : channel.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 					!channel.channel_private || channel.channel_private === 0 ? (
 						<Icons.Hashtag defaultSize={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''} `} />
 					) : (

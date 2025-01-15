@@ -558,7 +558,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const userIds = users.map((u) => u.user_id);
 			const user = users?.find((user) => user.user_id === userId);
 			if (user) {
-				if (channel_desc.type === ChannelType.CHANNEL_TYPE_TEXT || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));

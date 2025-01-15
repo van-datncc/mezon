@@ -20,7 +20,7 @@ const ChannelSettingInforItem = ({ onClose, channelId }: ChannelSettingItemProps
 				<div className="flex w-full items-center gap-2 shadow-sm ">
 					<p className="font-semibold text-xl">{channel?.channel_label || ''}</p>
 					<div className="h-7 w-7 overflow-hidden flex items-center justify-center ">
-						{channel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+						{channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 							channel?.channel_private === ChannelStatusEnum.isPrivate ? (
 								<Icons.HashtagLocked defaultSize="w-6 h-6 dark:text-black" />
 							) : (
