@@ -294,7 +294,9 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 						channelId,
 						userId
 					);
-
+					if (isAnswerCall) {
+						await updatePeerConnectionOffer();
+					}
 					// Add stored ICE candidates
 					if (callState.storedIceCandidates) {
 						for (const candidate of callState.storedIceCandidates) {
@@ -303,9 +305,6 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 						callState.storedIceCandidates = [];
 					}
 					break;
-				}
-				if (isAnswerCall) {
-					await updatePeerConnectionOffer();
 				}
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
@@ -364,12 +363,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	const handleOtherCall = async (otherCallerId: string, otherChannelId: string) => {
 		await mezon.socketRef.current?.forwardWebrtcSignaling(otherCallerId, 5, '', otherChannelId, userId);
 	};
-	
+
 	const updatePeerConnectionOffer = async () => {
 		try {
 			const offer = await callState.peerConnection?.createOffer();
 			await callState.peerConnection?.setLocalDescription(offer);
-			
+
 			const compressedOffer = await compress(JSON.stringify(offer));
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
 		} catch (error) {
