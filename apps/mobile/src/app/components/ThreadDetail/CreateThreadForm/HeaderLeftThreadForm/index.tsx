@@ -26,7 +26,7 @@ const HeaderLeftThreadForm = ({ currentChannel }: { currentChannel: ChannelThrea
 					{!openThreadMessageState && (
 						<View style={{ marginRight: size.s_10 }}>
 							{currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-							currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+							currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 								<Icons.TextLockIcon width={18} height={18} color={themeValue.textStrong} />
 							) : (
 								<Icons.TextIcon width={18} height={18} color={themeValue.textStrong} />

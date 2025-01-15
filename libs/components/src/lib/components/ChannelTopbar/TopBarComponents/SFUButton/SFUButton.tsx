@@ -2,7 +2,7 @@ import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import Tippy from '@tippy.js/react';
 import { useSelector } from 'react-redux';
-import { usePushToTalk } from '../../../SFU/SFUContext';
+import { useSFU } from '../../../SFU/SFUContext';
 import { useWebRTC } from '../../../WebRTC/WebRTCContext';
 
 export interface ISFUBtnProps {
@@ -17,8 +17,8 @@ export const SFUBtn: React.FC<ISFUBtnProps> = ({ isLightMode }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	const { setClanId, setChannelId, channelId } = useWebRTC();
-	const { isJoined, startJoinSFU, quitSFU } = usePushToTalk();
+	const { setClanId, setChannelId } = useWebRTC();
+	const { isJoined, startJoinSFU, quitSFU } = useSFU();
 
 	return (
 		<div className="relative flex gap-[15px] leading-5 h-5">

@@ -72,7 +72,7 @@ export function useDMInvite(channelID?: string) {
 	useEffect(() => {
 		if (channelID)
 			dispatch(
-				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT })
+				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_CHANNEL })
 			);
 	}, [channelID]);
 

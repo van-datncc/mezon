@@ -22,7 +22,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 	const styles = style(themeValue);
 	const [isChannelPrivate, setChannelPrivate] = useState<boolean>(false);
 	const [channelName, setChannelName] = useState<string>('');
-	const [channelType, setChannelType] = useState<ChannelType>(ChannelType.CHANNEL_TYPE_TEXT);
+	const [channelType, setChannelType] = useState<ChannelType>(ChannelType.CHANNEL_TYPE_CHANNEL);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { categoryId } = route.params;
@@ -106,7 +106,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			[
 				{
 					bottomDescription:
-						channelType === ChannelType.CHANNEL_TYPE_TEXT
+						channelType === ChannelType.CHANNEL_TYPE_CHANNEL
 							? t('fields.channelPrivate.descriptionText')
 							: t('fields.channelPrivate.descriptionVoice'),
 					items: [
@@ -125,7 +125,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		{
 			title: t('fields.channelType.text.title'),
 			description: t('fields.channelType.text.description'),
-			value: ChannelType.CHANNEL_TYPE_TEXT,
+			value: ChannelType.CHANNEL_TYPE_CHANNEL,
 			icon: <Icons.TextIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 		},
 		{
@@ -160,7 +160,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 
 				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
 
-				{channelType === ChannelType.CHANNEL_TYPE_TEXT && <MezonMenu menu={menuPrivate} />}
+				{channelType === ChannelType.CHANNEL_TYPE_CHANNEL && <MezonMenu menu={menuPrivate} />}
 			</ScrollView>
 		</View>
 	);
