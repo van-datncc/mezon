@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useFriends, useMemberStatus } from '@mezon/core';
-import { CheckIcon, DisturbStatusIcon, IS_TABLET, Icons, IdleStatusIcon, OfflineStatus, OnlineStatus } from '@mezon/mobile-components';
+import { CheckIcon, DisturbStatusIcon, Icons, IdleStatusIcon, OfflineStatus, OnlineStatus } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	FriendsEntity,
@@ -146,7 +146,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
-						IS_TABLET ? (
+						isTabletLandscape ? (
 							<Image
 								source={{
 									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })

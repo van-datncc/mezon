@@ -1,4 +1,3 @@
-import { IS_TABLET } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
@@ -6,6 +5,7 @@ import { memo } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 interface IClanIconProps {
@@ -17,6 +17,7 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 	const styles = style(themeValue);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(props?.data?.clan_id ?? '')) || 0;
+	const isTabletLandscape = useTabletLandscape();
 
 	const isActive = currentClanId === props?.data?.clan_id;
 	return (
@@ -29,7 +30,7 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 			}}
 		>
 			{props?.data?.logo ? (
-				IS_TABLET ? (
+				isTabletLandscape ? (
 					<Image
 						source={{
 							uri: createImgproxyUrl(props?.data?.logo ?? '', { width: 100, height: 100, resizeType: 'fit' })

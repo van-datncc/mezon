@@ -1,10 +1,10 @@
-import { IS_TABLET } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import React from 'react';
 import { Image, StyleProp, TextStyle, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Images from '../../../assets/Images';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 interface IMezonClanAvatarProps {
@@ -26,11 +26,12 @@ export default function MezonClanAvatar({
 }: IMezonClanAvatarProps) {
 	const { themeValue } = useTheme();
 	const [isLoadFailProxy, setIsLoadFailProxy] = React.useState<boolean>(false);
+	const isTabletLandscape = useTabletLandscape();
 
 	const styles = style(themeValue);
 
 	if (image) {
-		if (IS_TABLET) {
+		if (isTabletLandscape) {
 			return (
 				<Image
 					source={{

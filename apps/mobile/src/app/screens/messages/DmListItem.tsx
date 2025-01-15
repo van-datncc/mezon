@@ -1,4 +1,4 @@
-import { ActionEmitEvent, IS_TABLET, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
@@ -135,7 +135,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 			) : (
 				<View style={styles.avatarWrapper}>
 					{directMessage?.channel_avatar?.[0] ? (
-						IS_TABLET ? (
+						isTabletLandscape ? (
 							<Image
 								source={{
 									uri: createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 100, height: 100, resizeType: 'fit' })
