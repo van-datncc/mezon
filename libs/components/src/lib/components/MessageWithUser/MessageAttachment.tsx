@@ -8,166 +8,165 @@ import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
 
 type MessageAttachmentProps = {
-  message: IMessageWithUser;
-  onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
-  mode: ChannelStreamMode;
+	message: IMessageWithUser;
+	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
+	mode: ChannelStreamMode;
 };
 
 const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMessageWithUser) => {
-  const videos: ApiMessageAttachment[] = [];
-  const images: (ApiMessageAttachment & { create_time?: string })[] = [];
-  const documents: ApiMessageAttachment[] = [];
-  const audio: ApiMessageAttachment[] = [];
+	const videos: ApiMessageAttachment[] = [];
+	const images: (ApiMessageAttachment & { create_time?: string })[] = [];
+	const documents: ApiMessageAttachment[] = [];
+	const audio: ApiMessageAttachment[] = [];
 
-  attachments.forEach((attachment) => {
-    if (isMediaTypeNotSupported(attachment.filetype)) {
-      documents.push(attachment);
-      return;
-    }
+	attachments.forEach((attachment) => {
+		if (isMediaTypeNotSupported(attachment.filetype)) {
+			documents.push(attachment);
+			return;
+		}
 
-    if (
-      ((attachment.filetype?.includes(EMimeTypes.mp4) || attachment.filetype?.includes(EMimeTypes.mov)) &&
-        !attachment.url?.includes(EMimeTypes.tenor)) ||
-      attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
-    ) {
-      videos.push(attachment);
-      return;
-    }
+		if (
+			((attachment.filetype?.includes(EMimeTypes.mp4) || attachment.filetype?.includes(EMimeTypes.mov)) &&
+				!attachment.url?.includes(EMimeTypes.tenor)) ||
+			attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
+		) {
+			videos.push(attachment);
+			return;
+		}
 
-    if (
-      ((attachment.filetype?.includes(EMimeTypes.png) ||
-        attachment.filetype?.includes(EMimeTypes.jpeg) ||
-        attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) &&
-        !attachment.filetype?.includes('svg+xml')) ||
-      attachment.url?.endsWith('.gif')
-    ) {
-      const resultAttach: ApiMessageAttachment & { create_time?: string } = {
-        ...attachment,
-        sender_id: message.sender_id,
-        create_time: message.create_time
-      };
-      images.push(resultAttach);
-      return;
-    }
+		if (
+			((attachment.filetype?.includes(EMimeTypes.png) ||
+				attachment.filetype?.includes(EMimeTypes.jpeg) ||
+				attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) &&
+				!attachment.filetype?.includes('svg+xml')) ||
+			attachment.url?.endsWith('.gif')
+		) {
+			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
+				...attachment,
+				sender_id: message.sender_id,
+				create_time: message.create_time
+			};
+			images.push(resultAttach);
+			return;
+		}
 
-    if (attachment.filetype?.includes(EMimeTypes.audio)) {
-      audio.push(attachment);
-      return;
-    }
+		if (attachment.filetype?.includes(EMimeTypes.audio)) {
+			audio.push(attachment);
+			return;
+		}
 
-    documents.push(attachment);
-  });
+		documents.push(attachment);
+	});
 
-  return { videos, images, documents, audio };
+	return { videos, images, documents, audio };
 };
 
 const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMessageWithUser; onContextMenu: any; mode: ChannelStreamMode }> = ({
-  attachments,
-  message,
-  onContextMenu,
-  mode
+	attachments,
+	message,
+	onContextMenu,
+	mode
 }) => {
-  const { videos, images, documents, audio } = useMemo(() => classifyAttachments(attachments, message), [attachments]);
-  return (
-    <>
-      {videos.length > 0 && (
-        <div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
-          {videos.map((video, index) => (
-            <div key={index} className="w-fit max-h-[350px] gap-y-2">
-              <MessageVideo attachmentData={video} />
-            </div>
-          ))}
-        </div>
-      )}
+	const { videos, images, documents, audio } = useMemo(() => classifyAttachments(attachments, message), [attachments]);
+	return (
+		<>
+			{videos.length > 0 && (
+				<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
+					{videos.map((video, index) => (
+						<div key={index} className="w-fit max-h-[350px] gap-y-2">
+							<MessageVideo attachmentData={video} />
+						</div>
+					))}
+				</div>
+			)}
 
-      {images.length > 0 && (
-        <ImageAlbum images={images} message={message} mode={mode} onContextMenu={onContextMenu} />
-      )}
+			{images.length > 0 && (
+				<ImageAlbum images={images} message={message} mode={mode} onContextMenu={onContextMenu} />
+			)}
 
-      {documents.length > 0 &&
-        documents.map((document, index) => (
-          <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
-        ))}
+			{documents.length > 0 &&
+				documents.map((document, index) => (
+					<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
+				))}
 
-      {audio.length > 0 && audio.map((audio, index) => <MessageAudio key={`${index}_${audio.url}`} audioUrl={audio.url || ''} />)}
-    </>
-  );
+			{audio.length > 0 && audio.map((audio, index) => <MessageAudio key={`${index}_${audio.url}`} audioUrl={audio.url || ''} />)}
+		</>
+	);
 };
 
 // TODO: refactor component for message lines
 const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentProps) => {
-  const validateAttachment = useMemo(() => {
-    return (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
-  }, [message.attachments]);
-  if (!validateAttachment) return null;
+	const validateAttachment = useMemo(() => {
+		return (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
+	}, [message.attachments]);
+	if (!validateAttachment) return null;
 
-  return <Attachments mode={mode} message={message} attachments={validateAttachment} onContextMenu={onContextMenu} />;
+	return <Attachments mode={mode} message={message} attachments={validateAttachment} onContextMenu={onContextMenu} />;
 };
 
 
 const ImageAlbum = ({ images, message, mode, onContextMenu }: { images: (ApiMessageAttachment & { create_time?: string; })[], message: IMessageWithUser, mode?: ChannelStreamMode, onContextMenu?: ((event: React.MouseEvent<HTMLImageElement>) => void) }) => {
-  let width = 0;
-  const sizeCss: { width: number, height: number }[] = [];
+	const sizeCss: { width: number, height: number }[] = [];
 
-  if (images.length > 2) {
+	if (images.length > 2) {
 
-    for (let i = 0; i < images.length; i += 2) {
-      if (images[i + 1]) {
-        let percent = 0;
+		for (let i = 0; i < images.length; i += 2) {
+			if (images[i + 1]) {
+				let percent = 0;
 
-        let height1 = images[i].height || 0;
-        let height2 = images[i + 1].height || 0;
+				let height1 = images[i].height || 0;
+				let height2 = images[i + 1].height || 0;
 
-        let sameHeight = 0;
-        if (height1 > height2) {
-          sameHeight = height2 + Math.round((height1 - height2) / 2);
-        } else {
-          sameHeight = height1 + Math.round((height2 - height1) / 2);
-        }
+				let sameHeight = 0;
+				if (height1 > height2) {
+					sameHeight = height2 + Math.round((height1 - height2) / 2);
+				} else {
+					sameHeight = height1 + Math.round((height2 - height1) / 2);
+				}
 
-        let width1 = ((images[i].width || 0) * sameHeight / (images[i].height || 1));
+				let width1 = ((images[i].width || 0) * sameHeight / (images[i].height || 1));
 
-        let width2 = ((images[i + 1].width || 0) * sameHeight / (images[i + 1].height || 1));
+				let width2 = ((images[i + 1].width || 0) * sameHeight / (images[i + 1].height || 1));
 
-        percent = (width1 + width2) / 512;
+				percent = (width1 + width2) / 512;
 
-        sizeCss[i] = {
-          width: Math.round(width1 / percent),
-          height: Math.round(sameHeight / percent)
-        }
-        sizeCss[i + 1] = {
-          width: Math.round(width2 / percent),
-          height: Math.round(sameHeight / percent)
-        }
-      } else {
-        const height = (images[i]?.height || 0) > 300 ? 300 : images[i]?.height || 150
-        sizeCss[i] = {
-          width: Math.round((images[i].width || 0) * height / (images[i]?.height || 1)),
-          height: height
-        }
-      }
-    }
+				sizeCss[i] = {
+					width: Math.round(width1 / percent),
+					height: Math.round(sameHeight / percent)
+				}
+				sizeCss[i + 1] = {
+					width: Math.round(width2 / percent),
+					height: Math.round(sameHeight / percent)
+				}
+			} else {
+				const height = (images[i]?.height || 0) > 300 ? 300 : images[i]?.height || 150
+				sizeCss[i] = {
+					width: Math.round((images[i].width || 0) * height / (images[i]?.height || 1)),
+					height: height
+				}
+			}
+		}
 
-  } else if (images.length == 1) {
-    sizeCss[0] = {
-      height: images[0].height || 0,
-      width: images[0].width || 0
-    }
-  }
+	} else if (images.length == 1) {
+		sizeCss[0] = {
+			height: images[0].height || 0,
+			width: images[0].width || 0
+		}
+	}
 
 
-  return (
-    <div className="flex flex-row justify-start flex-wrap w-full gap-x-2 max-w-[520px]">
-      {images.map((image, index) => {
-        const checkImage = notImplementForGifOrStickerSendFromPanel(image);
-        return (
-          <div key={index} className={`${checkImage ? '' : 'h-auto'} `}>
-            <MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} size={sizeCss[index]} />
-          </div>
-        );
-      })}
-    </div>
-  )
+	return (
+		<div className="flex flex-row justify-start flex-wrap w-full gap-x-2 max-w-[520px]">
+			{images.map((image, index) => {
+				const checkImage = notImplementForGifOrStickerSendFromPanel(image);
+				return (
+					<div key={index} className={`${checkImage ? '' : 'h-auto'} `}>
+						<MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} size={sizeCss[index]} />
+					</div>
+				);
+			})}
+		</div>
+	)
 }
 
 export default memo(MessageAttachment);
