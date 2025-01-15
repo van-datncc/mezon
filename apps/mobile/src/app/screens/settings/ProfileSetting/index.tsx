@@ -144,7 +144,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 						channelMembersActions.fetchChannelMembers({
 							clanId: currentClanId || '',
 							channelId: currentChannelId || '',
-							channelType: ChannelType.CHANNEL_TYPE_TEXT,
+							channelType: ChannelType.CHANNEL_TYPE_CHANNEL,
 							repace: true
 						})
 					);

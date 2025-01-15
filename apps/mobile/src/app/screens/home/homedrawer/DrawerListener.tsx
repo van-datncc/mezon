@@ -30,7 +30,7 @@ function useChannelSeen(channelId: string) {
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
 		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 		if (lastMessage) {
 			markAsReadSeen(lastMessage, mode);
 		}
@@ -67,7 +67,7 @@ function DrawerListener({ currentChannel }: { currentChannel: ChannelsEntity }) 
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? currentChannel?.parrent_id : currentChannel?.channel_id) || '',
-				channelType: ChannelType.CHANNEL_TYPE_TEXT
+				channelType: ChannelType.CHANNEL_TYPE_CHANNEL
 			})
 		);
 	}, [currentChannel, dispatch]);

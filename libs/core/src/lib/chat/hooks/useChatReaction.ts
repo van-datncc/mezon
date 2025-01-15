@@ -45,7 +45,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			clanIdActive = '0';
 			modeActive = ChannelStreamMode.STREAM_MODE_DM;
 			channelIdActive = directId || '';
-		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
 			channelIdActive = channel?.id || '';

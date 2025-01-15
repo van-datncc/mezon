@@ -9,7 +9,7 @@ function IconChannel({ channelPrivate, type }: { channelPrivate: number; type })
 
 	const renderIcon = () => {
 		switch (type) {
-			case ChannelType.CHANNEL_TYPE_TEXT:
+			case ChannelType.CHANNEL_TYPE_CHANNEL:
 				return isChannelPrivate ? (
 					<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 				) : (

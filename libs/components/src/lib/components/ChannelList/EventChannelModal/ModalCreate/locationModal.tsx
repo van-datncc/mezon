@@ -83,7 +83,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const optionsTextChannel = useMemo(
 		() =>
 			textChannels.map((channel) => {
-				const isTextChannel = channel.type === ChannelType.CHANNEL_TYPE_TEXT;
+				const isTextChannel = channel.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 				const isThread = channel.type === ChannelType.CHANNEL_TYPE_THREAD;
 				const isPrivateChannel = channel.channel_private;
 

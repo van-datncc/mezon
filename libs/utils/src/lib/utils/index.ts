@@ -1026,7 +1026,7 @@ export const openVoiceChannel = (url: string) => {
 
 export const getChannelMode = (chatType: number) => {
 	switch (chatType) {
-		case ChannelType.CHANNEL_TYPE_TEXT:
+		case ChannelType.CHANNEL_TYPE_CHANNEL:
 			return ChannelStreamMode.STREAM_MODE_CHANNEL;
 		case ChannelType.CHANNEL_TYPE_THREAD:
 			return ChannelStreamMode.STREAM_MODE_THREAD;

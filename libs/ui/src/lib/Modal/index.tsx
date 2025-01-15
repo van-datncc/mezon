@@ -57,11 +57,11 @@ const Modal = (props: ModalProps) => {
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
 												hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && <SpeakerLocked defaultSize="w-5 h-5" />}
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
-												hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && <HashtagLocked defaultSize="w-5 h-5 " />}
+												hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && <HashtagLocked defaultSize="w-5 h-5 " />}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 												<Speaker defaultSize="w-5 5-5" />
 											)}
-											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 												<Hashtag defaultSize="w-5 h-5" />
 											)}
 											<p>{hasChannel.channel_label}</p>
