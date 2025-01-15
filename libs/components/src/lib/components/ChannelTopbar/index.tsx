@@ -109,7 +109,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 
 	const setTurnOffThreadMessage = useCallback(() => {
 		const isShowCreateThread = selectIsShowCreateThread(store.getState() as RootState, channel?.id as string);
-		const isShowCreateTopic = selectIsShowCreateTopic(store.getState() as RootState, channel?.id as string);
+		const isShowCreateTopic = selectIsShowCreateTopic(store.getState() as RootState);
 		if (isShowCreateThread) {
 			dispatch(threadsActions.setOpenThreadMessageState(false));
 			dispatch(threadsActions.setValueThread(null));

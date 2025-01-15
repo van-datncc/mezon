@@ -15,7 +15,7 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateTopic }));
+			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
 		},
 		[currentChannelId, dispatch]
 	);

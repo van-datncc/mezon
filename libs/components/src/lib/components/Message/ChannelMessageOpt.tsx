@@ -128,7 +128,7 @@ function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: b
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateTopic }));
+			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
 			dispatch(
 				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread: false })
 			);
@@ -432,7 +432,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean, hasP
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread }));
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: message.channel_id as string, isShowCreateTopic: false }));
+			dispatch(topicsActions.setIsShowCreateTopic(false));
 		},
 		[message.channel_id, dispatch]
 	);

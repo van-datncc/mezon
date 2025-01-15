@@ -14,7 +14,7 @@ export function useTopics() {
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const messageTopicError = useSelector(selectMessageTopicError);
-	const isShowCreateTopic = useSelector((state) => selectIsShowCreateTopic(state, currentChannelId as string));
+	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
 	const valueTopic = useSelector(selectValueTopic);
 
 	const setTurnOffTopicMessage = useCallback(() => {
@@ -31,7 +31,7 @@ export function useTopics() {
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateTopic }));
+			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
 		},
 		[currentChannelId, dispatch]
 	);
