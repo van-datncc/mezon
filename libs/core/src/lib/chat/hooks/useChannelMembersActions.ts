@@ -29,7 +29,7 @@ export function useChannelMembersActions() {
 							clanId: clanId,
 							channelId: channelId,
 							noCache: true,
-							channelType: ChannelType.CHANNEL_TYPE_TEXT
+							channelType: ChannelType.CHANNEL_TYPE_CHANNEL
 						})
 					);
 				}

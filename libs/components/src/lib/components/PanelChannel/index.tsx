@@ -57,7 +57,7 @@ type PanelChannel = {
 };
 
 const typeChannel = {
-	text: ChannelType.CHANNEL_TYPE_TEXT,
+	text: ChannelType.CHANNEL_TYPE_CHANNEL,
 	thread: ChannelType.CHANNEL_TYPE_THREAD,
 	voice: ChannelType.CHANNEL_TYPE_VOICE
 };

@@ -29,7 +29,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 			[ChannelType.CHANNEL_TYPE_GROUP]: ChannelStreamMode.STREAM_MODE_GROUP,
 			[ChannelType.CHANNEL_TYPE_DM]: ChannelStreamMode.STREAM_MODE_DM,
 			[ChannelType.CHANNEL_TYPE_THREAD]: ChannelStreamMode.STREAM_MODE_THREAD,
-			[ChannelType.CHANNEL_TYPE_TEXT]: ChannelStreamMode.STREAM_MODE_CHANNEL
+			[ChannelType.CHANNEL_TYPE_CHANNEL]: ChannelStreamMode.STREAM_MODE_CHANNEL
 		} as const;
 
 		return modeMap[channelOrDirect.type];

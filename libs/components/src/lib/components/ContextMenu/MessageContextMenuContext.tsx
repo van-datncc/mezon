@@ -107,7 +107,7 @@ const getActiveMode = (appState: RootState) => {
 	const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
 
 	if (isClanView) {
-		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			return ChannelStreamMode.STREAM_MODE_CHANNEL;
 		}
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {

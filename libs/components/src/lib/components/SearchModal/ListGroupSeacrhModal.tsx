@@ -23,7 +23,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 			listItemWithoutRecent.reduce<ClassifiedLists>(
 				(acc, item) => {
 					const hasCountUnread = item.count_messsage_unread && item.count_messsage_unread > 0;
-					const isTextChannel = item.type === ChannelType.CHANNEL_TYPE_TEXT;
+					const isTextChannel = item.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 					const isThreadChannel = item.type === ChannelType.CHANNEL_TYPE_THREAD;
 					const isDMMessage = item.type === ChannelType.CHANNEL_TYPE_DM;
 					const isGrMessage = item.type === ChannelType.CHANNEL_TYPE_GROUP;

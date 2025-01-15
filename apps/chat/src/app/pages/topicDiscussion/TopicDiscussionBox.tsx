@@ -157,7 +157,7 @@ const TopicDiscussionBox = () => {
 					<MemoizedChannelMessages
 						channelId={currentTopicId as string}
 						clanId={currentClanId as string}
-						type={ChannelType.CHANNEL_TYPE_TEXT}
+						type={ChannelType.CHANNEL_TYPE_CHANNEL}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						isTopicBox
 						topicId={currentTopicId}

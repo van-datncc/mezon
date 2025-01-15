@@ -176,7 +176,7 @@ export const removeMemberChannel = createAsyncThunk(
 			}
 			if (kickMember) {
 				await thunkAPI.dispatch(
-					fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT })
+					fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_CHANNEL })
 				);
 				return;
 			}

@@ -64,7 +64,7 @@ const SettingRightUser = ({
 					channelMembersActions.fetchChannelMembers({
 						clanId: currentClanId || '',
 						channelId: currentChannelId || '',
-						channelType: ChannelType.CHANNEL_TYPE_TEXT,
+						channelType: ChannelType.CHANNEL_TYPE_CHANNEL,
 						noCache: true,
 						repace: true
 					})
