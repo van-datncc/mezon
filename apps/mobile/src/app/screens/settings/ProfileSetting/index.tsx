@@ -124,11 +124,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	}, [originUserProfileValue, currentUserProfileValue]);
 
 	const isUserProfileEmptyName = useMemo(() => {
-		return !currentUserProfileValue?.displayName || !currentUserProfileValue?.displayName?.trim();
+		return !currentUserProfileValue?.displayName?.trim();
 	}, [currentUserProfileValue?.displayName]);
 
 	const isClanProfileEmptyName = useMemo(() => {
-		return !currentClanProfileValue?.displayName || !currentClanProfileValue?.displayName?.trim();
+		return !currentClanProfileValue?.displayName?.trim();
 	}, [currentClanProfileValue?.displayName]);
 
 	const isClanProfileNotChanged = useMemo(() => {
@@ -142,7 +142,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			const response = await updateUser(
 				username,
 				imgUrl,
-				displayName?.trimStart() || username,
+				displayName?.trim() || username,
 				aboutMe,
 				userProfile?.user?.dob,
 				userProfile?.logo,
@@ -178,7 +178,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		if (currentClanProfileValue?.imgUrl || currentClanProfileValue?.displayName) {
 			try {
 				dispatch(appActions.setLoadingMainMobile(true));
-				const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName?.trimStart() || username, imgUrl || '');
+				const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName?.trim() || username, imgUrl || '');
 				dispatch(appActions.setLoadingMainMobile(false));
 				if (response) {
 					Toast.show({
