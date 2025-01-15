@@ -23,7 +23,7 @@ export function useSendForwardMessage() {
 			}
 
 			try {
-				let type = ChannelType.CHANNEL_TYPE_TEXT;
+				let type = ChannelType.CHANNEL_TYPE_CHANNEL;
 				if (mode === ChannelStreamMode.STREAM_MODE_DM) {
 					type = ChannelType.CHANNEL_TYPE_DM;
 				} else if (mode === ChannelStreamMode.STREAM_MODE_GROUP) {

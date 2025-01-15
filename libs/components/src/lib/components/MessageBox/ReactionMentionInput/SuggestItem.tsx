@@ -72,7 +72,7 @@ const SuggestItem = ({
 
 		const { channel_private, type } = specificChannel;
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}

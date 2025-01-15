@@ -250,7 +250,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 					channelMembersActions.fetchChannelMembers({
 						clanId: '',
 						channelId: directMessageId,
-						channelType: ChannelType.CHANNEL_TYPE_TEXT,
+						channelType: ChannelType.CHANNEL_TYPE_CHANNEL,
 						noCache
 					})
 				);
