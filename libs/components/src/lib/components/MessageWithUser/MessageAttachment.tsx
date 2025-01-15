@@ -107,28 +107,70 @@ const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentPr
 
 const ImageAlbum = ({ images, message, mode, onContextMenu }: { images: (ApiMessageAttachment & { create_time?: string; })[], message: IMessageWithUser, mode?: ChannelStreamMode, onContextMenu?: ((event: React.MouseEvent<HTMLImageElement>) => void) }) => {
   let width = 0;
+  const sizeCss: { width: number, height: number }[] = [];
+
   if (images.length > 2) {
-    const maxWidth = images[0]?.width || 0 + (images[1]?.width || 0);
+
+    for (let i = 0; i < images.length; i += 2) {
+      if (images[i + 1]) {
+        let percent = 0;
+
+        let height1 = images[i].height || 0;
+        let height2 = images[i + 1].height || 0;
+
+        let sameHeight = 0;
+        if (height1 > height2) {
+          sameHeight = height2 + Math.round((height1 - height2) / 2);
+        } else {
+          sameHeight = height1 + Math.round((height2 - height1) / 2);
+        }
+
+        let width1 = ((images[i].width || 0) * sameHeight / (images[i].height || 1));
+
+        let width2 = ((images[i + 1].width || 0) * sameHeight / (images[i + 1].height || 1));
+
+        percent = (width1 + width2) / 512;
+
+        sizeCss[i] = {
+          width: Math.round(width1 / percent),
+          height: Math.round(sameHeight / percent)
+        }
+        sizeCss[i + 1] = {
+          width: Math.round(width2 / percent),
+          height: Math.round(sameHeight / percent)
+        }
+      } else {
+        const height = (images[i]?.height || 0) > 300 ? 300 : images[i]?.height || 150
+        sizeCss[i] = {
+          width: Math.round((images[i].width || 0) * height / (images[i]?.height || 1)),
+          height: height
+        }
+      }
+    }
+
+  } else if (images.length == 1) {
+    sizeCss[0] = {
+      height: images[0].height || 0,
+      width: images[0].width || 0
+    }
   }
 
 
+  return (
+    <div className="flex flex-row justify-start flex-wrap w-full gap-x-2 max-w-[520px]">
+      {images.map((image, index) => {
+        const checkImage = notImplementForGifOrStickerSendFromPanel(image);
+        return (
+          <div key={index} className={`${checkImage ? '' : 'h-auto'} `}>
+            <MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} size={sizeCss[index]} />
+          </div>
+        );
+      })}
+    </div>
+  )
+}
 
-
-    return (
-      <div className="flex flex-row justify-start flex-wrap w-full gap-x-2 max-w-[720px]">
-        {images.map((image, index) => {
-          const checkImage = notImplementForGifOrStickerSendFromPanel(image);
-          return (
-            <div key={index} className={`${checkImage ? '' : 'h-auto'}  `}>
-              <MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
-            </div>
-          );
-        })}
-      </div>
-    )
-  }
-
-  export default memo(MessageAttachment);
+export default memo(MessageAttachment);
 
 
 
