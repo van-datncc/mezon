@@ -99,8 +99,8 @@ export { default as EventSchedule } from './components/EventSchedule';
 export { default as ModalCall } from './components/ModalCall';
 export { default as MultiStepModalE2ee } from './components/ModalSendCode';
 
-export { PushToTalkProvider } from './components/PushToTalk/PushToTalkContext';
+export { PushToTalkProvider } from './components/SFU/SFUContext';
 export { WebRTCStreamProvider, useWebRTCStream } from './components/StreamContext/StreamContext';
-export { WebRTCProvider } from './components/WebRTC/WebRTCContext';
+export { WebRTCProvider, useWebRTC } from './components/WebRTC/WebRTCContext';
 
 export * from './components/HtmlCanvas';

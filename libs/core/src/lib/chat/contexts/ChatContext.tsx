@@ -4,9 +4,7 @@ import {
 	ActivitiesEntity,
 	AttachmentEntity,
 	DMCallActions,
-	JoinPTTActions,
 	RootState,
-	TalkPTTActions,
 	accountActions,
 	acitvitiesActions,
 	appActions,
@@ -41,10 +39,10 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
-	pttMembersActions,
 	reactionActions,
 	rolesClanActions,
 	selectAllTextChannel,
+	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
@@ -53,9 +51,10 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
-	selectPttMembersByChannelId,
+	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
+	sfuMembersActions,
 	stickerSettingActions,
 	toastActions,
 	topicsActions,
@@ -81,9 +80,9 @@ import {
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
-	TypeMessage
+	TypeMessage,
+	electronBridge
 } from '@mezon/utils';
-import { Snowflake } from '@theinternetfolks/snowflake';
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
@@ -98,18 +97,16 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
-	JoinPTTChannel,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
 	MessageButtonClicked,
 	MessageTypingEvent,
 	Notification,
-	PTTJoinedEvent,
-	PTTLeavedEvent,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
+	SFUSignalingFwd,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -117,7 +114,6 @@ import {
 	StickerUpdateEvent,
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
-	TalkPTTChannel,
 	UnmuteEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -165,7 +161,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const pttMembers = useSelector(selectPttMembersByChannelId(channelId || ''));
+	const pttMembers = useSelector(selectSFUMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
@@ -225,22 +221,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const onPTTchannelJoined = useCallback(
-		(user: PTTJoinedEvent) => {
+	const onsfusignalingfwd = useCallback(
+		(user: SFUSignalingFwd) => {
 			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
 			if (existingMember) {
-				dispatch(pttMembersActions.remove(existingMember?.id));
+				dispatch(sfuMembersActions.remove(existingMember?.id));
 			}
-			dispatch(pttMembersActions.add(user));
+			// TODO:
+			//dispatch(sfuMembersActions.add(user));
 		},
 		[dispatch, pttMembers]
-	);
-
-	const onPTTchannelLeaved = useCallback(
-		(user: PTTLeavedEvent) => {
-			dispatch(pttMembersActions.remove(user?.id));
-		},
-		[dispatch]
 	);
 
 	const onactivityupdated = useCallback(
@@ -657,52 +647,48 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
-			if (userId !== stickerCreated.creator_id) {
-				dispatch(
-					stickerSettingActions.add({
-						category: stickerCreated.category,
-						clan_id: stickerCreated.clan_id,
-						creator_id: stickerCreated.creator_id,
-						id: stickerCreated.sticker_id,
-						shortname: stickerCreated.shortname,
-						source: stickerCreated.source,
-						logo: stickerCreated.logo,
-						clan_name: stickerCreated.clan_name
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.add({
+					category: stickerCreated.category,
+					clan_id: stickerCreated.clan_id,
+					creator_id: stickerCreated.creator_id,
+					id: stickerCreated.sticker_id,
+					shortname: stickerCreated.shortname,
+					source: stickerCreated.source,
+					logo: stickerCreated.logo,
+					clan_name: stickerCreated.clan_name
+				})
+			);
 		},
 		[dispatch, userId]
 	);
 
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
-			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === EEventAction.CREATED) {
-					dispatch(
-						emojiSuggestionActions.add({
-							category: eventEmoji.clan_name,
-							clan_id: eventEmoji.clan_id,
-							creator_id: eventEmoji.user_id,
-							id: eventEmoji.id,
-							shortname: eventEmoji.short_name,
-							src: eventEmoji.source,
-							logo: eventEmoji.logo,
-							clan_name: eventEmoji.clan_name
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.UPDATE) {
-					dispatch(
-						emojiSuggestionActions.update({
-							id: eventEmoji.id,
-							changes: {
-								shortname: eventEmoji.short_name
-							}
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.DELETE) {
-					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
-				}
+			if (eventEmoji.action === EEventAction.CREATED) {
+				dispatch(
+					emojiSuggestionActions.add({
+						category: eventEmoji.clan_name,
+						clan_id: eventEmoji.clan_id,
+						creator_id: eventEmoji.user_id,
+						id: eventEmoji.id,
+						shortname: eventEmoji.short_name,
+						src: eventEmoji.source,
+						logo: eventEmoji.logo,
+						clan_name: eventEmoji.clan_name
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.UPDATE) {
+				dispatch(
+					emojiSuggestionActions.update({
+						id: eventEmoji.id,
+						changes: {
+							shortname: eventEmoji.short_name
+						}
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.DELETE) {
+				dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 			}
 		},
 		[dispatch, userId]
@@ -710,25 +696,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickerdeleted = useCallback(
 		(stickerDeleted: StickerDeleteEvent) => {
-			if (userId !== stickerDeleted.user_id) {
-				dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
-			}
+			dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
 		},
 		[userId, dispatch]
 	);
 
 	const onstickerupdated = useCallback(
 		(stickerUpdated: StickerUpdateEvent) => {
-			if (userId !== stickerUpdated.user_id) {
-				dispatch(
-					stickerSettingActions.update({
-						id: stickerUpdated.sticker_id,
-						changes: {
-							shortname: stickerUpdated.shortname
-						}
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.update({
+					id: stickerUpdated.sticker_id,
+					changes: {
+						shortname: stickerUpdated.shortname
+					}
+				})
+			);
 		},
 		[userId, dispatch]
 	);
@@ -1093,12 +1075,38 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
 		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+
 		const updateAmount = isReceiverGiveCoffee
 			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 			: isSenderGiveCoffee
 				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 				: 0;
 		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
+		if (isReceiverGiveCoffee && isElectron()) {
+			const senderToken = coffeeEvent.sender_id;
+			const allMembersClan = selectAllUserClans(store.getState() as RootState);
+			let member = null;
+			for (const m of allMembersClan) {
+				if (m.id === senderToken) {
+					member = m;
+					break;
+				}
+			}
+			if (!member) return;
+			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
+			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
+
+			const title = 'Token Received:';
+			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
+
+			electronBridge.pushNotification(title, {
+				body: body,
+				icon: prioritizedAvatar,
+				data: {
+					link: ''
+				}
+			});
+		}
 	}, []);
 
 	const onroleevent = useCallback(
@@ -1231,29 +1239,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[userCallId]
 	);
 
-	const onjoinpttchannel = useCallback((event: JoinPTTChannel) => {
-		dispatch(
-			JoinPTTActions.add({
-				joinPttData: event,
-				// todo: refactor this
-				id: Snowflake.generate()
-			})
-		);
-	}, []);
-
-	const ontalkpttchannel = useCallback((event: TalkPTTChannel) => {
-		if (event.is_talk) {
-			dispatch(
-				TalkPTTActions.add({
-					talkPttData: event,
-					id: event.user_id
-				})
-			);
-		} else {
-			dispatch(TalkPTTActions.remove(event.user_id));
-		}
-	}, []);
-
 	const onuserstatusevent = useCallback(
 		async (userStatusEvent: UserStatusEvent) => {
 			if (userStatusEvent.user_id !== userId) {
@@ -1272,10 +1257,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onvoiceended = onvoiceended;
 
 			socket.onvoiceleaved = onvoiceleaved;
-
-			socket.onpttchanneljoined = onPTTchannelJoined;
-
-			socket.onpttchannelleaved = onPTTchannelLeaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
 
@@ -1355,9 +1336,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
-			socket.ontalkpttchannel = ontalkpttchannel;
-
-			socket.onjoinpttchannel = onjoinpttchannel;
+			socket.onsfusignalingfwd = onsfusignalingfwd;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1400,10 +1379,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			ontokensent,
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
-			onjoinpttchannel,
-			ontalkpttchannel,
-			onPTTchannelJoined,
-			onPTTchannelLeaved
+			onsfusignalingfwd
 		]
 	);
 
@@ -1539,9 +1515,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oncoffeegiven,
 		onroleevent,
 		onuserstatusevent,
-		ontokensent,
-		onPTTchannelJoined,
-		onPTTchannelLeaved
+		ontokensent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(
