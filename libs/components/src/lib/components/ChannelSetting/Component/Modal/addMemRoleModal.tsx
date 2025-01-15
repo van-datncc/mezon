@@ -190,12 +190,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 						<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 					)}
-					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 						<Icons.HashtagLocked defaultSize="w-5 h-5 " />
 					)}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 5-5" />}
-					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
+					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-[16px]" style={{ wordBreak: 'break-word' }}>
 						{channel.channel_label}
 					</p>

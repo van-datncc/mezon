@@ -279,13 +279,13 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 							<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
-						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 							<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
 						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 							<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
-						{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+						{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 							<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
 						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (

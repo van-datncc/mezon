@@ -105,7 +105,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 			.map(mapDirectMessageToForwardObject);
 
 		const listTextChannel = listChannels
-			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
+			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && channel?.channel_label)
 			.map(mapChannelToForwardObject);
 
 		return [...listTextChannel, ...listGroupForward, ...listDMForward];
@@ -113,7 +113,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 
 	const filteredForwardObjects = useMemo(() => {
 		if (searchText?.trim()?.charAt(0) === '#') {
-			return allForwardObject.filter((ob) => ob.type === ChannelType.CHANNEL_TYPE_TEXT);
+			return allForwardObject.filter((ob) => ob.type === ChannelType.CHANNEL_TYPE_CHANNEL);
 		}
 		return allForwardObject.filter((ob) => normalizeString(ob?.name).includes(normalizeString(searchText)));
 	}, [searchText, allForwardObject]);
@@ -156,7 +156,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						}
 						break;
-					case ChannelType.CHANNEL_TYPE_TEXT:
+					case ChannelType.CHANNEL_TYPE_CHANNEL:
 						for (const message of combineMessages) {
 							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						}
@@ -191,7 +191,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 					case ChannelType.CHANNEL_TYPE_GROUP:
 						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						break;
-					case ChannelType.CHANNEL_TYPE_TEXT:
+					case ChannelType.CHANNEL_TYPE_CHANNEL:
 						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						break;
 					default:

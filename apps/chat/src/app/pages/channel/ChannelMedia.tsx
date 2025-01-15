@@ -13,7 +13,7 @@ export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
 	if (
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ||
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 	) {

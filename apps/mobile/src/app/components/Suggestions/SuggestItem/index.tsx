@@ -29,7 +29,7 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 	const { t } = useTranslation(['clan']);
 	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
 		const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
-		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_TEXT;
+		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 
 		const isThread = checkIsThread(channel as ChannelsEntity);
 

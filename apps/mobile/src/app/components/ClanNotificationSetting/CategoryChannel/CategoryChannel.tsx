@@ -30,7 +30,7 @@ export const CategoryChannel = React.memo(() => {
 						<CategoryChannelItem
 							categoryLabel={item?.channel_category_label}
 							categorySubtext={item?.channel_category_title}
-							typePreviousIcon={ChannelType.CHANNEL_TYPE_TEXT}
+							typePreviousIcon={ChannelType.CHANNEL_TYPE_CHANNEL}
 							expandable={true}
 							notificationStatus={item.notification_setting_type}
 							data={item}

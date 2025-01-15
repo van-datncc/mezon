@@ -77,7 +77,7 @@ export const PushToTalkProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 	);
 };
 
-export const usePushToTalk = () => {
+export const useSFU = () => {
 	const context = useContext(SFUContext);
 	if (!context) {
 		throw new Error('usePushToTalk must be used within a PushToTalkProvider');
