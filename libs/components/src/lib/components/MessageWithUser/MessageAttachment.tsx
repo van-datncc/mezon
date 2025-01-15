@@ -109,41 +109,41 @@ const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentPr
 const designLayout = (images: (ApiMessageAttachment & {
   create_time?: string;
 })[]) => {
-  const sizeCss: { width: number, height: number }[] = [];
+  const listImageSize: { width: number, height: number }[] = [];
 
   if (images.length > 2) {
 
     for (let i = 0; i < images.length; i += 2) {
       if (images[i + 1]) {
-        let percent = 0;
+       
 
-        let height1 = images[i].height || 0;
-        let height2 = images[i + 1].height || 0;
+        const heightPicOne = images[i].height || 0;
+        const heightPicTwo = images[i + 1].height || 0;
 
         let sameHeight = 0;
-        if (height1 > height2) {
-          sameHeight = height2 + Math.round((height1 - height2) / 2);
+        if (heightPicOne > heightPicTwo) {
+          sameHeight = heightPicOne + Math.round((heightPicOne - heightPicTwo) / 2);
         } else {
-          sameHeight = height1 + Math.round((height2 - height1) / 2);
+          sameHeight = heightPicTwo + Math.round((heightPicTwo - heightPicOne) / 2);
         }
 
-        let width1 = ((images[i].width || 0) * sameHeight / (images[i].height || 1));
+        const width1 = ((images[i].width || 0) * sameHeight / (images[i].height || 1));
 
-        let width2 = ((images[i + 1].width || 0) * sameHeight / (images[i + 1].height || 1));
+        const width2 = ((images[i + 1].width || 0) * sameHeight / (images[i + 1].height || 1));
 
-        percent = (width1 + width2) / 512;
+        const percent = (width1 + width2) / 512;
 
-        sizeCss[i] = {
+        listImageSize[i] = {
           width: Math.round(width1 / percent),
           height: Math.round(sameHeight / percent)
         }
-        sizeCss[i + 1] = {
+        listImageSize[i + 1] = {
           width: Math.round(width2 / percent),
           height: Math.round(sameHeight / percent)
         }
       } else {
         const width = 520;
-        sizeCss[i] = {
+        listImageSize[i] = {
           width: width,
           height: width * (images[i].height || 1) / (images[i].width || 1)
         }
@@ -151,20 +151,20 @@ const designLayout = (images: (ApiMessageAttachment & {
     }
 
   } else if (images.length == 1) {
-    sizeCss[0] = {
+    listImageSize[0] = {
       height: images[0].height || 0,
       width: images[0].width || 0
     }
   }
 
-  return sizeCss;
+  return listImageSize;
 }
 
 
 
 const ImageAlbum = ({ images, message, mode, onContextMenu }: { images: (ApiMessageAttachment & { create_time?: string; })[], message: IMessageWithUser, mode?: ChannelStreamMode, onContextMenu?: ((event: React.MouseEvent<HTMLImageElement>) => void) }) => {
 
-  const sizeCss = designLayout(images)
+  const listImageSize = designLayout(images)
 
 
   return (
@@ -173,7 +173,7 @@ const ImageAlbum = ({ images, message, mode, onContextMenu }: { images: (ApiMess
         const checkImage = notImplementForGifOrStickerSendFromPanel(image);
         return (
           <div key={index} className={`${checkImage ? '' : 'h-auto'} `}>
-            <MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} size={sizeCss[index]} />
+            <MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} size={listImageSize[index]} />
           </div>
         );
       })}
