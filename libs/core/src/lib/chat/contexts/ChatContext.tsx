@@ -42,6 +42,7 @@ import {
 	reactionActions,
 	rolesClanActions,
 	selectAllTextChannel,
+	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
 	selectCurrentChannel,
@@ -79,7 +80,8 @@ import {
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
-	TypeMessage
+	TypeMessage,
+	electronBridge
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -645,52 +647,48 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
-			if (userId !== stickerCreated.creator_id) {
-				dispatch(
-					stickerSettingActions.add({
-						category: stickerCreated.category,
-						clan_id: stickerCreated.clan_id,
-						creator_id: stickerCreated.creator_id,
-						id: stickerCreated.sticker_id,
-						shortname: stickerCreated.shortname,
-						source: stickerCreated.source,
-						logo: stickerCreated.logo,
-						clan_name: stickerCreated.clan_name
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.add({
+					category: stickerCreated.category,
+					clan_id: stickerCreated.clan_id,
+					creator_id: stickerCreated.creator_id,
+					id: stickerCreated.sticker_id,
+					shortname: stickerCreated.shortname,
+					source: stickerCreated.source,
+					logo: stickerCreated.logo,
+					clan_name: stickerCreated.clan_name
+				})
+			);
 		},
 		[dispatch, userId]
 	);
 
 	const oneventemoji = useCallback(
 		(eventEmoji: EventEmoji) => {
-			if (userId !== eventEmoji.user_id) {
-				if (eventEmoji.action === EEventAction.CREATED) {
-					dispatch(
-						emojiSuggestionActions.add({
-							category: eventEmoji.clan_name,
-							clan_id: eventEmoji.clan_id,
-							creator_id: eventEmoji.user_id,
-							id: eventEmoji.id,
-							shortname: eventEmoji.short_name,
-							src: eventEmoji.source,
-							logo: eventEmoji.logo,
-							clan_name: eventEmoji.clan_name
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.UPDATE) {
-					dispatch(
-						emojiSuggestionActions.update({
-							id: eventEmoji.id,
-							changes: {
-								shortname: eventEmoji.short_name
-							}
-						})
-					);
-				} else if (eventEmoji.action === EEventAction.DELETE) {
-					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
-				}
+			if (eventEmoji.action === EEventAction.CREATED) {
+				dispatch(
+					emojiSuggestionActions.add({
+						category: eventEmoji.clan_name,
+						clan_id: eventEmoji.clan_id,
+						creator_id: eventEmoji.user_id,
+						id: eventEmoji.id,
+						shortname: eventEmoji.short_name,
+						src: eventEmoji.source,
+						logo: eventEmoji.logo,
+						clan_name: eventEmoji.clan_name
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.UPDATE) {
+				dispatch(
+					emojiSuggestionActions.update({
+						id: eventEmoji.id,
+						changes: {
+							shortname: eventEmoji.short_name
+						}
+					})
+				);
+			} else if (eventEmoji.action === EEventAction.DELETE) {
+				dispatch(emojiSuggestionActions.remove(eventEmoji.id));
 			}
 		},
 		[dispatch, userId]
@@ -698,25 +696,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstickerdeleted = useCallback(
 		(stickerDeleted: StickerDeleteEvent) => {
-			if (userId !== stickerDeleted.user_id) {
-				dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
-			}
+			dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
 		},
 		[userId, dispatch]
 	);
 
 	const onstickerupdated = useCallback(
 		(stickerUpdated: StickerUpdateEvent) => {
-			if (userId !== stickerUpdated.user_id) {
-				dispatch(
-					stickerSettingActions.update({
-						id: stickerUpdated.sticker_id,
-						changes: {
-							shortname: stickerUpdated.shortname
-						}
-					})
-				);
-			}
+			dispatch(
+				stickerSettingActions.update({
+					id: stickerUpdated.sticker_id,
+					changes: {
+						shortname: stickerUpdated.shortname
+					}
+				})
+			);
 		},
 		[userId, dispatch]
 	);
@@ -1081,12 +1075,38 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
 		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
+
 		const updateAmount = isReceiverGiveCoffee
 			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 			: isSenderGiveCoffee
 				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
 				: 0;
 		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
+		if (isReceiverGiveCoffee && isElectron()) {
+			const senderToken = coffeeEvent.sender_id;
+			const allMembersClan = selectAllUserClans(store.getState() as RootState);
+			let member = null;
+			for (const m of allMembersClan) {
+				if (m.id === senderToken) {
+					member = m;
+					break;
+				}
+			}
+			if (!member) return;
+			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
+			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
+
+			const title = 'Token Received:';
+			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
+
+			electronBridge.pushNotification(title, {
+				body: body,
+				icon: prioritizedAvatar,
+				data: {
+					link: ''
+				}
+			});
+		}
 	}, []);
 
 	const onroleevent = useCallback(
