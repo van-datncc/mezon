@@ -94,7 +94,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	};
 
 	const channelIcon = (type: ChannelType, isPrivate: boolean) => {
-		if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isPrivate) {
 				return <Icons.TextLockIcon height={size.s_24} width={size.s_24} />;
 			}

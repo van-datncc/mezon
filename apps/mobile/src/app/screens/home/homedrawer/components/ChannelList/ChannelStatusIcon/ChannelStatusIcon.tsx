@@ -23,14 +23,14 @@ export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: C
 					/>
 				)}
 			{channel?.channel_private === ChannelStatusEnum.isPrivate &&
-				channel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+				channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
 				!isAgeRestrictedChannel && (
 					<Icons.TextLockIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 				<Icons.VoiceNormalIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 			)}
-			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 				<Icons.TextIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 			)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
@@ -39,7 +39,7 @@ export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: C
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_APP && (
 				<Icons.AppChannelIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
 			)}
-			{channel?.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel && (
+			{channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel && (
 				<Icons.HashtagWarning width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 			)}
 		</Block>

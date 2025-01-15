@@ -14,7 +14,7 @@ export const EventChannelDetail = memo(({ event }: IEventLocation) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const eventChannel = useAppSelector((state) => selectChannelById(state, event?.channel_id || ''));
-	const channelType = eventChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? 'channel' : 'thread';
+	const channelType = eventChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? 'channel' : 'thread';
 
 	return (
 		<Text style={styles.container}>

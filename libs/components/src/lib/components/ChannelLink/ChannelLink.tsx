@@ -257,16 +257,16 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
-								{channel.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel && (
+								{channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel && (
 									<Icons.HashtagWarning className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
 								)}
 								{isPrivate === ChannelStatusEnum.isPrivate &&
-									channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
+									channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
 									!isAgeRestrictedChannel && <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
-								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && !isAgeRestrictedChannel && (
+								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && !isAgeRestrictedChannel && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (

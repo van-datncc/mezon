@@ -52,7 +52,7 @@ function ForwardMessageItem({
 						<UserGroupIcon />
 					</View>
 				);
-			case ChannelType.CHANNEL_TYPE_TEXT:
+			case ChannelType.CHANNEL_TYPE_CHANNEL:
 				return (
 					<Block width={size.s_16} height={size.s_34} justifyContent="center">
 						<Text center h3 color={themeValue.white}>
@@ -79,7 +79,7 @@ function ForwardMessageItem({
 			<Block flexDirection="row" padding={size.s_10} gap={size.s_6} justifyContent="center">
 				<Block>{renderAvatar(item)}</Block>
 				<Block flex={1} justifyContent="center">
-					{item.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+					{item.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 						<Text color={themeValue.textStrong} numberOfLines={1}>{`${item.name} (${item.clanName})`}</Text>
 					) : (
 						<Text color={themeValue.textStrong} numberOfLines={1}>

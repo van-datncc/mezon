@@ -24,7 +24,7 @@ export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProp
 	};
 	return (
 		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
-			{[ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_APP].includes(channelData?.type) ? (
+			{[ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_APP].includes(channelData?.type) ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center">
 					<IconChannel channelPrivate={channelData?.channel_private} type={channelData?.type} />
 					<Block>

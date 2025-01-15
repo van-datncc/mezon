@@ -65,8 +65,8 @@ export const ThreadHeader = memo(() => {
 
 	const renderChannelIcon = () => {
 		const isPrivateChannel = currentChannel?.channel_private === ChannelStatusEnum.isPrivate;
-		const isTextOrThreadChannel = [ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type);
-		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && isAgeRestrictedChannel) {
+		const isTextOrThreadChannel = [ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type);
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel) {
 			return <Icons.HashtagWarning width={20} height={20} color={themeValue.text} />;
 		}
 		if (isPrivateChannel && isTextOrThreadChannel) {

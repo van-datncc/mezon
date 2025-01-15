@@ -132,7 +132,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						references: []
 					});
 				}
-			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 				for (const message of combineMessages) {
 					await sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
@@ -170,7 +170,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					...selectedMessage,
 					references: []
 				});
-			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 				await sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
@@ -258,7 +258,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	}, [accountId, listDM, listGroup, membersInClan, usersClan]);
 
 	const listChannelSearch = useMemo(() => {
-		const listChannelForward = listChannels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT);
+		const listChannelForward = listChannels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_CHANNEL);
 		const list = listChannelForward.map((item: ChannelThreads) => {
 			return {
 				id: item?.id ?? '',
