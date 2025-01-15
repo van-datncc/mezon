@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 const STUN_SERVERS = [
 	{
-		urls: process.env.NX_WEBRTC_ICESERVERS_URL as string,
+		urls: process.env.NX_WEBRTC_ICESERVERS_REPLY_URL as string,
 		username: process.env.NX_WEBRTC_ICESERVERS_USERNAME,
 		credential: process.env.NX_WEBRTC_ICESERVERS_CREDENTIAL
 	}
@@ -60,6 +60,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		peerConnection: null,
 		storedIceCandidates: null
 	});
+	const [isAnswerCall, setIsAnswerCall] = useState<boolean>(false);
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 	const mezon = useMezon();
@@ -72,6 +73,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	useEffect(() => {
 		return () => {
 			if (callState.localStream) {
+				setIsAnswerCall(false);
 				callState.localStream.getTracks().forEach((track) => track.stop());
 			}
 			timeStartConnected.current = null;
@@ -177,6 +179,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	// Start a call
 	const startCall = async (isVideoCall: boolean, isAnswer: boolean) => {
 		try {
+			setIsAnswerCall(isAnswer);
 			let permissionCameraGranted = false;
 			let permissionMicroGranted = false;
 
@@ -301,6 +304,9 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					}
 					break;
 				}
+				if (isAnswerCall) {
+					await updatePeerConnectionOffer();
+				}
 
 				case WebrtcSignalingType.WEBRTC_SDP_ANSWER: {
 					const decompressedData = await decompress(signalingData.json_data);
@@ -357,6 +363,18 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	const handleOtherCall = async (otherCallerId: string, otherChannelId: string) => {
 		await mezon.socketRef.current?.forwardWebrtcSignaling(otherCallerId, 5, '', otherChannelId, userId);
+	};
+	
+	const updatePeerConnectionOffer = async () => {
+		try {
+			const offer = await callState.peerConnection?.createOffer();
+			await callState.peerConnection?.setLocalDescription(offer);
+			
+			const compressedOffer = await compress(JSON.stringify(offer));
+			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_OFFER, compressedOffer, channelId, userId);
+		} catch (error) {
+			console.error('Error creating and forwarding offer:', error);
+		}
 	};
 
 	// End call and cleanup
