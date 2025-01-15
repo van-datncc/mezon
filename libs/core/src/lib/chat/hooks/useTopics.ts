@@ -2,7 +2,7 @@ import {
 	selectCurrentChannelId,
 	selectIsShowCreateTopic,
 	selectMessageTopicError,
-	selectValueTopic,
+	selectCurrentTopicInitMessage,
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -15,11 +15,11 @@ export function useTopics() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const messageTopicError = useSelector(selectMessageTopicError);
 	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
-	const valueTopic = useSelector(selectValueTopic);
+	const currentTopicInitMessage = useSelector(selectCurrentTopicInitMessage);
 
 	const setTurnOffTopicMessage = useCallback(() => {
 		setOpenTopicMessageState(false);
-		setValueTopic(null);
+		setCurrentTopicInitMessage(null);
 	}, [dispatch]);
 
 	const setOpenTopicMessageState = useCallback(
@@ -30,15 +30,15 @@ export function useTopics() {
 	);
 
 	const setIsShowCreateTopic = useCallback(
-		(isShowCreateTopic: boolean, channelId?: string) => {
+		(isShowCreateTopic: boolean) => {
 			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
 		},
 		[currentChannelId, dispatch]
 	);
 
-	const setValueTopic = useCallback(
+	const setCurrentTopicInitMessage = useCallback(
 		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setValueTopic(value));
+			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -46,12 +46,12 @@ export function useTopics() {
 		() => ({
 			isShowCreateTopic,
 			messageTopicError,
-			valueTopic,
+			currentTopicInitMessage,
 			setIsShowCreateTopic,
-			setValueTopic,
+			setCurrentTopicInitMessage,
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage
 		}),
-		[isShowCreateTopic, messageTopicError, valueTopic, setIsShowCreateTopic, setValueTopic, setOpenTopicMessageState, setTurnOffTopicMessage]
+		[isShowCreateTopic, messageTopicError, currentTopicInitMessage, setIsShowCreateTopic, setCurrentTopicInitMessage, setOpenTopicMessageState, setTurnOffTopicMessage]
 	);
 }

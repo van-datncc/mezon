@@ -346,9 +346,9 @@ function MessageContextMenu({
 		[dispatch]
 	);
 
-	const setValueTopic = useCallback(
+	const setCurrentTopicInitMessage = useCallback(
 		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setValueTopic(value));
+			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -363,10 +363,10 @@ function MessageContextMenu({
 	const handleCreateTopic = useCallback(() => {
 		setIsShowCreateTopic(true);
 		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setValueTopic(message);
+		setCurrentTopicInitMessage(message);
 		dispatch(topicsActions.setCurrentTopicId(''));
 		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
-	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
+	}, [dispatch, message, setIsShowCreateTopic, setCurrentTopicInitMessage]);
 
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {

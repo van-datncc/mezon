@@ -23,7 +23,7 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 	error?: string | null;
 	isShowCreateTopic: boolean;
 	messageTopicError?: string;
-	valueTopic: IMessageWithUser | null;
+	currentTopicInitMessage: IMessageWithUser | null;
 	openTopicMessageState: boolean;
 	currentTopicId?: string;
 	firstMessageOfCurrentTopic?: ApiSdTopic;
@@ -79,8 +79,8 @@ export const fetchTopics = createAsyncThunk('topics/fetchTopics', async ({ clanI
 			return [];
 		}
 
-		const threads = mapToTopicEntity(response.topics);
-		return threads;
+		const topics = mapToTopicEntity(response.topics);
+		return topics;
 	} catch (error) {
 		captureSentryError(error, 'topics/fetchTopics');
 		return thunkAPI.rejectWithValue(error);
@@ -92,8 +92,7 @@ export const initialTopicsState: TopicDiscussionsState = topicsAdapter.getInitia
 	error: null,
 	isShowCreateTopic: false,
 	isPrivate: 0,
-	nameValueTopic: {},
-	valueTopic: null,
+	currentTopicInitMessage: null,
 	openTopicMessageState: false
 });
 
@@ -200,8 +199,8 @@ export const topicsSlice = createSlice({
 		setIsShowCreateTopic: (state: TopicDiscussionsState, action: PayloadAction<boolean>) => {
 			state.isShowCreateTopic = action.payload;
 		},
-		setValueTopic: (state, action: PayloadAction<IMessageWithUser | null>) => {
-			state.valueTopic = action.payload;
+		setCurrentTopicInitMessage: (state, action: PayloadAction<IMessageWithUser | null>) => {
+			state.currentTopicInitMessage = action.payload;
 		},
 		setOpenTopicMessageState(state, action) {
 			state.openTopicMessageState = action.payload;
@@ -298,7 +297,7 @@ export const selectTopicById = createSelector([selectTopicsEntities, (state, top
 
 export const selectMessageTopicError = createSelector(getTopicsState, (state) => state.messageTopicError);
 
-export const selectValueTopic = createSelector(getTopicsState, (state) => state.valueTopic);
+export const selectCurrentTopicInitMessage = createSelector(getTopicsState, (state) => state.currentTopicInitMessage);
 
 export const selectOpenTopicMessageState = createSelector(getTopicsState, (state: TopicDiscussionsState) => state.openTopicMessageState);
 

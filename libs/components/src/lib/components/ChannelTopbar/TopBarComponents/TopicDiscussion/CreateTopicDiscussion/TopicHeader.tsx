@@ -22,7 +22,7 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 
 	const setTurnOffThreadMessage = useCallback(() => {
 		dispatch(topicsActions.setOpenTopicMessageState(false));
-		dispatch(topicsActions.setValueTopic(null));
+		dispatch(topicsActions.setCurrentTopicInitMessage(null));
 	}, [dispatch]);
 
 	const { setRequestInput, request } = useMessageValue();

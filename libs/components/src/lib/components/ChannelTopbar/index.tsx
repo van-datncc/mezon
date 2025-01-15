@@ -116,7 +116,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 		}
 		if (isShowCreateTopic) {
 			dispatch(topicsActions.setOpenTopicMessageState(false));
-			dispatch(topicsActions.setValueTopic(null));
+			dispatch(topicsActions.setCurrentTopicInitMessage(null));
 		}
 	}, [channel?.id, dispatch, store]);
 

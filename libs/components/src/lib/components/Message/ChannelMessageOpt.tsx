@@ -136,9 +136,9 @@ function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: b
 		[currentChannel?.id, dispatch]
 	);
 
-	const setValueTopic = useCallback(
+	const setCurrentTopicInitMessage = useCallback(
 		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setValueTopic(value));
+			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -146,10 +146,10 @@ function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: b
 	const handleCreateTopic = useCallback(() => {
 		setIsShowCreateTopic(true);
 		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setValueTopic(realTimeMessage);
+		setCurrentTopicInitMessage(realTimeMessage);
 		dispatch(topicsActions.setCurrentTopicId(''));
 		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
-	}, [dispatch, message, realTimeMessage, setIsShowCreateTopic, setValueTopic]);
+	}, [dispatch, message, realTimeMessage, setIsShowCreateTopic, setCurrentTopicInitMessage]);
 
 	const menuPlugin = useMemo(() => {
 		const plugin = {
