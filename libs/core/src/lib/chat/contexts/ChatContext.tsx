@@ -555,6 +555,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (userAdds: UserChannelAddedEvent) => {
 			if (!userAdds?.channel_desc) return;
 			const { channel_desc, users, clan_id, create_time_second, caller } = userAdds;
+
 			const userIds = users.map((u) => u.user_id);
 			const user = users?.find((user) => user.user_id === userId);
 			if (user) {
@@ -573,15 +574,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						})
 					);
 				}
+			}
 
-				if (channel_desc.type === ChannelType.CHANNEL_TYPE_GROUP) {
-					dispatch(
-						directActions.addGroupUserWS({
-							channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
-							users: [...users].filter((item) => item.user_id !== userId)
-						})
-					);
-				}
+			if (channel_desc.type == ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(
+					directActions.addGroupUserWS({
+						channel_desc: { ...channel_desc, create_time_seconds: create_time_second },
+						users: [...users].filter((item) => item.user_id !== userId)
+					})
+				);
 			}
 
 			if (clanIdActive === clan_id) {
