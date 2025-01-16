@@ -139,7 +139,7 @@ const designLayout = (
 			} else if (images[i + 1]) {
 				const width = 520;
 				listImageSize[i] = {
-					width: 512 /2,
+					width: 512 / 2,
 					height: 150
 				};
 			} else {
@@ -157,7 +157,8 @@ const designLayout = (
 				width: images[0].width || 0
 			};
 			return listImageSize;
-		} else if ((images[0]?.width || 0) > 520) {
+		}
+		if ((images[0]?.width || 0) > 520) {
 			listImageSize[0] = {
 				height: Math.round((520 * (images[0].height || 1)) / (images[0].width || 1)),
 				width: 520
