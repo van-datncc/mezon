@@ -324,14 +324,14 @@ function MessageContextMenu({
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread }));
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: currentChannel?.id as string, isShowCreateTopic: false }));
+			dispatch(topicsActions.setIsShowCreateTopic(false));
 		},
 		[currentChannel?.id, dispatch]
 	);
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateTopic }));
+			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
 			dispatch(
 				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread: false })
 			);
@@ -346,9 +346,9 @@ function MessageContextMenu({
 		[dispatch]
 	);
 
-	const setValueTopic = useCallback(
+	const setCurrentTopicInitMessage = useCallback(
 		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setValueTopic(value));
+			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -363,10 +363,10 @@ function MessageContextMenu({
 	const handleCreateTopic = useCallback(() => {
 		setIsShowCreateTopic(true);
 		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setValueTopic(message);
+		setCurrentTopicInitMessage(message);
 		dispatch(topicsActions.setCurrentTopicId(''));
 		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
-	}, [dispatch, message, setIsShowCreateTopic, setValueTopic]);
+	}, [dispatch, message, setIsShowCreateTopic, setCurrentTopicInitMessage]);
 
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
