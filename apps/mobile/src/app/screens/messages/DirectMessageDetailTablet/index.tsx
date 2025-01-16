@@ -115,6 +115,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 
 	const fetchMemberChannel = useCallback(async () => {
 		const currentClanIdCached = await load(STORAGE_CLAN_ID);
+		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
 
 		if (!currentClanIdCached) {
 			return;
@@ -128,7 +129,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId('0')),
 			store.dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: directMessageId,

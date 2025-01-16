@@ -4,7 +4,6 @@ import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/sto
 import React, { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
 import ProfileBar from './ProfileBar';
@@ -48,22 +47,21 @@ const MemoizedChannelList = React.memo(ChannelList, (prevProps, nextProps) => {
 	return JSON.stringify(prevProps.categorizedChannels) === JSON.stringify(nextProps.categorizedChannels);
 });
 
-const DrawerContent = React.memo(() => {
+const DrawerContent = React.memo(({ isTablet }: { isTablet?: boolean }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const isTabletLandscape = useTabletLandscape();
 
 	return (
-		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
+		<View style={[styles.containerDrawerContent, { backgroundColor: isTablet ? themeValue.tertiary : themeValue.primary }]}>
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					<ServerList />
-					{!isTabletLandscape && <BackNativeListener />}
+					{!isTablet && <BackNativeListener />}
 					<ChannelListWrapper />
 				</View>
-				{isTabletLandscape && <ProfileBar />}
+				{isTablet && <ProfileBar />}
 			</View>
-			{isTabletLandscape && <View style={styles.wall}></View>}
+			{isTablet && <View style={styles.wall}></View>}
 		</View>
 	);
 });

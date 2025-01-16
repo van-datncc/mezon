@@ -20,6 +20,7 @@ type ChannelMessageActionListenerProps = {
 	channelId: string;
 	clanId: string;
 };
+let isHaveEventListenerRef = false;
 const ChannelMessageActionListener = React.memo(({ mode, isPublic, clanId, channelId }: ChannelMessageActionListenerProps) => {
 	const dispatch = useAppDispatch();
 	const { socketRef } = useMezon();
@@ -99,17 +100,20 @@ const ChannelMessageActionListener = React.memo(({ mode, isPublic, clanId, chann
 	);
 
 	useEffect(() => {
-		const eventOpenImage = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_IMAGE_DETAIL_MESSAGE_ITEM, onOpenImage);
-		const eventOpenMessageAction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, onMessageAction);
-		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
-			isHiddenBottomSheet && setOpenBottomSheet(null);
-		});
-
-		return () => {
-			eventOpenImage.remove();
-			eventOpenMessageAction.remove();
-			messageItemBSListener.remove();
-		};
+		if (!isHaveEventListenerRef) {
+			const eventOpenImage = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_IMAGE_DETAIL_MESSAGE_ITEM, onOpenImage);
+			const eventOpenMessageAction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, onMessageAction);
+			const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
+				isHiddenBottomSheet && setOpenBottomSheet(null);
+			});
+			isHaveEventListenerRef = true;
+			return () => {
+				eventOpenImage.remove();
+				eventOpenMessageAction.remove();
+				messageItemBSListener.remove();
+				isHaveEventListenerRef = false;
+			};
+		}
 	}, [onOpenImage, onMessageAction]);
 
 	return (

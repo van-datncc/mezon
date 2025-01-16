@@ -1,15 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
-import notifee from '@notifee/react-native';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
-import BootSplash from 'react-native-bootsplash';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
@@ -37,19 +34,6 @@ const HomeDefault = React.memo((props: any) => {
 	const isChannelApp = useMemo(() => {
 		return currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	}, [currentChannel?.type]);
-
-	useEffect(() => {
-		navigation.dispatch(DrawerActions.openDrawer());
-		const timer = setTimeout(async () => {
-			await notifee.cancelAllNotifications();
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-			await BootSplash.hide({ fade: true });
-		}, 1);
-		return () => {
-			clearTimeout(timer);
-		};
-	}, []);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
