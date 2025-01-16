@@ -94,7 +94,9 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 				]}
 				children={isUploading ? <UploadingIndicator /> : null}
 				source={{
-					uri: isLoadFailProxy ? image?.url : createImgproxyUrl(image?.url ?? '', { width: 500, height: 500, resizeType: 'fit' }),
+					uri: isLoadFailProxy
+						? image?.url
+						: createImgproxyUrl(image?.url ?? '', { width: image?.width || 500, height: image?.height || 500, resizeType: 'fit' }),
 					priority: FastImage.priority.high
 				}}
 				resizeMode={!imageSize?.height && !isUploading ? 'cover' : isMultiple ? 'cover' : 'contain'}
@@ -166,7 +168,9 @@ const RenderImageHaveSize = React.memo(
 					]}
 					children={isUploading ? <UploadingIndicator /> : null}
 					source={{
-						uri: isLoadFailProxy ? image?.url : createImgproxyUrl(image?.url ?? '', { width: 500, height: 500, resizeType: 'fit' }),
+						uri: isLoadFailProxy
+							? image?.url
+							: createImgproxyUrl(image?.url ?? '', { width: image?.width || 500, height: image?.height || 500, resizeType: 'fit' }),
 						priority: FastImage.priority.high
 					}}
 					resizeMode={isMultiple ? 'cover' : 'contain'}

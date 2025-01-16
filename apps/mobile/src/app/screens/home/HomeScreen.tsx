@@ -17,26 +17,6 @@ const HomeScreen = React.memo(() => {
 	const dispatch = useDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation();
-	const { themeValue, themeBasic } = useTheme();
-
-	useEffect(() => {
-		const focusedListener = navigation.addListener('focus', () => {
-			if (Platform.OS === 'android') {
-				StatusBar.setBackgroundColor(themeValue.primary);
-			}
-			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
-		});
-		const blurListener = navigation.addListener('blur', () => {
-			if (Platform.OS === 'android') {
-				StatusBar.setBackgroundColor(themeValue.secondary);
-			}
-			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
-		});
-		return () => {
-			focusedListener();
-			blurListener();
-		};
-	}, [navigation, themeBasic, themeValue.primary, themeValue.secondary]);
 
 	if (isTabletLandscape) {
 		return (
