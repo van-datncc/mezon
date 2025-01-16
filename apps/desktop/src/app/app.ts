@@ -261,26 +261,22 @@ export default class App {
 		let activityTimeout: NodeJS.Timeout | null = null;
 
 		const fetchActiveWindow = (): void => {
-			try {
-				const window = activeWindows?.getActiveWindow();
-				if (!window) return;
+			const window = activeWindows?.getActiveWindow();
+			if (!window) return;
 
-				const { windowClass, windowName } = window;
-				const appName = windowClass.replace(/\.(exe|app)$/, '');
-				const windowTitle = windowName;
-				const startTime = new Date().toISOString();
+			const { windowClass, windowName } = window;
+			const appName = windowClass.replace(/\.(exe|app)$/, '');
+			const windowTitle = windowName;
+			const startTime = new Date().toISOString();
 
-				const typeActivity = getActivityType(appName);
-				if (typeActivity === null) return;
+			const typeActivity = getActivityType(appName);
+			if (typeActivity === null) return;
 
-				const newAppInfo = { appName, windowTitle, startTime, typeActivity };
+			const newAppInfo = { appName, windowTitle, startTime, typeActivity };
 
-				if (!defaultApp || defaultApp.appName !== newAppInfo.appName || defaultApp.windowTitle !== newAppInfo.windowTitle) {
-					defaultApp = newAppInfo;
-					App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
-				}
-			} catch (ex) {
-				console.error(ex);
+			if (!defaultApp || defaultApp.appName !== newAppInfo.appName || defaultApp.windowTitle !== newAppInfo.windowTitle) {
+				defaultApp = newAppInfo;
+				App.mainWindow.webContents.send(ACTIVE_WINDOW, defaultApp);
 			}
 		};
 
@@ -291,13 +287,23 @@ export default class App {
 			return null;
 		};
 
-		fetchActiveWindow();
+		try {
+			fetchActiveWindow();
+		} catch (ex) {
+			console.error(ex);
+		}
 
 		if (activityTimeout) {
 			clearInterval(activityTimeout);
 		}
 
-		activityTimeout = setInterval(fetchActiveWindow, usageThreshold);
+		activityTimeout = setInterval(() => {
+			try {
+				fetchActiveWindow();
+			} catch (ex) {
+				console.error(ex);
+			}
+		}, usageThreshold);
 	}
 
 	private static setupMenu() {
