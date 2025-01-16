@@ -155,24 +155,32 @@ const designLayout = (
 			}
 		}
 	} else if (images.length == 1) {
-		if (!images[0]?.height) {
+		if (!images[0]?.height || !images[0]?.width) {
 			listImageSize[0] = {
 				height: 150,
 				width: images[0].width || 0
 			};
 			return listImageSize;
-		}
-		if ((images[0]?.width || 0) > MAX_WIDTH_ALBUM_IMAGE) {
+		} else {
+			const aspectRatio = images[0]?.width / images[0]?.height;
+			let heightAlonePic = images[0]?.height;
+			let widthAlonePic = images[0]?.width;
+			if (heightAlonePic >= 275) {
+				heightAlonePic = 275;
+				widthAlonePic = heightAlonePic * aspectRatio;
+			}
+
+			if (widthAlonePic >= 550) {
+				widthAlonePic = 550;
+				heightAlonePic = widthAlonePic / aspectRatio;
+			}
+	
 			listImageSize[0] = {
-				height: Math.round((MAX_WIDTH_ALBUM_IMAGE * (images[0].height || 1)) / (images[0].width || 1)),
-				width: MAX_WIDTH_ALBUM_IMAGE
+				height: Math.round(heightAlonePic),
+				width: Math.round(widthAlonePic)
 			};
 			return listImageSize;
 		}
-		listImageSize[0] = {
-			height: images[0].height,
-			width: images[0].width || 0
-		};
 	}
 
 	return listImageSize;
