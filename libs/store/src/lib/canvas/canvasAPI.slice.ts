@@ -7,6 +7,7 @@ import { memoizeAndTrack } from '../memoize';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
+const limitCanvas = 10;
 
 /*
  * Update these interfaces according to your requirements.
@@ -49,7 +50,7 @@ type getCanvasListPayload = {
 
 export const fetchCanvasCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
-		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, 10, page);
+		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limitCanvas, page);
 		return { ...response, time: Date.now() };
 	},
 	{
