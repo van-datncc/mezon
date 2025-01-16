@@ -13,7 +13,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button, Pagination } from 'flowbite-react';
-import { RefObject, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
@@ -49,17 +49,25 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-	const totalPages = useMemo(() => {
-		if (countCanvas === undefined) {
-			return 0;
-		}
-		return Math.ceil(countCanvas / 10);
-	}, [countCanvas]);
+	const totalPages = countCanvas === undefined ? 0 : Math.ceil(countCanvas / 10);
 	const [currentPage, setCurrentPage] = useState(1);
-	const onPageChange = (page: number) => {
-		setCurrentPage(page);
-		dispatch(getChannelCanvasList({ channel_id: currentChannel?.channel_id ?? '', clan_id: currentClanId ?? '', page: page, noCache: true }));
-	};
+	const onPageChange = useCallback(
+		(page: number) => {
+			if (!currentChannel?.channel_id || !currentClanId) {
+				return;
+			}
+			setCurrentPage(page);
+			dispatch(
+				getChannelCanvasList({
+					channel_id: currentChannel?.channel_id,
+					clan_id: currentClanId,
+					page: page,
+					noCache: true
+				})
+			);
+		},
+		[dispatch, currentChannel?.channel_id, currentClanId]
+	);
 	return (
 		<div
 			ref={modalRef}
