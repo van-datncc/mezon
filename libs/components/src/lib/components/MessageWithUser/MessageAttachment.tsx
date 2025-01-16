@@ -145,8 +145,21 @@ const designLayout = (
 			}
 		}
 	} else if (images.length == 1) {
+		if (!images[0]?.height) {
+			listImageSize[0] = {
+				height: 150,
+				width: images[0].width || 0
+			};
+			return listImageSize;
+		} else if ((images[0]?.width || 0) > 520) {
+			listImageSize[0] = {
+				height: Math.round((520 * (images[0].height || 1)) / (images[0].width || 1)),
+				width: 520
+			};
+			return listImageSize;
+		}
 		listImageSize[0] = {
-			height: images[0].height || 0,
+			height: images[0].height,
 			width: images[0].width || 0
 		};
 	}
