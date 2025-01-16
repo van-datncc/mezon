@@ -69,7 +69,7 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 	if (App.imageScriptWindowLoaded === false) {
 		App.imageScriptWindowLoaded = true;
 	}
-  imageWindow.show();
+	imageWindow.show();
 	imageWindow.focus();
 }
 
