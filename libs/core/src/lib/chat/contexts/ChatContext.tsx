@@ -647,7 +647,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onremovefriend = useCallback((userId: RemoveFriend) => {
-		//TODO: thanh.lexuan
+		//TODO: thanh.levan
 		// eslint-disable-next-line no-console
 		console.log('userId: ', userId);
 	}, []);
