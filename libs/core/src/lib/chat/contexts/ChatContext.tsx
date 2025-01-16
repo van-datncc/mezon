@@ -127,6 +127,7 @@ import {
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
+import { RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -644,6 +645,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
+
+	const onremovefriend = useCallback((userId: RemoveFriend) => {
+		//TODO: thanh.lexuan
+		// eslint-disable-next-line no-console
+		console.log('userId: ', userId);
+	}, []);
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
@@ -1300,6 +1307,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserclanadded = onuserclanadded;
 
+			socket.onremovefriend = onremovefriend;
+
 			socket.onclanprofileupdated = onclanprofileupdated;
 
 			socket.oncustomstatus = oncustomstatus;
@@ -1360,6 +1369,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclandeleted,
 			onuserchanneladded,
 			onuserclanadded,
+			onremovefriend,
 			onstickercreated,
 			oneventemoji,
 			onstickerdeleted,
@@ -1456,6 +1466,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onremovefriend = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickercreated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oneventemoji = () => {};
@@ -1488,6 +1500,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onclandeleted,
 		onuserchanneladded,
 		onuserclanadded,
+		onremovefriend,
 		onstickerupdated,
 		onstickerdeleted,
 		onstickercreated,

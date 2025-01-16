@@ -2,6 +2,8 @@ import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
 	canvasActions,
+	getChannelCanvasList,
+	selectCanvasCursors,
 	selectCanvasIdsByChannelId,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -10,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { Button } from 'flowbite-react';
+import { Button, Pagination } from 'flowbite-react';
 import { RefObject, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
@@ -28,7 +30,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const appearanceTheme = useSelector(selectTheme);
 	const [keywordSearch, setKeywordSearch] = useState('');
-
+	const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, currentChannel?.channel_id ?? ''));
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
 	const filteredCanvases = useMemo(() => {
 		if (!keywordSearch) return canvases;
@@ -47,7 +49,17 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-
+	const totalPages = useMemo(() => {
+		if (countCanvas === undefined) {
+			return 0;
+		}
+		return Math.ceil(countCanvas / 10);
+	}, [countCanvas]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const onPageChange = (page: number) => {
+		setCurrentPage(page);
+		dispatch(getChannelCanvasList({ channel_id: currentChannel?.channel_id ?? '', clan_id: currentClanId ?? '', page: page, noCache: true }));
+	};
 	return (
 		<div
 			ref={modalRef}
@@ -89,6 +101,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 							/>
 						);
 					})}
+					{canvases?.length && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />}
 
 					{!canvases?.length && <EmptyCanvas onClick={handleCreateCanvas} />}
 				</div>

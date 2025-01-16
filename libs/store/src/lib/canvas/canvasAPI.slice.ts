@@ -13,6 +13,7 @@ const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
  */
 export interface CanvasAPIEntity extends ICanvas {
 	id: string; // Primary ID
+	countCanvas?: number;
 }
 
 export interface CanvasAPIState {
@@ -22,6 +23,7 @@ export interface CanvasAPIState {
 		string,
 		EntityState<CanvasAPIEntity, string> & {
 			id: string;
+			countCanvas?: number;
 		}
 	>;
 }
@@ -47,7 +49,7 @@ type getCanvasListPayload = {
 
 export const fetchCanvasCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
-		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit, page);
+		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, 10, page);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -131,21 +133,25 @@ export const initialCanvasAPIState: CanvasAPIState = canvasAPIAdapter.getInitial
 const handleSetManyCanvas = ({
 	state,
 	channelId,
-	adapterPayload
+	adapterPayload,
+	countCanvas
 }: {
 	state: CanvasAPIState;
 	channelId?: string;
 	adapterPayload: CanvasAPIEntity[];
+	countCanvas: number;
 }) => {
 	if (!channelId) return;
 	if (!state.channelCanvas[channelId]) {
 		state.channelCanvas[channelId] = canvasAPIAdapter.getInitialState({
-			id: channelId
+			id: channelId,
+			countCanvas: countCanvas
 		});
 	}
 
-	const updatedChannelCanvas = canvasAPIAdapter.setMany(state.channelCanvas[channelId], adapterPayload);
+	const updatedChannelCanvas = canvasAPIAdapter.setAll(state.channelCanvas[channelId], adapterPayload);
 	state.channelCanvas[channelId] = updatedChannelCanvas;
+	state.channelCanvas[channelId].countCanvas = countCanvas;
 };
 
 export const canvasAPISlice = createSlice({
@@ -201,10 +207,12 @@ export const canvasAPISlice = createSlice({
 				if (action.payload.fromCache) return;
 				const channelId = (action as any)?.meta?.arg?.channel_id;
 				const reversedCanvas = action.payload.channel_canvases;
+				const countCanvas = action.payload.count;
 				handleSetManyCanvas({
 					state,
 					channelId,
-					adapterPayload: reversedCanvas
+					adapterPayload: reversedCanvas,
+					countCanvas: countCanvas
 				});
 			})
 			.addCase(getChannelCanvasList.rejected, (state: CanvasAPIState, action) => {
@@ -315,3 +323,7 @@ export const selectDefaultCanvasByChannelId = createSelector([getCanvasApiState,
 
 	return defaultCanvas || null;
 });
+
+export const selectCanvasCursors = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (state, channelId) => ({
+	countCanvas: state?.channelCanvas[channelId]?.countCanvas
+}));
