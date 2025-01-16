@@ -28,7 +28,7 @@ export type MessageImage = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode?: ChannelStreamMode;
 	messageId?: string;
-	size?: { width: number, height: number }
+	size?: { width: number; height: number };
 };
 
 const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, size }: MessageImage) => {
