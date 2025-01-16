@@ -1,10 +1,9 @@
 import { useCategory } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/store-mobile';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import ChannelListSkeleton from '../../../components/Skeletons/ChannelListSkeleton';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
@@ -53,22 +52,7 @@ const DrawerContent = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const isTabletLandscape = useTabletLandscape();
-	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
 
-	useEffect(() => {
-		const timer = setTimeout(async () => {
-			setIsReadyForUse(true);
-		}, 2000);
-		return () => {
-			clearTimeout(timer);
-		};
-	}, []);
-	if (!isReadyForUse)
-		return (
-			<View style={[styles.containerDrawerEmpty, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
-				<ChannelListSkeleton numberSkeleton={6} />
-			</View>
-		);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<View style={styles.container}>
