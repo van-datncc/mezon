@@ -1,5 +1,4 @@
 import {
-	useAuth,
 	useChannelMembersActions,
 	useEscapeKeyClose,
 	useMarkAsRead,
@@ -8,7 +7,7 @@ import {
 	UserRestrictionZone,
 	useSettingFooter
 } from '@mezon/core';
-import { clansActions, defaultNotificationActions, selectCurrentClanId, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
+import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
 import { EPermission, EUserSettings, IClan } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ApiAccount } from 'mezon-js/dist/api.gen';
@@ -100,8 +99,6 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		handClosePannel();
 	};
 
-	const { userId } = useAuth();
-	const currentClanId = useSelector(selectCurrentClanId);
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
 	const navigate = useNavigate();
 	const toggleLeaveClanPopup = () => {
@@ -109,7 +106,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	};
 	const { removeMemberClan } = useChannelMembersActions();
 	const handleLeaveClan = async () => {
-		await removeMemberClan({ channelId: '', clanId: clan?.clan_id as string, userIds: [userId as string] });
+		const currentClanId = await removeMemberClan({ channelId: '', clanId: clan?.clan_id as string, userIds: [] });
 		toggleLeaveClanPopup();
 		if (currentClanId === clan?.clan_id) {
 			navigate('/chat/direct/friends');
