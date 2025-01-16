@@ -48,18 +48,13 @@ const RootListener = () => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		let timer: string | number | NodeJS.Timeout;
 		if (isLoggedIn) {
 			authLoader();
-			mainLoader();
-			timer = setTimeout(async () => {
+			requestIdleCallback(() => {
 				initAppLoading();
-				// timeout 2000s to check app open from FCM or nomarly
-			}, 2000);
+				mainLoader();
+			});
 		}
-		return () => {
-			clearTimeout(timer);
-		};
 	}, [isLoggedIn]);
 
 	const refreshMessageInitApp = useCallback(async () => {
@@ -194,6 +189,7 @@ const RootListener = () => {
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
 			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
+			promises.push(dispatch(acitvitiesActions.listActivities()));
 			await Promise.all(promises);
 			return null;
 		} catch (error) {
@@ -209,19 +205,17 @@ const RootListener = () => {
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
+				if (!isFromFCM && clanId) {
+					save(STORAGE_CLAN_ID, clanId);
+					promises.push(dispatch(clansActions.joinClan({ clanId })));
+					promises.push(dispatch(clansActions.changeCurrentClan({ clanId })));
+				}
 				promises.push(dispatch(clansActions.fetchClans()));
-				promises.push(dispatch(acitvitiesActions.listActivities()));
 				const results = await Promise.all(promises);
-				if (!isFromFCM) {
-					if (clanId) {
-						save(STORAGE_CLAN_ID, clanId);
-						promises.push(dispatch(clansActions.joinClan({ clanId })));
-						promises.push(dispatch(clansActions.changeCurrentClan({ clanId })));
-					} else {
-						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
-						if (clanResp) {
-							await setCurrentClanLoader(clanResp.payload, clanId, false);
-						}
+				if (!isFromFCM && !clanId) {
+					const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
+					if (clanResp) {
+						await setCurrentClanLoader(clanResp.payload, clanId, false);
 					}
 				}
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
