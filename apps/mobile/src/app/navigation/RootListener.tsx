@@ -24,21 +24,20 @@ import React, { useCallback, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContext } from '@mezon/core';
-import { IWithError } from '@mezon/utils';
+import { IWithError, sleep } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	ActionEmitEvent,
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_MY_USER_ID,
-	jumpToChannel,
 	load,
 	save,
 	setCurrentClanLoader
 } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
 import { ChannelType } from 'mezon-js';
-import { AppState, DeviceEventEmitter, InteractionManager, View } from 'react-native';
+import { AppState, DeviceEventEmitter, View } from 'react-native';
 
 const RootListener = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
@@ -51,13 +50,10 @@ const RootListener = () => {
 	useEffect(() => {
 		let timer: string | number | NodeJS.Timeout;
 		if (isLoggedIn) {
-			refreshMessageInitApp();
 			authLoader();
 			mainLoader();
 			timer = setTimeout(async () => {
-				InteractionManager.runAfterInteractions(() => {
-					initAppLoading();
-				});
+				initAppLoading();
 				// timeout 2000s to check app open from FCM or nomarly
 			}, 2000);
 		}
@@ -78,17 +74,22 @@ const RootListener = () => {
 					clanId: currentClanId
 				})
 			);
-			dispatch(
-				channelsActions.fetchChannels({
-					clanId: currentClanId
-				})
-			);
+			// dispatch(
+			// 	channelsActions.fetchChannels({
+			// 		clanId: currentClanId
+			// 	})
+			// );
 		}
 	}, [currentChannelId, currentClanId, dispatch]);
 
 	const initAppLoading = async () => {
-		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-		await mainLoaderTimeout({ isFromFCM: isFromFCM?.toString() === 'true' });
+		const isDisableLoad = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		const isFromFCM = isDisableLoad?.toString() === 'true';
+		await mainLoaderTimeout({ isFromFCM });
+		if (!isFromFCM) {
+			await sleep(1000);
+			refreshMessageInitApp();
+		}
 	};
 
 	const messageLoaderBackground = useCallback(async () => {
@@ -123,7 +124,7 @@ const RootListener = () => {
 		} catch (error) {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 		}
-	}, [currentChannelId, currentClanId, handleReconnect]);
+	}, [currentClanId, handleReconnect]);
 
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
@@ -154,13 +155,13 @@ const RootListener = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
+	}, [isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
 
 	useEffect(() => {
 		if (currentClanId && currentClanId?.toString() !== '0') {
 			dispatch(channelsActions.fetchListFavoriteChannel({ clanId: currentClanId }));
 		}
-	}, [currentClanId]);
+	}, [currentClanId, dispatch]);
 
 	const authLoader = useCallback(async () => {
 		try {
@@ -210,21 +211,16 @@ const RootListener = () => {
 				const promises = [];
 				promises.push(dispatch(clansActions.fetchClans()));
 				promises.push(dispatch(acitvitiesActions.listActivities()));
+				const results = await Promise.all(promises);
 				if (!isFromFCM) {
 					if (clanId) {
 						save(STORAGE_CLAN_ID, clanId);
 						promises.push(dispatch(clansActions.joinClan({ clanId })));
 						promises.push(dispatch(clansActions.changeCurrentClan({ clanId })));
-					}
-				}
-				const results = await Promise.all(promises);
-				if (!isFromFCM) {
-					if (currentChannelId && clanId) {
-						await jumpToChannel(currentChannelId, clanId);
 					} else {
 						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
 						if (clanResp) {
-							await setCurrentClanLoader(clanResp.payload, clanId);
+							await setCurrentClanLoader(clanResp.payload, clanId, false);
 						}
 					}
 				}
@@ -235,7 +231,7 @@ const RootListener = () => {
 				dispatch(appActions.setLoadingMainMobile(false));
 			}
 		},
-		[currentChannelId, currentClanId, dispatch]
+		[currentClanId, dispatch]
 	);
 
 	return <View />;

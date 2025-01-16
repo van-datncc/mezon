@@ -20,6 +20,7 @@ import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
 import DrawerListener from './DrawerListener';
 import HomeDefaultHeader from './HomeDefaultHeader';
+import NoChannelSelected from './NoChannelSelected';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
@@ -32,20 +33,19 @@ const HomeDefault = React.memo((props: any) => {
 	const timeoutRef = useRef<any>(null);
 	const navigation = useNavigation<any>();
 	const panelKeyboardRef = useRef(null);
-	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
 
 	const isChannelApp = useMemo(() => {
 		return currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	}, [currentChannel?.type]);
 
 	useEffect(() => {
+		navigation.dispatch(DrawerActions.openDrawer());
 		const timer = setTimeout(async () => {
-			setIsReadyForUse(true);
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 			await BootSplash.hide({ fade: true });
-		}, 500);
+		}, 1);
 		return () => {
 			clearTimeout(timer);
 		};
@@ -87,7 +87,7 @@ const HomeDefault = React.memo((props: any) => {
 		<View style={[styles.homeDefault]}>
 			{Platform.OS === 'ios' && <LicenseAgreement />}
 
-			<DrawerListener currentChannel={currentChannel} />
+			{currentChannel && <DrawerListener currentChannel={currentChannel} />}
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}
 				navigation={props.navigation}
@@ -96,7 +96,7 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{isChannelApp && currentChannel ? (
 				<ChannelApp channelId={currentChannel?.channel_id} />
-			) : currentChannel && isReadyForUse ? (
+			) : currentChannel ? (
 				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 54 : 0}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -120,9 +120,9 @@ const HomeDefault = React.memo((props: any) => {
 					/>
 				</KeyboardAvoidingView>
 			) : (
-				<View />
+				<NoChannelSelected />
 			)}
-			<AgeRestrictedModal />
+			{currentChannel && <AgeRestrictedModal />}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />

@@ -1,8 +1,7 @@
 import { useAuth } from '@mezon/core';
-import { PlusAltIcon, remove, save, setDefaultChannelLoader, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
+import { PlusAltIcon, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
-	channelsActions,
 	clansActions,
 	getStoreAsync,
 	selectAllClans,
@@ -74,10 +73,10 @@ export const ListClanPopup = React.memo(() => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));
-			const channelResp = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId }));
-			if (channelResp?.payload) {
-				await setDefaultChannelLoader(channelResp.payload, clanId);
-			}
+			// const channelResp = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId }));
+			// if (channelResp?.payload) {
+			// 	await setDefaultChannelLoader(channelResp.payload, clanId);
+			// }
 			requestAnimationFrame(async () => {
 				const promises = [];
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
