@@ -40,7 +40,7 @@ import {
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	EPermission,
-	FOR_1_HOUR,
+	FOR_10_MINUTES,
 	IMessageWithUser,
 	MenuBuilder,
 	ModeResponsive,
@@ -242,11 +242,11 @@ function MessageContextMenu({
 		const isSameSenderWithPreviousMessage = currentMessage?.sender_id === previousMessage?.sender_id;
 
 		const isNextMessageWithinTimeLimit = nextMessage
-			? Date.parse(nextMessage?.create_time) - Date.parse(currentMessage?.create_time) < FOR_1_HOUR
+			? Date.parse(nextMessage?.create_time) - Date.parse(currentMessage?.create_time) < FOR_10_MINUTES
 			: false;
 
 		const isPreviousMessageWithinTimeLimit = previousMessage
-			? Date.parse(currentMessage?.create_time) - Date.parse(previousMessage?.create_time) < FOR_1_HOUR
+			? Date.parse(currentMessage?.create_time) - Date.parse(previousMessage?.create_time) < FOR_10_MINUTES
 			: false;
 
 		return isSameSenderWithPreviousMessage
