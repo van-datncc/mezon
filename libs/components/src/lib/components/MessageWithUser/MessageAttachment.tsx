@@ -163,9 +163,10 @@ const designLayout = (
 			return listImageSize;
 		}
 		if ((images[0]?.width || 0) > MAX_WIDTH_ALBUM_IMAGE) {
+			const scaleDownImage = MAX_WIDTH_ALBUM_IMAGE / 1.8 ;
 			listImageSize[0] = {
-				height: Math.round((MAX_WIDTH_ALBUM_IMAGE * (images[0].height || 1)) / (images[0].width || 1)),
-				width: MAX_WIDTH_ALBUM_IMAGE
+				height: Math.round((scaleDownImage * (images[0].height || 1)) / (images[0].width || 1)),
+				width: Math.round(scaleDownImage)
 			};
 			return listImageSize;
 		}
