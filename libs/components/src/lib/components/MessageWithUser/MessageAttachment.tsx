@@ -109,17 +109,17 @@ const designLayout = (
 ) => {
 	const listImageSize: { width: number; height: number }[] = [];
 
-	if (images.length > 2) {
+	if (images.length >= 2) {
 		for (let i = 0; i < images.length; i += 2) {
-			if (images[i + 1]) {
+			if (images[i + 1] && images[i]?.height && images[i + 1]?.height) {
 				const heightPicOne = images[i].height || 0;
 				const heightPicTwo = images[i + 1].height || 0;
 
 				let sameHeight = 0;
 				if (heightPicOne > heightPicTwo) {
-					sameHeight = heightPicOne + Math.round((heightPicOne - heightPicTwo) / 2);
+					sameHeight = heightPicTwo + Math.round((heightPicOne - heightPicTwo));
 				} else {
-					sameHeight = heightPicTwo + Math.round((heightPicTwo - heightPicOne) / 2);
+					sameHeight = heightPicOne + Math.round((heightPicTwo - heightPicOne));
 				}
 
 				const widthPicOneNew = ((images[i].width || 0) * sameHeight) / (images[i].height || 1);
@@ -135,6 +135,12 @@ const designLayout = (
 				listImageSize[i + 1] = {
 					width: Math.round(widthPicTwoNew / percent),
 					height: Math.round(sameHeight / percent)
+				};
+			} else if (images[i + 1]) {
+				const width = 520;
+				listImageSize[i] = {
+					width: 512 /2,
+					height: 150
 				};
 			} else {
 				const width = 520;
