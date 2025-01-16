@@ -61,7 +61,7 @@ const ChannelMessageListener = React.memo(() => {
 				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
-				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
+				} else if ([ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
 					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
 						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 							disconnect();

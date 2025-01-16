@@ -24,7 +24,7 @@ import { MicButton } from '../ChannelTopbar/TopBarComponents/SFUButton/MicIcon';
 import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
-import { usePushToTalk } from '../SFU/SFUContext';
+import { useSFU } from '../SFU/SFUContext';
 import ModalFooterProfile from './ModalFooterProfile';
 
 export type FooterProfileProps = {
@@ -215,7 +215,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 }
 
 export function SFUControls() {
-	const { isJoined, isTalking, toggleTalking, quitSFU } = usePushToTalk();
+	const { isJoined, isTalking, toggleTalking, quitSFU } = useSFU();
 	const appearanceTheme = useSelector(selectTheme);
 
 	const longPressHandlers = useLongPress<HTMLDivElement>({
