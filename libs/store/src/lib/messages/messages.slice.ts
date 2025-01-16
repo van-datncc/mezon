@@ -269,7 +269,7 @@ const shouldReturnCachedMessages = (
 	foundE2ee: boolean | undefined,
 	channelMessages: EntityState<MessagesEntity, string> | undefined
 ): boolean => {
-	if (isFetchingLatestMessages && oldMessages[0]?.id !== lastSentMessage?.id) {
+	if (isFetchingLatestMessages && oldMessages.at(-1)?.id !== lastSentMessage?.id) {
 		return false;
 	}
 
@@ -337,15 +337,19 @@ export const fetchMessages = createAsyncThunk(
 				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: firstMessage.id }));
 			}
 
-			let lastSentMessage = response.last_sent_message;
+			let lastSentMessage = (state.messages.lastMessageByChannel[channelId] as ApiChannelMessageHeader) || response.last_sent_message;
+
+			if (noCache) {
+				lastSentMessage = response.last_sent_message as ApiChannelMessageHeader;
+			}
 
 			// no message id and direction is before timestamp means load latest messages
 			// then the last sent message will be the last message of response
-			if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
+			if (noCache && ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages)) {
 				lastSentMessage = response.messages[response.messages.length - 1];
 			}
 
-			if (lastSentMessage && lastSentMessage.id) {
+			if (lastSentMessage && lastSentMessage.id && noCache) {
 				thunkAPI.dispatch(
 					messagesActions.setLastMessage({
 						...lastSentMessage,
