@@ -54,6 +54,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [currentDmGroup, navigation]);
 
 	const fetchMemberChannel = async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 		const currentClanIdCached = await load(STORAGE_CLAN_ID);
 		if (!currentClanIdCached) {
 			return;
@@ -65,7 +66,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const directMessageLoader = async () => {
 		await Promise.all([
-			dispatch(clansActions.setCurrentClanId('0')),
+			// dispatch(clansActions.setCurrentClanId('0')),
 			dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: directMessageId,
