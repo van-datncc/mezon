@@ -115,7 +115,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 
 	const fetchMemberChannel = useCallback(async () => {
 		const currentClanIdCached = await load(STORAGE_CLAN_ID);
-		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 
 		if (!currentClanIdCached) {
 			return;
