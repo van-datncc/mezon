@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux';
 import { IReactionMessageProps } from './components';
 
 const maxRetries = 10;
-let isHaveEventListenerRef = false;
 const ChannelMessageReactionListener = React.memo(() => {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -93,18 +92,14 @@ const ChannelMessageReactionListener = React.memo(() => {
 	);
 
 	useEffect(() => {
-		if (!isHaveEventListenerRef) {
-			const eventOnReaction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_REACTION_MESSAGE_ITEM, onReactionMessage);
-			const eventOnRetryReaction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_RETRY_REACTION_MESSAGE_ITEM, onReactionMessageRetry);
+		const eventOnReaction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_REACTION_MESSAGE_ITEM, onReactionMessage);
+		const eventOnRetryReaction = DeviceEventEmitter.addListener(ActionEmitEvent.ON_RETRY_REACTION_MESSAGE_ITEM, onReactionMessageRetry);
 
-			isHaveEventListenerRef = true;
-			return () => {
-				eventOnReaction.remove();
-				eventOnRetryReaction.remove();
-				intervalRef?.current && clearInterval(intervalRef.current);
-				isHaveEventListenerRef = false;
-			};
-		}
+		return () => {
+			eventOnReaction.remove();
+			eventOnRetryReaction.remove();
+			intervalRef?.current && clearInterval(intervalRef.current);
+		};
 	}, [onReactionMessage, onReactionMessageRetry]);
 
 	return <View />;
