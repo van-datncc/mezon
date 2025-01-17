@@ -162,7 +162,6 @@ export const ChatBoxBottomBar = memo(
 
 		const handleEventAfterEmojiPicked = useCallback(
 			async (shortName: string) => {
-				console.log(`${shortName}`);
 				let textFormat;
 				if (!text.length && !textChange.length) {
 					textFormat = shortName?.toString();
