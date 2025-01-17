@@ -647,11 +647,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
 
-	const onremovefriend = useCallback((userId: RemoveFriend) => {
-		//TODO: thanh.levan
-		// eslint-disable-next-line no-console
-		console.log('userId: ', userId);
-	}, []);
+	const onremovefriend = useCallback(
+		(removeFriend: RemoveFriend) => {
+			dispatch(friendsActions.remove(removeFriend.user_id));
+		},
+		[dispatch]
+	);
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
