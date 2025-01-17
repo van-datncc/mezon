@@ -18,3 +18,4 @@ export { default as TimePicker } from './lib/TimePicker';
 export * from './lib/Loading';
 export * from './lib/LogOutButton';
 export * from './lib/useMezonUi';
+export { FloatButton } from './lib/FloatButton'

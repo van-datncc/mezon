@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
+import { ChatContext, useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -13,18 +13,20 @@ import {
 	selectStatusStream,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector
+	useAppSelector,
+	selectIsShowMentionFloatButtonByClanId, selectChannelHasMentionedByClanId
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import { ChannelListItemRef } from './ChannelListItem';
+import { MentionFloatButton } from "../MentionFloatButton";
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -75,7 +77,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
-
+	
+	const isShowMentionFloatButton = useSelector(state => selectIsShowMentionFloatButtonByClanId(state, currentClan?.clan_id || ''));
+	const mentionChannelId = useSelector(state => selectChannelHasMentionedByClanId(state, currentClan?.clan_id || ''));
+	
+	
 	const data = useMemo(
 		() => [
 			{ type: 'bannerAndEvents' },
@@ -175,6 +181,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
+				{isShowMentionFloatButton && (
+					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
+						<MentionFloatButton channelId={mentionChannelId || ''} clanId={currentClan?.clan_id || ''}/>
+					</div>
+				)}
 				<div
 					style={{
 						position: 'absolute',
