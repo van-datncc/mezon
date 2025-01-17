@@ -367,7 +367,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							})
 						);
 					}
-					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+					dispatch(
+						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
+					);
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 				}
 				// check
@@ -832,7 +834,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
 								lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
 								clanId: extendChannelCreated.clan_id ?? '',
-								isMute: false
+								isMute: false,
+								senderId: ''
 							}
 						])
 					);
