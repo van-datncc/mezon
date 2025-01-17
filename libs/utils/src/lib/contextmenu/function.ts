@@ -10,6 +10,7 @@ export const convertImageToBlobFile = async (urlData: string): Promise<Blob | nu
 };
 
 export const handleCopyImage = async (urlData: string) => {
+  console.log('urlData: ', urlData);
 	try {
 		if (!navigator.clipboard?.write) {
 			console.warn('Clipboard API not supported. Image data not copied.');
@@ -42,11 +43,11 @@ export const handleCopyImage = async (urlData: string) => {
 		}
 
 		const file = new File([blob], fileName, {
-			type: `image/${fileType}`
+			type: `image/png`
 		});
 
 		const clipboardItem = new ClipboardItem({
-			[`image/${fileType}`]: file
+			[`image/png`]: file
 		});
 
 		await navigator.clipboard.write([clipboardItem]);
