@@ -160,11 +160,20 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [channelId]);
 
-		const handleEventAfterEmojiPicked = async (shortName: string) => {
-			const textFormat = `${textChange?.endsWith(' ') ? textChange : textChange + ' '}${shortName?.toString()} `;
-			setTextChange(textFormat);
-			await handleTextInputChange(textFormat);
-		};
+		const handleEventAfterEmojiPicked = useCallback(
+			async (shortName: string) => {
+				console.log(`${shortName}`);
+				let textFormat;
+				if (!text.length && !textChange.length) {
+					textFormat = shortName?.toString();
+				} else {
+					textFormat = `${textChange?.endsWith(' ') ? textChange : textChange + ' '}${shortName?.toString()}`;
+				}
+				setTextChange(textFormat);
+				await handleTextInputChange(textFormat);
+			},
+			[textChange]
+		);
 
 		const onSendSuccess = useCallback(() => {
 			setText('');
