@@ -1,4 +1,10 @@
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
+import {
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	load,
+	remove
+} from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -20,12 +26,22 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 			await BootSplash.hide({ fade: true });
 		}, 1);
-		const timer2 = setTimeout(async () => {
-			setIsReadyForUse(true);
-		}, 2000);
+		let timer2;
+		requestIdleCallback(() => {
+			const isDisableLoad = load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+			const isFromFCM = isDisableLoad?.toString() === 'true';
+
+			timer2 = setTimeout(
+				async () => {
+					setIsReadyForUse(true);
+				},
+				isFromFCM ? 1 : 2000
+			);
+		});
+
 		return () => {
 			clearTimeout(timer);
-			clearTimeout(timer2);
+			timer2 && clearTimeout(timer2);
 		};
 	}, []);
 

@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel, selectDmGroupCurrentId } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -27,6 +27,7 @@ const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const timeoutRef = useRef<any>(null);
 	const navigation = useNavigation<any>();
 	const panelKeyboardRef = useRef(null);
@@ -80,7 +81,7 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{isChannelApp && currentChannel ? (
 				<ChannelApp channelId={currentChannel?.channel_id} />
-			) : currentChannel ? (
+			) : currentChannel && !currentDirectId ? (
 				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 54 : 0}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -103,8 +104,10 @@ const HomeDefault = React.memo((props: any) => {
 						mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 				</KeyboardAvoidingView>
-			) : (
+			) : !currentDirectId ? (
 				<NoChannelSelected />
+			) : (
+				<View />
 			)}
 			{currentChannel && <AgeRestrictedModal />}
 
