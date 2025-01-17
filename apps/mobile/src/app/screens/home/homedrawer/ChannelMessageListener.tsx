@@ -8,6 +8,7 @@ import {
 	selectAllUserClans,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
+	selectDmGroupCurrentId,
 	selectStatusStream,
 	useAppDispatch,
 	videoStreamActions
@@ -22,11 +23,12 @@ import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { EMessageBSToShow } from './enums';
 
-let isHaveEventListenerRef = false;
 const ChannelMessageListener = React.memo(() => {
 	const usersClan = useSelector(selectAllUserClans);
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const currentClanId = useSelector(selectCurrentClanId);
+	const clanId = useSelector(selectCurrentClanId);
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const currentClanId = currentDirectId ? '0' : clanId;
 	const navigation = useNavigation<any>();
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
@@ -104,17 +106,13 @@ const ChannelMessageListener = React.memo(() => {
 	);
 
 	useEffect(() => {
-		if (!isHaveEventListenerRef) {
-			const eventOnMention = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_USER_MESSAGE_ITEM, onMention);
-			const eventOnChannelMention = DeviceEventEmitter.addListener(ActionEmitEvent.ON_CHANNEL_MENTION_MESSAGE_ITEM, onChannelMention);
+		const eventOnMention = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_USER_MESSAGE_ITEM, onMention);
+		const eventOnChannelMention = DeviceEventEmitter.addListener(ActionEmitEvent.ON_CHANNEL_MENTION_MESSAGE_ITEM, onChannelMention);
 
-			isHaveEventListenerRef = true;
-			return () => {
-				eventOnMention.remove();
-				eventOnChannelMention.remove();
-				isHaveEventListenerRef = false;
-			};
-		}
+		return () => {
+			eventOnMention.remove();
+			eventOnChannelMention.remove();
+		};
 	}, [onChannelMention, onMention]);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
