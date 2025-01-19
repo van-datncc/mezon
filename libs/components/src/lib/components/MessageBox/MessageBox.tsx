@@ -50,7 +50,6 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 
 	const onConvertToFiles = useCallback(
 		async (content: string) => {
-			if (content.length > MIN_THRESHOLD_CHARS) {
 				const fileContent = new Blob([content], { type: 'text/plain' });
 				const now = Date.now();
 				const filename = now + '.txt';
@@ -73,8 +72,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 							}
 						]
 					})
-				);
-			}
+				);	
 		},
 		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
