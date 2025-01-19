@@ -429,7 +429,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const path = isElectron() ? window.location.hash : window.location.pathname;
 			const isFriendPageView = path.includes('/chat/direct/friends');
 			const isDirectViewPage = path.includes('/chat/direct/message/');
-			
+
 			if (
 				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
 				isDirectViewPage ||
@@ -447,14 +447,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					(isElectron() && isFocusDesktop === false) ||
 					isTabVisible === false;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
-					dispatch(notificationActions.setIsShowMentionFloatButton({
-						clanId: (notification as any).clan_id,
-						isShowMentionFloatButton: true
-					}));
-					dispatch(notificationActions.setChannelHasMentionedByClan({
-						clanId: (notification as any).clan_id,
-						channelId: (notification as any).channel_id ?? ''
-					}))
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(
 						channelsActions.updateChannelBadgeCount({

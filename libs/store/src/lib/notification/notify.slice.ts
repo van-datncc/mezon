@@ -25,8 +25,6 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	messageNotifiedId: string;
 	isShowInbox: boolean;
 	lastNotificationId: string;
-	isShowMentionFloatButtonByClan: Record<string, boolean>;
-	channelHasMentionedByClan: Record<string, string>;
 }
 
 export type LastSeenTimeStampChannelArgs = {
@@ -108,9 +106,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
 	isShowInbox: false,
-	lastNotificationId: '',
-	isShowMentionFloatButtonByClan: {},
-	channelHasMentionedByClan: {}
+	lastNotificationId: ''
 });
 
 export const notificationSlice = createSlice({
@@ -131,12 +127,6 @@ export const notificationSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
-		},
-		setIsShowMentionFloatButton: (state, action: PayloadAction<{clanId: string, isShowMentionFloatButton: boolean}>) => {
-			state.isShowMentionFloatButtonByClan[action.payload.clanId] = action.payload.isShowMentionFloatButton;
-		},
-		setChannelHasMentionedByClan: (state, action: PayloadAction<{clanId: string, channelId: string}>) => {
-			state.channelHasMentionedByClan[action.payload.clanId] = action.payload.channelId;
 		}
 	},
 
@@ -251,13 +241,3 @@ export const selectMentionAndReplyUnreadByClanId = (listLastSeen: ChannelMetaEnt
 			return notificationTimestamp > lastSeen;
 		});
 	});
-
-export const selectIsShowMentionFloatButtonByClanId = createSelector(
-	[getNotificationState, (state, clanId: string) => clanId],
-	(state, clanId) => state.isShowMentionFloatButtonByClan?.[clanId]
-);
-
-export const selectChannelHasMentionedByClanId = createSelector(
-	[getNotificationState, (state, clanId: string) => clanId],
-	(state, clanId) => state.channelHasMentionedByClan?.[clanId]
-);

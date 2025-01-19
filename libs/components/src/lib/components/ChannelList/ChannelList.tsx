@@ -1,9 +1,11 @@
-import { ChatContext, useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
 import {
+	ChannelsEntity,
 	ClansEntity,
 	categoriesActions,
 	selectAllChannelsFavorite,
 	selectChannelById,
+	selectChannelsByClanId,
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
 	selectCurrentClan,
@@ -13,20 +15,19 @@ import {
 	selectStatusStream,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector,
-	selectIsShowMentionFloatButtonByClanId, selectChannelHasMentionedByClanId
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
+import { MentionFloatButton } from '../MentionFloatButton';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import { ChannelListItemRef } from './ChannelListItem';
-import { MentionFloatButton } from "../MentionFloatButton";
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -77,11 +78,12 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
-	
-	const isShowMentionFloatButton = useSelector(state => selectIsShowMentionFloatButtonByClanId(state, currentClan?.clan_id || ''));
-	const mentionChannelId = useSelector(state => selectChannelHasMentionedByClanId(state, currentClan?.clan_id || ''));
-	
-	
+
+	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
+	const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
+		channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
+	const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
+
 	const data = useMemo(
 		() => [
 			{ type: 'bannerAndEvents' },
@@ -163,6 +165,12 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 
+	const handleScrollChannelIntoView = () => {
+		if (!firstChannelWithBadgeCount) return;
+
+		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
+	};
+
 	return (
 		<div
 			ref={parentRef}
@@ -181,9 +189,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
-				{isShowMentionFloatButton && (
+				{firstChannelWithBadgeCount && (
 					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
-						<MentionFloatButton channelId={mentionChannelId || ''} clanId={currentClan?.clan_id || ''}/>
+						<MentionFloatButton
+							channelId={findFirstChannelWithBadgeCount(channelsInClan)?.channel_id || ''}
+							clanId={currentClan?.clan_id || ''}
+							onClick={handleScrollChannelIntoView}
+						/>
 					</div>
 				)}
 				<div
