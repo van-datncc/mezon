@@ -165,11 +165,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 
-	const handleScrollChannelIntoView = () => {
+	const handleScrollChannelIntoView = useCallback(() => {
 		if (!firstChannelWithBadgeCount) return;
 
 		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
-	};
+	}, [firstChannelWithBadgeCount]);
 
 	return (
 		<div
@@ -191,11 +191,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			>
 				{firstChannelWithBadgeCount && (
 					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
-						<MentionFloatButton
-							channelId={findFirstChannelWithBadgeCount(channelsInClan)?.channel_id || ''}
-							clanId={currentClan?.clan_id || ''}
-							onClick={handleScrollChannelIntoView}
-						/>
+						<MentionFloatButton onClick={handleScrollChannelIntoView} />
 					</div>
 				)}
 				<div

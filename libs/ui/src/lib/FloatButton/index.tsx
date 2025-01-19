@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type FloatButtonProps = {
 	content: string;
@@ -6,9 +6,9 @@ type FloatButtonProps = {
 	textColor: string;
 	onClick: () => void;
 	className?: string;
-}
+};
 
-export const FloatButton: React.FC<FloatButtonProps> = ({content, backgroundColor, textColor, onClick, className}) => {
+export const FloatButton: React.FC<FloatButtonProps> = ({ content, backgroundColor, textColor, onClick, className }) => {
 	return (
 		<div
 			style={{
@@ -16,9 +16,12 @@ export const FloatButton: React.FC<FloatButtonProps> = ({content, backgroundColo
 				color: textColor
 			}}
 			onClick={onClick}
-			className={'shadow-lg text-sm text-white bg-contentBrand rounded-full py-1 px-2 w-fit my-2 font-semibold align-center cursor-pointer opacity-90 hover:opacity-95 active:opacity-100' + className}
+			className={
+				'shadow-lg text-sm text-white bg-contentBrand rounded-full py-1 px-2 w-fit my-2 font-semibold align-center cursor-pointer opacity-90 hover:opacity-95 active:opacity-100 ' +
+				className
+			}
 		>
 			{content}
 		</div>
-	)
-}
+	);
+};
