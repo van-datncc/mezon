@@ -2,7 +2,7 @@ import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useState } from 'react';
-import { SafeAreaView, ScrollView, StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar } from 'react-native';
 import { Chase } from 'react-native-animated-spinkit';
 import { WebView } from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -50,21 +50,19 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 				</Block>
 			)}
 			<StatusBar barStyle="light-content" backgroundColor={Colors.bgCharcoal} />
-			<ScrollView contentContainerStyle={styles.scrollView}>
-				<WebView
-					source={{
-						uri: uri
-					}}
-					style={styles.container}
-					injectedJavaScriptBeforeContentLoaded={injectedJS}
-					javaScriptEnabled={true}
-					nestedScrollEnabled={true}
-					onLoadEnd={async () => {
-						await sleep(500);
-						setLoading(false);
-					}}
-				/>
-			</ScrollView>
+			<WebView
+				source={{
+					uri: uri
+				}}
+				style={styles.container}
+				injectedJavaScriptBeforeContentLoaded={injectedJS}
+				javaScriptEnabled={true}
+				nestedScrollEnabled={true}
+				onLoadEnd={async () => {
+					await sleep(500);
+					setLoading(false);
+				}}
+			/>
 		</SafeAreaView>
 	);
 }
