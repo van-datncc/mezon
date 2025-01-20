@@ -13,6 +13,9 @@ import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
 
+import { Dropdown } from 'flowbite-react';
+import React from 'react';
+
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
 	const InputRef = useRef<ChannelNameModalRef>(null);
@@ -237,6 +240,15 @@ export const CreateNewChannelModal = () => {
 										/>
 									</div>
 								)}
+								{channelType === ChannelType.CHANNEL_TYPE_VOICE && (
+									<div className={'mt-2 w-full'}>
+										<ChannelVoicePlatformField
+											ref={appUrlInputRef}
+											onChange={handleAppUrlChannge}
+											channelVoicePlatformProps="Choose meeting platform:"
+										/>
+									</div>
+								)}
 								{channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
 									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
 								)}
@@ -328,6 +340,57 @@ const ChannelAppUrlTextField = forwardRef<ChannelAppUrlModalRef, ChannelAppUrlMo
 			{shouldValidate && (checkValidate || checkAppUrlChannel) ? (
 				<p className="text-[#e44141] text-xs italic font-thin">Please enter a valid URL (e.g., https://example.com).</p>
 			) : null}
+		</div>
+	);
+});
+
+interface ChannelVoicePlatformModalProps {
+	channelVoicePlatformProps: string;
+	onChange: (value: string) => void;
+}
+
+type ChannelVoicePlatformRef = {
+	checkInput: () => boolean;
+};
+
+const ChannelVoicePlatformField = forwardRef<ChannelVoicePlatformRef, ChannelVoicePlatformModalProps>((props, ref) => {
+	const { channelVoicePlatformProps, onChange } = props;
+	const options = ['Google Meet', 'Mezon Meet'];
+	const [selectedPlatform, setSelectedPlatform] = useState<string | null>(options[0]);
+
+	const handleSelectPlatform = (platform: string) => {
+		setSelectedPlatform(platform);
+		onChange(platform);
+	};
+
+	return (
+		<div className="Frame408 self-stretch flex-col justify-start items-start gap-2 flex mt-1">
+			<ChannelLableModal labelProp={channelVoicePlatformProps} />
+			<Dropdown
+				placement={'bottom-start'}
+				label={''}
+				renderTrigger={() => (
+					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
+						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
+							<p>{selectedPlatform}</p>
+						</div>
+						<div>
+							<Icons.ArrowDownFill />
+						</div>
+					</div>
+				)}
+				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'}
+			>
+				{options.map((option) => (
+					<Dropdown.Item
+						key={option}
+						className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
+						onClick={() => handleSelectPlatform(option)}
+					>
+						<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">{option}</p>
+					</Dropdown.Item>
+				))}
+			</Dropdown>
 		</div>
 	);
 });
