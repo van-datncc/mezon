@@ -710,13 +710,14 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			content,
 			attachments,
 			create_time: new Date().toISOString(),
-			sender_id: senderId,
-			username: username || '',
-			avatar: avatar,
+			sender_id: anonymous ? NX_CHAT_APP_ANNONYMOUS_USER_ID : senderId,
+			username:anonymous ? 'Anonymous' : username || '',
+			avatar: anonymous ? '' : avatar,
 			isSending: true,
 			references: references?.filter((item) => item) || [],
 			isMe: true,
-			hide_editted: true
+			hide_editted: true,
+			isAnonymous: anonymous
 		};
 		const fakeMess = await thunkAPI.dispatch(messagesActions.mapMessageChannelToEntityAction({ message: fakeMessage })).unwrap();
 		const state = getMessagesState(getMessagesRootState(thunkAPI));
