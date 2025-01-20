@@ -18,7 +18,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 	const session = JSON.stringify(authState.session);
 	const [loading, setLoading] = useState(true);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`;
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/canvas-mobile/${clanId}/${channelId}/${canvasId}`;
 
 	const injectedJS = `
     (function() {
