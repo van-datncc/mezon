@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		clansBox: {
+			flex: 1,
 			marginTop: size.s_10
 		},
 		serverItem: {

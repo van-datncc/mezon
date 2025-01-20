@@ -28,7 +28,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const listVoiceChannel = useMemo(
-		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_VOICE),
+		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE),
 		[listChannelSearch]
 	);
 	const listTextChannel = useMemo(
@@ -59,7 +59,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 
 	const handleRouteData = useCallback(
 		async (channelData: ChannelThreads) => {
-			if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE && channelData?.meeting_code) {
+			if (channelData?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 				navigation.navigate(APP_SCREEN.HOME);
@@ -74,7 +74,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 				});
 			}
-			if (channelData?.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+			if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				if (isTabletLandscape) {
 					navigation.goBack();
 				} else {

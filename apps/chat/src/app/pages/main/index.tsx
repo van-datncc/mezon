@@ -256,7 +256,7 @@ function MyApp() {
 	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
 	useEffect(() => {
-		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			const urlVoice = `https://meet.google.com/${currentChannel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}

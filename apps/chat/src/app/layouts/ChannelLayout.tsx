@@ -18,7 +18,7 @@ import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();

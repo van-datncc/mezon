@@ -59,7 +59,7 @@ type PanelChannel = {
 const typeChannel = {
 	text: ChannelType.CHANNEL_TYPE_CHANNEL,
 	thread: ChannelType.CHANNEL_TYPE_THREAD,
-	voice: ChannelType.CHANNEL_TYPE_VOICE
+	voice: ChannelType.CHANNEL_TYPE_GMEET_VOICE
 };
 export const notiLabels: Record<number, string> = {
 	[NotificationType.ALL_MESSAGE]: 'All',

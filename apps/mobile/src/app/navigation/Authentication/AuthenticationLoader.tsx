@@ -1,11 +1,10 @@
 import { useAuth } from '@mezon/core';
-import { ActionEmitEvent, getAppInfo } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import {
 	DMCallActions,
 	appActions,
 	channelsActions,
 	directActions,
-	fcmActions,
 	getStoreAsync,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -16,7 +15,7 @@ import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Sound from 'react-native-sound';
@@ -26,14 +25,7 @@ import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
-import {
-	checkNotificationPermission,
-	handleFCMToken,
-	isShowNotification,
-	navigateToNotification,
-	setupCallKeep,
-	setupNotificationListeners
-} from '../../utils/pushNotificationHelpers';
+import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 
 export const AuthenticationLoader = () => {
@@ -49,31 +41,6 @@ export const AuthenticationLoader = () => {
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
-
-	const loadFRMConfig = useCallback(async () => {
-		try {
-			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
-			if (fcmtoken) {
-				const { app_platform: platform } = appInfo;
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
-				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: userProfile?.user?.username, platform }));
-			}
-		} catch (error) {
-			console.error('Error loading FCM config:', error);
-		}
-	}, [dispatch, userProfile?.user?.username]);
-
-	useEffect(() => {
-		if (userProfile?.user?.username) loadFRMConfig();
-	}, [loadFRMConfig, userProfile?.user?.username]);
-
-	useEffect(() => {
-		if (Platform.OS === 'ios') {
-			setupCallKeep();
-		}
-		setupNotificationListeners(navigation);
-	}, [navigation]);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;

@@ -310,7 +310,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			paddingLeft: size.s_6,
 			marginBottom: size.s_2,
-			paddingRight: size.s_20
+			paddingRight: size.s_28
 		},
 		aboveMessage: {
 			flexDirection: 'row',

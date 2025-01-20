@@ -6,6 +6,7 @@ import {
 	categoriesActions,
 	selectAllChannelsFavorite,
 	selectChannelById,
+	selectChannelsByClanId,
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
 	selectCurrentClan,
@@ -24,6 +25,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
+import { MentionFloatButton } from '../MentionFloatButton';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import { ChannelListItemRef } from './ChannelListItem';
@@ -77,6 +79,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
+
+	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
+	const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
+		channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
+	const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
 
 	const data = useMemo(
 		() => [
@@ -159,6 +166,24 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 
+	const handleScrollChannelIntoView = useCallback(() => {
+		if (!firstChannelWithBadgeCount) return;
+
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
+			return;
+		}
+
+		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
+	}, [firstChannelWithBadgeCount]);
+
+	const isChannelRefOutOfViewport = () => {
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
+		}
+		return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+	};
+
 	return (
 		<div
 			ref={parentRef}
@@ -177,6 +202,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
+				{firstChannelWithBadgeCount && isChannelRefOutOfViewport() && (
+					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
+						<MentionFloatButton onClick={handleScrollChannelIntoView} />
+					</div>
+				)}
 				<div
 					style={{
 						position: 'absolute',
@@ -276,13 +306,13 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 				className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
 			>
 				<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
-					{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 						<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 					)}
 					{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 						<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 					)}
-					{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 						<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 					)}
 					{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
