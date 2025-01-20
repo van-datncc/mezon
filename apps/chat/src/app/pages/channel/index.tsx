@@ -21,6 +21,7 @@ import {
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMembers,
+	selectAllRolesClan,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
@@ -224,6 +225,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const miniAppRef = useRef<HTMLIFrameElement>(null);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
+	const allRolesInClan = useSelector(selectAllRolesClan);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -313,6 +315,16 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 								appChannel.url ?? ''
 							);
 						}
+					} else if (eventType === 'GET_CLAN_ROLES') {
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
+							appChannel.url ?? ''
+						);
+					} else if (eventType === 'GET_CLAN_USERS') {
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'CLAN_USERS_RESPONSE', eventData: userChannels }),
+							appChannel.url ?? ''
+						);
 					} else if (eventType === 'CREATE_VOICE_ROOM') {
 						// eslint-disable-next-line no-console
 						console.log('mezon app handle CREATE_VOICE_ROOM');
