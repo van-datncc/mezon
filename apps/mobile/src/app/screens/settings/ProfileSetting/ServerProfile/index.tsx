@@ -52,6 +52,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 		if (isClanProfileNotChanged) {
 			setSelectedClan(clan);
 			onSelectedClan(clan);
+			bottomSheetDetail.current?.close();
 			return;
 		}
 
@@ -70,6 +71,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 			],
 			{ cancelable: false }
 		);
+		bottomSheetDetail.current?.close();
 	};
 
 	const handleAvatarChange = (url: string) => {
