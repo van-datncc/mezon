@@ -1,9 +1,10 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import { AttachmentEntity, selectDmGroupCurrentId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { Platform, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
 import { MezonClanAvatar } from '../../componentUI';
 import { useImage } from '../../hooks/useImage';
 import { style } from './styles';
@@ -20,6 +21,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 	const styles = style(themeValue);
 	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, imageSelected?.uploader || ''));
 	const { downloadImage, saveImageToCameraRoll } = useImage();
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const handleDownloadImage = async () => {
 		if (!imageSelected?.url) {
 			return;
@@ -59,10 +61,14 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				{!!uploader && (
 					<Block flexDirection={'row'} alignItems={'center'} gap={size.s_6}>
 						<Block style={styles.wrapperAvatar}>
-							<MezonClanAvatar image={uploader?.clan_avatar || uploader?.user?.avatar_url} />
+							<MezonClanAvatar
+								image={currentDirectId ? uploader?.user?.avatar_url : uploader?.clan_avatar || uploader?.user?.avatar_url}
+							/>
 						</Block>
 						<Block style={styles.messageBoxTop}>
-							<Text style={styles.userNameMessageBox}>{uploader?.user?.username || 'Anonymous'}</Text>
+							<Text style={styles.userNameMessageBox}>
+								{(currentDirectId ? uploader?.user?.display_name : uploader?.clan_nick) || 'Anonymous'}
+							</Text>
 							<Text style={styles.dateMessageBox}>
 								{imageSelected?.create_time ? convertTimeString(imageSelected?.create_time) : ''}
 							</Text>
