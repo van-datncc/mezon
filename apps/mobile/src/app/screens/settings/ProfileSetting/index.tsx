@@ -199,7 +199,8 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 				<Text
 					style={[
 						styles.saveChangeButton,
-						(!isUserProfileNotChanged || !isClanProfileNotChanged) && !isUserProfileEmptyName && !isClanProfileEmptyName
+						(tab === EProfileTab.UserProfile && !isUserProfileNotChanged && !isUserProfileEmptyName) ||
+						(tab === EProfileTab.ClanProfile && !isClanProfileNotChanged && !isClanProfileEmptyName)
 							? styles.changed
 							: styles.notChange
 					]}
@@ -243,16 +244,14 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	};
 
 	const saveCurrentTab = () => {
-		if ((isUserProfileNotChanged && isClanProfileNotChanged) || isUserProfileEmptyName || isClanProfileEmptyName) {
-			return;
-		}
-
 		if (tab === EProfileTab.UserProfile) {
+			if (isUserProfileNotChanged || isUserProfileEmptyName) return;
 			updateUserProfile();
 			return;
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
+			if (isClanProfileNotChanged || isClanProfileNotChanged) return;
 			updateClanProfile();
 			return;
 		}
