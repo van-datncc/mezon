@@ -2,7 +2,7 @@ import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useState } from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar } from 'react-native';
 import { Chase } from 'react-native-animated-spinkit';
 import { WebView } from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 	const session = JSON.stringify(authState.session);
 	const [loading, setLoading] = useState(true);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/canvas-mobile/${clanId}/${channelId}/${canvasId}`;
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`;
 
 	const injectedJS = `
     (function() {
@@ -50,18 +50,21 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 				</Block>
 			)}
 			<StatusBar barStyle="light-content" backgroundColor={Colors.bgCharcoal} />
-			<WebView
-				source={{
-					uri: uri
-				}}
-				style={styles.container}
-				injectedJavaScriptBeforeContentLoaded={injectedJS}
-				javaScriptEnabled={true}
-				onLoadEnd={async () => {
-					await sleep(500);
-					setLoading(false);
-				}}
-			/>
+			<ScrollView contentContainerStyle={styles.scrollView}>
+				<WebView
+					source={{
+						uri: uri
+					}}
+					style={styles.container}
+					injectedJavaScriptBeforeContentLoaded={injectedJS}
+					javaScriptEnabled={true}
+					nestedScrollEnabled={true}
+					onLoadEnd={async () => {
+						await sleep(500);
+						setLoading(false);
+					}}
+				/>
+			</ScrollView>
 		</SafeAreaView>
 	);
 }

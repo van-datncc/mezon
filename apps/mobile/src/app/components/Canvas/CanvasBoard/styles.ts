@@ -6,5 +6,8 @@ export const style = (colors: Attributes) =>
 		container: {
 			flex: 1,
 			backgroundColor: Colors.bgCharcoal
+		},
+		scrollView: {
+			flexGrow: 1
 		}
 	});
