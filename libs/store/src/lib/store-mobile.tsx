@@ -62,8 +62,6 @@ import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './po
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
-import { JoinSFUReducer } from './sfu/sfu.slice';
-import { sfuMembersReducer } from './sfu/sfuUsers.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
@@ -385,7 +383,6 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
-	sfuUsers: sfuMembersReducer,
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
@@ -410,7 +407,6 @@ const reducer = {
 	clanMembersMeta: clanMembersMetaReducer,
 	[ONBOARDING_FEATURE_KEY]: onboardingReducer,
 	dmcall: DMCallReducer,
-	joinSFU: JoinSFUReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,
