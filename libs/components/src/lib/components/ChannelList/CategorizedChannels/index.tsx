@@ -45,7 +45,7 @@ const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, clo
 
 	const confirmDeleteCategory = async () => {
 		await handleDeleteCategory({
-			category: { ...category, channels: category.channels || [] }
+			category: { ...category, channels: [] }
 		});
 		closeDeleteModal();
 	};
@@ -73,15 +73,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 		EPermission.manageChannel
 	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const permissions = useMemo(
-		() => ({
-			hasAdminPermission,
-			hasClanPermission,
-			hasChannelManagePermission,
-			isClanOwner
-		}),
-		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
-	);
+
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
@@ -93,7 +85,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const [openDeleteCategoryModal, closeDeleteModal] = useModal(() => {
 		return (
 			<DeleteCategoryModal
-				category={{ ...category, category_name: category.category_name || 'Default Name' }}
+				category={{ ...category, category_name: category.category_name || 'Default Name' , channels : []}}
 				closeDeleteModal={closeDeleteModal}
 			/>
 		);
@@ -212,12 +204,12 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>
 			)}
-			<ChannelList
-				channels={category?.channels || []}
+			{/* <ChannelList
+				channels={ []}
 				categoryExpandState={categoryExpandState}
 				channelRefs={channelRefs}
 				permissions={permissions}
-			/>
+			/> */}
 		</div>
 	);
 };

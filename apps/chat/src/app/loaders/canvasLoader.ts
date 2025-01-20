@@ -30,7 +30,7 @@ export const canvasLoader: CustomLoaderFunction = async ({ params, dispatch }) =
 	return null;
 };
 
-export const shouldRevalidateCanvas: ShouldRevalidateFunction = (ctx) => {
+export const shouldRevalidateCanvas: ShouldRevalidateFunction = (ctx : any) => {
 	const { currentParams, nextParams } = ctx;
 
 	const { canvasId: currentCanvasId } = currentParams;

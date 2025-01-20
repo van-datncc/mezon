@@ -24,21 +24,22 @@ export function useCategory() {
 					categoryLabel: category.category_name as string
 				})
 			);
-			const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
+			const targetIndex = categorizedChannels.findIndex((obj) => obj.id === category.id);
+      console.log('targetIndex: ', targetIndex);
 
 			let channelNavId = '';
 			if (targetIndex !== -1) {
 				if (targetIndex === 0) {
-					channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+					// channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
 					if (!channelNavId) {
 						const clanPath = toMembersPage(category.clan_id ?? '');
 						navigate(clanPath);
 						return;
 					}
 				} else if (targetIndex === categorizedChannels.length - 1) {
-					channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+					// channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
 				} else {
-					channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+					// channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
 				}
 			}
 
@@ -60,31 +61,45 @@ export function useCategory() {
 	);
 }
 
+
+
 export function useCategorizedChannels() {
 	const listChannels = useSelector(selectChannelThreads);
 	const categories = useSelector(selectAllCategories);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	const categorizedChannels = useMemo(() => {
+		const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 		const results = categories.map((category) => {
-			const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
+			// const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
 
-			if (category.category_id && categoryIdSortChannel[category.category_id]) {
-				categoryChannels.sort((a, b) => {
-					if (a.channel_label && b.channel_label) {
-						return b.channel_label.localeCompare(a.channel_label);
-					}
-					return 0;
-				});
-			}
+			// if (category.category_id && categoryIdSortChannel[category.category_id]) {
+			// 	categoryChannels.sort((a, b) => {
+			// 		if (a.channel_label && b.channel_label) {
+			// 			return b.channel_label.localeCompare(a.channel_label);
+			// 		}
+			// 		return 0;
+			// 	});
+			// }
 
-			return {
+			// return {
+			// 	...category,
+			// 	channels: categoryChannels
+			// };
+
+			const categoryChannels = listChannels.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
+			const listChannelIds = categoryChannels.map((channel) => channel.id);
+
+			const categoryWithChannels: ICategoryChannel = {
 				...category,
-				channels: categoryChannels
+				channels: listChannelIds
 			};
+
+			listChannelRender.push(categoryWithChannels);
+			categoryChannels.forEach((channel) => listChannelRender.push(channel));
 		});
 
-		return results as ICategoryChannel[];
+		return listChannelRender;
 	}, [categories, listChannels, categoryIdSortChannel]);
 
 	return categorizedChannels;
