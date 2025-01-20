@@ -109,7 +109,7 @@ const ChannelMessageActionListener = React.memo(({ mode, isPublic, clanId, chann
 			messageItemBSListener.remove();
 			eventOpenImage.remove();
 		};
-	}, [onMessageAction]);
+	}, [onMessageAction, onOpenImage]);
 
 	return (
 		<View>
