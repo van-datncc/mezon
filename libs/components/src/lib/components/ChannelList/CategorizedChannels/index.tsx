@@ -261,7 +261,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ channels, categoryExpandState
 					isUnreadChannel(channel as ChannelThreads) ||
 					channel.id === currentChannel?.id ||
 					channel.id === currentChannel?.parrent_id ||
-					channel.type === ChannelType.CHANNEL_TYPE_VOICE;
+					channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
 
 				if (shouldRender) {
 					acc.push(

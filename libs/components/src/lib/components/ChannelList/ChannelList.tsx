@@ -276,13 +276,13 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 					className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
 				>
 					<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
-						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 							<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
 						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 							<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
-						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 							<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						)}
 						{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (

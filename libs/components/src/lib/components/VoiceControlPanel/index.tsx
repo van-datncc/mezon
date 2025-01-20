@@ -45,7 +45,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const channelPath = toChannelPage(currentVoiceChannelId, currentVoiceChannel?.clan_id || '');
 
 	useEffect(() => {
-		if (channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (channelCurrent?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			dispatch(channelsActions.setCurrentVoiceChannelId(channelCurrent.id));
 		}
 	}, []);
