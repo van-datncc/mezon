@@ -56,7 +56,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	}, [props?.data]);
 
 	const isChannelVoice = useMemo(() => {
-		return props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE || props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+		return props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	}, [props?.data?.type]);
 
 	const timeoutRef = useRef<any>();
@@ -93,7 +93,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				bottomSheetChannelStreamingRef.current?.present();
 				return;
 			}
-			if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
 					await Linking.openURL(urlVoice);

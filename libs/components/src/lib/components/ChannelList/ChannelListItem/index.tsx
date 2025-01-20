@@ -79,7 +79,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
 
 	const channelMemberList = useMemo(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
+		if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
 		return [];
 	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
@@ -117,7 +117,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 
 	const renderChannelContent = useMemo(() => {
 		if (
-			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP
 		) {

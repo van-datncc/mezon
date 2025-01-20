@@ -54,7 +54,7 @@ export type ChannelTopbarProps = {
 };
 
 const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
-	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const currentClanId = useSelector(selectCurrentClanId);

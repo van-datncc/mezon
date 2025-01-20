@@ -35,7 +35,7 @@ export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProp
 					</Block>
 				</Block>
 			) : null}
-			{[ChannelType.CHANNEL_TYPE_VOICE, ChannelType.CHANNEL_TYPE_STREAMING].includes(channelData?.type) ? (
+			{[ChannelType.CHANNEL_TYPE_GMEET_VOICE, ChannelType.CHANNEL_TYPE_STREAMING].includes(channelData?.type) ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center" justifyContent="space-between">
 					<Block flexDirection="row" gap={size.s_10} alignItems="center">
 						<IconChannel channelPrivate={channelData?.channel_private} type={channelData?.type} />
