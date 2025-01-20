@@ -1,9 +1,11 @@
 import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
 import {
+	ChannelsEntity,
 	ClansEntity,
 	categoriesActions,
 	selectAllChannelsFavorite,
 	selectChannelById,
+	selectChannelsByClanId,
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
 	selectCurrentClan,
@@ -22,6 +24,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
+import { MentionFloatButton } from '../MentionFloatButton';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import { ChannelListItemRef } from './ChannelListItem';
@@ -75,6 +78,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const channels = useSelector(selectChannelsEntities);
 	const dispatch = useAppDispatch();
+
+	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
+	const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
+		channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
+	const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
 
 	const data = useMemo(
 		() => [
@@ -157,6 +165,24 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 
+	const handleScrollChannelIntoView = useCallback(() => {
+		if (!firstChannelWithBadgeCount) return;
+
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
+			return;
+		}
+
+		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
+	}, [firstChannelWithBadgeCount]);
+
+	const isChannelRefOutOfViewport = () => {
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
+		}
+		return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+	};
+
 	return (
 		<div
 			ref={parentRef}
@@ -175,6 +201,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
+				{firstChannelWithBadgeCount && isChannelRefOutOfViewport() && (
+					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
+						<MentionFloatButton onClick={handleScrollChannelIntoView} />
+					</div>
+				)}
 				<div
 					style={{
 						position: 'absolute',

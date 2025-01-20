@@ -101,3 +101,5 @@ export { default as MultiStepModalE2ee } from './components/ModalSendCode';
 export { WebRTCStreamProvider, useWebRTCStream } from './components/StreamContext/StreamContext';
 
 export * from './components/HtmlCanvas';
+
+export { MentionFloatButton } from './components/MentionFloatButton'
