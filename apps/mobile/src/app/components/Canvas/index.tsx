@@ -1,7 +1,8 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { canvasAPIActions, selectCanvasCursors, selectCanvasIdsByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { normalizeString } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -49,27 +50,36 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 		setSearchText(text);
 	};
 
+	const renderItem = ({ item, index }) => {
+		return (
+			<CanvasItem
+				key={`canvas_${index}_${item?.id}`}
+				canvas={item}
+				onPressItem={() => {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CANVAS,
+						params: {
+							channelId: channelId,
+							clanId: clanId,
+							canvasId: item?.id
+						}
+					});
+				}}
+			/>
+		);
+	};
+
 	return (
 		<View>
 			<CanvasSearch onSearchTextChange={handleSearchChange} />
 			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
 				<View style={styles.container}>
-					{filterCanvas?.map((item, index) => (
-						<CanvasItem
-							key={`canvas_${index}_${item?.id}`}
-							canvas={item}
-							onPressItem={() => {
-								navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-									screen: APP_SCREEN.MENU_CHANNEL.CANVAS,
-									params: {
-										channelId: channelId,
-										clanId: clanId,
-										canvasId: item?.id
-									}
-								});
-							}}
-						/>
-					))}
+					<FlashList
+						data={canvases}
+						keyExtractor={(item, index) => `canvas_${index}_${item?.id}`}
+						renderItem={renderItem}
+						estimatedItemSize={size.s_50}
+					/>
 				</View>
 			</ScrollView>
 			<ScrollView horizontal style={styles.horizontalScrollView}>
