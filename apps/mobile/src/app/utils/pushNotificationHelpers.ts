@@ -8,7 +8,7 @@ import {
 	save,
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -237,7 +237,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 
 			// IS message DM
 			if (linkDirectMessageMatch) {
-				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				const messageId = linkDirectMessageMatch[1];
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				store.dispatch(clansActions.joinClan({ clanId: '0' }));
