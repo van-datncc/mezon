@@ -51,10 +51,8 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
-	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
-	sfuMembersActions,
 	stickerSettingActions,
 	toastActions,
 	topicsActions,
@@ -106,7 +104,6 @@ import {
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
-	SFUSignalingFwd,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -162,7 +159,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const pttMembers = useSelector(selectSFUMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
@@ -220,18 +216,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
-	);
-
-	const onsfusignalingfwd = useCallback(
-		(user: SFUSignalingFwd) => {
-			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
-			if (existingMember) {
-				dispatch(sfuMembersActions.remove(existingMember?.id));
-			}
-			// TODO:
-			//dispatch(sfuMembersActions.add(user));
-		},
-		[dispatch, pttMembers]
 	);
 
 	const onactivityupdated = useCallback(
@@ -1349,8 +1333,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
-
-			socket.onsfusignalingfwd = onsfusignalingfwd;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1393,8 +1375,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onuserstatusevent,
 			ontokensent,
 			onmessagebuttonclicked,
-			onwebrtcsignalingfwd,
-			onsfusignalingfwd
+			onwebrtcsignalingfwd
 		]
 	);
 

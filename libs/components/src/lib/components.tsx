@@ -98,10 +98,7 @@ export { default as DmCalling } from './components/DmCalling';
 export { default as EventSchedule } from './components/EventSchedule';
 export { default as ModalCall } from './components/ModalCall';
 export { default as MultiStepModalE2ee } from './components/ModalSendCode';
-
-export { PushToTalkProvider } from './components/SFU/SFUContext';
 export { WebRTCStreamProvider, useWebRTCStream } from './components/StreamContext/StreamContext';
-export { WebRTCProvider, useWebRTC } from './components/WebRTC/WebRTCContext';
 
 export * from './components/HtmlCanvas';
 
