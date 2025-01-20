@@ -4,7 +4,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MetaMaskProvider } from '@metamask/sdk-react';
-import { PushToTalkProvider, WebRTCProvider } from '@mezon/components';
 import { useActivities, useSettingFooter } from '@mezon/core';
 import { captureSentryError } from '@mezon/logger';
 import { ACTIVE_WINDOW, DOWNLOAD_PROGRESS, TRIGGER_SHORTCUT, UPDATE_AVAILABLE, UPDATE_ERROR, electronBridge } from '@mezon/utils';
@@ -82,11 +81,7 @@ export function App() {
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 			<AppInitializer />
-			<WebRTCProvider>
-				<PushToTalkProvider>
-					<Routes />
-				</PushToTalkProvider>
-			</WebRTCProvider>
+			<Routes />
 		</MezonStoreProvider>
 	);
 }
