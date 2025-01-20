@@ -2,6 +2,7 @@ import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize 
 import {
 	ChannelsEntity,
 	ClansEntity,
+	appActions,
 	categoriesActions,
 	selectAllChannelsFavorite,
 	selectChannelById,
@@ -292,42 +293,39 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const { navigate, toChannelPage } = useAppNavigation();
-	const handleJumpChannel = (id: string, clanId: string) => {
-		if (channelRef) {
-			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
-		}
-		navigate(toChannelPage(id, clanId));
+	const handleJumpChannel = (channel: ChannelsEntity) => {
+		dispatch(appActions.setIsShowCanvas(false));
+		dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
+		const channelUrl = toChannelPage(channel?.id ?? '', channel?.clan_id ?? '');
+		navigate(channelUrl);
 	};
-
 	return (
-		<div>
-			{channel ? (
-				<div
-					onClick={() => handleJumpChannel(channel.channel_id || '', channel.clan_id || '')}
-					className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
-				>
-					<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
-						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-							<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-						)}
-						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-							<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-						)}
-						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-							<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-						)}
-						{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-							<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-						)}
-						{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-							<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-						)}
-						{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
-					</div>
-					{channel.channel_label}
+		Object.keys(channel).length > 0 && (
+			<div
+				onClick={() => handleJumpChannel(channel)}
+				className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
+			>
+				<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
+					{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+						<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+					)}
+					{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
+						<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+					)}
+					{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+						<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+					)}
+					{channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
+						<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+					)}
+					{channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
+						<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+					)}
+					{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
 				</div>
-			) : null}
-		</div>
+				{channel.channel_label}
+			</div>
+		)
 	);
 };
 
