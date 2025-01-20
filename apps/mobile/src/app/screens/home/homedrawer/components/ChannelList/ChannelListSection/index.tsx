@@ -1,114 +1,73 @@
-import { size, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
-import { categoriesActions, selectCategoryExpandStateByCategoryId, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
-import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
-import { memo, useCallback } from 'react';
-import { View } from 'react-native';
+import { ActionEmitEvent } from '@mezon/mobile-components';
+import { size } from '@mezon/mobile-ui';
+import { selectCategoryChannelOffsets, selectCurrentChannel } from '@mezon/store-mobile';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
+import { DeviceEventEmitter, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ChannelsPositionRef } from '../../../ChannelList';
-import { ChannelListItem, IThreadActiveType } from '../ChannelListItem';
-import ChannelListSectionHeader from '../ChannelListSectionHeader';
-import { style } from './styles';
 
-interface IChannelListSectionProps {
-	data: ICategoryChannel;
-	onLongPressCategory: (channel: ICategoryChannel) => void;
-	onLongPressChannel: (channel: ChannelThreads) => void;
-	onLongPressThread: (thread: ChannelThreads) => void;
+interface IProps {
 	channelsPositionRef: ChannelsPositionRef;
+	flashListRef: any;
 }
 
-const ChannelListSection = memo(
-	({ data, onLongPressCategory, onLongPressChannel, onLongPressThread, channelsPositionRef }: IChannelListSectionProps) => {
-		const styles = style(useTheme().themeValue);
-		const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
-		const dispatch = useAppDispatch();
-		const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, data?.category_id));
+const ChannelListScroll = ({ channelsPositionRef, flashListRef }: IProps) => {
+	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const isFirstOpen = useRef(false);
 
-		const handleOnPressSortChannel = useCallback(() => {
-			dispatch(
-				categoriesActions.setCategoryIdSortChannel({
-					isSortChannelByCategoryId: !categoryIdSortChannel[data?.category_id],
-					categoryId: data?.category_id,
-					clanId: data?.clan_id
-				})
-			);
-		}, [categoryIdSortChannel, data?.category_id, dispatch]);
-
-		const toggleCollapse = useCallback(
-			(category: ICategoryChannel) => {
-				const payload = {
-					clanId: category.clan_id || '',
-					categoryId: category.id,
-					expandState: !categoryExpandState
-				};
-				dispatch(categoriesActions.setCategoryExpandState(payload));
-			},
-			[dispatch, categoryExpandState]
-		);
-
-		const onLongPressHeader = useCallback(() => {
-			onLongPressCategory(data);
-		}, [data, onLongPressCategory]);
-
-		if (!data?.category_name?.trim()) {
-			return;
+	useEffect(() => {
+		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
+		if (currentChannel?.channel_id) {
+			timerToScrollChannelActive = setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, currentChannel?.channel_id);
+			}, 1500);
 		}
+		return () => {
+			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
+		};
+	}, [currentChannel?.channel_id]);
 
-		const handlePositionChannel = (item, event) => {
-			const { y } = event.nativeEvent.layout;
-			let threadY = 0;
-			const heightChannel = y;
-			if (item?.threads?.length) {
-				const threadActives = item?.threads.filter((thread: { active: IThreadActiveType }) => thread?.active === IThreadActiveType.Active);
-				threadActives?.forEach((thread) => {
-					const threadHeight = size.s_36;
-					threadY += threadHeight;
-					channelsPositionRef.current = {
-						...channelsPositionRef.current,
-						[`${thread.id}`]: {
-							cateId: item?.category_id,
-							height: y + threadY
-						}
-					};
+	useEffect(() => {
+		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
+		if (currentChannel?.channel_id && isFirstOpen?.current) {
+			timerToScrollChannelActive = setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
+			}, 10);
+		} else {
+			isFirstOpen.current = true;
+		}
+		return () => {
+			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
+		};
+	}, [currentChannel?.channel_id]);
+
+	const handleScrollToChannel = useCallback(
+		(currentChannelId: string) => {
+			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
+			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || ''];
+			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
+
+			if (position) {
+				flashListRef?.current?.scrollTo({
+					x: 0,
+					y: position - size.s_100 * 2,
+					animated: true
 				});
 			}
-			channelsPositionRef.current = {
-				...channelsPositionRef.current,
-				[`${item.id}`]: {
-					height: heightChannel,
-					cateId: item?.category_id
-				}
-			};
+		},
+		[channelsPositionRef, flashListRef, selectCategoryOffsets]
+	);
+	useEffect(() => {
+		const scrollChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (channelId?: string) => {
+			handleScrollToChannel(channelId || currentChannel?.channel_id);
+		});
+		return () => {
+			scrollChannel.remove();
 		};
+	}, [handleScrollToChannel, currentChannel?.channel_id]);
 
-		return (
-			<View style={styles.channelListSection}>
-				<ChannelListSectionHeader
-					title={data.category_name}
-					onPress={toggleCollapse}
-					onLongPress={onLongPressHeader}
-					onPressSortChannel={handleOnPressSortChannel}
-					isCollapsed={categoryExpandState}
-					category={data}
-				/>
+	return <View />;
+};
 
-				{data?.channels?.map((item: IChannel, index: number) => {
-					return (
-						<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
-							<ChannelListItem
-								data={item}
-								key={`${item.id}_channel_item` + index}
-								onLongPress={() => {
-									onLongPressChannel(item);
-								}}
-								onLongPressThread={onLongPressThread}
-							/>
-						</View>
-					);
-				})}
-			</View>
-		);
-	}
-);
-export default ChannelListSection;
+export default memo(ChannelListScroll);

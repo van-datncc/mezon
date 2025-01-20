@@ -44,7 +44,7 @@ export const style = (colors: Attributes) =>
 			width: size.s_6,
 			height: '80%',
 			top: '10%',
-			left: -13,
+			left: 0,
 			borderTopRightRadius: 10,
 			borderBottomEndRadius: 10,
 			position: 'absolute'
@@ -60,7 +60,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			bottom: -5,
-			right: -5
+			right: 0
 		},
 		badgeText: {
 			color: Colors.white,

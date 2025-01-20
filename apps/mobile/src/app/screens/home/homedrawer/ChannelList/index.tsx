@@ -122,7 +122,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					showsVerticalScrollIndicator={false}
 					ref={flashListRef}
 					scrollEventThrottle={16}
-					removeClippedSubviews={true}
+					removeClippedSubviews={false}
 					nestedScrollEnabled={true}
 					bounces={false}
 				>
