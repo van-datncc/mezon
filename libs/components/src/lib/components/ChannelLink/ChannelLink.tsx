@@ -18,7 +18,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel, isElementInViewport, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
@@ -63,6 +63,7 @@ export const classes = {
 
 export type ChannelLinkRef = {
 	scrollIntoView: (options?: ScrollIntoViewOptions) => void;
+	isInViewport: () => boolean;
 };
 
 const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
@@ -94,6 +95,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		useImperativeHandle(ref, () => ({
 			scrollIntoView: (options?: ScrollIntoViewOptions) => {
 				channelLinkRef.current?.scrollIntoView(options);
+			},
+			isInViewport: () => {
+				return isElementInViewport(channelLinkRef.current as HTMLElement);
 			}
 		}));
 

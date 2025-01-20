@@ -189,7 +189,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
-				{firstChannelWithBadgeCount && (
+				{firstChannelWithBadgeCount && !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport() && (
 					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
 						<MentionFloatButton onClick={handleScrollChannelIntoView} />
 					</div>
