@@ -80,7 +80,7 @@ export const CreateNewChannelModal = () => {
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
 
-		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}
@@ -187,7 +187,7 @@ export const CreateNewChannelModal = () => {
 										/>
 										<ChannelTypeComponent
 											disable={false}
-											type={ChannelType.CHANNEL_TYPE_VOICE}
+											type={ChannelType.CHANNEL_TYPE_GMEET_VOICE}
 											onChange={onChangeChannelType}
 											error={isErrorType}
 										/>
@@ -237,7 +237,7 @@ export const CreateNewChannelModal = () => {
 										/>
 									</div>
 								)}
-								{channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
+								{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
 									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
 								)}
 							</div>

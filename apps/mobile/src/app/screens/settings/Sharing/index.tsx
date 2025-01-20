@@ -52,7 +52,7 @@ export const Sharing = ({ data, onClose }) => {
 	const clans = useAppSelector((state) => selectClansEntities(state));
 
 	const listChannelsText = useMemo(() => {
-		return listChannels.filter((channel) => channel.type !== ChannelType.CHANNEL_TYPE_VOICE);
+		return listChannels.filter((channel) => channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE);
 	}, [listChannels]);
 
 	const listDMText = useMemo(() => {
