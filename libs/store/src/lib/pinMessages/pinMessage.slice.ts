@@ -1,11 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, IPinMessage, LoadingStatus, TypeMessage } from '@mezon/utils';
+import { IMessageWithUser, IPinMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelMessage, safeJSONParse } from 'mezon-js';
-import { ApiMessageMention, ApiPinMessageRequest } from 'mezon-js/api.gen';
+import { ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
-import { mapMessageChannelToEntityAction, messagesActions } from '../messages/messages.slice';
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
 
@@ -103,32 +101,6 @@ export const setChannelPinMessage = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			const content = safeJSONParse(response.content ?? '');
-			const originalMentions = safeJSONParse(response.mention ?? '') as ApiMessageMention[];
-			const mentions = originalMentions.map((item) => ({
-				user_id: item.user_id,
-				e: item.e
-			}));
-			const reference = safeJSONParse(response.referece ?? '');
-
-			const messageSystem: ChannelMessage = {
-				clan_id: clan_id,
-				id: response.id ?? '',
-				channel_id: channel_id,
-				channel_label: '',
-				code: TypeMessage.CreatePin,
-				content: content ?? '',
-				create_time: response.timestamp_seconds ? new Date(response.timestamp_seconds * 1000).toISOString() : '',
-				mentions: mentions ?? [],
-				references: reference ?? [],
-				sender_id: '0',
-				username: 'System'
-			};
-			const mess = await thunkAPI.dispatch(mapMessageChannelToEntityAction({ message: messageSystem, isSystem: true })).unwrap();
-			mess.isMe = true;
-			mess.hide_editted = true;
-			thunkAPI.dispatch(messagesActions.addNewMessage(mess));
-			thunkAPI.dispatch(pinMessageActions.add(message as IMessageWithUser));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/setChannelPinMessage');

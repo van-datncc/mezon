@@ -51,10 +51,8 @@ import {
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
-	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
-	sfuMembersActions,
 	stickerSettingActions,
 	toastActions,
 	topicsActions,
@@ -106,7 +104,6 @@ import {
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
-	SFUSignalingFwd,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -162,7 +159,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const pttMembers = useSelector(selectSFUMembersByChannelId(channelId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
@@ -220,18 +216,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
-	);
-
-	const onsfusignalingfwd = useCallback(
-		(user: SFUSignalingFwd) => {
-			const existingMember = pttMembers?.find((member) => member?.user_id === user?.user_id);
-			if (existingMember) {
-				dispatch(sfuMembersActions.remove(existingMember?.id));
-			}
-			// TODO:
-			//dispatch(sfuMembersActions.add(user));
-		},
-		[dispatch, pttMembers]
 	);
 
 	const onactivityupdated = useCallback(
@@ -367,7 +351,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							})
 						);
 					}
-					dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+					dispatch(
+						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
+					);
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 				}
 				// check
@@ -565,7 +551,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
 				}
-				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					dispatch(
 						channelsActions.joinChat({
 							clanId: clan_id,
@@ -647,11 +633,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
 
-	const onremovefriend = useCallback((userId: RemoveFriend) => {
-		//TODO: thanh.levan
-		// eslint-disable-next-line no-console
-		console.log('userId: ', userId);
-	}, []);
+	const onremovefriend = useCallback(
+		(removeFriend: RemoveFriend) => {
+			dispatch(friendsActions.remove(removeFriend.user_id));
+		},
+		[dispatch]
+	);
 
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
@@ -808,7 +795,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
 
-				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
 					const extendChannelCreated = {
 						...channelCreated,
@@ -832,7 +819,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
 								lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
 								clanId: extendChannelCreated.clan_id ?? '',
-								isMute: false
+								isMute: false,
+								senderId: ''
 							}
 						])
 					);
@@ -1345,8 +1333,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onmessagebuttonclicked = onmessagebuttonclicked;
 
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
-
-			socket.onsfusignalingfwd = onsfusignalingfwd;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1389,8 +1375,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onuserstatusevent,
 			ontokensent,
 			onmessagebuttonclicked,
-			onwebrtcsignalingfwd,
-			onsfusignalingfwd
+			onwebrtcsignalingfwd
 		]
 	);
 

@@ -1,7 +1,6 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
 	ETypeMission,
-	JoinSFUActions,
 	appActions,
 	channelsActions,
 	notificationSettingActions,
@@ -18,7 +17,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel, isElementInViewport, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
@@ -63,6 +62,7 @@ export const classes = {
 
 export type ChannelLinkRef = {
 	scrollIntoView: (options?: ScrollIntoViewOptions) => void;
+	isInViewport: () => boolean;
 };
 
 const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
@@ -94,6 +94,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		useImperativeHandle(ref, () => ({
 			scrollIntoView: (options?: ScrollIntoViewOptions) => {
 				channelLinkRef.current?.scrollIntoView(options);
+			},
+			isInViewport: () => {
+				return isElementInViewport(channelLinkRef.current as HTMLElement);
 			}
 		}));
 
@@ -153,7 +156,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						channelId: channel.id
 					})
 				);
-				dispatch(JoinSFUActions.clear());
 			}
 			dispatch(appActions.setIsShowCanvas(false));
 			if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
@@ -173,13 +175,19 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 
 		const notVoiceOrAppOrStreamChannel =
-			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING;
 
 		const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
-		const notMuteAndUnread = !channel?.is_mute && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
-		const notMuteAndHasCountNoti = !channel?.is_mute && numberNotification && numberNotification > 0 && notVoiceOrAppOrStreamChannel && !isActive;
+		const notMuteAndUnread =
+			(channel?.is_mute === undefined ? true : !channel?.is_mute) && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
+		const notMuteAndHasCountNoti =
+			(channel?.is_mute === undefined ? true : !channel?.is_mute) &&
+			numberNotification &&
+			numberNotification > 0 &&
+			notVoiceOrAppOrStreamChannel &&
+			!isActive;
 		const showWhiteDot = (notMuteAndUnread && !isActive) || (notMuteAndHasCountNoti && !isActive);
 		const hightLightTextChannel = activeChannelChannelText || notMuteAndUnread || notMuteAndHasCountNoti;
 		const highLightVoiceChannel = isActive && !notVoiceOrAppOrStreamChannel;
@@ -223,7 +231,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				role="button"
 				className={`relative group ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>
-				{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
+				{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 					<span
 						ref={channelLinkRef}
 						className={`${classes[state]} ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${isActive ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
@@ -254,7 +262,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							{events[0] && <EventSchedule event={events[0]} className="mr-1 mt-0.5" />}
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
-								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel && (
@@ -263,7 +271,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate === ChannelStatusEnum.isPrivate &&
 									channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
 									!isAgeRestrictedChannel && <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />}
-								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && !isAgeRestrictedChannel && (

@@ -4,10 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
 	clansActions,
-	ISFUUsersEntity,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
-	selectSFUMembersByChannelId,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -34,6 +32,7 @@ export type ChannelListItemRef = {
 	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
 	channelId: string;
 	channelRef: ChannelLinkRef | null;
+	isInViewport: () => boolean;
 };
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props, ref) => {
@@ -50,7 +49,11 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			listThreadRef.current?.scrollIntoThread(threadId, options);
 		},
 		channelId: channel?.id,
-		channelRef: channelLinkRef.current
+		channelRef: channelLinkRef.current,
+		isInViewport: () => {
+			if (!channelLinkRef.current) return false;
+			return channelLinkRef.current?.isInViewport();
+		}
 	}));
 
 	return (
@@ -79,12 +82,10 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const sfuMembers = useSelector(selectSFUMembersByChannelId(channel.id));
 
 	const channelMemberList = useMemo(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
+		if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
-		if (channel.type === ChannelType.CHANNEL_TYPE_APP) return sfuMembers;
 		return [];
 	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
 
@@ -121,7 +122,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 
 	const renderChannelContent = useMemo(() => {
 		if (
-			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP
 		) {
@@ -177,7 +178,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 };
 
 interface ICollapsedMemberListProps {
-	channelMemberList: VoiceEntity[] | UsersStreamEntity[] | ISFUUsersEntity[];
+	channelMemberList: VoiceEntity[] | UsersStreamEntity[];
 	isPttList?: boolean;
 }
 

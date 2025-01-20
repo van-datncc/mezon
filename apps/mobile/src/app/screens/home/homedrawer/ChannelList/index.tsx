@@ -92,7 +92,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	const handleScrollToChannelFavorite = useCallback(
 		async (channel?: ChannelsEntity) => {
-			if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				if (channel?.status === StatusVoiceChannel.Active && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);

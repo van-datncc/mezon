@@ -278,7 +278,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				return;
 			}
 
-			if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 				window.open(urlVoice, '_blank', 'noreferrer');
 				return;

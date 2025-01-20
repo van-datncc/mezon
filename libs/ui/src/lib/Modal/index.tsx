@@ -55,10 +55,10 @@ const Modal = (props: ModalProps) => {
 									{hasChannel && (
 										<div className="inline-flex gap-x-2">
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
-												hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && <SpeakerLocked defaultSize="w-5 h-5" />}
+												hasChannel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && <SpeakerLocked defaultSize="w-5 h-5" />}
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
 												hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && <HashtagLocked defaultSize="w-5 h-5 " />}
-											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 												<Speaker defaultSize="w-5 5-5" />
 											)}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (

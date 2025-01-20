@@ -62,7 +62,7 @@ const SuggestItem = ({
 	const [specificChannel, setSpecificChannel] = useState<ChannelsEntity | HashtagDm | null>(null);
 	const numberMembersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
 	const checkVoiceStatus = useMemo(() => {
-		if (channelId !== undefined && numberMembersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (channelId !== undefined && numberMembersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			return numberMembersVoice >= 2;
 		}
 		return false;
@@ -90,7 +90,7 @@ const SuggestItem = ({
 			}
 		}
 
-		if (type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Speaker defaultSize="w-5 5-5" />;
 			}
@@ -152,7 +152,9 @@ const SuggestItem = ({
 
 				{display && (
 					<span className={`text-[15px] font-thin dark:text-white text-textLightTheme one-line flex items-center`} style={{ color: color }}>
-						<span className={`${isUnread ? ' font-medium' : ''}`}>
+						<span
+							className={`${isUnread || (count && count > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+						>
 							{isHightLight ? HighlightMatchBold(display ?? '', valueHightLight ?? '') : display}
 						</span>
 						{count && count > 0 && (
