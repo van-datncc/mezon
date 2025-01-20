@@ -50,7 +50,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
 			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+			if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: '0',

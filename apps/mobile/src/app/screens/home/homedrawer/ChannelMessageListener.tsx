@@ -61,7 +61,7 @@ const ChannelMessageListener = React.memo(() => {
 				const channelId = channel?.channel_id;
 				const clanId = channel?.clan_id;
 
-				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
+				if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
 				} else if ([ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {

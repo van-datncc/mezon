@@ -552,7 +552,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
 				}
-				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					dispatch(
 						channelsActions.joinChat({
 							clanId: clan_id,
@@ -803,7 +803,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
 
-				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
 					const extendChannelCreated = {
 						...channelCreated,

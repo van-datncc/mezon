@@ -22,7 +22,7 @@ function IconChannel({ channelPrivate, type }: { channelPrivate: number; type })
 					<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 				);
 
-			case ChannelType.CHANNEL_TYPE_VOICE:
+			case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
 				return isChannelPrivate ? (
 					<Icons.VoiceLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 				) : (
