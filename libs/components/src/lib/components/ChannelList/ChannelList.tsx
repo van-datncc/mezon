@@ -1,6 +1,8 @@
 import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
 import {
+	ChannelsEntity,
 	ClansEntity,
+	appActions,
 	categoriesActions,
 	selectAllChannelsFavorite,
 	selectChannelById,
@@ -261,18 +263,17 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const { navigate, toChannelPage } = useAppNavigation();
-	const handleJumpChannel = (id: string, clanId: string) => {
-		if (channelRef) {
-			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
-		}
-		navigate(toChannelPage(id, clanId));
+	const handleJumpChannel = (channel: ChannelsEntity) => {
+		dispatch(appActions.setIsShowCanvas(false));
+		dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
+		const channelUrl = toChannelPage(channel?.id ?? '', channel?.clan_id ?? '');
+		navigate(channelUrl);
 	};
-
 	return (
 		<div>
-			{channel ? (
+			{Object.keys(channel).length > 0 ? (
 				<div
-					onClick={() => handleJumpChannel(channel.channel_id || '', channel.clan_id || '')}
+					onClick={() => handleJumpChannel(channel)}
 					className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
 				>
 					<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
