@@ -168,8 +168,20 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const handleScrollChannelIntoView = useCallback(() => {
 		if (!firstChannelWithBadgeCount) return;
 
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
+			return;
+		}
+
 		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
 	}, [firstChannelWithBadgeCount]);
+
+	const isChannelRefOutOfViewport = () => {
+		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
+			return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
+		}
+		return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+	};
 
 	return (
 		<div
@@ -189,7 +201,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					position: 'relative'
 				}}
 			>
-				{firstChannelWithBadgeCount && !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport() && (
+				{firstChannelWithBadgeCount && isChannelRefOutOfViewport() && (
 					<div className={'sticky top-0 z-50 w-full flex justify-center'}>
 						<MentionFloatButton onClick={handleScrollChannelIntoView} />
 					</div>
