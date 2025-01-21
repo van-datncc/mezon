@@ -8,12 +8,14 @@ import {
 	selectChannelsEntities,
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
-import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
+import Toast from 'react-native-toast-message';
+import Feather from 'react-native-vector-icons/Feather';
 import { useStore } from 'react-redux';
 import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -28,6 +30,8 @@ interface ElementToken {
 	role_id?: string;
 	channelid?: string;
 	emojiid?: string;
+	type?: EBacktickType;
+	username?: string;
 }
 
 export default function openUrl(url, customCallback) {
@@ -172,7 +176,11 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			color: colors.textRoleLink,
 			backgroundColor: colors.darkMossGreen
 		},
-		threadIcon: { marginBottom: size.s_2 }
+		threadIcon: { marginBottom: size.s_2 },
+		privateChannel: {
+			color: colors.text,
+			backgroundColor: colors.secondaryLight
+		}
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -259,6 +267,26 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 			return <RenderCanvasItem clanId={clanId} channelId={channelId} canvasId={canvasId} />;
 		}
 
+		if (content?.includes?.('unknown')) {
+			return (
+				<Text
+					key={node.key}
+					onPress={() => {
+						Toast.show({
+							type: 'error',
+							text1: 'You don`t have access to this link.',
+							text2: 'This link is to a clan or channel you don`t have access to.'
+						});
+						return;
+					}}
+				>
+					<Text style={styles.privateChannel}>
+						<Feather name="lock" size={15} /> private-channel
+					</Text>
+				</Text>
+			);
+		}
+
 		if (content?.startsWith(':')) {
 			return (
 				<View key={`${content}`} style={!isOnlyContainEmoji && styles.emojiInMessageContain}>
@@ -304,11 +332,7 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 			return (
 				<Text
 					key={node.key}
-					style={[
-						styles.mention,
-						content?.includes?.('# unknown') && styles.unknownChannel,
-						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention
-					]}
+					style={[styles.mention, payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
 				>
 					{content}
@@ -385,12 +409,6 @@ export const formatUrls = (text: string) => {
 };
 
 export const formatBlockCode = (text: string, isMessageReply: boolean) => {
-	const matchesUrls = text?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
-
-	if (matchesUrls) {
-		return formatUrls(text);
-	}
-
 	const addNewlinesToCodeBlock = (block) => {
 		if (isMessageReply) {
 			block = block.replace(/```|\n/g, '').trim();
@@ -496,8 +514,36 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
 				}
 
-				if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
-					formattedContent += formatBlockCode(contentInElement, isMessageReply);
+				if (element.kindOf === ETokenMessage.MARKDOWNS) {
+					if (element.type === EBacktickType.LINK) {
+						formattedContent += formatUrls(contentInElement);
+					} else if (element.type === EBacktickType.BOLD) {
+						formattedContent += `**${contentInElement}**` ?? '';
+					} else if (element.type === EBacktickType.VOICE_LINK) {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-expect-error
+						const channelsEntities = selectChannelsEntities(store.getState() as RootState);
+						const meetingCode = contentInElement?.split('/').pop();
+						const allChannelVoice = Object.values(channelsEntities).flat();
+						const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+						if (!voiceChannelFound) {
+							formattedContent += formatUrls(contentInElement);
+						} else {
+							formattedContent += ChannelHashtag({
+								channelHashtagId: voiceChannelFound?.channel_id,
+								channelsEntities
+							});
+						}
+					} else {
+						let content = contentInElement ?? '';
+						if (element.type === EBacktickType.PRE) {
+							content = '```' + content + '```';
+						}
+						if (element.type === EBacktickType.CODE) {
+							content = '`' + content + '`';
+						}
+						formattedContent += formatBlockCode(content, isMessageReply);
+					}
 				}
 
 				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
@@ -510,7 +556,7 @@ export const RenderTextMarkdownContent = React.memo(
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(contentInElement, isMessageReply);
+						formattedContent += formatUrls(contentInElement);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
 					}
@@ -571,7 +617,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
+				{contentRender}
 			</Markdown>
 		);
 
