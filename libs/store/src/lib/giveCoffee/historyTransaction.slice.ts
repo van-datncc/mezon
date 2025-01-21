@@ -9,18 +9,15 @@ export interface WalletLedgerState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	walletLedger?: ApiWalletLedger[] | null;
-	nextCursor?: string;
-	prevCursor?: string;
+	count?: number;
 }
 
-export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ cursor }: { cursor?: string }, thunkAPI) => {
+export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ page }: { page?: number }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listWalletLedger(mezon.session, 8, cursor || '');
-
+	const response = await mezon.client.listWalletLedger(mezon.session, 8, '', '', page);
 	return {
 		ledgers: response.wallet_ledger || [],
-		nextCursor: response.next_cursor,
-		prevCursor: response.prev_cursor
+		count: response.count || 0
 	};
 });
 
@@ -28,8 +25,7 @@ export const initialWalletLedgerState: WalletLedgerState = {
 	loadingStatus: 'not loaded',
 	error: null,
 	walletLedger: null,
-	nextCursor: undefined,
-	prevCursor: undefined
+	count: 0
 };
 
 export const walletLedgerSlice = createSlice({
@@ -43,8 +39,7 @@ export const walletLedgerSlice = createSlice({
 			})
 			.addCase(fetchListWalletLedger.fulfilled, (state: WalletLedgerState, action) => {
 				state.walletLedger = action.payload.ledgers;
-				state.nextCursor = action.payload.nextCursor;
-				state.prevCursor = action.payload.prevCursor;
+				state.count = action.payload.count;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchListWalletLedger.rejected, (state: WalletLedgerState, action) => {
@@ -58,7 +53,4 @@ export const getWalletLedgerState = (rootState: { [WALLET_LEDGER_FEATURE_KEY]: W
 	rootState[WALLET_LEDGER_FEATURE_KEY];
 export const walletLedgerReducer = walletLedgerSlice.reducer;
 export const selectWalletLedger = createSelector(getWalletLedgerState, (state) => state.walletLedger);
-export const selectWalletLedgerCursors = createSelector(getWalletLedgerState, (state) => ({
-	nextCursor: state.nextCursor,
-	prevCursor: state.prevCursor
-}));
+export const selectCountWalletLedger = createSelector(getWalletLedgerState, (state) => state.count);

@@ -1,8 +1,9 @@
-import { fetchListWalletLedger, selectWalletLedger, selectWalletLedgerCursors, useAppDispatch, useAppSelector } from '@mezon/store';
+import { fetchListWalletLedger, selectCountWalletLedger, selectWalletLedger, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { formatNumber } from '@mezon/utils';
+import { Pagination } from 'flowbite-react';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface IProps {
 	onClose: () => void;
@@ -10,22 +11,19 @@ interface IProps {
 const HistoryTransaction = ({ onClose }: IProps) => {
 	const dispatch = useAppDispatch();
 	const walletLedger = useAppSelector((state) => selectWalletLedger(state));
-	const { nextCursor, prevCursor } = useAppSelector((state) => selectWalletLedgerCursors(state));
+	const count = useAppSelector((state) => selectCountWalletLedger(state));
+	const [currentPage, setCurrentPage] = useState(1);
+	const totalPages = count === undefined ? 0 : Math.ceil(count / 8);
 
 	useEffect(() => {
-		dispatch(fetchListWalletLedger({ cursor: undefined }));
+		dispatch(fetchListWalletLedger({ page: 1 }));
 	}, [dispatch]);
-	const handleNextPage = () => {
-		if (nextCursor) {
-			dispatch(fetchListWalletLedger({ cursor: nextCursor }));
-		}
+
+	const onPageChange = (page: number) => {
+		setCurrentPage(page);
+		dispatch(fetchListWalletLedger({ page: page }));
 	};
 
-	const handlePrevPage = () => {
-		if (prevCursor) {
-			dispatch(fetchListWalletLedger({ cursor: prevCursor }));
-		}
-	};
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
 		const day = date.getDate().toString().padStart(2, '0');
@@ -70,24 +68,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 								);
 							})}
 						</div>
-						<div className="flex justify-end z-10">
-							<div className="inline-flex mt-2 ">
-								<button
-									onClick={handlePrevPage}
-									disabled={!prevCursor}
-									className="flex items-center justify-center px-4  h-8 text-sm font-medium text-white bg-gray-800 rounded-s dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white  enabled:hover:bg-gray-900 enabled:hover:text-white   disabled:cursor-not-allowed disabled:opacity-50 border border-zinc-400 "
-								>
-									<span>Prev</span>
-								</button>
-								<button
-									onClick={handleNextPage}
-									disabled={!nextCursor}
-									className="flex items-center justify-center px-4  h-8 text-sm font-medium text-white bg-gray-800 rounded-e dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white   enabled:hover:bg-gray-900 enabled:hover:text-white   disabled:cursor-not-allowed disabled:opacity-50 border border-zinc-400"
-								>
-									<span>Next</span>
-								</button>
-							</div>
-						</div>
+						<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
 					</>
 				) : (
 					<div className="flex items-center justify-center bg-white  ">
