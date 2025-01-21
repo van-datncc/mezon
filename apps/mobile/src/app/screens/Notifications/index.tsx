@@ -173,74 +173,69 @@ const Notifications = () => {
 		closeBottomSheet();
 	};
 
+	const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
+		store.dispatch(appActions.setLoadingMainMobile(true));
+		return new Promise<void>((resolve) => {
+			requestAnimationFrame(async () => {
+				const promises = [];
+				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					promises.push(store.dispatch(directActions.fetchDirectMessage({})));
+					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
+				} else {
+					if (notify?.content?.clan_id !== currentClanId) {
+						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
+					}
+
+					promises.push(
+						store.dispatch(
+							channelsActions.joinChannel({
+								clanId: notify?.content?.clan_id ?? '',
+								channelId: notify?.content?.channel_id,
+								noFetchMembers: false,
+								noCache: true
+							})
+						)
+					);
+				}
+
+				await Promise.all(promises);
+
+				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+						params: { directMessageId: notify?.content?.channel_id }
+					});
+				} else {
+					const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
+					save(STORAGE_CLAN_ID, notify?.content?.clan_id);
+					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+					navigation.navigate(APP_SCREEN.HOME as never);
+					if (!isTabletLandscape) {
+						navigation.dispatch(DrawerActions.closeDrawer());
+					}
+				}
+				timeoutRef.current = setTimeout(() => {
+					store.dispatch(
+						messagesActions.jumpToMessage({
+							clanId: notify?.content?.clan_id,
+							channelId: notify?.content?.channel_id,
+							messageId: notify?.content?.message_id
+						})
+					);
+					store.dispatch(appActions.setLoadingMainMobile(false));
+				}, 200);
+				store.dispatch(appActions.setLoadingMainMobile(false));
+				resolve();
+			});
+		});
+	};
+
 	const handleOnPressNotify = useCallback(
 		async (notify: INotification) => {
 			if (!notify?.content?.channel_id) {
 				return;
 			}
 			const store = await getStoreAsync();
-			const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
-				store.dispatch(appActions.setLoadingMainMobile(true));
-				return new Promise<void>((resolve) => {
-					requestAnimationFrame(async () => {
-						const promises = [];
-						if (
-							notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM ||
-							notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP
-						) {
-							promises.push(store.dispatch(directActions.fetchDirectMessage({})));
-							promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
-						} else {
-							if (notify?.content?.clan_id !== currentClanId) {
-								promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
-							}
-
-							promises.push(
-								store.dispatch(
-									channelsActions.joinChannel({
-										clanId: notify?.content?.clan_id ?? '',
-										channelId: notify?.content?.channel_id,
-										noFetchMembers: false,
-										noCache: true
-									})
-								)
-							);
-						}
-
-						await Promise.all(promises);
-
-						if (
-							notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM ||
-							notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP
-						) {
-							navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-								screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-								params: { directMessageId: notify?.content?.channel_id }
-							});
-						} else {
-							const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
-							save(STORAGE_CLAN_ID, notify?.content?.clan_id);
-							save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-							navigation.navigate(APP_SCREEN.HOME as never);
-							if (!isTabletLandscape) {
-								navigation.dispatch(DrawerActions.closeDrawer());
-							}
-						}
-						timeoutRef.current = setTimeout(() => {
-							store.dispatch(
-								messagesActions.jumpToMessage({
-									clanId: notify?.content?.clan_id,
-									channelId: notify?.content?.channel_id,
-									messageId: notify?.content?.message_id
-								})
-							);
-							store.dispatch(appActions.setLoadingMainMobile(false));
-						}, 200);
-						store.dispatch(appActions.setLoadingMainMobile(false));
-						resolve();
-					});
-				});
-			};
 			await handleNotification(notify, currentClanId, store, navigation);
 		},
 		[currentClanId, navigation, isTabletLandscape]

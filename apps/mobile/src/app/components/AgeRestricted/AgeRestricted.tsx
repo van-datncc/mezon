@@ -30,7 +30,7 @@ const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
 	};
 
 	const handleNode = useCallback(() => {
-		if (isTabletLandscape) {
+		if (!isTabletLandscape) {
 			navigation.dispatch(DrawerActions.openDrawer());
 		}
 	}, [isTabletLandscape]);

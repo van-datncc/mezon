@@ -18,7 +18,6 @@ import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from
 import RNCallKeep from 'react-native-callkeep';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
 import VoipPushNotification from 'react-native-voip-push-notification';
-import useTabletLandscape from '../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
@@ -183,11 +182,9 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 	return true;
 };
 
-export const navigateToNotification = async (store: any, notification: any, navigation: any, time?: number) => {
+export const navigateToNotification = async (store: any, notification: any, navigation: any, isTabletLandscape?: boolean, time?: number) => {
 	const link = notification?.data?.link;
 	const topicId = notification?.data?.topicId;
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const isTabletLandscape = useTabletLandscape();
 	if (link) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
@@ -300,21 +297,21 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 	});
 };
 
-const processNotification = async ({ notification, navigation, time = 0 }) => {
+const processNotification = async ({ notification, navigation, isTabletLandscape, time = 0 }) => {
 	const store = await getStoreAsync();
 	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
-			navigateToNotification(store, notification, navigation, time);
+			navigateToNotification(store, notification, navigation, isTabletLandscape, time);
 		}, time);
 	} else {
-		navigateToNotification(store, notification, navigation);
+		navigateToNotification(store, notification, navigation, isTabletLandscape);
 	}
 };
 
-export const setupNotificationListeners = async (navigation) => {
+export const setupNotificationListeners = async (navigation, isTabletLandscape) => {
 	// await notifee.createChannel({
 	// 	id: 'default',
 	// 	name: 'mezon',
@@ -334,6 +331,7 @@ export const setupNotificationListeners = async (navigation) => {
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
+						isTabletLandscape,
 						time: 1
 					});
 				}
@@ -344,6 +342,7 @@ export const setupNotificationListeners = async (navigation) => {
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
+			isTabletLandscape,
 			time: 0
 		});
 	});
@@ -357,7 +356,8 @@ export const setupNotificationListeners = async (navigation) => {
 			case EventType.PRESS:
 				processNotification({
 					notification: detail.notification,
-					navigation
+					navigation,
+					isTabletLandscape
 				});
 				break;
 		}
