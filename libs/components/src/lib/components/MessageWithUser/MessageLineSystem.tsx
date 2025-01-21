@@ -1,7 +1,7 @@
 import { messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
 import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser, TypeMessage, parseThreadInfo } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
@@ -28,7 +28,7 @@ const MessageLineSystemComponent = ({ message, mode, content, isJumMessageEnable
 	);
 };
 
-export const MessageLineSystem = memo(MessageLineSystemComponent);
+export const MessageLineSystem = MessageLineSystemComponent;
 
 interface RenderContentProps {
 	message: IMessageWithUser;
@@ -50,7 +50,7 @@ interface ElementTokenSystem {
 	type?: EBacktickType;
 }
 
-const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumMessageEnabled, isTokenClickAble }: RenderContentProps) => {
+const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessageEnabled, isTokenClickAble }: RenderContentProps) => {
 	const { t, mentions = [] } = data;
 	const elements = useMemo(() => {
 		return [...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS }))].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
@@ -195,4 +195,4 @@ const RenderContentSystem = memo(({ message, data, mode, isSearchMessage, isJumM
 				))}
 		</div>
 	);
-});
+};
