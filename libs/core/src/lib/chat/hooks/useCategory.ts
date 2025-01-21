@@ -41,7 +41,7 @@ export function useCategory() {
 	);
 }
 
-export function useCategorizedChannels() {
+export function useCategorizedChannelsWeb() {
 	const listChannels = useSelector(selectChannelThreads);
 	const categories = useSelector(selectAllCategories);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
@@ -62,6 +62,36 @@ export function useCategorizedChannels() {
 		});
 
 		return listChannelRender;
+	}, [categories, listChannels, categoryIdSortChannel]);
+
+	return categorizedChannels;
+}
+
+export function useCategorizedChannels() {
+	const listChannels = useSelector(selectChannelThreads);
+	const categories = useSelector(selectAllCategories);
+	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+
+	const categorizedChannels = useMemo(() => {
+		const results = categories.map((category) => {
+			const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
+
+			if (category.category_id && categoryIdSortChannel[category.category_id]) {
+				categoryChannels.sort((a, b) => {
+					if (a.channel_label && b.channel_label) {
+						return b.channel_label.localeCompare(a.channel_label);
+					}
+					return 0;
+				});
+			}
+
+			return {
+				...category,
+				channels: categoryChannels
+			};
+		});
+
+		return results as ICategoryChannel[];
 	}, [categories, listChannels, categoryIdSortChannel]);
 
 	return categorizedChannels;

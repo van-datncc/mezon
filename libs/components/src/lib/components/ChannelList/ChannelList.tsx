@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useCategorizedChannels, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useAuth, useCategorizedChannels, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
   ChannelsEntity,
   ClansEntity,
@@ -72,7 +72,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
   const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-  const categorizedChannels = useCategorizedChannels();
+  const categorizedChannels = useCategorizedChannelsWeb();
   const currentClan = useSelector(selectCurrentClan);
   const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
   const streamPlay = useSelector(selectStatusStream);
