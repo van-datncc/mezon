@@ -6,6 +6,7 @@ import {
 	searchMessagesActions,
 	selectActiveThreads,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	selectJoinedThreadsWithinLast30Days,
 	selectShowEmptyStatus,
 	selectTheme,
@@ -14,9 +15,9 @@ import {
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { Icons } from '@mezon/ui';
+import { Icons, customTheme } from '@mezon/ui';
 import { EOverriddenPermission, checkIsThread } from '@mezon/utils';
-import { Button } from 'flowbite-react';
+import { Button, Pagination } from 'flowbite-react';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -53,10 +54,31 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const [keywordSearch, setKeywordSearch] = useState('');
 
-	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch));
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch));
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch));
+	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch)); // is thread public and last message within 30days
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch)); // is thread joined and last message within 30days
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch)); // is thread joined/public and last message over 30days
 
+	const currentClanId = useSelector(selectCurrentClanId);
+	const totalPages = 10;
+	const [currentPage, setCurrentPage] = useState(1);
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+
+	const onPageChange = useCallback(
+		async (page: number) => {
+			if (!currentChannel?.channel_id || !currentClanId) {
+				return;
+			}
+			setCurrentPage(page);
+			const body = {
+				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
+				clanId: currentChannel?.clan_id ?? '',
+				page: page,
+				noCache: true
+			};
+			await dispatch(threadsActions.fetchThreads(body));
+		},
+		[dispatch, currentChannel?.channel_id, currentClanId]
+	);
 	useEffect(() => {
 		const fetchThreads = async () => {
 			const isThread = checkIsThread(currentChannel as ChannelsEntity);
@@ -65,8 +87,9 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 			if (channelId && clanId) {
 				const body = {
-					channelId,
-					clanId
+					channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
+					clanId: currentChannel?.clan_id ?? '',
+					page: currentPage
 				};
 				await dispatch(threadsActions.fetchThreads(body));
 			}
@@ -170,7 +193,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							))}
 						</GroupThreads>
 					)}
-					{/* Order threads */}
+					{/* Older threads */}
 					{getThreadsOlderThan30Days.length > 0 && (
 						<GroupThreads
 							title={
@@ -193,6 +216,19 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 					{isEmpty && <EmptyThread onClick={handleCreateThread} />}
 				</div>
+				{totalPages > 1 && (
+					<div className="py-2">
+						<Pagination
+							theme={customTheme(totalPages <= 5)}
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							previousLabel=""
+							nextLabel=""
+							showIcons={totalPages > 5}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

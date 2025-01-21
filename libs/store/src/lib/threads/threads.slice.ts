@@ -55,14 +55,15 @@ export interface FetchThreadsArgs {
 	clanId: string;
 	threadId?: string;
 	noCache?: boolean;
+	page?: number;
 }
 
 const fetchThreadsCached = memoizee(
-	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string, defaultResponse?: ApiChannelDescList) => {
+	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string, defaultResponse?: ApiChannelDescList, page?: number) => {
 		if (defaultResponse) {
 			return { ...defaultResponse, time: Date.now() };
 		}
-		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, 0, clanId, threadId);
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 10, 0, clanId, threadId, page);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -91,13 +92,15 @@ const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
 	}));
 };
 
-export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, noCache }: FetchThreadsArgs, thunkAPI) => {
+export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, noCache, page }: FetchThreadsArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
 			fetchThreadsCached.delete(mezon, channelId, clanId);
 		}
-		const response = await fetchThreadsCached(mezon, channelId, clanId);
+		const response = await fetchThreadsCached(mezon, channelId, clanId, undefined, undefined, page);
+		fetchThreadsCached(mezon, channelId, clanId, undefined, { channeldesc: response.channeldesc });
+
 		if (!response.channeldesc) {
 			return [];
 		}
@@ -345,17 +348,24 @@ export const selectIsShowCreateThread = createSelector([getThreadsState, (_, cha
 
 export const selectIsThreadModalVisible = createSelector(getThreadsState, (state: ThreadsState) => state.isThreadModalVisible);
 // new update
-
+// is thread public and last message within 30days
 export const selectActiveThreads = (keywordSearch: string) =>
 	createSelector([selectAllThreads], (threads) => {
-		const result = threads.filter(
-			(thread) =>
-				thread.active === ThreadStatus.activePublic && thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
-		);
+		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+		const currentTime = Math.floor(Date.now() / 1000);
+		const result = threads.filter((thread) => {
+			const lastMessageTimestamp = thread?.last_sent_message?.timestamp_seconds;
+			const isWithin30Days = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) < thirtyDaysInSeconds;
+			return (
+				thread.active === ThreadStatus.activePublic &&
+				isWithin30Days &&
+				thread.channel_label?.toLocaleLowerCase().includes(keywordSearch.toLocaleLowerCase())
+			);
+		});
 		const sortByLsentMess = sortChannelsByLastActivity(result as any);
 		return sortByLsentMess;
 	});
-
+// is thread joined and last message within 30days
 export const selectJoinedThreadsWithinLast30Days = (keywordSearch: string) =>
 	createSelector([selectAllThreads], (threads) => {
 		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
@@ -374,7 +384,7 @@ export const selectJoinedThreadsWithinLast30Days = (keywordSearch: string) =>
 		const sortByLsentMess = sortChannelsByLastActivity(result as any);
 		return sortByLsentMess;
 	});
-
+// is thread joined/public and last message over 30days
 export const selectThreadsOlderThan30Days = (keywordSearch: string) =>
 	createSelector([selectAllThreads], (threads) => {
 		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
