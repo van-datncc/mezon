@@ -4,6 +4,7 @@ import { formatNumber } from '@mezon/utils';
 import { Pagination } from 'flowbite-react';
 
 import { useEffect, useState } from 'react';
+const limitWallet = 8;
 
 interface IProps {
 	onClose: () => void;
@@ -13,7 +14,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const walletLedger = useAppSelector((state) => selectWalletLedger(state));
 	const count = useAppSelector((state) => selectCountWalletLedger(state));
 	const [currentPage, setCurrentPage] = useState(1);
-	const totalPages = count === undefined ? 0 : Math.ceil(count / 8);
+	const totalPages = count === undefined ? 0 : Math.ceil(count / limitWallet);
 
 	useEffect(() => {
 		dispatch(fetchListWalletLedger({ page: 1 }));
