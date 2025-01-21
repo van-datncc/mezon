@@ -177,7 +177,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		threadIcon: { marginBottom: size.s_2 },
 		privateChannel: {
 			color: colors.text,
-			backgroundColor: colors.secondary
+			backgroundColor: colors.secondaryLight
 		}
 	});
 
