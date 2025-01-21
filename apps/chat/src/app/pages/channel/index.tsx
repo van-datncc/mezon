@@ -227,7 +227,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
-	const [isPayment, setIsPayment] = useState(false);
+	const [isShowDepositConfirmPopup, setIsShowDepositConfirmPopup] = useState(false);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -295,8 +295,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							appChannel.url ?? ''
 						);
 					} else if (eventType === 'SEND_TOKEN') {
-						const { amount, note, receiver_id, extra_attribute } = {} as any;
-						setIsPayment(true);
+						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
+						setIsShowDepositConfirmPopup(true);
 						const tokenEvent: ApiTokenSentEvent = {
 							receiver_id,
 							amount,
@@ -327,10 +327,10 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	const toggleDepositPopup = (type: boolean) => {
 		if (type) {
-			setIsPayment(false);
+			setIsShowDepositConfirmPopup(false);
 			dispatch(giveCoffeeActions.setShowModalSendToken(true));
 		} else {
-			setIsPayment(false);
+			setIsShowDepositConfirmPopup(false);
 		}
 	};
 
@@ -353,7 +353,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"
 				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+				onDragEnter={canSendMessage ? handleDragEnter : () => { }}
 			>
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
@@ -395,7 +395,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<MemberList />
 						</div>
 					)}
-					{isPayment && (
+					{isShowDepositConfirmPopup && (
 						<ModalConfirm
 							handleCancel={() => toggleDepositPopup(false)}
 							handleConfirm={() => toggleDepositPopup(true)}
