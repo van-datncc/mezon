@@ -16,7 +16,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons, customTheme } from '@mezon/ui';
-import { EOverriddenPermission, checkIsThread } from '@mezon/utils';
+import { EOverriddenPermission, LIMIT, checkIsThread } from '@mezon/utils';
 import { Button, Pagination } from 'flowbite-react';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -53,21 +53,22 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const [keywordSearch, setKeywordSearch] = useState('');
-
-	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch)); // is thread public and last message within 30days
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch)); // is thread joined and last message within 30days
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch)); // is thread joined/public and last message over 30days
-
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [currentPage, setCurrentPage] = useState(1);
 	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+	const getActiveThreads = useSelector(selectActiveThreads(keywordSearch)); // is thread public and last message within 30days
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(keywordSearch)); // is thread joined and last message within 30days
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch)); // is thread joined/public and last message over 30days
+	const totalCountThread = getActiveThreads.length + getJoinedThreadsWithinLast30Days.length + getThreadsOlderThan30Days.length;
+	const isNotFullPage = totalCountThread < LIMIT;
+
+	const firstPageNotFull = isNotFullPage && currentPage === 1;
 
 	const onPageChange = useCallback(
 		async (page: number) => {
 			if (!currentChannel?.channel_id || !currentClanId) {
 				return;
 			}
-
 			setCurrentPage(page);
 			const body = {
 				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
@@ -77,7 +78,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 			};
 			await dispatch(threadsActions.fetchThreads(body));
 		},
-		[dispatch, currentChannel?.channel_id, currentClanId]
+		[dispatch, currentChannel?.channel_id, currentClanId, totalCountThread, currentPage]
 	);
 	useEffect(() => {
 		const fetchThreads = async () => {
@@ -162,10 +163,10 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 									: `${getJoinedThreadsWithinLast30Days.length} joined thread`
 							}
 						>
-							{getJoinedThreadsWithinLast30Days.map((thread: ThreadsEntity) => (
+							{getJoinedThreadsWithinLast30Days.map((thread: ThreadsEntity, index: number) => (
 								<ThreadItem
 									thread={thread}
-									key={`${thread.id}-joined-threads`}
+									key={`${thread.id}-joined-threads-${index}`}
 									setIsShowThread={onClose}
 									preventClosePannel={preventClosePannel}
 								/>
@@ -181,11 +182,11 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 									: `${getActiveThreads.length} other active thread`
 							}
 						>
-							{getActiveThreads.map((thread: ThreadsEntity) => (
+							{getActiveThreads.map((thread: ThreadsEntity, index: number) => (
 								<ThreadItem
 									isPublicThread={true}
 									thread={thread}
-									key={`${thread.id}-other-active-threads`}
+									key={`${thread.id}-other-active-threads-${index}`}
 									setIsShowThread={onClose}
 									isHasContext={false}
 									preventClosePannel={preventClosePannel}
@@ -202,10 +203,10 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 									: `${getThreadsOlderThan30Days.length} older thread`
 							}
 						>
-							{getThreadsOlderThan30Days.map((thread: ThreadsEntity) => (
+							{getThreadsOlderThan30Days.map((thread: ThreadsEntity, index: number) => (
 								<ThreadItem
 									thread={thread}
-									key={`${thread.id}-older-threads`}
+									key={`${thread.id}-older-threads-${index}`}
 									setIsShowThread={onClose}
 									isHasContext={false}
 									preventClosePannel={preventClosePannel}
@@ -216,18 +217,20 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 					{isEmpty && <EmptyThread onClick={handleCreateThread} />}
 				</div>
-				<div className="py-2 dark:bg-[#2B2D31] bg-[#F2F3F5]">
-					<Pagination
-						layout="navigation"
-						theme={customTheme(false)}
-						currentPage={currentPage}
-						totalPages={100}
-						onPageChange={onPageChange}
-						previousLabel=""
-						nextLabel=""
-						showIcons={true}
-					/>
-				</div>
+				{firstPageNotFull ? null : (
+					<div className="py-2 dark:bg-[#2B2D31] bg-[#F2F3F5]">
+						<Pagination
+							layout="navigation"
+							theme={customTheme(false)}
+							currentPage={currentPage}
+							totalPages={100}
+							onPageChange={onPageChange}
+							previousLabel=""
+							nextLabel=""
+							showIcons={true}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);
