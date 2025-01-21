@@ -216,7 +216,6 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
-	hide_editted?: boolean;
 	isErrorRetry?: boolean;
 	code?: number;
 };
@@ -640,6 +639,7 @@ export type ChannelDraftMessages = {
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
 	draftAttachment: ApiMessageAttachment[];
+	draftTopicId?: string;
 };
 
 export interface IGifCategory {
