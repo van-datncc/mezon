@@ -140,9 +140,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	useEffect(() => {
 		if (showModalSendToken && InfoSendToken) {
-			setToken(Number(InfoSendToken.amount));
-			setSelectedUserId(String(InfoSendToken.receiver_id));
-			setNote(String(InfoSendToken.note));
+			setToken(InfoSendToken.amount ?? 0);
+			setSelectedUserId(InfoSendToken.receiver_id ?? '');
+			setNote(InfoSendToken.note ?? 'send token');
 			setExtraAttribute(InfoSendToken.extra_attribute ?? '');
 		}
 	}, [showModalSendToken]);
