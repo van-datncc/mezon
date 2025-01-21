@@ -1,14 +1,13 @@
 import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
-import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById } from '@mezon/store-mobile';
+import { directActions, selectDirectById, selectIsUnreadDMById } from '@mezon/store-mobile';
 import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useSelector } from 'react-redux';
 import BuzzBadge from '../../components/BuzzBadge/BuzzBadge';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -25,7 +24,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
 	const [hiddenFlag, setHiddenFlag] = useState(false);
 
@@ -118,12 +116,12 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	return (
 		<TouchableOpacity
 			style={[
-				styles.messageItem,
-				currentDmGroupId === directMessage?.id && {
-					backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
-					borderColor: themeValue.borderHighlight,
-					borderWidth: 1
-				}
+				styles.messageItem
+				// currentDmGroupId === directMessage?.id && {
+				// 	backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
+				// 	borderColor: themeValue.borderHighlight,
+				// 	borderWidth: 1
+				// }
 			]}
 			onPress={redirectToMessageDetail}
 			onLongPress={() => onLongPress(directMessage)}

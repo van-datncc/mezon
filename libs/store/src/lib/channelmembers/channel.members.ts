@@ -293,7 +293,7 @@ export const channelMembers = createSlice({
 				};
 			}
 			userIds.forEach((userId) => {
-				if (!state.memberChannels[channelId]?.ids.includes(userId)) {
+				if (!state.memberChannels[channelId]?.ids.includes(userId) && userId !== process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID) {
 					state.memberChannels[channelId].ids.push(userId);
 				}
 			});

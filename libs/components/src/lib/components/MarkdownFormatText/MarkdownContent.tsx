@@ -1,10 +1,10 @@
-import { useAppNavigation } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType } from '@mezon/utils';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 type MarkdownContentOpt = {
 	content?: string;
@@ -26,7 +26,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	typeOfBacktick
 }) => {
 	const appearanceTheme = useSelector(selectTheme);
-	const { navigate } = useAppNavigation();
+	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const origin = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/';
 	const originClan = process.env.NX_CHAT_APP_REDIRECT_URI + '/chat/clans/';
@@ -68,9 +68,9 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
-			{!isLink && isBacktick && typeOfBacktick === EBacktickType.SINGLE ? (
+			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
 				<SingleBacktick contentBacktick={content} isInPinMsg={isInPinMsg} isLightMode={isLightMode} posInNotification={posInNotification} />
-			) : isBacktick && typeOfBacktick === EBacktickType.TRIPLE && !posInReply && !isLink ? (
+			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !posInReply && !isLink ? (
 				<TripleBackticks contentBacktick={content} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
 			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply && !isLink ? (
 				<SingleBacktick contentBacktick={content} isLightMode={isLightMode} />
@@ -78,7 +78,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 		</div>
 	);
 };
-export default memo(MarkdownContent);
+export default MarkdownContent;
 
 type BacktickOpt = {
 	contentBacktick?: any;

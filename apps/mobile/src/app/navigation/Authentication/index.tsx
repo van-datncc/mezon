@@ -6,7 +6,6 @@ import { Platform } from 'react-native';
 import CallingModal from '../../components/CallingModal';
 import StreamingPopup from '../../screens/home/homedrawer/components/StreamingPopup/StreamingPopup';
 import { APP_SCREEN } from '../ScreenTypes';
-import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigator from './BottomNavigator';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
@@ -46,7 +45,6 @@ export const Authentication = () => {
 
 				<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
 			</RootStack.Navigator>
-			<AuthenticationLoader />
 			<CallingModal />
 			<StreamingPopup />
 		</BottomSheetModalProvider>

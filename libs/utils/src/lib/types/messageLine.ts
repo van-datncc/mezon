@@ -7,7 +7,12 @@ export interface IStartEndIndex {
 
 export enum EBacktickType {
 	TRIPLE = 't',
-	SINGLE = 's'
+	SINGLE = 's',
+	PRE = 'pre',
+	CODE = 'c',
+	BOLD = 'b',
+	LINK = 'lk',
+	VOICE_LINK = 'vk'
 }
 
 export interface IMention {
@@ -27,6 +32,14 @@ export interface IMarkdown {
 	type?: EBacktickType;
 }
 
+export interface IPre {
+	l?: string; // language
+}
+
+export interface IBold {
+	l?: string; // language
+}
+
 export interface IMentionOnMessage extends IMention, IStartEndIndex {}
 export interface IExtendedMessage extends IMessageSendPayload {
 	mentions?: IMentionOnMessage[];
@@ -36,3 +49,7 @@ export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export type ILinkOnMessage = IStartEndIndex;
 export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {}
 export type ILinkVoiceRoomOnMessage = IStartEndIndex;
+
+export interface IPreMessage extends IPre, IStartEndIndex {}
+
+export interface IBoldMessage extends IBold, IStartEndIndex {}
