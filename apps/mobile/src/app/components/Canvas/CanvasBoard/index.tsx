@@ -57,6 +57,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 				style={styles.container}
 				injectedJavaScriptBeforeContentLoaded={injectedJS}
 				javaScriptEnabled={true}
+				nestedScrollEnabled={true}
 				onLoadEnd={async () => {
 					await sleep(500);
 					setLoading(false);
