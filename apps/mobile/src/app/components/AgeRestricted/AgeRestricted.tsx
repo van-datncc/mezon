@@ -2,10 +2,11 @@ import { Icons, load, save, STORAGE_AGE_RESTRICTED_CHANNEL_IDS } from '@mezon/mo
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
@@ -13,6 +14,7 @@ const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation('ageRestricted');
+	const isTabletLandscape = useTabletLandscape();
 
 	const styles = style(themeValue);
 	const handleSaveChannel = () => {
@@ -27,9 +29,11 @@ const AgeRestricted = ({ onClose }: { onClose: () => void }) => {
 		onClose();
 	};
 
-	const handleNode = () => {
-		navigation.dispatch(DrawerActions.openDrawer());
-	};
+	const handleNode = useCallback(() => {
+		if (isTabletLandscape) {
+			navigation.dispatch(DrawerActions.openDrawer());
+		}
+	}, [isTabletLandscape]);
 
 	return (
 		<Block backgroundColor={themeValue.secondary} borderRadius={size.s_10} padding={size.s_20}>

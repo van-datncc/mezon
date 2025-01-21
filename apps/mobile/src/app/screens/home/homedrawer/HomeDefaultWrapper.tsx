@@ -11,15 +11,19 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import React, { useEffect, useState } from 'react';
 import BootSplash from 'react-native-bootsplash';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import HomeDefault from './HomeDefault';
 
 const HomeDefaultWrapper = React.memo((props: any) => {
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
+	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
 
 	useEffect(() => {
-		navigation.dispatch(DrawerActions.openDrawer());
+		if (!isTabletLandscape) {
+			navigation.dispatch(DrawerActions.openDrawer());
+		}
 		const timer = setTimeout(async () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
@@ -40,7 +44,7 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 			clearTimeout(timer);
 			timer2 && clearTimeout(timer2);
 		};
-	}, []);
+	}, [isTabletLandscape]);
 
 	if (!isReadyForUse) {
 		return <Block flex={1} backgroundColor={themeValue.primary} />;

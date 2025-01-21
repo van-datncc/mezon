@@ -12,6 +12,7 @@ import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import ChannelApp from './ChannelApp';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
@@ -28,6 +29,7 @@ const HomeDefault = React.memo((props: any) => {
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const isTabletLandscape = useTabletLandscape();
 	const timeoutRef = useRef<any>(null);
 	const navigation = useNavigation<any>();
 	const panelKeyboardRef = useRef(null);
@@ -44,11 +46,13 @@ const HomeDefault = React.memo((props: any) => {
 
 	const onOpenDrawer = useCallback(() => {
 		requestAnimationFrame(async () => {
-			navigation.dispatch(DrawerActions.openDrawer());
+			if (!isTabletLandscape) {
+				navigation.dispatch(DrawerActions.openDrawer());
+			}
 			onShowKeyboardBottomSheet(false, 'text');
 			Keyboard.dismiss();
 		});
-	}, [navigation, onShowKeyboardBottomSheet]);
+	}, [navigation, isTabletLandscape, onShowKeyboardBottomSheet]);
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const snapPoints = useMemo(() => ['50%'], []);

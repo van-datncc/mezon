@@ -18,6 +18,7 @@ import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from
 import RNCallKeep from 'react-native-callkeep';
 import { PERMISSIONS, RESULTS, requestMultiple } from 'react-native-permissions';
 import VoipPushNotification from 'react-native-voip-push-notification';
+import useTabletLandscape from '../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
@@ -185,6 +186,8 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 export const navigateToNotification = async (store: any, notification: any, navigation: any, time?: number) => {
 	const link = notification?.data?.link;
 	const topicId = notification?.data?.topicId;
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const isTabletLandscape = useTabletLandscape();
 	if (link) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
@@ -192,7 +195,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME as never);
-				navigation.dispatch(DrawerActions.closeDrawer());
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
 			}
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
