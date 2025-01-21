@@ -92,6 +92,7 @@ function ChannelMessages({
 	const store = useStore();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId));
 	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId2(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const isJumpingToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
@@ -275,7 +276,11 @@ function ChannelMessages({
 	if (!shouldRender) return null;
 
 	return (
-		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
+		<MessageContextMenuProvider
+			channelId={channelId}
+			allRolesInClan={allRolesInClan}
+			allUserIdsInChannel={allUserIdsInChannel && allUserIdsInChannel?.length ? allUserIdsInChannel : allUserIds}
+		>
 			<ChatMessageList
 				key={channelId}
 				messageIds={messageIds}
