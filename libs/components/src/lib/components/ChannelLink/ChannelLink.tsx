@@ -68,7 +68,6 @@ export type ChannelLinkRef = {
 const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 	(
 		{ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, isActive, channelType, permissions }: ChannelLinkProps,
-		ref
 	) => {
 		const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 		const dispatch = useAppDispatch();
@@ -91,14 +90,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 
-		useImperativeHandle(ref, () => ({
-			scrollIntoView: (options?: ScrollIntoViewOptions) => {
-				channelLinkRef.current?.scrollIntoView(options);
-			},
-			isInViewport: () => {
-				return isElementInViewport(channelLinkRef.current as HTMLElement);
-			}
-		}));
 
 		const handleCreateLinkInvite = () => {
 			createInviteLink(clanId ?? '', channel.channel_id ?? '');

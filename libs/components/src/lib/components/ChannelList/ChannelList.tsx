@@ -4,6 +4,7 @@ import {
 	ClansEntity,
 	appActions,
 	categoriesActions,
+	selectAllAccount,
 	selectAllChannelsFavorite,
 	selectChannelById,
 	selectChannelsByClanId,
@@ -11,6 +12,7 @@ import {
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectCurrentUserId,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
@@ -28,7 +30,7 @@ import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
-import CategorizedChannels from './CategorizedChannels';
+import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
 export type ChannelListProps = { className?: string };
@@ -168,13 +170,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
-	const { userProfile } = useAuth();
+	const userId  = useSelector(selectCurrentUserId);
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
 		EPermission.manageChannel
 	]);
-	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+	const isClanOwner = currentClan?.creator_id === userId;
 	const permissions = useMemo(
 		() => ({
 			hasAdminPermission,
@@ -250,14 +252,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 										isExpandFavorite={isExpandFavorite}
 										handleExpandFavoriteChannel={handleExpandFavoriteChannel}
 										channelFavorites={channelFavorites}
-										channelRefs={channelRefs}
 									/>
 								</div>
 							);
 						} else if (item.channels) {
 							return (
 								<div style={{ padding: '10px 0' }} key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
+									<CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
 								</div>
 							);
 						} else {
@@ -265,7 +266,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 								return (
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
 										<ChannelListItem
-											ref={null}
 											isActive={currentChannelId === item.id}
 											key={item.id}
 											channel={item as ChannelThreads}
@@ -278,11 +278,9 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
 										<ThreadLinkWrapper
 											key={item.id}
-											ref={null}
 											isActive={currentChannelId === item.id}
 											thread={item}
 											isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
-											handleClick={() => { }}
 											isCollapsed={false}
 										/>
 									</div>
@@ -301,12 +299,11 @@ const FavoriteChannelsSection = ({
 	isExpandFavorite,
 	handleExpandFavoriteChannel,
 	channelFavorites,
-	channelRefs
+
 }: {
 	isExpandFavorite: boolean;
 	handleExpandFavoriteChannel: () => void;
 	channelFavorites: string[];
-	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
 }) => (
 	<div>
 		<div
@@ -320,7 +317,7 @@ const FavoriteChannelsSection = ({
 			<div className="w-[94%] mx-auto">
 				{channelFavorites
 					? channelFavorites.map((id, index) => (
-						<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+						<FavoriteChannel key={index} channelId={id} />
 					))
 					: ''}
 			</div>
@@ -329,10 +326,9 @@ const FavoriteChannelsSection = ({
 );
 type FavoriteChannelProps = {
 	channelId: string;
-	channelRef: ChannelListItemRef | null;
 };
 
-const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
+const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
 	const channel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();

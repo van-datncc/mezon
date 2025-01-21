@@ -27,45 +27,44 @@ export type ListThreadChannelRef = {
 type ThreadLinkWrapperProps = {
 	thread: IChannel;
 	isFirstThread: boolean;
-	handleClick: (thread: IChannel) => void;
 	isActive: boolean;
 	isCollapsed: boolean;
 };
 
-export const ThreadLinkWrapper = forwardRef<ThreadLinkRef, ThreadLinkWrapperProps>(({ thread, isFirstThread, handleClick, isActive, isCollapsed }, ref) => {
+export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, isFirstThread, isActive, isCollapsed }) => {
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const threadMeta = useAppSelector((state) => selectChannelMetaById(state, thread?.id));
-  const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, thread.category_id as string));
-  const closeMenu = useSelector(selectCloseMenu);
+	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, thread.category_id as string));
+	const closeMenu = useAppSelector(selectCloseMenu);
 	const dispatch = useAppDispatch();
 	const { setStatusMenu } = useMenu();
 	
-  const handleClickLink = (thread: IChannel) => {
-		dispatch(referencesActions.setOpenEditMessageState(false));
-		if (currentChannelId === thread.parrent_id) {
-			dispatch(threadsActions.setIsShowCreateThread({ channelId: thread.parrent_id as string, isShowCreateThread: false }));
-		}
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
-		dispatch(threadsActions.setOpenThreadMessageState(false));
-		dispatch(threadsActions.setValueThread(null));
-		dispatch(appActions.setIsShowCanvas(false));
+	const handleClickLink = (thread: IChannel) => {
+			dispatch(referencesActions.setOpenEditMessageState(false));
+			if (currentChannelId === thread.parrent_id) {
+					dispatch(threadsActions.setIsShowCreateThread({ channelId: thread.parrent_id as string, isShowCreateThread: false }));
+			}
+			if (closeMenu) {
+					setStatusMenu(false);
+			}
+			dispatch(threadsActions.setOpenThreadMessageState(false));
+			dispatch(threadsActions.setValueThread(null));
+			dispatch(appActions.setIsShowCanvas(false));
 	};
 
-  const isShowThread = (thread: IChannel) => {
-		const threadId = thread.id;
-		return (
-			(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
-			(thread?.count_mess_unread ?? 0) > 0 ||
-			threadId === currentChannelId
-		);
+	const isShowThread = (thread: IChannel) => {
+			const threadId = thread.id;
+			return (
+					(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
+					(thread?.count_mess_unread ?? 0) > 0 ||
+					threadId === currentChannelId
+			);
 	};
 
 	const shouldShow = !isCollapsed ? thread?.active === 1 : isShowThread(thread);
 	if (!shouldShow || !isCategoryExpanded) {
-		return null;
+			return null;
 	}
 
-	return <ThreadLink ref={ref} isActive={isActive} thread={thread} isFirstThread={isFirstThread} handleClick={handleClickLink} />;
-});
+	return <ThreadLink isActive={isActive} thread={thread} isFirstThread={isFirstThread} handleClick={handleClickLink} />;
+};

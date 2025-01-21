@@ -62,7 +62,7 @@ const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, clo
 	);
 };
 
-const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
+const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, category.id));
@@ -205,5 +205,5 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 		</>
 	);
 };
-export default memo(CategorizedChannels);
+export default memo(CategorizedItem);
 

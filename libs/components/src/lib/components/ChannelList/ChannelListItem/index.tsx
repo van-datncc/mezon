@@ -27,17 +27,20 @@ type ChannelListItemProp = {
 	permissions: IChannelLinkPermission;
 };
 
+export type ChannelListItemRef = {
+	scrollIntoChannel: (options?: ScrollIntoViewOptions) => void;
+	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
+	channelId: string;
+	channelRef: ChannelLinkRef | null;
+	isInViewport: () => boolean;
+};
+
 const ChannelListItem: React.FC<ChannelListItemProp> = (props) => {
 	const { channel, isActive, permissions } = props;
-
-	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
-	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
 
 	return (
 			<ChannelLinkContent
 					channel={channel}
-					listThreadRef={listThreadRef}
-					channelLinkRef={channelLinkRef}
 					isActive={isActive}
 					permissions={permissions}
 			/>
@@ -48,13 +51,12 @@ export default memo(ChannelListItem);
 
 type ChannelLinkContentProps = {
 	channel: ChannelThreads;
-	listThreadRef: Ref<ListThreadChannelRef>;
-	channelLinkRef: Ref<ChannelLinkRef>;
+
 	isActive: boolean;
 	permissions: IChannelLinkPermission;
 };
 
-const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listThreadRef, channelLinkRef, isActive, permissions }) => {
+const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActive, permissions }) => {
 	const dispatch = useDispatch();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
@@ -76,7 +78,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const renderChannelLink = () => {
 		return (
 			<ChannelLink
-				ref={channelLinkRef}
 				clanId={channel?.clan_id}
 				channel={channel}
 				key={channel.id}
@@ -148,7 +149,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				<CollapsedMemberList channelMemberList={channelMemberList} />
 			</>
 		) : null;
-	}, [channel.type, channel.threads, channel.channel_id, isCategoryExpanded, channelMemberList, renderChannelLink, listThreadRef]);
+	}, [channel.type, channel.threads, channel.channel_id, isCategoryExpanded, channelMemberList, renderChannelLink]);
 
 	return <>{renderChannelContent} </>;
 };
