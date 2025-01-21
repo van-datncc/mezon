@@ -27,45 +27,22 @@ type ChannelListItemProp = {
 	permissions: IChannelLinkPermission;
 };
 
-export type ChannelListItemRef = {
-	scrollIntoChannel: (options?: ScrollIntoViewOptions) => void;
-	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
-	channelId: string;
-	channelRef: ChannelLinkRef | null;
-	isInViewport: () => boolean;
-};
-
-const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props) => {
+const ChannelListItem: React.FC<ChannelListItemProp> = (props) => {
 	const { channel, isActive, permissions } = props;
 
 	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
 	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
 
-	useImperativeHandle(null, () => ({
-		scrollIntoChannel: (options: ScrollIntoViewOptions = { block: 'center' }) => {
-			channelLinkRef.current?.scrollIntoView(options);
-		},
-		scrollIntoThread: (threadId: string, options: ScrollIntoViewOptions = { block: 'center' }) => {
-			listThreadRef.current?.scrollIntoThread(threadId, options);
-		},
-		channelId: channel?.id,
-		channelRef: channelLinkRef.current,
-		isInViewport: () => {
-			if (!channelLinkRef.current) return false;
-			return channelLinkRef.current?.isInViewport();
-		}
-	}));
-
 	return (
-		<ChannelLinkContent
-			channel={channel}
-			listThreadRef={listThreadRef}
-			channelLinkRef={channelLinkRef}
-			isActive={isActive}
-			permissions={permissions}
-		/>
+			<ChannelLinkContent
+					channel={channel}
+					listThreadRef={listThreadRef}
+					channelLinkRef={channelLinkRef}
+					isActive={isActive}
+					permissions={permissions}
+			/>
 	);
-});
+};
 
 export default memo(ChannelListItem);
 
