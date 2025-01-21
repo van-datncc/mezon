@@ -23,10 +23,10 @@ import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
+import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
-import { ThreadLinkWrapper } from '../ThreadListChannel';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -288,8 +288,8 @@ const FavoriteChannelsSection = ({
 			<div className="w-[94%] mx-auto">
 				{channelFavorites
 					? channelFavorites.map((id, index) => (
-							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-						))
+						<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+					))
 					: ''}
 			</div>
 		) : null}

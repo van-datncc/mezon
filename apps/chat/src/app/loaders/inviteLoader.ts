@@ -11,7 +11,7 @@ export const inviteLoader: CustomLoaderFunction = async ({ params, dispatch }) =
 
 	return null;
 };
-export const shouldRevalidateInvite: ShouldRevalidateFunction = (ctx) => {
+export const shouldRevalidateInvite: ShouldRevalidateFunction = (ctx : any) => {
 	const { currentParams, nextParams } = ctx;
 	const { inviteId: currentInviteId } = currentParams;
 	const { inviteId: nextInviteId } = nextParams;

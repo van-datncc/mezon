@@ -26,7 +26,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	} as ClanLoaderData;
 };
 
-export const shouldRevalidateServer: ShouldRevalidateFunction = (ctx) => {
+export const shouldRevalidateServer: ShouldRevalidateFunction = (ctx : any) => {
 	const { currentParams, nextParams } = ctx;
 	const { clanId: currentServerId } = currentParams;
 	const { clanId: nextServerId } = nextParams;

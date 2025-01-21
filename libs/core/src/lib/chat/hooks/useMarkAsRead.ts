@@ -169,7 +169,6 @@ export function useMarkAsRead() {
 	);
 }
 
-
 function getThreadWithBadgeCount(channel: ChannelThreads) {
 	return channel.threads || [];
 }
