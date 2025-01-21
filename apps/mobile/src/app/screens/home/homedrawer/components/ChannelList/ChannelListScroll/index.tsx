@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { selectCategoryChannelOffsets, selectCurrentChannel } from '@mezon/store-mobile';
-import React, { memo, useCallback, useEffect } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ChannelsPositionRef } from '../../../ChannelList';
@@ -14,14 +14,28 @@ interface IProps {
 const ChannelListScroll = ({ channelsPositionRef, flashListRef }: IProps) => {
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isFirstOpen = useRef(false);
 
 	useEffect(() => {
 		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
 		if (currentChannel?.channel_id) {
 			timerToScrollChannelActive = setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
 				DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, currentChannel?.channel_id);
-			}, 1000);
+			}, 1500);
+		}
+		return () => {
+			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
+		};
+	}, [currentChannel?.channel_id]);
+
+	useEffect(() => {
+		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
+		if (currentChannel?.channel_id && isFirstOpen?.current) {
+			timerToScrollChannelActive = setTimeout(() => {
+				DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
+			}, 10);
+		} else {
+			isFirstOpen.current = true;
 		}
 		return () => {
 			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
