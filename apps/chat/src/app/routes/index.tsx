@@ -53,6 +53,7 @@ const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 const ChannelSettingMain = loadable(() => import('../pages/setting/channelSetting'));
 const GuideMain = loadable(() => import('../pages/guide'));
+const CanvasLayout = loadable(() => import('../layouts/CanvasLayout'));
 // Components
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
@@ -266,7 +267,7 @@ export const Routes = memo(() => {
 																				path: ':canvasId',
 																				loader: loaderWithStore(canvasLoader),
 																				shouldRevalidate: shouldRevalidateCanvas,
-																				element: <Canvas />
+																				element: <CanvasLayout />
 																			}
 																		]
 																	}
