@@ -5,6 +5,7 @@ import {
 	giveCoffeeActions,
 	selectAccountCustomStatus,
 	selectCurrentClanId,
+	selectInfoSendToken,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectShowModalSendToken,
@@ -40,6 +41,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
+	const InfoSendToken = useSelector(selectInfoSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
@@ -50,6 +52,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
 	const [note, setNote] = useState<string>('send token');
+	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
@@ -106,10 +109,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			sender_name: myProfile?.userProfile?.user?.username as string,
 			receiver_id: userId,
 			amount: token,
-			note: note
+			note: note,
+			extra_attribute: extraAttribute
 		};
 
 		dispatch(giveCoffeeActions.sendToken(tokenEvent));
+		dispatch(giveCoffeeActions.setInfoSendToken(null));
 		handleCloseModalSendToken();
 	};
 
@@ -132,6 +137,15 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	useEffect(() => {
 		loadParamsSendTokenFromURL();
 	}, []);
+
+	useEffect(() => {
+		if (showModalSendToken && InfoSendToken) {
+			setToken(InfoSendToken.amount ?? 0);
+			setSelectedUserId(InfoSendToken.receiver_id ?? '');
+			setNote(InfoSendToken.note ?? 'send token');
+			setExtraAttribute(InfoSendToken.extra_attribute ?? '');
+		}
+	}, [showModalSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
 

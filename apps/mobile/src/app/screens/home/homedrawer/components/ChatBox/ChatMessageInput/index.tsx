@@ -35,6 +35,7 @@ interface IChatMessageInputProps {
 	hashtagsOnMessage?: MutableRefObject<IHashtagOnMessage[]>;
 	emojisOnMessage?: MutableRefObject<IEmojiOnMessage[]>;
 	linksOnMessage?: MutableRefObject<ILinkOnMessage[]>;
+	boldsOnMessage?: MutableRefObject<ILinkOnMessage[]>;
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	isShowCreateThread?: boolean;
@@ -62,6 +63,7 @@ export const ChatMessageInput = memo(
 				hashtagsOnMessage,
 				emojisOnMessage,
 				linksOnMessage,
+				boldsOnMessage,
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
 				isPublic
@@ -189,6 +191,7 @@ export const ChatMessageInput = memo(
 						hashtagsOnMessage={hashtagsOnMessage}
 						emojisOnMessage={emojisOnMessage}
 						linksOnMessage={linksOnMessage}
+						boldsOnMessage={boldsOnMessage}
 						markdownsOnMessage={markdownsOnMessage}
 						voiceLinkRoomOnMessage={voiceLinkRoomOnMessage}
 						messageAction={messageAction}
