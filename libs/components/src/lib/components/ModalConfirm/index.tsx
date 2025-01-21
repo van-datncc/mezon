@@ -11,6 +11,7 @@ interface ModalConfirmProps {
 	buttonColor?: string;
 	message?: string;
 	customModalName?: string;
+	customTitle?: string;
 }
 
 const ModalConfirm = ({
@@ -19,10 +20,11 @@ const ModalConfirm = ({
 	buttonName = 'OK',
 	modalName,
 	handleConfirm,
-	buttonColor,
+	buttonColor = 'bg-red-600 hover:bg-red-700',
 	message = `You won’t be able to re-join this
             server unless you are re-invited.`,
-	customModalName
+	customModalName,
+	customTitle = ''
 }: ModalConfirmProps) => {
 	useEffect(() => {
 		const handleEnterKey = (event: KeyboardEvent) => {
@@ -50,17 +52,21 @@ const ModalConfirm = ({
 						{customModalName ? customModalName : modalName}
 					</div>
 					<div className="dark:text-[#dbdee1] text-textLightTheme pb-[20px]">
-						Are you sure you want to {title} <b className="font-semibold">{modalName}</b>? {message}
+						{customTitle !== '' ? (
+							<span>{customTitle}</span>
+						) : (
+							<span>
+								Are you sure you want to {title}
+								<b className="font-semibold">{modalName}</b>? {message}
+							</span>
+						)}
 					</div>
 				</div>
 				<div className="dark:bg-[#2b2d31] bg-[#f2f3f5] dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium rounded-b-md">
 					<div onClick={handleCancel} className="hover:underline cursor-pointer">
 						Cancel
 					</div>
-					<div
-						className={`bg-red-600 hover:bg-red-700 text-white rounded-sm px-[25px] py-[8px] cursor-pointer ${buttonColor}`}
-						onClick={handleConfirm}
-					>
+					<div className={`${buttonColor} text-white rounded-sm px-[25px] py-[8px] cursor-pointer`} onClick={handleConfirm}>
 						{buttonName}
 					</div>
 				</div>
