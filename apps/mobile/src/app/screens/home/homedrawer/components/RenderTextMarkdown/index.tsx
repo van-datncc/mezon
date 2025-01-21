@@ -14,6 +14,8 @@ import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
+import Toast from 'react-native-toast-message';
+import Feather from 'react-native-vector-icons/Feather';
 import { useStore } from 'react-redux';
 import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -174,7 +176,11 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			color: colors.textRoleLink,
 			backgroundColor: colors.darkMossGreen
 		},
-		threadIcon: { marginBottom: size.s_2 }
+		threadIcon: { marginBottom: size.s_2 },
+		privateChannel: {
+			color: colors.text,
+			backgroundColor: colors.secondaryLight
+		}
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -261,6 +267,26 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 			return <RenderCanvasItem clanId={clanId} channelId={channelId} canvasId={canvasId} />;
 		}
 
+		if (content?.includes?.('unknown')) {
+			return (
+				<Text
+					key={node.key}
+					onPress={() => {
+						Toast.show({
+							type: 'error',
+							text1: 'You don`t have access to this link.',
+							text2: 'This link is to a clan or channel you don`t have access to.'
+						});
+						return;
+					}}
+				>
+					<Text style={styles.privateChannel}>
+						<Feather name="lock" size={15} /> private-channel
+					</Text>
+				</Text>
+			);
+		}
+
 		if (content?.startsWith(':')) {
 			return (
 				<View key={`${content}`} style={!isOnlyContainEmoji && styles.emojiInMessageContain}>
@@ -306,11 +332,7 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 			return (
 				<Text
 					key={node.key}
-					style={[
-						styles.mention,
-						content?.includes?.('# unknown') && styles.unknownChannel,
-						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention
-					]}
+					style={[styles.mention, payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
 				>
 					{content}

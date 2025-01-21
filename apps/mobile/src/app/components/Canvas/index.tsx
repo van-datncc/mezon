@@ -1,11 +1,13 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { canvasAPIActions, selectCanvasCursors, selectCanvasIdsByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { normalizeString } from '@mezon/utils';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import CanvasItem from './CanvasItem';
 import CanvasSearch from './CanvasSearch';
@@ -37,8 +39,10 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, channelId));
 	const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, channelId ?? ''));
-	const totalPages = countCanvas === undefined ? 0 : Math.ceil(countCanvas / 10);
-	const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+	const pages = useMemo(() => {
+		const totalPages = countCanvas === undefined ? 0 : Math.ceil(countCanvas / 10);
+		return Array.from({ length: totalPages }, (_, index) => index + 1);
+	}, [countCanvas]);
 
 	const filterCanvas = useMemo(() => {
 		return canvases?.filter((canvas) =>
@@ -49,6 +53,25 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 	const handleSearchChange = (text) => {
 		setSearchText(text);
 	};
+	const handleDeleteCanvas = useCallback(async (canvasId: string) => {
+		if (canvasId && channelId && clanId) {
+			const body = {
+				id: canvasId,
+				channel_id: channelId,
+				clan_id: clanId
+			};
+			await dispatch(canvasAPIActions.deleteCanvas(body));
+			dispatch(canvasAPIActions.removeOneCanvas({ channelId, canvasId }));
+		}
+	}, []);
+
+	const handleCopyLink = useCallback((canvasId: string) => {
+		Clipboard.setString(process.env.NX_CHAT_APP_REDIRECT_URI + `/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`);
+		Toast.show({
+			type: 'info',
+			text1: 'Copied canvas link to clipboard'
+		});
+	}, []);
 
 	const renderItem = ({ item, index }) => {
 		return (
@@ -65,6 +88,8 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 						}
 					});
 				}}
+				onPressDelete={handleDeleteCanvas}
+				onCopyLink={handleCopyLink}
 			/>
 		);
 	};
@@ -74,12 +99,14 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 			<CanvasSearch onSearchTextChange={handleSearchChange} />
 			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
 				<View style={styles.container}>
-					<FlashList
-						data={canvases}
-						keyExtractor={(item, index) => `canvas_${index}_${item?.id}`}
-						renderItem={renderItem}
-						estimatedItemSize={size.s_50}
-					/>
+					{!!filterCanvas?.length && (
+						<FlashList
+							data={filterCanvas}
+							keyExtractor={(item, index) => `canvas_${index}_${item?.id}`}
+							renderItem={renderItem}
+							estimatedItemSize={size.s_50}
+						/>
+					)}
 				</View>
 			</ScrollView>
 			<ScrollView horizontal style={styles.horizontalScrollView}>
