@@ -19,6 +19,20 @@ export const style = (colors: Attributes) =>
 		title: {
 			color: colors.text,
 			marginHorizontal: size.s_10,
-			width: '90%'
+			width: '75%'
+		},
+		buttonGroup: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_4
+		},
+		button: {
+			height: size.s_30,
+			width: size.s_30,
+			borderRadius: size.s_15,
+			borderWidth: 1,
+			borderColor: colors.tertiary,
+			justifyContent: 'center',
+			alignItems: 'center'
 		}
 	});

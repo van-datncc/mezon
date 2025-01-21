@@ -44,6 +44,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const [selectedUser, setSelectedUser] = useState<Receiver>(null);
 	const [searchText, setSearchText] = useState<string>('');
+	const [plainTokenCount, setPlainTokenCount] = useState(0);
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
@@ -88,7 +89,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				});
 				return;
 			}
-			if (Number(tokenCount || 0) <= 0) {
+			if (Number(plainTokenCount || 0) <= 0) {
 				Toast.show({
 					type: 'error',
 					text1: 'Token amount must be greater than zero'
@@ -96,7 +97,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				return;
 			}
 
-			if (Number(tokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
 				Toast.show({
 					type: 'error',
 					text1: 'Token amount exceeds wallet balance'
@@ -109,7 +110,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				sender_id: userProfile?.user?.id || '',
 				sender_name: userProfile?.user?.username || '',
 				receiver_id: selectedUser?.id || '',
-				amount: Number(tokenCount || 1),
+				amount: Number(plainTokenCount || 1),
 				note: note || ''
 			};
 
@@ -165,23 +166,20 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 		setSearchText(text);
 	}, 500);
 
-	const handleInputChange = (text) => {
+	const handleInputChange = (text: string) => {
 		let sanitizedText = text.replace(/[^0-9]/g, '');
 
 		if (sanitizedText === '') {
 			setTokenCount('0');
+			setPlainTokenCount(0);
 			return;
 		}
 
 		sanitizedText = sanitizedText.replace(/^0+/, '');
+		const numericValue = parseInt(sanitizedText, 10) || 0;
 
-		if (sanitizedText === '') {
-			setTokenCount('0');
-			return;
-		}
-
-		const formattedText = parseInt(sanitizedText, 10).toLocaleString();
-		setTokenCount(formattedText);
+		setPlainTokenCount(numericValue);
+		setTokenCount(numericValue.toLocaleString());
 	};
 
 	return (
