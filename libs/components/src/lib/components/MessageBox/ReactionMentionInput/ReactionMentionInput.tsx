@@ -60,6 +60,7 @@ import {
 	CHANNEL_INPUT_ID,
 	ChannelMembersEntity,
 	GENERAL_INPUT_ID,
+	IMarkdownOnMessage,
 	IMentionOnMessage,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -78,7 +79,9 @@ import {
 	generateMentionItems,
 	getDisplayMention,
 	insertStringAt,
+	parseHtmlAsFormattedText,
 	parsePastedMentionData,
+	processMarkdownEntities,
 	searchMentionsHashtag,
 	threadError,
 	transformTextWithMentions
@@ -113,7 +116,6 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 import processMention from './processMention';
-import useProcessedContent from './useProcessedContent';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -168,15 +170,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const dataReferencesTopic = useSelector(selectDataReferences(currTopicId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(isNotChannel ? currentChannelId + String(isNotChannel) : (currentChannelId as string));
-	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
+
 	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
-	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = processMention(
-		request?.mentionRaw,
-		rolesClan,
-		membersOfChild as ChannelMembersEntity[],
-		membersOfParent as ChannelMembersEntity[],
-		dataReferences?.message_sender_id || ''
-	);
+
+	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useMemo(() => {
+		return processMention(
+			request?.mentionRaw,
+			rolesClan,
+			membersOfChild as ChannelMembersEntity[],
+			membersOfParent as ChannelMembersEntity[],
+			dataReferences?.message_sender_id || ''
+		);
+	}, [request?.mentionRaw, rolesClan, membersOfChild, membersOfParent, dataReferences?.message_sender_id]);
 
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
@@ -301,14 +306,16 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
+			const { text, entities } = parseHtmlAsFormattedText(request?.content);
+			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
+
 			const payload = {
-				t: request?.content,
+				t: text,
 				hg: hashtagList,
 				ej: emojiList,
-				lk: linkList,
-				mk: markdownList,
-				vk: voiceLinkRoomList
+				mk
 			};
+
 			const addMentionToPayload = addMention(payload, mentionList);
 			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
@@ -457,9 +464,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			request,
 			hashtagList,
 			emojiList,
-			linkList,
-			markdownList,
-			voiceLinkRoomList,
 			mentionData,
 			nameValueThread,
 			props,
@@ -638,7 +642,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
 						draftMention: lastMessageByUserId.mentions ?? [],
-						draftAttachment: lastMessageByUserId.attachments ?? []
+						draftAttachment: lastMessageByUserId.attachments ?? [],
+						draftTopicId: lastMessageByUserId.content.tp as string
 					}
 				})
 			);

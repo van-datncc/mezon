@@ -61,7 +61,8 @@ import {
 	userChannelsActions,
 	usersClanActions,
 	usersStreamActions,
-	voiceActions
+	voiceActions,
+	webhookActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
@@ -123,7 +124,7 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useStore } from 'react-redux';
@@ -749,6 +750,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const ontokensent = useCallback(
 		(tokenEvent: ApiTokenSentEvent) => {
 			dispatch(giveCoffeeActions.handleSocketToken({ currentUserId: userId as string, tokenEvent }));
+			const isReceiverGiveCoffee = tokenEvent.receiver_id === userId;
+			const isSenderGiveCoffee = tokenEvent.sender_id === userId;
+
+			const updateAmount =
+				tokenEvent.amount !== undefined ? (isReceiverGiveCoffee ? tokenEvent.amount : isSenderGiveCoffee ? -tokenEvent.amount : 0) : 0;
+
+			dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 		},
 		[dispatch, userId]
 	);
@@ -1246,6 +1254,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[userId, dispatch]
 	);
 
+	const oneventwebhook = useCallback(
+		async (webhook_event: ApiWebhook) => {
+			if (webhook_event.status === EEventAction.DELETE) {
+				dispatch(webhookActions.removeOneWebhook({ channelId: webhook_event.channel_id || '', webhookId: webhook_event.id || '' }));
+			} else {
+				dispatch(webhookActions.upsertWebhook(webhook_event));
+			}
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1328,6 +1347,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserstatusevent = onuserstatusevent;
 
+			socket.oneventwebhook = oneventwebhook;
+
 			socket.ontokensent = ontokensent;
 
 			socket.onmessagebuttonclicked = onmessagebuttonclicked;
@@ -1373,6 +1394,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncoffeegiven,
 			onroleevent,
 			onuserstatusevent,
+			oneventwebhook,
 			ontokensent,
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd
@@ -1470,6 +1492,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserstatusevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oneventwebhook = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
 		};
 	}, [
@@ -1514,6 +1538,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oncoffeegiven,
 		onroleevent,
 		onuserstatusevent,
+		oneventwebhook,
 		ontokensent
 	]);
 

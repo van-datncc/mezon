@@ -39,7 +39,15 @@ import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
 import { ILongPressType } from '../hooks';
 import { CanvasDataResponse } from './htmlCanvas';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
+import {
+	IBoldMessage,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IPreMessage
+} from './messageLine';
 
 export * from './base';
 export * from './config';
@@ -360,6 +368,8 @@ export interface IMessageSendPayload {
 	ej?: IEmojiOnMessage[];
 	lk?: ILinkOnMessage[];
 	mk?: IMarkdownOnMessage[];
+	pre?: IPreMessage[];
+	bm?: IBoldMessage[];
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	canvas?: CanvasDataResponse;
@@ -630,6 +640,7 @@ export type ChannelDraftMessages = {
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
 	draftAttachment: ApiMessageAttachment[];
+	draftTopicId?: string;
 };
 
 export interface IGifCategory {
@@ -922,7 +933,9 @@ export enum ETokenMessage {
 	HASHTAGS = 'hg',
 	LINKS = 'lk',
 	VOICE_LINKS = 'vk',
-	MARKDOWNS = 'mk'
+	MARKDOWNS = 'mk',
+	PRE = 'pre',
+	BOLD = 'bm'
 }
 export type SearchFilter = {
 	field_name: string;
