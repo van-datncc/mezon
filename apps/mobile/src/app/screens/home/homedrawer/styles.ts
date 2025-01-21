@@ -310,7 +310,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			paddingLeft: size.s_6,
 			marginBottom: size.s_2,
-			paddingRight: size.s_20
+			paddingRight: size.s_28
 		},
 		aboveMessage: {
 			flexDirection: 'row',
@@ -747,6 +747,11 @@ export const style = (colors: Attributes) =>
 		messageText: {
 			color: colors.text,
 			fontSize: size.s_14
+		},
+		forward: {
+			fontSize: size.s_12,
+			color: Colors.gray72,
+			fontStyle: 'italic'
 		},
 		messageTime: { fontSize: size.s_10, color: colors.textDisabled },
 		textMention: {

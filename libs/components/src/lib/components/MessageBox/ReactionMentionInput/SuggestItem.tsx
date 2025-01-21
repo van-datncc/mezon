@@ -62,7 +62,7 @@ const SuggestItem = ({
 	const [specificChannel, setSpecificChannel] = useState<ChannelsEntity | HashtagDm | null>(null);
 	const numberMembersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
 	const checkVoiceStatus = useMemo(() => {
-		if (channelId !== undefined && numberMembersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (channelId !== undefined && numberMembersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			return numberMembersVoice >= 2;
 		}
 		return false;
@@ -90,7 +90,7 @@ const SuggestItem = ({
 			}
 		}
 
-		if (type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Speaker defaultSize="w-5 5-5" />;
 			}

@@ -15,6 +15,7 @@ export { default as Select } from './lib/Select';
 export { default as TextArea } from './lib/TextArea';
 export { default as TimePicker } from './lib/TimePicker';
 
+export { FloatButton } from './lib/FloatButton';
 export * from './lib/Loading';
 export * from './lib/LogOutButton';
 export * from './lib/useMezonUi';

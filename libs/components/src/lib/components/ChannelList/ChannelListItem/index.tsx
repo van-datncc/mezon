@@ -32,6 +32,7 @@ export type ChannelListItemRef = {
 	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
 	channelId: string;
 	channelRef: ChannelLinkRef | null;
+	isInViewport: () => boolean;
 };
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props) => {
@@ -48,7 +49,11 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			listThreadRef.current?.scrollIntoThread(threadId, options);
 		},
 		channelId: channel?.id,
-		channelRef: channelLinkRef.current
+		channelRef: channelLinkRef.current,
+		isInViewport: () => {
+			if (!channelLinkRef.current) return false;
+			return channelLinkRef.current?.isInViewport();
+		}
 	}));
 
 	return (
@@ -79,7 +84,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
 
 	const channelMemberList = useMemo(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
+		if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) return voiceChannelMembers;
 		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
 		return [];
 	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
@@ -117,7 +122,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 
 	const renderChannelContent = useMemo(() => {
 		if (
-			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP && isCategoryExpanded
 		) {

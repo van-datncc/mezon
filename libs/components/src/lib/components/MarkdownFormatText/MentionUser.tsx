@@ -82,6 +82,7 @@ const MentionUser = ({
 		}
 	}, [tagUserName, tagRoleName, tagUserId, tagRoleId, mention]);
 
+	const checkAnonymous = tagUserId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
 	const channelId = isDM ? currentDirectId : currentChannelId;
@@ -106,6 +107,9 @@ const MentionUser = ({
 
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			if (checkAnonymous) {
+				return;
+			}
 			const heightPanel =
 				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
 					? HEIGHT_PANEL_PROFILE
@@ -124,7 +128,7 @@ const MentionUser = ({
 			setIsShowPanelChannel(!showProfileUser);
 			openProfileItem();
 		},
-		[tagRoleId]
+		[checkAnonymous, mode]
 	);
 
 	return (

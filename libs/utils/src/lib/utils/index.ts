@@ -57,6 +57,7 @@ export * from './forceReflow';
 export * from './heavyAnimation';
 export * from './mergeRefs';
 export * from './message';
+export * from './parseHtmlAsFormattedText';
 export * from './resetScroll';
 export * from './schedulers';
 export * from './select';
@@ -1078,3 +1079,14 @@ export function splitPayload(
 
 	return { commonFields, conditionalFields };
 }
+
+export const isElementInViewport = (element: HTMLElement) => {
+	const rect = element.getBoundingClientRect();
+
+	return (
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+	);
+};

@@ -26,18 +26,15 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 			await BootSplash.hide({ fade: true });
 		}, 1);
-		let timer2;
-		requestIdleCallback(() => {
-			const isDisableLoad = load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			const isFromFCM = isDisableLoad?.toString() === 'true';
+		const isDisableLoad = load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		const isFromFCM = isDisableLoad?.toString() === 'true';
 
-			timer2 = setTimeout(
-				async () => {
-					setIsReadyForUse(true);
-				},
-				isFromFCM ? 1 : 2000
-			);
-		});
+		const timer2 = setTimeout(
+			() => {
+				setIsReadyForUse(true);
+			},
+			isFromFCM ? 1 : 2000
+		);
 
 		return () => {
 			clearTimeout(timer);

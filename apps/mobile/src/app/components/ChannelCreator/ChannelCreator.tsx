@@ -80,7 +80,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			return;
 		}
 
-		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 			navigation.dispatch(DrawerActions.closeDrawer());
 			requestAnimationFrame(async () => {
@@ -131,7 +131,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		{
 			title: t('fields.channelType.voice.title'),
 			description: t('fields.channelType.voice.description'),
-			value: ChannelType.CHANNEL_TYPE_VOICE,
+			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE,
 			icon: <Icons.VoiceNormalIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 		},
 		{

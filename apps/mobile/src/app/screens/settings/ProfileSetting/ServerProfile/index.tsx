@@ -66,7 +66,10 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 				},
 				{
 					text: t('changedAlert.discard'),
-					onPress: () => setSelectedClan(clan)
+					onPress: () => {
+						setSelectedClan(clan);
+						onSelectedClan(clan);
+					}
 				}
 			],
 			{ cancelable: false }
@@ -126,7 +129,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 				</View>
 
 				<MezonInput
-					value={clanProfileValue?.displayName}
+					value={clanProfileValue?.displayName || clanProfileValue?.username}
 					onTextChange={(newValue) => onValueChange({ displayName: newValue })}
 					placeHolder={clanProfileValue?.username}
 					maxCharacter={32}

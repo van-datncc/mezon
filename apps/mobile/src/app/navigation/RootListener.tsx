@@ -109,7 +109,7 @@ const RootListener = () => {
 					voiceActions.fetchVoiceChannelMembers({
 						clanId: currentClanId ?? '',
 						channelId: '',
-						channelType: ChannelType.CHANNEL_TYPE_VOICE
+						channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE
 					})
 				)
 			];
