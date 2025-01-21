@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, IThread, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
+import { IMessageWithUser, IThread, LIMIT, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
@@ -63,7 +63,7 @@ const fetchThreadsCached = memoizee(
 		if (defaultResponse) {
 			return { ...defaultResponse, time: Date.now() };
 		}
-		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 10, 0, clanId, threadId, page);
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, LIMIT, 0, clanId, threadId, page);
 		return { ...response, time: Date.now() };
 	},
 	{

@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { CanvasUpdate, ICanvas, LoadingStatus } from '@mezon/utils';
+import { CanvasUpdate, ICanvas, LIMIT, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -7,7 +7,6 @@ import { memoizeAndTrack } from '../memoize';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
-const limitCanvas = 10;
 
 /*
  * Update these interfaces according to your requirements.
@@ -50,7 +49,7 @@ type getCanvasListPayload = {
 
 export const fetchCanvasCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
-		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limitCanvas, page);
+		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, LIMIT, page);
 		return { ...response, time: Date.now() };
 	},
 	{

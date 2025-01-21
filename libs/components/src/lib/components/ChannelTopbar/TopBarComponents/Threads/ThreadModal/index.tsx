@@ -59,7 +59,6 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(keywordSearch)); // is thread joined/public and last message over 30days
 
 	const currentClanId = useSelector(selectCurrentClanId);
-	const totalPages = 10;
 	const [currentPage, setCurrentPage] = useState(1);
 	const isThread = checkIsThread(currentChannel as ChannelsEntity);
 
@@ -68,6 +67,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 			if (!currentChannel?.channel_id || !currentClanId) {
 				return;
 			}
+
 			setCurrentPage(page);
 			const body = {
 				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
@@ -216,19 +216,18 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 					{isEmpty && <EmptyThread onClick={handleCreateThread} />}
 				</div>
-				{totalPages > 1 && (
-					<div className="py-2">
-						<Pagination
-							theme={customTheme(totalPages <= 5)}
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={onPageChange}
-							previousLabel=""
-							nextLabel=""
-							showIcons={totalPages > 5}
-						/>
-					</div>
-				)}
+				<div className="py-2 dark:bg-[#2B2D31] bg-[#F2F3F5]">
+					<Pagination
+						layout="navigation"
+						theme={customTheme(false)}
+						currentPage={currentPage}
+						totalPages={100}
+						onPageChange={onPageChange}
+						previousLabel=""
+						nextLabel=""
+						showIcons={true}
+					/>
+				</div>
 			</div>
 		</div>
 	);
