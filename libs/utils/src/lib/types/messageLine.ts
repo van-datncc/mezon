@@ -19,6 +19,7 @@ export interface IMention {
 	user_id?: string | undefined;
 	role_id?: string | undefined;
 	username?: string | undefined;
+	display?: string;
 }
 
 export interface IHashtag {
