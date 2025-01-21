@@ -57,6 +57,7 @@ export * from './forceReflow';
 export * from './heavyAnimation';
 export * from './mergeRefs';
 export * from './message';
+export * from './parseHtmlAsFormattedText';
 export * from './resetScroll';
 export * from './schedulers';
 export * from './select';
