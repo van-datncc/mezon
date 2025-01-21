@@ -12,7 +12,7 @@ interface ChannelTypeProps {
 
 const labelMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_CHANNEL]: 'Text',
-	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
+	[ChannelType.CHANNEL_TYPE_GMEET_VOICE]: 'Voice',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
 	[ChannelType.CHANNEL_TYPE_APP]: 'Apps',
@@ -24,7 +24,7 @@ const labelMap: Partial<Record<ChannelType, string>> = {
 
 const descriptionMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_CHANNEL]: 'Send messages, images, GIFs, emoji, opinions, and puns',
-	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
+	[ChannelType.CHANNEL_TYPE_GMEET_VOICE]: 'Hang out together with voice, video, and screen share',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the clan',
 	[ChannelType.CHANNEL_TYPE_APP]: 'Apps',
@@ -38,7 +38,7 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 	const theme = useSelector(selectTheme);
 	const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
 		[ChannelType.CHANNEL_TYPE_CHANNEL]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-		[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_GMEET_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Stream defaultSize="w-6 h-6" />,

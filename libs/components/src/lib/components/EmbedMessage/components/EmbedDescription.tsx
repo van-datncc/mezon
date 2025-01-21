@@ -1,7 +1,6 @@
-import { convertMarkdown, EBacktickType, ETokenMessage } from '@mezon/utils';
+import { convertMarkdown, EBacktickType, ETokenMessage, IMarkdownOnMessage, parseHtmlAsFormattedText, processMarkdownEntities } from '@mezon/utils';
 import { useMemo } from 'react';
 import { MarkdownContent } from '../../MarkdownFormatText/MarkdownContent';
-import useProcessedContent from '../../MessageBox/ReactionMentionInput/useProcessedContent';
 import { ElementToken } from '../../MessageWithUser/MessageLine';
 
 interface EmbedDescriptionProps {
@@ -9,8 +8,10 @@ interface EmbedDescriptionProps {
 }
 
 export function EmbedDescription({ description }: EmbedDescriptionProps) {
-	const { markdownList } = useProcessedContent(description);
-	const mkm = Array.isArray(markdownList) ? markdownList.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
+	const { text, entities } = parseHtmlAsFormattedText(description);
+	const markdownList: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
+
+	const mkm = markdownList.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS }));
 	const elements: ElementToken[] = [...mkm].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 	let lastindex = 0;
@@ -21,10 +22,10 @@ export function EmbedDescription({ description }: EmbedDescriptionProps) {
 			const s = element.s ?? 0;
 			const e = element.e ?? 0;
 
-			const contentInElement = description?.substring(s, e);
+			const contentInElement = text?.substring(s, e);
 
 			if (lastindex < s) {
-				formattedContent.push(<p key={`plain-${lastindex}`}>{description?.slice(lastindex, s) ?? ''}</p>);
+				formattedContent.push(<p key={`plain-${lastindex}`}>{text?.slice(lastindex, s) ?? ''}</p>);
 			}
 
 			if (element.kindOf === ETokenMessage.MARKDOWNS) {
@@ -46,8 +47,8 @@ export function EmbedDescription({ description }: EmbedDescriptionProps) {
 			lastindex = e;
 		});
 
-		if (description && lastindex < description?.length) {
-			formattedContent.push(<p key={`plain-${lastindex}-end`}>{description.slice(lastindex)}</p>);
+		if (text && lastindex < text?.length) {
+			formattedContent.push(<p key={`plain-${lastindex}-end`}>{text.slice(lastindex)}</p>);
 		}
 
 		return formattedContent;

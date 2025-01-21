@@ -165,25 +165,44 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 		setSearchText(text);
 	}, 500);
 
+	const handleInputChange = (text) => {
+		let sanitizedText = text.replace(/[^0-9]/g, '');
+
+		if (sanitizedText === '') {
+			setTokenCount('0');
+			return;
+		}
+
+		sanitizedText = sanitizedText.replace(/^0+/, '');
+
+		if (sanitizedText === '') {
+			setTokenCount('0');
+			return;
+		}
+
+		const formattedText = parseInt(sanitizedText, 10).toLocaleString();
+		setTokenCount(formattedText);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView style={styles.form}>
-				<Text style={styles.heading}>Receiver Information</Text>
+				<Text style={styles.heading}>Send Token</Text>
 				<View>
-					<Text style={styles.title}>User name</Text>
+					<Text style={styles.title}>Send Token To ?</Text>
 					<TouchableOpacity style={[styles.textField, { height: size.s_50 }]} onPress={handleOpenBottomSheet}>
 						<Text style={styles.userName}>{selectedUser?.username}</Text>
 					</TouchableOpacity>
 				</View>
 				<View>
-					<Text style={styles.title}>Token count</Text>
+					<Text style={styles.title}>Token</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={styles.textInput}
 							value={tokenCount}
 							keyboardType="numeric"
 							placeholderTextColor="#535353"
-							onChangeText={(text) => setTokenCount(text)}
+							onChangeText={handleInputChange}
 						/>
 					</View>
 				</View>

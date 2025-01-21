@@ -48,7 +48,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 					{data?.channel_label}
 				</Text>
 			</View>
-			{data?.type === ChannelType.CHANNEL_TYPE_VOICE && data?.status === StatusVoiceChannel.No_Active && (
+			{data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && data?.status === StatusVoiceChannel.No_Active && (
 				<ActivityIndicator color={themeValue.white} />
 			)}
 

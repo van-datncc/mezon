@@ -254,7 +254,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			);
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
-			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				const isPublic = checkIsThread(response as ChannelsEntity) ? false : !response.channel_private;
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -1198,7 +1198,7 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 );
 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
-	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE)
+	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE)
 );
 export const selectAllTextChannel = createSelector(selectAllChannels, (channels) =>
 	channels.filter(

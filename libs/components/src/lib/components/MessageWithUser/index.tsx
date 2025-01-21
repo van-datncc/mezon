@@ -168,14 +168,11 @@ function MessageWithUser({
 	}, [mode]);
 
 	const avatar = useMemo(() => {
-		if (isDM && shortUserId.current === message?.sender_id) {
-			return message?.avatar;
-		}
-
 		if (shortUserId.current === message?.sender_id) {
-			return message?.clan_avatar || message?.avatar;
+			return isDM ? message?.avatar : message?.clan_avatar || message?.avatar;
 		}
-	}, [isDM, message?.avatar, message?.clan_avatar, message?.sender_id]);
+		return message?.avatar;
+	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.sender_id]);
 
 	const messageHour = message ? convertTimeHour(message.create_time) : '';
 
