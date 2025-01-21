@@ -124,13 +124,13 @@ const ModalNotificationSetting = (props: ModalParam) => {
 			label: category.category_name,
 			title: 'category'
 		},
-		...category.channels
-			.filter((channel) => channel.type !== 4)
-			.map((channel) => ({
-				id: channel.id,
-				label: `# ${channel.channel_label}`,
-				title: 'channel'
-			}))
+		// ...category.channels
+		// 	.filter((channel) => channel.type !== 4)
+		// 	.map((channel) => ({
+		// 		id: channel.id,
+		// 		label: `# ${channel.channel_label}`,
+		// 		title: 'channel'
+		// 	}))
 	]);
 	const [selectedOption, setSelectedOption] = useState(null);
 	const handleChange = (newValue: any) => {

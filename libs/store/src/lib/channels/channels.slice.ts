@@ -1304,10 +1304,7 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 		}
 	}
 
-	return parentChannels.map((channel) => ({
-		...channel,
-		threads: threadsByParentId.get(channel.channel_id as string) || []
-	})) as ChannelThreads[];
+	return parentChannels.flatMap((channel) => [channel, ...(threadsByParentId.get(channel.channel_id as string) || [])]) as ChannelThreads[];
 });
 
 export const selectBuzzStateByChannelId = createSelector(

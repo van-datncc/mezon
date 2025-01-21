@@ -17,7 +17,7 @@ import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
-import ThreadListChannel, { ListThreadChannelRef } from '../../ThreadListChannel';
+import { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 import { IChannelLinkPermission } from '../CategorizedChannels';
 
@@ -34,13 +34,13 @@ export type ChannelListItemRef = {
 	channelRef: ChannelLinkRef | null;
 };
 
-const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props, ref) => {
+const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props) => {
 	const { channel, isActive, permissions } = props;
 
 	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
 	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
 
-	useImperativeHandle(ref, () => ({
+	useImperativeHandle(null, () => ({
 		scrollIntoChannel: (options: ScrollIntoViewOptions = { block: 'center' }) => {
 			channelLinkRef.current?.scrollIntoView(options);
 		},
@@ -119,12 +119,11 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
-			channel.type !== ChannelType.CHANNEL_TYPE_APP
+			channel.type !== ChannelType.CHANNEL_TYPE_APP && isCategoryExpanded
 		) {
 			return (
 				<>
 					{renderChannelLink()}
-					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
 					{channelMemberList?.length > 0 && (
 						<div className="flex gap-1 px-4">
 							<div className="flex gap-1 h-fit">

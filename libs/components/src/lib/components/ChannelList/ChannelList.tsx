@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useAuth, useCategorizedChannels, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ClansEntity,
 	categoriesActions,
@@ -6,6 +6,7 @@ import {
 	selectChannelById,
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
+	selectCurrentChannelId,
 	selectCurrentClan,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
@@ -16,7 +17,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, EPermission, ICategoryChannel, IChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +25,8 @@ import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
-import { ChannelListItemRef } from './ChannelListItem';
+import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
+import { ThreadLinkWrapper } from '../ThreadListChannel';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -80,10 +82,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		() => [
 			{ type: 'bannerAndEvents' },
 			{ type: 'favorites' },
-			...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => item.channels.length !== 0))
+			...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined))
 		],
 		[categorizedChannels, isShowEmptyCategory]
 	) as ICategoryChannel[];
+	const currentChannelId = useSelector(selectCurrentChannelId)
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const count = data.length;
@@ -156,6 +159,22 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
+	const { userProfile } = useAuth();
+	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.manageChannel
+	]);
+	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+	const permissions = useMemo(
+		() => ({
+			hasAdminPermission,
+			hasClanPermission,
+			hasChannelManagePermission,
+			isClanOwner
+		}),
+		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
+	);
 
 	return (
 		<div
@@ -203,16 +222,41 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 									/>
 								</div>
 							);
-						} else {
+						} else if (item.channels) {
 							return (
-								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<div style={{ padding: '10px 0' }}>
-										<div>
-											<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
-										</div>
-									</div>
+								<div style={{ padding: '10px 0' }} key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
 								</div>
 							);
+						} else {
+							if ((item as IChannel).parrent_id === '0') {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ChannelListItem
+											ref={null}
+											isActive={currentChannelId === item.id}
+											key={item.id}
+											channel={item as ChannelThreads}
+											permissions={permissions}
+										/>
+									</div>
+								);
+							} else {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ThreadLinkWrapper
+											key={item.id}
+											ref={null}
+											isActive={currentChannelId === item.id}
+											thread={item}
+											isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
+											handleClick={() => { }}
+											isCollapsed={false}
+										/>
+									</div>
+								)
+							}
+
 						}
 					})}
 				</div>

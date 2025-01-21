@@ -169,21 +169,6 @@ export function useMarkAsRead() {
 	);
 }
 
-function getChannelsWithBadgeCountCategory(cat: ICategoryChannel) {
-	const allChannelsAndThreads = cat.channels.flatMap((channel: ChannelThreads) => {
-		const threads = channel.threads || [];
-		return [channel, ...threads];
-	});
-
-	const channelsWithBadge = allChannelsAndThreads.filter(
-		(item: ChannelsEntity) =>
-			item?.last_seen_message?.timestamp_seconds &&
-			item?.last_sent_message?.timestamp_seconds &&
-			item.last_seen_message.timestamp_seconds <= item.last_sent_message.timestamp_seconds
-	);
-
-	return channelsWithBadge;
-}
 
 function getThreadWithBadgeCount(channel: ChannelThreads) {
 	return channel.threads || [];

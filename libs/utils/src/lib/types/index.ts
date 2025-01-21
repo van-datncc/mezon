@@ -113,7 +113,7 @@ export type IUsersRole = RoleUserListRoleUser & {
 };
 
 export type ICategoryChannel = ICategory & {
-	channels: IChannel[];
+	channels: string[];
 };
 
 export type IRole = {

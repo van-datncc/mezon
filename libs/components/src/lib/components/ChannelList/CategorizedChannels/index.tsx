@@ -42,10 +42,11 @@ interface DeleteCategoryModalProps {
 
 const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, closeDeleteModal }) => {
 	const { handleDeleteCategory } = useCategory();
-
+	const currentChannel = useSelector(selectCurrentChannel)
 	const confirmDeleteCategory = async () => {
 		await handleDeleteCategory({
-			category: { ...category, channels: category.channels || [] }
+			category: { ...category, channels: [] },
+			currenChannel: currentChannel as IChannel
 		});
 		closeDeleteModal();
 	};
@@ -73,15 +74,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 		EPermission.manageChannel
 	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const permissions = useMemo(
-		() => ({
-			hasAdminPermission,
-			hasClanPermission,
-			hasChannelManagePermission,
-			isClanOwner
-		}),
-		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
-	);
+
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
@@ -93,7 +86,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const [openDeleteCategoryModal, closeDeleteModal] = useModal(() => {
 		return (
 			<DeleteCategoryModal
-				category={{ ...category, category_name: category.category_name || 'Default Name' }}
+				category={{ ...category, category_name: category.category_name || 'Default Name', channels: [] }}
 				closeDeleteModal={closeDeleteModal}
 			/>
 		);
@@ -183,13 +176,11 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	};
 
 	return (
-		<div>
+		<>
 			{category.category_name && (
 				<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
 					<button
-						onClick={() => {
-							handleToggleCategory();
-						}}
+						onClick={handleToggleCategory}
 						className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 					>
 						{categoryExpandState ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
@@ -212,70 +203,8 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>
 			)}
-			<ChannelList
-				channels={category?.channels || []}
-				categoryExpandState={categoryExpandState}
-				channelRefs={channelRefs}
-				permissions={permissions}
-			/>
-		</div>
+		</>
 	);
 };
 export default memo(CategorizedChannels);
 
-type ChannelListProps = {
-	channels: IChannel[];
-	categoryExpandState: boolean;
-	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
-	permissions: IChannelLinkPermission;
-};
-
-const ChannelList: React.FC<ChannelListProps> = ({ channels, categoryExpandState, channelRefs, permissions }) => {
-	const currentChannel = useSelector(selectCurrentChannel);
-	const refItem = useCallback((component: ChannelListItemRef | null) => {
-		channelRefs.current && (channelRefs.current[component?.channelId as string] = component);
-	}, []);
-
-	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
-
-	const isUnreadChannel = (channel: ChannelThreads) => {
-		const isUnreadForChannel =
-			(allChannelMetaEntities[channel.id].isMute !== true &&
-				allChannelMetaEntities[channel.id]?.lastSeenTimestamp < allChannelMetaEntities[channel.id]?.lastSentTimestamp) ||
-			(channel?.count_mess_unread ?? 0) > 0;
-
-		const isUnreadForThreads = channel.threads?.some((thread) => {
-			const threadMeta = allChannelMetaEntities[thread.id];
-			return (
-				(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) || (thread?.count_mess_unread ?? 0) > 0
-			);
-		});
-		return isUnreadForChannel || isUnreadForThreads;
-	};
-
-	return (
-		<div className="mt-[5px] space-y-0.5 text-contentTertiary">
-			{channels.reduce<React.ReactNode[]>((acc, channel) => {
-				const shouldRender =
-					categoryExpandState ||
-					isUnreadChannel(channel as ChannelThreads) ||
-					channel.id === currentChannel?.id ||
-					channel.id === currentChannel?.parrent_id ||
-					channel.type === ChannelType.CHANNEL_TYPE_VOICE;
-
-				if (shouldRender) {
-					acc.push(
-						<ChannelListItem
-							ref={refItem}
-							isActive={currentChannel?.id === channel.id}
-							key={channel.id}
-							channel={channel as ChannelThreads}
-							permissions={permissions}
-						/>
-					);
-				}
-				return acc;
-			}, [])}
-		</div>
-	);
-};
