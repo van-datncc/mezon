@@ -58,6 +58,7 @@ import {
 	isWindowsDesktop,
 	titleMission
 } from '@mezon/utils';
+import ModalConfirm from 'libs/components/src/lib/components/ModalConfirm';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -226,6 +227,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
+	const [isPayment, setIsPayment] = useState(false);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -293,28 +295,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							appChannel.url ?? ''
 						);
 					} else if (eventType === 'SEND_TOKEN') {
-						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
+						const { amount, note, receiver_id, extra_attribute } = {} as any;
+						setIsPayment(true);
 						const tokenEvent: ApiTokenSentEvent = {
-							sender_id: currentUser.userId as string,
-							sender_name: currentUser?.userProfile?.user?.username as string,
 							receiver_id,
 							amount,
 							note,
 							extra_attribute
 						};
-						try {
-							const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
-							miniAppRef.current?.contentWindow?.postMessage(
-								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: response }),
-								appChannel.url ?? ''
-							);
-						} catch (err) {
-							console.error(err);
-							miniAppRef.current?.contentWindow?.postMessage(
-								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: err }),
-								appChannel.url ?? ''
-							);
-						}
+						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
 					} else if (eventType === 'GET_CLAN_ROLES') {
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
@@ -335,6 +324,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			return () => window.removeEventListener('message', handleMessage);
 		}
 	}, [appChannel?.url]);
+
+	const toggleDepositPopup = (type: boolean) => {
+		if (type) {
+			setIsPayment(false);
+			dispatch(giveCoffeeActions.setShowModalSendToken(true));
+		} else {
+			setIsPayment(false);
+		}
+	};
 
 	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
@@ -396,6 +394,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						>
 							<MemberList />
 						</div>
+					)}
+					{isPayment && (
+						<ModalConfirm
+							handleCancel={() => toggleDepositPopup(false)}
+							handleConfirm={() => toggleDepositPopup(true)}
+							buttonColor="bg-primary hover:bg-opacity-80"
+							title={currentChannel.channel_label}
+							customTitle={`${currentChannel.channel_label} requires a deposit to continue playing. Would you like to make a payment?`}
+						/>
 					)}
 
 					{isSearchMessage && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
