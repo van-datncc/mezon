@@ -34,6 +34,7 @@ export const CreateNewChannelModal = () => {
 	const [isErrorAppUrl, setIsErrorAppUrl] = useState<string>('');
 	const [isPrivate, setIsPrivate] = useState<number>(0);
 	const [channelType, setChannelType] = useState<number>(-1);
+	const [channelTypeVoice, setChannelTypeVoice] = useState<number>(ChannelType.CHANNEL_TYPE_MEZON_VOICE);
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const isAppChannel = channelType === ChannelType.CHANNEL_TYPE_APP;
@@ -83,7 +84,12 @@ export const CreateNewChannelModal = () => {
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
 
-		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (
+			newChannelCreatedId &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING
+		) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}
@@ -121,6 +127,11 @@ export const CreateNewChannelModal = () => {
 		setChannelType(value);
 	};
 
+	const onChangeChannelTypeVoice = (value: number) => {
+		setChannelTypeVoice(value);
+		setChannelType(value);
+	};
+
 	const onChangeToggle = (value: number) => {
 		setIsPrivate(value);
 	};
@@ -129,6 +140,7 @@ export const CreateNewChannelModal = () => {
 		setChannelName('');
 		setAppUrl('');
 		setChannelType(-1);
+		setChannelTypeVoice(ChannelType.CHANNEL_TYPE_MEZON_VOICE);
 		setIsPrivate(0);
 	};
 
@@ -190,7 +202,7 @@ export const CreateNewChannelModal = () => {
 										/>
 										<ChannelTypeComponent
 											disable={false}
-											type={ChannelType.CHANNEL_TYPE_GMEET_VOICE}
+											type={channelTypeVoice}
 											onChange={onChangeChannelType}
 											error={isErrorType}
 										/>
@@ -240,18 +252,20 @@ export const CreateNewChannelModal = () => {
 										/>
 									</div>
 								)}
-								{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+								{channelType === channelTypeVoice && (
 									<div className={'mt-2 w-full'}>
 										<ChannelVoicePlatformField
-											ref={appUrlInputRef}
-											onChange={handleAppUrlChannge}
-											channelVoicePlatformProps="Choose meeting platform:"
+											onChange={onChangeChannelTypeVoice}
+											channelVoicePlatformProp="Choose meeting platform:"
+											channelTypeVoiceProp={channelTypeVoice}
 										/>
 									</div>
 								)}
-								{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
-									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-								)}
+								{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+									channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+									channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
+										<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+									)}
 							</div>
 						</div>
 					</div>
@@ -345,34 +359,36 @@ const ChannelAppUrlTextField = forwardRef<ChannelAppUrlModalRef, ChannelAppUrlMo
 });
 
 interface ChannelVoicePlatformModalProps {
-	channelVoicePlatformProps: string;
-	onChange: (value: string) => void;
+	channelVoicePlatformProp: string;
+	onChange: (value: number) => void;
+	channelTypeVoiceProp: number;
 }
 
-type ChannelVoicePlatformRef = {
-	checkInput: () => boolean;
-};
+const ChannelVoicePlatformField: React.FC<ChannelVoicePlatformModalProps> = ({ channelVoicePlatformProp, onChange, channelTypeVoiceProp }) => {
+	const options = [
+		{ label: 'Mezon Meet', value: ChannelType.CHANNEL_TYPE_MEZON_VOICE },
+		{ label: 'Google Meet', value: ChannelType.CHANNEL_TYPE_GMEET_VOICE }
+	];
 
-const ChannelVoicePlatformField = forwardRef<ChannelVoicePlatformRef, ChannelVoicePlatformModalProps>((props, ref) => {
-	const { channelVoicePlatformProps, onChange } = props;
-	const options = ['Google Meet', 'Mezon Meet'];
-	const [selectedPlatform, setSelectedPlatform] = useState<string | null>(options[0]);
+	const handleSelectPlatform = (value: number) => {
+		onChange(value);
+	};
 
-	const handleSelectPlatform = (platform: string) => {
-		setSelectedPlatform(platform);
-		onChange(platform);
+	const getSelectedLabel = () => {
+		const selectedOption = options.find((option) => option.value === channelTypeVoiceProp);
+		return selectedOption?.label;
 	};
 
 	return (
 		<div className="Frame408 self-stretch flex-col justify-start items-start gap-2 flex mt-1">
-			<ChannelLableModal labelProp={channelVoicePlatformProps} />
+			<ChannelLableModal labelProp={channelVoicePlatformProp} />
 			<Dropdown
 				placement={'bottom-start'}
 				label={''}
 				renderTrigger={() => (
 					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
 						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
-							<p>{selectedPlatform}</p>
+							<p>{getSelectedLabel()}</p>
 						</div>
 						<div>
 							<Icons.ArrowDownFill />
@@ -381,16 +397,16 @@ const ChannelVoicePlatformField = forwardRef<ChannelVoicePlatformRef, ChannelVoi
 				)}
 				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'}
 			>
-				{options.map((option) => (
+				{options.map(({ label, value }) => (
 					<Dropdown.Item
-						key={option}
+						key={value}
 						className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
-						onClick={() => handleSelectPlatform(option)}
+						onClick={() => handleSelectPlatform(value)}
 					>
-						<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">{option}</p>
+						<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">{label}</p>
 					</Dropdown.Item>
 				))}
 			</Dropdown>
 		</div>
 	);
-});
+};
