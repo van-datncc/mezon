@@ -148,7 +148,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 
 		addMessage: {
 			position: 'absolute',
-			bottom: size.s_100,
+			bottom: isTablet ? size.s_10 : size.s_100,
 			right: size.s_10,
 			width: size.s_50,
 			height: size.s_50,

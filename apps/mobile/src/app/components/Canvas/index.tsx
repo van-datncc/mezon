@@ -8,14 +8,16 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import CanvasItem from './CanvasItem';
 import CanvasSearch from './CanvasSearch';
 import { style } from './styles';
 
 const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string }) => {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = style(themeValue, isTabletLandscape);
 	const navigation = useNavigation<any>();
 	const dispatch = useAppDispatch();
 	const [searchText, setSearchText] = useState('');

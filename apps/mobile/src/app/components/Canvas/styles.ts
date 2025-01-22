@@ -1,10 +1,10 @@
 import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		scrollView: {
-			height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3)
+			height: (isTabletLandscape ? Dimensions.get('screen').height : Metrics.screenHeight) / (Platform.OS === 'ios' ? 1.4 : 1.3)
 		},
 		contentContainer: {
 			paddingBottom: size.s_50
