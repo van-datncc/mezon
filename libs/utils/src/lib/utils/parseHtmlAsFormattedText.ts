@@ -292,16 +292,20 @@ export const processMarkdownEntities = (text: string | undefined, entities: ApiM
 
 	entities.forEach((entity) => {
 		const key = `${entity.offset + entity.length}-${entity.offset}`;
-		if (!entityMap.has(key) || entity.type === ApiMessageEntityTypes.Pre || entity.type === ApiMessageEntityTypes.Url) {
+		if (
+			!entityMap.has(key) ||
+			entity.type === ApiMessageEntityTypes.Pre ||
+			entity.type === ApiMessageEntityTypes.Url ||
+			entity.type === ApiMessageEntityTypes.TextUrl
+		) {
 			entityMap.set(key, entity);
 		}
 	});
 
 	const filteredEntities = Array.from(entityMap.values());
-
 	return filteredEntities
 		.map((entity) => {
-			if (entity.type === ApiMessageEntityTypes.Url) {
+			if (entity.type === ApiMessageEntityTypes.Url || entity.type === ApiMessageEntityTypes.TextUrl) {
 				const link = text?.substring(entity.offset, entity.offset + entity.length);
 				return {
 					type: link?.startsWith('https://meet.google.com/') ? EBacktickType.VOICE_LINK : EBacktickType.LINK,
