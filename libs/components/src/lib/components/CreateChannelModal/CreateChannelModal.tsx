@@ -1,5 +1,15 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
-import { RootState, channelsActions, createNewChannel, selectCurrentClanId, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	channelsActions,
+	createNewChannel,
+	selectCurrentCategory,
+	selectCurrentClanId,
+	selectIsOpenCreateNewChannel,
+	selectLoadingStatus,
+	selectTheme,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { AlertTitleTextWarning, Icons } from '@mezon/ui';
 import { ValidateURL } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -22,9 +32,9 @@ export const CreateNewChannelModal = () => {
 	const appUrlInputRef = useRef<ChannelAppUrlModalRef>(null);
 	const [isInputError, setIsInputError] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentCategory = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.currentCategory);
-	const isOpenModal = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.isOpenCreateNewChannel);
-	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
+	const currentCategory = useAppSelector((state) => selectCurrentCategory(state));
+	const isOpenModal = useAppSelector((state) => selectIsOpenCreateNewChannel(state));
+	const isLoading = useSelector(selectLoadingStatus);
 	const [validate, setValidate] = useState(true);
 	const [validateUrl, setValidateUrl] = useState(true);
 	const [channelName, setChannelName] = useState<string>('');

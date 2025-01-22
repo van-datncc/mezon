@@ -1,4 +1,4 @@
-import { useDragAndDrop, useIdleRender, usePermissionChecker, useReference } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
@@ -7,7 +7,6 @@ import {
 	ILongPressType,
 	IMessageSendPayload,
 	MAX_FILE_ATTACHMENTS,
-	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	ThreadValue,
 	processFile,
@@ -50,29 +49,29 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 
 	const onConvertToFiles = useCallback(
 		async (content: string) => {
-				const fileContent = new Blob([content], { type: 'text/plain' });
-				const now = Date.now();
-				const filename = now + '.txt';
-				const file = new File([fileContent], filename, { type: 'text/plain' });
+			const fileContent = new Blob([content], { type: 'text/plain' });
+			const now = Date.now();
+			const filename = now + '.txt';
+			const file = new File([fileContent], filename, { type: 'text/plain' });
 
-				if (attachmentFilteredByChannelId?.files?.length + 1 > 10) {
-					setOverUploadingState(true);
-					return;
-				}
+			if (attachmentFilteredByChannelId?.files?.length + 1 > 10) {
+				setOverUploadingState(true);
+				return;
+			}
 
-				dispatch(
-					referencesActions.setAtachmentAfterUpload({
-						channelId: currentChannelId,
-						files: [
-							{
-								filename: file.name,
-								filetype: file.type,
-								size: file.size,
-								url: URL.createObjectURL(file)
-							}
-						]
-					})
-				);	
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					files: [
+						{
+							filename: file.name,
+							filetype: file.type,
+							size: file.size,
+							url: URL.createObjectURL(file)
+						}
+					]
+				})
+			);
 		},
 		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
@@ -116,12 +115,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		event.stopPropagation();
 	};
 
-	const shouldRender = useIdleRender();
 	const [isRecording, setIsRecording] = useState(false);
-
-	const handleStartRecording = useCallback(() => {
-		setIsRecording(true);
-	}, []);
 
 	const handleEndRecording = useCallback(() => {
 		setIsRecording(false);
@@ -131,8 +125,6 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		onStart: () => setIsRecording(true),
 		onFinish: () => setIsRecording(false)
 	});
-
-	if (!shouldRender) return <></>;
 
 	return (
 		<div className="relative max-sm:-pb-2">

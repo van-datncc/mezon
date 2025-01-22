@@ -430,7 +430,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading') {
+			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
 
@@ -521,8 +521,10 @@ export const jumpToMessage = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
-			const isMessageExist = channelMessages.includes(messageId);
-			if (!isMessageExist) {
+			const indexMessage = channelMessages.indexOf(messageId);
+			console.log(indexMessage, 'indexMessage');
+
+			if (indexMessage < 30) {
 				await thunkAPI.dispatch(
 					fetchMessages({
 						clanId: clanId,

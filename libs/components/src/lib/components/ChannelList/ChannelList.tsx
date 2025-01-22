@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -47,13 +47,9 @@ export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
 	const appearanceTheme = useSelector(selectTheme);
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return <></>;
-
 	return (
-		<div onContextMenu={(event) => event.preventDefault()} id="channelList" role="button">
-			{<CreateNewChannelModal />}
+		<div onContextMenu={(event) => event.preventDefault()} id="channelList" className="h-full">
+			<CreateNewChannelModal />
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
 			<div className={`flex-1 space-y-[21px] text-gray-300`}>
 				<RowVirtualizerDynamic appearanceTheme={appearanceTheme} />
@@ -151,7 +147,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	};
 
 	const findScrollIndex = () => {
-		const categoryId = firstChannelWithBadgeCount?.category_id;
+		const categoryId = firstChannelWithBadgeCount?.id;
 		const index = data.findIndex((item) => item.id === categoryId);
 		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
 		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
@@ -167,7 +163,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		const focusChannel = ctrlKFocusChannel;
 		const { id, parentId } = focusChannel as { id: string; parentId: string };
 		const categoryId = channels[id]?.category_id;
-		const index = data.findIndex((item) => item.id === categoryId);
+		const index = data.findIndex((item) => item.id === id);
 		if (index <= 0) return;
 
 		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);

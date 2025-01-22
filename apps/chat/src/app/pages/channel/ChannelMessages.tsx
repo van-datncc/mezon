@@ -4,7 +4,6 @@ import {
 	LoadMoreDirection,
 	isBackgroundModeActive,
 	useContainerHeight,
-	useIdleRender,
 	useLayoutEffectWithPrevDeps,
 	usePermissionChecker,
 	useScrollHooks,
@@ -273,9 +272,6 @@ function ChannelMessages({
 		}
 	}, [dispatch, isJumpingToPresent, channelId, scrollToLastMessage]);
 
-	const shouldRender = useIdleRender();
-	if (!shouldRender) return null;
-
 	return (
 		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 			<ChatMessageList
@@ -494,14 +490,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						!isAlreadyFocusing
 					) {
 						// Break out of `forceLayout`
-						if (!lastItemElement) return;
+						// if (!lastItemElement) return;
 
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
 							// firstUnreadElement
 							// noMessageSendingAnimation
-							if (!shouldScrollToBottom) return;
-
+							// if (!shouldScrollToBottom) return;
 							animateScroll(
 								container,
 								shouldScrollToBottom ? lastItemElement! : null!,

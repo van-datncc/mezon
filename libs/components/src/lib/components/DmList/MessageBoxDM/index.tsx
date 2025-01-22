@@ -1,10 +1,10 @@
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import {
-	RootState,
 	messagesActions,
 	referencesActions,
 	selectDataReferences,
 	selectIsViewingOlderMessagesByChannelId,
+	selectSession,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -34,7 +34,7 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: direct, mode: mode });
 	// TODO: move selector to store
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
