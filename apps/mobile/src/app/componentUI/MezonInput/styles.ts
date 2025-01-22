@@ -42,6 +42,7 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_10,
 			color: colors.textStrong,
 			flexGrow: 1,
+			flexShrink: 1,
 			fontSize: size.medium
 		},
 
