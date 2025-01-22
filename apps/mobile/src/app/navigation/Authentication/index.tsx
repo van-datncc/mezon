@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 import CallingModal from '../../components/CallingModal';
 import StreamingPopup from '../../screens/home/homedrawer/components/StreamingPopup/StreamingPopup';
 import { APP_SCREEN } from '../ScreenTypes';
-import BottomNavigator from './BottomNavigator';
+import BottomNavigatorWrapper from './BottomNavigatorWrapper';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
 import { MenuClanStacks } from './stacks/MenuSererStack';
@@ -31,7 +31,7 @@ export const Authentication = () => {
 					animation: Platform.OS === 'android' ? 'none' : 'default'
 				}}
 			>
-				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />
+				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} options={{ gestureEnabled: false }} />
 				<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
 				<RootStack.Screen name={APP_SCREEN.MESSAGES.STACK} children={(props) => <MessagesStacks {...props} />} />
 				<RootStack.Screen name={APP_SCREEN.NOTIFICATION.STACK} children={(props) => <NotificationStacks {...props} />} />
