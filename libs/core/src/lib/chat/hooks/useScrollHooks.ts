@@ -9,7 +9,7 @@ export enum LoadMoreDirection {
 	Around
 }
 
-export const MESSAGE_LIST_SENSITIVE_AREA = 750;
+export const MESSAGE_LIST_SENSITIVE_AREA = 250;
 
 const FAB_THRESHOLD = 50;
 const NOTCH_THRESHOLD = 1; // Notch has zero height so we at least need a 1px margin to intersect

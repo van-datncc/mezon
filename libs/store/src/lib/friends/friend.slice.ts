@@ -209,3 +209,4 @@ export const selectFriendStatus = (userID: string) =>
 		const friend = selectById(state, userID);
 		return friend?.state;
 	});
+export const selectCurrentTabStatus = createSelector(getFriendsState, (state) => state.currentTabStatus);

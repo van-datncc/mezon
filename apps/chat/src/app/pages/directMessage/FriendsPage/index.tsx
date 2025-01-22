@@ -1,12 +1,11 @@
 import { useEscapeKey, useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
-	RootState,
 	channelsActions,
-	e2eeActions,
 	friendsActions,
 	requestAddFriendParam,
 	selectCloseMenu,
+	selectCurrentTabStatus,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -31,7 +30,7 @@ const FriendsPage = () => {
 	const [showRequestFailedPopup, setShowRequestFailedPopup] = useState(false);
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
-	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
+	const currentTabStatus = useSelector(selectCurrentTabStatus);
 
 	const handleChangeTab = (valueTab: string) => {
 		dispatch(friendsActions.changeCurrentStatusTab(valueTab));
@@ -40,10 +39,6 @@ const FriendsPage = () => {
 
 	const handleOpenRequestFriend = () => {
 		setOpenModalAddFriend(true);
-	};
-
-	const handleOpenModalE2ee = () => {
-		dispatch(e2eeActions.setOpenModalE2ee(true));
 	};
 
 	const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({

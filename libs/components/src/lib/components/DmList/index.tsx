@@ -1,4 +1,4 @@
-import { useFriends, useIdleRender } from '@mezon/core';
+import { useFriends } from '@mezon/core';
 import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import Tippy from '@tippy.js/react';
@@ -13,13 +13,7 @@ export type CategoriesState = Record<string, boolean>;
 
 function DirectMessageList() {
 	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
-	const appearanceTheme = useSelector(selectTheme);
 	const { quantityPendingRequest } = useFriends();
-
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return null;
-
 	return (
 		<>
 			<div className="mt-5 px-2 py-1">
