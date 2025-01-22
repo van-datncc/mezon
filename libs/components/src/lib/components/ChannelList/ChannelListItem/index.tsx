@@ -1,5 +1,5 @@
 import { Avatar } from 'flowbite-react';
-import React, { memo, Ref, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -17,7 +17,6 @@ import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
-import { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 import { IChannelLinkPermission } from '../CategorizedChannels';
 
@@ -38,13 +37,7 @@ export type ChannelListItemRef = {
 const ChannelListItem: React.FC<ChannelListItemProp> = (props) => {
 	const { channel, isActive, permissions } = props;
 
-	return (
-			<ChannelLinkContent
-					channel={channel}
-					isActive={isActive}
-					permissions={permissions}
-			/>
-	);
+	return <ChannelLinkContent channel={channel} isActive={isActive} permissions={permissions} />;
 };
 
 export default memo(ChannelListItem);
@@ -102,7 +95,8 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
-			channel.type !== ChannelType.CHANNEL_TYPE_APP && isCategoryExpanded
+			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
+			isCategoryExpanded
 		) {
 			return (
 				<>

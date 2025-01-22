@@ -40,7 +40,7 @@ interface DeleteCategoryModalProps {
 
 const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, closeDeleteModal }) => {
 	const { handleDeleteCategory } = useCategory();
-	const currentChannel = useSelector(selectCurrentChannel)
+	const currentChannel = useSelector(selectCurrentChannel);
 	const confirmDeleteCategory = async () => {
 		await handleDeleteCategory({
 			category: { ...category, channels: [] },
@@ -72,8 +72,6 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category, channel
 		EPermission.manageChannel
 	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-
-
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
@@ -206,4 +204,3 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category, channel
 	);
 };
 export default memo(CategorizedItem);
-

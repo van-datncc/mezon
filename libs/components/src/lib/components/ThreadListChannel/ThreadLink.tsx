@@ -91,9 +91,9 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			role={'button'}
 			onContextMenu={(event) => handleMouseClick(event)}
 		>
-				<span className={`absolute ${isFirstThread ? 'top-2 left-5' : 'top-[-18px] left-[21px]'} `}>
-					{isFirstThread ? <Icons.ShortCorner /> : <Icons.LongCorner />}
-				</span>
+			<span className={`absolute ${isFirstThread ? 'top-2 left-5' : 'top-[-18px] left-[21px]'} `}>
+				{isFirstThread ? <Icons.ShortCorner /> : <Icons.LongCorner />}
+			</span>
 
 			<Link
 				draggable="false"
