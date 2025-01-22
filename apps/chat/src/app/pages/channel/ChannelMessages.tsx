@@ -65,6 +65,7 @@ type ChannelMessagesProps = {
 	mode: number;
 	userName?: string;
 	userIdsFromThreadBox?: string[];
+	userIdsFromTopicBox?: string[];
 	isThreadBox?: boolean;
 	isTopicBox?: boolean;
 	topicId?: string;
@@ -84,6 +85,7 @@ function ChannelMessages({
 	userName,
 	mode,
 	userIdsFromThreadBox,
+	userIdsFromTopicBox,
 	isThreadBox = false,
 	isTopicBox,
 	isDM,
@@ -92,14 +94,13 @@ function ChannelMessages({
 	const store = useStore();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId));
 	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId2(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const isJumpingToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
 	const isFetching = useSelector(selectMessageIsLoading);
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId, isDM));
-	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
+	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : isTopicBox ? userIdsFromTopicBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const lastMessageId = lastMessage?.id;
@@ -276,11 +277,7 @@ function ChannelMessages({
 	if (!shouldRender) return null;
 
 	return (
-		<MessageContextMenuProvider
-			channelId={channelId}
-			allRolesInClan={allRolesInClan}
-			allUserIdsInChannel={allUserIdsInChannel && allUserIdsInChannel?.length ? allUserIdsInChannel : allUserIds}
-		>
+		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 			<ChatMessageList
 				key={channelId}
 				messageIds={messageIds}

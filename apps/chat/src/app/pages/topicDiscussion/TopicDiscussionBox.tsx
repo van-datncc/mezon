@@ -160,6 +160,7 @@ const TopicDiscussionBox = () => {
 						type={ChannelType.CHANNEL_TYPE_CHANNEL}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						isTopicBox
+						userIdsFromTopicBox={allUserIdsInChannel}
 						topicId={currentTopicId}
 					/>
 				</div>
