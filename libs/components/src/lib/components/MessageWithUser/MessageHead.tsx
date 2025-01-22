@@ -55,10 +55,7 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 		message?.sender_id ?? ''
 	);
 
-	const priorityName = useMemo(() => {
-		if (message.display_name) return message.display_name;
-		return message.username;
-	}, [message.display_name, message.username]);
+	const priorityName = message.display_name ? message.display_name : message.username;
 
 	return (
 		<div className="relative group">

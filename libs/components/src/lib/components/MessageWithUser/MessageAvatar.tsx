@@ -1,6 +1,6 @@
 import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import usePendingNames from './usePendingNames';
 
@@ -28,13 +28,12 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 		message?.clan_avatar
 	);
 
-	const avatarUrl = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return clanAvatar || pendingClanAvatar || pendingUserAvatar;
-		}
-
-		return pendingUserAvatar || message?.avatar || '';
-	}, [mode, clanAvatar, pendingClanAvatar, pendingUserAvatar, message?.avatar]);
+	const avatarUrl =
+		((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? clanAvatar || pendingClanAvatar || pendingUserAvatar
+			: pendingUserAvatar) ||
+			message?.avatar) ??
+		'';
 
 	return (
 		<AvatarImage
