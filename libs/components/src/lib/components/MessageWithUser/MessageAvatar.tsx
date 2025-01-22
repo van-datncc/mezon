@@ -1,4 +1,3 @@
-import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { IMessageWithUser, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo } from 'react';
@@ -13,9 +12,8 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
-	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message.sender_id));
-	const clanAvatar = userClan?.clan_avatar;
-	const generalAvatar = userClan?.user?.avatar_url;
+	const clanAvatar = message?.clan_avatar;
+	const generalAvatar = message?.avatar;
 	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
 		message,
 		undefined,
@@ -30,6 +28,13 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 		message?.clan_avatar
 	);
 
+	const avatarUrl =
+		((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? clanAvatar || pendingClanAvatar || pendingUserAvatar
+			: pendingUserAvatar) ||
+			message?.avatar) ??
+		'';
+
 	return (
 		<AvatarImage
 			onContextMenu={(e) => {
@@ -39,19 +44,8 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 			alt={message.username ?? ''}
 			userName={message.username}
 			data-popover-target="popover-content"
-			srcImgProxy={createImgproxyUrl(
-				((mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-					? clanAvatar || pendingClanAvatar || pendingUserAvatar
-					: pendingUserAvatar) ||
-					message?.avatar) ??
-					'',
-				{ width: 100, height: 100, resizeType: 'fit' }
-			)}
-			src={
-				(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-					? clanAvatar || pendingClanAvatar || pendingUserAvatar
-					: pendingUserAvatar) || message?.avatar
-			}
+			srcImgProxy={createImgproxyUrl(avatarUrl, { width: 100, height: 100, resizeType: 'fit' })}
+			src={avatarUrl}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"
 			isAnonymous={message.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}
