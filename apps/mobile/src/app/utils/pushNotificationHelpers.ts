@@ -211,7 +211,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				const joinAndChangeClan = async (store: any, clanId: string) => {
 					await Promise.all([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
 					]);
 				};
 				await joinAndChangeClan(store, clanId);
