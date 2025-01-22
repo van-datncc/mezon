@@ -1,4 +1,4 @@
-import { useAppNavigation, useCategorizedChannels, useIdleRender, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -9,7 +9,9 @@ import {
 	selectChannelsByClanId,
 	selectChannelsEntities,
 	selectCtrlKFocusChannel,
+	selectCurrentChannelId,
 	selectCurrentClan,
+	selectCurrentUserId,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
@@ -19,16 +21,27 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ICategoryChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
+import {
+	ChannelStatusEnum,
+	ChannelThreads,
+	EPermission,
+	ICategoryChannel,
+	IChannel,
+	createImgproxyUrl,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	toggleDisableHover
+} from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { MentionFloatButton } from '../MentionFloatButton';
-import CategorizedChannels from './CategorizedChannels';
+import { ThreadLinkWrapper } from '../ThreadListChannel';
+import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
-import { ChannelListItemRef } from './ChannelListItem';
+import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -70,7 +83,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-	const categorizedChannels = useCategorizedChannels();
+	const categorizedChannels = useCategorizedChannelsWeb();
 	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const streamPlay = useSelector(selectStatusStream);
@@ -89,10 +102,17 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		() => [
 			{ type: 'bannerAndEvents' },
 			{ type: 'favorites' },
-			...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => item.channels.length !== 0))
+			...(isShowEmptyCategory
+				? categorizedChannels
+				: categorizedChannels.filter(
+						(item) =>
+							((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
+							(item as ICategoryChannel).channels === undefined
+					))
 		],
 		[categorizedChannels, isShowEmptyCategory]
 	) as ICategoryChannel[];
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const count = data.length;
@@ -130,6 +150,16 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		setIsExpandFavorite(!isExpandFavorite);
 	};
 
+	const findScrollIndex = () => {
+		const categoryId = firstChannelWithBadgeCount?.category_id;
+		const index = data.findIndex((item) => item.id === categoryId);
+		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
+		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
+		const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
+
+		return { index, currentScrollIndex, currentScrollPosition, targetScrollPosition };
+	};
+
 	useLayoutEffect(() => {
 		if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
 		if (!virtualizer.getVirtualItems().length) return;
@@ -146,42 +176,40 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
 			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
-		if (id && parentId && parentId !== '0') {
-			if (channelRefs.current[parentId]?.channelRef) {
-				requestAnimationFrame(() => {
-					channelRefs.current[parentId]?.scrollIntoThread(id);
-				});
-			}
-		} else if (id) {
-			if (channelRefs.current[id]?.channelRef) {
-				requestAnimationFrame(() => {
-					channelRefs.current[id]?.scrollIntoChannel();
-				});
-			}
-		}
+
 		setTimeout(() => {
 			dispatch(categoriesActions.setCtrlKFocusChannel(null));
 		}, 100);
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
+	const userId = useSelector(selectCurrentUserId);
+	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.manageChannel
+	]);
+	const isClanOwner = currentClan?.creator_id === userId;
+	const permissions = useMemo(
+		() => ({
+			hasAdminPermission,
+			hasClanPermission,
+			hasChannelManagePermission,
+			isClanOwner
+		}),
+		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
+	);
 
 	const handleScrollChannelIntoView = useCallback(() => {
-		if (!firstChannelWithBadgeCount) return;
-
-		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-			channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
-			return;
+		const { index, currentScrollIndex, currentScrollPosition, targetScrollPosition } = findScrollIndex();
+		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
+			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
-
-		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
 	}, [firstChannelWithBadgeCount]);
 
 	const isChannelRefOutOfViewport = () => {
-		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-			return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
-		}
-		return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+		const { currentScrollIndex } = findScrollIndex();
+		return currentScrollIndex === -1;
 	};
 
 	return (
@@ -231,20 +259,45 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 										isExpandFavorite={isExpandFavorite}
 										handleExpandFavoriteChannel={handleExpandFavoriteChannel}
 										channelFavorites={channelFavorites}
-										channelRefs={channelRefs}
 									/>
 								</div>
 							);
-						} else {
+						} else if (item.channels) {
 							return (
-								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<div style={{ padding: '10px 0' }}>
-										<div>
-											<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
-										</div>
-									</div>
+								<div
+									style={{ padding: '10px 0' }}
+									key={virtualRow.key}
+									data-index={virtualRow.index}
+									ref={virtualizer.measureElement}
+								>
+									<CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
 								</div>
 							);
+						} else {
+							if ((item as IChannel).parrent_id === '0') {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ChannelListItem
+											isActive={currentChannelId === item.id}
+											key={item.id}
+											channel={item as ChannelThreads}
+											permissions={permissions}
+										/>
+									</div>
+								);
+							} else {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ThreadLinkWrapper
+											key={item.id}
+											isActive={currentChannelId === item.id}
+											thread={item}
+											isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
+											isCollapsed={false}
+										/>
+									</div>
+								);
+							}
 						}
 					})}
 				</div>
@@ -256,13 +309,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 const FavoriteChannelsSection = ({
 	isExpandFavorite,
 	handleExpandFavoriteChannel,
-	channelFavorites,
-	channelRefs
+	channelFavorites
 }: {
 	isExpandFavorite: boolean;
 	handleExpandFavoriteChannel: () => void;
 	channelFavorites: string[];
-	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
 }) => (
 	<div>
 		<div
@@ -274,21 +325,16 @@ const FavoriteChannelsSection = ({
 		</div>
 		{isExpandFavorite ? (
 			<div className="w-[94%] mx-auto">
-				{channelFavorites
-					? channelFavorites.map((id, index) => (
-							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-						))
-					: ''}
+				{channelFavorites ? channelFavorites.map((id, index) => <FavoriteChannel key={index} channelId={id} />) : ''}
 			</div>
 		) : null}
 	</div>
 );
 type FavoriteChannelProps = {
 	channelId: string;
-	channelRef: ChannelListItemRef | null;
 };
 
-const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
+const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
 	const channel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();

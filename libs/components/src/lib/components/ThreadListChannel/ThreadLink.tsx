@@ -91,22 +91,16 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			role={'button'}
 			onContextMenu={(event) => handleMouseClick(event)}
 		>
-			{isFirstThread ? (
-				<span className="absolute top-2 left-0">
-					<Icons.ShortCorner />
-				</span>
-			) : (
-				<span className="absolute top-[-16px] left-[1px]">
-					<Icons.LongCorner />
-				</span>
-			)}
+			<span className={`absolute ${isFirstThread ? 'top-2 left-5' : 'top-[-18px] left-[21px]'} `}>
+				{isFirstThread ? <Icons.ShortCorner /> : <Icons.LongCorner />}
+			</span>
 
 			<Link
 				draggable="false"
 				ref={threadLinkRef}
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel || numberNotification > 0 ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
+				className={`${classes[state]} ml-10 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel || numberNotification > 0 ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
 				onClick={() => {
 					handleClick(thread);
 				}}

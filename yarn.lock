@@ -12153,7 +12153,7 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
-mezon-js-protobuf@^1.6.92:
+mezon-js-protobuf@^1.6.93:
   version "1.6.93"
   resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.6.93.tgz#845748787d6bddf38fec5742fef41d96e8e79a8a"
   integrity sha512-zvUE/rfPoZKuKXZAca/9OkL30VJX6ExpiqIULWTda0b0OIrlWDgfkepHmptCw8GGLQ3Gum/O0zIeXM1vJR6kGg==

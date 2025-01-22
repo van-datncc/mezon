@@ -1,5 +1,6 @@
-import { useCategory } from '@mezon/core';
+import { useCategorizedChannelsWeb } from '@mezon/core';
 import {
+	SetDefaultNotificationPayload,
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
 	notificationSettingActions,
@@ -9,11 +10,11 @@ import {
 	selectCurrentClanId,
 	selectDefaultNotificationClan,
 	selectTheme,
-	SetDefaultNotificationPayload,
 	useAppDispatch
 } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import { ThemeApp } from '@mezon/utils';
+import { ICategoryChannel, IChannel, ThemeApp } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Creatable from 'react-select/creatable';
@@ -117,21 +118,16 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const handleNotificationClanChange = (event: any, notification: number) => {
 		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.id, notification_type: notification }));
 	};
-	const { categorizedChannels } = useCategory();
-	const options = categorizedChannels.flatMap((category) => [
-		{
-			id: category.id,
-			label: category.category_name,
-			title: 'category'
-		},
-		...category.channels
-			.filter((channel) => channel.type !== 4)
-			.map((channel) => ({
-				id: channel.id,
-				label: `# ${channel.channel_label}`,
-				title: 'channel'
-			}))
-	]);
+	const categorizedChannels = useCategorizedChannelsWeb();
+	const options = categorizedChannels.map((category) => {
+		if ((category as IChannel).type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+			return {
+				id: category.id,
+				label: (category as IChannel).channel_label || category.category_name,
+				title: (category as ICategoryChannel).channels ? 'category' : 'channel'
+			};
+		}
+	});
 	const [selectedOption, setSelectedOption] = useState(null);
 	const handleChange = (newValue: any) => {
 		setSelectedOption(newValue);

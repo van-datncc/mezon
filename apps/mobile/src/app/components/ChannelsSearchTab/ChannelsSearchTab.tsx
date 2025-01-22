@@ -63,7 +63,9 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 				navigation.navigate(APP_SCREEN.HOME);
-				navigation.dispatch(DrawerActions.openDrawer());
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.openDrawer());
+				}
 			}
 			const clanId = channelData?.clan_id;
 			const store = await getStoreAsync();
@@ -75,20 +77,17 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 				});
 			}
 			if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
-				if (isTabletLandscape) {
-					navigation.goBack();
-				} else {
-					navigation.goBack();
+				const channelId = channelData?.channel_id;
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+				if (!isTabletLandscape) {
 					navigation.dispatch(DrawerActions.closeDrawer());
 				}
-				const channelId = channelData?.channel_id;
+				navigation.goBack();
 
 				timeoutRef.current = setTimeout(async () => {
-					requestAnimationFrame(async () => {
-						await store.dispatch(
-							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true })
-						);
-					});
+					await store.dispatch(
+						channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true })
+					);
 				}, 0);
 
 				// Set cache
