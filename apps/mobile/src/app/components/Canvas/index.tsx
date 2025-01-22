@@ -1,5 +1,13 @@
+import { useAuth } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { canvasAPIActions, selectCanvasCursors, selectCanvasIdsByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import {
+	canvasAPIActions,
+	selectCanvasCursors,
+	selectCanvasIdsByChannelId,
+	selectCurrentChannel,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { normalizeString } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +16,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import CanvasItem from './CanvasItem';
@@ -19,9 +28,11 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 	const { themeValue } = useTheme();
 	const styles = style(themeValue, isTabletLandscape);
 	const navigation = useNavigation<any>();
+	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const [searchText, setSearchText] = useState('');
 	const [canvasPage, setCanvasPage] = useState(1);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	useEffect(() => {
 		fetchCanvas(canvasPage);
@@ -92,6 +103,8 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 				}}
 				onPressDelete={handleDeleteCanvas}
 				onCopyLink={handleCopyLink}
+				currentUser={userProfile}
+				creatorIdChannel={currentChannel?.creator_id}
 			/>
 		);
 	};

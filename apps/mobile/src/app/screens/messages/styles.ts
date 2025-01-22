@@ -124,7 +124,8 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 		friendAvatar: {
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50
+			borderRadius: size.s_20,
+			overlayColor: colors.primary
 		},
 
 		messageContent: {

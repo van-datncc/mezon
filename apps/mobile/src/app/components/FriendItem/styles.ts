@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 		friendAvatar: {
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50
+			borderRadius: 50,
+			overlayColor: colors.secondary
 		},
 		friendItemContent: {
 			flexDirection: 'row',
