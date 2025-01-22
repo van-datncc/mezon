@@ -13,7 +13,7 @@ import {
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
-import { useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
 import { DeviceEventEmitter, Linking, View } from 'react-native';
@@ -65,6 +65,9 @@ const ChannelMessageListener = React.memo(() => {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
 				} else if ([ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
+					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+					await jumpToChannel(channelId, clanId);
 					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
 						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 							disconnect();
@@ -86,7 +89,10 @@ const ChannelMessageListener = React.memo(() => {
 							);
 						}
 					} else {
-						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+						if (currentDirectId) {
+							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+							navigation.dispatch(DrawerActions.closeDrawer());
+						}
 					}
 					if (currentClanId !== clanId) {
 						changeClan(clanId);
@@ -94,9 +100,6 @@ const ChannelMessageListener = React.memo(() => {
 					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
 						isFetchMemberChannelDM: true
 					});
-					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					await jumpToChannel(channelId, clanId);
 				}
 			} catch (error) {
 				/* empty */
