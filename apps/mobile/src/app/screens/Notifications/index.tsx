@@ -210,7 +210,9 @@ const Notifications = () => {
 					save(STORAGE_CLAN_ID, notify?.content?.clan_id);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 					navigation.navigate(APP_SCREEN.HOME as never);
-					navigation.dispatch(DrawerActions.closeDrawer());
+					if (!isTabletLandscape) {
+						navigation.dispatch(DrawerActions.closeDrawer());
+					}
 				}
 				timeoutRef.current = setTimeout(() => {
 					store.dispatch(
@@ -222,6 +224,7 @@ const Notifications = () => {
 					);
 					store.dispatch(appActions.setLoadingMainMobile(false));
 				}, 200);
+				store.dispatch(appActions.setLoadingMainMobile(false));
 				resolve();
 			});
 		});
@@ -235,7 +238,7 @@ const Notifications = () => {
 			const store = await getStoreAsync();
 			await handleNotification(notify, currentClanId, store, navigation);
 		},
-		[currentClanId, navigation]
+		[currentClanId, navigation, isTabletLandscape]
 	);
 
 	const closeBottomSheet = () => {
