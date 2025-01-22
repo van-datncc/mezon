@@ -1,10 +1,9 @@
-import { useAppNavigation, useAuth, useCategorizedChannels, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
 	appActions,
 	categoriesActions,
-	selectAllAccount,
 	selectAllChannelsFavorite,
 	selectChannelById,
 	selectChannelsByClanId,
@@ -22,7 +21,17 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, EPermission, ICategoryChannel, IChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
+import {
+	ChannelStatusEnum,
+	ChannelThreads,
+	EPermission,
+	ICategoryChannel,
+	IChannel,
+	createImgproxyUrl,
+	isLinuxDesktop,
+	isWindowsDesktop,
+	toggleDisableHover
+} from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -93,11 +102,17 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		() => [
 			{ type: 'bannerAndEvents' },
 			{ type: 'favorites' },
-			...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined))
+			...(isShowEmptyCategory
+				? categorizedChannels
+				: categorizedChannels.filter(
+						(item) =>
+							((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
+							(item as ICategoryChannel).channels === undefined
+					))
 		],
 		[categorizedChannels, isShowEmptyCategory]
 	) as ICategoryChannel[];
-	const currentChannelId = useSelector(selectCurrentChannelId)
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const parentRef = useRef<HTMLDivElement>(null);
 	const count = data.length;
@@ -135,6 +150,16 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		setIsExpandFavorite(!isExpandFavorite);
 	};
 
+	const findScrollIndex = () => {
+		const categoryId = firstChannelWithBadgeCount?.category_id;
+		const index = data.findIndex((item) => item.id === categoryId);
+		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
+		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
+		const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
+
+		return { index, currentScrollIndex, currentScrollPosition, targetScrollPosition };
+	};
+
 	useLayoutEffect(() => {
 		if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
 		if (!virtualizer.getVirtualItems().length) return;
@@ -151,26 +176,14 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
 			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
-		if (id && parentId && parentId !== '0') {
-			if (channelRefs.current[parentId]?.channelRef) {
-				requestAnimationFrame(() => {
-					channelRefs.current[parentId]?.scrollIntoThread(id);
-				});
-			}
-		} else if (id) {
-			if (channelRefs.current[id]?.channelRef) {
-				requestAnimationFrame(() => {
-					channelRefs.current[id]?.scrollIntoChannel();
-				});
-			}
-		}
+
 		setTimeout(() => {
 			dispatch(categoriesActions.setCtrlKFocusChannel(null));
 		}, 100);
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
-	const userId  = useSelector(selectCurrentUserId);
+	const userId = useSelector(selectCurrentUserId);
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
@@ -188,21 +201,15 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	);
 
 	const handleScrollChannelIntoView = useCallback(() => {
-		if (!firstChannelWithBadgeCount) return;
-
-		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-			channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
-			return;
+		const { index, currentScrollIndex, currentScrollPosition, targetScrollPosition } = findScrollIndex();
+		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
+			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
-
-		channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
 	}, [firstChannelWithBadgeCount]);
 
 	const isChannelRefOutOfViewport = () => {
-		if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-			return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
-		}
-		return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+		const { currentScrollIndex } = findScrollIndex();
+		return currentScrollIndex === -1;
 	};
 
 	return (
@@ -257,7 +264,12 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 							);
 						} else if (item.channels) {
 							return (
-								<div style={{ padding: '10px 0' }} key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+								<div
+									style={{ padding: '10px 0' }}
+									key={virtualRow.key}
+									data-index={virtualRow.index}
+									ref={virtualizer.measureElement}
+								>
 									<CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
 								</div>
 							);
@@ -284,9 +296,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 											isCollapsed={false}
 										/>
 									</div>
-								)
+								);
 							}
-
 						}
 					})}
 				</div>
@@ -298,8 +309,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 const FavoriteChannelsSection = ({
 	isExpandFavorite,
 	handleExpandFavoriteChannel,
-	channelFavorites,
-
+	channelFavorites
 }: {
 	isExpandFavorite: boolean;
 	handleExpandFavoriteChannel: () => void;
@@ -315,11 +325,7 @@ const FavoriteChannelsSection = ({
 		</div>
 		{isExpandFavorite ? (
 			<div className="w-[94%] mx-auto">
-				{channelFavorites
-					? channelFavorites.map((id, index) => (
-						<FavoriteChannel key={index} channelId={id} />
-					))
-					: ''}
+				{channelFavorites ? channelFavorites.map((id, index) => <FavoriteChannel key={index} channelId={id} />) : ''}
 			</div>
 		) : null}
 	</div>
