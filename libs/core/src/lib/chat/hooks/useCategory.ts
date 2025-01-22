@@ -9,7 +9,7 @@ export function useCategory() {
 	const navigate = useNavigate();
 	const categorizedChannels = useCategorizedChannels();
 	const handleDeleteCategory = useCallback(
-		async ({ category }: { category: ICategoryChannel }) => {
+		async ({ category, currenChannel }: { category: ICategoryChannel; currenChannel: IChannel }) => {
 			const toChannelPage = (channelId: string, clanId: string) => {
 				if (channelId) return `/chat/clans/${clanId}/channels/${channelId}`;
 				return `/chat/clans/${clanId}`;
@@ -24,29 +24,9 @@ export function useCategory() {
 					categoryLabel: category.category_name as string
 				})
 			);
-			const targetIndex = categorizedChannels.findIndex((obj) => obj.id === category.id);
-      console.log('targetIndex: ', targetIndex);
-
-			let channelNavId = '';
-			if (targetIndex !== -1) {
-				if (targetIndex === 0) {
-					// channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
-					if (!channelNavId) {
-						const clanPath = toMembersPage(category.clan_id ?? '');
-						navigate(clanPath);
-						return;
-					}
-				} else if (targetIndex === categorizedChannels.length - 1) {
-					// channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-				} else {
-					// channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-				}
-			}
-
-			if (channelNavId && category.clan_id) {
-				const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
-				navigate(channelPath);
-				return;
+			if (currenChannel.category_id === category.category_id) {
+				const linkPageMember = toMembersPage(category.clan_id || '');
+				navigate(linkPageMember);
 			}
 		},
 		[categorizedChannels]
@@ -61,32 +41,14 @@ export function useCategory() {
 	);
 }
 
-
-
-export function useCategorizedChannels() {
+export function useCategorizedChannelsWeb() {
 	const listChannels = useSelector(selectChannelThreads);
 	const categories = useSelector(selectAllCategories);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	const categorizedChannels = useMemo(() => {
 		const listChannelRender: (ICategoryChannel | IChannel)[] = [];
-		const results = categories.map((category) => {
-			// const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
-
-			// if (category.category_id && categoryIdSortChannel[category.category_id]) {
-			// 	categoryChannels.sort((a, b) => {
-			// 		if (a.channel_label && b.channel_label) {
-			// 			return b.channel_label.localeCompare(a.channel_label);
-			// 		}
-			// 		return 0;
-			// 	});
-			// }
-
-			// return {
-			// 	...category,
-			// 	channels: categoryChannels
-			// };
-
+		categories.map((category) => {
 			const categoryChannels = listChannels.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
 			const listChannelIds = categoryChannels.map((channel) => channel.id);
 
@@ -100,6 +62,36 @@ export function useCategorizedChannels() {
 		});
 
 		return listChannelRender;
+	}, [categories, listChannels, categoryIdSortChannel]);
+
+	return categorizedChannels;
+}
+
+export function useCategorizedChannels() {
+	const listChannels = useSelector(selectChannelThreads);
+	const categories = useSelector(selectAllCategories);
+	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+
+	const categorizedChannels = useMemo(() => {
+		const results = categories.map((category) => {
+			const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
+
+			if (category.category_id && categoryIdSortChannel[category.category_id]) {
+				categoryChannels.sort((a, b) => {
+					if (a.channel_label && b.channel_label) {
+						return b.channel_label.localeCompare(a.channel_label);
+					}
+					return 0;
+				});
+			}
+
+			return {
+				...category,
+				channels: categoryChannels
+			};
+		});
+
+		return results as ICategoryChannel[];
 	}, [categories, listChannels, categoryIdSortChannel]);
 
 	return categorizedChannels;

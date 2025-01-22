@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useCategorizedChannels, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -11,6 +11,7 @@ import {
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectCurrentUserId,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
@@ -25,6 +26,7 @@ import {
 	ChannelThreads,
 	EPermission,
 	ICategoryChannel,
+	IChannel,
 	createImgproxyUrl,
 	isLinuxDesktop,
 	isWindowsDesktop,
@@ -36,7 +38,8 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { MentionFloatButton } from '../MentionFloatButton';
-import CategorizedChannels from './CategorizedChannels';
+import { ThreadLinkWrapper } from '../ThreadListChannel';
+import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
 export type ChannelListProps = { className?: string };
@@ -80,7 +83,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-	const categorizedChannels = useCategorizedChannels();
+	const categorizedChannels = useCategorizedChannelsWeb();
 	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const streamPlay = useSelector(selectStatusStream);
@@ -180,13 +183,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
-	const { userProfile } = useAuth();
+	const userId = useSelector(selectCurrentUserId);
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
 		EPermission.manageChannel
 	]);
-	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+	const isClanOwner = currentClan?.creator_id === userId;
 	const permissions = useMemo(
 		() => ({
 			hasAdminPermission,
@@ -256,35 +259,45 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 										isExpandFavorite={isExpandFavorite}
 										handleExpandFavoriteChannel={handleExpandFavoriteChannel}
 										channelFavorites={channelFavorites}
-										channelRefs={channelRefs}
 									/>
 								</div>
 							);
 						} else if (item.channels) {
 							return (
-								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<div style={{ padding: '10px 0' }}>
-										<div>
-											<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
-										</div>
-									</div>
+								<div
+									style={{ padding: '10px 0' }}
+									key={virtualRow.key}
+									data-index={virtualRow.index}
+									ref={virtualizer.measureElement}
+								>
+									<CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
 								</div>
 							);
 						} else {
-							// const refItem = useCallback((component: ChannelListItemRef | null) => {
-							//   channelRefs.current && (channelRefs.current[component?.channelId as string] = component);
-							// }, []);
-							return (
-								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<ChannelListItem
-										ref={null}
-										isActive={currentChannelId === item.id}
-										key={item.id}
-										channel={item as ChannelThreads}
-										permissions={permissions}
-									/>
-								</div>
-							);
+							if ((item as IChannel).parrent_id === '0') {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ChannelListItem
+											isActive={currentChannelId === item.id}
+											key={item.id}
+											channel={item as ChannelThreads}
+											permissions={permissions}
+										/>
+									</div>
+								);
+							} else {
+								return (
+									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+										<ThreadLinkWrapper
+											key={item.id}
+											isActive={currentChannelId === item.id}
+											thread={item}
+											isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
+											isCollapsed={false}
+										/>
+									</div>
+								);
+							}
 						}
 					})}
 				</div>
@@ -296,13 +309,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 const FavoriteChannelsSection = ({
 	isExpandFavorite,
 	handleExpandFavoriteChannel,
-	channelFavorites,
-	channelRefs
+	channelFavorites
 }: {
 	isExpandFavorite: boolean;
 	handleExpandFavoriteChannel: () => void;
 	channelFavorites: string[];
-	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
 }) => (
 	<div>
 		<div
@@ -314,21 +325,16 @@ const FavoriteChannelsSection = ({
 		</div>
 		{isExpandFavorite ? (
 			<div className="w-[94%] mx-auto">
-				{channelFavorites
-					? channelFavorites.map((id, index) => (
-							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
-						))
-					: ''}
+				{channelFavorites ? channelFavorites.map((id, index) => <FavoriteChannel key={index} channelId={id} />) : ''}
 			</div>
 		) : null}
 	</div>
 );
 type FavoriteChannelProps = {
 	channelId: string;
-	channelRef: ChannelListItemRef | null;
 };
 
-const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
+const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
 	const channel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();

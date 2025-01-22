@@ -63,7 +63,9 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 				navigation.navigate(APP_SCREEN.HOME);
-				navigation.dispatch(DrawerActions.openDrawer());
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.openDrawer());
+				}
 			}
 			const clanId = channelData?.clan_id;
 			const store = await getStoreAsync();

@@ -121,7 +121,7 @@ export type IUsersRole = RoleUserListRoleUser & {
 };
 
 export type ICategoryChannel = ICategory & {
-	channels: string[];
+	channels: string[] | IChannel[];
 };
 
 export type IRole = {

@@ -41,6 +41,7 @@ import notifee from '@notifee/react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { AppState, DeviceEventEmitter, InteractionManager, Platform, View } from 'react-native';
+import useTabletLandscape from '../hooks/useTabletLandscape';
 import { handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
 
 const RootListener = () => {
@@ -48,6 +49,7 @@ const RootListener = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
+	const isTabletLandscape = useTabletLandscape();
 	const { handleReconnect } = useContext(ChatContext);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
@@ -56,8 +58,8 @@ const RootListener = () => {
 		if (Platform.OS === 'ios') {
 			setupCallKeep();
 		}
-		setupNotificationListeners(navigation);
-	}, [navigation]);
+		setupNotificationListeners(navigation, isTabletLandscape);
+	}, [navigation, isTabletLandscape]);
 
 	useEffect(() => {
 		if (isLoggedIn) {
