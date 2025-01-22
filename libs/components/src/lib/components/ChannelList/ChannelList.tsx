@@ -86,11 +86,9 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
   const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-  const categorizedChannels = useCategorizedChannelsWeb();
-  const listChannels = useSelector(selectChannelThreads);
-  const categories = useSelector(selectAllCategories);
   const currentClan = useSelector(selectCurrentClan);
   const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id))
+  console.log('listChannelRender: ', listChannelRender);
   const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
   const streamPlay = useSelector(selectStatusStream);
   const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
@@ -103,17 +101,15 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
     channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
   const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
-  const listChannelFavor = useSelector(selectAllChannelsFavorite)
 
-  const channelFavorites = getChannelFavorite({ listChannelClan: channelsInClan, listIdChannelFavor: listChannelFavor })
 
   const data = useMemo(
     () => [
       { type: 'bannerAndEvents' },
       { type: 'favorites' },
-      ...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined))
+      ...(listChannelRender ? (isShowEmptyCategory ? listChannelRender : listChannelRender.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined)) : [])
     ],
-    [categorizedChannels, isShowEmptyCategory]
+    [listChannelRender, isShowEmptyCategory]
   ) as ICategoryChannel[];
   const currentChannelId = useSelector(selectCurrentChannelId)
 
@@ -129,13 +125,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
   const [height, setHeight] = useState(0);
   const clanTopbarEle = 60;
-  const heightTemp = useMemo(() => {
-    const clanFooterEle = document.getElementById('clan-footer');
-    const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
-    const outsideHeight = totalHeight;
-    const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
-    return (window.innerHeight - outsideHeight - titleBarHeight);
-  }, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable])
 
   const calculateHeight = useCallback(() => {
     const clanFooterEle = document.getElementById('clan-footer');
@@ -151,14 +140,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
   useEffect(() => {
     calculateHeight();
-    if (!listChannelRender) {
-      dispatch(listChannelRenderAction.mapListChannelRender({
-        clanId: currentClan?.clan_id || '',
-        listCategory: categories,
-        listChannel: listChannels,
-        listChannelFavor: listChannelFavor
-      }))
-    }
   }, [streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
   const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
@@ -275,16 +256,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
               return (
                 <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
                   <ChannelBannerAndEvents currentClan={currentClan} />
-                </div>
-              );
-            } else if (virtualRow.index === 1) {
-              return (
-                <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-                  {/* <FavoriteChannelsSection
-                    isExpandFavorite={isExpandFavorite}
-                    handleExpandFavoriteChannel={handleExpandFavoriteChannel}
-                    channelFavorites={channelFavorites}
-                  /> */}
                 </div>
               );
             } else if (item.channels) {
