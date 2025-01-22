@@ -1,11 +1,9 @@
 import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-components';
-import { ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigationState } from '@react-navigation/native';
-import React, { memo, useEffect, useMemo, useRef } from 'react';
-import { Animated, Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { memo, useEffect, useRef } from 'react';
+import { Animated } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import Notifications from '../../screens/Notifications';
@@ -17,19 +15,11 @@ import { APP_SCREEN } from '../ScreenTypes';
 
 const TabStack = createBottomTabNavigator();
 
-const BottomNavigator = memo(() => {
+const BottomNavigator = memo(({ isLastActiveTabDm = false }: { isLastActiveTabDm: boolean }) => {
 	const isTabletLandscape = useTabletLandscape();
 	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
-	const { themeValue, themeBasic } = useTheme();
+	const { themeValue } = useTheme();
 	const tabBarTranslateY = useRef(new Animated.Value(0)).current;
-	const routesNavigation = useNavigationState((state) => state?.routes?.[state?.index]);
-
-	const isHomeActive = useMemo(() => {
-		if (routesNavigation?.state?.index === 0) {
-			return true;
-		}
-		return routesNavigation?.name === APP_SCREEN.BOTTOM_BAR && !routesNavigation?.state?.index;
-	}, [routesNavigation]);
 
 	useEffect(() => {
 		Animated.timing(tabBarTranslateY, {
@@ -38,16 +28,6 @@ const BottomNavigator = memo(() => {
 			useNativeDriver: true
 		}).start();
 	}, [isHiddenTab, tabBarTranslateY]);
-
-	useEffect(() => {
-		const statusBarColor = isHiddenTab ? themeValue.primary : themeValue.secondary;
-		const statusBarStyle = themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content';
-
-		if (Platform.OS === 'android') {
-			StatusBar.setBackgroundColor(statusBarColor);
-		}
-		StatusBar.setBarStyle(statusBarStyle);
-	}, [isHiddenTab, themeBasic, themeValue.primary, themeValue.secondary]);
 
 	const AnimatedIcon = ({ color, Icon, focused }) => {
 		const scaleValue = useRef(new Animated.Value(1)).current;
@@ -98,69 +78,67 @@ const BottomNavigator = memo(() => {
 		);
 	};
 	return (
-		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: isHomeActive ? themeValue.primary : themeValue.secondary }}>
-			<TabStack.Navigator
-				screenOptions={{
-					tabBarHideOnKeyboard: true,
-					tabBarStyle: {
-						position: 'absolute',
-						zIndex: isHiddenTab ? -1 : 100,
-						height: size.s_80,
-						paddingHorizontal: 0,
-						transform: [{ translateY: tabBarTranslateY }],
-						paddingBottom: size.s_20,
-						borderTopWidth: 1,
-						elevation: 0,
-						backgroundColor: themeValue.secondary,
-						borderTopColor: themeValue.border
-					},
-					tabBarActiveTintColor: themeValue.textStrong,
-					tabBarInactiveTintColor: themeValue.textDisabled
+		<TabStack.Navigator
+			screenOptions={{
+				tabBarHideOnKeyboard: true,
+				tabBarStyle: {
+					position: 'absolute',
+					zIndex: isHiddenTab ? -1 : 100,
+					height: size.s_80,
+					paddingHorizontal: 0,
+					transform: [{ translateY: tabBarTranslateY }],
+					paddingBottom: size.s_20,
+					borderTopWidth: 1,
+					elevation: 0,
+					backgroundColor: themeValue.secondary,
+					borderTopColor: themeValue.border
+				},
+				tabBarActiveTintColor: themeValue.textStrong,
+				tabBarInactiveTintColor: themeValue.textDisabled
+			}}
+			initialRouteName={isLastActiveTabDm ? APP_SCREEN.MESSAGES.HOME : APP_SCREEN.HOME}
+		>
+			<TabStack.Screen
+				name={APP_SCREEN.HOME}
+				component={HomeScreen}
+				options={{
+					headerShown: false,
+					title: 'Clans',
+					tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+					tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={HomeTab} color={color} focused={focused} />
 				}}
-				initialRouteName={APP_SCREEN.DRAWER_BAR}
-			>
-				<TabStack.Screen
-					name={APP_SCREEN.HOME}
-					component={HomeScreen}
-					options={{
-						headerShown: false,
-						title: 'Clans',
-						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
-						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={HomeTab} color={color} focused={focused} />
-					}}
-				/>
-				<TabStack.Screen
-					name={APP_SCREEN.MESSAGES.HOME}
-					component={isTabletLandscape ? MessagesScreenTablet : MessagesScreen}
-					options={{
-						headerShown: false,
-						title: 'Messages',
-						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
-						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={MessageTab} color={color} focused={focused} />
-					}}
-				/>
-				<TabStack.Screen
-					name={APP_SCREEN.NOTIFICATION.HOME}
-					component={Notifications}
-					options={{
-						headerShown: false,
-						title: 'Notifications',
-						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
-						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={NotiTab} color={color} focused={focused} />
-					}}
-				/>
-				<TabStack.Screen
-					name={APP_SCREEN.PROFILE.HOME}
-					component={ProfileScreen}
-					options={{
-						headerShown: false,
-						title: 'Profile',
-						tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
-						tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={ProfileTab} color={color} focused={focused} />
-					}}
-				/>
-			</TabStack.Navigator>
-		</SafeAreaView>
+			/>
+			<TabStack.Screen
+				name={APP_SCREEN.MESSAGES.HOME}
+				component={isTabletLandscape ? MessagesScreenTablet : MessagesScreen}
+				options={{
+					headerShown: false,
+					title: 'Messages',
+					tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+					tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={MessageTab} color={color} focused={focused} />
+				}}
+			/>
+			<TabStack.Screen
+				name={APP_SCREEN.NOTIFICATION.HOME}
+				component={Notifications}
+				options={{
+					headerShown: false,
+					title: 'Notifications',
+					tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+					tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={NotiTab} color={color} focused={focused} />
+				}}
+			/>
+			<TabStack.Screen
+				name={APP_SCREEN.PROFILE.HOME}
+				component={ProfileScreen}
+				options={{
+					headerShown: false,
+					title: 'Profile',
+					tabBarLabelStyle: { fontWeight: '600', top: -size.s_2 },
+					tabBarIcon: ({ color, focused }) => <AnimatedIcon Icon={ProfileTab} color={color} focused={focused} />
+				}}
+			/>
+		</TabStack.Navigator>
 	);
 });
 
