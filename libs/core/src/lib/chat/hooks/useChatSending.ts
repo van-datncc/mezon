@@ -3,15 +3,19 @@ import {
 	selectAllAccount,
 	selectAnonymousMode,
 	selectCurrentTopicId,
+	selectCurrentTopicInitMessage,
 	selectIsFocusOnChannelInput,
 	selectIsShowCreateTopic,
+	selectMemberClanByUserId2,
 	topicsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, checkTokenOnMarkdown } from '@mezon/utils';
-import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useMemo } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api.gen';
+import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export type UseChatSendingOptions = {
@@ -29,9 +33,39 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
 	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
 	const userProfile = useSelector(selectAllAccount);
+
+	const profileInTheClan = useAppSelector((state) => selectMemberClanByUserId2(state, userProfile?.user?.id ?? ''));
+	const priorityAvatar =
+		mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? profileInTheClan?.clan_avatar
+				? profileInTheClan?.clan_avatar
+				: userProfile?.user?.avatar_url
+			: userProfile?.user?.avatar_url;
+
+	const priorityDisplayName = userProfile?.user?.display_name ? userProfile?.user?.display_name : userProfile?.user?.username;
+	const priorityNameToShow =
+		mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? profileInTheClan?.clan_nick
+				? profileInTheClan?.clan_nick
+				: priorityDisplayName
+			: priorityDisplayName;
+
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector(selectAnonymousMode);
+	const initMessageOfTopic = useSelector(selectCurrentTopicInitMessage);
 	const { clientRef, sessionRef, socketRef } = useMezon();
+
+	const createTopic = useCallback(async () => {
+		const body: ApiSdTopicRequest = {
+			clan_id: getClanId as string,
+			channel_id: channelIdOrDirectId as string,
+			message_id: initMessageOfTopic?.id as string
+		};
+
+		const topic = (await dispatch(topicsActions.createTopic(body))).payload as ApiSdTopic;
+		dispatch(topicsActions.setCurrentTopicId(topic.id || ''));
+		return topic;
+	}, [channelIdOrDirectId, dispatch, getClanId, initMessageOfTopic?.id]);
 
 	const sendMessage = React.useCallback(
 		async (
@@ -59,6 +93,38 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				ej: validEmojiList
 			};
 			if (!isFocusOnChannelInput && isShowCreateTopic) {
+				if (!currentTopicId) {
+					const topic = (await createTopic()) as ApiSdTopic;
+					if (topic) {
+						dispatch(
+							topicsActions.handleSendTopic({
+								clanId: getClanId as string,
+								channelId: channelIdOrDirectId as string,
+								mode: mode,
+								anonymous: false,
+								attachments: attachments,
+								code: 0,
+								content: validatedContent,
+								isMobile: isMobile,
+								isPublic: isPublic,
+								mentionEveryone: mentionEveryone,
+								mentions: validMentionList,
+								references: references,
+								topicId: topic?.id as string
+							})
+						);
+						dispatch(
+							messagesActions.updateToBeTopicMessage({
+								channelId: channelIdOrDirectId as string,
+								messageId: initMessageOfTopic?.id as string,
+								topicId: topic.id as string,
+								creatorId: userProfile?.user?.id as string
+							})
+						);
+						return;
+					}
+				}
+
 				dispatch(
 					topicsActions.handleSendTopic({
 						clanId: getClanId as string,
@@ -91,14 +157,29 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
-					avatar: userProfile?.user?.avatar_url,
+					avatar: priorityAvatar,
 					isMobile,
-					username: userProfile?.user?.display_name,
+					username: priorityNameToShow,
 					code: code
 				})
 			);
 		},
-		[dispatch, channelIdOrDirectId, getClanId, mode, isPublic, currentUserId]
+		[
+			isFocusOnChannelInput,
+			isShowCreateTopic,
+			dispatch,
+			channelIdOrDirectId,
+			getClanId,
+			mode,
+			isPublic,
+			currentUserId,
+			priorityAvatar,
+			priorityNameToShow,
+			currentTopicId,
+			createTopic,
+			initMessageOfTopic?.id,
+			userProfile?.user?.id
+		]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {

@@ -353,7 +353,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"
 				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => { }}
+				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
 			>
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
