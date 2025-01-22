@@ -1,11 +1,11 @@
 import { useCategory } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
-import { categorySettingList, ItemObjProps } from '../ClanSettings/ItemObj';
+import { useSelector } from 'react-redux';
+import { ItemObjProps, categorySettingList } from '../ClanSettings/ItemObj';
 import SettingItem from '../ClanSettings/SettingItem';
 import ModalConfirm from '../ModalConfirm';
-import { useSelector } from 'react-redux';
-import { selectCurrentChannel } from '@mezon/store';
 
 interface ICategorySettingSidebarProps {
 	onClickItem: (settingItem: ItemObjProps) => void;
@@ -24,7 +24,7 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({
 }) => {
 	const [showModal, setShowModal] = useState(false);
 	const { handleDeleteCategory } = useCategory();
-	const currenChannel = useSelector(selectCurrentChannel)
+	const currenChannel = useSelector(selectCurrentChannel);
 	const handleClickButtonSidebar = (setting: ItemObjProps) => {
 		onClickItem(setting);
 	};

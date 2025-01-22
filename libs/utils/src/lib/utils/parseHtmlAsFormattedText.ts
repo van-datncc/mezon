@@ -60,7 +60,15 @@ export const ENTITY_CLASS_BY_NODE_NAME: Record<string, ApiMessageEntityTypes> = 
 
 const MAX_TAG_DEEPNESS = 3;
 
+export function escapeHtml(html: string) {
+	const fragment = document.createElement('div');
+	const text = document.createTextNode(html);
+	fragment.appendChild(text);
+	return fragment.innerHTML;
+}
+
 export function parseHtmlAsFormattedText(html: string): ApiFormattedText {
+	html = escapeHtml(html);
 	const fragment = document.createElement('div');
 	fragment.innerHTML = parseMarkdown(parseMarkdownLinks(html));
 	fixImageContent(fragment);
@@ -117,6 +125,9 @@ export function fixImageContent(fragment: HTMLDivElement) {
 function parseMarkdown(html: string) {
 	let parsedHtml = html.slice(0);
 
+	// Define a regex to match mentions
+	const mentionRegex = /@\[(.*?)\]\(\d+\)/g;
+
 	// Strip redundant nbsp's
 	parsedHtml = parsedHtml.replace(/&nbsp;/g, ' ');
 
@@ -131,35 +142,46 @@ function parseMarkdown(html: string) {
 	parsedHtml = parsedHtml.replace(/<\/div>/g, '');
 
 	// Pre
-	parsedHtml = parsedHtml.replace(/^`{3}(.*?)[\n\r](.*?[\n\r]?)`{3}/gms, '<pre data-language="$1">$2</pre>');
-	parsedHtml = parsedHtml.replace(/^`{3}[\n\r]?(.*?)[\n\r]?`{3}/gms, '<pre>$1</pre>');
-	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, '<pre>$1</pre>');
 
-	// Code
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, '<code>$2</code>');
+	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, (match, p1, offset) => {
+		let data = '';
+		if (mentionRegex.test(p1)) {
+			data = match
+				.replace(mentionRegex, (match, display) => {
+					return '@' + display;
+				})
+				.replace(/`/g, `'`);
+		}
+		return data || `<pre>${p1}</pre>`;
+	});
 
-	// Custom Emoji markdown tag
-	// if (!IS_EMOJI_SUPPORTED) {
-	// 	// Prepare alt text for custom emoji
-	// 	parsedHtml = parsedHtml.replace(/\[<img[^>]+alt="([^"]+)"[^>]*>]/gm, '[$1]');
-	// }
-	parsedHtml = parsedHtml.replace(
-		/(?!<(?:code|pre)[^<]*|<\/)\[([^\]\n]+)\]\(customEmoji:(\d+)\)(?![^<]*<\/(?:code|pre)>)/g,
-		'<img alt="$1" data-document-id="$2">'
-	);
+	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, (match, p1, p2) => {
+		let data = '';
+		if (mentionRegex.test(p2)) {
+			data = match.replace(mentionRegex, (_, display) => {
+				return '@' + display;
+			});
+		}
+		return data || `<code>${p2}</code>`;
+	});
 
-	// Other simple markdown
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*\n]+)[*]{2}(?![^<]*<\/(code|pre)>)/g, '<b>$2</b>');
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[_]{2}([^_\n]+)[_]{2}(?![^<]*<\/(code|pre)>)/g, '<i>$2</i>');
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[~]{2}([^~\n]+)[~]{2}(?![^<]*<\/(code|pre)>)/g, '<s>$2</s>');
-	parsedHtml = parsedHtml.replace(
-		/(?!<(code|pre)[^<]*|<\/)[|]{2}([^|\n]+)[|]{2}(?![^<]*<\/(code|pre)>)/g,
-		`<span data-entity-type="${ApiMessageEntityTypes.Spoiler}">$2</span>`
-	);
+	// Process bold markdown, but skip mentions
+	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*\n]+)[*]{2}(?![^<]*<\/(code|pre)>)/g, (match, p1, p2) => {
+		let data = '';
+		if (mentionRegex.test(p2)) {
+			data = match.replace(mentionRegex, (_, display) => {
+				return display;
+			});
+		}
+		return data || `<b>${p2}</b>`;
+	});
+
+	parsedHtml = parsedHtml.replace(mentionRegex, (_, display) => {
+		return '@' + display;
+	});
 
 	return parsedHtml;
 }
-
 const LINK_TEMPLATE = /(?<!<a\s+href="[^"]*">[^<]*)(https?:\/\/(?:www\.)?([a-zA-Z0-9][a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(?:\/[^#\s<]+)?)(?![^<]*<\/a>)/g;
 
 function parseMarkdownLinks(html: string) {
@@ -266,9 +288,24 @@ const ENTITY_TYPE_TO_BACKTICK_MAP = {
 export const processMarkdownEntities = (text: string | undefined, entities: ApiMessageEntity[] | undefined): IMarkdownOnMessage[] => {
 	if (!entities) return [];
 
-	return entities
+	const entityMap = new Map<string, ApiMessageEntity>();
+
+	entities.forEach((entity) => {
+		const key = `${entity.offset + entity.length}-${entity.offset}`;
+		if (
+			!entityMap.has(key) ||
+			entity.type === ApiMessageEntityTypes.Pre ||
+			entity.type === ApiMessageEntityTypes.Url ||
+			entity.type === ApiMessageEntityTypes.TextUrl
+		) {
+			entityMap.set(key, entity);
+		}
+	});
+
+	const filteredEntities = Array.from(entityMap.values());
+	return filteredEntities
 		.map((entity) => {
-			if (entity.type === ApiMessageEntityTypes.Url) {
+			if (entity.type === ApiMessageEntityTypes.Url || entity.type === ApiMessageEntityTypes.TextUrl) {
 				const link = text?.substring(entity.offset, entity.offset + entity.length);
 				return {
 					type: link?.startsWith('https://meet.google.com/') ? EBacktickType.VOICE_LINK : EBacktickType.LINK,

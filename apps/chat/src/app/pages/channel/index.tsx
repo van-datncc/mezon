@@ -295,26 +295,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					} else if (eventType === 'SEND_TOKEN') {
 						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
 						const tokenEvent: ApiTokenSentEvent = {
-							sender_id: currentUser.userId as string,
-							sender_name: currentUser?.userProfile?.user?.username as string,
 							receiver_id,
 							amount,
 							note,
 							extra_attribute
 						};
-						try {
-							const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
-							miniAppRef.current?.contentWindow?.postMessage(
-								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: response }),
-								appChannel.url ?? ''
-							);
-						} catch (err) {
-							console.error(err);
-							miniAppRef.current?.contentWindow?.postMessage(
-								JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE', eventData: err }),
-								appChannel.url ?? ''
-							);
-						}
+						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
+						dispatch(giveCoffeeActions.setShowModalSendToken(true));
 					} else if (eventType === 'GET_CLAN_ROLES') {
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
@@ -397,7 +384,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<MemberList />
 						</div>
 					)}
-
 					{isSearchMessage && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 				</div>
 			</div>

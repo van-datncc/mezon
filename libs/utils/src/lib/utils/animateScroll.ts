@@ -59,8 +59,20 @@ function createMutateFunction(
 		forceDuration = 0;
 	}
 
-	const { offsetTop: elementTop, offsetHeight: elementHeight } = element;
-	const { scrollTop: currentScrollTop, offsetHeight: containerHeight, scrollHeight } = container;
+	let elementTop: number;
+	let elementHeight: number;
+	let currentScrollTop: number;
+	let containerHeight: number;
+	let scrollHeight: number;
+
+	try {
+		({ offsetTop: elementTop, offsetHeight: elementHeight } = element);
+		({ scrollTop: currentScrollTop, offsetHeight: containerHeight, scrollHeight } = container);
+	} catch (error) {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		return () => {};
+	}
+
 	const targetContainerHeight =
 		forceNormalContainerHeight && container.dataset.normalHeight ? Number(container.dataset.normalHeight) : containerHeight;
 

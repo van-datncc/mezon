@@ -4,7 +4,6 @@ import {
 	LoadMoreDirection,
 	isBackgroundModeActive,
 	useContainerHeight,
-	useIdleRender,
 	useLayoutEffectWithPrevDeps,
 	usePermissionChecker,
 	useScrollHooks,
@@ -65,6 +64,7 @@ type ChannelMessagesProps = {
 	mode: number;
 	userName?: string;
 	userIdsFromThreadBox?: string[];
+	userIdsFromTopicBox?: string[];
 	isThreadBox?: boolean;
 	isTopicBox?: boolean;
 	topicId?: string;
@@ -84,6 +84,7 @@ function ChannelMessages({
 	userName,
 	mode,
 	userIdsFromThreadBox,
+	userIdsFromTopicBox,
 	isThreadBox = false,
 	isTopicBox,
 	isDM,
@@ -98,7 +99,7 @@ function ChannelMessages({
 	const isFetching = useSelector(selectMessageIsLoading);
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId, isDM));
-	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : getMemberIds;
+	const allUserIdsInChannel = isThreadBox ? userIdsFromThreadBox : isTopicBox ? userIdsFromTopicBox : getMemberIds;
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const lastMessageId = lastMessage?.id;
@@ -270,9 +271,6 @@ function ChannelMessages({
 			});
 		}
 	}, [dispatch, isJumpingToPresent, channelId, scrollToLastMessage]);
-
-	const shouldRender = useIdleRender();
-	if (!shouldRender) return null;
 
 	return (
 		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
@@ -492,12 +490,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						!isAlreadyFocusing
 					) {
 						// Break out of `forceLayout`
-						if (!lastItemElement) return;
+						// if (!lastItemElement) return;
+
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
 							// firstUnreadElement
 							// noMessageSendingAnimation
-
+							// if (!shouldScrollToBottom) return;
 							animateScroll(
 								container,
 								shouldScrollToBottom ? lastItemElement! : null!,

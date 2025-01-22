@@ -1,5 +1,15 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
-import { RootState, channelsActions, createNewChannel, selectCurrentClanId, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	channelsActions,
+	createNewChannel,
+	selectCurrentCategory,
+	selectCurrentClanId,
+	selectIsOpenCreateNewChannel,
+	selectLoadingStatus,
+	selectTheme,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { AlertTitleTextWarning, Icons } from '@mezon/ui';
 import { ValidateURL } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -13,15 +23,18 @@ import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
 
+import { Dropdown } from 'flowbite-react';
+import React from 'react';
+
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
 	const InputRef = useRef<ChannelNameModalRef>(null);
 	const appUrlInputRef = useRef<ChannelAppUrlModalRef>(null);
 	const [isInputError, setIsInputError] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentCategory = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.currentCategory);
-	const isOpenModal = useSelector((state: RootState) => state.channels.byClans[state.clans.currentClanId as string]?.isOpenCreateNewChannel);
-	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
+	const currentCategory = useAppSelector((state) => selectCurrentCategory(state));
+	const isOpenModal = useAppSelector((state) => selectIsOpenCreateNewChannel(state));
+	const isLoading = useSelector(selectLoadingStatus);
 	const [validate, setValidate] = useState(true);
 	const [validateUrl, setValidateUrl] = useState(true);
 	const [channelName, setChannelName] = useState<string>('');
@@ -31,6 +44,7 @@ export const CreateNewChannelModal = () => {
 	const [isErrorAppUrl, setIsErrorAppUrl] = useState<string>('');
 	const [isPrivate, setIsPrivate] = useState<number>(0);
 	const [channelType, setChannelType] = useState<number>(-1);
+	const [channelTypeVoice, setChannelTypeVoice] = useState<number>(ChannelType.CHANNEL_TYPE_MEZON_VOICE);
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const isAppChannel = channelType === ChannelType.CHANNEL_TYPE_APP;
@@ -80,7 +94,12 @@ export const CreateNewChannelModal = () => {
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
 
-		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (
+			newChannelCreatedId &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+			typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING
+		) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}
@@ -118,6 +137,11 @@ export const CreateNewChannelModal = () => {
 		setChannelType(value);
 	};
 
+	const onChangeChannelTypeVoice = (value: number) => {
+		setChannelTypeVoice(value);
+		setChannelType(value);
+	};
+
 	const onChangeToggle = (value: number) => {
 		setIsPrivate(value);
 	};
@@ -126,6 +150,7 @@ export const CreateNewChannelModal = () => {
 		setChannelName('');
 		setAppUrl('');
 		setChannelType(-1);
+		setChannelTypeVoice(ChannelType.CHANNEL_TYPE_MEZON_VOICE);
 		setIsPrivate(0);
 	};
 
@@ -187,7 +212,7 @@ export const CreateNewChannelModal = () => {
 										/>
 										<ChannelTypeComponent
 											disable={false}
-											type={ChannelType.CHANNEL_TYPE_GMEET_VOICE}
+											type={channelTypeVoice}
 											onChange={onChangeChannelType}
 											error={isErrorType}
 										/>
@@ -237,9 +262,20 @@ export const CreateNewChannelModal = () => {
 										/>
 									</div>
 								)}
-								{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
-									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+								{channelType === channelTypeVoice && (
+									<div className={'mt-2 w-full'}>
+										<ChannelVoicePlatformField
+											onChange={onChangeChannelTypeVoice}
+											channelVoicePlatformProp="Choose meeting platform:"
+											channelTypeVoiceProp={channelTypeVoice}
+										/>
+									</div>
 								)}
+								{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+									channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+									channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
+										<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+									)}
 							</div>
 						</div>
 					</div>
@@ -331,3 +367,56 @@ const ChannelAppUrlTextField = forwardRef<ChannelAppUrlModalRef, ChannelAppUrlMo
 		</div>
 	);
 });
+
+interface ChannelVoicePlatformModalProps {
+	channelVoicePlatformProp: string;
+	onChange: (value: number) => void;
+	channelTypeVoiceProp: number;
+}
+
+const ChannelVoicePlatformField: React.FC<ChannelVoicePlatformModalProps> = ({ channelVoicePlatformProp, onChange, channelTypeVoiceProp }) => {
+	const options = [
+		{ label: 'Mezon Meet', value: ChannelType.CHANNEL_TYPE_MEZON_VOICE },
+		{ label: 'Google Meet', value: ChannelType.CHANNEL_TYPE_GMEET_VOICE }
+	];
+
+	const handleSelectPlatform = (value: number) => {
+		onChange(value);
+	};
+
+	const getSelectedLabel = () => {
+		const selectedOption = options.find((option) => option.value === channelTypeVoiceProp);
+		return selectedOption?.label;
+	};
+
+	return (
+		<div className="Frame408 self-stretch flex-col justify-start items-start gap-2 flex mt-1">
+			<ChannelLableModal labelProp={channelVoicePlatformProp} />
+			<Dropdown
+				placement={'bottom-start'}
+				label={''}
+				renderTrigger={() => (
+					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
+						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
+							<p>{getSelectedLabel()}</p>
+						</div>
+						<div>
+							<Icons.ArrowDownFill />
+						</div>
+					</div>
+				)}
+				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'}
+			>
+				{options.map(({ label, value }) => (
+					<Dropdown.Item
+						key={value}
+						className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
+						onClick={() => handleSelectPlatform(value)}
+					>
+						<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">{label}</p>
+					</Dropdown.Item>
+				))}
+			</Dropdown>
+		</div>
+	);
+};

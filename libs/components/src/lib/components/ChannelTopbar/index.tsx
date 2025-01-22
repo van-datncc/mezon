@@ -62,17 +62,17 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
 
 	const shouldRender = useIdleRender();
-	if (!shouldRender) return null;
 
 	return (
 		<div
 			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			{isChannelVoice ? (
-				<TopBarChannelVoice channel={channel} />
-			) : (
-				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
-			)}
+			{shouldRender &&
+				(isChannelVoice ? (
+					<TopBarChannelVoice channel={channel} />
+				) : (
+					<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
+				))}
 		</div>
 	);
 });

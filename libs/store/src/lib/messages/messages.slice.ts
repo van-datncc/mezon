@@ -521,8 +521,10 @@ export const jumpToMessage = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
-			const isMessageExist = channelMessages.includes(messageId);
-			if (!isMessageExist) {
+			const indexMessage = channelMessages.indexOf(messageId);
+			console.log(indexMessage, 'indexMessage');
+
+			if (indexMessage < 30) {
 				await thunkAPI.dispatch(
 					fetchMessages({
 						clanId: clanId,
@@ -711,7 +713,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: anonymous ? NX_CHAT_APP_ANNONYMOUS_USER_ID : senderId,
-			username:anonymous ? 'Anonymous' : username || '',
+			username: anonymous ? 'Anonymous' : username || '',
 			avatar: anonymous ? '' : avatar,
 			isSending: true,
 			references: references?.filter((item) => item) || [],

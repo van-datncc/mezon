@@ -8,6 +8,7 @@ import {
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
+	fcmActions,
 	friendsActions,
 	listChannelsByUserActions,
 	listUsersByUserActions,
@@ -31,28 +32,44 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_MY_USER_ID,
+	getAppInfo,
 	load,
 	save,
 	setCurrentClanLoader
 } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import { AppState, DeviceEventEmitter, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
+import useTabletLandscape from '../hooks/useTabletLandscape';
+import { handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
 
 const RootListener = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
+	const isTabletLandscape = useTabletLandscape();
 	const { handleReconnect } = useContext(ChatContext);
 	const dispatch = useAppDispatch();
+	const navigation = useNavigation<any>();
+
+	useEffect(() => {
+		if (Platform.OS === 'ios') {
+			setupCallKeep();
+		}
+		setupNotificationListeners(navigation, isTabletLandscape);
+	}, [navigation, isTabletLandscape]);
 
 	useEffect(() => {
 		if (isLoggedIn) {
 			authLoader();
 			requestIdleCallback(() => {
-				initAppLoading();
-				mainLoader();
+				setTimeout(() => {
+					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
+						console.error('Error in tasks:', error);
+					});
+				}, 100);
 			});
 		}
 	}, [isLoggedIn]);
@@ -168,8 +185,9 @@ const RootListener = () => {
 			const profileResponse = await dispatch(accountActions.getUserProfile());
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
-			const userId = profileResponse?.payload?.user?.id as string;
-			if (userId) save(STORAGE_MY_USER_ID, userId?.toString());
+			const { id = '', username = '' } = profileResponse?.payload?.user || {};
+			if (id) save(STORAGE_MY_USER_ID, id?.toString());
+			await loadFRMConfig(username);
 			if ((profileResponse as unknown as IWithError).error) {
 				console.log('Session expired');
 				return;
@@ -179,13 +197,28 @@ const RootListener = () => {
 		}
 	}, [dispatch]);
 
+	const loadFRMConfig = async (userName: string) => {
+		try {
+			if (!userName) {
+				return;
+			}
+			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
+			if (fcmtoken) {
+				const { app_platform: platform } = appInfo;
+				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: userName, platform }));
+			}
+		} catch (error) {
+			console.error('Error loading FCM config:', error);
+		}
+	};
+
 	const mainLoader = useCallback(async () => {
 		try {
 			const promises = [];
 			promises.push(dispatch(listUsersByUserActions.fetchListUsersByUser({})));
 			promises.push(dispatch(friendsActions.fetchListFriends({})));
 			promises.push(dispatch(clansActions.joinClan({ clanId: '0' })));
-			promises.push(dispatch(directActions.fetchDirectMessage({})));
+			promises.push(dispatch(directActions.fetchDirectMessage({ noCache: true })));
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
 			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			promises.push(dispatch(userStatusActions.getUserStatus()));

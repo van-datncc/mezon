@@ -13,7 +13,7 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
-import { useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform } from 'react-native';
@@ -23,6 +23,7 @@ import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
@@ -40,6 +41,7 @@ export const AuthenticationLoader = () => {
 	const [fileShared, setFileShared] = useState<any>();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
+	const isTabletLandscape = useTabletLandscape();
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -124,6 +126,9 @@ export const AuthenticationLoader = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
+						if (!isTabletLandscape) {
+							navigation.dispatch(DrawerActions.closeDrawer());
+						}
 						requestAnimationFrame(async () => {
 							await navigateToNotification(store, remoteMessage, navigation);
 						});

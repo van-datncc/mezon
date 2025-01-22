@@ -254,7 +254,11 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			);
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
-			if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (
+				response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+				response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+				response.type !== ChannelType.CHANNEL_TYPE_STREAMING
+			) {
 				const isPublic = checkIsThread(response as ChannelsEntity) ? false : !response.channel_private;
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -1310,4 +1314,16 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 export const selectBuzzStateByChannelId = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (state, channelId: string) => channelId],
 	(state, clanId, channelId) => state.byClans[clanId]?.buzzState[channelId]
+);
+
+export const selectLoadingStatus = createSelector([getChannelsState], (state) => state.loadingStatus);
+
+export const selectIsOpenCreateNewChannel = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.isOpenCreateNewChannel ?? false
+);
+
+export const selectCurrentCategory = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.currentCategory
 );
