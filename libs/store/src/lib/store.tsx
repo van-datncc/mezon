@@ -35,6 +35,7 @@ import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChanne
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
+import { CHANNEL_LIST_RENDER, listChannelRenderReducer } from './channels/listChannelRender.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
 import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
@@ -74,297 +75,296 @@ import { topicsReducer } from './topicDiscussion/topicDiscussions.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { CHANNEL_LIST_RENDER, listChannelRenderReducer } from './channels/listChannelRender.slice';
 
 const persistedReducer = persistReducer(
-  {
-    key: 'auth',
-    storage
-  },
-  authReducer
+	{
+		key: 'auth',
+		storage
+	},
+	authReducer
 );
 
 const persistedClansReducer = persistReducer(
-  {
-    key: 'clans',
-    storage,
-    blacklist: ['invitePeople']
-  },
-  clansReducer
+	{
+		key: 'clans',
+		storage,
+		blacklist: ['invitePeople']
+	},
+	clansReducer
 );
 
 const persistedAppReducer = persistReducer(
-  {
-    key: 'apps',
-    storage,
-    blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth', 'isShowCanvas']
-  },
-  appReducer
+	{
+		key: 'apps',
+		storage,
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth', 'isShowCanvas']
+	},
+	appReducer
 );
 
 const persistedEmojiSuggestionReducer = persistReducer(
-  {
-    key: 'suggestionemoji',
-    storage
-  },
-  emojiSuggestionReducer
+	{
+		key: 'suggestionemoji',
+		storage
+	},
+	emojiSuggestionReducer
 );
 
 const persistedCatReducer = persistReducer(
-  {
-    key: 'categories',
-    storage
-  },
-  categoriesReducer
+	{
+		key: 'categories',
+		storage
+	},
+	categoriesReducer
 );
 
 const persistedChannelReducer = persistReducer(
-  {
-    key: 'channels',
-    storage,
-    blacklist: ['request', 'previousChannels']
-  },
-  channelsReducer
+	{
+		key: 'channels',
+		storage,
+		blacklist: ['request', 'previousChannels']
+	},
+	channelsReducer
 );
 
 const persistedThreadReducer = persistReducer(
-  {
-    key: 'threads',
-    storage,
-    blacklist: ['isShowCreateThread', 'isThreadModalVisible']
-  },
-  threadsReducer
+	{
+		key: 'threads',
+		storage,
+		blacklist: ['isShowCreateThread', 'isThreadModalVisible']
+	},
+	threadsReducer
 );
 
 const persistedTopicReducer = persistReducer(
-  {
-    key: 'topicdiscussions',
-    storage,
-    blacklist: ['isShowCreateTopic']
-  },
-  topicsReducer
+	{
+		key: 'topicdiscussions',
+		storage,
+		blacklist: ['isShowCreateTopic']
+	},
+	topicsReducer
 );
 
 const persistedChannelMembersReducer = persistReducer(
-  {
-    key: 'channelmembers',
-    storage,
-    blacklist: ['onlineStatusUser']
-  },
-  channelMembersReducer
+	{
+		key: 'channelmembers',
+		storage,
+		blacklist: ['onlineStatusUser']
+	},
+	channelMembersReducer
 );
 
 const persistedListUsersByUserReducer = persistReducer(
-  {
-    key: 'listusersbyuserid',
-    storage,
-    blacklist: ['onlineStatusUser']
-  },
-  listUsersByUserReducer
+	{
+		key: 'listusersbyuserid',
+		storage,
+		blacklist: ['onlineStatusUser']
+	},
+	listUsersByUserReducer
 );
 
 const persistedListchannelsByUserReducer = persistReducer(
-  {
-    key: 'listchannelbyusers',
-    storage
-  },
-  listchannelsByUserReducer
+	{
+		key: 'listchannelbyusers',
+		storage
+	},
+	listchannelsByUserReducer
 );
 
 const persistedPermissionRoleChannelReducer = persistReducer(
-  {
-    key: 'listpermissionroleschannel',
-    storage
-  },
-  permissionRoleChannelReducer
+	{
+		key: 'listpermissionroleschannel',
+		storage
+	},
+	permissionRoleChannelReducer
 );
 
 const persistedRolesClanReducer = persistReducer(
-  {
-    key: 'rolesclan',
-    storage
-  },
-  RolesClanReducer
+	{
+		key: 'rolesclan',
+		storage
+	},
+	RolesClanReducer
 );
 
 const persistedEventMngtReducer = persistReducer(
-  {
-    key: 'eventmanagement',
-    storage,
-    blacklist: ['ongoingEvent']
-  },
-  eventManagementReducer
+	{
+		key: 'eventmanagement',
+		storage,
+		blacklist: ['ongoingEvent']
+	},
+	eventManagementReducer
 );
 
 const persistedChannelCatSettingReducer = persistReducer(
-  {
-    key: 'notichannelcategorysetting',
-    storage
-  },
-  channelCategorySettingReducer
+	{
+		key: 'notichannelcategorysetting',
+		storage
+	},
+	channelCategorySettingReducer
 );
 
 const persistedPinMsgReducer = persistReducer(
-  {
-    key: 'pinmessages',
-    storage,
-    blacklist: ['isPinModalVisible']
-  },
-  pinMessageReducer
+	{
+		key: 'pinmessages',
+		storage,
+		blacklist: ['isPinModalVisible']
+	},
+	pinMessageReducer
 );
 
 const persistedDefaultNotiClanReducer = persistReducer(
-  {
-    key: 'defaultnotificationclan',
-    storage
-  },
-  defaultNotificationClanReducer
+	{
+		key: 'defaultnotificationclan',
+		storage
+	},
+	defaultNotificationClanReducer
 );
 
 const persistedDefaultNotiCatReducer = persistReducer(
-  {
-    key: 'defaultnotificationcategory',
-    storage
-  },
-  defaultNotificationCategoryReducer
+	{
+		key: 'defaultnotificationcategory',
+		storage
+	},
+	defaultNotificationCategoryReducer
 );
 
 const persistedHashTagDmReducer = persistReducer(
-  {
-    key: 'hashtagdm',
-    storage
-  },
-  hashtagDmReducer
+	{
+		key: 'hashtagdm',
+		storage
+	},
+	hashtagDmReducer
 );
 
 const persistedNotiReactMsgReducer = persistReducer(
-  {
-    key: 'notifireactmessage',
-    storage
-  },
-  notifiReactMessageReducer
+	{
+		key: 'notifireactmessage',
+		storage
+	},
+	notifiReactMessageReducer
 );
 
 const persistedGifsStickerEmojiReducer = persistReducer(
-  {
-    key: 'gifsstickersemojis',
-    storage,
-    blacklist: ['subPanelActive']
-  },
-  gifsStickerEmojiReducer
+	{
+		key: 'gifsstickersemojis',
+		storage,
+		blacklist: ['subPanelActive']
+	},
+	gifsStickerEmojiReducer
 );
 
 const persistedChannelMetaReducer = persistReducer(
-  {
-    key: 'channelmeta',
-    storage
-  },
-  channelMetaReducer
+	{
+		key: 'channelmeta',
+		storage
+	},
+	channelMetaReducer
 );
 
 const persistedsettingClanStickerReducer = persistReducer(
-  {
-    key: 'settingSticker',
-    storage,
-    blacklist: ['hasGrandchildModal']
-  },
-  settingStickerReducer
+	{
+		key: 'settingSticker',
+		storage,
+		blacklist: ['hasGrandchildModal']
+	},
+	settingStickerReducer
 );
 
 const persisteduserChannelsReducer = persistReducer(
-  {
-    key: 'allUsersByAddChannel',
-    storage
-  },
-  userChannelsReducer
+	{
+		key: 'allUsersByAddChannel',
+		storage
+	},
+	userChannelsReducer
 );
 
 const persistedOnboardingReducer = persistReducer(
-  {
-    key: ONBOARDING_FEATURE_KEY,
-    storage,
-    whitelist: ['keepAnswers', 'answerByClanId']
-  },
-  onboardingReducer
+	{
+		key: ONBOARDING_FEATURE_KEY,
+		storage,
+		whitelist: ['keepAnswers', 'answerByClanId']
+	},
+	onboardingReducer
 );
 const reducer = {
-  app: persistedAppReducer,
-  account: accountReducer,
-  auth: persistedReducer,
-  attachments: attachmentReducer,
-  clans: persistedClansReducer,
-  channels: persistedChannelReducer,
-  channelmeta: persistedChannelMetaReducer,
-  settingSticker: persistedsettingClanStickerReducer,
-  allUsersByAddChannel: persisteduserChannelsReducer,
-  listchannelbyusers: persistedListchannelsByUserReducer,
-  listpermissionroleschannel: persistedPermissionRoleChannelReducer,
-  channelMembers: persistedChannelMembersReducer,
-  listusersbyuserid: persistedListUsersByUserReducer,
-  threads: persistedThreadReducer,
-  topicdiscussions: persistedTopicReducer,
-  [SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-  messages: messagesReducer,
-  categories: persistedCatReducer,
-  rolesclan: persistedRolesClanReducer,
-  eventmanagement: persistedEventMngtReducer,
-  usersClan: usersClanReducer,
-  [POLICIES_FEATURE_KEY]: policiesReducer,
-  userClanProfile: userClanProfileReducer,
-  friends: friendsReducer,
-  direct: directReducer,
-  directmeta: directMetaReducer,
-  roleId: roleIdReducer,
-  policiesDefaultSlice: policiesDefaultReducer,
-  [OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
-  notificationsetting: notificationSettingReducer,
-  pinmessages: persistedPinMsgReducer,
-  defaultnotificationclan: persistedDefaultNotiClanReducer,
-  defaultnotificationcategory: persistedDefaultNotiCatReducer,
-  notichannelcategorysetting: persistedChannelCatSettingReducer,
-  hashtagdm: persistedHashTagDmReducer,
-  notifireactmessage: persistedNotiReactMsgReducer,
-  invite: inviteReducer,
-  isshow: IsShowReducer,
-  forwardmessage: popupForwardReducer,
-  notification: notificationReducer,
-  voice: voiceReducer,
-  usersstream: usersStreamReducer,
-  videostream: videoStreamReducer,
-  canvas: canvasReducer,
-  canvasapi: canvasAPIReducer,
-  activitiesapi: activitiesAPIReducer,
-  auditlog: auditLogReducer,
-  audiocall: audioCallReducer,
-  fcm: fcmReducer,
-  auditlogfilter: auditLogFilterReducer,
-  references: referencesReducer,
-  reaction: reactionReducer,
-  suggestionEmoji: persistedEmojiSuggestionReducer,
-  gifs: gifsReducer,
-  gifsStickersEmojis: persistedGifsStickerEmojiReducer,
-  dragAndDrop: dragAndDropReducer,
-  [ERRORS_FEATURE_KEY]: errorsReducer,
-  [TOASTS_FEATURE_KEY]: toastsReducer,
-  integrationWebhook: integrationWebhookReducer,
-  integrationClanWebhook: integrationClanWebhookReducer,
-  adminApplication: adminApplicationReducer,
-  systemMessages: systemMessageReducer,
-  giveCoffee: giveCoffeeReducer,
-  settingClanChannel: settingChannelReducer,
-  clanMembersMeta: clanMembersMetaReducer,
-  directmembersmeta: directMembersMetaReducer,
-  [ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
-  dmcall: DMCallReducer,
-  [USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
-  [E2EE_FEATURE_KEY]: e2eeReducer,
-  [EMBED_MESSAGE]: embedReducer,
-  walletLedger: walletLedgerReducer,
-  [CHANNEL_LIST_RENDER]: listChannelRenderReducer
+	app: persistedAppReducer,
+	account: accountReducer,
+	auth: persistedReducer,
+	attachments: attachmentReducer,
+	clans: persistedClansReducer,
+	channels: persistedChannelReducer,
+	channelmeta: persistedChannelMetaReducer,
+	settingSticker: persistedsettingClanStickerReducer,
+	allUsersByAddChannel: persisteduserChannelsReducer,
+	listchannelbyusers: persistedListchannelsByUserReducer,
+	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
+	channelMembers: persistedChannelMembersReducer,
+	listusersbyuserid: persistedListUsersByUserReducer,
+	threads: persistedThreadReducer,
+	topicdiscussions: persistedTopicReducer,
+	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
+	messages: messagesReducer,
+	categories: persistedCatReducer,
+	rolesclan: persistedRolesClanReducer,
+	eventmanagement: persistedEventMngtReducer,
+	usersClan: usersClanReducer,
+	[POLICIES_FEATURE_KEY]: policiesReducer,
+	userClanProfile: userClanProfileReducer,
+	friends: friendsReducer,
+	direct: directReducer,
+	directmeta: directMetaReducer,
+	roleId: roleIdReducer,
+	policiesDefaultSlice: policiesDefaultReducer,
+	[OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
+	notificationsetting: notificationSettingReducer,
+	pinmessages: persistedPinMsgReducer,
+	defaultnotificationclan: persistedDefaultNotiClanReducer,
+	defaultnotificationcategory: persistedDefaultNotiCatReducer,
+	notichannelcategorysetting: persistedChannelCatSettingReducer,
+	hashtagdm: persistedHashTagDmReducer,
+	notifireactmessage: persistedNotiReactMsgReducer,
+	invite: inviteReducer,
+	isshow: IsShowReducer,
+	forwardmessage: popupForwardReducer,
+	notification: notificationReducer,
+	voice: voiceReducer,
+	usersstream: usersStreamReducer,
+	videostream: videoStreamReducer,
+	canvas: canvasReducer,
+	canvasapi: canvasAPIReducer,
+	activitiesapi: activitiesAPIReducer,
+	auditlog: auditLogReducer,
+	audiocall: audioCallReducer,
+	fcm: fcmReducer,
+	auditlogfilter: auditLogFilterReducer,
+	references: referencesReducer,
+	reaction: reactionReducer,
+	suggestionEmoji: persistedEmojiSuggestionReducer,
+	gifs: gifsReducer,
+	gifsStickersEmojis: persistedGifsStickerEmojiReducer,
+	dragAndDrop: dragAndDropReducer,
+	[ERRORS_FEATURE_KEY]: errorsReducer,
+	[TOASTS_FEATURE_KEY]: toastsReducer,
+	integrationWebhook: integrationWebhookReducer,
+	integrationClanWebhook: integrationClanWebhookReducer,
+	adminApplication: adminApplicationReducer,
+	systemMessages: systemMessageReducer,
+	giveCoffee: giveCoffeeReducer,
+	settingClanChannel: settingChannelReducer,
+	clanMembersMeta: clanMembersMetaReducer,
+	directmembersmeta: directMembersMetaReducer,
+	[ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
+	dmcall: DMCallReducer,
+	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
+	[E2EE_FEATURE_KEY]: e2eeReducer,
+	[EMBED_MESSAGE]: embedReducer,
+	walletLedger: walletLedgerReducer,
+	[CHANNEL_LIST_RENDER]: listChannelRenderReducer
 };
 
 let storeInstance = configureStore({
-  reducer
+	reducer
 });
 
 let storeCreated = false;
@@ -374,43 +374,43 @@ export type RootState = ReturnType<typeof storeInstance.getState>;
 export type PreloadedRootState = RootState | undefined;
 
 const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
-  // Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
-  if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
-    const { channelIdLastFetch, channelMessages } = action.payload || {};
+	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
+	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
+		const { channelIdLastFetch, channelMessages } = action.payload || {};
 
-    if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
-      // Limit the channelMessages to only include messages for the last fetched channelId
-      action.payload = {
-        ...action.payload,
-        channelMessages: {
-          [channelIdLastFetch]: channelMessages[channelIdLastFetch]
-        }
-      };
-    }
-  }
-  // Pass the action to the next middleware or reducer
-  return next(action);
+		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
+			// Limit the channelMessages to only include messages for the last fetched channelId
+			action.payload = {
+				...action.payload,
+				channelMessages: {
+					[channelIdLastFetch]: channelMessages[channelIdLastFetch]
+				}
+			};
+		}
+	}
+	// Pass the action to the next middleware or reducer
+	return next(action);
 };
 
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
-  const store = configureStore({
-    reducer,
-    preloadedState,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        thunk: {
-          extraArgument: {
-            mezon
-          }
-        },
-        immutableCheck: false,
-        serializableCheck: false
-      }).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
-  });
-  storeInstance = store;
-  storeCreated = true;
-  const persistor = persistStore(store);
-  return { store, persistor };
+	const store = configureStore({
+		reducer,
+		preloadedState,
+		middleware: (getDefaultMiddleware) =>
+			getDefaultMiddleware({
+				thunk: {
+					extraArgument: {
+						mezon
+					}
+				},
+				immutableCheck: false,
+				serializableCheck: false
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+	});
+	storeInstance = store;
+	storeCreated = true;
+	const persistor = persistStore(store);
+	return { store, persistor };
 };
 
 export type Store = typeof storeInstance;
@@ -420,21 +420,21 @@ export type AppThunkDispatch = ThunkDispatch<RootState, unknown, UnknownAction>;
 export type AppDispatch = typeof storeInstance.dispatch & AppThunkDispatch;
 
 export const getStore = () => {
-  return storeInstance;
+	return storeInstance;
 };
 
 export const getStoreAsync = async () => {
-  if (!storeCreated) {
-    return new Promise<Store>((resolve) => {
-      const interval = setInterval(() => {
-        if (storeCreated) {
-          clearInterval(interval);
-          resolve(storeInstance);
-        }
-      }, 100);
-    });
-  }
-  return storeInstance;
+	if (!storeCreated) {
+		return new Promise<Store>((resolve) => {
+			const interval = setInterval(() => {
+				if (storeCreated) {
+					clearInterval(interval);
+					resolve(storeInstance);
+				}
+			}, 100);
+		});
+	}
+	return storeInstance;
 };
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();

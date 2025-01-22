@@ -280,11 +280,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
             } else if (virtualRow.index === 1) {
               return (
                 <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-                  <FavoriteChannelsSection
+                  {/* <FavoriteChannelsSection
                     isExpandFavorite={isExpandFavorite}
                     handleExpandFavoriteChannel={handleExpandFavoriteChannel}
                     channelFavorites={channelFavorites}
-                  />
+                  /> */}
                 </div>
               );
             } else if (item.channels) {

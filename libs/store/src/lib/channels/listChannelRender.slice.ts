@@ -1,7 +1,7 @@
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
+import { CategoriesEntity } from '../categories/categories.slice';
 import { RootState } from '../store';
-import { CategoriesEntity } from '@mezon/store';
 
 export const CHANNEL_LIST_RENDER = 'CHANNEL_LIST_RENDER';
 
@@ -26,20 +26,20 @@ export const listChannelRenderSlice = createSlice({
 	reducers: {
 		mapListChannelRender: (state, action: PayloadAction<DataChannelAndCate>) => {
 			const { listChannel, listCategory, clanId, listChannelFavor } = action.payload;
-      const listChannelRender: (ICategoryChannel | IChannel)[] = [];
-      listCategory.map((category) => {
-        const categoryChannels = listChannel.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
-        const listChannelIds = categoryChannels.map((channel) => channel.id);
-  
-        const categoryWithChannels: ICategoryChannel = {
-          ...category,
-          channels: listChannelIds
-        };
-  
-        listChannelRender.push(categoryWithChannels);
-        categoryChannels.forEach((channel) => listChannelRender.push(channel));
-      });
-      state.listChannelRender[clanId] = listChannelRender;
+			const listChannelRender: (ICategoryChannel | IChannel)[] = [];
+			listCategory.map((category) => {
+				const categoryChannels = listChannel.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
+				const listChannelIds = categoryChannels.map((channel) => channel.id);
+
+				const categoryWithChannels: ICategoryChannel = {
+					...category,
+					channels: listChannelIds
+				};
+
+				listChannelRender.push(categoryWithChannels);
+				categoryChannels.forEach((channel) => listChannelRender.push(channel));
+			});
+			state.listChannelRender[clanId] = listChannelRender;
 		}
 	}
 });
@@ -47,7 +47,6 @@ export const listChannelRenderSlice = createSlice({
 export const listChannelRenderAction = {
 	...listChannelRenderSlice.actions
 };
-
 
 export const listChannelRenderReducer = listChannelRenderSlice.reducer;
 
