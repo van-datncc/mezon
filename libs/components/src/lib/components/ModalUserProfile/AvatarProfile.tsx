@@ -48,7 +48,7 @@ const AvatarProfile = ({
 	};
 
 	const handleClearCustomStatus = () => {
-		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: '' }));
+		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: '', minutes: 0, noClear: true }));
 	};
 
 	const activityNames: { [key: number]: string } = {
