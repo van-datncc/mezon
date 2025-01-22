@@ -1,5 +1,12 @@
 import { ChatContext, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, load, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_CLAN_ID,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
+	STORAGE_IS_LAST_ACTIVE_TAB_DM,
+	load,
+	save
+} from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions, channelsActions, clansActions, directActions, messagesActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
@@ -65,6 +72,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	};
 
 	const directMessageLoader = async () => {
+		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'true');
 		await Promise.all([
 			// dispatch(clansActions.setCurrentClanId('0')),
 			dispatch(
@@ -109,6 +117,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	useEffect(() => {
 		return () => {
+			save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
 			dispatch(directActions.setDmGroupCurrentId(''));
 			if (!isFetchMemberChannelDmRef.current) {
 				requestAnimationFrame(async () => {

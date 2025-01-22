@@ -198,35 +198,28 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
-			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			const isExistChannel = respChannel?.payload?.channels?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
-			store.dispatch(appActions.setLoadingMainMobile(false));
-			if (isExistChannel) {
+			if (clanId && channelId) {
+				store.dispatch(
+					channelsActions.joinChannel({
+						clanId: clanId ?? '',
+						channelId: channelId,
+						noFetchMembers: false,
+						isClearMessage: true,
+						noCache: true
+					})
+				);
+				const joinAndChangeClan = async (store: any, clanId: string) => {
+					await Promise.all([
+						store.dispatch(clansActions.joinClan({ clanId: clanId })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+					]);
+				};
+				await joinAndChangeClan(store, clanId);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				save(STORAGE_CLAN_ID, clanId);
 			}
-			save(STORAGE_CLAN_ID, clanId);
-			const joinAndChangeClan = async (store: any, clanId: string) => {
-				await Promise.all([
-					store.dispatch(clansActions.joinClan({ clanId: clanId })),
-					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-					isExistChannel
-						? store.dispatch(
-								channelsActions.joinChannel({
-									clanId: clanId ?? '',
-									channelId: channelId,
-									noFetchMembers: false,
-									isClearMessage: true,
-									noCache: true
-								})
-							)
-						: Promise.resolve()
-				]);
-			};
-			await joinAndChangeClan(store, clanId);
-			if (!isExistChannel) {
-				await setDefaultChannelLoader(respChannel.payload, clanId);
-			}
+			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (topicId && topicId !== '0' && !!topicId) {
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}

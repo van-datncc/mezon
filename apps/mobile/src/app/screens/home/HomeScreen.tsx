@@ -35,6 +35,7 @@ const HomeScreen = React.memo(() => {
 	return (
 		<View style={{ flex: 1, position: 'relative' }}>
 			<Drawer.Navigator
+				defaultStatus="open"
 				screenOptions={{
 					drawerPosition: 'left',
 					drawerType: 'back',
@@ -49,9 +50,9 @@ const HomeScreen = React.memo(() => {
 					state: (e) => {
 						Keyboard.dismiss();
 						if (e.data.state.history?.length > 1) {
-							dispatch(appActions.setHiddenBottomTabMobile(false));
-						} else {
 							dispatch(appActions.setHiddenBottomTabMobile(true));
+						} else {
+							dispatch(appActions.setHiddenBottomTabMobile(false));
 						}
 					}
 				}}

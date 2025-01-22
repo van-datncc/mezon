@@ -160,6 +160,7 @@ const TopicDiscussionBox = () => {
 						type={ChannelType.CHANNEL_TYPE_CHANNEL}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						isTopicBox
+						userIdsFromTopicBox={allUserIdsInChannel}
 						topicId={currentTopicId}
 					/>
 				</div>
@@ -170,7 +171,7 @@ const TopicDiscussionBox = () => {
 				</div>
 			)}
 			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+				<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 					<MentionReactInput
 						onSend={handleSend}
 						onTyping={handleTypingDebounced}
