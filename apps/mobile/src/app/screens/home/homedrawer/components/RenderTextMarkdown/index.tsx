@@ -8,7 +8,7 @@ import {
 	selectChannelsEntities,
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
-import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -30,6 +30,8 @@ interface ElementToken {
 	role_id?: string;
 	channelid?: string;
 	emojiid?: string;
+	type?: EBacktickType;
+	username?: string;
 }
 
 export default function openUrl(url, customCallback) {
@@ -177,7 +179,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		threadIcon: { marginBottom: size.s_2 },
 		privateChannel: {
 			color: colors.text,
-			backgroundColor: colors.secondary
+			backgroundColor: colors.secondaryLight
 		}
 	});
 
@@ -407,12 +409,6 @@ export const formatUrls = (text: string) => {
 };
 
 export const formatBlockCode = (text: string, isMessageReply: boolean) => {
-	const matchesUrls = text?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
-
-	if (matchesUrls) {
-		return formatUrls(text);
-	}
-
 	const addNewlinesToCodeBlock = (block) => {
 		if (isMessageReply) {
 			block = block.replace(/```|\n/g, '').trim();
@@ -518,8 +514,36 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
 				}
 
-				if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
-					formattedContent += formatBlockCode(contentInElement, isMessageReply);
+				if (element.kindOf === ETokenMessage.MARKDOWNS) {
+					if (element.type === EBacktickType.LINK) {
+						formattedContent += formatUrls(contentInElement);
+					} else if (element.type === EBacktickType.BOLD) {
+						formattedContent += `**${contentInElement}**` ?? '';
+					} else if (element.type === EBacktickType.VOICE_LINK) {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-expect-error
+						const channelsEntities = selectChannelsEntities(store.getState() as RootState);
+						const meetingCode = contentInElement?.split('/').pop();
+						const allChannelVoice = Object.values(channelsEntities).flat();
+						const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+						if (!voiceChannelFound) {
+							formattedContent += formatUrls(contentInElement);
+						} else {
+							formattedContent += ChannelHashtag({
+								channelHashtagId: voiceChannelFound?.channel_id,
+								channelsEntities
+							});
+						}
+					} else {
+						let content = contentInElement ?? '';
+						if (element.type === EBacktickType.PRE) {
+							content = '```' + content + '```';
+						}
+						if (element.type === EBacktickType.CODE) {
+							content = '`' + content + '`';
+						}
+						formattedContent += formatBlockCode(content, isMessageReply);
+					}
 				}
 
 				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
@@ -532,7 +556,7 @@ export const RenderTextMarkdownContent = React.memo(
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(contentInElement, isMessageReply);
+						formattedContent += formatUrls(contentInElement);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
 					}
@@ -593,7 +617,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
+				{contentRender}
 			</Markdown>
 		);
 

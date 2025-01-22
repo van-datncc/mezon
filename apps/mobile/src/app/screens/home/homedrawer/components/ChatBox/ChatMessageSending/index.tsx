@@ -55,6 +55,7 @@ interface IChatMessageSendingProps {
 	hashtagsOnMessage?: MutableRefObject<IHashtagOnMessage[]>;
 	emojisOnMessage?: MutableRefObject<IEmojiOnMessage[]>;
 	linksOnMessage?: MutableRefObject<ILinkOnMessage[]>;
+	boldsOnMessage?: MutableRefObject<ILinkOnMessage[]>;
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 }
@@ -72,6 +73,7 @@ export const ChatMessageSending = memo(
 		hashtagsOnMessage,
 		emojisOnMessage,
 		linksOnMessage,
+		boldsOnMessage,
 		markdownsOnMessage,
 		voiceLinkRoomOnMessage
 	}: IChatMessageSendingProps) => {
@@ -112,7 +114,10 @@ export const ChatMessageSending = memo(
 
 		const removeTags = (text: string) => {
 			if (!text) return '';
-			return text?.replace?.(/@\[(.*?)\]/g, '@$1')?.replace?.(/<#(.*?)>/g, '#$1');
+			return text
+				?.replace?.(/@\[(.*?)\]/g, '@$1')
+				?.replace?.(/<#(.*?)>/g, '#$1')
+				?.replace?.(/\*\*(.*?)\*\*/g, '$1');
 		};
 
 		const onEditMessage = useCallback(
@@ -170,9 +175,12 @@ export const ChatMessageSending = memo(
 				t: removeTags(valueInputRef?.current),
 				hg: hashtagsOnMessage?.current || [],
 				ej: emojisOnMessage?.current || [],
-				lk: linksOnMessage?.current || [],
-				mk: markdownsOnMessage?.current || [],
-				vk: voiceLinkRoomOnMessage?.current || []
+				mk: [
+					...(linksOnMessage?.current || []),
+					...(voiceLinkRoomOnMessage?.current || []),
+					...(markdownsOnMessage?.current || []),
+					...(boldsOnMessage?.current || [])
+				]
 			};
 
 			const payloadThreadSendMessage: IPayloadThreadSendMessage = {

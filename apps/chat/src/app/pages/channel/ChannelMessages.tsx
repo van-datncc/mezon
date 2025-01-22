@@ -493,10 +493,12 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					) {
 						// Break out of `forceLayout`
 						if (!lastItemElement) return;
+
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
 							// firstUnreadElement
 							// noMessageSendingAnimation
+							if (!shouldScrollToBottom) return;
 
 							animateScroll(
 								container,
