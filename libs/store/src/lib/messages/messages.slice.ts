@@ -430,7 +430,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading') {
 				return;
 			}
 
@@ -711,7 +711,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: anonymous ? NX_CHAT_APP_ANNONYMOUS_USER_ID : senderId,
-			username:anonymous ? 'Anonymous' : username || '',
+			username: anonymous ? 'Anonymous' : username || '',
 			avatar: anonymous ? '' : avatar,
 			isSending: true,
 			references: references?.filter((item) => item) || [],
