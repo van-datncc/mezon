@@ -1,5 +1,5 @@
 import { useShowName } from '@mezon/core';
-import { RolesClanEntity, selectMemberClanByUserId2, selectRolesClanEntities, useAppSelector } from '@mezon/store';
+import { RolesClanEntity, selectRolesClanEntities } from '@mezon/store';
 import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, DEFAULT_ROLE_COLOR, IMessageWithUser, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
@@ -14,10 +14,9 @@ type IMessageHeadProps = {
 
 const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	const messageTime = convertTimeString(message?.create_time as string);
-	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message?.sender_id));
-	const usernameSender = userClan?.user?.username;
-	const clanNick = userClan?.clan_nick;
-	const displayName = userClan?.user?.display_name;
+	const usernameSender = message?.username;
+	const clanNick = message?.clan_nick;
+	const displayName = message?.display_name;
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
 	const userRolesClan = useMemo(() => {
 		const activeRole: Array<RolesClanEntity> = [];
@@ -56,6 +55,8 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 		message?.sender_id ?? ''
 	);
 
+	const priorityName = message.display_name ? message.display_name : message.username;
+
 	return (
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
@@ -71,11 +72,7 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 								: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
 					}}
 				>
-					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
-						? nameShowed
-						: message?.display_name
-							? message?.display_name
-							: message?.username}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? nameShowed : priorityName}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>

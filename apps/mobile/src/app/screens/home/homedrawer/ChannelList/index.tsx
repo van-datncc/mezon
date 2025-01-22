@@ -2,7 +2,9 @@ import {
 	ActionEmitEvent,
 	getUpdateOrAddClanChannelCache,
 	hasNonEmptyChannels,
+	load,
 	save,
+	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
@@ -10,7 +12,7 @@ import { appActions, channelsActions, ChannelsEntity, getStoreAsync, useAppDispa
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { DeviceEventEmitter, InteractionManager, Linking, ScrollView, View } from 'react-native';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -44,6 +46,13 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 	const dispatch = useAppDispatch();
+	const timeoutRef = useRef<any>();
+
+	useEffect(() => {
+		return () => {
+			timeoutRef.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const handlePress = useCallback(() => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_MENU_CLAN_CHANNEL);
@@ -98,16 +107,28 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					await Linking.openURL(urlVoice);
 				}
 			} else {
+				const channelId = channel?.channel_id || '';
+				const clanId = channel?.clan_id || '';
+				const store = await getStoreAsync();
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				const isCached = channelsCache?.includes(channelId);
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				if (!isTabletLandscape) {
 					navigation.dispatch(DrawerActions.closeDrawer());
 				}
-				const channelId = channel?.channel_id || '';
-				const clanId = channel?.clan_id || '';
+				timeoutRef.current = setTimeout(async () => {
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
+					store.dispatch(
+						channelsActions.joinChannel({
+							clanId: clanId ?? '',
+							channelId: channelId,
+							noFetchMembers: false,
+							isClearMessage: true,
+							noCache: true
+						})
+					);
+				}, 0);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				const store = await getStoreAsync();
-				requestAnimationFrame(async () => {
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true }));
-				});
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
 		},

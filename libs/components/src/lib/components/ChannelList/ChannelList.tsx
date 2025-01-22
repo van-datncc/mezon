@@ -1,10 +1,9 @@
-import { useAppNavigation, useAuth, useCategorizedChannels, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
   ChannelsEntity,
   ClansEntity,
   appActions,
   categoriesActions,
-  selectAllAccount,
   selectAllCategories,
   selectAllChannelsFavorite,
   selectChannelById,
@@ -24,8 +23,19 @@ import {
   useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, EPermission, ICategoryChannel, IChannel, createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
+import {
+  ChannelStatusEnum,
+  ChannelThreads,
+  EPermission,
+  ICategoryChannel,
+  IChannel,
+  createImgproxyUrl,
+  isLinuxDesktop,
+  isWindowsDesktop,
+  toggleDisableHover
+} from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { listChannelRenderAction, selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -35,7 +45,6 @@ import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
-import { listChannelRenderAction, selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -102,11 +111,9 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     () => [
       { type: 'bannerAndEvents' },
       { type: 'favorites' },
-      { id: 'favor', channels: [], category_id: 'favor', category_name: 'Favorite Channel', category_order: 1, clan_id: currentClan?.clan_id, creator_id: '' } as ICategoryChannel,
-      ...channelFavorites,
-      ...( listChannelRender ? (isShowEmptyCategory  ? listChannelRender : listChannelRender.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined)) : [])
+      ...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined))
     ],
-    [categorizedChannels, isShowEmptyCategory, channelFavorites]
+    [categorizedChannels, isShowEmptyCategory]
   ) as ICategoryChannel[];
   const currentChannelId = useSelector(selectCurrentChannelId)
 
@@ -122,13 +129,13 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
   const [height, setHeight] = useState(0);
   const clanTopbarEle = 60;
-  const heightTemp = useMemo(()=>{
+  const heightTemp = useMemo(() => {
     const clanFooterEle = document.getElementById('clan-footer');
     const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
     const outsideHeight = totalHeight;
     const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
     return (window.innerHeight - outsideHeight - titleBarHeight);
-  },[data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable])
+  }, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable])
 
   const calculateHeight = useCallback(() => {
     const clanFooterEle = document.getElementById('clan-footer');
@@ -144,12 +151,12 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
   useEffect(() => {
     calculateHeight();
-    if(!listChannelRender){
+    if (!listChannelRender) {
       dispatch(listChannelRenderAction.mapListChannelRender({
-        clanId : currentClan?.clan_id || '',
-        listCategory : categories,
-        listChannel : listChannels,
-        listChannelFavor : listChannelFavor
+        clanId: currentClan?.clan_id || '',
+        listCategory: categories,
+        listChannel: listChannels,
+        listChannelFavor: listChannelFavor
       }))
     }
   }, [streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
@@ -234,7 +241,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     <div
       ref={parentRef}
       style={{
-        height: heightTemp
+        height: height
       }}
       className={`thread-scroll`}
       onWheelCapture={() => {
@@ -268,6 +275,16 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
               return (
                 <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
                   <ChannelBannerAndEvents currentClan={currentClan} />
+                </div>
+              );
+            } else if (virtualRow.index === 1) {
+              return (
+                <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+                  <FavoriteChannelsSection
+                    isExpandFavorite={isExpandFavorite}
+                    handleExpandFavoriteChannel={handleExpandFavoriteChannel}
+                    channelFavorites={channelFavorites}
+                  />
                 </div>
               );
             } else if (item.channels) {

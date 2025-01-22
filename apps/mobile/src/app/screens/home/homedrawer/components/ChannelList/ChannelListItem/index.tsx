@@ -18,7 +18,7 @@ import { ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
+import { DeviceEventEmitter, InteractionManager, Linking, SafeAreaView, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -99,27 +99,26 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					await Linking.openURL(urlVoice);
 				}
 			} else {
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.closeDrawer());
-				}
 				const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 				const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 				const isCached = channelsCache?.includes(channelId);
 				const store = await getStoreAsync();
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
 				timeoutRef.current = setTimeout(async () => {
-					requestAnimationFrame(async () => {
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
-						store.dispatch(
-							channelsActions.joinChannel({
-								clanId: clanId ?? '',
-								channelId: channelId,
-								noFetchMembers: false,
-								isClearMessage: true,
-								noCache: true
-							})
-						);
-					});
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
+					store.dispatch(
+						channelsActions.joinChannel({
+							clanId: clanId ?? '',
+							channelId: channelId,
+							noFetchMembers: false,
+							isClearMessage: true,
+							noCache: true
+						})
+					);
 				}, 0);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
