@@ -45,7 +45,8 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.channel_label?.split?.(',') || [];
+		const usernameList = directMessage?.usernames?.split?.(',') || [];
+
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
 			username: username
@@ -55,7 +56,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		if (!content || (typeof content === 'object' && Object.keys(content).length === 0) || content === '{}') return null;
 		const text = typeof content === 'string' ? safeJSONParse(content)?.t : safeJSONParse(JSON.stringify(content) || '{}')?.t;
-		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
+		const lastMessageSender = otherMemberList?.find?.((it) => it?.userId === directMessage?.last_sent_message?.sender_id);
 
 		if (!text) {
 			return (

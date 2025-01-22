@@ -116,6 +116,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			aboutMe: about_me
 		};
 		setOriginClanProfileValue(initialValue);
+		if (!nick_name) {
+			setCurrentClanProfileValue(Object.assign({}, initialValue, { displayName: username }));
+		} else {
+			setCurrentClanProfileValue(initialValue);
+		}
 		setCurrentClanProfileValue(initialValue);
 	}, [userClansProfile, tab, userProfile, selectedClan]);
 

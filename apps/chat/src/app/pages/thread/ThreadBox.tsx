@@ -118,7 +118,7 @@ const ThreadBox = () => {
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	return (
-		<div className="flex flex-col flex-1 justify-end">
+		<div className="flex flex-col flex-1 justify-end border-l dark:border-borderDivider border-bgLightTertiary">
 			<div>
 				{threadCurrentChannel && (
 					<div
