@@ -147,7 +147,7 @@ const MessageText = memo(
 			attachmentOnMessage?.length === 1 &&
 			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
 			attachmentOnMessage[0].url === contentToMessage?.trim();
-		const showEditted = !message.hide_editted;
+		const showEditted = !message.hide_editted && !isSearchMessage;
 		const messageTime = convertTimeString(message?.create_time as string);
 		return (
 			// eslint-disable-next-line react/jsx-no-useless-fragment
