@@ -96,7 +96,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-			isCategoryExpanded
+			(isCategoryExpanded || isUnreadChannel)
 		) {
 			return (
 				<>
