@@ -103,6 +103,7 @@ const ModalUserProfile = ({
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 	const displayCustomStatus = userID === currentUserId ? currentUserCustomStatus : userCustomStatus;
+	const avatarByUserId = isDM ? userById?.user?.avatar_url : userById?.clan_avatar || userById?.user?.avatar_url;
 
 	const [content, setContent] = useState<string>('');
 
@@ -219,7 +220,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={avatar || userById?.user?.avatar_url}
+				avatar={avatar || avatarByUserId}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={displayCustomStatus}
