@@ -1,5 +1,5 @@
 import { Avatar } from 'flowbite-react';
-import React, { memo, Ref, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -17,7 +17,6 @@ import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
-import ThreadListChannel, { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 import { IChannelLinkPermission } from '../CategorizedChannels';
 
@@ -35,49 +34,22 @@ export type ChannelListItemRef = {
 	isInViewport: () => boolean;
 };
 
-const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props, ref) => {
+const ChannelListItem: React.FC<ChannelListItemProp> = (props) => {
 	const { channel, isActive, permissions } = props;
 
-	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
-	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
-
-	useImperativeHandle(ref, () => ({
-		scrollIntoChannel: (options: ScrollIntoViewOptions = { block: 'center' }) => {
-			channelLinkRef.current?.scrollIntoView(options);
-		},
-		scrollIntoThread: (threadId: string, options: ScrollIntoViewOptions = { block: 'center' }) => {
-			listThreadRef.current?.scrollIntoThread(threadId, options);
-		},
-		channelId: channel?.id,
-		channelRef: channelLinkRef.current,
-		isInViewport: () => {
-			if (!channelLinkRef.current) return false;
-			return channelLinkRef.current?.isInViewport();
-		}
-	}));
-
-	return (
-		<ChannelLinkContent
-			channel={channel}
-			listThreadRef={listThreadRef}
-			channelLinkRef={channelLinkRef}
-			isActive={isActive}
-			permissions={permissions}
-		/>
-	);
-});
+	return <ChannelLinkContent channel={channel} isActive={isActive} permissions={permissions} />;
+};
 
 export default memo(ChannelListItem);
 
 type ChannelLinkContentProps = {
 	channel: ChannelThreads;
-	listThreadRef: Ref<ListThreadChannelRef>;
-	channelLinkRef: Ref<ChannelLinkRef>;
+
 	isActive: boolean;
 	permissions: IChannelLinkPermission;
 };
 
-const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listThreadRef, channelLinkRef, isActive, permissions }) => {
+const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActive, permissions }) => {
 	const dispatch = useDispatch();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
@@ -99,7 +71,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 	const renderChannelLink = () => {
 		return (
 			<ChannelLink
-				ref={channelLinkRef}
 				clanId={channel?.clan_id}
 				channel={channel}
 				key={channel.id}
@@ -124,12 +95,12 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
-			channel.type !== ChannelType.CHANNEL_TYPE_APP
+			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
+			(isCategoryExpanded || isUnreadChannel)
 		) {
 			return (
 				<>
 					{renderChannelLink()}
-					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
 					{channelMemberList?.length > 0 && (
 						<div className="flex gap-1 px-4">
 							<div className="flex gap-1 h-fit">
@@ -172,7 +143,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 				<CollapsedMemberList channelMemberList={channelMemberList} />
 			</>
 		) : null;
-	}, [channel.type, channel.threads, channel.channel_id, isCategoryExpanded, channelMemberList, renderChannelLink, listThreadRef]);
+	}, [channel.type, channel.threads, channel.channel_id, isCategoryExpanded, channelMemberList, renderChannelLink]);
 
 	return <>{renderChannelContent} </>;
 };

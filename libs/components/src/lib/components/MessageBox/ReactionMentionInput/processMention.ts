@@ -13,6 +13,7 @@ const processMention = (
 	const mentions: IMentionOnMessage[] = [];
 	const hashtags: IHashtagOnMessage[] = [];
 	const emojis: IEmojiOnMessage[] = [];
+
 	mentionsRaw?.forEach((item) => {
 		const { id, display, plainTextIndex, childIndex } = item;
 		const s = plainTextIndex;
@@ -24,13 +25,15 @@ const processMention = (
 				mentions.push({
 					role_id: id,
 					s,
-					e
+					e,
+					display
 				});
 			} else {
 				mentions.push({
 					user_id: id,
 					s,
-					e
+					e,
+					display
 				});
 			}
 		} else if (childIndex === ETypeMEntion.HASHTAG) {

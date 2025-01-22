@@ -17,10 +17,10 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, isElementInViewport, openVoiceChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -66,10 +66,7 @@ export type ChannelLinkRef = {
 };
 
 const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
-	(
-		{ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, isActive, channelType, permissions }: ChannelLinkProps,
-		ref
-	) => {
+	({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, isActive, channelType, permissions }: ChannelLinkProps) => {
 		const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 		const dispatch = useAppDispatch();
 		const channelLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -90,15 +87,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
-
-		useImperativeHandle(ref, () => ({
-			scrollIntoView: (options?: ScrollIntoViewOptions) => {
-				channelLinkRef.current?.scrollIntoView(options);
-			},
-			isInViewport: () => {
-				return isElementInViewport(channelLinkRef.current as HTMLElement);
-			}
-		}));
 
 		const handleCreateLinkInvite = () => {
 			createInviteLink(clanId ?? '', channel.channel_id ?? '');

@@ -306,7 +306,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request?.content);
+			const { text, entities } = parseHtmlAsFormattedText(request.content);
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
 			const payload = {
@@ -642,7 +642,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
 						draftMention: lastMessageByUserId.mentions ?? [],
-						draftAttachment: lastMessageByUserId.attachments ?? []
+						draftAttachment: lastMessageByUserId.attachments ?? [],
+						draftTopicId: lastMessageByUserId.content.tp as string
 					}
 				})
 			);
@@ -894,7 +895,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						}
 					}
 				}}
-				className={`dark:bg-channelTextarea  bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
+				className={`h-11 dark:bg-channelTextarea  bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-lg ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

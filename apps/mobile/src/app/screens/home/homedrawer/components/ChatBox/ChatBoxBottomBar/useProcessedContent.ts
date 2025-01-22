@@ -9,21 +9,23 @@ const useProcessedContent = (inputText: string) => {
 	const markdownList = useRef<IMarkdownOnMessage[]>([]);
 	const voiceLinkRoomList = useRef<ILinkVoiceRoomOnMessage[]>([]);
 	const emojiObjPicked = useSelector(selectEmojiObjSuggestion);
+	const boldList = useRef<ILinkOnMessage[]>([]);
 
 	useEffect(() => {
 		const processInput = () => {
 			const resultString = inputText.replace(/[[\]<>]/g, '');
-			const { emojis, links, markdowns, voiceRooms } = processText(resultString, emojiObjPicked);
+			const { emojis, links, markdowns, voiceRooms, bolds } = processText(resultString, emojiObjPicked);
 			emojiList.current = emojis;
 			linkList.current = links;
 			markdownList.current = markdowns;
 			markdownList.current = markdowns;
 			voiceLinkRoomList.current = voiceRooms;
+			boldList.current = bolds;
 		};
 
 		processInput();
 	}, [inputText]);
-	return { emojiList, linkList, markdownList, inputText, voiceLinkRoomList };
+	return { emojiList, linkList, markdownList, inputText, voiceLinkRoomList, boldList };
 };
 
 export default useProcessedContent;
@@ -33,11 +35,13 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 	const links: ILinkOnMessage[] = [];
 	const markdowns: IMarkdownOnMessage[] = [];
 	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
+	const bolds: ILinkOnMessage[] = [];
 
 	const singleBacktick = '`';
 	const tripleBacktick = '```';
 	const googleMeetPrefix = 'https://meet.google.com/';
 	const colon = ':';
+	const boldPrefix = '**';
 
 	let i = 0;
 	while (i < inputString.length) {
@@ -73,16 +77,41 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			const endindex = i;
 			const link = inputString.substring(startindex, endindex);
 
+			// TODO: convert html parser like web
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					type: EBacktickType.VOICE_LINK,
 					s: startindex,
 					e: endindex
 				});
 			} else {
 				links.push({
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					type: EBacktickType.LINK,
 					s: startindex,
 					e: endindex
 				});
+			}
+		} else if (inputString.substring(i, i + boldPrefix.length) === boldPrefix) {
+			// Triple backtick markdown processing
+			const startindex = i;
+			i += boldPrefix.length;
+			let bold = '';
+			while (i < inputString.length && inputString.substring(i, i + boldPrefix.length) !== boldPrefix) {
+				bold += inputString[i];
+				i++;
+			}
+			if (i < inputString.length && inputString.substring(i, i + boldPrefix.length) === boldPrefix) {
+				i += boldPrefix.length;
+				const endindex = i;
+				if (bold.trim().length > 0) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					bolds.push({ type: EBacktickType.BOLD, s: startindex, e: endindex - boldPrefix?.length * 2 });
+				}
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 			// Triple backtick markdown processing
@@ -122,5 +151,5 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 		}
 	}
 
-	return { emojis, links, markdowns, voiceRooms };
+	return { emojis, links, markdowns, voiceRooms, bolds };
 };

@@ -254,7 +254,11 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			);
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
-			if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (
+				response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+				response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+				response.type !== ChannelType.CHANNEL_TYPE_STREAMING
+			) {
 				const isPublic = checkIsThread(response as ChannelsEntity) ? false : !response.channel_private;
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -1304,10 +1308,7 @@ export const selectChannelThreads = createSelector([selectAllChannels], (channel
 		}
 	}
 
-	return parentChannels.map((channel) => ({
-		...channel,
-		threads: threadsByParentId.get(channel.channel_id as string) || []
-	})) as ChannelThreads[];
+	return parentChannels.flatMap((channel) => [channel, ...(threadsByParentId.get(channel.channel_id as string) || [])]) as ChannelThreads[];
 });
 
 export const selectBuzzStateByChannelId = createSelector(

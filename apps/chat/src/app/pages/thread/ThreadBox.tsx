@@ -118,7 +118,7 @@ const ThreadBox = () => {
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	return (
-		<div className="flex flex-col flex-1 justify-end">
+		<div className="flex flex-col flex-1 justify-end border-l dark:border-borderDivider border-bgLightTertiary">
 			<div>
 				{threadCurrentChannel && (
 					<div
@@ -137,7 +137,7 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+			<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
