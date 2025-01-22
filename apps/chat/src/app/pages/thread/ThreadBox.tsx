@@ -1,7 +1,6 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage } from '@mezon/core';
 import {
-	RootState,
 	channelsActions,
 	checkDuplicateThread,
 	createNewChannel,
@@ -10,6 +9,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectSession,
 	selectThreadCurrentChannel,
 	useAppDispatch,
 	useAppSelector
@@ -28,7 +28,7 @@ const ThreadBox = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
 
 	const membersOfParent = useAppSelector((state) =>
