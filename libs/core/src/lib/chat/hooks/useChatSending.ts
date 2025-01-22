@@ -6,11 +6,14 @@ import {
 	selectCurrentTopicInitMessage,
 	selectIsFocusOnChannelInput,
 	selectIsShowCreateTopic,
+	selectMemberClanByUserId2,
 	topicsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, checkTokenOnMarkdown } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -30,6 +33,23 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
 	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
 	const userProfile = useSelector(selectAllAccount);
+
+	const profileInTheClan = useAppSelector((state) => selectMemberClanByUserId2(state, userProfile?.user?.id ?? ''));
+	const priorityAvatar =
+		mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? profileInTheClan?.clan_avatar
+				? profileInTheClan?.clan_avatar
+				: userProfile?.user?.avatar_url
+			: userProfile?.user?.avatar_url;
+
+	const priorityDisplayName = userProfile?.user?.display_name ? userProfile?.user?.display_name : userProfile?.user?.username;
+	const priorityNameToShow =
+		mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? profileInTheClan?.clan_nick
+				? profileInTheClan?.clan_nick
+				: priorityDisplayName
+			: priorityDisplayName;
+
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const initMessageOfTopic = useSelector(selectCurrentTopicInitMessage);
@@ -137,9 +157,9 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
-					avatar: userProfile?.user?.avatar_url,
+					avatar: priorityAvatar,
 					isMobile,
-					username: userProfile?.user?.display_name,
+					username: priorityNameToShow,
 					code: code
 				})
 			);
@@ -153,10 +173,12 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			mode,
 			isPublic,
 			currentUserId,
-			userProfile?.user?.avatar_url,
-			userProfile?.user?.display_name,
+			priorityAvatar,
+			priorityNameToShow,
 			currentTopicId,
-			createTopic
+			createTopic,
+			initMessageOfTopic?.id,
+			userProfile?.user?.id
 		]
 	);
 
