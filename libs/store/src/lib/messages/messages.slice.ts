@@ -522,9 +522,7 @@ export const jumpToMessage = createAsyncThunk(
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
-			console.log(indexMessage, 'indexMessage');
-
-			if (indexMessage < 30) {
+			if (indexMessage < 10) {
 				await thunkAPI.dispatch(
 					fetchMessages({
 						clanId: clanId,
