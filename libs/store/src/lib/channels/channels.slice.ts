@@ -273,6 +273,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string })
 				);
 			}
+			thunkAPI.dispatch(listChannelRenderAction.addChannelToListRender(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -311,6 +312,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 			}
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
 			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
+			thunkAPI.dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: body.channelId, clanId: body.clanId }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
@@ -352,6 +354,9 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 							changes: { ...body }
 						}
 					})
+				);
+				thunkAPI.dispatch(
+					listChannelRenderAction.updateChannelInListRender({ channelId: body.channel_id, clanId: clanId as string, dataUpdate: body })
 				);
 			}
 		}

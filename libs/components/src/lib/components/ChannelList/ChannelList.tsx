@@ -42,6 +42,7 @@ import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
+import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -78,8 +79,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 });
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
-  const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-  const categorizedChannels = useCategorizedChannelsWeb();
+
   const currentClan = useSelector(selectCurrentClan);
   const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
   const streamPlay = useSelector(selectStatusStream);
@@ -90,6 +90,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   const dispatch = useAppDispatch();
 
   const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
+  const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentClan?.clan_id))
+
   const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
     channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
   const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
@@ -98,15 +100,15 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     () => [
       { type: 'bannerAndEvents' },
       { type: 'favorites' },
-      ...(isShowEmptyCategory
-        ? categorizedChannels
-        : categorizedChannels.filter(
+      ...(listChannelRender ? (isShowEmptyCategory
+        ? listChannelRender
+        : listChannelRender.filter(
           (item) =>
             ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
             (item as ICategoryChannel).channels === undefined
-        ))
+        )) : [])
     ],
-    [categorizedChannels, isShowEmptyCategory]
+    [listChannelRender, isShowEmptyCategory]
   ) as ICategoryChannel[];
   const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -139,13 +141,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     calculateHeight();
   }, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
-  const channelFavorites = useSelector(selectAllChannelsFavorite);
-  const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
-
-  const handleExpandFavoriteChannel = () => {
-    setIsExpandFavorite(!isExpandFavorite);
-  };
-
   const findScrollIndex = () => {
     const categoryId = firstChannelWithBadgeCount?.id;
     const index = data.findIndex((item) => item.id === categoryId);
@@ -157,7 +152,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   };
 
   useLayoutEffect(() => {
-    if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
+    if (!ctrlKFocusChannel?.id) return;
     if (!virtualizer.getVirtualItems().length) return;
 
     const focusChannel = ctrlKFocusChannel;
@@ -248,16 +243,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                   <ChannelBannerAndEvents currentClan={currentClan} />
                 </div>
               );
-            } else if (virtualRow.index === 1) {
-              return (
-                <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-                  <FavoriteChannelsSection
-                    isExpandFavorite={isExpandFavorite}
-                    handleExpandFavoriteChannel={handleExpandFavoriteChannel}
-                    channelFavorites={channelFavorites}
-                  />
-                </div>
-              );
             } else if (item.channels) {
               return (
                 <div
@@ -266,7 +251,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                   data-index={virtualRow.index}
                   ref={virtualizer.measureElement}
                 >
-                  <CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
+                  <CategorizedItem key={item.id} category={item} />
                 </div>
               );
             } else {
@@ -274,7 +259,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                 return (
                   <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
                     <ChannelListItem
-                      isActive={currentChannelId === item.id}
+                      isActive={currentChannelId === (item as IChannel).channel_id}
                       key={item.id}
                       channel={item as ChannelThreads}
                       permissions={permissions}
@@ -301,74 +286,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   );
 });
 
-const FavoriteChannelsSection = ({
-  isExpandFavorite,
-  handleExpandFavoriteChannel,
-  channelFavorites
-}: {
-  isExpandFavorite: boolean;
-  handleExpandFavoriteChannel: () => void;
-  channelFavorites: string[];
-}) => (
-  <div>
-    <div
-      className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold px-2"
-      onClick={handleExpandFavoriteChannel}
-    >
-      {isExpandFavorite ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
-      <span className="one-line">Favorite channel</span>
-    </div>
-    {isExpandFavorite ? (
-      <div className="w-[94%] mx-auto">
-        {channelFavorites ? channelFavorites.map((id, index) => <FavoriteChannel key={index} channelId={id} />) : ''}
-      </div>
-    ) : null}
-  </div>
-);
-type FavoriteChannelProps = {
-  channelId: string;
-};
-
-const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
-  const channel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
-  const theme = useSelector(selectTheme);
-  const dispatch = useAppDispatch();
-  const { navigate, toChannelPage } = useAppNavigation();
-  const handleJumpChannel = (channel: ChannelsEntity) => {
-    dispatch(appActions.setIsShowCanvas(false));
-    dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
-    const channelUrl = toChannelPage(channel?.id ?? '', channel?.clan_id ?? '');
-    navigate(channelUrl);
-  };
-  return (
-    Object.keys(channel).length > 0 && (
-      <div
-        onClick={() => handleJumpChannel(channel)}
-        className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
-      >
-        <div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
-          {channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-            <Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-          )}
-          {channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-            <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-          )}
-          {channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-            <Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-          )}
-          {channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-            <Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-          )}
-          {channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-            <Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-          )}
-          {channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
-        </div>
-        {channel.channel_label}
-      </div>
-    )
-  );
-};
 
 const ChannelListMem = memo(ChannelList, () => true);
 

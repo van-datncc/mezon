@@ -122,6 +122,7 @@ export type IUsersRole = RoleUserListRoleUser & {
 
 export type ICategoryChannel = ICategory & {
 	channels: string[] | IChannel[];
+	isFavor?: boolean;
 };
 
 export type IRole = {
@@ -142,7 +143,7 @@ export type IChannel = ApiChannelDescription & {
 	description?: string;
 	usernames?: string;
 	isRoleUser?: boolean;
-  isFavor?: boolean;
+	isFavor?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
