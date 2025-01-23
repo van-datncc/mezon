@@ -7,7 +7,7 @@ import { Track } from 'livekit-client';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
 
-const serverUrl = 'wss://abc-1qsisfgg.livekit.cloud';
+const serverUrl = 'wss://meet.mezon.vn';
 interface ChannelVoiceProps {
 	channel: ApiChannelAppResponse;
 	roomName: string;
