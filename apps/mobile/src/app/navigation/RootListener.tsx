@@ -4,7 +4,6 @@ import {
 	acitvitiesActions,
 	appActions,
 	authActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
@@ -17,6 +16,7 @@ import {
 	selectCurrentClanId,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	settingClanStickerActions,
 	useAppDispatch,
 	userStatusActions,
 	voiceActions
@@ -169,12 +169,6 @@ const RootListener = () => {
 		};
 	}, [isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
 
-	useEffect(() => {
-		if (currentClanId && currentClanId?.toString() !== '0') {
-			dispatch(channelsActions.fetchListFavoriteChannel({ clanId: currentClanId }));
-		}
-	}, [currentClanId, dispatch]);
-
 	const authLoader = useCallback(async () => {
 		try {
 			const response = await dispatch(authActions.refreshSession());
@@ -220,6 +214,7 @@ const RootListener = () => {
 			promises.push(dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(dispatch(directActions.fetchDirectMessage({ noCache: true })));
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
+			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({})));
 			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
 			promises.push(dispatch(acitvitiesActions.listActivities()));

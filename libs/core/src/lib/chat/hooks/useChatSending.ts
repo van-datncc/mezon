@@ -233,7 +233,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				validMentionList,
 				attachments,
 				hide_editted,
-				topic_id
+				topic_id,
+				false
 			);
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]

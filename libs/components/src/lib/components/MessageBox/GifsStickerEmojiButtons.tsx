@@ -17,7 +17,7 @@ const GifStickerEmojiButtons = memo(
 	({ activeTab, currentClanId, hasPermissionEdit, voiceLongPress, isRecording, focusTargetInput }: GifStickerEmojiButtonsProps) => {
 		const dispatch = useAppDispatch();
 		const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
-		const { setShowCategories } = useGifs();
+		const { setShowCategories, setClickedTrendingGif, setButtonArrowBack } = useGifs();
 		const { setValueInputSearch } = useGifsStickersEmoji();
 		const { directId: currentDmGroupId } = useAppParams();
 
@@ -34,6 +34,8 @@ const GifStickerEmojiButtons = memo(
 				setSubPanelActive(SubPanelName.GIFS);
 				setShowCategories(true);
 				setValueInputSearch('');
+				setClickedTrendingGif(false);
+				setButtonArrowBack(false);
 				dispatch(reactionActions.setReactionRightState(false));
 				dispatch(reactionActions.setReactionBottomState(false));
 				if (subPanelActive === SubPanelName.GIFS) {
@@ -53,7 +55,8 @@ const GifStickerEmojiButtons = memo(
 				setSubPanelActive(SubPanelName.STICKERS);
 				setShowCategories(true);
 				setValueInputSearch('');
-
+				setClickedTrendingGif(false);
+				setButtonArrowBack(false);
 				dispatch(reactionActions.setReactionRightState(false));
 				dispatch(reactionActions.setReactionBottomState(false));
 				if (subPanelActive === SubPanelName.STICKERS) {
@@ -72,6 +75,8 @@ const GifStickerEmojiButtons = memo(
 				handleFocusOnTargetInput();
 				setShowCategories(true);
 				setValueInputSearch('');
+				setClickedTrendingGif(false);
+				setButtonArrowBack(false);
 				dispatch(reactionActions.setReactionRightState(false));
 				dispatch(reactionActions.setReactionBottomState(false));
 				if (subPanelActive === SubPanelName.EMOJI) {
