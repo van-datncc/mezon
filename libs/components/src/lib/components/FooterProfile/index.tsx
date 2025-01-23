@@ -1,6 +1,8 @@
 import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
+	TOKEN_FAILED_STATUS,
+	TOKEN_SUCCESS_STATUS,
 	channelMembersActions,
 	giveCoffeeActions,
 	selectAccountCustomStatus,
@@ -41,7 +43,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
-	const InfoSendToken = useSelector(selectInfoSendToken);
+	const infoSendToken = useSelector(selectInfoSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
@@ -57,6 +59,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
 	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
+	const [isInputDisabled, setIsInputDisabled] = useState<boolean>(false);
 
 	const isMe = userId === myProfile?.userId;
 
@@ -95,6 +98,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setNote('send token');
 		setUserSearchError('');
 		setError('');
+		setIsInputDisabled(false);
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
 	};
 
@@ -116,25 +120,23 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		const tokenEvent: ApiTokenSentEvent = {
 			sender_id: myProfile.userId as string,
 			sender_name: myProfile?.userProfile?.user?.username as string,
-			receiver_id: userId,
-			amount: token,
+			receiver_id: infoSendToken?.receiver_id ?? userId,
+			amount: infoSendToken?.amount ?? token,
 			note: note,
-			extra_attribute: extraAttribute
+			extra_attribute: infoSendToken?.extra_attribute ?? extraAttribute
 		};
 
 		try {
-			const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
-			if (response) {
-				dispatch(giveCoffeeActions.setIsSendToken(true));
-			}
+			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
 		} catch (err) {
-			dispatch(giveCoffeeActions.setIsSendToken(false));
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}
 		handleCloseModalSendToken();
 	};
 
 	const handleClosePopup = () => {
-		dispatch(giveCoffeeActions.setIsSendToken(false));
+		dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: null, status: TOKEN_FAILED_STATUS }));
 		handleCloseModalSendToken();
 	};
 
@@ -159,11 +161,17 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, []);
 
 	useEffect(() => {
-		if (showModalSendToken && InfoSendToken) {
-			setToken(InfoSendToken.amount ?? 0);
-			setSelectedUserId(InfoSendToken.receiver_id ?? '');
-			setNote(InfoSendToken.note ?? 'send token');
-			setExtraAttribute(InfoSendToken.extra_attribute ?? '');
+		if (showModalSendToken && infoSendToken) {
+			setToken(infoSendToken.amount ?? 0);
+			setSelectedUserId(infoSendToken.receiver_id ?? '');
+			setNote(infoSendToken.note ?? 'send token');
+			setExtraAttribute(infoSendToken.extra_attribute ?? '');
+			setIsInputDisabled(true);
+			const timer = setTimeout(() => {
+				handleClosePopup();
+			}, 10000);
+
+			return () => clearTimeout(timer);
 		}
 	}, [showModalSendToken]);
 
@@ -240,6 +248,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
 					note={note}
+					isInputDisabled={isInputDisabled}
 				/>
 			)}
 		</>
