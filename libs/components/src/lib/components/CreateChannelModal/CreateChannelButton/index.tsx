@@ -1,4 +1,4 @@
-import { RootState } from '@mezon/store';
+import { selectLoadingStatus } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 
@@ -9,7 +9,7 @@ interface CreateChannelProps {
 }
 
 export const CreateChannelButton: React.FC<CreateChannelProps> = ({ checkInputError, onClickCancel, onClickCreate }) => {
-	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
+	const isLoading = useSelector(selectLoadingStatus);
 	return (
 		<div
 			className="Frame394 absolute border-t border-solid dark:border-borderDefault self-stretch mb-0 pt-3 justify-end items-center gap-4 inline-flex bottom-5 right-5"

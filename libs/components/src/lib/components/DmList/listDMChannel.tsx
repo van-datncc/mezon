@@ -1,7 +1,6 @@
 import { useAppParams, useMenu } from '@mezon/core';
 import {
 	channelsActions,
-	directActions,
 	selectCloseMenu,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
@@ -63,7 +62,6 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 
 	const joinToChatAndNavigate = useCallback(
 		async (DMid: string, type: number) => {
-			dispatch(directActions.setDmGroupCurrentId(DMid));
 			dispatch(channelsActions.setPreviousChannels({ channelId: DMid, clanId: '0' }));
 			navigate(`/chat/direct/message/${DMid}/${type}`);
 			if (closeMenu) {

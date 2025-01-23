@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, TouchableOpacity, ViewStyle } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import { WAY_AUDIO } from '../../../../../../assets/lottie';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 const formatTime = (millis: number) => {
 	const minutes = Math.floor(millis / 60000);
@@ -14,8 +15,9 @@ const formatTime = (millis: number) => {
 };
 const RenderAudioChat = React.memo(
 	({ audioURL, stylesContainerCustom, styleLottie }: { audioURL: string; stylesContainerCustom?: ViewStyle; styleLottie?: ViewStyle }) => {
+		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
-		const styles = style(themeValue);
+		const styles = style(themeValue, isTabletLandscape);
 		const recordingWaveRef = useRef(null);
 		const [isPlaying, setIsPlaying] = useState(false);
 		const [sound, setSound] = useState<Audio.Sound | null>(null);

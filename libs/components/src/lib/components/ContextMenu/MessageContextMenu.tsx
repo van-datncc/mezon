@@ -400,7 +400,7 @@ function MessageContextMenu({
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
-		return !checkMessageInPinnedList;
+		return !checkMessageInPinnedList && !isTopic;
 	}, [checkMessageInPinnedList, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {

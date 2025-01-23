@@ -1,8 +1,9 @@
+import { STORAGE_IS_DISABLE_LOAD_BACKGROUND, load } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Keyboard, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -18,6 +19,8 @@ const HomeScreen = React.memo(() => {
 	const dispatch = useDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation();
+	const isDisableLoad = useMemo(() => load(STORAGE_IS_DISABLE_LOAD_BACKGROUND), []);
+	const isFromFCM = useMemo(() => isDisableLoad?.toString() === 'true', [isDisableLoad]);
 
 	if (isTabletLandscape) {
 		return (
@@ -35,7 +38,7 @@ const HomeScreen = React.memo(() => {
 	return (
 		<View style={{ flex: 1, position: 'relative' }}>
 			<Drawer.Navigator
-				defaultStatus="open"
+				defaultStatus={isFromFCM ? 'closed' : 'open'}
 				screenOptions={{
 					drawerPosition: 'left',
 					drawerType: 'back',
@@ -50,9 +53,9 @@ const HomeScreen = React.memo(() => {
 					state: (e) => {
 						Keyboard.dismiss();
 						if (e.data.state.history?.length > 1) {
-							dispatch(appActions.setHiddenBottomTabMobile(true));
+							dispatch(appActions.setHiddenBottomTabMobile(!isFromFCM));
 						} else {
-							dispatch(appActions.setHiddenBottomTabMobile(false));
+							dispatch(appActions.setHiddenBottomTabMobile(isFromFCM));
 						}
 					}
 				}}

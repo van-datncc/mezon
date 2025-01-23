@@ -1,7 +1,7 @@
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button, Dropdown, Label, Modal } from 'flowbite-react';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 type ModalCustomStatusProps = {
 	name: string;
@@ -10,9 +10,20 @@ type ModalCustomStatusProps = {
 	customStatus?: string;
 	setCustomStatus: (customStatus: string) => void;
 	handleSaveCustomStatus?: () => void;
+	setResetTimerStatus: (minutes: number) => void;
+	setNoClearStatus: (noClear: boolean) => void;
 };
 
-const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomStatus, handleSaveCustomStatus }: ModalCustomStatusProps) => {
+const ModalCustomStatus = ({
+	openModal,
+	name,
+	customStatus,
+	onClose,
+	setCustomStatus,
+	handleSaveCustomStatus,
+	setResetTimerStatus,
+	setNoClearStatus
+}: ModalCustomStatusProps) => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -24,6 +35,23 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 	const handleChangeCustomStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const updatedStatus = e.target.value.slice(0, 128).replace(/\\/g, '\\\\');
 		setCustomStatus(updatedStatus);
+	};
+
+	const [timeSetReset, setTimeSetReset] = useState<string>('Today');
+
+	const setStatusTimer = (minutes: number, noClear: boolean, option: string) => {
+		setTimeSetReset(option);
+		if (noClear) {
+			setNoClearStatus(noClear);
+		} else {
+			if (option === 'Today') {
+				const now = new Date();
+				const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+				const timeDifference = endOfDay.getTime() - now.getTime();
+				minutes = Math.floor(timeDifference / (1000 * 60));
+			}
+			setResetTimerStatus(minutes);
+		}
 	};
 
 	return (
@@ -62,7 +90,7 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 							dismissOnClick={false}
 							renderTrigger={() => (
 								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
-									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">Today</li>
+									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">{timeSetReset}</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
@@ -70,11 +98,11 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 							placement="bottom-start"
 							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
 						>
-							<ItemSelect children="Today" />
-							<ItemSelect children="4 hours" />
-							<ItemSelect children="1 hours" />
-							<ItemSelect children="30 minutes" />
-							<ItemSelect children="Don't clear" />
+							<ItemSelect children="Today" onClick={() => setStatusTimer(0, false, 'Today')} />
+							<ItemSelect children="4 hours" onClick={() => setStatusTimer(240, false, '4 hours')} />
+							<ItemSelect children="1 hours" onClick={() => setStatusTimer(60, false, '1 hours')} />
+							<ItemSelect children="30 minutes" onClick={() => setStatusTimer(30, false, '30 minutes')} />
+							<ItemSelect children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
 						</Dropdown>
 					</div>
 					<div className="px-4">

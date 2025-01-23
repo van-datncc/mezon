@@ -93,7 +93,16 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 			channelId = currentDirectId;
 		}
 
-		channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
+		channelId &&
+			thunkAPI.dispatch(
+				messagesActions.fetchMessages({
+					clanId: clanId || '',
+					channelId: channelId,
+					isFetchingLatestMessages: true,
+					isClearMessage: true,
+					noCache: true
+				})
+			);
 
 		thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 		thunkAPI.dispatch(clansActions.fetchClans());

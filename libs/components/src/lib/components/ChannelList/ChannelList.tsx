@@ -1,13 +1,8 @@
-import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
   ChannelsEntity,
   ClansEntity,
-  appActions,
   categoriesActions,
-  selectAllCategories,
-  selectAllChannelsFavorite,
-  selectChannelById,
-  selectChannelThreads,
   selectChannelsByClanId,
   selectChannelsEntities,
   selectCtrlKFocusChannel,
@@ -22,9 +17,7 @@ import {
   useAppDispatch,
   useAppSelector
 } from '@mezon/store';
-import { Icons } from '@mezon/ui';
 import {
-  ChannelStatusEnum,
   ChannelThreads,
   EPermission,
   ICategoryChannel,
@@ -35,8 +28,7 @@ import {
   toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { listChannelRenderAction, selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
-import { ChannelType } from 'mezon-js';
+import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -50,13 +42,9 @@ export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
   const appearanceTheme = useSelector(selectTheme);
-  const shouldRender = useIdleRender();
-
-  if (!shouldRender) return <></>;
-
   return (
-    <div onContextMenu={(event) => event.preventDefault()} id="channelList" role="button">
-      {<CreateNewChannelModal />}
+    <div onContextMenu={(event) => event.preventDefault()} id="channelList" className="h-full">
+      <CreateNewChannelModal />
       <hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
       <div className={`flex-1 space-y-[21px] text-gray-300`}>
         <RowVirtualizerDynamic appearanceTheme={appearanceTheme} />
@@ -151,7 +139,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     const focusChannel = ctrlKFocusChannel;
     const { id, parentId } = focusChannel as { id: string; parentId: string };
     const categoryId = channels[id]?.category_id;
-    const index = data.findIndex((item) => item.id === categoryId);
+    const index = data.findIndex((item) => item.id === id);
     if (index <= 0) return;
 
     const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
@@ -280,7 +268,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                       isActive={currentChannelId === item.id}
                       thread={item}
                       isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
-                      isCollapsed={false}
                     />
                   </div>
                 )

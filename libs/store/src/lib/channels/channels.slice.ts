@@ -1329,3 +1329,15 @@ export const selectBuzzStateByChannelId = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (state, channelId: string) => channelId],
 	(state, clanId, channelId) => state.byClans[clanId]?.buzzState[channelId]
 );
+
+export const selectLoadingStatus = createSelector([getChannelsState], (state) => state.loadingStatus);
+
+export const selectIsOpenCreateNewChannel = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.isOpenCreateNewChannel ?? false
+);
+
+export const selectCurrentCategory = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => state.byClans[clanId]?.currentCategory
+);

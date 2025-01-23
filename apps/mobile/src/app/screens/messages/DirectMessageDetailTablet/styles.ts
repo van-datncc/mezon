@@ -45,7 +45,8 @@ export const style = (colors: Attributes) =>
 		friendAvatar: {
 			width: size.s_30,
 			height: size.s_30,
-			borderRadius: 50
+			borderRadius: 50,
+			overlayColor: colors.secondary
 		},
 		statusCircle: {
 			position: 'absolute',
