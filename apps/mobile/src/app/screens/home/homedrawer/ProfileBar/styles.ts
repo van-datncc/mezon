@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 		imageWrapper: {
 			height: size.s_50,
 			width: size.s_50,
-			borderRadius: size.s_50
+			borderRadius: size.s_50,
+			overlayColor: colors.secondary
 		},
 		userInfo: {
 			justifyContent: 'center'

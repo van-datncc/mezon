@@ -1,17 +1,20 @@
 import { Icons, STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
-import { Block, Metrics, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../InviteToChannel';
 import { style } from './StreamingRoom.styles';
 import { StreamingScreenComponent } from './StreamingScreen';
 import UserStreamingRoom from './UserStreamingRoom';
+
+const { width, height } = Dimensions.get('window');
 
 function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMinimizeRoom: () => void; isAnimationComplete: boolean }) {
 	const { themeValue } = useTheme();
@@ -19,6 +22,7 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 	const bottomSheetInviteRef = useRef(null);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const isTabletLandscape = useTabletLandscape();
 
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
@@ -47,9 +51,12 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 	};
 
 	const handleShowChat = () => {
-		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-			screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
-		});
+		if (!isTabletLandscape) {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
+			});
+			return;
+		}
 		onPressMinimizeRoom();
 	};
 
@@ -57,8 +64,8 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 		<SafeAreaView>
 			<Block
 				style={{
-					width: isAnimationComplete ? Metrics.screenWidth : 200,
-					height: isAnimationComplete ? Metrics.screenHeight : 100,
+					width: isAnimationComplete ? width : 200,
+					height: isAnimationComplete ? height : 100,
 					backgroundColor: themeValue?.primary
 				}}
 			>
