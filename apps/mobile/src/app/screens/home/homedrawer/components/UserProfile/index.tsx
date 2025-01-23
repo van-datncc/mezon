@@ -70,6 +70,10 @@ const UserProfile = React.memo(
 		const { dismiss } = useBottomSheetModal();
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 
+		const isDMThread = useMemo(() => {
+			return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
+		}, [currentChannel]);
+
 		const status = getUserStatusByMetadata(user?.user?.metadata);
 
 		const isKicked = useMemo(() => {
@@ -224,8 +228,12 @@ const UserProfile = React.memo(
 						<MezonAvatar
 							width={size.s_80}
 							height={size.s_80}
-							avatarUrl={messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
-							username={userById?.clan_nick || user?.display_name || userById?.user?.username}
+							avatarUrl={
+								!isDMThread
+									? messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url
+									: userById?.user?.avatar_url || user?.user?.avatar_url
+							}
+							username={user?.user?.username}
 							userStatus={userStatus}
 							customStatus={status}
 							isBorderBoxImage={true}
@@ -237,7 +245,9 @@ const UserProfile = React.memo(
 					<View style={[styles.userInfo]}>
 						<Text style={[styles.userName]}>
 							{userById
-								? userById.clan_nick || userById?.user?.display_name || userById?.user?.username
+								? !isDMThread
+									? userById?.clan_nick || userById?.user?.display_name || userById?.user?.username
+									: userById?.user?.display_name || userById?.user?.username
 								: user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
@@ -286,7 +296,7 @@ const UserProfile = React.memo(
 								</Block>
 							)}
 							<ActivityAppComponent userId={userId || user?.id || ''} />
-							{userRolesClan?.length && showRole ? (
+							{userRolesClan?.length && showRole && !isDMThread ? (
 								<Block>
 									<Text style={[styles.title]}>{t('aboutMe.roles.headerTitle')}</Text>
 									<View style={[styles.roles]}>
