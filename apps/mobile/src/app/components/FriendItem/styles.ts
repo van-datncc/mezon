@@ -23,6 +23,14 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			flex: 1
 		},
+		displayName: {
+			paddingVertical: 0,
+			paddingHorizontal: size.s_10,
+			color: colors.textStrong,
+			flexGrow: 1,
+			flexShrink: 1,
+			fontSize: size.medium
+		},
 		online: {
 			backgroundColor: Colors.green
 		},
