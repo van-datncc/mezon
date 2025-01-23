@@ -30,7 +30,6 @@ import {
   toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -38,7 +37,7 @@ import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
-import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
+import ChannelListItem from './ChannelListItem';
 import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -83,7 +82,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
   const IsElectronDownloading = useSelector(selectIsElectronDownloading);
   const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
-  const channels = useSelector(selectChannelsEntities);
   const dispatch = useAppDispatch();
 
   const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
@@ -154,8 +152,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     if (!virtualizer.getVirtualItems().length) return;
 
     const focusChannel = ctrlKFocusChannel;
-    const { id, parentId } = focusChannel as { id: string; parentId: string };
-    const categoryId = channels[id]?.category_id;
+    const { id } = focusChannel as { id: string; parentId: string };
     const index = data.findIndex((item) => item.id === id);
     if (index <= 0) return;
 
@@ -244,7 +241,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
             } else if (item.channels) {
               return (
                 <div
-                  style={{ padding: '10px 0' }}
+                  style={{ padding: '10px 0 6px' }}
                   key={virtualRow.key}
                   data-index={virtualRow.index}
                   ref={virtualizer.measureElement}
