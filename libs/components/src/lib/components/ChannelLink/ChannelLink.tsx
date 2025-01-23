@@ -262,6 +262,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
+								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
+									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+								)}
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && !isAgeRestrictedChannel && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}

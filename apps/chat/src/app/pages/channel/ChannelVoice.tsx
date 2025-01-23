@@ -7,7 +7,6 @@ import { Track } from 'livekit-client';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
 
-const serverUrl = 'wss://meet.mezon.vn';
 interface ChannelVoiceProps {
 	channel: ApiChannelAppResponse;
 	roomName: string;
@@ -68,7 +67,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 					video={true}
 					audio={true}
 					token={token}
-					serverUrl={serverUrl}
+					serverUrl={process.env.NX_CHAT_APP_STREAM_WS_URL}
 					data-lk-theme="default"
 					style={{ height: 'calc(100vh - 117px)' }}
 				>
