@@ -395,8 +395,6 @@ const SidebarMenu = memo(
 
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
 
-		console.log(idsSelectedChannel, 'idsSelectedChannel');
-
 		return (
 			<div
 				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
