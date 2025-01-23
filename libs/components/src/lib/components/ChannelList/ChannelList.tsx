@@ -1,11 +1,8 @@
-import { useAppNavigation, useCategorizedChannelsWeb, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
   ChannelsEntity,
   ClansEntity,
-  appActions,
   categoriesActions,
-  selectAllChannelsFavorite,
-  selectChannelById,
   selectChannelsByClanId,
   selectChannelsEntities,
   selectCtrlKFocusChannel,
@@ -20,9 +17,7 @@ import {
   useAppDispatch,
   useAppSelector
 } from '@mezon/store';
-import { Icons } from '@mezon/ui';
 import {
-  ChannelStatusEnum,
   ChannelThreads,
   EPermission,
   ICategoryChannel,
@@ -33,7 +28,7 @@ import {
   toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ChannelType } from 'mezon-js';
+import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -41,8 +36,7 @@ import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
-import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
-import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
+import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
