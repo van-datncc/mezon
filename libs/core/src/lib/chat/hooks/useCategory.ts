@@ -107,14 +107,13 @@ function sortChannels(channels: IChannel[]): IChannel[] {
     channelMap.set(channel.id, channel);
   });
 
-  // Use reduce to sort channels
-  channels.reduce((acc, channel) => {
+  // Use forEach to sort channels
+  channels.forEach(channel => {
     if (!channel.parrent_id || channel.parrent_id === '0') {
-      acc.push(channel);
-      addChildren(channel, acc);
+      sortedChannels.push(channel);
+      addChildren(channel, sortedChannels);
     }
-    return acc;
-  }, sortedChannels);
+  });
 
   function addChildren(parent: IChannel, acc: IChannel[]) {
     channels
