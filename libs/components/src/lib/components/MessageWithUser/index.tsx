@@ -171,7 +171,6 @@ function MessageWithUser({
 		if (shortUserId.current === message?.sender_id) {
 			return isDM ? message?.avatar : message?.clan_avatar || message?.avatar;
 		}
-		return message?.avatar;
 	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.sender_id]);
 
 	const messageHour = message ? convertTimeHour(message.create_time) : '';

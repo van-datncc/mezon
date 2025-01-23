@@ -1,7 +1,6 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage } from '@mezon/core';
 import {
-	RootState,
 	channelsActions,
 	checkDuplicateThread,
 	createNewChannel,
@@ -10,6 +9,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectSession,
 	selectThreadCurrentChannel,
 	useAppDispatch,
 	useAppSelector
@@ -28,7 +28,7 @@ const ThreadBox = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
 
 	const membersOfParent = useAppSelector((state) =>
@@ -137,7 +137,7 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+			<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}

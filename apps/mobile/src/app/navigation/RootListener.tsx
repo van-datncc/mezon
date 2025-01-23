@@ -39,7 +39,7 @@ import {
 import notifee from '@notifee/react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import { AppState, DeviceEventEmitter, InteractionManager, Platform, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
 import useTabletLandscape from '../hooks/useTabletLandscape';
 import { handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
 
@@ -63,7 +63,7 @@ const RootListener = () => {
 	useEffect(() => {
 		if (isLoggedIn) {
 			authLoader();
-			InteractionManager.runAfterInteractions(() => {
+			requestIdleCallback(() => {
 				setTimeout(() => {
 					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
 						console.error('Error in tasks:', error);

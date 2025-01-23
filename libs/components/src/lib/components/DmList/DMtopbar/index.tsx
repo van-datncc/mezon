@@ -1,9 +1,8 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { useChatSending, useIdleRender, useMenu } from '@mezon/core';
+import { useChatSending, useMenu } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	DirectEntity,
-	RootState,
 	appActions,
 	audioCallActions,
 	directActions,
@@ -15,6 +14,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsShowPinBadgeByDmId,
 	selectIsUseProfileDM,
+	selectSession,
 	selectStatusMenu,
 	selectTheme,
 	toastActions,
@@ -95,7 +95,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const isInCall = useSelector(selectIsInCall);
 
 	const handleSend = useCallback(
@@ -141,10 +141,6 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	};
 
 	const isLightMode = appearanceTheme === 'light';
-
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return null;
 
 	return (
 		<>

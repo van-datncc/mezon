@@ -192,14 +192,16 @@ export const removeMemberChannel = createAsyncThunk(
 type UpdateCustomStatus = {
 	clanId: string;
 	customStatus: string;
+	minutes: number;
+	noClear: boolean;
 };
 
 export const updateCustomStatus = createAsyncThunk(
 	'channelMembers/updateCustomStatusUser',
-	async ({ clanId, customStatus }: UpdateCustomStatus, thunkAPI) => {
+	async ({ clanId, customStatus, minutes, noClear }: UpdateCustomStatus, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus);
+			const response = await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus, minutes, noClear);
 			thunkAPI.dispatch(accountActions.setCustomStatus(customStatus));
 			thunkAPI.dispatch(accountActions.getUserProfile({ noCache: true }));
 			if (response) {

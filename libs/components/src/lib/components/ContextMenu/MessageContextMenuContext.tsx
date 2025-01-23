@@ -148,7 +148,7 @@ export const MessageContextMenuProvider = ({
 		const mode = getActiveMode(appState);
 		const message = getMessage(appState, isTopic, messageIdRef.current);
 		return <ModalDeleteMess mess={message} closeModal={closeDeleteMessageModal} mode={mode} />;
-	}, []);
+	}, [messageIdRef.current]);
 
 	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
 		const appState = appStore.getState() as RootState;
@@ -165,7 +165,7 @@ export const MessageContextMenuProvider = ({
 				channelLabel={currentChannel?.channel_label || ''}
 			/>
 		);
-	}, []);
+	}, [messageIdRef.current]);
 
 	const handlePinMessage = useCallback(async () => {
 		const appState = appStore.getState() as RootState;

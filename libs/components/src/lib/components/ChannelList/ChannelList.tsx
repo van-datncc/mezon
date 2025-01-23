@@ -1,13 +1,11 @@
-import { useAppNavigation, useCategorizedChannelsWeb, useIdleRender, usePermissionChecker, useWindowSize } from '@mezon/core';
+import { useAppNavigation, useCategorizedChannelsWeb, usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
   ChannelsEntity,
   ClansEntity,
   appActions,
   categoriesActions,
-  selectAllCategories,
   selectAllChannelsFavorite,
   selectChannelById,
-  selectChannelThreads,
   selectChannelsByClanId,
   selectChannelsEntities,
   selectCtrlKFocusChannel,
@@ -35,7 +33,6 @@ import {
   toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { listChannelRenderAction, selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -50,13 +47,9 @@ export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
   const appearanceTheme = useSelector(selectTheme);
-  const shouldRender = useIdleRender();
-
-  if (!shouldRender) return <></>;
-
   return (
-    <div onContextMenu={(event) => event.preventDefault()} id="channelList" role="button">
-      {<CreateNewChannelModal />}
+    <div onContextMenu={(event) => event.preventDefault()} id="channelList" className="h-full">
+      <CreateNewChannelModal />
       <hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
       <div className={`flex-1 space-y-[21px] text-gray-300`}>
         <RowVirtualizerDynamic appearanceTheme={appearanceTheme} />
@@ -86,9 +79,8 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
   const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
+  const categorizedChannels = useCategorizedChannelsWeb();
   const currentClan = useSelector(selectCurrentClan);
-  const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id))
-  console.log('listChannelRender: ', listChannelRender);
   const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
   const streamPlay = useSelector(selectStatusStream);
   const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
@@ -102,16 +94,21 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
   const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
 
-
   const data = useMemo(
     () => [
       { type: 'bannerAndEvents' },
       { type: 'favorites' },
-      ...(listChannelRender ? (isShowEmptyCategory ? listChannelRender : listChannelRender.filter((item) => ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) || (item as ICategoryChannel).channels === undefined)) : [])
+      ...(isShowEmptyCategory
+        ? categorizedChannels
+        : categorizedChannels.filter(
+          (item) =>
+            ((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
+            (item as ICategoryChannel).channels === undefined
+        ))
     ],
-    [listChannelRender, isShowEmptyCategory]
+    [categorizedChannels, isShowEmptyCategory]
   ) as ICategoryChannel[];
-  const currentChannelId = useSelector(selectCurrentChannelId)
+  const currentChannelId = useSelector(selectCurrentChannelId);
 
   const parentRef = useRef<HTMLDivElement>(null);
   const count = data.length;
@@ -140,9 +137,24 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
   useEffect(() => {
     calculateHeight();
-  }, [streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
+  }, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
+  const channelFavorites = useSelector(selectAllChannelsFavorite);
+  const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
 
+  const handleExpandFavoriteChannel = () => {
+    setIsExpandFavorite(!isExpandFavorite);
+  };
+
+  const findScrollIndex = () => {
+    const categoryId = firstChannelWithBadgeCount?.id;
+    const index = data.findIndex((item) => item.id === categoryId);
+    const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
+    const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
+    const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
+
+    return { index, currentScrollIndex, currentScrollPosition, targetScrollPosition };
+  };
 
   useLayoutEffect(() => {
     if (!ctrlKFocusChannel?.id || !channelRefs?.current) return;
@@ -151,7 +163,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     const focusChannel = ctrlKFocusChannel;
     const { id, parentId } = focusChannel as { id: string; parentId: string };
     const categoryId = channels[id]?.category_id;
-    const index = data.findIndex((item) => item.id === categoryId);
+    const index = data.findIndex((item) => item.id === id);
     if (index <= 0) return;
 
     const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
@@ -160,19 +172,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
       virtualizer.scrollToIndex(index, { align: 'center' });
     }
-    if (id && parentId && parentId !== '0') {
-      if (channelRefs.current[parentId]?.channelRef) {
-        requestAnimationFrame(() => {
-          channelRefs.current[parentId]?.scrollIntoThread(id);
-        });
-      }
-    } else if (id) {
-      if (channelRefs.current[id]?.channelRef) {
-        requestAnimationFrame(() => {
-          channelRefs.current[id]?.scrollIntoChannel();
-        });
-      }
-    }
+
     setTimeout(() => {
       dispatch(categoriesActions.setCtrlKFocusChannel(null));
     }, 100);
@@ -197,21 +197,15 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   );
 
   const handleScrollChannelIntoView = useCallback(() => {
-    if (!firstChannelWithBadgeCount) return;
-
-    if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-      channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.scrollIntoThread(firstChannelWithBadgeCount?.channel_id || '');
-      return;
+    const { index, currentScrollIndex, currentScrollPosition, targetScrollPosition } = findScrollIndex();
+    if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
+      virtualizer.scrollToIndex(index, { align: 'center' });
     }
-
-    channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.scrollIntoChannel();
   }, [firstChannelWithBadgeCount]);
 
   const isChannelRefOutOfViewport = () => {
-    if (firstChannelWithBadgeCount?.parrent_id !== '0') {
-      return !channelRefs.current[firstChannelWithBadgeCount?.parrent_id || '']?.isInViewport();
-    }
-    return !channelRefs.current[firstChannelWithBadgeCount?.channel_id || '']?.isInViewport();
+    const { currentScrollIndex } = findScrollIndex();
+    return currentScrollIndex === -1;
   };
 
   return (
@@ -254,19 +248,34 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                   <ChannelBannerAndEvents currentClan={currentClan} />
                 </div>
               );
+            } else if (virtualRow.index === 1) {
+              return (
+                <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+                  <FavoriteChannelsSection
+                    isExpandFavorite={isExpandFavorite}
+                    handleExpandFavoriteChannel={handleExpandFavoriteChannel}
+                    channelFavorites={channelFavorites}
+                  />
+                </div>
+              );
             } else if (item.channels) {
               return (
-                <div style={{ padding: '10px 0' }} key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+                <div
+                  style={{ padding: '10px 0' }}
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                >
                   <CategorizedItem key={item.id} category={item} channelRefs={channelRefs} />
                 </div>
               );
             } else {
-              if ((item as IChannel).parrent_id === '0') {
+              if (!(item as IChannel)?.parrent_id || (item as IChannel).parrent_id === '0') {
                 return (
                   <div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
                     <ChannelListItem
-                      isActive={currentChannelId === (item as IChannel).channel_id}
-                      key={(item as IChannel).channel_id}
+                      isActive={currentChannelId === item.id}
+                      key={item.id}
                       channel={item as ChannelThreads}
                       permissions={permissions}
                     />
@@ -280,12 +289,10 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
                       isActive={currentChannelId === item.id}
                       thread={item}
                       isFirstThread={(data[virtualRow.index - 1] as IChannel).parrent_id === '0'}
-                      isCollapsed={false}
                     />
                   </div>
-                )
+                );
               }
-
             }
           })}
         </div>
@@ -293,6 +300,75 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
     </div>
   );
 });
+
+const FavoriteChannelsSection = ({
+  isExpandFavorite,
+  handleExpandFavoriteChannel,
+  channelFavorites
+}: {
+  isExpandFavorite: boolean;
+  handleExpandFavoriteChannel: () => void;
+  channelFavorites: string[];
+}) => (
+  <div>
+    <div
+      className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold px-2"
+      onClick={handleExpandFavoriteChannel}
+    >
+      {isExpandFavorite ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+      <span className="one-line">Favorite channel</span>
+    </div>
+    {isExpandFavorite ? (
+      <div className="w-[94%] mx-auto">
+        {channelFavorites ? channelFavorites.map((id, index) => <FavoriteChannel key={index} channelId={id} />) : ''}
+      </div>
+    ) : null}
+  </div>
+);
+type FavoriteChannelProps = {
+  channelId: string;
+};
+
+const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
+  const channel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
+  const theme = useSelector(selectTheme);
+  const dispatch = useAppDispatch();
+  const { navigate, toChannelPage } = useAppNavigation();
+  const handleJumpChannel = (channel: ChannelsEntity) => {
+    dispatch(appActions.setIsShowCanvas(false));
+    dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
+    const channelUrl = toChannelPage(channel?.id ?? '', channel?.clan_id ?? '');
+    navigate(channelUrl);
+  };
+  return (
+    Object.keys(channel).length > 0 && (
+      <div
+        onClick={() => handleJumpChannel(channel)}
+        className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
+      >
+        <div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
+          {channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+            <Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+          )}
+          {channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
+            <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+          )}
+          {channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+            <Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+          )}
+          {channel.channel_private !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
+            <Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+          )}
+          {channel.channel_private === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
+            <Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+          )}
+          {channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
+        </div>
+        {channel.channel_label}
+      </div>
+    )
+  );
+};
 
 const ChannelListMem = memo(ChannelList, () => true);
 

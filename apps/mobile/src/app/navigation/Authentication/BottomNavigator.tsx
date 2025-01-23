@@ -4,6 +4,7 @@ import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { memo, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import Notifications from '../../screens/Notifications';
@@ -20,6 +21,10 @@ const BottomNavigator = memo(({ isLastActiveTabDm = false }: { isLastActiveTabDm
 	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
 	const { themeValue } = useTheme();
 	const tabBarTranslateY = useRef(new Animated.Value(0)).current;
+
+	useEffect(() => {
+		BootSplash.hide({ fade: true });
+	}, []);
 
 	useEffect(() => {
 		Animated.timing(tabBarTranslateY, {
