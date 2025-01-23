@@ -67,7 +67,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 					video={true}
 					audio={true}
 					token={token}
-					serverUrl={process.env.NX_CHAT_APP_STREAM_WS_URL}
+					serverUrl={process.env.NX_CHAT_APP_MEET_WS_URL}
 					data-lk-theme="default"
 					style={{ height: 'calc(100vh - 117px)' }}
 				>
