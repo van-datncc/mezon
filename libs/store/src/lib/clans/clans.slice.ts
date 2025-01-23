@@ -4,7 +4,6 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc, ApiUpdateAccountRequest } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
-import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
@@ -67,7 +66,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		try {
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId: '' }));
 			thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
-			thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
 			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 			thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
