@@ -104,9 +104,19 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			lk: channelDraftMessage?.draftContent?.lk,
 			mk: channelDraftMessage?.draftContent?.mk,
 			vk: channelDraftMessage?.draftContent?.vk,
-			tp: channelDraftMessage?.draftTopicId
+			tp: channelDraftMessage?.draftTopicId,
+			cid: channelDraftMessage?.draftContent?.cid
 		};
-	}, [channelDraftMessage?.draftContent, messageId]);
+	}, [
+		channelDraftMessage?.draftContent?.cid,
+		channelDraftMessage?.draftContent?.ej,
+		channelDraftMessage?.draftContent?.hg,
+		channelDraftMessage?.draftContent?.lk,
+		channelDraftMessage?.draftContent?.mk,
+		channelDraftMessage?.draftContent?.t,
+		channelDraftMessage?.draftContent?.vk,
+		channelDraftMessage?.draftTopicId
+	]);
 
 	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
 
@@ -243,7 +253,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			{
 				t: newPlainTextValue,
 				hg: hashtagList,
-				ej: emojiList
+				ej: emojiList,
+				cid: message?.content?.cid
 			},
 			mentionList,
 			attachmentOnMessage ?? [],
