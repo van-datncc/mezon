@@ -27,10 +27,9 @@ type ThreadLinkWrapperProps = {
 	thread: IChannel;
 	isFirstThread: boolean;
 	isActive: boolean;
-	isCollapsed: boolean;
 };
 
-export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, isFirstThread, isActive, isCollapsed }) => {
+export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, isFirstThread, isActive }) => {
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const threadMeta = useAppSelector((state) => selectChannelMetaById(state, thread?.id));
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, thread.category_id as string));
@@ -60,7 +59,7 @@ export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, is
 		);
 	};
 
-	const shouldShow = !isCollapsed ? thread?.active === 1 : isShowThread(thread);
+	const shouldShow = thread?.active === 1 || isShowThread(thread);
 	if (!shouldShow || !isCategoryExpanded) {
 		return null;
 	}
