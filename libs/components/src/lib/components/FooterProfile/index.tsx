@@ -124,6 +124,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		handleCloseModalSendToken();
 	};
 
+	const handleClosePopup = () => {
+		dispatch(giveCoffeeActions.setIsSendToken(false));
+		handleCloseModalSendToken();
+	};
+
 	const loadParamsSendTokenFromURL = () => {
 		const params = new URLSearchParams(window.location.search);
 		const openPopup = params.get('openPopup') === 'true';
@@ -217,7 +222,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
-					onClose={handleCloseModalSendToken}
+					onClose={handleClosePopup}
 					setSelectedUserId={setSelectedUserId}
 					setNote={setNote}
 					error={error}
