@@ -18,7 +18,7 @@ export default function MezonTabHeader({ tabIndex, tabs, isNeedConfirmWhenSwitch
 
 	useEffect(() => {
 		if (tab !== tabIndex) setTab(tabIndex);
-	}, [tabIndex]);
+	}, [tab, tabIndex]);
 
 	async function handleTabHeaderPress(index: number) {
 		if (isNeedConfirmWhenSwitch) {

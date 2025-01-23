@@ -63,7 +63,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 	const isEmptyHeader = !title || !confirmText;
 
 	return (
-		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
+		<Modal visible={visible} animationType={animationType} transparent={true}>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 				<SafeAreaView style={{ flex: 1 }}>
 					<View style={[styles.container, containerStyle]}>
