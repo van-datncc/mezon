@@ -3,6 +3,8 @@ import {
   ChannelsEntity,
   ClansEntity,
   categoriesActions,
+  selectAllChannelsFavorite,
+  selectChannelById,
   selectChannelsByClanId,
   selectChannelsEntities,
   selectCtrlKFocusChannel,
@@ -28,7 +30,7 @@ import {
   toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
+import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -36,7 +38,8 @@ import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
-import ChannelListItem from './ChannelListItem';
+import ChannelListItem, { ChannelListItemRef } from './ChannelListItem';
+import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -86,9 +89,10 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
   const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
   const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentClan?.clan_id))
 
-  const findFirstChannelWithBadgeCount = (channels: ChannelsEntity[] = []) =>
-    channels?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
-  const firstChannelWithBadgeCount = findFirstChannelWithBadgeCount(channelsInClan);
+  const firstChannelWithBadgeCount = useMemo(() => {
+    return channelsInClan?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
+  }, [channelsInClan])
+
 
   const data = useMemo(
     () => [
