@@ -203,7 +203,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			mentions: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
 			hide_editted?: boolean,
-			topic_id?: string
+			mess_topic_id?: string
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -233,7 +233,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				validMentionList,
 				attachments,
 				hide_editted,
-				topic_id
+				'',
+				mess_topic_id
 			);
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
