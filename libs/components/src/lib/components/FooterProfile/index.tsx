@@ -1,6 +1,8 @@
 import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
+	TOKEN_FAILED_STATUS,
+	TOKEN_SUCCESS_STATUS,
 	channelMembersActions,
 	giveCoffeeActions,
 	selectAccountCustomStatus,
@@ -126,15 +128,15 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
-			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: 'SUCCESS' }));
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
 		} catch (err) {
-			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: 'FAILED' }));
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}
 		handleCloseModalSendToken();
 	};
 
 	const handleClosePopup = () => {
-		dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: null, status: 'FAILED' }));
+		dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: null, status: TOKEN_FAILED_STATUS }));
 		handleCloseModalSendToken();
 	};
 

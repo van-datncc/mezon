@@ -12,6 +12,8 @@ import {
 import {
 	ChannelsEntity,
 	ETypeMission,
+	TOKEN_FAILED_STATUS,
+	TOKEN_SUCCESS_STATUS,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
@@ -29,7 +31,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectFetchChannelStatus,
-	selectInfoSendToken,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
@@ -229,7 +230,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
-	const infoSendToken = useSelector(selectInfoSendToken);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -329,18 +329,22 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel?.url]);
 
-	useEffect(() => {
-		if (sendTokenEvent?.status === 'SUCCESS') {
+	const handleTokenResponse = () => {
+		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
 				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: sendTokenEvent?.tokenEvent?.sender_id }),
 				appChannel.url ?? ''
 			);
-		} else if (sendTokenEvent?.status === 'FAILED') {
+		} else if (sendTokenEvent?.status === TOKEN_FAILED_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
 				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: sendTokenEvent?.tokenEvent?.sender_id }),
 				appChannel.url ?? ''
 			);
 		}
+	};
+
+	useEffect(() => {
+		handleTokenResponse();
 		dispatch(giveCoffeeActions.setSendTokenEvent(null));
 		dispatch(giveCoffeeActions.setInfoSendToken(null));
 	}, [sendTokenEvent]);
@@ -364,7 +368,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"
 				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+				onDragEnter={canSendMessage ? handleDragEnter : () => { }}
 			>
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}

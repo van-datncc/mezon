@@ -7,6 +7,8 @@ import { ensureSession, getMezonCtx } from '../helpers';
 import { toastActions } from '../toasts/toasts.slice';
 
 export const GIVE_COFEE = 'giveCoffee';
+export const TOKEN_SUCCESS_STATUS = 'SUCCESS';
+export const TOKEN_FAILED_STATUS = 'FAILED';
 
 export interface GiveCoffeeEntity {
 	id: string; // Primary ID
