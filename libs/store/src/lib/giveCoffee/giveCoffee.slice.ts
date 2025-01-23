@@ -7,6 +7,8 @@ import { ensureSession, getMezonCtx } from '../helpers';
 import { toastActions } from '../toasts/toasts.slice';
 
 export const GIVE_COFEE = 'giveCoffee';
+export const TOKEN_SUCCESS_STATUS = 'SUCCESS';
+export const TOKEN_FAILED_STATUS = 'FAILED';
 
 export interface GiveCoffeeEntity {
 	id: string; // Primary ID
@@ -19,7 +21,10 @@ export interface GiveCoffeeState extends EntityState<GiveCoffeeEntity, string> {
 	tokenSocket: Record<string, ApiGiveCoffeeEvent>;
 	tokenUpdate: Record<string, number>;
 	infoSendToken: ApiTokenSentEvent | null;
-	isSendToken: boolean | null;
+	sendTokenEvent: {
+		tokenEvent: ApiTokenSentEvent,
+		status: string
+	} | null;
 }
 
 export const giveCoffeeAdapter = createEntityAdapter<GiveCoffeeEntity>();
@@ -57,7 +62,7 @@ export const initialGiveCoffeeState: GiveCoffeeState = giveCoffeeAdapter.getInit
 	tokenSocket: {},
 	tokenUpdate: {},
 	infoSendToken: null,
-	isSendToken: null
+	sendTokenEvent: null
 });
 
 export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: ApiTokenSentEvent, thunkAPI) => {
@@ -95,8 +100,8 @@ export const giveCoffeeSlice = createSlice({
 		setInfoSendToken: (state, action: PayloadAction<ApiTokenSentEvent | null>) => {
 			state.infoSendToken = action.payload;
 		},
-		setIsSendToken: (state, action: PayloadAction<boolean | null>) => {
-			state.isSendToken = action.payload;
+		setSendTokenEvent: (state, action) => {
+			state.sendTokenEvent = action.payload
 		},
 		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
 			const { tokenEvent } = action.payload;
@@ -173,7 +178,7 @@ export const selectShowModalSendToken = createSelector(getCoffeeState, (state) =
 
 export const selectInfoSendToken = createSelector(getCoffeeState, (state) => state.infoSendToken);
 
-export const selectIsSendToken = createSelector(getCoffeeState, (state) => state.isSendToken);
+export const selectSendTokenEvent = createSelector(getCoffeeState, (state) => state.sendTokenEvent);
 
 export const selectUpdateToken = (userId: string) =>
 	createSelector(getCoffeeState, (state) => {
