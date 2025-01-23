@@ -1,4 +1,5 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
+import { Block, size } from '@mezon/mobile-ui';
 import { User } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -54,7 +55,9 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 				);
 			}}
 		>
-			<UserProfile userId={userId} user={user} onClose={onClose} showAction={showAction} showRole={showRole}></UserProfile>
+			<Block overflow="hidden" borderTopLeftRadius={size.s_14} borderTopRightRadius={size.s_14}>
+				<UserProfile userId={userId} user={user} onClose={onClose} showAction={showAction} showRole={showRole}></UserProfile>
+			</Block>
 		</MezonBottomSheet>
 	);
 });
