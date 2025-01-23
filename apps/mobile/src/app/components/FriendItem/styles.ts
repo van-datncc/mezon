@@ -14,13 +14,22 @@ export const style = (colors: Attributes) =>
 		friendAvatar: {
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50
+			borderRadius: 50,
+			overlayColor: colors.secondary
 		},
 		friendItemContent: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			flex: 1
+		},
+		displayName: {
+			paddingVertical: 0,
+			paddingHorizontal: size.s_10,
+			color: colors.textStrong,
+			flexGrow: 1,
+			flexShrink: 1,
+			fontSize: size.medium
 		},
 		online: {
 			backgroundColor: Colors.green

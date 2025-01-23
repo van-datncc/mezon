@@ -92,7 +92,7 @@ export const FriendItem = React.memo(
 				</View>
 				<View style={styles.fill}>
 					<View style={styles.friendItemContent}>
-						<View>
+						<View style={styles.displayName}>
 							{isShowDisplayName ? (
 								<Text style={[styles.defaultText, (isPendingFriendRequest || !showAction) && styles.whiteText]}>
 									{friend?.user?.display_name}

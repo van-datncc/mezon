@@ -146,7 +146,8 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 		imgWrapper: {
 			width: '100%',
 			height: '100%',
-			borderRadius: isTabletLandscape ? size.s_70 : size.s_50
+			borderRadius: isTabletLandscape ? size.s_70 : size.s_50,
+			overlayColor: colors.secondary
 		},
 		imgList: {
 			flexDirection: 'row',

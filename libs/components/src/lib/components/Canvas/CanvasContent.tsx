@@ -590,26 +590,28 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 			/>
 			<style>
 				{`
-				.ql-editor.ql-blank::before {
+				#editor .ql-editor.ql-blank::before {
 					color: ${placeholderColor};
 					opacity: 1;
 				}
 
-				.ql-snow .ql-editor code {
+				#editor .ql-snow .ql-editor code {
 					background-color: #23241f;
 					color: #f0f0f0 !important;
 				}
-					span, strong {
-						color: ${placeholderColor} !important;
-					}
-					.ql-toolbar {
-						display: none;
-					}
-					.ql-tooltip {
-						left: 0 !important;
-					}
 
-        `}
+				#editor span, #editor strong {
+					color: ${placeholderColor} !important;
+				}
+
+				.note-canvas .ql-toolbar {
+					display: none;
+				}
+
+				.note-canvas .ql-tooltip {
+					left: 0 !important;
+				}
+      `}
 			</style>
 		</div>
 	);

@@ -51,6 +51,7 @@ export function useCategorizedChannelsWeb() {
 		categories.map((category) => {
 			const categoryChannels = listChannels.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
 			const listChannelIds = categoryChannels.map((channel) => channel.id);
+			const channelSort = sortChannels(categoryChannels);
 
 			const categoryWithChannels: ICategoryChannel = {
 				...category,
@@ -58,7 +59,7 @@ export function useCategorizedChannelsWeb() {
 			};
 
 			listChannelRender.push(categoryWithChannels);
-			categoryChannels.forEach((channel) => listChannelRender.push(channel));
+			channelSort.forEach((channel) => listChannelRender.push(channel));
 		});
 
 		return listChannelRender;
@@ -95,4 +96,33 @@ export function useCategorizedChannels() {
 	}, [categories, listChannels, categoryIdSortChannel]);
 
 	return categorizedChannels;
+}
+
+function sortChannels(channels: IChannel[]): IChannel[] {
+	const channelMap = new Map<string, IChannel>();
+	const sortedChannels: IChannel[] = [];
+
+	// Create a map of channels by their id
+	channels.forEach((channel) => {
+		channelMap.set(channel.id, channel);
+	});
+
+	// Use forEach to sort channels
+	channels.forEach((channel) => {
+		if (!channel.parrent_id || channel.parrent_id === '0') {
+			sortedChannels.push(channel);
+			addChildren(channel, sortedChannels);
+		}
+	});
+
+	function addChildren(parent: IChannel, acc: IChannel[]) {
+		channels
+			.filter((child) => child.parrent_id === parent.id)
+			.forEach((child) => {
+				acc.push(child);
+				addChildren(child, acc);
+			});
+	}
+
+	return sortedChannels;
 }

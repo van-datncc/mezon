@@ -1,8 +1,8 @@
 import {
 	selectCurrentChannelId,
+	selectCurrentTopicInitMessage,
 	selectIsShowCreateTopic,
 	selectMessageTopicError,
-	selectCurrentTopicInitMessage,
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -52,6 +52,14 @@ export function useTopics() {
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage
 		}),
-		[isShowCreateTopic, messageTopicError, currentTopicInitMessage, setIsShowCreateTopic, setCurrentTopicInitMessage, setOpenTopicMessageState, setTurnOffTopicMessage]
+		[
+			isShowCreateTopic,
+			messageTopicError,
+			currentTopicInitMessage,
+			setIsShowCreateTopic,
+			setCurrentTopicInitMessage,
+			setOpenTopicMessageState,
+			setTurnOffTopicMessage
+		]
 	);
 }

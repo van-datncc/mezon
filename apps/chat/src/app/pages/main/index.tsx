@@ -59,7 +59,7 @@ import {
 import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
-import { ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -393,6 +393,8 @@ const SidebarMenu = memo(
 			}
 		};
 
+		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
+
 		return (
 			<div
 				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
@@ -413,13 +415,13 @@ const SidebarMenu = memo(
 								</SidebarTooltip>
 							))}
 					</div>
-					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
+					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
 					<div className="flex flex-col gap-3 ">
 						{clans.map((clan: IClan) => {
 							return (
 								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name} clan={clan}>
 									<SidebarClanItem
-										linkClan={`/chat/clans/${clan.id}`}
+										linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
 										option={clan}
 										active={isClanView && currentClanId === clan.clan_id}
 									/>

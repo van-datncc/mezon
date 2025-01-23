@@ -1,4 +1,4 @@
-import { useAuth, useIdleRender, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
+import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -55,6 +55,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
+	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
+	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
 
 	const isMe = userId === myProfile?.userId;
 
@@ -76,7 +78,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const handleSaveCustomStatus = () => {
-		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
+		dispatch(
+			channelMembersActions.updateCustomStatus({
+				clanId: currentClanId ?? '',
+				customStatus: customStatus,
+				minutes: resetTimerStatus,
+				noClear: noClearStatus
+			})
+		);
 		handleCloseModalCustomStatus();
 	};
 
@@ -89,7 +98,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
 	};
 
-	const handleSaveSendToken = (id: string) => {
+	const handleSaveSendToken = async (id: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
 			setUserSearchError('Please select a user');
@@ -113,8 +122,19 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			extra_attribute: extraAttribute
 		};
 
-		dispatch(giveCoffeeActions.sendToken(tokenEvent));
-		dispatch(giveCoffeeActions.setInfoSendToken(null));
+		try {
+			const response = await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
+			if (response) {
+				dispatch(giveCoffeeActions.setIsSendToken(true));
+			}
+		} catch (err) {
+			dispatch(giveCoffeeActions.setIsSendToken(false));
+		}
+		handleCloseModalSendToken();
+	};
+
+	const handleClosePopup = () => {
+		dispatch(giveCoffeeActions.setIsSendToken(false));
 		handleCloseModalSendToken();
 	};
 
@@ -148,10 +168,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, [showModalSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
-
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return <></>;
 
 	return (
 		<>
@@ -206,6 +222,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					name={name}
 					openModal={showModalCustomStatus}
 					onClose={handleCloseModalCustomStatus}
+					setNoClearStatus={setNoClearStatus}
+					setResetTimerStatus={setResetTimerStatus}
 				/>
 			)}
 			{showModalSendToken && (
@@ -215,7 +233,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
-					onClose={handleCloseModalSendToken}
+					onClose={handleClosePopup}
 					setSelectedUserId={setSelectedUserId}
 					setNote={setNote}
 					error={error}

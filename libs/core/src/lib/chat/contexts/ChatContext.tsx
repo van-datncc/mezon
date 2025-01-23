@@ -434,7 +434,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(
-						channelsActions.updateChannelBadgeCount({
+						channelsActions.updateChannelBadgeCountAsync({
 							clanId: (notification as any).clan_id,
 							channelId: (notification as any).channel_id ?? '',
 							count: 1
@@ -927,6 +927,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						})
 					);
 					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
+				}
+				if (channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+					dispatch(channelsActions.addThreadToChannels({ clanId: channelUpdated.clan_id, channelId: channelUpdated.channel_id }));
 				}
 			}
 		},

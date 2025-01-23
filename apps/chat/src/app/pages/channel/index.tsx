@@ -29,7 +29,9 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectFetchChannelStatus,
+	selectInfoSendToken,
 	selectIsSearchMessage,
+	selectIsSendToken,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
@@ -58,7 +60,6 @@ import {
 	isWindowsDesktop,
 	titleMission
 } from '@mezon/utils';
-import ModalConfirm from 'libs/components/src/lib/components/ModalConfirm';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -227,7 +228,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
-	const [isShowDepositConfirmPopup, setIsShowDepositConfirmPopup] = useState(false);
+	const isSendToken = useSelector(selectIsSendToken);
+	const infoSendToken = useSelector(selectInfoSendToken);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -296,14 +298,16 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						);
 					} else if (eventType === 'SEND_TOKEN') {
 						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
-						setIsShowDepositConfirmPopup(true);
 						const tokenEvent: ApiTokenSentEvent = {
+							sender_id: currentUser.userId as string,
+							sender_name: currentUser?.userProfile?.user?.username as string,
 							receiver_id,
 							amount,
 							note,
 							extra_attribute
 						};
 						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
+						dispatch(giveCoffeeActions.setShowModalSendToken(true));
 					} else if (eventType === 'GET_CLAN_ROLES') {
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
@@ -325,14 +329,21 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel?.url]);
 
-	const toggleDepositPopup = (type: boolean) => {
-		if (type) {
-			setIsShowDepositConfirmPopup(false);
-			dispatch(giveCoffeeActions.setShowModalSendToken(true));
-		} else {
-			setIsShowDepositConfirmPopup(false);
+	useEffect(() => {
+		if (isSendToken === true) {
+			miniAppRef.current?.contentWindow?.postMessage(
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
+				appChannel.url ?? ''
+			);
+		} else if (isSendToken === false) {
+			miniAppRef.current?.contentWindow?.postMessage(
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
+				appChannel.url ?? ''
+			);
 		}
-	};
+		dispatch(giveCoffeeActions.setIsSendToken(null));
+		dispatch(giveCoffeeActions.setInfoSendToken(null));
+	}, [isSendToken]);
 
 	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
@@ -353,7 +364,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"
 				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => { }}
+				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
 			>
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
@@ -395,16 +406,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<MemberList />
 						</div>
 					)}
-					{isShowDepositConfirmPopup && (
-						<ModalConfirm
-							handleCancel={() => toggleDepositPopup(false)}
-							handleConfirm={() => toggleDepositPopup(true)}
-							buttonColor="bg-primary hover:bg-opacity-80"
-							title={currentChannel.channel_label}
-							customTitle={`${currentChannel.channel_label} requires a deposit to continue playing. Would you like to make a payment?`}
-						/>
-					)}
-
 					{isSearchMessage && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 				</div>
 			</div>
