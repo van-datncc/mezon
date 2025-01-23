@@ -21,20 +21,24 @@ export function useDeleteMessage({ channelId, mode, hasAttachment }: UseDeleteMe
 			const socket = socketRef.current;
 			if (!socket) return;
 
-			dispatch(
-				messagesActions.remove({
-					channelId,
-					messageId
-				})
-			);
+			try {
+				dispatch(
+					messagesActions.remove({
+						channelId,
+						messageId
+					})
+				);
 
-			const payload = transformPayloadWriteSocket({
-				clanId: currentClanId as string,
-				isPublicChannel: isPublicChannel(channel),
-				isClanView: isClanView as boolean
-			});
+				const payload = transformPayloadWriteSocket({
+					clanId: currentClanId as string,
+					isPublicChannel: isPublicChannel(channel),
+					isClanView: isClanView as boolean
+				});
 
-			await socket.removeChatMessage(payload.clan_id, channelId, mode, payload.is_public, messageId, hasAttachment);
+				await socket.removeChatMessage(payload.clan_id, channelId, mode, payload.is_public, messageId, hasAttachment);
+			} catch (e) {
+				console.error(e);
+			}
 		},
 		[socketRef, channel, channelId, dispatch, currentClanId, mode, isClanView, hasAttachment]
 	);
