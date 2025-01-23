@@ -229,7 +229,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
 	const isSendToken = useSelector(selectIsSendToken);
-	const InfoSendToken = useSelector(selectInfoSendToken);
+	const infoSendToken = useSelector(selectInfoSendToken);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -332,12 +332,12 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	useEffect(() => {
 		if (isSendToken === true) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: {} }),
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		} else if (isSendToken === false) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: InfoSendToken }),
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		}
