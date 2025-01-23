@@ -29,7 +29,9 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectFetchChannelStatus,
+	selectInfoSendToken,
 	selectIsSearchMessage,
+	selectIsSendToken,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
@@ -66,6 +68,7 @@ import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
+import ChannelVoice from './ChannelVoice';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -226,6 +229,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
+	const isSendToken = useSelector(selectIsSendToken);
+	const infoSendToken = useSelector(selectInfoSendToken);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -295,6 +300,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					} else if (eventType === 'SEND_TOKEN') {
 						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
 						const tokenEvent: ApiTokenSentEvent = {
+							sender_id: currentUser.userId as string,
+							sender_name: currentUser?.userProfile?.user?.username as string,
 							receiver_id,
 							amount,
 							note,
@@ -324,6 +331,22 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [appChannel?.url]);
 
 	useEffect(() => {
+		if (isSendToken === true) {
+			miniAppRef.current?.contentWindow?.postMessage(
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
+				appChannel.url ?? ''
+			);
+		} else if (isSendToken === false) {
+			miniAppRef.current?.contentWindow?.postMessage(
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
+				appChannel.url ?? ''
+			);
+		}
+		dispatch(giveCoffeeActions.setIsSendToken(null));
+		dispatch(giveCoffeeActions.setInfoSendToken(null));
+	}, [isSendToken]);
+
+	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
 		if (!savedChannelIds.includes(currentChannel.channel_id) && currentChannel.age_restricted === 1) {
 			setIsShowAgeRestricted(true);
@@ -332,63 +355,69 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [currentChannel]);
 
-	return currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
-		<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
-	) : (
-		<>
-			{!isShowCanvas && !isShowAgeRestricted && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
-			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
-				id="mainChat"
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
-			>
-				<div
-					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
-				>
-					{!isShowCanvas && !isShowAgeRestricted && (
+	switch (currentChannel?.type) {
+		case ChannelType.CHANNEL_TYPE_APP:
+			return <ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />;
+		case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
+			return <ChannelVoice channel={currentChannel} roomName={currentChannel.meeting_code || ''} />;
+		default:
+			return (
+				<>
+					{!isShowCanvas && !isShowAgeRestricted && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+					{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
+					<div
+						className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
+						id="mainChat"
+						// eslint-disable-next-line @typescript-eslint/no-empty-function
+						onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+					>
 						<div
-							className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
+							className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
 						>
-							<div
-								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
-								ref={messagesContainerRef}
-							>
-								<ChannelMedia currentChannel={currentChannel} />
-							</div>
-							<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
-						</div>
-					)}
-					{isShowCanvas && !isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div
-							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-						>
-							<Canvas />
-						</div>
-					)}
+							{!isShowCanvas && !isShowAgeRestricted && (
+								<div
+									className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
+								>
+									<div
+										className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
+										ref={messagesContainerRef}
+									>
+										<ChannelMedia currentChannel={currentChannel} />
+									</div>
+									<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
+								</div>
+							)}
+							{isShowCanvas && !isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+								<div
+									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+								>
+									<Canvas />
+								</div>
+							)}
 
-					{!isShowCanvas && isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div
-							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-						>
-							<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
+							{!isShowCanvas && isShowAgeRestricted && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+								<div
+									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+								>
+									<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
+								</div>
+							)}
+							{isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+								<div
+									onContextMenu={(event) => event.preventDefault()}
+									className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+									id="memberList"
+								>
+									<MemberList />
+								</div>
+							)}
+
+							{isSearchMessage && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 						</div>
-					)}
-					{isShowMemberList && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div
-							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-							id="memberList"
-						>
-							<MemberList />
-						</div>
-					)}
-					{isSearchMessage && currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
-				</div>
-			</div>
-		</>
-	);
+					</div>
+				</>
+			);
+	}
 };
 
 interface IChannelMainProps {

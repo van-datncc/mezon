@@ -16,6 +16,7 @@ import {
 	selectCurrentClanId,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	settingClanStickerActions,
 	useAppDispatch,
 	userStatusActions,
 	voiceActions
@@ -213,6 +214,7 @@ const RootListener = () => {
 			promises.push(dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(dispatch(directActions.fetchDirectMessage({ noCache: true })));
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
+			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({})));
 			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
 			promises.push(dispatch(acitvitiesActions.listActivities()));
