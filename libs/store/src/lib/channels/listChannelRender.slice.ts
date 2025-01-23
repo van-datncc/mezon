@@ -26,20 +26,43 @@ export const listChannelRenderSlice = createSlice({
 	reducers: {
 		mapListChannelRender: (state, action: PayloadAction<DataChannelAndCate>) => {
 			const { listChannel, listCategory, clanId, listChannelFavor } = action.payload;
-			const listChannelRender: (ICategoryChannel | IChannel)[] = [];
-			listCategory.map((category) => {
-				const categoryChannels = listChannel.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
-				const listChannelIds = categoryChannels.map((channel) => channel.id);
+			if (!state.listChannelRender[clanId]) {
+				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
+				const listFavorChannel: IChannel[] = [];
+				listCategory.map((category) => {
+					const categoryChannels = listChannel.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
+					const listChannelIds = categoryChannels.map((channel) => channel.id);
+					const sortChannelList = sortChannels(categoryChannels);
+					const categoryWithChannels: ICategoryChannel = {
+						...category,
+						channels: listChannelIds
+					};
 
-				const categoryWithChannels: ICategoryChannel = {
-					...category,
-					channels: listChannelIds
+					listChannelRender.push(categoryWithChannels);
+					sortChannelList.forEach((channel) => {
+						if (listChannelFavor.includes(channel.id)) {
+							listFavorChannel.push({
+								...channel,
+								isFavor: true,
+								category_id : 'favorCate', 
+								channel_id : `favor-${channel.id}`,
+							});
+						}
+						listChannelRender.push(channel);
+					});
+				});
+				const favorCate: ICategoryChannel = {
+					channels: listChannelFavor,
+					id: 'favorCate',
+					category_id: 'favorCate',
+					category_name: 'Favorite Channel',
+					clan_id: clanId,
+					creator_id: '0',
+					category_order: 1
 				};
 
-				listChannelRender.push(categoryWithChannels);
-				categoryChannels.forEach((channel) => listChannelRender.push(channel));
-			});
-			state.listChannelRender[clanId] = listChannelRender;
+				state.listChannelRender[clanId] = [favorCate, ...listFavorChannel, ...listChannelRender];
+			}
 		}
 	}
 });
@@ -62,3 +85,32 @@ export const selectListChannelRenderByClanId = createSelector(
 		return state.listChannelRender[clanId];
 	}
 );
+
+function sortChannels(channels: IChannel[]): IChannel[] {
+	const channelMap = new Map<string, IChannel>();
+	const sortedChannels: IChannel[] = [];
+
+	// Create a map of channels by their id
+	channels.forEach((channel) => {
+		channelMap.set(channel.id, channel);
+	});
+
+	// Use forEach to sort channels
+	channels.forEach((channel) => {
+		if (!channel.parrent_id || channel.parrent_id === '0') {
+			sortedChannels.push(channel);
+			addChildren(channel, sortedChannels);
+		}
+	});
+
+	function addChildren(parent: IChannel, acc: IChannel[]) {
+		channels
+			.filter((child) => child.parrent_id === parent.id)
+			.forEach((child) => {
+				acc.push(child);
+				addChildren(child, acc);
+			});
+	}
+
+	return sortedChannels;
+}

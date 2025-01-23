@@ -73,7 +73,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 			<ChannelLink
 				clanId={channel?.clan_id}
 				channel={channel}
-				key={channel.id}
+				key={channel.channel_id}
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnreadChannel}

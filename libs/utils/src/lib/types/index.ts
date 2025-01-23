@@ -142,6 +142,7 @@ export type IChannel = ApiChannelDescription & {
 	description?: string;
 	usernames?: string;
 	isRoleUser?: boolean;
+  isFavor?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
