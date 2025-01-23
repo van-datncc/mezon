@@ -212,7 +212,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, siz
 			style={{
 				height: size?.height,
 				maxWidth: size?.width || 'auto',
-				width: "100%"
+				width: '100%'
 			}}
 		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>

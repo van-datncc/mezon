@@ -270,7 +270,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 								</div>
 							);
 						} else {
-							if ( !(item as IChannel)?.parrent_id || (item as IChannel).parrent_id === '0') {
+							if (!(item as IChannel)?.parrent_id || (item as IChannel).parrent_id === '0') {
 								return (
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
 										<ChannelListItem
