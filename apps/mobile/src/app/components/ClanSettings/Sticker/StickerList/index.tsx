@@ -27,7 +27,13 @@ export const StickerList = ({ listSticker, clanID }: StickerListProps) => {
 
 	const renderItem = ({ item }) => {
 		return (
-			<StickerSettingItem data={item} clanID={clanID} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={handleSwipe} />
+			<StickerSettingItem
+				data={item}
+				clanID={clanID}
+				key={`sticker_${clanID}_${item.id}`}
+				ref={(ref) => (row[parseInt(item.id)] = ref)}
+				onSwipeOpen={handleSwipe}
+			/>
 		);
 	};
 

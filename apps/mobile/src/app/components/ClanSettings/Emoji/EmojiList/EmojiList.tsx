@@ -34,7 +34,14 @@ export const EmojiList = ({ emojiList }: EmojiListProps) => {
 	}, []);
 
 	const renderItem = ({ item }) => {
-		return <EmojiDetail item={item} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={handleSwipe} />;
+		return (
+			<EmojiDetail
+				item={item}
+				key={`emoji_${item.clan_id}_${item.id}`}
+				ref={(ref) => (row[parseInt(item.id)] = ref)}
+				onSwipeOpen={handleSwipe}
+			/>
+		);
 	};
 
 	return (
