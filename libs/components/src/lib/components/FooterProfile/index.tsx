@@ -55,6 +55,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
+	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
+	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
 
 	const isMe = userId === myProfile?.userId;
 
@@ -76,7 +78,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const handleSaveCustomStatus = () => {
-		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
+		dispatch(
+			channelMembersActions.updateCustomStatus({
+				clanId: currentClanId ?? '',
+				customStatus: customStatus,
+				minutes: resetTimerStatus,
+				noClear: noClearStatus
+			})
+		);
 		handleCloseModalCustomStatus();
 	};
 
@@ -202,6 +211,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					name={name}
 					openModal={showModalCustomStatus}
 					onClose={handleCloseModalCustomStatus}
+					setNoClearStatus={setNoClearStatus}
+					setResetTimerStatus={setResetTimerStatus}
 				/>
 			)}
 			{showModalSendToken && (
