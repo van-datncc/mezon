@@ -91,9 +91,7 @@ const ModalCustomStatus = ({
 							renderTrigger={() => (
 								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
 									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">{timeSetReset}</li>
-									<div onClick={() => setStatusTimer(0, false, 'Today')}>
-										<Icons.ArrowDown defaultFill="#fff" />
-									</div>
+									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
 							label=""
