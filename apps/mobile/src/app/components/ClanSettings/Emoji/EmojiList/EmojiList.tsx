@@ -1,5 +1,5 @@
 import { DEFAULT_MAX_EMOJI_SLOTS } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { FlashList } from '@shopify/flash-list';
 import { ClanEmoji } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
@@ -40,7 +40,7 @@ export const EmojiList = ({ emojiList }: EmojiListProps) => {
 	return (
 		<View>
 			<Text style={styles.emojiSlotsTitle}>{t('emojiList.slotsDetails', { slots })}</Text>
-			<FlashList data={emojiList} keyExtractor={(item) => item.id} renderItem={renderItem} />
+			<FlashList data={emojiList} keyExtractor={(item) => item.id} renderItem={renderItem} estimatedItemSize={size.s_60} />
 		</View>
 	);
 };
