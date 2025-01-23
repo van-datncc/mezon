@@ -359,7 +359,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		case ChannelType.CHANNEL_TYPE_APP:
 			return <ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />;
 		case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
-			return <ChannelVoice channel={currentChannel} roomName={'mezon'} />;
+			return <ChannelVoice channel={currentChannel} roomName={currentChannel.meeting_code || ''} />;
 		default:
 			return (
 				<>
