@@ -59,6 +59,9 @@ export function useAppNavigation() {
 		return `chat/direct/message/${directId}/${type}`;
 	}, []);
 
+	const toFriendList = useCallback(() => {
+		return `chat/direct/friends`;
+	}, []);
 	return useMemo(
 		() => ({
 			navigate,
@@ -74,7 +77,8 @@ export function useAppNavigation() {
 			toDmGroupPageFromMainApp,
 			toMessageChannel,
 			toChannelSettingPage,
-			toGuidePage
+			toGuidePage,
+			toFriendList
 		}),
 		[
 			navigate,
@@ -90,7 +94,8 @@ export function useAppNavigation() {
 			toDmGroupPageFromMainApp,
 			toMessageChannel,
 			toChannelSettingPage,
-			toGuidePage
+			toGuidePage,
+			toFriendList
 		]
 	);
 }
