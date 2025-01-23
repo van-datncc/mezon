@@ -124,6 +124,7 @@ errorListenerMiddleware.startListening({
 			return;
 		}
 		if (toast.type === 'error') {
+			listenerApi.dispatch(toastActions.setClanIdOnErrorMessage({ clanId: action.meta.arg.clanId }));
 			listenerApi.dispatch(toastActions.setErrorToastStatus(true));
 		}
 

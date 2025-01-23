@@ -1,7 +1,7 @@
 import { useAppNavigation } from '@mezon/core';
-import { toastActions } from '@mezon/store';
+import { selectClanIdOnErrorMessage, toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 type ModalUnknowChannelProps = {
 	onClose: () => void;
@@ -11,13 +11,15 @@ type ModalUnknowChannelProps = {
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const dispatch = useDispatch();
 	const { onClose, isError = false } = props;
-	const { toFriendList, navigate } = useAppNavigation();
+	const { navigate, toClanPage } = useAppNavigation();
 	const resetErrorToastStatus = () => {
 		dispatch(toastActions.setErrorToastStatus(false));
 	};
-	const directToFriendList = () => {
+	const getClanIdOnErrorMessage = useSelector(selectClanIdOnErrorMessage);
+
+	const directToParent = () => {
 		resetErrorToastStatus();
-		navigate(toFriendList());
+		navigate(toClanPage(getClanIdOnErrorMessage as string));
 	};
 
 	const onCloseAndReset = () => {
@@ -54,10 +56,10 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 						{isError ? (
 							<button
 								className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary"
-								onClick={() => directToFriendList()}
+								onClick={() => directToParent()}
 								style={{ color: 'white' }}
 							>
-								Return to Friend list page
+								Come back to the Channel
 							</button>
 						) : (
 							<button className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary" onClick={onClose} style={{ color: 'white' }}>
