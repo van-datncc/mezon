@@ -123,7 +123,8 @@ errorListenerMiddleware.startListening({
 		if (!toast) {
 			return;
 		}
-		if (toast.type === 'error') {
+		const clanId = action.meta.arg.clanId;
+		if (toast.type === 'error' && clanId) {
 			listenerApi.dispatch(toastActions.setClanIdOnErrorMessage({ clanId: action.meta.arg.clanId }));
 			listenerApi.dispatch(toastActions.setErrorToastStatus(true));
 		}

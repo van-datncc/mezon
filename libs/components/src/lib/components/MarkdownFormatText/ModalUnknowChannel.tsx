@@ -59,7 +59,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 								onClick={() => directToParent()}
 								style={{ color: 'white' }}
 							>
-								Come back to the Channel
+								Come back to the Clan
 							</button>
 						) : (
 							<button className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary" onClick={onClose} style={{ color: 'white' }}>
