@@ -2,7 +2,6 @@ import { useAuth, useSendForwardMessage } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
-	RootState,
 	channelsActions,
 	getIsFowardAll,
 	getSelectedMessage,
@@ -14,6 +13,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
+	selectLoadingStatus,
 	selectModeResponsive,
 	selectTheme,
 	toggleIsShowPopupForwardFalse,
@@ -53,7 +53,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
-	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
+	const isLoading = useSelector(selectLoadingStatus);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const { sendForwardMessage } = useSendForwardMessage();

@@ -1,4 +1,4 @@
-import { useAuth, useIdleRender, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
+import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -157,10 +157,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, [showModalSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
-
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return <></>;
 
 	return (
 		<>

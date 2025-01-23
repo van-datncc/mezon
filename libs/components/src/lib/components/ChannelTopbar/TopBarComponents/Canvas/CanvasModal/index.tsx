@@ -11,7 +11,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Icons } from '@mezon/ui';
+import { Icons, customTheme } from '@mezon/ui';
 import { Button, Pagination } from 'flowbite-react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -112,58 +112,22 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 
 					{!canvases?.length && <EmptyCanvas onClick={handleCreateCanvas} />}
 				</div>
-				{totalPages > 1 &&
+				{totalPages > 1 && (
 					<div className="py-2">
-						<Pagination theme={customTheme(totalPages <= 5)} currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} previousLabel=""
+						<Pagination
+							theme={customTheme(totalPages <= 5)}
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={onPageChange}
+							previousLabel=""
 							nextLabel=""
-							showIcons={totalPages > 5} />
+							showIcons={totalPages > 5}
+						/>
 					</div>
-				}
+				)}
 			</div>
 		</div>
 	);
-};
-
-const customTheme = (hiddenNextPage: boolean) => {
-	if (hiddenNextPage) {
-		return {
-			pages: {
-				base: '[&_li:is(:first-child,:last-child)]:hidden px-4 flex gap-2 justify-end',
-				selector: {
-					"base": "w-5 h-5 rounded-full overflow-hidden text-[12px] flex items-center justify-center bg-gray-700",
-					"active": "!bg-white !text-black",
-					"disabled": "cursor-not-allowed opacity-50 bg-cyan-50 hover:bg-cyan-100"
-				},
-				previous: {
-					"base": "!h-5 !w-5 overflow-hidden flex items-center  justify-center text-white",
-					"icon": "h-5 w-5"
-				},
-				next: {
-					"base": "!h-5 !w-5 overflow-hidden flex items-center  justify-center text-white",
-					"icon": "h-5 w-5"
-				},
-			},
-		}
-	}
-	return {
-		pages: {
-			base: ' flex gap-2 px-4 justify-end',
-			selector: {
-				"base": "w-5 h-5 rounded-full overflow-hidden text-[12px] flex items-center justify-center bg-gray-700",
-				"active": "!bg-white !text-black",
-				"disabled": "cursor-not-allowed opacity-50 bg-cyan-50 hover:bg-cyan-100"
-			},
-			previous: {
-				"base": "!h-5 !w-5 overflow-hidden flex items-center  justify-center text-white",
-				"icon": "h-5 w-5"
-			},
-			next: {
-				"base": "!h-5 !w-5 overflow-hidden flex items-center  justify-center text-white",
-				"icon": "h-5 w-5"
-			},
-		},
-	}
-
 };
 
 export default CanvasModal;

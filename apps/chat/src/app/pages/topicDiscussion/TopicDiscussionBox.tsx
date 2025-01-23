@@ -1,10 +1,8 @@
 import { MentionReactInput, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useAuth, useTopics } from '@mezon/core';
 import {
-	RootState,
 	fetchMessages,
 	messagesActions,
-	selectAllRoleIds,
 	selectAllUserIdChannels,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -12,6 +10,7 @@ import {
 	selectCurrentTopicId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
+	selectSession,
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -32,9 +31,8 @@ const TopicDiscussionBox = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allUserIdsInChannel = useSelector(selectAllUserIdChannels);
-	const allRolesIdsInClan = useSelector(selectAllRoleIds);
 	const { currentTopicInitMessage } = useTopics();
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);

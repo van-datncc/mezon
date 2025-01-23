@@ -1,12 +1,12 @@
 import { useChatSending } from '@mezon/core';
 import {
 	audioCallActions,
-	RootState,
 	selectAudioBusyTone,
 	selectAudioDialTone,
 	selectAudioRingTone,
 	selectDmGroupCurrent,
 	selectIsInCall,
+	selectSession,
 	toastActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -81,7 +81,7 @@ const iconMap: { [key: string]: { icon: JSX.Element; text: string; colorClass: s
 export default function CallLogMessage({ userId, userName, messageId, channelId, senderId, callLog, contentMsg }: CallLogMessageProps) {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const sessionUser = useSelector(selectSession);
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const isInCall = useSelector(selectIsInCall);

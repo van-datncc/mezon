@@ -1,5 +1,5 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RootState,
@@ -61,36 +61,21 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean, isBuzzMessage?: boolean) =>
-	StyleSheet.create({
-		heading1: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(22)
-		},
-		heading2: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(20)
-		},
-		heading3: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(18)
-		},
-		heading4: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(17)
-		},
-		heading5: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(15)
-		},
-		heading6: {
-			fontWeight: 'bold',
-			fontSize: verticalScale(16)
-		},
-		body: {
-			color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
-			fontSize: isLastMessage ? size.small : size.medium
-		},
+export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean, isBuzzMessage?: boolean) => {
+	const commonHeadingStyle = {
+		color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
+		fontSize: isLastMessage ? size.small : size.medium
+	};
+	return StyleSheet.create({
+		heading1: commonHeadingStyle,
+		heading2: commonHeadingStyle,
+		heading3: commonHeadingStyle,
+		heading4: commonHeadingStyle,
+		heading5: commonHeadingStyle,
+		heading6: commonHeadingStyle,
+		body: commonHeadingStyle,
+		em: commonHeadingStyle,
+		s: commonHeadingStyle,
 		paragraph: {
 			marginTop: 0,
 			marginBottom: 0,
@@ -182,6 +167,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			backgroundColor: colors.secondaryLight
 		}
 	});
+};
 
 const styleMessageReply = (colors: Attributes) =>
 	StyleSheet.create({
