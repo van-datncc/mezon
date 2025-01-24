@@ -17,6 +17,13 @@ export const MessageAudio: React.FC<MessageAudioProps> = React.memo(({ audioUrl 
 			audioControlRef.current.togglePlay();
 		}
 	};
+	const handleSaveImage = () => {
+		const link = document.createElement('a');
+		link.href = audioUrl;
+		link.download = 'audio-file.mp3';
+		link.click();
+		link.remove();
+	};
 
 	return (
 		<>
@@ -28,7 +35,13 @@ export const MessageAudio: React.FC<MessageAudioProps> = React.memo(({ audioUrl 
 				setIsPlaying={setIsPlaying}
 				isPlaying={isPlaying}
 			/>
-			<MessageAudioUI isPlaying={isPlaying} currentTime={currentTime} duration={duration} togglePlay={handleTogglePlay} />
+			<MessageAudioUI
+				isPlaying={isPlaying}
+				currentTime={currentTime}
+				duration={duration}
+				togglePlay={handleTogglePlay}
+				handleSaveImage={handleSaveImage}
+			/>
 		</>
 	);
 });
