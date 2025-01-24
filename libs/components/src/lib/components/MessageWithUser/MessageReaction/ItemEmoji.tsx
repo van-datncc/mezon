@@ -1,8 +1,8 @@
 import { useAuth, useChatReaction } from '@mezon/core';
-import { selectCurrentChannel, selectTheme } from '@mezon/store';
+import { selectCurrentChannel } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
-import { forwardRef, memo, useMemo, useRef } from 'react';
+import Tooltip from 'rc-tooltip';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -15,15 +15,10 @@ type EmojiItemProps = {
 function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const userId = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
-	// const emojiHover = useRef<EmojiDataOptionals | null>(null);
 	const getUrlItem = getSrcEmoji(emoji.emojiId || '');
 	const count = calculateTotalCount(emoji.senders);
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
-	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const appearanceTheme = useSelector(selectTheme);
-
-	const scrollRef = useRef<HTMLDivElement>(null);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -49,55 +44,41 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		);
 	}
 
-	const isLightMode = appearanceTheme === 'light';
-
 	return (
-		<Tippy
-			content={<UserReactionPanel ref={scrollRef} message={message} emojiShowPanel={emoji} mode={mode} />}
-			className={`flex justify-center items-center bg-blackA ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-			interactive={true}
-			hideOnClick={false}
-			lazy={true}
-			onShow={() => {
-				setTimeout(() => {
-					scrollRef.current?.focus();
-				}, 0);
-			}}
-		>
-			<ItemDetail
-				ref={emojiItemRef}
-				userSenderCount={userSenderCount ?? NaN}
-				onClickReactExist={() =>
-					reactOnExistEmoji(
-						emoji.emojiId ?? '',
-						mode,
-						emoji.message_id ?? '',
-						emoji.emojiId ?? '',
-						emoji.emoji ?? '',
-						1,
-						userId.userId ?? '',
-						false
-					)
-				}
-				getUrlItem={getUrlItem}
-				totalCount={count}
-			/>
-		</Tippy>
+		<Tooltip overlay={<UserReactionPanel message={message} emojiShowPanel={emoji} mode={mode} />} placement="top">
+			<div>
+				<ItemDetail
+					userSenderCount={userSenderCount ?? NaN}
+					onClickReactExist={() =>
+						reactOnExistEmoji(
+							emoji.emojiId ?? '',
+							mode,
+							emoji.message_id ?? '',
+							emoji.emojiId ?? '',
+							emoji.emoji ?? '',
+							1,
+							userId.userId ?? '',
+							false
+						)
+					}
+					getUrlItem={getUrlItem}
+					totalCount={count}
+				/>
+			</div>
+		</Tooltip>
 	);
 }
 
 export default memo(ItemEmoji);
 
 type ItemDetailProps = {
-	ref: React.RefObject<HTMLDivElement>;
-
 	userSenderCount: number;
 	onClickReactExist: () => void;
 	getUrlItem: string;
 	totalCount: number;
 };
 
-const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(({ userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
+const ItemDetail = ({ userSenderCount, onClickReactExist, getUrlItem, totalCount }: ItemDetailProps) => {
 	const strCount = useMemo(() => {
 		const thresh = 1000;
 
@@ -121,7 +102,6 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(({ userSenderCoun
 	return (
 		<div className="flex flex-row gap-1" style={{ height: 24 }}>
 			<div
-				ref={ref}
 				className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row noselect
           cursor-pointer justify-center items-center relative
           ${userSenderCount > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
@@ -136,4 +116,4 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(({ userSenderCoun
 			</div>
 		</div>
 	);
-});
+};
