@@ -235,6 +235,9 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				hide_editted,
 				topic_id
 			);
+			if (topic_id) {
+				dispatch(topicsActions.updateInitMessage({ content: validatedContent, mentions: validMentionList }));
+			}
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
 	);
