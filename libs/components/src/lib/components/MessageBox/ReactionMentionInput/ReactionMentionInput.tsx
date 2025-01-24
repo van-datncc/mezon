@@ -306,11 +306,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request.content);
+			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
 			const payload = {
-				t: text.trim(),
+				t: text,
 				hg: hashtagList,
 				ej: emojiList,
 				mk
