@@ -134,14 +134,14 @@ export const listChannelRenderSlice = createSlice({
 				...(channel as IChannel),
 				id: channel.id
 			};
-			const isExistChannel = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.id);
+			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.id);
 			if (isExistChannel === -1 && clanId && state.listChannelRender[clanId]) {
-				const indexInsert = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.parrent_id);
+				const indexInsert = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.parrent_id);
 
 				if (indexInsert === -1) {
 					return;
 				}
-				state.listChannelRender[clanId].splice(indexInsert + 1, 0, channelData);
+				state.listChannelRender[clanId]?.splice(indexInsert + 1, 0, channelData);
 				state.listChannelRender[clanId].join();
 				state.listChannelRender[clanId][indexInsert + 1] = {
 					...state.listChannelRender[clanId][indexInsert + 1],
