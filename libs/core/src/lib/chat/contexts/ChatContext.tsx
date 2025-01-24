@@ -28,6 +28,7 @@ import {
 	eventManagementActions,
 	friendsActions,
 	giveCoffeeActions,
+	listChannelRenderAction,
 	listChannelsByUserActions,
 	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,

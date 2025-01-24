@@ -101,6 +101,7 @@ export const deleteWebhookById = createAsyncThunk(
 				clan_id: data.clanId
 			};
 			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string, body);
+			thunkAPI.dispatch(webhookActions.removeOneWebhook({ channelId: data.webhook.channel_id || '', webhookId: data.webhook.id || '' }));
 			if (!response) {
 				thunkAPI.rejectWithValue({});
 			}

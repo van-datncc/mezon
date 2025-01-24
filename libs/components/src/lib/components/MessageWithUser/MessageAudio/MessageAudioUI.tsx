@@ -1,3 +1,4 @@
+import { Icons } from '@mezon/ui';
 import { formatTimeToMMSS } from '@mezon/utils';
 import React from 'react';
 
@@ -6,9 +7,10 @@ type AudioUIProps = {
 	currentTime: number;
 	duration: number;
 	togglePlay: () => void;
+	handleSaveImage: () => void;
 };
 
-export const MessageAudioUI: React.FC<AudioUIProps> = ({ isPlaying, currentTime, duration, togglePlay }) => (
+export const MessageAudioUI: React.FC<AudioUIProps> = ({ isPlaying, currentTime, duration, togglePlay, handleSaveImage }) => (
 	<div className="inline-flex items-center justify-between gap-3 bg-bgSelectItem text-white rounded-full py-1.5 pl-1.5 pr-3.5 w-60 will-change-transform">
 		<button
 			onClick={togglePlay}
@@ -29,5 +31,8 @@ export const MessageAudioUI: React.FC<AudioUIProps> = ({ isPlaying, currentTime,
 		<span className="ml-2 text-sm whitespace-nowrap">
 			{formatTimeToMMSS(currentTime)} / {formatTimeToMMSS(duration)}
 		</span>
+		<button onClick={handleSaveImage}>
+			<Icons.Download />
+		</button>
 	</div>
 );
