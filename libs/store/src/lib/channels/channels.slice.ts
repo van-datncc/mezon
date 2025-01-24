@@ -31,7 +31,7 @@ import {
 	ApiMarkAsReadRequest
 } from 'mezon-js/api.gen';
 import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
-import { fetchCategories } from '../categories/categories.slice';
+import { categoriesActions, FetchCategoriesPayload } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { clansActions } from '../clans/clans.slice';
@@ -49,12 +49,12 @@ import { RootState } from '../store';
 import { selectListThreadId, threadsActions } from '../threads/threads.slice';
 import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
 import {
-	fetchListChannelsByUser,
 	LIST_CHANNELS_USER_FEATURE_KEY,
 	listChannelsByUserActions,
 	ListChannelsByUserState,
 	selectEntitiesChannelsByUser
 } from './channelUser.slice';
+import { listChannelRenderAction } from './listChannelRender.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 60;
 
@@ -252,8 +252,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(
 				channelsActions.add({ channel: { id: response.channel_id as string, ...response }, clanId: response.clan_id as string })
 			);
-			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
+
 			if (
 				response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
 				response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
@@ -274,6 +273,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string })
 				);
 			}
+			thunkAPI.dispatch(listChannelRenderAction.addChannelToListRender(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -312,6 +312,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 			}
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
 			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
+			thunkAPI.dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: body.channelId, clanId: body.clanId }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
@@ -353,6 +354,9 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 							changes: { ...body }
 						}
 					})
+				);
+				thunkAPI.dispatch(
+					listChannelRenderAction.updateChannelInListRender({ channelId: body.channel_id, clanId: clanId as string, dataUpdate: body })
 				);
 			}
 		}
@@ -566,6 +570,21 @@ export const fetchChannels = createAsyncThunk(
 				...mapChannelToEntity(channel),
 				last_seen_message: channel.last_seen_message ? channel.last_seen_message : { timestamp_seconds: 0 }
 			}));
+
+			const [favorChannels, listCategory] = await Promise.all([
+				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId })),
+				thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }))
+			]);
+
+			thunkAPI.dispatch(
+				listChannelRenderAction.mapListChannelRender({
+					clanId,
+					listChannelFavor: favorChannels.payload.channel_ids || [],
+					listCategory: (listCategory.payload as FetchCategoriesPayload)?.categories || [],
+					listChannel: channels
+				})
+			);
+
 			const meta = channels.map((ch) => extractChannelMeta(ch));
 			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 			return { channels, clanId };

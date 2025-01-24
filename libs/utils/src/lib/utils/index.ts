@@ -1090,3 +1090,23 @@ export const isElementInViewport = (element: HTMLElement) => {
 		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 };
+
+export function isYouTubeLink(url: string): boolean {
+	return /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|e\/|shorts\/)|youtu\.be\/)/.test(url);
+}
+
+export function getYouTubeEmbedUrl(url: string): string {
+	const match = url.match(/(?:youtube\.com\/(?:watch\?v=|v\/|e\/|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+	return match ? `https://www.youtube.com/embed/${match[1]}` : '';
+}
+
+export function isYouTubeShorts(url: string) {
+	return /youtube\.com\/shorts\//.test(url);
+}
+
+export function getYouTubeEmbedSize(url: string) {
+	if (isYouTubeShorts(url)) {
+		return { width: '169px', height: '300px' };
+	}
+	return { width: '400px', height: '225px' };
+}

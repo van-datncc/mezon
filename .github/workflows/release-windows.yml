@@ -53,6 +53,7 @@ jobs:
           NX_WEBRTC_ICESERVERS_USERNAME: ${{ secrets.NX_WEBRTC_ICESERVERS_USERNAME_PROD }}
           NX_WEBRTC_ICESERVERS_CREDENTIAL: ${{ secrets.NX_WEBRTC_ICESERVERS_CREDENTIAL_PROD }}
           NX_CHAT_APP_STREAM_WS_URL : ${{ secrets.NX_CHAT_APP_STREAM_WS_URL }}
+          NX_CHAT_APP_MEET_WS_URL : ${{ secrets.NX_CHAT_APP_MEET_WS_URL }}
 
       - name: Push to MinIO
         run: |

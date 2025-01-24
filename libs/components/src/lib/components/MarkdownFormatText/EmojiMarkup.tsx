@@ -22,20 +22,19 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 		setPositionShow(SHOW_POSITION.IN_EMOJI);
 	}, [srcEmoji]);
 
-	const emojiElement = (
-		<img
-			id={`emoji-${emojiSyntax}`}
-			src={srcEmoji}
-			alt={`[${emojiSyntax}](${emojiId})`}
-			className={`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`}
-			onDragStart={(e) => e.preventDefault()}
-		/>
-	);
 	return (
-		<span onContextMenu={handleContextMenu} style={{ display: 'inline-block', height: onlyEmoji ? '50px' : 'auto' }}>
+		<span title={emojiSyntax} onContextMenu={handleContextMenu} style={{ display: 'inline-block', height: onlyEmoji ? '50px' : 'auto' }}>
 			{srcEmoji ? (
 				// <Tooltip style={appearanceTheme === 'light' ? 'light' : 'dark'} content={<p style={{ width: 'max-content' }}>{emojiSyntax}</p>}>
-				<div style={{ height: onlyEmoji ? 48 : 24 }}>{emojiElement}</div>
+				<div style={{ height: onlyEmoji ? 48 : 24 }}>
+					<img
+						id={`emoji-${emojiSyntax}`}
+						src={srcEmoji}
+						alt={`[${emojiSyntax}](${emojiId})`}
+						className={`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`}
+						onDragStart={(e) => e.preventDefault()}
+					/>
+				</div>
 			) : (
 				// </Tooltip>
 				<PlainText text={emojiSyntax} />

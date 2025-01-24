@@ -233,7 +233,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				validMentionList,
 				attachments,
 				hide_editted,
-				topic_id
+				topic_id,
+				false
 			);
 			if (topic_id) {
 				dispatch(topicsActions.updateInitMessage({ content: validatedContent, mentions: validMentionList }));

@@ -1,7 +1,4 @@
-import { selectTheme } from '@mezon/store';
 import { IClan } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
-import { useSelector } from 'react-redux';
 
 export type SidebarTooltipProps = {
 	titleTooltip?: string;
@@ -10,22 +7,7 @@ export type SidebarTooltipProps = {
 };
 
 const SidebarTooltip = ({ titleTooltip, clan, children }: SidebarTooltipProps) => {
-	const appearanceTheme = useSelector(selectTheme);
-
-	return (
-		<Tippy
-			arrow={false}
-			content={
-				<div style={{ whiteSpace: 'nowrap' }} className={`max-w-60 truncate flex gap-1 items-center`}>
-					{clan?.is_onboarding && <OnboardingIcon />} <div className="flex-1 truncate"> {titleTooltip} </div>
-				</div>
-			}
-			placement="right"
-			className={`!left-12  ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}
-		>
-			<div>{children}</div>
-		</Tippy>
-	);
+	return <div>{children}</div>;
 };
 
 const OnboardingIcon = () => {

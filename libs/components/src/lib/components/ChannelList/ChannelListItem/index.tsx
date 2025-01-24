@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	clansActions,
 	selectCategoryExpandStateByCategoryId,
+	selectChannelById2,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
@@ -54,6 +55,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
+	const channelSelector = useAppSelector((state) => selectChannelById2(state, channel.id));
 
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) return voiceChannelMembers;
@@ -62,7 +64,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
 
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, channel.category_id as string));
-	const unreadMessageCount = channel?.count_mess_unread || 0;
+	const unreadMessageCount = channelSelector?.count_mess_unread || 0;
 
 	const handleOpenInvite = () => {
 		dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
@@ -73,7 +75,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 			<ChannelLink
 				clanId={channel?.clan_id}
 				channel={channel}
-				key={channel.id}
+				key={channel.channel_id}
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnreadChannel}
@@ -99,7 +101,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 			(isCategoryExpanded || isUnreadChannel)
 		) {
 			return (
-				<>
+				<div className={'pt-1'}>
 					{renderChannelLink()}
 					{channelMemberList?.length > 0 && (
 						<div className="flex gap-1 px-4">
@@ -124,7 +126,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 							</div>
 						</div>
 					)}
-				</>
+				</div>
 			);
 		}
 
