@@ -113,9 +113,9 @@ export const listChannelRenderSlice = createSlice({
 		},
 		addCategoryToListRender: (state, action: PayloadAction<{ clanId: string; cate: ICategoryChannel }>) => {
 			const { clanId, cate } = action.payload;
-      if (state.listChannelRender[clanId]) {
-        state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate]
-      }
+			if (state.listChannelRender[clanId]) {
+				state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate];
+			}
 		}
 	}
 });

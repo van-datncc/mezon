@@ -115,8 +115,8 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 						category_id: response.category_id,
 						category_name: response.category_name,
 						creator_id: response.creator_id,
-            clan_id :  body.clan_id as string,
-            category_order : response.category_order,
+						clan_id: body.clan_id as string,
+						category_order: response.category_order
 					}
 				})
 			);
