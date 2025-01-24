@@ -216,6 +216,12 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 				}
 			})
 		);
+    thunkAPI.dispatch(
+			listChannelRenderAction.updateCategory({
+				clanId,
+				cate: request
+			})
+		);
 	} catch (error) {
 		captureSentryError(error, 'categories/updateCategory');
 		return thunkAPI.rejectWithValue(error);
