@@ -107,7 +107,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			tp: channelDraftMessage?.draftTopicId,
 			cid: channelDraftMessage?.draftContent?.cid
 		};
-	}, [channelDraftMessage]);
+	}, [channelDraftMessage?.draftContent]);
 
 	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
 
