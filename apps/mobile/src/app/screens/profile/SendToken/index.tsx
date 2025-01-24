@@ -111,7 +111,8 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				sender_name: userProfile?.user?.username || '',
 				receiver_id: selectedUser?.id || '',
 				amount: Number(plainTokenCount || 1),
-				note: note || ''
+				note: note || '',
+				extra_attribute: ''
 			};
 
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));

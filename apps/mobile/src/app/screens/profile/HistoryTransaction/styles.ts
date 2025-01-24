@@ -40,11 +40,19 @@ export const style = (colors: Attributes) =>
 		},
 		cursorItem: {
 			height: size.s_50,
-			width: (screenWidth - size.s_30) / 2,
+			width: (screenWidth - size.s_100) / 2,
 			flex: 1,
 			backgroundColor: colors.borderDim,
 			justifyContent: 'center',
 			alignItems: 'center',
 			borderRadius: size.s_8
+		},
+		page: {
+			justifyContent: 'center',
+			alignItems: 'center',
+			height: size.s_60,
+			width: size.s_60,
+			borderRadius: size.s_4,
+			backgroundColor: colors.borderDim
 		}
 	});
