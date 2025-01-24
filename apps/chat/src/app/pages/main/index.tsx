@@ -6,6 +6,7 @@ import {
 	MessageModalImage,
 	ModalCall,
 	ModalCreateClan,
+	ModalUnknowChannel,
 	MultiStepModalE2ee,
 	NavLinkComponent,
 	SearchModal,
@@ -52,6 +53,7 @@ import {
 	selectStatusMenu,
 	selectStreamMembersByChannelId,
 	selectTheme,
+	selectToastErrorStatus,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -275,7 +277,18 @@ function MyApp() {
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
-
+	// show toast error
+	const toastErrorStatus = useSelector(selectToastErrorStatus);
+	const [openUnknown, closeUnknown] = useModal(() => {
+		return <ModalUnknowChannel isError={true} onClose={closeUnknown} />;
+	}, []);
+	useEffect(() => {
+		if (toastErrorStatus) {
+			openUnknown();
+		} else {
+			closeUnknown();
+		}
+	}, [toastErrorStatus]);
 	return (
 		<div
 			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}

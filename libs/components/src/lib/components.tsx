@@ -61,6 +61,7 @@ export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileB
 export { default as FirstJoinPopup } from './components/FirstJoinPopup';
 export { default as ForwardMessageModal } from './components/ForwardMessage';
 export * from './components/LoginForm';
+export { default as ModalUnknowChannel } from './components/MarkdownFormatText/ModalUnknowChannel';
 export * from './components/MessageBox';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
 export { ModalErrorTypeUpload, ModalOverData } from './components/ModalError';
@@ -77,6 +78,7 @@ export * from './components/SettingProfile';
 export { getColorAverageFromURL } from './components/SettingProfile/AverageColor';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
+
 export { UserMentionList } from './components/UserMentionList';
 
 export * from './components/ContextMenu';
