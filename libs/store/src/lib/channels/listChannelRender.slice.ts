@@ -3,7 +3,7 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { CategoriesEntity } from '../categories/categories.slice';
 import { RootState } from '../store';
-import { IUpdateChannelRequest } from './channels.slice';
+import { ChannelsEntity, IUpdateChannelRequest } from './channels.slice';
 
 export const CHANNEL_LIST_RENDER = 'CHANNEL_LIST_RENDER';
 
@@ -117,18 +117,50 @@ export const listChannelRenderSlice = createSlice({
 				state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate];
 			}
 		},
-    updateCategory: (state, action: PayloadAction<{ clanId: string; cate: ApiUpdateCategoryDescRequest }>) => {
+		updateCategory: (state, action: PayloadAction<{ clanId: string; cate: ApiUpdateCategoryDescRequest }>) => {
 			const { clanId, cate } = action.payload;
 			if (state.listChannelRender[clanId]) {
-        const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === cate.category_id);
-        state.listChannelRender[clanId][indexUpdate] = {
-          ...state.listChannelRender[clanId][indexUpdate],
-          category_name: cate.category_name
-        }
-
-
+				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === cate.category_id);
+				state.listChannelRender[clanId][indexUpdate] = {
+					...state.listChannelRender[clanId][indexUpdate],
+					category_name: cate.category_name
+				};
 			}
 		},
+		addThreadToListRender: (state, action: PayloadAction<{ clanId: string; channel: ChannelsEntity }>) => {
+			const { channel, clanId } = action.payload;
+
+			const channelData: IChannel = {
+				...(channel as IChannel),
+				id: channel.id
+			};
+			const isExistChannel = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.id);
+			if (isExistChannel === -1 && clanId && state.listChannelRender[clanId]) {
+				const indexInsert = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.parrent_id);
+
+				if (indexInsert === -1) {
+					return;
+				}
+				state.listChannelRender[clanId].splice(indexInsert + 1, 0, channelData);
+				state.listChannelRender[clanId].join();
+				state.listChannelRender[clanId][indexInsert + 1] = {
+					...state.listChannelRender[clanId][indexInsert + 1],
+					count_mess_unread: ((state.listChannelRender[clanId][indexInsert + 1] as ChannelsEntity).count_mess_unread || 0) + 1
+				};
+			}
+		},
+		addBadgeToChannelRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+
+			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			if (updateIndex === -1) {
+				return;
+			}
+			state.listChannelRender[clanId][updateIndex] = {
+				...state.listChannelRender[clanId][updateIndex],
+				count_mess_unread: ((state.listChannelRender[clanId][updateIndex] as ChannelsEntity).count_mess_unread || 0) + 1
+			};
+		}
 	}
 });
 
