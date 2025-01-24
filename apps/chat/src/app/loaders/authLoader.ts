@@ -36,6 +36,17 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 	dispatch(listUsersByUserActions.fetchListUsersByUser({}));
 	dispatch(friendsActions.fetchListFriends({}));
 	dispatch(directActions.fetchDirectMessage({}));
+	// check network not connect
+	if (!navigator.onLine) {
+		await new Promise<void>((resolve) => {
+			const handleOnline = () => {
+				window.removeEventListener('online', handleOnline);
+				resolve();
+			};
+			window.addEventListener('online', handleOnline);
+		});
+	}
+
 	try {
 		const response = await dispatch(authActions.refreshSession());
 		if ((response as unknown as IWithError).error) {
