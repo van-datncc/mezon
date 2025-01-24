@@ -12,10 +12,11 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { checkIsThread } from '@mezon/utils';
+import { LIMIT, checkIsThread } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../navigation/ScreenTypes';
 import EmptyThread from './EmptyThread';
@@ -46,18 +47,31 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const isThread = checkIsThread(currentChannel as ChannelsEntity);
 	const loadingStatus = useSelector((state: RootState) => state?.threads?.loadingStatus);
 	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
+	const [page, setPage] = useState<number>(1);
+	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(false);
 
-	const fetchThreads = useCallback(async () => {
-		const body = {
-			channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
-			clanId: currentChannel?.clan_id ?? ''
-		};
-		await dispatch(threadsActions.fetchThreads(body));
-	}, [currentChannel?.channel_id, currentChannel?.clan_id, currentChannel?.parrent_id, dispatch, isThread]);
+	const fetchThreads = useCallback(
+		async (currentPage: number) => {
+			const body = {
+				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
+				clanId: currentChannel?.clan_id ?? '',
+				page: currentPage,
+				noCache: true
+			};
+			const response = await dispatch(threadsActions.fetchThreads(body)).unwrap();
+
+			if (response?.length < LIMIT) {
+				setIsNextDisabled(true);
+			} else {
+				setIsNextDisabled(false);
+			}
+		},
+		[currentChannel?.channel_id, currentChannel?.clan_id, currentChannel?.parrent_id, dispatch, isThread]
+	);
 
 	useEffect(() => {
-		fetchThreads();
-	}, [fetchThreads]);
+		fetchThreads(page);
+	}, [fetchThreads, page]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const getActiveThreads = useSelector(selectActiveThreads(searchText));
@@ -70,10 +84,10 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 			screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL,
 			params: {
-				channelThreads: channelThreads
+				channelThreads
 			}
 		});
-	}, []);
+	}, [channelThreads, dispatch, navigation, setValueThread]);
 
 	const debouncedSetSearchText = useCallback((value) => {
 		setSearchText(value);
@@ -89,7 +103,11 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 			) : (
 				<View>
 					<SearchThreadsBar onTextChanged={debouncedSetSearchText} />
-					<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
+					<ScrollView
+						style={styles.scrollView}
+						showsVerticalScrollIndicator={false}
+						contentContainerStyle={{ paddingBottom: size.s_60, paddingTop: size.s_10 }}
+					>
 						{getJoinedThreadsWithinLast30Days?.length > 0 && (
 							<GroupThread
 								title={
@@ -130,6 +148,24 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 							</GroupThread>
 						)}
 					</ScrollView>
+
+					<View style={styles.paginationContainer}>
+						<TouchableOpacity
+							style={[styles.paginationButton]}
+							onPress={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
+							disabled={page === 1}
+						>
+							<MaterialIcons style={page === 1 ? styles.disableButton : styles.normalButton} name="navigate-before" size={20} />
+						</TouchableOpacity>
+						<Text style={styles.textPage}>{page}</Text>
+						<TouchableOpacity
+							style={styles.paginationButton}
+							onPress={() => setPage((prevPage) => prevPage + 1)}
+							disabled={isNextDisabled}
+						>
+							<MaterialIcons style={isNextDisabled ? styles.disableButton : styles.normalButton} name="navigate-next" size={20} />
+						</TouchableOpacity>
+					</View>
 				</View>
 			)}
 		</View>

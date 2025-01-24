@@ -108,6 +108,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			await dispatch(markAsReadProcessing(body));
 		} catch (error) {
 			console.error('Failed to mark as read:', error);
+		} finally {
 			dismiss();
 		}
 	};
