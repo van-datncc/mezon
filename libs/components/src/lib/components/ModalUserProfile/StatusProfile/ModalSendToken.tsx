@@ -71,6 +71,7 @@ const ModalSendToken = ({
 	const handleChangeSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setSearchTerm(value);
+		setIsDropdownOpen(true);
 
 		if (selectedUserId) {
 			setSelectedUserId('');
