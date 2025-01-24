@@ -1,7 +1,8 @@
 import { useAppNavigation } from '@mezon/core';
-import { selectClanIdOnErrorMessage, toastActions } from '@mezon/store';
+import { toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useDispatch, useSelector } from 'react-redux';
+import { KOMU_CLAN_ID, WELCOME_CHANNEL_ID } from '@mezon/utils';
+import { useDispatch } from 'react-redux';
 
 type ModalUnknowChannelProps = {
 	onClose: () => void;
@@ -11,15 +12,14 @@ type ModalUnknowChannelProps = {
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const dispatch = useDispatch();
 	const { onClose, isError = false } = props;
-	const { navigate, toClanPage } = useAppNavigation();
+	const { navigate, toChannelPage } = useAppNavigation();
 	const resetErrorToastStatus = () => {
 		dispatch(toastActions.setErrorToastStatus(false));
 	};
-	const getClanIdOnErrorMessage = useSelector(selectClanIdOnErrorMessage);
 
-	const directToParent = () => {
+	const directToWelcomeChannel = () => {
 		resetErrorToastStatus();
-		navigate(toClanPage(getClanIdOnErrorMessage as string));
+		navigate(toChannelPage(WELCOME_CHANNEL_ID, KOMU_CLAN_ID));
 	};
 
 	const onCloseAndReset = () => {
@@ -56,10 +56,10 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 						{isError ? (
 							<button
 								className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary"
-								onClick={() => directToParent()}
+								onClick={() => directToWelcomeChannel()}
 								style={{ color: 'white' }}
 							>
-								Come back to the Clan
+								Direct to Welcome channel
 							</button>
 						) : (
 							<button className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary" onClick={onClose} style={{ color: 'white' }}>

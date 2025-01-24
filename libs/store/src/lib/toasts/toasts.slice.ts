@@ -9,8 +9,7 @@ const toastsAdapter = createEntityAdapter<Toast>();
 
 const initialState = {
 	...toastsAdapter.getInitialState(),
-	toastErrorStatus: false,
-	clanIdOnErrorMessage: ''
+	toastErrorStatus: false
 };
 const addToast = createAsyncThunk(
 	'toasts/addToast',
@@ -65,21 +64,17 @@ export const toastsSlice = createSlice({
 		},
 		setErrorToastStatus: (state, action: PayloadAction<boolean>) => {
 			state.toastErrorStatus = action.payload;
-		},
-		setClanIdOnErrorMessage: (state, action: PayloadAction<{ clanId: string }>) => {
-			state.clanIdOnErrorMessage = action.payload.clanId;
 		}
 	}
 });
 
-export const { addOneToast, removeToast, clearToasts, setErrorToastStatus, setClanIdOnErrorMessage } = toastsSlice.actions;
+export const { addOneToast, removeToast, clearToasts, setErrorToastStatus } = toastsSlice.actions;
 
 export const toastActions = {
 	addToast,
 	removeToast,
 	clearToasts,
-	setErrorToastStatus,
-	setClanIdOnErrorMessage
+	setErrorToastStatus
 };
 
 // Create selectors using the adapter's getSelectors method
@@ -88,6 +83,5 @@ export const { selectAll: selectToasts, selectById: selectToastById } = toastsAd
 );
 
 export const selectToastErrorStatus = (state: { toasts: typeof initialState }) => state.toasts.toastErrorStatus;
-export const selectClanIdOnErrorMessage = (state: { toasts: typeof initialState }) => state.toasts.clanIdOnErrorMessage;
 
 export const toastsReducer = toastsSlice.reducer;
