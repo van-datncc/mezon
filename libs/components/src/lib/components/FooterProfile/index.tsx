@@ -1,6 +1,8 @@
 import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
+	TOKEN_FAILED_STATUS,
+	TOKEN_SUCCESS_STATUS,
 	channelMembersActions,
 	giveCoffeeActions,
 	selectAccountCustomStatus,
@@ -16,7 +18,6 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
 import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -41,7 +42,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
-	const InfoSendToken = useSelector(selectInfoSendToken);
+	const infoSendToken = useSelector(selectInfoSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
@@ -57,6 +58,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
 	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
 	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
+	const [isInputDisabled, setIsInputDisabled] = useState<boolean>(false);
 
 	const isMe = userId === myProfile?.userId;
 
@@ -95,10 +97,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setNote('send token');
 		setUserSearchError('');
 		setError('');
+		setIsInputDisabled(false);
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
 	};
 
-	const handleSaveSendToken = (id: string) => {
+	const handleSaveSendToken = async (id: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
 			setUserSearchError('Please select a user');
@@ -116,14 +119,23 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		const tokenEvent: ApiTokenSentEvent = {
 			sender_id: myProfile.userId as string,
 			sender_name: myProfile?.userProfile?.user?.username as string,
-			receiver_id: userId,
-			amount: token,
+			receiver_id: infoSendToken?.receiver_id ?? userId,
+			amount: infoSendToken?.amount ?? token,
 			note: note,
-			extra_attribute: extraAttribute
+			extra_attribute: infoSendToken?.extra_attribute ?? extraAttribute
 		};
 
-		dispatch(giveCoffeeActions.sendToken(tokenEvent));
-		dispatch(giveCoffeeActions.setInfoSendToken(null));
+		try {
+			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
+		} catch (err) {
+			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
+		}
+		handleCloseModalSendToken();
+	};
+
+	const handleClosePopup = () => {
+		dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: null, status: TOKEN_FAILED_STATUS }));
 		handleCloseModalSendToken();
 	};
 
@@ -148,11 +160,17 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, []);
 
 	useEffect(() => {
-		if (showModalSendToken && InfoSendToken) {
-			setToken(InfoSendToken.amount ?? 0);
-			setSelectedUserId(InfoSendToken.receiver_id ?? '');
-			setNote(InfoSendToken.note ?? 'send token');
-			setExtraAttribute(InfoSendToken.extra_attribute ?? '');
+		if (showModalSendToken && infoSendToken) {
+			setToken(infoSendToken.amount ?? 0);
+			setSelectedUserId(infoSendToken.receiver_id ?? '');
+			setNote(infoSendToken.note ?? 'send token');
+			setExtraAttribute(infoSendToken.extra_attribute ?? '');
+			setIsInputDisabled(true);
+			const timer = setTimeout(() => {
+				handleClosePopup();
+			}, 10000);
+
+			return () => clearTimeout(timer);
 		}
 	}, [showModalSendToken]);
 
@@ -193,14 +211,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Tippy content="Settings" className={` ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
-						<div
-							onClick={openSetting}
-							className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
-						>
-							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
-						</div>
-					</Tippy>
+					<div
+						onClick={openSetting}
+						className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
+					>
+						<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
+					</div>
 				</div>
 			</div>
 			{showModalCustomStatus && (
@@ -222,13 +238,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
 					openModal={showModalSendToken}
-					onClose={handleCloseModalSendToken}
+					onClose={handleClosePopup}
 					setSelectedUserId={setSelectedUserId}
 					setNote={setNote}
 					error={error}
 					userSearchError={userSearchError}
 					userId={myProfile.userId as string}
 					note={note}
+					isInputDisabled={isInputDisabled}
 				/>
 			)}
 		</>

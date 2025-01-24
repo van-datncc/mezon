@@ -25,7 +25,6 @@ import {
 import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { IMessageSendPayload, IMessageTypeCallLog, isMacDesktop } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -174,44 +173,36 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 					<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 						<div className=" items-center gap-2 flex">
 							<div className="justify-start items-center gap-[15px] flex">
-								<button onClick={() => handleStartCall()}>
-									<Tippy content="Start voice call" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-										<span>
-											<Icons.IconPhoneDM
-												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
-											/>
-										</span>
-									</Tippy>
+								<button title="Start voice call" onClick={() => handleStartCall()}>
+									<span>
+										<Icons.IconPhoneDM
+											className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+										/>
+									</span>
 								</button>
-								<button onClick={() => handleStartCall(true)}>
-									<Tippy content="Start Video Call" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-										<span>
-											<Icons.IconMeetDM
-												className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
-											/>
-										</span>
-									</Tippy>
+								<button title="Start Video Call" onClick={() => handleStartCall(true)}>
+									<span>
+										<Icons.IconMeetDM
+											className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`}
+										/>
+									</span>
 								</button>
 								<div>
-									<PinButton isLightMode={isLightMode} />
+									<PinButton mode={mode} isLightMode={isLightMode} />
 								</div>
 								<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
 								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
-									<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
-										<Tippy content="Show Member List" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-											<span>
-												<Icons.MemberList isWhite={isShowMemberListDM} />
-											</span>
-										</Tippy>
+									<button title="Show Member List" onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
+										<span>
+											<Icons.MemberList isWhite={isShowMemberListDM} />
+										</span>
 									</button>
 								)}
 								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
-									<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
-										<Tippy content="Show User Profile" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-											<span>
-												<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-											</span>
-										</Tippy>
+									<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
+										<span>
+											<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+										</span>
 									</button>
 								)}
 							</div>
@@ -232,21 +223,17 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 						</div>
 					</div>
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
-						<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
-							<Tippy content="Show Member List" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-								<span>
-									<Icons.MemberList isWhite={isShowMemberListDM} />
-								</span>
-							</Tippy>
+						<button title="Show Member List" onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
+							<span>
+								<Icons.MemberList isWhite={isShowMemberListDM} />
+							</span>
 						</button>
 					)}
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
-						<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
-							<Tippy content="Show User Profile" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-								<span>
-									<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
-								</span>
-							</Tippy>
+						<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
+							<span>
+								<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+							</span>
 						</button>
 					)}
 				</div>
@@ -258,7 +245,7 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	);
 }
 
-function PinButton({ isLightMode }: { isLightMode: boolean }) {
+function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number }) {
 	const dispatch = useAppDispatch();
 	const currentDm = useSelector(selectCurrentDM);
 	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, currentDm?.id as string));
@@ -280,17 +267,18 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
-			<Tippy className={`${isShowPinMessage && 'hidden'} w-[142px] ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Pinned Messages">
-				<div>
-					<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
-						<Icons.PinRight isWhite={isShowPinMessage} />
-						{isShowPinBadge && (
-							<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
-						)}
-					</button>
-				</div>
-			</Tippy>
-			{isShowPinMessage && <PinnedMessages onClose={handleClose} rootRef={threadRef} />}
+			<button
+				title="Pinned Messages"
+				className="focus-visible:outline-none relative"
+				onClick={handleShowPinMessage}
+				onContextMenu={(e) => e.preventDefault()}
+			>
+				<Icons.PinRight isWhite={isShowPinMessage} />
+				{isShowPinBadge && (
+					<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
+				)}
+			</button>
+			{isShowPinMessage && <PinnedMessages mode={mode} onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -301,7 +289,6 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 		setOpenAddToGroup(!openAddToGroup);
 	};
 	const rootRef = useRef<HTMLDivElement>(null);
-	const isLightMode = appearanceTheme === 'light';
 	return (
 		<div onClick={handleOpenAddToGroupModal} ref={rootRef} className="cursor-pointer">
 			{openAddToGroup && (
@@ -315,11 +302,9 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 					/>
 				</div>
 			)}
-			<Tippy content="Add friends to DM" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-				<span>
-					<Icons.IconAddFriendDM />
-				</span>
-			</Tippy>
+			<span title="Add friends to DM">
+				<Icons.IconAddFriendDM />
+			</span>
 		</div>
 	);
 };

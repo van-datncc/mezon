@@ -1,6 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiWalletLedger } from 'mezon-js/api.gen';
+import { ApiTransactionDetail, ApiWalletLedger } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 export const WALLET_LEDGER_FEATURE_KEY = 'walletLedger';
@@ -10,6 +10,7 @@ export interface WalletLedgerState {
 	error?: string | null;
 	walletLedger?: ApiWalletLedger[] | null;
 	count?: number;
+	detailLedger?: ApiTransactionDetail | null;
 }
 
 export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ page }: { page?: number }, thunkAPI) => {
@@ -21,10 +22,18 @@ export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', 
 	};
 });
 
+export const fetchDetailTransaction = createAsyncThunk('walletLedger/fetchDetailTransaction', async ({ transId }: { transId: string }, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const response = await mezon.client.listTransactionDetail(mezon.session, transId);
+	return {
+		detailLedger: response
+	};
+});
 export const initialWalletLedgerState: WalletLedgerState = {
 	loadingStatus: 'not loaded',
 	error: null,
 	walletLedger: null,
+	detailLedger: null,
 	count: 0
 };
 
@@ -45,6 +54,18 @@ export const walletLedgerSlice = createSlice({
 			.addCase(fetchListWalletLedger.rejected, (state: WalletLedgerState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			})
+			.addCase(fetchDetailTransaction.pending, (state: WalletLedgerState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchDetailTransaction.fulfilled, (state: WalletLedgerState, action) => {
+				state.detailLedger = action.payload.detailLedger;
+
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(fetchDetailTransaction.rejected, (state: WalletLedgerState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
 			});
 	}
 });
@@ -54,3 +75,4 @@ export const getWalletLedgerState = (rootState: { [WALLET_LEDGER_FEATURE_KEY]: W
 export const walletLedgerReducer = walletLedgerSlice.reducer;
 export const selectWalletLedger = createSelector(getWalletLedgerState, (state) => state.walletLedger);
 export const selectCountWalletLedger = createSelector(getWalletLedgerState, (state) => state.count);
+export const selectDetailedger = createSelector(getWalletLedgerState, (state) => state.detailLedger);

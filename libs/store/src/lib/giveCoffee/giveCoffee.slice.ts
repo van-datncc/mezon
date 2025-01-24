@@ -7,6 +7,8 @@ import { ensureSession, getMezonCtx } from '../helpers';
 import { toastActions } from '../toasts/toasts.slice';
 
 export const GIVE_COFEE = 'giveCoffee';
+export const TOKEN_SUCCESS_STATUS = 'SUCCESS';
+export const TOKEN_FAILED_STATUS = 'FAILED';
 
 export interface GiveCoffeeEntity {
 	id: string; // Primary ID
@@ -19,6 +21,10 @@ export interface GiveCoffeeState extends EntityState<GiveCoffeeEntity, string> {
 	tokenSocket: Record<string, ApiGiveCoffeeEvent>;
 	tokenUpdate: Record<string, number>;
 	infoSendToken: ApiTokenSentEvent | null;
+	sendTokenEvent: {
+		tokenEvent: ApiTokenSentEvent;
+		status: string;
+	} | null;
 }
 
 export const giveCoffeeAdapter = createEntityAdapter<GiveCoffeeEntity>();
@@ -55,7 +61,8 @@ export const initialGiveCoffeeState: GiveCoffeeState = giveCoffeeAdapter.getInit
 	showModalSendToken: false,
 	tokenSocket: {},
 	tokenUpdate: {},
-	infoSendToken: null
+	infoSendToken: null,
+	sendTokenEvent: null
 });
 
 export const sendToken = createAsyncThunk('token/sendToken', async (tokenEvent: ApiTokenSentEvent, thunkAPI) => {
@@ -92,6 +99,9 @@ export const giveCoffeeSlice = createSlice({
 		},
 		setInfoSendToken: (state, action: PayloadAction<ApiTokenSentEvent | null>) => {
 			state.infoSendToken = action.payload;
+		},
+		setSendTokenEvent: (state, action) => {
+			state.sendTokenEvent = action.payload;
 		},
 		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
 			const { tokenEvent } = action.payload;
@@ -167,6 +177,8 @@ export const getCoffeeState = (rootState: { [GIVE_COFEE]: GiveCoffeeState }): Gi
 export const selectShowModalSendToken = createSelector(getCoffeeState, (state) => state.showModalSendToken);
 
 export const selectInfoSendToken = createSelector(getCoffeeState, (state) => state.infoSendToken);
+
+export const selectSendTokenEvent = createSelector(getCoffeeState, (state) => state.sendTokenEvent);
 
 export const selectUpdateToken = (userId: string) =>
 	createSelector(getCoffeeState, (state) => {

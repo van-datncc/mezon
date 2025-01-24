@@ -19,11 +19,9 @@ import { CategorySetting } from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
 import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';
-import { ChannelListItemRef } from '../ChannelListItem';
 
 type CategorizedChannelsProps = {
 	category: ICategoryChannel;
-	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
 };
 
 export interface IChannelLinkPermission {
@@ -62,7 +60,7 @@ const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, clo
 	);
 };
 
-const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
+const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, category.id));
@@ -189,14 +187,17 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category, channel
 					>
 						<Icons.UpDownIcon />
 					</button>
-					<UserRestrictionZone policy={isShowCreateChannel}>
-						<button
-							className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black"
-							onClick={() => handleOpenCreateChannelModal(category)}
-						>
-							<Icons.Plus />
-						</button>
-					</UserRestrictionZone>
+					{!category.isFavor && (
+						<UserRestrictionZone policy={isShowCreateChannel}>
+							<button
+								className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black"
+								onClick={() => handleOpenCreateChannelModal(category)}
+							>
+								<Icons.Plus />
+							</button>
+						</UserRestrictionZone>
+					)}
+
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>
 			)}

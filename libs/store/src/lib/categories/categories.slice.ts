@@ -48,7 +48,7 @@ type updatCategoryPayload = {
 	request: ApiUpdateCategoryDescRequest;
 };
 
-type FetchCategoriesPayload = {
+export type FetchCategoriesPayload = {
 	categories: ICategory[];
 	clanId: string;
 	fromCache?: boolean;
@@ -83,14 +83,6 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 	}
 
 	const response = await fetchCategoriesCached(mezon, clanId);
-
-	if (Date.now() - response.time > 100) {
-		return {
-			categories: [],
-			clanId: clanId,
-			fromCache: true
-		};
-	}
 
 	if (!response.categorydesc) {
 		return { categories: [], clanId: clanId };

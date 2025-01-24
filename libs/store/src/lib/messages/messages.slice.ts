@@ -118,7 +118,6 @@ export interface MessagesState {
 	>;
 	channelViewPortMessageIds: Record<string, string[]>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
-	channelIdLastFetch: string;
 	directMessageUnread: Record<string, ChannelMessage[]>;
 }
 export type FetchMessagesMeta = {
@@ -357,16 +356,14 @@ export const fetchMessages = createAsyncThunk(
 				);
 			}
 
-			const lastLoadMessage = response.messages[response.messages.length - 1];
-			const hasMore = lastLoadMessage?.code !== EMessageCode.FIRST_MESSAGE;
-
-			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
-
-			thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId: chlId }));
-
 			const oldMessages = channelMessagesAdapter
 				.getSelectors()
 				.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
+
+			const lastLoadMessage = !fromCache ? response.messages.at(-1) : oldMessages[0];
+			const hasMore = lastLoadMessage?.code !== EMessageCode.FIRST_MESSAGE;
+
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage?.id, hasMore } }));
 
 			if (shouldReturnCachedMessages(isFetchingLatestMessages, oldMessages, lastSentMessage, !!fromCache)) {
 				thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages: oldMessages }));
@@ -847,7 +844,6 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: {},
 	idMessageToJump: null,
-	channelIdLastFetch: '',
 	directMessageUnread: {},
 	channelViewPortMessageIds: {}
 };
@@ -886,9 +882,6 @@ export const messagesSlice = createSlice({
 		},
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
-		},
-		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string }>) => {
-			state.channelIdLastFetch = action.payload.channelId;
 		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
