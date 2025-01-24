@@ -3,6 +3,7 @@ import { ICategory, LoadingStatus, SortChannel, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
+import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
@@ -105,6 +106,20 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 					category: mapCategoryToEntity(response)
 				})
 			);
+			thunkAPI.dispatch(
+				listChannelRenderAction.addCategoryToListRender({
+					clanId: body.clan_id as string,
+					cate: {
+						id: response.category_id as string,
+						channels: [],
+						category_id: response.category_id,
+						category_name: response.category_name,
+						creator_id: response.creator_id,
+						clan_id: body.clan_id as string,
+						category_order: response.category_order
+					}
+				})
+			);
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -199,6 +214,12 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 					id: request.category_id as string,
 					...request
 				}
+			})
+		);
+    thunkAPI.dispatch(
+			listChannelRenderAction.updateCategory({
+				clanId,
+				cate: request
 			})
 		);
 	} catch (error) {

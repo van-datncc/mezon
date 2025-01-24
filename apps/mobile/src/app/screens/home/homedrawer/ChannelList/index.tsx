@@ -1,31 +1,19 @@
-import {
-	ActionEmitEvent,
-	getUpdateOrAddClanChannelCache,
-	hasNonEmptyChannels,
-	load,
-	save,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
-} from '@mezon/mobile-components';
+import { hasNonEmptyChannels } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { appActions, channelsActions, ChannelsEntity, getStoreAsync, useAppDispatch } from '@mezon/store-mobile';
-import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { DeviceEventEmitter, InteractionManager, Linking, ScrollView, View } from 'react-native';
+import { appActions, useAppDispatch } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useRef } from 'react';
+import { InteractionManager, ScrollView, View } from 'react-native';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { linkGoogleMeet } from '../../../../utils/helpers';
+import { ChannelListContext } from '../Reusables';
 import ChannelListBackground from '../components/ChannelList/ChannelListBackground';
 import ChannelListBottomSheet from '../components/ChannelList/ChannelListBottomSheet';
 import { ChannelListFavorite } from '../components/ChannelList/ChannelListFavorite';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
-import { StatusVoiceChannel } from '../components/ChannelList/ChannelListItem';
 import ChannelListLoading from '../components/ChannelList/ChannelListLoading';
 import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
-import { ChannelListContext } from '../Reusables';
 import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
 export type ChannelsPositionRef = {
@@ -46,29 +34,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 	const dispatch = useAppDispatch();
-	const timeoutRef = useRef<any>();
-
-	useEffect(() => {
-		return () => {
-			timeoutRef.current && clearTimeout(timeoutRef.current);
-		};
-	}, []);
-
-	const handlePress = useCallback(() => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_MENU_CLAN_CHANNEL);
-	}, []);
-
-	const handleLongPressCategory = useCallback((category: ICategoryChannel) => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CATEGORY, category);
-	}, []);
-
-	const handleLongPressChannel = useCallback((channel: ChannelThreads) => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel });
-	}, []);
-
-	const handleLongPressThread = useCallback((channel: ChannelThreads) => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel, isThread: true });
-	}, []);
 
 	const handleLayout = useCallback(
 		(event, item) => {
@@ -86,53 +51,11 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		({ item, index }) => {
 			return (
 				<View onLayout={(e) => handleLayout(e, item)} key={`${item?.category_id}_${index}_ItemChannelList}`}>
-					<ChannelListSection
-						channelsPositionRef={channelsPositionRef}
-						data={item}
-						onLongPressCategory={handleLongPressCategory}
-						onLongPressChannel={handleLongPressChannel}
-						onLongPressThread={handleLongPressThread}
-					/>
+					<ChannelListSection channelsPositionRef={channelsPositionRef} data={item} />
 				</View>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread, handleLayout]
-	);
-
-	const handleScrollToChannelFavorite = useCallback(
-		async (channel?: ChannelsEntity) => {
-			if (channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
-				if (channel?.status === StatusVoiceChannel.Active && channel?.meeting_code) {
-					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-					await Linking.openURL(urlVoice);
-				}
-			} else {
-				const channelId = channel?.channel_id || '';
-				const clanId = channel?.clan_id || '';
-				const store = await getStoreAsync();
-				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-				const isCached = channelsCache?.includes(channelId);
-				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.closeDrawer());
-				}
-				timeoutRef.current = setTimeout(async () => {
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
-					store.dispatch(
-						channelsActions.joinChannel({
-							clanId: clanId ?? '',
-							channelId: channelId,
-							noFetchMembers: false,
-							isClearMessage: true,
-							noCache: true
-						})
-					);
-				}, 0);
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			}
-		},
-		[isTabletLandscape, navigation]
+		[handleLayout]
 	);
 
 	return (
@@ -147,9 +70,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					nestedScrollEnabled={true}
 					bounces={false}
 				>
-					<ChannelListBackground onPress={handlePress} />
-					<ChannelListHeader onPress={handlePress} />
-					<ChannelListFavorite onPress={handleScrollToChannelFavorite} />
+					<ChannelListBackground />
+					<ChannelListHeader />
+					<ChannelListFavorite />
 					<ChannelListLoading isNonChannel={hasNonEmptyChannels(categorizedChannels || [])} />
 					<ChannelListScroll channelsPositionRef={channelsPositionRef} flashListRef={flashListRef} />
 					{!!categorizedChannels?.length &&
