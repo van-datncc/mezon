@@ -12,7 +12,8 @@ export enum EBacktickType {
 	CODE = 'c',
 	BOLD = 'b',
 	LINK = 'lk',
-	VOICE_LINK = 'vk'
+	VOICE_LINK = 'vk',
+	LINKYOUTUBE = 'lk_yt'
 }
 
 export interface IMention {
@@ -50,6 +51,7 @@ export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export type ILinkOnMessage = IStartEndIndex;
 export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {}
 export type ILinkVoiceRoomOnMessage = IStartEndIndex;
+export type ILinkYoutubeOnMessage = IStartEndIndex;
 
 export interface IPreMessage extends IPre, IStartEndIndex {}
 

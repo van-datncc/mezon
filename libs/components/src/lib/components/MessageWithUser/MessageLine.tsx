@@ -19,6 +19,7 @@ type MessageLineProps = {
 	code?: number;
 	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 	messageId?: string;
+	isReply?: boolean;
 };
 
 const MessageLineComponent = ({
@@ -34,7 +35,8 @@ const MessageLineComponent = ({
 	isInPinMsg,
 	code,
 	onCopy,
-	messageId
+	messageId,
+	isReply
 }: MessageLineProps) => {
 	return (
 		<div
@@ -60,6 +62,7 @@ const MessageLineComponent = ({
 				code={code}
 				onCopy={onCopy}
 				messsageId={messageId}
+				isReply={isReply}
 			/>
 		</div>
 	);
@@ -81,6 +84,7 @@ interface RenderContentProps {
 	code?: number;
 	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 	messsageId?: string;
+	isReply?: boolean;
 }
 
 export interface ElementToken {
@@ -108,13 +112,15 @@ const RenderContent = ({
 	isInPinMsg,
 	code,
 	onCopy,
-	messsageId
+	messsageId,
+	isReply
 }: RenderContentProps) => {
-	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], lky = [] } = data;
 	const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
 	const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 	const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
 	const lkm = Array.isArray(lk) ? lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })) : [];
+	const lkym = Array.isArray(lky) ? lky.map((item) => ({ ...item, kindOf: ETokenMessage.LINKYOUTUBE })) : [];
 	const vkm = Array.isArray(vk) ? vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })) : [];
 	const elements: ElementToken[] = [
 		...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
@@ -122,11 +128,11 @@ const RenderContent = ({
 		...ejm,
 		...mkm,
 		...lkm,
+		...lkym,
 		...vkm
 	].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 	let lastindex = 0;
-
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
@@ -191,7 +197,7 @@ const RenderContent = ({
 						emojiId={element.emojiid ?? ''}
 					/>
 				);
-			} else if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
+			} else if ((element.kindOf === ETokenMessage.LINKS || element.kindOf === ETokenMessage.LINKYOUTUBE) && !isHideLinkOneImage) {
 				formattedContent.push(
 					<MarkdownContent
 						key={`link${s}-${messsageId}`}
@@ -199,6 +205,7 @@ const RenderContent = ({
 						isTokenClickAble={isTokenClickAble}
 						isJumMessageEnabled={isJumMessageEnabled}
 						content={contentInElement}
+						isReply={isReply}
 					/>
 				);
 			} else if (element.kindOf === ETokenMessage.VOICE_LINKS) {
@@ -215,7 +222,7 @@ const RenderContent = ({
 					/>
 				);
 			} else if (element.kindOf === ETokenMessage.MARKDOWNS) {
-				if (element.type === EBacktickType.LINK) {
+				if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
 					formattedContent.push(
 						<MarkdownContent
 							key={`link${s}-${messsageId}`}
@@ -223,6 +230,7 @@ const RenderContent = ({
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							content={contentInElement}
+							isReply={isReply}
 						/>
 					);
 				} else if (element.type === EBacktickType.BOLD) {
