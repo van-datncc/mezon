@@ -19,7 +19,6 @@ import { CategorySetting } from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
 import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';
-import { ChannelListItemRef } from '../ChannelListItem';
 
 type CategorizedChannelsProps = {
 	category: ICategoryChannel;
@@ -188,7 +187,7 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 					>
 						<Icons.UpDownIcon />
 					</button>
-					{!category.isFavor &&
+					{!category.isFavor && (
 						<UserRestrictionZone policy={isShowCreateChannel}>
 							<button
 								className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black"
@@ -197,7 +196,7 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 								<Icons.Plus />
 							</button>
 						</UserRestrictionZone>
-					}
+					)}
 
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>

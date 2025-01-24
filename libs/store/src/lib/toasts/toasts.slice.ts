@@ -1,4 +1,4 @@
-import { createAsyncThunk, createEntityAdapter, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { sleep } from '../helpers';
 import { Toast, ToastPayload } from './types';
 
@@ -7,8 +7,10 @@ export const TOASTS_FEATURE_KEY = 'toasts';
 // Create an adapter for the toasts
 const toastsAdapter = createEntityAdapter<Toast>();
 
-const initialState = toastsAdapter.getInitialState();
-
+const initialState = {
+	...toastsAdapter.getInitialState(),
+	toastErrorStatus: false
+};
 const addToast = createAsyncThunk(
 	'toasts/addToast',
 	async (payload: ToastPayload, thunkAPI) => {
@@ -59,21 +61,28 @@ export const toastsSlice = createSlice({
 		},
 		clearToasts: (state) => {
 			toastsAdapter.removeAll(state);
+		},
+		setErrorToastStatus: (state, action: PayloadAction<boolean>) => {
+			state.toastErrorStatus = action.payload;
 		}
 	}
 });
 
-export const { addOneToast, removeToast, clearToasts } = toastsSlice.actions;
+export const { addOneToast, removeToast, clearToasts, setErrorToastStatus } = toastsSlice.actions;
 
 export const toastActions = {
 	addToast,
 	removeToast,
-	clearToasts
+	clearToasts,
+	setErrorToastStatus
 };
 
 // Create selectors using the adapter's getSelectors method
 export const { selectAll: selectToasts, selectById: selectToastById } = toastsAdapter.getSelectors(
 	(state: { toasts: typeof initialState }) => state.toasts
 );
-
+export const selectToastErrorStatus = createSelector(
+	[(state: { toasts: typeof initialState }) => state.toasts],
+	(toastsState) => toastsState.toastErrorStatus
+);
 export const toastsReducer = toastsSlice.reducer;

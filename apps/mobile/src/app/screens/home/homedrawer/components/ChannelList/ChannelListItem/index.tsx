@@ -14,7 +14,7 @@ import {
 	selectIsUnreadChannelById,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { ChannelThreads, IChannel } from '@mezon/utils';
+import { IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';

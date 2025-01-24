@@ -22,8 +22,8 @@ export interface GiveCoffeeState extends EntityState<GiveCoffeeEntity, string> {
 	tokenUpdate: Record<string, number>;
 	infoSendToken: ApiTokenSentEvent | null;
 	sendTokenEvent: {
-		tokenEvent: ApiTokenSentEvent,
-		status: string
+		tokenEvent: ApiTokenSentEvent;
+		status: string;
 	} | null;
 }
 
@@ -101,7 +101,7 @@ export const giveCoffeeSlice = createSlice({
 			state.infoSendToken = action.payload;
 		},
 		setSendTokenEvent: (state, action) => {
-			state.sendTokenEvent = action.payload
+			state.sendTokenEvent = action.payload;
 		},
 		updateTokenUser: (state, action: PayloadAction<{ tokenEvent: ApiTokenSentEvent }>) => {
 			const { tokenEvent } = action.payload;
