@@ -18,7 +18,6 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
 import { safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -212,14 +211,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Tippy content="Settings" className={` ${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
-						<div
-							onClick={openSetting}
-							className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
-						>
-							<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
-						</div>
-					</Tippy>
+					<div
+						onClick={openSetting}
+						className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
+					>
+						<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
+					</div>
 				</div>
 			</div>
 			{showModalCustomStatus && (
