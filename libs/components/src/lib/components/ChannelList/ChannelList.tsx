@@ -90,7 +90,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const data = useMemo(
 		() => [
 			{ type: 'bannerAndEvents' },
-			{ type: 'favorites' },
 			...(listChannelRender
 				? isShowEmptyCategory
 					? listChannelRender
