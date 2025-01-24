@@ -185,7 +185,10 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IE
 					<div className="w-3/12 dark:text-[#b5bac1] text-textLightTheme">
 						<input onChange={handleChooseFile} ref={avatarRef} type="file" hidden />
 						<div className="relative w-fit">
-							<div className="absolute right-0 top-0 p-[5px] bg-[#ffffff] rounded-full z-10 shadow-xl border">
+							<div
+								onClick={() => avatarRef.current?.click()}
+								className="absolute right-0 top-0 p-[5px] bg-[#ffffff] rounded-full z-10 shadow-xl border cursor-pointer"
+							>
 								<Icons.SelectFileIcon />
 							</div>
 							<img
