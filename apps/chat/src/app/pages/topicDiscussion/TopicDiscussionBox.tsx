@@ -15,7 +15,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, checkTokenOnMarkdown, sleep } from '@mezon/utils';
+import { IMessageSendPayload, sleep } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -76,26 +76,14 @@ const TopicDiscussionBox = () => {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
-				content.mk ?? [],
-				content.hg ?? [],
-				mentions ?? [],
-				content.ej ?? []
-			);
-			const validatedContent = {
-				...content,
-				hg: validHashtagList,
-				ej: validEmojiList
-			};
 
 			await socket.writeChatMessage(
 				currentClanId,
 				currentChannel?.channel_id as string,
 				mode,
 				currentChannel?.channel_private !== 1,
-				validatedContent,
-				validMentionList,
+				content,
+				mentions,
 				attachments,
 				references,
 				false,

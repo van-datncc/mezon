@@ -310,7 +310,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
 			const payload = {
-				t: text,
+				t: text.trim(),
 				hg: hashtagList,
 				ej: emojiList,
 				mk
