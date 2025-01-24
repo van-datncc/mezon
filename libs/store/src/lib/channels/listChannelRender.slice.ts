@@ -110,6 +110,12 @@ export const listChannelRenderSlice = createSlice({
 					channel_private: dataUpdate.channel_private
 				};
 			}
+		},
+		addCategoryToListRender: (state, action: PayloadAction<{ clanId: string; cate: ICategoryChannel }>) => {
+			const { clanId, cate } = action.payload;
+      if (state.listChannelRender[clanId]) {
+        state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate]
+      }
 		}
 	}
 });

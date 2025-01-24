@@ -90,7 +90,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const data = useMemo(
 		() => [
 			{ type: 'bannerAndEvents' },
-			{ type: 'favorites' },
 			...(listChannelRender
 				? isShowEmptyCategory
 					? listChannelRender
@@ -277,9 +276,3 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		</div>
 	);
 });
-
-const ChannelListMem = memo(ChannelList, () => true);
-
-ChannelListMem.displayName = 'ChannelListMem';
-
-export default ChannelListMem;
