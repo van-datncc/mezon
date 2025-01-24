@@ -1,21 +1,19 @@
-import { useAuth } from '@mezon/core';
 import { PlusAltIcon, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	clansActions,
 	getStoreAsync,
+	RootState,
 	selectAllClans,
 	selectCurrentStreamInfo,
-	selectStreamMembersByChannelId,
 	useAppDispatch,
-	usersStreamActions,
 	videoStreamActions
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -31,23 +29,23 @@ export const ListClanPopup = React.memo(() => {
 	const navigation = useNavigation();
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
-	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const store = useStore();
 	const { disconnect } = useWebRTCStream();
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const { userProfile } = useAuth();
-	const clans = useSelector(selectAllClans);
-	clans.sort((a, b) => {
-		const nameA = a.clan_name ?? '';
-		const nameB = b.clan_name ?? '';
+	const clanData = useSelector(selectAllClans);
+	const clans = useMemo(() => {
+		return [...clanData].sort((a, b) => {
+			const nameA = a.clan_name ?? '';
+			const nameB = b.clan_name ?? '';
 
-		if (nameA < nameB) {
-			return -1;
-		}
-		if (nameA > nameB) {
-			return 1;
-		}
-		return 0;
-	});
+			if (nameA < nameB) {
+				return -1;
+			}
+			if (nameA > nameB) {
+				return 1;
+			}
+			return 0;
+		});
+	}, [clanData]);
 	useEffect(() => {
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);
@@ -59,13 +57,14 @@ export const ListClanPopup = React.memo(() => {
 	}, []);
 
 	const handleLeaveChannel = useCallback(async () => {
+		const currentStreamInfo = selectCurrentStreamInfo(store.getState() as RootState);
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 			disconnect();
-			const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
-			dispatch(usersStreamActions.remove(idStreamByMe));
+			// const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
+			// dispatch(usersStreamActions.remove(idStreamByMe));
 		}
-	}, [currentStreamInfo, disconnect, streamChannelMember, dispatch, userProfile]);
+	}, [disconnect, dispatch, store]);
 
 	const handleChangeClan = useCallback(
 		async (clanId: string) => {
@@ -74,10 +73,6 @@ export const ListClanPopup = React.memo(() => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));
-			// const channelResp = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId }));
-			// if (channelResp?.payload) {
-			// 	await setDefaultChannelLoader(channelResp.payload, clanId);
-			// }
 			requestAnimationFrame(async () => {
 				const promises = [];
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
