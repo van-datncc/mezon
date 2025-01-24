@@ -1,6 +1,6 @@
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EBacktickType } from '@mezon/utils';
+import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
@@ -68,6 +68,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
+			{isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
 				<SingleBacktick contentBacktick={content} isInPinMsg={isInPinMsg} isLightMode={isLightMode} posInNotification={posInNotification} />
 			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !posInReply && !isLink ? (
@@ -132,6 +133,26 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 				</CopyToClipboard>
 				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick?.trim()}</code>
 			</pre>
+		</div>
+	);
+};
+
+const YouTubeEmbed: React.FC<{ url: string }> = ({ url }) => {
+	const embedUrl = getYouTubeEmbedUrl(url);
+	const { width, height } = getYouTubeEmbedSize(url);
+
+	return (
+		<div className="flex">
+			<div className="border-l-4 rounded-l border-[#ff001f]"></div>
+			<div className="p-4 bg-[#2b2d31] rounded">
+				<iframe
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+					title={url}
+					src={embedUrl}
+					style={{ width, height, border: 'none' }}
+					allowFullScreen
+				></iframe>
+			</div>
 		</div>
 	);
 };

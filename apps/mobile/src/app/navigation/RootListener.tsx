@@ -4,7 +4,6 @@ import {
 	acitvitiesActions,
 	appActions,
 	authActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
@@ -169,12 +168,6 @@ const RootListener = () => {
 			timeout && clearTimeout(timeout);
 		};
 	}, [isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
-
-	useEffect(() => {
-		if (currentClanId && currentClanId?.toString() !== '0') {
-			dispatch(channelsActions.fetchListFavoriteChannel({ clanId: currentClanId }));
-		}
-	}, [currentClanId, dispatch]);
 
 	const authLoader = useCallback(async () => {
 		try {

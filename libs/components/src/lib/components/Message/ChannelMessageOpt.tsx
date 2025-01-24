@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction, useEmojiConverted } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiConverted, useGifs } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -403,9 +403,12 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 
 function useReactMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
+	const { setClickedTrendingGif, setButtonArrowBack } = useGifs();
 
 	const handleItemClick = useCallback(
 		(event: React.MouseEvent<HTMLDivElement>) => {
+			setClickedTrendingGif(false);
+			setButtonArrowBack(false);
 			dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
 			dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT));
 			event.stopPropagation();

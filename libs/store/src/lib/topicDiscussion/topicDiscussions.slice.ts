@@ -1,5 +1,12 @@
 import { captureSentryError } from '@mezon/logger';
-import { getMobileUploadedAttachments, getWebUploadedAttachments, IMessageSendPayload, IMessageWithUser, LoadingStatus } from '@mezon/utils';
+import {
+	getMobileUploadedAttachments,
+	getWebUploadedAttachments,
+	IMentionOnMessage,
+	IMessageSendPayload,
+	IMessageWithUser,
+	LoadingStatus
+} from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic } from 'mezon-js/api.gen';
@@ -224,6 +231,14 @@ export const topicsSlice = createSlice({
 				topic.last_sent_message.sender_id = sender_id;
 				topic.last_sent_message.timestamp_seconds = timestamp_seconds;
 			}
+		},
+		updateInitMessage(state, action: PayloadAction<{ content: IMessageSendPayload; mentions: IMentionOnMessage[] }>) {
+			if (!state.firstMessageOfCurrentTopic?.message) return;
+			const { content, mentions } = action.payload;
+			const stringifiedContent = JSON.stringify(content, null, 4);
+			const stringifiedMentions = JSON.stringify(mentions, null, 4);
+			state.firstMessageOfCurrentTopic.message.content = stringifiedContent;
+			state.firstMessageOfCurrentTopic.message.mentions = stringifiedMentions;
 		}
 	},
 	extraReducers: (builder) => {
