@@ -18,7 +18,7 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
-		return widthScreen / 3 - size.s_4 * (Platform.OS === 'ios' ? 4 : 1);
+		return ((widthScreen - size.s_24) / 3) * (Platform.OS === 'ios' ? 4 : 1);
 	}, [widthScreen]);
 
 	const openImage = useCallback(

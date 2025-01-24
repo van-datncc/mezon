@@ -277,7 +277,7 @@ const MessageItem = React.memo(
 
 		const panResponder = PanResponder.create({
 			onMoveShouldSetPanResponder: (_, gestureState) => {
-				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5 && gestureState.dx < -5) {
+				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 && gestureState.dx < -8) {
 					Animated.sequence([
 						Animated.timing(translateX, {
 							toValue: -100,

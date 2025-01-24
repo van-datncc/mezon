@@ -36,7 +36,11 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 					<View>
 						<FastImage
 							source={{
-								uri: createImgproxyUrl(reactionMember?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+								uri: createImgproxyUrl(reactionMember?.clan_avatar ?? reactionMember?.user?.avatar_url ?? '', {
+									width: 300,
+									height: 300,
+									resizeType: 'fit'
+								})
 							}}
 							style={styles.image}
 						/>
