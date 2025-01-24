@@ -89,8 +89,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 									<Icons.ImageThumbnail />
 								</div>
 							) : (
-								<div className="h-6 overflow-hidden flex-1 flex items-center">
-									{' '}
+								<div className="h-6 overflow-hidden flex-1 leading-6">
 									<MessageLine
 										isEditted={false}
 										isTokenClickAble={false}
