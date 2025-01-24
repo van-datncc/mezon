@@ -30,8 +30,6 @@ import UserListVoiceChannel from '../ChannelListUserVoice';
 interface IChannelListItemProps {
 	data: any;
 	image?: string;
-	onLongPress: () => void;
-	onLongPressThread?: (thread: ChannelThreads) => void;
 }
 
 export enum StatusVoiceChannel {
@@ -135,19 +133,33 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		]
 	);
 
+	const handleLongPressChannel = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data });
+	}, [props?.data]);
+
+	const handleLongPressThread = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data, isThread: true });
+	}, [props?.data]);
+
 	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive && !isUnReadThreads) return;
 	return (
 		<View>
 			{!isChannelVoice && (
-				<ChannelItem onPress={handleRouteData} onLongPress={props?.onLongPress} data={props?.data} isUnRead={isUnRead} isActive={isActive} />
+				<ChannelItem
+					onPress={handleRouteData}
+					onLongPress={handleLongPressChannel}
+					data={props?.data}
+					isUnRead={isUnRead}
+					isActive={isActive}
+				/>
 			)}
-			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
+			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={handleLongPressThread} />}
 			{isChannelVoice && (
 				<UserListVoiceChannel
 					channelId={props?.data?.channel_id}
 					isCategoryExpanded={isCategoryExpanded}
 					onPress={handleRouteData}
-					onLongPress={props?.onLongPress}
+					onLongPress={handleLongPressChannel}
 					data={props?.data}
 					isUnRead={false}
 					isActive={isActive}

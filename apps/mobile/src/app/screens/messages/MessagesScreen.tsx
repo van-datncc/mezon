@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, directActions, selectDirectsOpenlistOrder, useAppDispatch } from '@mezon/store-mobile';
+import { DirectEntity, RootState, appActions, directActions, selectDirectsOpenlistOrder, useAppDispatch } from '@mezon/store-mobile';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,6 +28,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	useFocusEffect(
 		useCallback(() => {
+			dispatch(appActions.setHiddenBottomTabMobile(false));
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		}, [dispatch])
 	);
