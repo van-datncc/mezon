@@ -1,7 +1,9 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
 	ETypeMission,
+	FAVORITE_CATEGORY_ID,
 	appActions,
+	categoriesActions,
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
@@ -133,6 +135,10 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
 		const handleClick = () => {
+			if (channel.category_id === FAVORITE_CATEGORY_ID) {
+				dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parrent_id ?? '' }));
+			}
+
 			setTurnOffThreadMessage();
 			if (closeMenu) {
 				setStatusMenu(false);

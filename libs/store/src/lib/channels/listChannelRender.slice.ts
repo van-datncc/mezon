@@ -22,6 +22,8 @@ export interface DataChannelAndCate {
 	listChannelFavor: string[];
 }
 
+export const FAVORITE_CATEGORY_ID = 'favorCate';
+
 export const listChannelRenderSlice = createSlice({
 	name: CHANNEL_LIST_RENDER,
 	initialState: initialListChannelRenderState,
