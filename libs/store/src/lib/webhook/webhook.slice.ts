@@ -142,7 +142,7 @@ export const integrationWebhookSlice = createSlice({
 					id: channel_id
 				});
 			}
-			webhookAdapter.upsertOne(state.webhookList[channel_id], webhook);
+			state.webhookList[channel_id] = webhookAdapter.upsertOne(state.webhookList[channel_id], webhook);
 		},
 		removeOneWebhook: (state, action: PayloadAction<{ channelId: string; webhookId: string }>) => {
 			const { channelId, webhookId } = action.payload;
