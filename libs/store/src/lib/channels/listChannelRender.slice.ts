@@ -117,18 +117,16 @@ export const listChannelRenderSlice = createSlice({
 				state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate];
 			}
 		},
-    updateCategory: (state, action: PayloadAction<{ clanId: string; cate: ApiUpdateCategoryDescRequest }>) => {
+		updateCategory: (state, action: PayloadAction<{ clanId: string; cate: ApiUpdateCategoryDescRequest }>) => {
 			const { clanId, cate } = action.payload;
 			if (state.listChannelRender[clanId]) {
-        const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === cate.category_id);
-        state.listChannelRender[clanId][indexUpdate] = {
-          ...state.listChannelRender[clanId][indexUpdate],
-          category_name: cate.category_name
-        }
-
-
+				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === cate.category_id);
+				state.listChannelRender[clanId][indexUpdate] = {
+					...state.listChannelRender[clanId][indexUpdate],
+					category_name: cate.category_name
+				};
 			}
-		},
+		}
 	}
 });
 
