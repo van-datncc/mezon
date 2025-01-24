@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
+import { ChannelType } from 'mezon-js';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
@@ -9,6 +10,7 @@ import { directActions } from '../direct/direct.slice';
 import { clearAllMemoizedFunctions } from '../memoize';
 import { createCachedSelector, messagesActions } from '../messages/messages.slice';
 import { RootState } from '../store';
+import { voiceActions } from '../voice/voice.slice';
 
 export const APP_FEATURE_KEY = 'app';
 
@@ -110,6 +112,13 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
 			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: currentClanId }));
+			thunkAPI.dispatch(
+				voiceActions.fetchVoiceChannelMembers({
+					clanId: currentClanId ?? '',
+					channelId: '',
+					channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE
+				})
+			);
 		}
 
 		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
