@@ -45,6 +45,7 @@ import {
 	IHashtagOnMessage,
 	ILinkOnMessage,
 	ILinkVoiceRoomOnMessage,
+	ILinkYoutubeOnMessage,
 	IMarkdownOnMessage,
 	IPreMessage
 } from './messageLine';
@@ -379,6 +380,7 @@ export interface IMessageSendPayload {
 	tp?: string;
 	cid?: string;
 	fwd?: boolean;
+	lky?: ILinkYoutubeOnMessage[];
 }
 
 export type IUser = {
@@ -936,7 +938,8 @@ export enum ETokenMessage {
 	VOICE_LINKS = 'vk',
 	MARKDOWNS = 'mk',
 	PRE = 'pre',
-	BOLD = 'bm'
+	BOLD = 'bm',
+	LINKYOUTUBE = 'lk_yt'
 }
 export type SearchFilter = {
 	field_name: string;
