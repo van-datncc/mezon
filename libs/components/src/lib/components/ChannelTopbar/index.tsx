@@ -31,7 +31,6 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, isMacDesktop } from '@mezon/utils';
-import Tippy from '@tippy.js/react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -184,14 +183,9 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={fileRef}>
-			<Tippy
-				className={`${isShowFile && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-				content="Files"
-			>
-				<button className="focus-visible:outline-none" onClick={handleShowFile} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.FileIcon isWhite={isShowFile} defaultSize="size-6" />
-				</button>
-			</Tippy>
+			<button title="Files" className="focus-visible:outline-none" onClick={handleShowFile} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.FileIcon isWhite={isShowFile} defaultSize="size-6" />
+			</button>
 			{isShowFile && <FileModal onClose={handleClose} rootRef={fileRef} />}
 		</div>
 	);
@@ -211,14 +205,9 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
-			<Tippy
-				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-				content="Canvas"
-			>
-				<button className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
-				</button>
-			</Tippy>
+			<button content="Canvas" className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
+			</button>
 			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
 	);
@@ -236,14 +225,9 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<Tippy
-				className={`${isShowThread && 'hidden'}  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-				content="Threads"
-			>
-				<button className="focus-visible:outline-none" onClick={handleToggleThreads} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
-				</button>
-			</Tippy>
+			<button title="Threads" className="focus-visible:outline-none" onClick={handleToggleThreads} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
+			</button>
 			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>
 	);
@@ -293,18 +277,18 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={notiRef}>
-			<Tippy
-				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-				content="Notification Settings"
+			<button
+				title="Notification Settings"
+				className="focus-visible:outline-none"
+				onClick={handleShowNotificationSetting}
+				onContextMenu={(e) => e.preventDefault()}
 			>
-				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{isMuteBell ? (
-						<Icons.MuteBell isWhite={isShowNotificationSetting} />
-					) : (
-						<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
-					)}
-				</button>
-			</Tippy>
+				{isMuteBell ? (
+					<Icons.MuteBell isWhite={isShowNotificationSetting} />
+				) : (
+					<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
+				)}
+			</button>
 			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
@@ -327,17 +311,17 @@ function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number 
 
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
-			<Tippy
-				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}
-				content="Pinned Messages"
+			<button
+				title="Pinned Messages"
+				className="focus-visible:outline-none relative"
+				onClick={handleTogglePinMessage}
+				onContextMenu={(e) => e.preventDefault()}
 			>
-				<button className="focus-visible:outline-none relative" onClick={handleTogglePinMessage} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.PinRight isWhite={isShowPinMessage} />
-					{isShowPinBadge && (
-						<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
-					)}
-				</button>
-			</Tippy>
+				<Icons.PinRight isWhite={isShowPinMessage} />
+				{isShowPinBadge && (
+					<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
+				)}
+			</button>
 			{isShowPinMessage && <PinnedMessages mode={mode} rootRef={pinRef} onClose={handleTogglePinMessage} />}
 		</div>
 	);
@@ -362,12 +346,10 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tippy content={isShowInbox ? '' : 'Inbox'} className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
-				</button>
-			</Tippy>
+			<button title="Inbox" className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
+				{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
+			</button>
 			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
@@ -387,11 +369,9 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 	const { navigate } = useAppNavigation();
 	return (
 		<div className="relative leading-5 h-5">
-			<Tippy content="Help" className={`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-				<button onClick={() => navigate('help')}>
-					<Icons.Help />
-				</button>
-			</Tippy>
+			<button title="Help" onClick={() => navigate('help')}>
+				<Icons.Help />
+			</button>
 		</div>
 	);
 }
@@ -406,11 +386,9 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tippy content="Members" className={`flex justify-center items-center ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
-				<button onClick={handleClick}>
-					<Icons.MemberList isWhite={isActive} />
-				</button>
-			</Tippy>
+			<button title="Members" onClick={handleClick}>
+				<Icons.MemberList isWhite={isActive} />
+			</button>
 		</div>
 	);
 }
@@ -422,11 +400,9 @@ function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tippy className={`w-max ${isLightMode ? 'tooltipLightMode' : 'tooltip'}`} content="Show Chat">
-				<button onClick={handleClick}>
-					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
-				</button>
-			</Tippy>
+			<button title="Show Chat" onClick={handleClick}>
+				<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
+			</button>
 		</div>
 	);
 }

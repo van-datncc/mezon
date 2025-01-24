@@ -1,7 +1,6 @@
 import { useFriends } from '@mezon/core';
 import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import Tippy from '@tippy.js/react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -60,11 +59,9 @@ const CreateMessageGroupModal = memo(
 				onClick={onClickOpenModal}
 				className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full whitespace-nowrap"
 			>
-				<Tippy content="Create DM" className={`${appearanceTheme === 'light' ? 'tooltipLightMode' : 'tooltip'}`}>
-					<span>
-						<Icons.Plus className="w-4 h-4" />
-					</span>
-				</Tippy>
+				<span title="Create DM">
+					<Icons.Plus className="w-4 h-4" />
+				</span>
 				{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
 			</div>
 		);
