@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
+import { selectAllAccount } from '../account/account.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 import { clanMembersMetaActions, extracMeta, selectClanMembersMetaEntities } from './clan.members.meta';
@@ -176,35 +177,63 @@ export const selectMembersClanCount = createSelector(getUsersClanState, (state) 
 const getName = (user: UsersClanEntity) =>
 	user.clan_nick?.toLowerCase() || user.user?.display_name?.toLowerCase() || user.user?.username?.toLowerCase() || '';
 
-export const selectClanMemberWithStatusIds = createSelector(selectAllUserClans, selectClanMembersMetaEntities, (members, metas) => {
-	if (!metas || !members) {
+export const selectClanMemberWithStatusIds = createSelector(
+	selectAllUserClans,
+	selectClanMembersMetaEntities,
+	selectAllAccount,
+	(members, metas, userProfile) => {
+		if (!metas || !members) {
+			return {
+				online: [],
+				offline: []
+			};
+		}
+
+		const users = members.map((item) => ({
+			...item,
+			user: {
+				...item.user,
+				online: !!metas[item.id]?.online,
+				is_mobile: !!metas[item.id]?.isMobile
+			}
+		})) as UsersClanEntity[];
+
+		const userProfileId = userProfile?.user?.id;
+		if (userProfileId) {
+			const userIndex = users.findIndex((user) => user.id === userProfileId);
+
+			if (userIndex === -1) {
+				users.push({
+					id: userProfileId,
+					user: {
+						...userProfile.user,
+						online: true
+					}
+				} as UsersClanEntity);
+			} else {
+				users[userIndex] = {
+					...users[userIndex],
+					user: {
+						...users[userIndex].user,
+						online: true
+					}
+				};
+			}
+		}
+
+		users.sort((a, b) => {
+			if (a.user?.online === b.user?.online) {
+				return getName(a).localeCompare(getName(b));
+			}
+			return a.user?.online ? -1 : 1;
+		});
+		const firstOfflineIndex = users.findIndex((user) => !user.user?.online);
+		const onlineUsers = firstOfflineIndex === -1 ? users : users?.slice(0, firstOfflineIndex);
+		const offlineUsers = firstOfflineIndex === -1 ? [] : users?.slice(firstOfflineIndex);
+
 		return {
-			online: [],
-			offline: []
+			online: onlineUsers?.map((item) => item?.id),
+			offline: offlineUsers?.map((item) => item?.id)
 		};
 	}
-
-	const users = members.map((item) => ({
-		...item,
-		user: {
-			...item.user,
-			online: !!metas[item.id]?.online,
-			is_mobile: !!metas[item.id]?.isMobile
-		}
-	})) as UsersClanEntity[];
-
-	users.sort((a, b) => {
-		if (a.user?.online === b.user?.online) {
-			return getName(a).localeCompare(getName(b));
-		}
-		return a.user?.online ? -1 : 1;
-	});
-	const firstOfflineIndex = users.findIndex((user) => !user.user?.online);
-	const onlineUsers = firstOfflineIndex === -1 ? users : users?.slice(0, firstOfflineIndex);
-	const offlineUsers = firstOfflineIndex === -1 ? [] : users?.slice(firstOfflineIndex);
-
-	return {
-		online: onlineUsers?.map((item) => item?.id),
-		offline: offlineUsers?.map((item) => item?.id)
-	};
-});
+);
