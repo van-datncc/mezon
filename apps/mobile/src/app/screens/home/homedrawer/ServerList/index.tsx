@@ -1,9 +1,8 @@
-import { useFriends } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import LogoMezonDark from '../../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../../assets/svg/logoMezonLight.svg';
@@ -13,12 +12,12 @@ import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
 import { ListClanPopup } from '../components/ListClanPopup';
 import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
+import BadgeFriendRequest from './BadgeFriendRequest';
 import { style } from './styles';
 
 const ServerList = React.memo(() => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const { quantityPendingRequest } = useFriends();
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const logoCustom = useSelector(selectLogoCustom);
@@ -41,11 +40,7 @@ const ServerList = React.memo(() => {
 				) : (
 					<LogoMezonDark width={size.s_48} height={size.s_48} />
 				)}
-				{quantityPendingRequest ? (
-					<View style={styles.badge}>
-						<Text style={styles.badgeText}>{quantityPendingRequest > 99 ? `+99` : quantityPendingRequest}</Text>
-					</View>
-				) : null}
+				<BadgeFriendRequest />
 			</TouchableOpacity>
 			<SeparatorWithLine style={styles.separatorLine} />
 			<ScrollView contentContainerStyle={styles.contentScroll} showsVerticalScrollIndicator={false}>

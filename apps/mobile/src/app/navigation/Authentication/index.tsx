@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -17,13 +17,11 @@ import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
 const RootStack = createNativeStackNavigator();
 
-export const Authentication = () => {
-	const getInitialRouteName = APP_SCREEN.BOTTOM_BAR;
-
+export const Authentication = memo(() => {
 	return (
 		<BottomSheetModalProvider>
 			<RootStack.Navigator
-				initialRouteName={getInitialRouteName}
+				initialRouteName={APP_SCREEN.BOTTOM_BAR}
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
@@ -49,4 +47,4 @@ export const Authentication = () => {
 			<StreamingPopup />
 		</BottomSheetModalProvider>
 	);
-};
+});
