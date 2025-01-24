@@ -1,6 +1,6 @@
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { CategoriesEntity } from '../categories/categories.slice';
 import { RootState } from '../store';
 import { IUpdateChannelRequest } from './channels.slice';
@@ -108,6 +108,22 @@ export const listChannelRenderSlice = createSlice({
 					topic: dataUpdate.topic,
 					age_restricted: dataUpdate.age_restricted,
 					channel_private: dataUpdate.channel_private
+				};
+			}
+		},
+		addCategoryToListRender: (state, action: PayloadAction<{ clanId: string; cate: ICategoryChannel }>) => {
+			const { clanId, cate } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				state.listChannelRender[clanId] = [...state.listChannelRender[clanId], cate];
+			}
+		},
+		updateCategory: (state, action: PayloadAction<{ clanId: string; cate: ApiUpdateCategoryDescRequest }>) => {
+			const { clanId, cate } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === cate.category_id);
+				state.listChannelRender[clanId][indexUpdate] = {
+					...state.listChannelRender[clanId][indexUpdate],
+					category_name: cate.category_name
 				};
 			}
 		}
