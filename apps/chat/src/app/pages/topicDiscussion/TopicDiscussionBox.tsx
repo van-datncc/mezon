@@ -151,7 +151,7 @@ const TopicDiscussionBox = () => {
 	return (
 		<>
 			{(isFetchMessageDone || firstMessageOfThisTopic) && (
-				<div className={isElectron() ? 'h-[calc(100%_-_60px_-_80px)]' : 'h-full'}>
+				<div className={isElectron() ? 'h-[calc(100%_-_60px_-_30px)]' : 'h-full'}>
 					<MemoizedChannelMessages
 						channelId={currentTopicId as string}
 						clanId={currentClanId as string}

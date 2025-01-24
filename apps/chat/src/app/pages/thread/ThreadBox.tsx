@@ -15,6 +15,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, ThreadValue, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
@@ -137,7 +138,9 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+			<div
+				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[46px]' : 'pb-[26px]'} px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative`}
+			>
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
