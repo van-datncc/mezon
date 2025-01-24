@@ -31,6 +31,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectFetchChannelStatus,
+	selectInfoSendToken,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
@@ -231,6 +232,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentUser = useAuth();
 	const allRolesInClan = useSelector(selectAllRolesClan);
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
+	const infoSendToken = useSelector(selectInfoSendToken);
 
 	const closeAgeRestricted = () => {
 		setIsShowAgeRestricted(false);
@@ -333,12 +335,12 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: sendTokenEvent?.tokenEvent?.sender_id }),
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		} else if (sendTokenEvent?.status === TOKEN_FAILED_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: sendTokenEvent?.tokenEvent?.sender_id }),
+				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		}
