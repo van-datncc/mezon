@@ -9,11 +9,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
-interface IProps {
-	onPress: () => void;
-}
-
-const ChannelListHeader = ({ onPress }: IProps) => {
+const ChannelListHeader = () => {
 	const currentClan = useSelector(selectCurrentClan);
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['clanMenu']);
@@ -48,9 +44,13 @@ const ChannelListHeader = ({ onPress }: IProps) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_EVENT_CHANNEL);
 	};
 
+	const handlePress = () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_MENU_CLAN_CHANNEL);
+	};
+
 	return (
 		<View style={[styles.container]}>
-			<TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.listHeader}>
+			<TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.listHeader}>
 				<View style={styles.titleNameWrapper}>
 					<Text numberOfLines={1} style={styles.titleServer}>
 						{clanName}

@@ -16,6 +16,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const [token, setToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const handleJoinRoom = async () => {
 		if (!roomName) return;
 		setLoading(true);
@@ -47,7 +48,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 
 	return (
 		<>
-			{!token ? (
+			{!token || !serverUrl ? (
 				<div className="w-full h-full bg-black flex justify-center items-center">
 					<div className="flex flex-col justify-center items-center gap-4 w-full">
 						<div className="w-full flex gap-2 justify-center p-2">
@@ -67,7 +68,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 					video={true}
 					audio={true}
 					token={token}
-					serverUrl={process.env.NX_CHAT_APP_MEET_WS_URL}
+					serverUrl={serverUrl}
 					data-lk-theme="default"
 					style={{ height: 'calc(100vh - 117px)' }}
 				>

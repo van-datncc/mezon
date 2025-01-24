@@ -2,7 +2,7 @@ import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-componen
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useMemo, useRef } from 'react';
 import { Animated } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import { useSelector } from 'react-redux';
@@ -18,7 +18,10 @@ const TabStack = createBottomTabNavigator();
 
 const BottomNavigator = memo(({ isLastActiveTabDm = false }: { isLastActiveTabDm: boolean }) => {
 	const isTabletLandscape = useTabletLandscape();
-	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
+	const isHiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
+	const isHiddenTab = useMemo(() => {
+		return isHiddenBottomTab || isTabletLandscape;
+	}, [isHiddenBottomTab, isTabletLandscape]);
 	const { themeValue } = useTheme();
 	const tabBarTranslateY = useRef(new Animated.Value(0)).current;
 
