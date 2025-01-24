@@ -1,6 +1,7 @@
 import { usePermissionChecker, useWindowSize } from '@mezon/core';
 import {
 	ClansEntity,
+	FAVORITE_CATEGORY_ID,
 	categoriesActions,
 	selectChannelsByClanId,
 	selectCtrlKFocusChannel,
@@ -10,6 +11,7 @@ import {
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsShowEmptyCategory,
+	selectListChannelRenderByClanId,
 	selectStatusStream,
 	selectTheme,
 	useAppDispatch,
@@ -26,7 +28,6 @@ import {
 	toggleDisableHover
 } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { selectListChannelRenderByClanId } from 'libs/store/src/lib/channels/listChannelRender.slice';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -71,7 +72,6 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 });
 
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
-
 	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const streamPlay = useSelector(selectStatusStream);
@@ -81,24 +81,24 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const dispatch = useAppDispatch();
 
 	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
-	const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentClan?.clan_id))
+	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 
 	const firstChannelWithBadgeCount = useMemo(() => {
 		return channelsInClan?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
-	}, [channelsInClan])
-
+	}, [channelsInClan]);
 
 	const data = useMemo(
 		() => [
 			{ type: 'bannerAndEvents' },
-			{ type: 'favorites' },
-			...(listChannelRender ? (isShowEmptyCategory
-				? listChannelRender
-				: listChannelRender.filter(
-					(item) =>
-						((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
-						(item as ICategoryChannel).channels === undefined
-				)) : [])
+			...(listChannelRender
+				? isShowEmptyCategory
+					? listChannelRender
+					: listChannelRender.filter(
+							(item) =>
+								((item as ICategoryChannel).channels && (item as ICategoryChannel).channels.length > 0) ||
+								(item as ICategoryChannel).channels === undefined
+						)
+				: [])
 		],
 		[listChannelRender, isShowEmptyCategory]
 	) as ICategoryChannel[];
@@ -134,8 +134,8 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable]);
 
 	const findScrollIndex = () => {
-		const categoryId = firstChannelWithBadgeCount?.id;
-		const index = data.findIndex((item) => item.id === categoryId);
+		const channelId = firstChannelWithBadgeCount?.id;
+		const index = data.findIndex((item) => item.id === channelId && item.category_id !== FAVORITE_CATEGORY_ID);
 		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
 		const currentScrollPosition = virtualizer.scrollElement?.scrollTop;
 		const targetScrollPosition = virtualizer.getVirtualItems()[currentScrollIndex]?.start;
@@ -149,7 +149,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 
 		const focusChannel = ctrlKFocusChannel;
 		const { id } = focusChannel as { id: string; parentId: string };
-		const index = data.findIndex((item) => item.id === id);
+		const index = data.findIndex((item) => item.id === id && item.category_id !== FAVORITE_CATEGORY_ID);
 		if (index <= 0) return;
 
 		const currentScrollIndex = virtualizer.getVirtualItems().findIndex((item) => item.index === index);
@@ -276,7 +276,6 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		</div>
 	);
 });
-
 
 const ChannelListMem = memo(ChannelList, () => true);
 
