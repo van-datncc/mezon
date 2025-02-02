@@ -101,6 +101,7 @@ export const deleteWebhookById = createAsyncThunk(
 				clan_id: data.clanId
 			};
 			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string, body);
+			thunkAPI.dispatch(webhookActions.removeOneWebhook({ channelId: data.webhook.channel_id || '', webhookId: data.webhook.id || '' }));
 			if (!response) {
 				thunkAPI.rejectWithValue({});
 			}
@@ -142,7 +143,7 @@ export const integrationWebhookSlice = createSlice({
 					id: channel_id
 				});
 			}
-			webhookAdapter.upsertOne(state.webhookList[channel_id], webhook);
+			state.webhookList[channel_id] = webhookAdapter.upsertOne(state.webhookList[channel_id], webhook);
 		},
 		removeOneWebhook: (state, action: PayloadAction<{ channelId: string; webhookId: string }>) => {
 			const { channelId, webhookId } = action.payload;

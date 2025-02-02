@@ -372,7 +372,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					{!isShowCanvas && !isShowAgeRestricted && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 					{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 					<div
-						className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
+						className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 						id="mainChat"
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
 						onDragEnter={canSendMessage ? handleDragEnter : () => {}}

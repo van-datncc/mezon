@@ -492,7 +492,8 @@ export const fetchChannelsCached = memoizeAndTrack(
 export const addThreadToChannels = createAsyncThunk(
 	'channels/addThreadToChannels',
 	async ({ clanId, channelId }: { clanId: string; channelId: string }, thunkAPI) => {
-		if (channelId && !selectChannelById2(getChannelsRootState(thunkAPI), channelId)) {
+		const channelData = selectChannelById2(getChannelsRootState(thunkAPI), channelId);
+		if (channelId && !channelData) {
 			const data = await thunkAPI
 				.dispatch(
 					threadsActions.fetchThread({
@@ -509,7 +510,20 @@ export const addThreadToChannels = createAsyncThunk(
 						channel: { ...data[0], active: 1 } as ChannelsEntity
 					})
 				);
+				thunkAPI.dispatch(
+					listChannelRenderAction.addThreadToListRender({
+						clanId: clanId,
+						channel: { ...data[0], active: 1 } as ChannelsEntity
+					})
+				);
 			}
+		} else {
+			thunkAPI.dispatch(
+				listChannelRenderAction.addThreadToListRender({
+					clanId: clanId,
+					channel: channelData
+				})
+			);
 		}
 	}
 );
@@ -686,6 +700,7 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 						count: 1
 					})
 				);
+				thunkAPI.dispatch(listChannelRenderAction.addBadgeToChannelRender({ clanId: clanId, channelId: channelId }));
 			}
 		}
 
@@ -701,6 +716,7 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 						count: 1
 					})
 				);
+				thunkAPI.dispatch(listChannelRenderAction.addBadgeToChannelRender({ clanId: clanId, channelId: channelId }));
 			}
 		}
 	}

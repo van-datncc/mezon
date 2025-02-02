@@ -14,6 +14,7 @@ type MarkdownContentOpt = {
 	isLink?: boolean;
 	isBacktick?: boolean;
 	typeOfBacktick?: EBacktickType;
+	isReply?: boolean;
 };
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
@@ -23,7 +24,8 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	isInPinMsg,
 	isLink,
 	isBacktick,
-	typeOfBacktick
+	typeOfBacktick,
+	isReply
 }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const navigate = useNavigate();
@@ -68,7 +70,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
-			{isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} />}
+			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
 				<SingleBacktick contentBacktick={content} isInPinMsg={isInPinMsg} isLightMode={isLightMode} posInNotification={posInNotification} />
 			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !posInReply && !isLink ? (

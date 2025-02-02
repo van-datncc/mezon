@@ -11,6 +11,7 @@ import {
 	selectCurrentDM,
 	selectDmGroupCurrent,
 	selectIsInCall,
+	selectIsPinModalVisible,
 	selectIsShowMemberListDM,
 	selectIsShowPinBadgeByDmId,
 	selectIsUseProfileDM,
@@ -249,21 +250,16 @@ function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number 
 	const dispatch = useAppDispatch();
 	const currentDm = useSelector(selectCurrentDM);
 	const isShowPinBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, currentDm?.id as string));
-
-	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
+	const isShowPinMessage = useSelector(selectIsPinModalVisible);
 	const threadRef = useRef<HTMLDivElement>(null);
 
 	const handleShowPinMessage = async () => {
 		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentDm?.id as string }));
-		setIsShowPinMessage(!isShowPinMessage);
+		dispatch(pinMessageActions.togglePinModal());
 		if (isShowPinBadge) {
 			dispatch(directActions.setShowPinBadgeOfDM({ dmId: currentDm?.id as string, isShow: false }));
 		}
 	};
-
-	const handleClose = useCallback(() => {
-		setIsShowPinMessage(false);
-	}, []);
 
 	return (
 		<div className="relative leading-5 size-6" ref={threadRef}>
@@ -278,7 +274,7 @@ function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number 
 					<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
 				)}
 			</button>
-			{isShowPinMessage && <PinnedMessages mode={mode} onClose={handleClose} rootRef={threadRef} />}
+			{isShowPinMessage && <PinnedMessages mode={mode} onClose={handleShowPinMessage} rootRef={threadRef} />}
 		</div>
 	);
 }

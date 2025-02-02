@@ -1,3 +1,4 @@
+import { isYouTubeLink } from '.';
 import { EBacktickType, IMarkdownOnMessage } from '../types';
 
 export enum ApiMessageEntityTypes {
@@ -308,7 +309,11 @@ export const processMarkdownEntities = (text: string | undefined, entities: ApiM
 			if (entity.type === ApiMessageEntityTypes.Url || entity.type === ApiMessageEntityTypes.TextUrl) {
 				const link = text?.substring(entity.offset, entity.offset + entity.length);
 				return {
-					type: link?.startsWith('https://meet.google.com/') ? EBacktickType.VOICE_LINK : EBacktickType.LINK,
+					type: link?.startsWith('https://meet.google.com/')
+						? EBacktickType.VOICE_LINK
+						: isYouTubeLink(text as string)
+							? EBacktickType.LINKYOUTUBE
+							: EBacktickType.LINK,
 					e: entity.offset + entity.length,
 					s: entity.offset
 				};

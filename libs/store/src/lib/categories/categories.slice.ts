@@ -216,7 +216,7 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 				}
 			})
 		);
-    thunkAPI.dispatch(
+		thunkAPI.dispatch(
 			listChannelRenderAction.updateCategory({
 				clanId,
 				cate: request
