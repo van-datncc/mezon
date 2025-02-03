@@ -13,10 +13,15 @@ import {
 	IMessageWithUser,
 	MentionDataProps,
 	ThemeApp,
+	addMarkdownPrefix,
 	addMention,
 	createFormattedString,
 	filterEmptyArrays,
-	searchMentionsHashtag
+	generateNewPlaintext,
+	getMarkdownPrefixItems,
+	prepareProcessedContent,
+	searchMentionsHashtag,
+	updateMarkdownPositions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -32,13 +37,6 @@ import { UserMentionList } from '../../components/UserMentionList';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
-import {
-	addMarkdownPrefix,
-	generateNewPlaintext,
-	getMarkdownPrefixItems,
-	prepareProcessedContent,
-	updateMarkdownPositions
-} from './editMessageHelper';
 
 type MessageInputProps = {
 	messageId: string;
