@@ -53,13 +53,9 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, directMessage?.channel_id ?? ''));
 
 	const [openUnknown, closeUnknown] = useModal(() => {
-		return (
-			<LeaveGroupModal
-				groupWillBeLeave={directMessage}
-				onClose={closeUnknown}
-				handleLeaveGroup={(e) => handleLeave(e, directMessage.channel_id as string, currentDmGroupId)}
-			/>
-		);
+		if (isTypeDMGroup) {
+			return <LeaveGroupModal navigateToFriends={navigateToFriends} groupWillBeLeave={directMessage} onClose={closeUnknown} />;
+		}
 	}, [directMessage]);
 
 	const handleCloseClick = useCallback(

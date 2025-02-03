@@ -1,21 +1,30 @@
-import { DirectEntity } from '@mezon/store';
+import { directActions, DirectEntity, directMetaActions, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 interface LeaveGroupModalProps {
 	onClose: () => void;
 	groupWillBeLeave: DirectEntity;
-	handleLeaveGroup: (e: React.MouseEvent<HTMLDivElement>) => void;
+	navigateToFriends: () => void;
 }
 
-function LeaveGroupModal({ groupWillBeLeave, onClose, handleLeaveGroup }: LeaveGroupModalProps) {
+function LeaveGroupModal({ groupWillBeLeave, onClose, navigateToFriends }: LeaveGroupModalProps) {
 	const [isChecked, setIsChecked] = useState(false);
+	const dispatch = useAppDispatch();
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 
 	const handleCheckboxChange = () => {
 		setIsChecked(!isChecked);
 	};
 
 	const handleLeaveAndClose = async (e: React.MouseEvent<HTMLDivElement>) => {
-		await handleLeaveGroup(e);
+		e.stopPropagation();
+		await dispatch(directActions.closeDirectMessage({ channel_id: groupWillBeLeave.channel_id }));
+		const timestamp = Date.now() / 1000;
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: groupWillBeLeave.channel_id ?? '', timestamp }));
+		if (groupWillBeLeave.channel_id === currentDmGroupId) {
+			navigateToFriends();
+		}
 		onClose();
 	};
 
