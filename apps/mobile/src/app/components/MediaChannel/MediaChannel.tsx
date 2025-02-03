@@ -1,7 +1,7 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity, RootState, selectAllListAttachmentByChannel } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { Dimensions, FlatList, Platform, View } from 'react-native';
+import { Dimensions, FlatList, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EmptySearchPage } from '../EmptySearchPage';
 import { ImageListModal } from '../ImageListModal';
@@ -18,7 +18,7 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
-		return ((widthScreen - size.s_24) / 3) * (Platform.OS === 'ios' ? 4 : 1);
+		return (widthScreen - size.s_24) / 3;
 	}, [widthScreen]);
 
 	const openImage = useCallback(

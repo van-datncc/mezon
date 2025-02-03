@@ -351,6 +351,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								isReset: true
 							})
 						);
+						dispatch(
+							listChannelsByUserActions.updateChannelBadgeCount({
+								channelId: message.channel_id,
+								count: 0,
+								isReset: true
+							})
+						);
 					}
 					dispatch(
 						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
@@ -440,6 +447,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							count: 1
 						})
 					);
+					dispatch(
+						listChannelsByUserActions.updateChannelBadgeCount({
+							channelId: (notification as any).channel_id,
+							count: 1
+						})
+					);
 
 					if (isNotCurrentDirect) {
 						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
@@ -484,6 +497,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
 		dispatch(
 			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
+		);
+		dispatch(
+			listChannelsByUserActions.updateChannelBadgeCount({
+				channelId: lastSeenMess.channel_id,
+				count: 0,
+				isReset: true
+			})
 		);
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
 	}, []);
