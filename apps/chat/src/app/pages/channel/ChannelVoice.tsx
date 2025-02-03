@@ -1,22 +1,84 @@
-import { DisconnectButton, GridLayout, LiveKitRoom, ParticipantTile, RoomAudioRenderer, TrackToggle, useTracks } from '@livekit/components-react';
+import {
+	DisconnectButton,
+	GridLayout,
+	LiveKitRoom,
+	MediaDeviceMenu,
+	ParticipantPlaceholder,
+	ParticipantTile,
+	RoomAudioRenderer,
+	TrackToggle,
+	usePreviewTracks,
+	useTracks
+} from '@livekit/components-react';
 
 import '@livekit/components-styles';
 import { fetchJoinMezonMeet, useAppDispatch } from '@mezon/store';
 
-import { Track } from 'livekit-client';
+import { facingModeFromLocalTrack, LocalAudioTrack, LocalVideoTrack, Track, TrackProcessor } from 'livekit-client';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 interface ChannelVoiceProps {
 	channel: ApiChannelAppResponse;
 	roomName: string;
+	videoProcessor?: TrackProcessor<Track.Kind.Video>;
 }
 
-const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
+const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoProcessor }) => {
 	const [token, setToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
+
+	const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
+	const [videoEnabled, setVideoEnabled] = useState<boolean>(true);
+	const [audioDeviceId, setAudioDeviceId] = useState<string | null>(null);
+	const [videoDeviceId, setVideoDeviceId] = useState<string | null>(null);
+
+	useEffect(() => {
+		const loadDevices = async () => {
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			const audioInput = devices.find((device) => device.kind === 'audioinput');
+			const videoInput = devices.find((device) => device.kind === 'videoinput');
+
+			if (audioInput) setAudioDeviceId(audioInput.deviceId);
+			if (videoInput) setVideoDeviceId(videoInput.deviceId);
+		};
+
+		loadDevices();
+	}, []);
+
+	const tracks = usePreviewTracks({
+		audio: audioEnabled && audioDeviceId ? { deviceId: audioDeviceId } : false,
+		video: videoEnabled && videoDeviceId ? { deviceId: videoDeviceId, processor: videoProcessor } : false
+	});
+
+	const videoEl = useRef(null);
+
+	const videoTrack = useMemo(() => tracks?.filter((track) => track.kind === Track.Kind.Video)[0] as LocalVideoTrack, [tracks]);
+
+	const facingMode = useMemo(() => {
+		if (videoTrack) {
+			const { facingMode } = facingModeFromLocalTrack(videoTrack);
+			return facingMode;
+		} else {
+			return 'undefined';
+		}
+	}, [videoTrack]);
+
+	const audioTrack = useMemo(() => tracks?.filter((track) => track.kind === Track.Kind.Audio)[0] as LocalAudioTrack, [tracks]);
+
+	useEffect(() => {
+		if (videoEl.current && videoTrack) {
+			videoTrack.unmute();
+			videoTrack.attach(videoEl.current);
+		}
+
+		return () => {
+			videoTrack?.detach();
+		};
+	}, [videoTrack, videoEnabled, token]);
+
 	const handleJoinRoom = async () => {
 		if (!roomName) return;
 		setLoading(true);
@@ -42,22 +104,76 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		}
 	};
 
+	const toggleAudio = async () => {
+		setAudioEnabled(!audioEnabled);
+	};
+
+	const toggleVideo = async () => {
+		setVideoEnabled(!videoEnabled);
+	};
+
 	const handleLeaveRoom = async () => {
 		setToken(null);
+		setAudioEnabled(true);
+		setVideoEnabled(true);
 	};
 
 	return (
 		<>
 			{!token || !serverUrl ? (
-				<div className="w-full h-full bg-black flex justify-center items-center">
-					<div className="flex flex-col justify-center items-center gap-4 w-full">
-						<div className="w-full flex gap-2 justify-center p-2">
-							{/* {memberJoin.length > 0 && <UserListStreamChannel memberJoin={memberJoin} memberMax={3}></UserListStreamChannel>} */}
+				<div className="w-full h-full flex flex-col" data-lk-theme="default">
+					<div className="flex justify-center items-center" style={{ height: `calc(100vh - 116px)` }}>
+						{videoTrack && videoEnabled && (
+							<video
+								ref={videoEl}
+								width="1280"
+								height="720"
+								data-lk-facing-mode={facingMode}
+								style={{
+									transform: facingMode === 'user' ? 'rotateY(180deg)' : 'rotateY(0deg)'
+								}}
+							/>
+						)}
+						{(!videoTrack || !videoEnabled) && (
+							<div className="w-[1280px] h-[720px] flex flex-row justify-center items-center border-bgLightSecondary">
+								<ParticipantPlaceholder />
+							</div>
+						)}
+					</div>
+					<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !p-[6px] !border-none">
+						<div className="lk-button-group audio">
+							<TrackToggle initialState={audioEnabled} source={Track.Source.Microphone} onClick={toggleAudio}>
+								Microphone
+							</TrackToggle>
+							<div className="lk-button-group-menu">
+								<MediaDeviceMenu
+									initialSelection={audioDeviceId || 'default'}
+									kind="audioinput"
+									disabled={!audioTrack}
+									tracks={{ audioinput: audioTrack }}
+									onActiveDeviceChange={(_, id) => setAudioDeviceId(id)}
+								/>
+							</div>
+						</div>
+						<div className="lk-button-group video">
+							<TrackToggle initialState={videoEnabled} source={Track.Source.Camera} onClick={toggleVideo}>
+								Camera
+							</TrackToggle>
+							<div className="lk-button-group-menu">
+								<MediaDeviceMenu
+									initialSelection={videoDeviceId || 'default'}
+									kind="videoinput"
+									disabled={!videoTrack}
+									tracks={{ videoinput: videoTrack }}
+									onActiveDeviceChange={(_, id) => setVideoDeviceId(id)}
+								/>
+							</div>
 						</div>
 						<button
 							disabled={!roomName}
-							className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
+							className={`bg-green-700 rounded-xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
 							onClick={handleJoinRoom}
+							aria-label="Join Room"
 						>
 							{loading ? 'Joining...' : 'Join Room'}
 						</button>
@@ -65,22 +181,49 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 				</div>
 			) : (
 				<LiveKitRoom
-					video={true}
-					audio={true}
+					video={videoEnabled}
+					audio={audioEnabled}
 					token={token}
 					serverUrl={serverUrl}
 					data-lk-theme="default"
-					style={{ height: 'calc(100vh - 117px)' }}
+					style={{ height: 'calc(100vh - 116px)' }}
 				>
 					<MyVideoConference />
 					<RoomAudioRenderer />
-					{/* <ControlBar className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !p-[5px] !border-none" /> */}
-					<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !p-[5px] !border-none">
-						<TrackToggle source={Track.Source.Microphone} />
-						<TrackToggle source={Track.Source.Camera} />
-						<TrackToggle source={Track.Source.ScreenShare} />
-						<DisconnectButton onClick={handleLeaveRoom} className="!p-[4px]">
-							Leave
+					<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !pt-[6px] !pb-[14px] !border-none">
+						<div className="lk-button-group audio" data-lk-theme="default">
+							<TrackToggle source={Track.Source.Microphone} onClick={toggleAudio}>
+								Microphone
+							</TrackToggle>
+							<div className="lk-button-group-menu">
+								<MediaDeviceMenu
+									initialSelection={audioDeviceId || 'default'}
+									kind="audioinput"
+									disabled={!audioTrack}
+									tracks={{ audioinput: audioTrack }}
+									onActiveDeviceChange={(_, id) => setAudioDeviceId(id)}
+								/>
+							</div>
+						</div>
+						<div className="lk-button-group video" data-lk-theme="default">
+							<TrackToggle source={Track.Source.Camera} onClick={toggleVideo}>
+								Camera
+							</TrackToggle>
+							<div className="lk-button-group-menu">
+								<MediaDeviceMenu
+									initialSelection={videoDeviceId || 'default'}
+									kind="videoinput"
+									disabled={!videoTrack}
+									tracks={{ videoinput: videoTrack }}
+									onActiveDeviceChange={(_, id) => {
+										if (id !== 'default') setAudioDeviceId(id);
+									}}
+								/>
+							</div>
+						</div>
+						<TrackToggle source={Track.Source.ScreenShare}>ScreenShare</TrackToggle>
+						<DisconnectButton onClick={handleLeaveRoom} className="!p-[7px]">
+							Leave Room
 						</DisconnectButton>
 					</div>
 				</LiveKitRoom>

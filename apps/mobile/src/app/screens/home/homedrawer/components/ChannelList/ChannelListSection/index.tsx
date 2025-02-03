@@ -1,11 +1,10 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import { categoriesActions, selectCategoryExpandStateByCategoryId, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
+import { categoriesActions, selectCategoryExpandStateByCategoryId, useAppDispatch } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { memo, useCallback } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { ChannelsPositionRef } from '../../../ChannelList';
 import { ChannelListItem, IThreadActiveType } from '../ChannelListItem';
 import ChannelListSectionHeader from '../ChannelListSectionHeader';
@@ -18,19 +17,8 @@ interface IChannelListSectionProps {
 
 const ChannelListSection = memo(({ data, channelsPositionRef }: IChannelListSectionProps) => {
 	const styles = style(useTheme().themeValue);
-	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const dispatch = useAppDispatch();
 	const categoryExpandState = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, data?.category_id));
-
-	const handleOnPressSortChannel = useCallback(() => {
-		dispatch(
-			categoriesActions.setCategoryIdSortChannel({
-				isSortChannelByCategoryId: !categoryIdSortChannel[data?.category_id],
-				categoryId: data?.category_id,
-				clanId: data?.clan_id
-			})
-		);
-	}, [categoryIdSortChannel, data?.category_id, data?.clan_id, dispatch]);
 
 	const toggleCollapse = useCallback(
 		(category: ICategoryChannel) => {
@@ -85,12 +73,11 @@ const ChannelListSection = memo(({ data, channelsPositionRef }: IChannelListSect
 				title={data.category_name}
 				onPress={toggleCollapse}
 				onLongPress={onLongPressHeader}
-				onPressSortChannel={handleOnPressSortChannel}
 				isCollapsed={categoryExpandState}
 				category={data}
 			/>
 
-			{data?.channels?.map((item: IChannel, index: number) => {
+			{(data?.channels as IChannel[])?.map((item: IChannel, index: number) => {
 				return (
 					<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
 						<ChannelListItem data={item} key={`${item.id}_channel_item` + index} />

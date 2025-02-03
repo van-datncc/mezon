@@ -15,16 +15,16 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
 import ChannelItem from '../ChannelItem';
-import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 
 interface IChannelListItemProps {
@@ -47,29 +47,14 @@ export const ChannelListItem = React.memo(
 		const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 		const [isActive, setIsActive] = useState<boolean>(false);
 		const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
-		const isUnReadThreads = useMemo(() => {
-			if (!props?.data?.threads || !props?.data?.threads?.length) return false;
-			return props?.data?.threads?.some((thread) => {
-				return !!thread?.count_mess_unread;
-			});
-		}, [props?.data]);
 
 		const isChannelVoice = useMemo(() => {
 			return props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 		}, [props?.data?.type]);
 
 		const timeoutRef = useRef<any>();
-		const navigation = useNavigation();
+		const navigation = useNavigation<any>();
 		const isTabletLandscape = useTabletLandscape();
-
-		const dataThreads = useMemo(() => {
-			return !props?.data?.threads
-				? []
-				: props?.data?.threads.filter(
-						(thread: { active: IThreadActiveType; count_mess_unread: number }) =>
-							thread?.active === IThreadActiveType.Active || !thread?.count_mess_unread
-					);
-		}, [props?.data?.threads]);
 
 		useEffect(() => {
 			const event = DeviceEventEmitter.addListener(ActionEmitEvent.CHANNEL_ID_ACTIVE, (channelId: string) => {
@@ -104,9 +89,7 @@ export const ChannelListItem = React.memo(
 					const isCached = channelsCache?.includes(channelId);
 					const store = await getStoreAsync();
 					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					if (!isTabletLandscape) {
-						navigation.dispatch(DrawerActions.closeDrawer());
-					}
+					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					timeoutRef.current = setTimeout(async () => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(
@@ -135,14 +118,14 @@ export const ChannelListItem = React.memo(
 		);
 
 		const handleLongPressChannel = useCallback(() => {
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data });
+			if (props?.data?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data, isThread: true });
+			} else {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data });
+			}
 		}, [props?.data]);
 
-		const handleLongPressThread = useCallback(() => {
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data, isThread: true });
-		}, [props?.data]);
-
-		if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive && !isUnReadThreads) return;
+		if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
 		return (
 			<View>
 				{!isChannelVoice && (
@@ -154,7 +137,6 @@ export const ChannelListItem = React.memo(
 						isActive={isActive}
 					/>
 				)}
-				{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={handleLongPressThread} />}
 				{isChannelVoice && (
 					<UserListVoiceChannel
 						channelId={props?.data?.channel_id}
