@@ -1,6 +1,7 @@
 import { useCategorizedAllChannels } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectIsShowEmptyCategory } from '@mezon/store-mobile';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import React, { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -22,14 +23,16 @@ const ChannelListWrapper = React.memo(() => {
 		}
 		const channelMap = new Map();
 		categorizedChannelsRaw.forEach((item) => {
-			if (item?.channel_id) {
-				channelMap.set(item?.channel_id, item);
+			if ((item as IChannel)?.channel_id) {
+				channelMap.set((item as IChannel)?.channel_id, item);
 			}
 		});
 		const dataFormat = categorizedChannelsRaw
-			.filter((item) => item?.channels)
+			.filter((item) => (item as ICategoryChannel)?.channels)
 			.map((category) => {
-				const populatedChannels = category?.channels.map((channelId) => channelMap.get(channelId)).filter((channel) => !!channel);
+				const populatedChannels = (category as ICategoryChannel)?.channels
+					.map((channelId) => channelMap.get(channelId))
+					.filter((channel) => !!channel);
 
 				if (!isShowEmptyCategory && populatedChannels.length === 0) {
 					return null;
