@@ -116,10 +116,17 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
 	};
 
-	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus) => {
+	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus, duration: number, noClearStatus: boolean) => {
 		userStatusBottomSheetRef?.current?.dismiss();
 		setIsVisibleAddStatusUserModal(false);
-		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
+		dispatch(
+			channelMembersActions.updateCustomStatus({
+				clanId: currentClanId ?? '',
+				customStatus: customStatus,
+				minutes: duration,
+				noClear: noClearStatus
+			})
+		);
 	};
 
 	const showUserStatusBottomSheet = () => {
