@@ -147,9 +147,9 @@ export const listChannelRenderSlice = createSlice({
 		},
 		addBadgeToChannelRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
-      if(clanId === '0'){
-        return;
-      }
+			if (clanId === '0') {
+				return;
+			}
 			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
 			if (updateIndex === -1) {
 				return;
@@ -159,7 +159,7 @@ export const listChannelRenderSlice = createSlice({
 				count_mess_unread: ((state.listChannelRender[clanId][updateIndex] as ChannelsEntity).count_mess_unread || 0) + 1
 			};
 		},
-    removeBadgeFromChannel : (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
 				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
@@ -168,10 +168,10 @@ export const listChannelRenderSlice = createSlice({
 				}
 				state.listChannelRender[clanId][indexUpdate] = {
 					...state.listChannelRender[clanId][indexUpdate],
-          count_mess_unread : 0
+					count_mess_unread: 0
 				};
 			}
-		},
+		}
 	}
 });
 

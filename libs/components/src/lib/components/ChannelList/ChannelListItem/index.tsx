@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	clansActions,
 	selectCategoryExpandStateByCategoryId,
-	selectChannelById2,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
