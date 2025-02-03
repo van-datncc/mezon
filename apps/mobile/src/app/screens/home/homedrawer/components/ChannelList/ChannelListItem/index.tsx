@@ -15,12 +15,13 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
 import ChannelItem from '../ChannelItem';
@@ -52,7 +53,7 @@ export const ChannelListItem = React.memo(
 		}, [props?.data?.type]);
 
 		const timeoutRef = useRef<any>();
-		const navigation = useNavigation();
+		const navigation = useNavigation<any>();
 		const isTabletLandscape = useTabletLandscape();
 
 		useEffect(() => {
@@ -88,9 +89,7 @@ export const ChannelListItem = React.memo(
 					const isCached = channelsCache?.includes(channelId);
 					const store = await getStoreAsync();
 					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					if (!isTabletLandscape) {
-						navigation.dispatch(DrawerActions.closeDrawer());
-					}
+					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					timeoutRef.current = setTimeout(async () => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(

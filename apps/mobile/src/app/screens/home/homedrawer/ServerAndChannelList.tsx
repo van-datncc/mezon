@@ -5,7 +5,7 @@ import { ICategoryChannel, IChannel } from '@mezon/utils';
 import React, { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import BackNativeListener from './BackNativeListener';
+// import BackNativeListener from './BackNativeListener';
 import ChannelList from './ChannelList';
 import ProfileBar from './ProfileBar';
 import ServerList from './ServerList';
@@ -58,7 +58,7 @@ const MemoizedChannelList = React.memo(ChannelList, (prevProps, nextProps) => {
 	return JSON.stringify(prevProps.categorizedChannels) === JSON.stringify(nextProps.categorizedChannels);
 });
 
-const DrawerContent = React.memo(({ isTablet }: { isTablet?: boolean }) => {
+const ServerAndChannelList = React.memo(({ isTablet }: { isTablet?: boolean }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -67,7 +67,7 @@ const DrawerContent = React.memo(({ isTablet }: { isTablet?: boolean }) => {
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					<ServerList />
-					{!isTablet && <BackNativeListener />}
+					{/*{!isTablet && <BackNativeListener />}*/}
 					<ChannelListWrapper />
 				</View>
 				{isTablet && <ProfileBar />}
@@ -77,4 +77,4 @@ const DrawerContent = React.memo(({ isTablet }: { isTablet?: boolean }) => {
 	);
 });
 
-export default DrawerContent;
+export default ServerAndChannelList;

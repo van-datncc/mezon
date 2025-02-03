@@ -1,8 +1,7 @@
 import { size } from '@mezon/mobile-ui';
 import { ClansEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
 import { memo, useMemo } from 'react';
-import { Text } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Text, TouchableOpacity } from 'react-native';
 import { MezonAvatar } from '../../../../componentUI';
 import { styles } from './styles';
 

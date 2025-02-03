@@ -1,11 +1,21 @@
 import { useAuth } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import {
-	DMCallActions,
+	ActionEmitEvent,
+	remove,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
+} from '@mezon/mobile-components';
+import {
 	appActions,
+	authActions,
 	channelsActions,
+	clansActions,
 	directActions,
+	DMCallActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrentId,
@@ -13,15 +23,16 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
+import { MezonConfirm } from '../../componentUI';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { Sharing } from '../../screens/settings/Sharing';
@@ -39,6 +50,7 @@ export const AuthenticationLoader = () => {
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
+	const [isSessionExpired, setIsSessionExpired] = useState<boolean>(false);
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	const isTabletLandscape = useTabletLandscape();
@@ -102,6 +114,16 @@ export const AuthenticationLoader = () => {
 	}, [dispatch, navigation, userProfile?.user?.id]);
 
 	useEffect(() => {
+		const listener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED, () => {
+			setIsSessionExpired(true);
+		});
+
+		return () => {
+			listener.remove();
+		};
+	}, [dispatch, navigation, userProfile?.user?.id]);
+
+	useEffect(() => {
 		checkNotificationPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
@@ -126,9 +148,7 @@ export const AuthenticationLoader = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						if (!isTabletLandscape) {
-							navigation.dispatch(DrawerActions.closeDrawer());
-						}
+						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 						requestAnimationFrame(async () => {
 							await navigateToNotification(store, remoteMessage, navigation);
 						});
@@ -202,14 +222,43 @@ export const AuthenticationLoader = () => {
 		}
 	};
 
-	const onCloseFileShare = () => {
+	const onCloseFileShare = useCallback(() => {
 		setFileShared(undefined);
 		navigation.goBack();
-	};
+	}, []);
+
+	const logout = useCallback(async () => {
+		const store = await getStoreAsync();
+		store.dispatch(channelsActions.removeAll());
+		store.dispatch(messagesActions.removeAll());
+		store.dispatch(clansActions.setCurrentClanId(''));
+		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.refreshStatus());
+
+		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
+		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+		await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		store.dispatch(authActions.logOut());
+		setIsSessionExpired(false);
+	}, []);
+
+	const cancelConfirm = useCallback(async () => {
+		setIsSessionExpired(false);
+	}, []);
 
 	return (
 		<>
 			<LoadingModal isVisible={isLoadingMain} />
+			<MezonConfirm
+				visible={isSessionExpired}
+				onConfirm={logout}
+				onCancel={cancelConfirm}
+				title={'Session Expired or Network Error'}
+				confirmText={'Login Again'}
+				content={'Your session has expired. Please log in again to continue.'}
+				hasBackdrop={true}
+			/>
 			{!!fileShared && !isLoadingMain && <Sharing data={fileShared} onClose={onCloseFileShare} />}
 		</>
 	);

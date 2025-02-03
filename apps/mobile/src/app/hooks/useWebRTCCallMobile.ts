@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, DeviceEventEmitter, NativeModules } from 'react-native';
+import { BackHandler, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
@@ -108,7 +108,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	}, [callState.localStream, callState.remoteStream]);
 
 	useEffect(() => {
-		SharedPreferences.removeItem('notificationDataCalling');
+		if (Platform.OS === 'android') {
+			SharedPreferences.removeItem('notificationDataCalling');
+		}
 		return () => {
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
 			endCallTimeout.current = null;
