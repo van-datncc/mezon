@@ -687,7 +687,9 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 		}
 		const entity = channelState.entities.entities[channelId];
 		if (!entity) {
-			await thunkAPI.dispatch(channelsActions.addThreadToChannels({ clanId, channelId }));
+      if (clanId !== '0') {
+        await thunkAPI.dispatch(channelsActions.addThreadToChannels({ clanId, channelId }));
+      }
 			const state = thunkAPI.getState() as RootState;
 			const updatedEntity = state.channels.byClans[clanId].entities.entities[channelId];
 			const newCountMessUnread = isReset ? 0 : (updatedEntity?.count_mess_unread ?? 0) + count;

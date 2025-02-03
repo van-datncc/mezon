@@ -151,7 +151,9 @@ export const listChannelRenderSlice = createSlice({
 		},
 		addBadgeToChannelRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
-
+      if(clanId === '0'){
+        return;
+      }
 			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
 			if (updateIndex === -1) {
 				return;
