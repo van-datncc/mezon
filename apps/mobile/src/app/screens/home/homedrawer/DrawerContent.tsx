@@ -1,6 +1,7 @@
-import { useCategory } from '@mezon/core';
+import { useCategorizedAllChannels } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectIsShowEmptyCategory } from '@mezon/store-mobile';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import React, { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -12,7 +13,7 @@ import UserEmptyClan from './UserEmptyClan';
 import { style } from './styles';
 
 const ChannelListWrapper = React.memo(() => {
-	const { categorizedChannels: categorizedChannelsRaw } = useCategory();
+	const categorizedChannelsRaw = useCategorizedAllChannels();
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const previousCategorizedChannels = useRef(null);
 
@@ -20,12 +21,27 @@ const ChannelListWrapper = React.memo(() => {
 		if (!categorizedChannelsRaw?.length && !!previousCategorizedChannels?.current) {
 			return previousCategorizedChannels?.current;
 		}
-		const dataFormat = categorizedChannelsRaw.map((item) => {
-			if (!isShowEmptyCategory && item?.channels?.length === 0) {
-				return null;
+		const channelMap = new Map();
+		categorizedChannelsRaw.forEach((item) => {
+			if ((item as IChannel)?.channel_id) {
+				channelMap.set((item as IChannel)?.channel_id, item);
 			}
-			return item;
 		});
+		const dataFormat = categorizedChannelsRaw
+			.filter((item) => (item as ICategoryChannel)?.channels)
+			.map((category) => {
+				const populatedChannels = (category as ICategoryChannel)?.channels
+					.map((channelId) => channelMap.get(channelId))
+					.filter((channel) => !!channel);
+
+				if (!isShowEmptyCategory && populatedChannels.length === 0) {
+					return null;
+				}
+
+				return { ...category, channels: populatedChannels };
+			})
+			.filter((category) => category !== null);
+
 		previousCategorizedChannels.current = dataFormat;
 		return dataFormat;
 	}, [categorizedChannelsRaw, isShowEmptyCategory]);

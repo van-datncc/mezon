@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 		threadItem: {
 			flexDirection: 'row',
 			flexGrow: 1,
-			alignItems: 'flex-end'
+			alignItems: 'flex-end',
+			paddingLeft: size.s_28
 		},
 
 		threadItemActive: {
@@ -29,7 +30,7 @@ export const style = (colors: Attributes) =>
 		boxThread: {
 			flex: 1,
 			marginLeft: size.s_2,
-			paddingLeft: size.s_6,
+			paddingLeft: size.s_4,
 			paddingTop: size.s_2,
 			paddingBottom: size.s_6,
 			borderRadius: size.s_10,

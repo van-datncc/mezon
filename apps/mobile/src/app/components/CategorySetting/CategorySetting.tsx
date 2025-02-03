@@ -1,4 +1,4 @@
-import { useCategory } from '@mezon/core';
+import { useCategorizedAllChannels } from '@mezon/core';
 import {
 	CheckIcon,
 	Icons,
@@ -11,6 +11,7 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, channelsActions, getStoreAsync, selectCategoryById, useAppDispatch } from '@mezon/store-mobile';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +28,9 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 	const styles = style(themeValue);
 	const { t } = useTranslation(['categorySetting']);
 	const dispatch = useAppDispatch();
-	const { categorizedChannels } = useCategory();
+	const categorizedChannels = useCategorizedAllChannels();
 	const { categoryId } = route.params;
-	const category = useSelector(selectCategoryById(categoryId || ''));
+	const category = useSelector((state) => selectCategoryById(state, categoryId || ''));
 	const [isVisibleDeleteCategoryModal, setIsVisibleDeleteCategoryModal] = useState<boolean>(false);
 	const [categorySettingValue, setCategorySettingValue] = useState<string>('');
 	const [currentSettingValue, setCurrentSettingValue] = useState<string>('');
@@ -124,9 +125,11 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 		let channelNavId = '';
 		if (targetIndex !== -1) {
 			if (targetIndex === 0) {
-				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+				const nextCategory = categorizedChannels[targetIndex + 1] as ICategoryChannel;
+				channelNavId = (nextCategory?.channels?.[0] as IChannel)?.id;
 			} else {
-				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+				const prevCategory = categorizedChannels[targetIndex - 1] as ICategoryChannel;
+				channelNavId = (prevCategory?.channels?.[0] as IChannel)?.id;
 			}
 		}
 
@@ -152,7 +155,8 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 		await dispatch(
 			categoriesActions.deleteCategory({
 				clanId: category.clan_id as string,
-				categoryId: category.id as string
+				categoryId: category.id as string,
+				categoryLabel: category.category_name as string
 			})
 		);
 

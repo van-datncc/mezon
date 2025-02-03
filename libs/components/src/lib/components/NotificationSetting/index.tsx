@@ -1,4 +1,4 @@
-import { useCategorizedChannelsWeb } from '@mezon/core';
+import { useCategorizedAllChannels } from '@mezon/core';
 import {
 	SetDefaultNotificationPayload,
 	defaultNotificationActions,
@@ -118,7 +118,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const handleNotificationClanChange = (event: any, notification: number) => {
 		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.id, notification_type: notification }));
 	};
-	const categorizedChannels = useCategorizedChannelsWeb();
+	const categorizedChannels = useCategorizedAllChannels();
 	const options = categorizedChannels.map((category) => {
 		if ((category as IChannel).type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			return {
