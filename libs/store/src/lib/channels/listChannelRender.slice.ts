@@ -158,7 +158,20 @@ export const listChannelRenderSlice = createSlice({
 				...state.listChannelRender[clanId][updateIndex],
 				count_mess_unread: ((state.listChannelRender[clanId][updateIndex] as ChannelsEntity).count_mess_unread || 0) + 1
 			};
-		}
+		},
+    removeBadgeFromChannel : (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+				if (indexUpdate === -1) {
+					return;
+				}
+				state.listChannelRender[clanId][indexUpdate] = {
+					...state.listChannelRender[clanId][indexUpdate],
+          count_mess_unread : 0
+				};
+			}
+		},
 	}
 });
 
