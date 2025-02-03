@@ -9,14 +9,14 @@ import {
 } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, ChannelsEntity, getStoreAsync, selectAllChannelsFavorite } from '@mezon/store-mobile';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Linking, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
-import { AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
+import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { ChannelFavoriteItem } from './ChannelFavoriteItem';
@@ -56,9 +56,7 @@ export const ChannelListFavorite = React.memo(() => {
 				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 				const isCached = channelsCache?.includes(channelId);
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.closeDrawer());
-				}
+				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				store.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
 				timeoutRef.current = setTimeout(async () => {
 					DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);

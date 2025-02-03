@@ -41,7 +41,7 @@ export function useCategory() {
 	);
 }
 
-export function useCategorizedChannelsWeb() {
+export function useCategorizedAllChannels() {
 	const listChannels = useSelector(selectChannelThreads);
 	const categories = useSelector(selectAllCategories);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);

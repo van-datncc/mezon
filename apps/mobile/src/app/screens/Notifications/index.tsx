@@ -19,7 +19,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -209,10 +209,7 @@ const Notifications = () => {
 					const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
 					save(STORAGE_CLAN_ID, notify?.content?.clan_id);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					navigation.navigate(APP_SCREEN.HOME as never);
-					if (!isTabletLandscape) {
-						navigation.dispatch(DrawerActions.closeDrawer());
-					}
+					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				}
 				timeoutRef.current = setTimeout(() => {
 					store.dispatch(

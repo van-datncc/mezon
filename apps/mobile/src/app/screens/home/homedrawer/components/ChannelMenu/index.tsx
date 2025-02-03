@@ -1,5 +1,5 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useMarkAsRead, usePermissionChecker } from '@mezon/core';
+import { useCategorizedAllChannels, useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import {
 	ENotificationActive,
 	ENotificationChannelId,
@@ -22,8 +22,9 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelThreads, EOverriddenPermission, EPermission, IChannel } from '@mezon/utils';
+import { ChannelThreads, EOverriddenPermission, EPermission, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { ChannelType } from 'mezon-js';
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -53,7 +54,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		channel?.channel_id ?? ''
 	);
 
-	const { categorizedChannels } = useCategory();
+	const categorizedChannels = useCategorizedAllChannels();
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
@@ -66,8 +67,8 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		);
 	}, [getNotificationChannelSelected]);
 	const isChannel = useMemo(() => {
-		return Array.isArray(channel?.threads);
-	}, [channel?.threads]);
+		return channel?.type !== ChannelType.CHANNEL_TYPE_THREAD;
+	}, [channel?.type]);
 	const favoriteChannel = useSelector(selectAllChannelsFavorite);
 	const isFavorite = useMemo(() => {
 		if (favoriteChannel && favoriteChannel?.length > 0) {
@@ -319,11 +320,11 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const handleFocusDefaultChannel = async () => {
 		const firstTextChannel = categorizedChannels.reduce((firstChannel, category) => {
 			if (firstChannel) return firstChannel;
-			const typeThreeChannel = category.channels?.find((channel) => channel?.type === 3);
+			const typeThreeChannel = (category as ICategoryChannel)?.channels?.find((channel) => (channel as IChannel)?.type === 3);
 			if (typeThreeChannel) {
 				return typeThreeChannel;
 			} else {
-				return category.channels?.[0];
+				return (category as ICategoryChannel)?.channels?.[0];
 			}
 		}, null) as IChannel;
 		if (!firstTextChannel) return;

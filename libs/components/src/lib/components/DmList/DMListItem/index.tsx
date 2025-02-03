@@ -11,8 +11,10 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { memo, useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
+import { useModal } from 'react-modal-hook';
 import BuzzBadge from '../../BuzzBadge';
+import LeaveGroupModal from '../../LeaveGroupModal';
 import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
@@ -32,7 +34,10 @@ export type directMessageValueProps = {
 function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFriends, isActive }: DirectMessProp) {
 	const dispatch = useAppDispatch();
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
+	const isTypeDMGroup = Number(directMessage.type) === ChannelType.CHANNEL_TYPE_GROUP;
+
 	const user = useAppSelector((state) => selectDirectMemberMetaUserId(state, directMessage.user_id?.at(0) || ''));
+
 	const metadata = useMemo(() => {
 		if (typeof user?.user?.metadata === 'string') {
 			try {
@@ -47,12 +52,29 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, directMessage?.channel_id ?? ''));
 
-	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
+	const [openUnknown, closeUnknown] = useModal(() => {
+		if (isTypeDMGroup) {
+			return <LeaveGroupModal navigateToFriends={navigateToFriends} groupWillBeLeave={directMessage} onClose={closeUnknown} />;
+		}
+	}, [directMessage]);
+
+	const handleCloseClick = useCallback(
+		async (e: React.MouseEvent) => {
+			e.stopPropagation();
+			if (isTypeDMGroup) {
+				openUnknown();
+			} else {
+				handleLeave(e, directMessage.channel_id as string, currentDmGroupId);
+			}
+		},
+		[isTypeDMGroup, directMessage.channel_id, currentDmGroupId]
+	);
+
+	const handleLeave = async (e: React.MouseEvent, directId: string, currentDmGroupId: string) => {
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
 		const timestamp = Date.now() / 1000;
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
-
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp }));
 		if (directId === currentDmGroupId) {
 			navigateToFriends();
 		}
@@ -64,8 +86,6 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		dmID: directMessage.id,
 		e2ee: directMessage.e2ee
 	};
-
-	const isTypeDMGroup = Number(directMessage.type) === ChannelType.CHANNEL_TYPE_GROUP;
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -112,7 +132,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			) : null}
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}
-				onClick={(e) => handleCloseClick(e, directMessage.channel_id as string)}
+				onClick={(e) => handleCloseClick(e)}
 			>
 				<Icons.Close defaultSize="size-3" />
 			</button>

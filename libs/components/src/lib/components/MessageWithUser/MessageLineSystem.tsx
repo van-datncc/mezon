@@ -1,4 +1,4 @@
-import { messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
+import { channelsActions, messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
 import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, IMessageWithUser, TypeMessage, parseThreadInfo } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
@@ -134,8 +134,9 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 		return { threadLabel: '', threadId: '', threadContent: '' };
 	}, [message.code, message.content?.t]);
 
-	const handelJumpToChannel = () => {
+	const handelJumpToChannel = async () => {
 		if (threadId) {
+			await dispatch(channelsActions.addThreadToChannels({ channelId: threadId, clanId: message?.clan_id as string }));
 			navigate(`/chat/clans/${message?.clan_id}/channels/${threadId}`);
 		}
 	};

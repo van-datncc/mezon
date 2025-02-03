@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { convertTimeMessage, IChannelMember } from '@mezon/utils';
-import { DrawerActions, NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -45,7 +45,6 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 			navigation.goBack();
 		} else {
 			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-			navigation.dispatch(DrawerActions.closeDrawer());
 		}
 		const channelId = thread?.channel_id;
 		requestAnimationFrame(async () => {

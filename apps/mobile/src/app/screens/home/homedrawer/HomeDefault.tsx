@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel, selectDmGroupCurrentId } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,7 +12,6 @@ import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
-import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import ChannelApp from './ChannelApp';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
@@ -29,7 +28,6 @@ const HomeDefault = React.memo((props: any) => {
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
-	const isTabletLandscape = useTabletLandscape();
 	const timeoutRef = useRef<any>(null);
 	const navigation = useNavigation<any>();
 	const panelKeyboardRef = useRef(null);
@@ -46,13 +44,11 @@ const HomeDefault = React.memo((props: any) => {
 
 	const onOpenDrawer = useCallback(() => {
 		requestAnimationFrame(async () => {
-			if (!isTabletLandscape) {
-				navigation.dispatch(DrawerActions.openDrawer());
-			}
+			navigation.goBack();
 			onShowKeyboardBottomSheet(false, 'text');
 			Keyboard.dismiss();
 		});
-	}, [navigation, isTabletLandscape, onShowKeyboardBottomSheet]);
+	}, [navigation, onShowKeyboardBottomSheet]);
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const snapPoints = useMemo(() => ['50%'], []);
