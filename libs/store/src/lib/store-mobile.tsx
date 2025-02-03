@@ -439,12 +439,14 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// comment logic cache messages
 	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
 		const { channelMessages } = action.payload || {};
-		const keys = Object.keys(channelMessages);
-		if (channelMessages && keys?.length > LIMIT_CHANNEL_CACHE) {
-			while (keys.length > LIMIT_CHANNEL_CACHE) {
-				const oldestKey = keys.shift();
-				if (oldestKey) {
-					delete channelMessages[oldestKey];
+		if (channelMessages && typeof channelMessages === 'object') {
+			const keys = Object.keys(channelMessages);
+			if (channelMessages && keys?.length > LIMIT_CHANNEL_CACHE) {
+				while (keys.length > LIMIT_CHANNEL_CACHE) {
+					const oldestKey = keys.shift();
+					if (oldestKey) {
+						delete channelMessages[oldestKey];
+					}
 				}
 			}
 		}
