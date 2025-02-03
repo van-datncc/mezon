@@ -2,8 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectEventsByClanId, useAppSelector } from '@mezon/store';
-import { EventManagementEntity, selectCurrentClanId } from '@mezon/store-mobile';
+import { EventManagementEntity, selectAllTextChannel, selectCurrentClanId, selectEventsByClanId, useAppSelector } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useMemo, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -23,6 +22,16 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allEventManagement = useAppSelector((state) => selectEventsByClanId(state, currentClanId as string));
+	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
+	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
+
+	const listEventToShow = useMemo(() => {
+		return (
+			allEventManagement?.filter(
+				(event) => !event?.channel_id || event?.channel_id === '0' || allThreadChannelPrivateIds?.includes(event?.channel_id)
+			) || []
+		);
+	}, [allEventManagement, allThreadChannelPrivateIds]);
 
 	const [currentEvent, setCurrentEvent] = useState<EventManagementEntity>();
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
@@ -45,7 +54,7 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={[styles.section, styles.sectionRight]}></View>
-				<Text style={[styles.section, styles.sectionTitle]}>{`${allEventManagement?.length} Events`}</Text>
+				<Text style={[styles.section, styles.sectionTitle]}>{`${listEventToShow?.length} Events`}</Text>
 				<View style={[styles.section, styles.sectionRight]}>
 					{isCanManageEvent && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
@@ -54,8 +63,8 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 					)}
 				</View>
 			</View>
-			{allEventManagement?.length > 0 ? (
-				allEventManagement?.map((event, index) => (
+			{listEventToShow?.length > 0 ? (
+				listEventToShow?.map((event, index) => (
 					<EventItem event={event} start={event?.start_time} key={index.toString()} onPress={() => handlePress(event)} />
 				))
 			) : (

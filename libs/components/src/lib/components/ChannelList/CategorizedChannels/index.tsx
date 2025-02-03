@@ -140,16 +140,6 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 		setIsShowCategorySetting(false);
 	};
 
-	const handleSortByName = () => {
-		dispatch(
-			categoriesActions.setCategoryIdSortChannel({
-				isSortChannelByCategoryId: !categoryIdSortChannel[category.id],
-				categoryId: category.id,
-				clanId: category.clan_id as string
-			})
-		);
-	};
-
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel({ clanId: paramCategory.clan_id as string, isOpen: true }));
 		dispatch(
@@ -180,12 +170,6 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 					>
 						{categoryExpandState ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 						<span className="one-line">{category.category_name}</span>
-					</button>
-					<button
-						onClick={handleSortByName}
-						className="focus-visible:outline-none dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black"
-					>
-						<Icons.UpDownIcon />
 					</button>
 					{!category.isFavor && (
 						<UserRestrictionZone policy={isShowCreateChannel}>

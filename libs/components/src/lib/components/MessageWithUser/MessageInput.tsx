@@ -16,7 +16,6 @@ import {
 	addMention,
 	createFormattedString,
 	filterEmptyArrays,
-	processText,
 	searchMentionsHashtag
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -33,6 +32,13 @@ import { UserMentionList } from '../../components/UserMentionList';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+import {
+	addMarkdownPrefix,
+	generateNewPlaintext,
+	getMarkdownPrefixItems,
+	prepareProcessedContent,
+	updateMarkdownPositions
+} from './editMessageHelper';
 
 type MessageInputProps = {
 	messageId: string;
@@ -96,9 +102,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
 
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-	const processedContentDraft: IMessageSendPayload = useMemo(() => {
-		return {
-			t: channelDraftMessage?.draftContent?.t,
+
+	// update prefix if type: c/pre/boldtext
+	const updatePrefixDraftMesssage = useMemo(() => {
+		const originalDraftContent = {
 			hg: channelDraftMessage?.draftContent?.hg,
 			ej: channelDraftMessage?.draftContent?.ej,
 			lk: channelDraftMessage?.draftContent?.lk,
@@ -107,7 +114,41 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			tp: channelDraftMessage?.draftTopicId,
 			cid: channelDraftMessage?.draftContent?.cid
 		};
-	}, [channelDraftMessage?.draftTopicId, channelDraftMessage?.draftContent]);
+		// to get markdown will be add prefix include: code/pre/boldtext
+		const markdownHasPrefix = getMarkdownPrefixItems(channelDraftMessage.draftContent.mk ?? []);
+		// if markdown do not exist no need update
+		if (!markdownHasPrefix || markdownHasPrefix.length === 0) {
+			return {
+				...originalDraftContent,
+				t: channelDraftMessage.draftContent.t
+			};
+		} else {
+			const plaintextOriginal = channelDraftMessage.draftContent.t;
+			// to add `/``` or ** to token markdown
+			const addPrefix = addMarkdownPrefix(markdownHasPrefix, plaintextOriginal ?? '');
+			// to calculator new position of token markdown after added frefix
+			const updatedNewPos = updateMarkdownPositions(addPrefix ?? []);
+			// get the new plaintext with token added prefix
+			const newPlaintext = generateNewPlaintext(updatedNewPos, plaintextOriginal ?? '');
+			return {
+				...originalDraftContent,
+				t: newPlaintext
+			};
+		}
+	}, [channelDraftMessage.draftContent.t]);
+
+	const processedContentDraft: IMessageSendPayload = useMemo(() => {
+		return {
+			t: updatePrefixDraftMesssage?.t,
+			hg: updatePrefixDraftMesssage?.hg,
+			ej: updatePrefixDraftMesssage?.ej,
+			lk: updatePrefixDraftMesssage?.lk,
+			mk: updatePrefixDraftMesssage?.mk,
+			vk: updatePrefixDraftMesssage?.vk,
+			tp: updatePrefixDraftMesssage?.tp,
+			cid: updatePrefixDraftMesssage?.cid
+		};
+	}, [channelDraftMessage?.draftTopicId, channelDraftMessage?.draftContent, updatePrefixDraftMesssage]);
 
 	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
 
@@ -136,16 +177,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const originalContent = useMemo(() => {
 		return message.content?.t;
 	}, [message.content?.t]);
-
-	const prepareProcessedContent = (processedContentDraft: IMessageSendPayload) => {
-		const { links, markdowns, voiceRooms } = processText(processedContentDraft.t ?? '');
-		return {
-			...processedContentDraft,
-			lk: links,
-			mk: markdowns,
-			vk: voiceRooms
-		};
-	};
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {

@@ -108,6 +108,23 @@ export const listChannelsByUserSlice = createSlice({
 					}
 				});
 			}
+		},
+		updateChannelBadgeCount: (state: ListChannelsByUserState, action: PayloadAction<{ channelId: string; count: number; isReset?: boolean }>) => {
+			const { channelId, count, isReset = false } = action.payload;
+			if (state.entities) {
+				const entity = state.entities[channelId];
+				if (entity) {
+					const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
+					if (entity.count_mess_unread !== newCountMessUnread) {
+						listChannelsByUserAdapter.updateOne(state, {
+							id: channelId,
+							changes: {
+								count_mess_unread: newCountMessUnread
+							}
+						});
+					}
+				}
+			}
 		}
 	},
 	extraReducers: (builder) => {

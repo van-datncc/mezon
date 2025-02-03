@@ -143,15 +143,13 @@ export const listChannelRenderSlice = createSlice({
 				}
 				state.listChannelRender[clanId]?.splice(indexInsert + 1, 0, channelData);
 				state.listChannelRender[clanId].join();
-				state.listChannelRender[clanId][indexInsert + 1] = {
-					...state.listChannelRender[clanId][indexInsert + 1],
-					count_mess_unread: ((state.listChannelRender[clanId][indexInsert + 1] as ChannelsEntity).count_mess_unread || 0) + 1
-				};
 			}
 		},
 		addBadgeToChannelRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
-
+      if(clanId === '0'){
+        return;
+      }
 			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
 			if (updateIndex === -1) {
 				return;
