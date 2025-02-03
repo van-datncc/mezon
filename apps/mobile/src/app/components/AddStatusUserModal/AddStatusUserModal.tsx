@@ -9,35 +9,35 @@ export interface IAddStatusUserModalProps {
 	isVisible: boolean;
 	setIsVisible: (value: boolean) => void;
 	userCustomStatus: string;
-	handleCustomUserStatus?: (customStatus: string, type: ETypeCustomUserStatus) => void;
+	handleCustomUserStatus?: (customStatus: string, type: ETypeCustomUserStatus, duration: number, noClearStatus: boolean) => void;
 }
 
 export const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, handleCustomUserStatus }: IAddStatusUserModalProps) => {
 	const [lineStatus, setLineStatus] = useState<string>('');
 	const { t } = useTranslation(['customUserStatus']);
-	const [statusDuration, setStatusDuration] = useState<string>('');
+	const [statusDuration, setStatusDuration] = useState<number>(-1);
 	const timeOptions = useMemo(
 		() =>
 			[
 				{
 					title: t('statusDuration.today'),
-					value: t('statusDuration.today')
+					value: -1
 				},
 				{
 					title: t('statusDuration.fourHours'),
-					value: t('statusDuration.fourHours')
+					value: 240
 				},
 				{
 					title: t('statusDuration.oneHour'),
-					value: t('statusDuration.oneHour')
+					value: 60
 				},
 				{
 					title: t('statusDuration.thirtyMinutes'),
-					value: t('statusDuration.thirtyMinutes')
+					value: 30
 				},
 				{
 					title: t('statusDuration.dontClear'),
-					value: t('statusDuration.dontClear')
+					value: 0
 				}
 			] as IMezonOptionData,
 		[]
@@ -47,9 +47,24 @@ export const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, 
 		setLineStatus(userCustomStatus);
 	}, [userCustomStatus]);
 
-	function handleTimeOptionChange(value: string) {
+	function handleTimeOptionChange(value: number) {
 		setStatusDuration(value);
 	}
+
+	const handleSaveCustomStatus = () => {
+		let minutes = statusDuration;
+		let noClear = false;
+		if (statusDuration === -1) {
+			const now = new Date();
+			const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+			const timeDifference = endOfDay.getTime() - now.getTime();
+			minutes = Math.floor(timeDifference / (1000 * 60));
+		}
+		if (statusDuration === 0) {
+			noClear = true;
+		}
+		handleCustomUserStatus(lineStatus, ETypeCustomUserStatus.Save, minutes, noClear);
+	};
 
 	return (
 		<MezonModal
@@ -59,9 +74,7 @@ export const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, 
 			headerStyles={styles.headerModal}
 			titleStyle={styles.titleModal}
 			rightBtnText={lineStatus ? t('save') : ''}
-			onClickRightBtn={() => {
-				handleCustomUserStatus(lineStatus, ETypeCustomUserStatus.Save);
-			}}
+			onClickRightBtn={handleSaveCustomStatus}
 		>
 			<Block>
 				<MezonInput value={lineStatus} onTextChange={setLineStatus} placeHolder={t('placeholder')} textarea={true} maxCharacter={128} />

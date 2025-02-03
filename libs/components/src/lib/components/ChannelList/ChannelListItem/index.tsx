@@ -55,7 +55,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const channelSelector = useAppSelector((state) => selectChannelById2(state, channel.id));
 
 	const channelMemberList = useMemo(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) return voiceChannelMembers;
@@ -64,7 +63,6 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 	}, [channel.type, voiceChannelMembers, streamChannelMembers]);
 
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, channel.category_id as string));
-	const unreadMessageCount = channelSelector?.count_mess_unread || 0;
 
 	const handleOpenInvite = () => {
 		dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
@@ -79,7 +77,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnreadChannel}
-				numberNotification={unreadMessageCount}
+				numberNotification={channel.count_mess_unread}
 				channelType={channel?.type}
 				isActive={isActive}
 				permissions={permissions}

@@ -20,6 +20,7 @@ import {
 	directMetaActions,
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
+	listChannelRenderAction,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMembers,
@@ -98,6 +99,12 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
+      
+      dispatch(listChannelRenderAction.removeBadgeFromChannel({
+        clanId : currentChannel.clan_id as string,
+        channelId : currentChannel.channel_id as string
+      }))
+
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
 					clanId: previousChannels.at(1)?.clanId as string,
