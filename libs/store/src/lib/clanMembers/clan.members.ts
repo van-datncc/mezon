@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { safeJSONParse } from 'mezon-js';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { selectAllAccount } from '../account/account.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -200,7 +201,9 @@ export const selectClanMemberWithStatusIds = createSelector(
 
 		const userProfileId = userProfile?.user?.id;
 		if (userProfileId) {
-			const userIndex = users.findIndex((user) => user.id === userProfileId);
+			const userIndex = users.findIndex((user) =>
+				user.id === userProfileId && typeof user?.user?.metadata === 'string' ? safeJSONParse(user?.user?.metadata) : user?.user?.metadata
+			);
 
 			if (userIndex === -1) {
 				users.push({
