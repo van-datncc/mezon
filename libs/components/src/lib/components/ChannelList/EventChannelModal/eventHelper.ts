@@ -1,31 +1,30 @@
-import { ERepeatType } from '@mezon/utils';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { compareTime } from './timeFomatEvent';
 
 export const checkError = (
 	timeStart: string,
 	timeEnd: string,
-	frequencyValue: ERepeatType,
-	selectedDateStart: Date,
+	startDate: Date,
+	endDate: Date,
 	setErrorStart: (value: boolean) => void,
 	setErrorEnd: (value: boolean) => void
 ) => {
-	const formatDate = format(selectedDateStart, 'yyyyMMdd');
-	const today = format(Date.now(), 'yyyyMMdd');
-	const currentTime = format(new Date(), 'HH:mm');
+	const currentDate = new Date();
+	const currentTime = format(currentDate, 'HH:mm');
+	const compareCurrentAndStart = compareTime(currentTime, timeStart);
+	const compareStartAndEnd = compareTime(timeStart, timeEnd);
+	const isStartDateSameCurrentDate = isSameDay(currentDate, startDate);
+	const isStartDateSameEndDate = isSameDay(startDate, endDate);
 
-	if (
-		(Number(formatDate) === Number(today) && frequencyValue === ERepeatType.DOES_NOT_REPEAT) ||
-		(Number(formatDate) === Number(today) && frequencyValue === ERepeatType.DEFAULT)
-	) {
-		setErrorStart(!compareTime(currentTime, timeStart, true));
+	// check error startTime
+	if (isStartDateSameCurrentDate) {
+		setErrorStart(!compareCurrentAndStart);
 	} else {
 		setErrorStart(false);
 	}
-
-	const isSameDay = Number(formatDate) === Number(today);
-	if (isSameDay && !compareTime(timeStart, timeEnd)) {
-		setErrorEnd(true);
+	// check error startEnd
+	if (!compareStartAndEnd && isStartDateSameEndDate) {
+		setErrorEnd(!compareStartAndEnd);
 	} else {
 		setErrorEnd(false);
 	}

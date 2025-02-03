@@ -8,6 +8,7 @@ import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import { EventBadge } from '../ChannelEventBadge';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { style } from '../ChannelListItem/styles';
+import ChannelListThreadItem from '../ChannelListThreadItem';
 import { ChannelStatusIcon } from '../ChannelStatusIcon';
 
 interface IChannelItemProps {
@@ -24,6 +25,10 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 	const numberNotification = useMemo(() => {
 		return data?.count_mess_unread ? data?.count_mess_unread : 0;
 	}, [data?.count_mess_unread]);
+
+	if (data.type === ChannelType.CHANNEL_TYPE_THREAD) {
+		return <ChannelListThreadItem thread={data} isActive={isActive} onPress={onPress} onLongPress={onLongPress} />;
+	}
 
 	return (
 		<TouchableOpacity

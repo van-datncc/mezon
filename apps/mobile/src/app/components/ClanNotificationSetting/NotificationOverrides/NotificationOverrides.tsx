@@ -1,6 +1,7 @@
-import { useCategory } from '@mezon/core';
+import { useCategorizedAllChannels } from '@mezon/core';
 import { EOptionOverridesType, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, TextInput } from 'react-native';
 import { CategoryChannelItem } from '../CategoryChannelItem';
@@ -9,7 +10,7 @@ import { style } from './NotificationOverrides.styles';
 const NotificationOverrides = () => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { categorizedChannels } = useCategory();
+	const categorizedChannels = useCategorizedAllChannels();
 	const [searchText, setSearchText] = useState<string>('');
 
 	const options = useMemo(() => {
@@ -21,11 +22,11 @@ const NotificationOverrides = () => {
 				title: 'category',
 				type: EOptionOverridesType.Category
 			},
-			...category.channels
-				.filter((channel) => channel.type !== 4)
+			...(category as ICategoryChannel).channels
+				.filter((channel) => (channel as IChannel).type !== 4)
 				.map((channel) => ({
-					id: channel.id,
-					label: channel.channel_label,
+					id: (channel as IChannel).id,
+					label: (channel as IChannel).channel_label,
 					title: 'channel',
 					type: EOptionOverridesType.Channel
 				}))

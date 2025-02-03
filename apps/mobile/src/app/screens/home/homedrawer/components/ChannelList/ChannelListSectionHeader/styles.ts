@@ -10,6 +10,8 @@ export const style = (colors: Attributes) =>
 		},
 
 		channelListHeaderItem: {
+			paddingTop: size.s_8,
+			paddingBottom: size.s_8,
 			flexDirection: 'row',
 			alignItems: 'center',
 			flex: 1
@@ -20,12 +22,5 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_13,
 			fontWeight: 'bold',
 			color: colors.text
-		},
-
-		sortButton: {
-			paddingHorizontal: size.s_14,
-			paddingTop: size.s_8,
-			paddingBottom: size.s_6,
-			marginLeft: 'auto'
 		}
 	});

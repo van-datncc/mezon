@@ -8,7 +8,13 @@ type TimePickerProps = {
 
 function TimePicker(props: TimePickerProps) {
 	const { name, value, handleChangeTime } = props;
-
+	// if value is H:MM => HH:MM
+	const formattedValue = useMemo(() => {
+		const [hour, minute] = value.split(':');
+		const normalizedHour = hour.padStart(2, '0');
+		const normalizedMinute = minute.padStart(2, '0');
+		return `${normalizedHour}:${normalizedMinute}`;
+	}, [value]);
 	const renderOptions = useMemo(() => {
 		const options = [];
 		for (let hour = 0; hour < 24; hour++) {
@@ -29,7 +35,7 @@ function TimePicker(props: TimePickerProps) {
 			name={name}
 			onChange={handleChangeTime}
 			className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
-			value={value}
+			value={formattedValue}
 		>
 			{renderOptions}
 		</select>

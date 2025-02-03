@@ -9,7 +9,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
 import { checkError } from '../eventHelper';
-import { compareDate, compareTime } from '../timeFomatEvent';
 
 export type EventInfoModalProps = {
 	contentSubmit: ContenSubmitEventProps;
@@ -26,7 +25,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1000);
 	const [errorStart, setErrorStart] = useState(false);
 	const [errorEnd, setErrorEnd] = useState(false);
-	const [checkDaySame, setCheckDaySame] = useState(true);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
 	const currentClanId = useSelector(selectCurrentClanId) || '';
@@ -50,6 +48,14 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	};
 
 	const weekdayOccurrence = getWeekdayOccurrence(contentSubmit.selectedDateStart);
+
+	useEffect(() => {
+		if (errorEnd || errorStart) {
+			setErrorTime(true);
+		} else {
+			setErrorTime(false);
+		}
+	}, [errorStart, errorEnd]);
 
 	const frequencies = useMemo(() => {
 		const options = [
@@ -77,14 +83,30 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	useEffect(() => {
 		setSelectedFrequency(contentSubmit.repeatType ?? 0);
 	}, []);
+	// this one to check error timeStart/timeEnd
+	useMemo(() => {
+		checkError(
+			contentSubmit.timeStart,
+			contentSubmit.timeEnd,
+			contentSubmit.selectedDateStart,
+			contentSubmit.selectedDateEnd,
+			setErrorStart,
+			setErrorEnd
+		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [contentSubmit.timeStart, contentSubmit.timeEnd, contentSubmit.selectedDateStart, contentSubmit.selectedDateEnd, contentSubmit.repeatType]);
 
 	const handleDateChangeStart = (date: Date) => {
 		setContentSubmit((prev) => ({ ...prev, selectedDateStart: date }));
+		// check dateEnd
+		// if endDate < startDate => set is startDate
+		if (date > contentSubmit.selectedDateEnd) {
+			handleDateChangeEnd(date);
+		}
 	};
 
 	const handleDateChangeEnd = (date: Date) => {
 		setContentSubmit((prev) => ({ ...prev, selectedDateEnd: date }));
-		setCheckDaySame(compareDate(contentSubmit.selectedDateStart, date));
 	};
 
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -98,7 +120,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			setSelectedFrequency(value);
 			setContentSubmit((prevContentSubmit) => {
 				const updatedContent = { ...prevContentSubmit, repeatType: value };
-				checkError(updatedContent.timeStart, updatedContent.timeEnd, value, updatedContent.selectedDateStart, setErrorStart, setErrorEnd);
 				return updatedContent;
 			});
 		},
@@ -110,14 +131,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			const time = e.target.value;
 			setContentSubmit((prev) => {
 				const updatedContent = { ...prev, timeStart: time };
-				checkError(
-					time,
-					updatedContent.timeEnd,
-					updatedContent.repeatType as ERepeatType,
-					updatedContent.selectedDateStart,
-					setErrorStart,
-					setErrorEnd
-				);
 				return updatedContent;
 			});
 		},
@@ -129,14 +142,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			const time = e.target.value;
 			setContentSubmit((prev) => {
 				const updatedContent = { ...prev, timeEnd: time };
-				checkError(
-					updatedContent.timeStart,
-					time,
-					updatedContent.repeatType as ERepeatType,
-					updatedContent.selectedDateStart,
-					setErrorStart,
-					setErrorEnd
-				);
 				return updatedContent;
 			});
 		},
@@ -173,22 +178,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		});
 	};
 
-	useEffect(() => {
-		if (!checkDaySame) {
-			setErrorEnd(false);
-		}
-		if (checkDaySame && !compareTime(contentSubmit.timeStart, contentSubmit.timeEnd) && choiceLocation) {
-			setErrorEnd(true);
-		}
-	}, [checkDaySame, contentSubmit.timeStart, contentSubmit.timeEnd, choiceLocation]);
-
-	useEffect(() => {
-		if (errorEnd || errorStart) {
-			setErrorTime(true);
-		} else {
-			setErrorTime(false);
-		}
-	}, [errorEnd, errorStart, setErrorTime]);
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 
@@ -244,7 +233,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						selected={contentSubmit.selectedDateEnd}
 						onChange={handleDateChangeEnd}
 						dateFormat="dd/MM/yyyy"
-						minDate={new Date()}
+						minDate={contentSubmit.selectedDateStart}
 					/>
 				</div>
 				<div className="w-1/2">
@@ -301,7 +290,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				{contentSubmit.logo && <img src={contentSubmit.logo} alt="logo" className="max-h-[180px] rounded w-full object-cover" />}
 			</div>
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
-
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</div>
 	);

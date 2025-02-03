@@ -332,7 +332,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				<ItemPanel
 					children="Invite People"
 					onClick={() => {
-						dispatch(clansActions.toggleInvitePeople({ status: true }));
+						dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
 						handClosePannel();
 					}}
 				/>
