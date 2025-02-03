@@ -18,7 +18,6 @@ export const style = (colors: Attributes) =>
 		messageBoxTop: {
 			flexDirection: 'row',
 			alignItems: 'flex-end',
-			justifyContent: 'space-between',
 			marginBottom: size.s_6
 		}
 	});
