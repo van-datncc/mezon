@@ -60,6 +60,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 
 	const handleCloseClick = useCallback(
 		async (e: React.MouseEvent) => {
+			e.stopPropagation();
 			if (isTypeDMGroup) {
 				openUnknown();
 			} else {
