@@ -10,11 +10,10 @@ import {
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
-import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../RenderMessageInvite.styles';
 
@@ -28,7 +27,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 	const styles = style(themeValue);
 	const { inviteUser } = useInvite();
 	const navigation = useNavigation<any>();
-	const isTabletLandscape = useTabletLandscape();
 	const inviteID = useMemo(() => extractInviteIdFromUrl(content), [content]);
 	const { t } = useTranslation('linkMessageInvite');
 
@@ -40,9 +38,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 				if (res && res?.clan_id) {
 					requestAnimationFrame(async () => {
 						navigation.navigate(APP_SCREEN.HOME);
-						if (!isTabletLandscape) {
-							navigation.dispatch(DrawerActions.openDrawer());
-						}
 						DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
 							isFetchMemberChannelDM: true
 						});

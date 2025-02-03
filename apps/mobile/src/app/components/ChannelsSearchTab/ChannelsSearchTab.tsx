@@ -2,7 +2,7 @@ import { ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanC
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,10 +62,6 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (channelData?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
-				navigation.navigate(APP_SCREEN.HOME);
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.openDrawer());
-				}
 			}
 			const clanId = channelData?.clan_id;
 			const store = await getStoreAsync();
@@ -79,11 +75,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				const channelId = channelData?.channel_id;
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.closeDrawer());
-				}
-				navigation.goBack();
-
+				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				timeoutRef.current = setTimeout(async () => {
 					await store.dispatch(
 						channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true })

@@ -22,7 +22,6 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import { DrawerActions } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +31,6 @@ import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../componentUI';
 import { IMezonSliderData } from '../../componentUI/MezonSlider';
 import useBackHardWare from '../../hooks/useBackHardWare';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
 import { validInput } from '../../utils/validate';
@@ -52,7 +50,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const { t } = useTranslation(['channelSetting', 'channelCreator']);
 	const { t: t1 } = useTranslation(['screenStack']);
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
 	const channel = useAppSelector((state) => selectChannelById(state, channelId || ''));
 	const isChannel = !checkIsThread(channel);
@@ -357,9 +354,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			})
 		);
 		navigation.navigate(APP_SCREEN.HOME);
-		if (!isTabletLandscape) {
-			navigation.dispatch(DrawerActions.openDrawer());
-		}
 		if (channel?.parrent_id !== '0') {
 			await dispatch(
 				channelsActions.joinChannel({
@@ -369,7 +363,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				})
 			);
 		}
-	}, [isTabletLandscape]);
+	}, []);
 
 	const handleJoinChannel = async () => {
 		const channelId = channel?.parrent_id || '';
@@ -392,12 +386,9 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			})
 		);
 		navigation.navigate(APP_SCREEN.HOME);
-		if (!isTabletLandscape) {
-			navigation.dispatch(DrawerActions.openDrawer());
-		}
 		dismiss();
 		handleJoinChannel();
-	}, [isTabletLandscape]);
+	}, []);
 
 	const handleLeaveModalVisibleChange = (visible: boolean) => {
 		setIsVisibleLeaveChannelModal(visible);

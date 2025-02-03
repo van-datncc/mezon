@@ -124,14 +124,14 @@ const transformJumpingError = createTransform<MessagesState, MessagesState>(
 );
 
 // comment logic cache messages
-// const persistedMessageReducer = persistReducer(
-// 	{
-// 		key: 'messages',
-// 		storage,
-// 		blacklist: ['typingUsers', 'isSending', 'isViewingOlderMessagesByChannelId']
-// 	},
-// 	messagesReducer
-// );
+const persistedMessageReducer = persistReducer(
+	{
+		key: 'messages',
+		storage,
+		blacklist: ['typingUsers', 'isSending', 'isViewingOlderMessagesByChannelId']
+	},
+	messagesReducer
+);
 
 const persistedCatReducer = persistReducer(
 	{
@@ -357,7 +357,7 @@ const reducer = {
 	listusersbyuserid: persistedListUsersByUserReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: messagesReducer,
+	messages: persistedMessageReducer,
 	categories: persistedCatReducer,
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
@@ -423,38 +423,32 @@ let storeCreated = false;
 export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
-let currentClanId = '';
-const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
-	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
-	if (action.type === 'persist/REHYDRATE' && action?.key === 'clans') {
-		currentClanId = action.payload?.currentClanId;
-	}
 
+const LIMIT_CHANNEL_CACHE = 10;
+const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
+	// Check if the action is of type 'persist/REHYDRATE' and the key is 'channels'
 	if (action.type === 'persist/REHYDRATE' && action?.key === 'channels') {
 		if (action.payload && action.payload.byClans) {
-			Object.keys(action.payload.byClans).forEach((clanId) => {
-				if (clanId !== currentClanId) {
-					if (action.payload.byClans[clanId].currentChannelId) {
-						delete action.payload.byClans[clanId].currentChannelId;
-					}
+			Object.keys(action.payload.byClans)?.forEach((clanId) => {
+				if (action.payload.byClans[clanId].currentChannelId) {
+					delete action.payload.byClans[clanId].currentChannelId;
 				}
 			});
 		}
 	}
 	// comment logic cache messages
-	// if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
-	// 	const { channelIdLastFetch, channelMessages } = action.payload || {};
-	//
-	// 	if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
-	// 		// Limit the channelMessages to only include messages for the last fetched channelId
-	// 		action.payload = {
-	// 			...action.payload,
-	// 			channelMessages: {
-	// 				[channelIdLastFetch]: channelMessages[channelIdLastFetch]
-	// 			}
-	// 		};
-	// 	}
-	// }
+	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
+		const { channelMessages } = action.payload || {};
+		const keys = Object.keys(channelMessages);
+		if (channelMessages && keys?.length > LIMIT_CHANNEL_CACHE) {
+			while (keys.length > LIMIT_CHANNEL_CACHE) {
+				const oldestKey = keys.shift();
+				if (oldestKey) {
+					delete channelMessages[oldestKey];
+				}
+			}
+		}
+	}
 	// Pass the action to the next middleware or reducer
 	return next(action);
 };

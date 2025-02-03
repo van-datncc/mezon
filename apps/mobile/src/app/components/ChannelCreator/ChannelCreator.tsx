@@ -3,7 +3,6 @@ import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { channelsActions, createNewChannel, getStoreAsync, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
-import { DrawerActions } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
@@ -12,7 +11,6 @@ import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-nat
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../componentUI';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
@@ -27,7 +25,6 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { categoryId } = route.params;
-	const isTabletLandscape = useTabletLandscape();
 
 	const { t } = useTranslation(['channelCreator']);
 	const dispatch = useAppDispatch();
@@ -84,9 +81,6 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 
 		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-			if (!isTabletLandscape) {
-				navigation.dispatch(DrawerActions.closeDrawer());
-			}
 			requestAnimationFrame(async () => {
 				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));
 			});
