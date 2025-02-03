@@ -119,7 +119,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoPro
 	};
 
 	return (
-		<div className="w-full">
+		<>
 			{!token || !serverUrl ? (
 				<div className="w-full h-full flex flex-col" data-lk-theme="default">
 					<div className="flex justify-center items-center" style={{ height: `calc(100vh - 116px)` }}>
@@ -228,7 +228,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoPro
 					</div>
 				</LiveKitRoom>
 			)}
-		</div>
+		</>
 	);
 };
 
