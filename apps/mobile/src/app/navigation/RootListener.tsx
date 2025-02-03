@@ -170,24 +170,49 @@ const RootListener = () => {
 	}, [isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
 
 	const authLoader = useCallback(async () => {
-		try {
-			const response = await dispatch(authActions.refreshSession());
-			if ((response as unknown as IWithError).error) {
-				console.log('Session expired');
-				return;
+		let retries = 3;
+		while (retries > 0) {
+			try {
+				const response = await dispatch(authActions.refreshSession());
+				if ((response as unknown as IWithError).error) {
+					retries -= 1;
+					if (retries === 0) {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
+						console.log('Session expired after 3 retries');
+						return;
+					}
+					console.log(`Session expired, retrying... (${3 - retries}/3)`);
+					await sleep(1000);
+					continue;
+				}
+				const profileResponse = await dispatch(accountActions.getUserProfile());
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				const { id = '', username = '' } = profileResponse?.payload?.user || {};
+				if (id) save(STORAGE_MY_USER_ID, id?.toString());
+				await loadFRMConfig(username);
+				if ((profileResponse as unknown as IWithError).error) {
+					retries -= 1;
+					if (retries === 0) {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
+						console.log('Session expired after 3 retries');
+						return;
+					}
+					console.log(`Session expired, retrying... (${3 - retries}/3)`);
+					await sleep(1000);
+					continue;
+				}
+				break; // Exit the loop if no error
+			} catch (error) {
+				retries -= 1;
+				if (retries === 0) {
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
+					console.log('Session expired after 3 retries');
+					return;
+				}
+				console.log(`Error in authLoader, retrying... (${3 - retries}/3)`, error);
+				await sleep(1000);
 			}
-			const profileResponse = await dispatch(accountActions.getUserProfile());
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			const { id = '', username = '' } = profileResponse?.payload?.user || {};
-			if (id) save(STORAGE_MY_USER_ID, id?.toString());
-			await loadFRMConfig(username);
-			if ((profileResponse as unknown as IWithError).error) {
-				console.log('Session expired');
-				return;
-			}
-		} catch (error) {
-			console.log('error authLoader', error);
 		}
 	}, [dispatch]);
 
