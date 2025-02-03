@@ -12,9 +12,9 @@ import { appActions, channelsActions, clansActions, directActions, messagesActio
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import SwipeBackContainer from '../../home/homedrawer/SwipeBackContainer';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
@@ -195,7 +195,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [from, navigation]);
 
 	return (
-		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
+		<SwipeBackContainer handleBack={handleBack}>
 			<HeaderDirectMessage
 				handleBack={handleBack}
 				navigateToThreadDetail={navigateToThreadDetail}
@@ -208,9 +208,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				directMessageId={directMessageId}
 				firstUserId={firstUserId}
 			/>
-			{directMessageId && (
-				<ChatMessageWrapper handleBack={handleBack} directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />
-			)}
-		</SafeAreaView>
+			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
+		</SwipeBackContainer>
 	);
 };

@@ -74,34 +74,34 @@ const RootListener = () => {
 		}
 	}, [isLoggedIn]);
 
-	const refreshMessageInitApp = useCallback(async () => {
-		dispatch(appActions.setLoadingMainMobile(false));
-		if (currentChannelId) {
-			dispatch(
-				messagesActions.fetchMessages({
-					channelId: currentChannelId,
-					noCache: true,
-					isFetchingLatestMessages: true,
-					isClearMessage: true,
-					clanId: currentClanId
-				})
-			);
-			// dispatch(
-			// 	channelsActions.fetchChannels({
-			// 		clanId: currentClanId
-			// 	})
-			// );
-		}
-	}, [currentChannelId, currentClanId, dispatch]);
+	// const refreshMessageInitApp = useCallback(async () => {
+	// 	dispatch(appActions.setLoadingMainMobile(false));
+	// 	if (currentChannelId) {
+	// 		dispatch(
+	// 			messagesActions.fetchMessages({
+	// 				channelId: currentChannelId,
+	// 				noCache: true,
+	// 				isFetchingLatestMessages: true,
+	// 				isClearMessage: true,
+	// 				clanId: currentClanId
+	// 			})
+	// 		);
+	// 		// dispatch(
+	// 		// 	channelsActions.fetchChannels({
+	// 		// 		clanId: currentClanId
+	// 		// 	})
+	// 		// );
+	// 	}
+	// }, [currentChannelId, currentClanId, dispatch]);
 
 	const initAppLoading = async () => {
 		const isDisableLoad = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		const isFromFCM = isDisableLoad?.toString() === 'true';
 		await mainLoaderTimeout({ isFromFCM });
-		if (!isFromFCM) {
-			await sleep(1000);
-			refreshMessageInitApp();
-		}
+		// if (!isFromFCM) {
+		// 	await sleep(1000);
+		// 	refreshMessageInitApp();
+		// }
 	};
 
 	const messageLoaderBackground = useCallback(async () => {

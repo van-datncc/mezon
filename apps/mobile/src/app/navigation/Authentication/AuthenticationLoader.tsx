@@ -23,7 +23,7 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform } from 'react-native';
@@ -148,9 +148,7 @@ export const AuthenticationLoader = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						if (!isTabletLandscape) {
-							navigation.dispatch(DrawerActions.closeDrawer());
-						}
+						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 						requestAnimationFrame(async () => {
 							await navigateToNotification(store, remoteMessage, navigation);
 						});

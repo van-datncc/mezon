@@ -76,16 +76,16 @@ function DmTopbar({ dmGroupId, isHaveCallInChannel = false }: ChannelTopbarProps
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 
 	const metadata = useMemo(() => {
-		if (typeof currentDmGroup.metadata?.at(0) === 'string') {
+		if (typeof currentDmGroup?.metadata?.at(0) === 'string') {
 			try {
-				return safeJSONParse(currentDmGroup.metadata?.at(0) || '');
+				return safeJSONParse(currentDmGroup?.metadata?.at(0) || '');
 			} catch (error) {
-				console.error('Error parsing JSON:', currentDmGroup.metadata?.at(0), error);
+				console.error('Error parsing JSON:', currentDmGroup?.metadata?.at(0), error);
 			}
-		} else if (typeof currentDmGroup.metadata?.at(0) === 'object') {
-			return currentDmGroup.metadata?.at(0);
+		} else if (typeof currentDmGroup?.metadata?.at(0) === 'object') {
+			return currentDmGroup?.metadata?.at(0);
 		}
-	}, [currentDmGroup.metadata]);
+	}, [currentDmGroup?.metadata]);
 
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);

@@ -2,8 +2,9 @@ import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform } from 'react-native';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import CallingModal from '../../components/CallingModal';
+import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import StreamingPopup from '../../screens/home/homedrawer/components/StreamingPopup/StreamingPopup';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
@@ -18,18 +19,27 @@ import { SettingStacks } from './stacks/SettingStacks';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = memo(() => {
+	const Stack = createStackNavigator();
+
 	return (
 		<BottomSheetModalProvider>
 			<RootStack.Navigator
 				initialRouteName={APP_SCREEN.BOTTOM_BAR}
 				screenOptions={{
 					headerShown: false,
-					gestureEnabled: true,
-					gestureDirection: 'horizontal',
-					animation: Platform.OS === 'android' ? 'none' : 'default'
+					gestureEnabled: true
 				}}
 			>
-				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} options={{ gestureEnabled: false }} />
+				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
+				<Stack.Screen
+					name={APP_SCREEN.HOME_DEFAULT}
+					component={HomeDefaultWrapper}
+					options={{
+						cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+						headerShown: false,
+						gestureDirection: 'horizontal'
+					}}
+				/>
 				<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
 				<RootStack.Screen name={APP_SCREEN.MESSAGES.STACK} children={(props) => <MessagesStacks {...props} />} />
 				<RootStack.Screen name={APP_SCREEN.NOTIFICATION.STACK} children={(props) => <NotificationStacks {...props} />} />
