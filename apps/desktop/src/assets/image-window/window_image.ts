@@ -46,8 +46,8 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 	const parentBounds = parentWindow.getBounds();
 	const activeIndex = imageData.channelImagesData.selectedImageIndex;
 	// Calculate initial size (150% of parent window)
-	const width = Math.floor(parentBounds.width * 1.5);
-	const height = Math.floor(parentBounds.height * 1.5);
+	const width = Math.floor(parentBounds.width * 1.0);
+	const height = Math.floor(parentBounds.height * 1.0);
 
 	// Calculate position to center over parent window
 	const x = Math.floor(parentBounds.x + (parentBounds.width - width) / 2);
