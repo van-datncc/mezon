@@ -33,7 +33,15 @@ export interface IEmoji {
 export interface IMarkdown {
 	type?: EBacktickType;
 }
-
+export interface IMarkdown {
+	type?: EBacktickType;
+}
+export interface INewPos {
+	ne?: number;
+	ns?: number;
+	markerNumber?: number;
+	value?: string;
+}
 export interface IPre {
 	l?: string; // language
 }
@@ -56,3 +64,5 @@ export type ILinkYoutubeOnMessage = IStartEndIndex;
 export interface IPreMessage extends IPre, IStartEndIndex {}
 
 export interface IBoldMessage extends IBold, IStartEndIndex {}
+
+export interface INewPosMarkdown extends IMarkdown, IStartEndIndex, INewPos {}

@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
-import { LoadingStatus, UsersClanEntity } from '@mezon/utils';
+import { EUserStatus, LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, Update, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { safeJSONParse } from 'mezon-js';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { selectAllAccount } from '../account/account.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -200,9 +201,11 @@ export const selectClanMemberWithStatusIds = createSelector(
 
 		const userProfileId = userProfile?.user?.id;
 		if (userProfileId) {
+			const metadata =
+				typeof userProfile?.user?.metadata === 'string' ? safeJSONParse(userProfile?.user?.metadata) : userProfile?.user?.metadata;
 			const userIndex = users.findIndex((user) => user.id === userProfileId);
 
-			if (userIndex === -1) {
+			if (userIndex === -1 && metadata.user_status !== EUserStatus.INVISIBLE) {
 				users.push({
 					id: userProfileId,
 					user: {
@@ -210,12 +213,20 @@ export const selectClanMemberWithStatusIds = createSelector(
 						online: true
 					}
 				} as UsersClanEntity);
-			} else {
+			} else if (metadata.user_status !== EUserStatus.INVISIBLE) {
 				users[userIndex] = {
 					...users[userIndex],
 					user: {
 						...users[userIndex].user,
 						online: true
+					}
+				};
+			} else {
+				users[userIndex] = {
+					...users[userIndex],
+					user: {
+						...users[userIndex].user,
+						online: false
 					}
 				};
 			}

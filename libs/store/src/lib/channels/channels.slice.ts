@@ -272,8 +272,12 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string })
 				);
+				const thread: ChannelsEntity = { ...response, id: response.channel_id as string, active: 1 };
+				thunkAPI.dispatch(listChannelRenderAction.addThreadToListRender({ clanId: response.clan_id as string, channel: thread }));
+			} else {
+				thunkAPI.dispatch(listChannelRenderAction.addChannelToListRender(response));
 			}
-			thunkAPI.dispatch(listChannelRenderAction.addChannelToListRender(response));
+
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -687,7 +691,9 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 		}
 		const entity = channelState.entities.entities[channelId];
 		if (!entity) {
-			await thunkAPI.dispatch(channelsActions.addThreadToChannels({ clanId, channelId }));
+			if (clanId !== '0') {
+				await thunkAPI.dispatch(channelsActions.addThreadToChannels({ clanId, channelId }));
+			}
 			const state = thunkAPI.getState() as RootState;
 			const updatedEntity = state.channels.byClans[clanId].entities.entities[channelId];
 			const newCountMessUnread = isReset ? 0 : (updatedEntity?.count_mess_unread ?? 0) + count;
