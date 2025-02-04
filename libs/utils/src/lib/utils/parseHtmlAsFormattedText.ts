@@ -128,7 +128,7 @@ function parseMarkdown(html: string) {
 
 	// Define a regex to match mentions
 	const mentionRegex = /@\[(.*?)\]\(\d+\)/g;
-	const mentionRegex1 = /::\[(.*?)\]\(\d+\)/g;
+	const emojiRegex = /::\[(.*?)\]\(\d+\)/g;
 
 	// Strip redundant nbsp's
 	parsedHtml = parsedHtml.replace(/&nbsp;/g, ' ');
@@ -143,7 +143,7 @@ function parseMarkdown(html: string) {
 	parsedHtml = parsedHtml.replace(/<div>/g, '\n');
 	parsedHtml = parsedHtml.replace(/<\/div>/g, '');
 
-	parsedHtml = parsedHtml.replace(mentionRegex1, (match, display) => {
+	parsedHtml = parsedHtml.replace(emojiRegex, (match, display) => {
 		return display;
 	});
 
