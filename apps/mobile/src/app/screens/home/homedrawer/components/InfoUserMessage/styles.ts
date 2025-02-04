@@ -6,7 +6,7 @@ export const style = (colors: Attributes) =>
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '700',
-			width: '65%'
+			maxWidth: '65%'
 		},
 		dateMessageBox: {
 			fontSize: size.small,
