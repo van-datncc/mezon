@@ -34,7 +34,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { MezonConfirm } from '../../componentUI';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
@@ -53,7 +52,6 @@ export const AuthenticationLoader = () => {
 	const [isSessionExpired, setIsSessionExpired] = useState<boolean>(false);
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
-	const isTabletLandscape = useTabletLandscape();
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -146,9 +144,9 @@ export const AuthenticationLoader = () => {
 					onPress: async () => {
 						Toast.hide();
 						const store = await getStoreAsync();
+						store.dispatch(directActions.setDmGroupCurrentId(''));
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 						requestAnimationFrame(async () => {
 							await navigateToNotification(store, remoteMessage, navigation);
 						});
