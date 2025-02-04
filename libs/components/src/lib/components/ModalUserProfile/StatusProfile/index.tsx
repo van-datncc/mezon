@@ -85,7 +85,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	};
 	return (
 		<>
-			<div>
+			<div className="max-md:relative">
 				<Dropdown
 					label=""
 					trigger="click"
@@ -100,7 +100,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 						</div>
 					)}
 					placement="right-start"
-					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
 					<ItemStatus onClick={handleSendToken} children="Send Token" startIcon={<Icons.SendMoney />} />
 					<ItemStatus
@@ -124,7 +124,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					)}
 					label=""
 					placement="right-start"
-					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
 					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} onClick={() => updateUserStatus('Online', 0, true)} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
@@ -150,7 +150,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				)}
 				label=""
 				placement="right-start"
-				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px]"
+				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 			>
 				<ItemProfile avatar={user?.avatar_url} username={user?.username} />
 				<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>

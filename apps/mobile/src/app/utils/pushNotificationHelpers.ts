@@ -8,7 +8,7 @@ import {
 	save,
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -181,7 +181,7 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 	return true;
 };
 
-export const navigateToNotification = async (store: any, notification: any, navigation: any, isTabletLandscape?: boolean, time?: number) => {
+export const navigateToNotification = async (store: any, notification: any, navigation: any, time?: number) => {
 	const link = notification?.data?.link;
 	const topicId = notification?.data?.topicId;
 	if (link) {
@@ -194,7 +194,15 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
+			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
+				const joinAndChangeClan = async (store: any, clanId: string) => {
+					await Promise.all([
+						store.dispatch(clansActions.joinClan({ clanId: clanId })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
+					]);
+				};
+				await joinAndChangeClan(store, clanId);
 				store.dispatch(
 					channelsActions.joinChannel({
 						clanId: clanId ?? '',
@@ -204,13 +212,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 						noCache: true
 					})
 				);
-				const joinAndChangeClan = async (store: any, clanId: string) => {
-					await Promise.all([
-						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
-					]);
-				};
-				await joinAndChangeClan(store, clanId);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				save(STORAGE_CLAN_ID, clanId);
@@ -286,21 +287,21 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 	});
 };
 
-const processNotification = async ({ notification, navigation, isTabletLandscape, time = 0 }) => {
+const processNotification = async ({ notification, navigation, time = 0 }) => {
 	const store = await getStoreAsync();
 	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
-			navigateToNotification(store, notification, navigation, isTabletLandscape, time);
+			navigateToNotification(store, notification, navigation, time);
 		}, time);
 	} else {
-		navigateToNotification(store, notification, navigation, isTabletLandscape);
+		navigateToNotification(store, notification, navigation);
 	}
 };
 
-export const setupNotificationListeners = async (navigation, isTabletLandscape) => {
+export const setupNotificationListeners = async (navigation) => {
 	// await notifee.createChannel({
 	// 	id: 'default',
 	// 	name: 'mezon',
@@ -320,7 +321,6 @@ export const setupNotificationListeners = async (navigation, isTabletLandscape) 
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
-						isTabletLandscape,
 						time: 1
 					});
 				}
@@ -331,7 +331,6 @@ export const setupNotificationListeners = async (navigation, isTabletLandscape) 
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
-			isTabletLandscape,
 			time: 0
 		});
 	});
@@ -345,8 +344,7 @@ export const setupNotificationListeners = async (navigation, isTabletLandscape) 
 			case EventType.PRESS:
 				processNotification({
 					notification: detail.notification,
-					navigation,
-					isTabletLandscape
+					navigation
 				});
 				break;
 		}
