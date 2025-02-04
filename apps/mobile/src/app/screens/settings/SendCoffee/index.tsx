@@ -1,7 +1,7 @@
 import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { appActions, getStoreAsync, giveCoffeeActions, selectAllAccount, selectDirectsOpenlist, selectUpdateToken } from '@mezon/store-mobile';
-import { TOKEN_TO_AMOUNT, TypeMessage, formatMoney } from '@mezon/utils';
+import { TypeMessage, formatMoney } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useState } from 'react';
@@ -71,7 +71,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+					`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -80,7 +80,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				const response = createDirectMessageWithUser(jsonObject?.receiver_id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+						`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken

@@ -12,7 +12,7 @@ import {
 	selectAllUserClans,
 	selectUpdateToken
 } from '@mezon/store-mobile';
-import { TOKEN_TO_AMOUNT, TypeMessage, formatMoney } from '@mezon/utils';
+import { TypeMessage, formatMoney } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
@@ -128,7 +128,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -137,7 +137,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				const response = createDirectMessageWithUser(selectedUser?.id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
