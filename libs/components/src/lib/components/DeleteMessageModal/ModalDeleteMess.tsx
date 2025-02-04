@@ -31,8 +31,6 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		hasAttachment: hasAttachment,
 		isTopic: isTopic
 	});
-	// eslint-disable-next-line no-console
-	console.log(mess, isTopic);
 
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 	const { editSendMessage } = useChatSending({ channelOrDirect: current, mode });
