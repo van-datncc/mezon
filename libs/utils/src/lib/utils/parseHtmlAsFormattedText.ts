@@ -172,18 +172,6 @@ function parseMarkdown(html: string) {
 		return data || `<pre>${p1}</pre>`;
 	});
 
-	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, (match, p1, offset) => {
-		let data = '';
-		if (mentionRegex.test(p1)) {
-			data = match
-				.replace(mentionRegex, (match, display) => {
-					return '@' + display;
-				})
-				.replace(/`/g, `'`);
-		}
-		return data || `<pre>${p1}</pre>`;
-	});
-
 	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, (match, p1, p2) => {
 		let data = '';
 		if (mentionRegex.test(p2)) {
