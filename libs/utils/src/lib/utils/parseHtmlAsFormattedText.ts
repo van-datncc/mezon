@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { isYouTubeLink } from '.';
 import { EBacktickType, IMarkdownOnMessage } from '../types';
 
@@ -187,7 +188,7 @@ function parseMarkdown(html: string) {
 		let data = '';
 		if (mentionRegex.test(p2)) {
 			data = match.replace(mentionRegex, (_, display) => {
-				return display;
+				return '@' + display;
 			});
 		}
 		return data || `<b>${p2}</b>`;
