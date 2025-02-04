@@ -27,7 +27,8 @@ export const Authentication = memo(() => {
 				initialRouteName={APP_SCREEN.BOTTOM_BAR}
 				screenOptions={{
 					headerShown: false,
-					gestureEnabled: true
+					gestureEnabled: true,
+					animation: 'ios_from_right'
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />

@@ -77,7 +77,7 @@ const RootListener = () => {
 				}, 100);
 			});
 		}
-	}, [hasInternet]);
+	}, [isLoggedIn]);
 
 	// const refreshMessageInitApp = useCallback(async () => {
 	// 	dispatch(appActions.setLoadingMainMobile(false));
