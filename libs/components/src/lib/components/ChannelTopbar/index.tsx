@@ -177,8 +177,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 		const body = {
 			channelId: channel?.parrent_id !== '0' ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
 			clanId: channel?.clan_id ?? '',
-			page: 1,
-			noCache: true
+			page: 1
 		};
 		await dispatch(threadsActions.fetchThreads(body));
 	};
