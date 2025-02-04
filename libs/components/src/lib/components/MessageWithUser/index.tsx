@@ -18,6 +18,7 @@ import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { MessageActionsPanel } from '../MessageActionsPanel';
 import ModalUserProfile from '../ModalUserProfile';
+import TokenTransactionMessage from '../TokenTransactionMsg/TokenTransactionMsg';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -293,16 +294,18 @@ function MessageWithUser({
 																message={message}
 															/>
 														)}
-														{!isEditing && !message?.content?.callLog?.callLogType && (
-															<MessageContent
-																message={message}
-																isSending={message?.isSending}
-																isError={message?.isError}
-																mode={mode}
-																isSearchMessage={isSearchMessage}
-																isInTopic={isTopic}
-															/>
-														)}
+														{!isEditing &&
+															!message?.content?.callLog?.callLogType &&
+															!(message.code === TypeMessage.SendToken) && (
+																<MessageContent
+																	message={message}
+																	isSending={message?.isSending}
+																	isError={message?.isError}
+																	mode={mode}
+																	isSearchMessage={isSearchMessage}
+																	isInTopic={isTopic}
+																/>
+															)}
 
 														{(message?.attachments?.length as number) > 0 && (
 															<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
@@ -329,6 +332,8 @@ function MessageWithUser({
 																contentMsg={message?.content?.t || ''}
 															/>
 														)}
+
+														{!!(message.code === TypeMessage.SendToken) && <TokenTransactionMessage message={message} />}
 
 														{message?.content?.components &&
 															message?.content.components.map((actionRow, index) => (

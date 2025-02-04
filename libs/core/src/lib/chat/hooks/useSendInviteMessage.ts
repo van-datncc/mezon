@@ -7,7 +7,7 @@ export function useSendInviteMessage() {
 	const client = clientRef.current;
 
 	const sendInviteMessage = React.useCallback(
-		async (url: string, channel_id: string, channelMode: number) => {
+		async (url: string, channel_id: string, channelMode: number, code?: number) => {
 			const { links, markdowns } = processText(url);
 
 			const content: IMessageSendPayload = {
@@ -25,7 +25,7 @@ export function useSendInviteMessage() {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('0', channel_id, channelMode, false, content, [], [], []);
+			await socket.writeChatMessage('0', channel_id, channelMode, false, content, [], [], [], undefined, undefined, undefined, code);
 		},
 		[sessionRef, clientRef, socketRef]
 	);
