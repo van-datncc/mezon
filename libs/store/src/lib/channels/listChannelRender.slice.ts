@@ -207,7 +207,6 @@ export const selectListChannelRenderByClanId = createSelector(
 function sortChannels(channels: IChannel[]): IChannel[] {
 	const sortedChannels: IChannel[] = [];
 
-	// Add channel into list first
 	channels.forEach((channel) => {
 		if (!channel.parrent_id || channel.parrent_id === '0') {
 			sortedChannels.push(channel);
@@ -222,6 +221,5 @@ function sortChannels(channels: IChannel[]): IChannel[] {
 				acc.push(child);
 			});
 	}
-
 	return sortedChannels;
 }
