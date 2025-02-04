@@ -11,18 +11,7 @@ export function ChannelApps({
 	miniAppRef: RefObject<HTMLIFrameElement>;
 	miniAppDataHash: string;
 }) {
-	// const { setClanId, setChannelId, startLocalStream } = useWebRTC();
-
-	// useEffect(() => {
-	// 	if (appChannel) {
-	// 		setClanId(appChannel.clan_id || '');
-	// 		setChannelId(appChannel.channel_id || '');
-
-	// 		startLocalStream().catch((err) => {
-	// 			console.error('Failed to start local WebRTC stream:', err);
-	// 		});
-	// 	}
-	// }, [appChannel, setClanId, setChannelId, startLocalStream]);
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 
 	return appChannel?.url ? (
 		<iframe ref={miniAppRef} title={appChannel?.url} src={`${appChannel?.url}#${miniAppDataHash}`} className="w-full h-full"></iframe>
