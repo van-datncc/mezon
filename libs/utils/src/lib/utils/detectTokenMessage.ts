@@ -268,7 +268,7 @@ export const adjustPos = (
 	const shouldBeAdjustHashtagPos = markdownHasPrefix?.length > 0 && hashtagList?.length > 0;
 	const shouldBeAdjustEmojiPos = markdownHasPrefix?.length > 0 && emojiList?.length > 0;
 	const shouldBeAdjustToken = shouldBeAdjustMentionPos || shouldBeAdjustHashtagPos || shouldBeAdjustEmojiPos;
-	// add numberMarkder. Ex: pre:3; code: 2: bold:4
+	// add numberMarkder. Ex: pre:6; code: 2: bold:4
 	const addedNumberMarker = shouldBeAdjustToken ? addMarkdownPrefix(markdownHasPrefix, text) : [];
 	// calculate totalAaccumulateNumber:
 	// example: `1` ```2``` **3**
