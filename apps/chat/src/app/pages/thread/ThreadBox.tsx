@@ -89,7 +89,7 @@ const ThreadBox = () => {
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
-								channelType: thread.type as number,
+								channelType: ChannelType.CHANNEL_TYPE_THREAD,
 								isPublic: false
 							})
 						);
