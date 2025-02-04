@@ -69,8 +69,6 @@ const ThreadBox = () => {
 		[currentChannel, currentChannelId, currentClanId, dispatch]
 	);
 
-	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
