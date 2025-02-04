@@ -26,8 +26,10 @@ import {
 	IMessageWithUser,
 	MenuBuilder,
 	SubPanelName,
+	TOKEN_TO_AMOUNT,
 	TypeMessage,
 	findParentByClass,
+	formatMoney,
 	isPublicChannel,
 	useMenuBuilder,
 	useMenuBuilderPlugin
@@ -206,7 +208,12 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 			const response = await createDirectMessageWithUser(userId);
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
-				sendInviteMessage('Tokens sent: 10,000₫', response.channel_id, channelMode, TypeMessage.SendToken);
+				sendInviteMessage(
+					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+					response.channel_id,
+					channelMode,
+					TypeMessage.SendToken
+				);
 			}
 		},
 		[createDirectMessageWithUser, sendInviteMessage]
