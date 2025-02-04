@@ -1,3 +1,4 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { selectIsLogin } from '@mezon/store-mobile';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
@@ -11,24 +12,22 @@ const Root = createStackNavigator();
 
 const RootStack = (props) => {
 	const isLoggedIn = useSelector(selectIsLogin);
+	const { themeValue } = useTheme();
+
 	if (props?.payload && isLoggedIn) return <IncomingHomeScreen {...props} />;
 	return (
-		<Root.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
+		<Root.Navigator
+			screenOptions={{
+				headerShown: false,
+				cardStyle: { backgroundColor: themeValue.primary }
+			}}
+		>
 			{isLoggedIn ? (
-				<Root.Group
-					screenOptions={{
-						gestureEnabled: false
-					}}
-				>
+				<Root.Group>
 					<Root.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
 				</Root.Group>
 			) : (
-				<Root.Group
-					screenOptions={{
-						animationTypeForReplace: 'pop',
-						gestureEnabled: false
-					}}
-				>
+				<Root.Group>
 					<Root.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
 				</Root.Group>
 			)}

@@ -12,7 +12,6 @@ import { appActions, channelsActions, clansActions, getStoreAsync, topicsActions
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
-import { DrawerActions } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
@@ -191,10 +190,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		// IF is notification to channel
 		if (linkMatch) {
 			if (navigation) {
-				navigation.navigate(APP_SCREEN.HOME as never);
-				if (!isTabletLandscape) {
-					navigation.dispatch(DrawerActions.closeDrawer());
-				}
+				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];

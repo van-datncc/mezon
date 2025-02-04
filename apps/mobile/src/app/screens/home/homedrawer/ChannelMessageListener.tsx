@@ -13,7 +13,7 @@ import {
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
 import { DeviceEventEmitter, Linking, View } from 'react-native';
@@ -91,7 +91,6 @@ const ChannelMessageListener = React.memo(() => {
 					} else {
 						if (currentDirectId) {
 							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-							navigation.dispatch(DrawerActions.closeDrawer());
 						}
 					}
 					if (currentClanId !== clanId) {

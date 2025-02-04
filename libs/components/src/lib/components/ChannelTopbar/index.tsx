@@ -150,19 +150,21 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 			<div className="items-center h-full ml-auto flex">
 				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
 					<div className="justify-end items-center gap-2 flex">
-						<div className="hidden sbm:flex">
-							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
-								{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-								<ThreadButton isLightMode={appearanceTheme === 'light'} fetchThreads={fetchThreads} />
-								<MuteButton isLightMode={appearanceTheme === 'light'} />
-								<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
-								<div onClick={() => setTurnOffThreadMessage()}>
-									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+						{channel?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
+							<div className="hidden sbm:flex">
+								<div className="relative justify-start items-center gap-[15px] flex mr-4">
+									{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
+									{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
+									<ThreadButton isLightMode={appearanceTheme === 'light'} />
+									<MuteButton isLightMode={appearanceTheme === 'light'} />
+									<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
+									<div onClick={() => setTurnOffThreadMessage()}>
+										<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+									</div>
 								</div>
+								<SearchMessageChannel mode={mode} />
 							</div>
-							<SearchMessageChannel mode={mode} />
-						</div>
+						)}
 						<div
 							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
 							id="inBox"

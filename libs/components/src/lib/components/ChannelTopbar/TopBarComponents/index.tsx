@@ -29,7 +29,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
+	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelText = type === ChannelType.CHANNEL_TYPE_CHANNEL || type === ChannelType.CHANNEL_TYPE_THREAD;
 	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isAppChannel = type === ChannelType.CHANNEL_TYPE_APP;

@@ -1,6 +1,6 @@
 import { STORAGE_IS_DISABLE_LOAD_BACKGROUND, load } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, InteractionManager, Text, TouchableOpacity } from 'react-native';
@@ -42,7 +42,7 @@ const NoChannelSelected = () => {
 				<Text style={styles.description}>{t('emptyClans.findChannel')}</Text>
 			</Block>
 			<Block marginTop={size.s_20}>
-				<TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())} style={styles.joinClan}>
+				<TouchableOpacity onPress={() => navigation.goBack()} style={styles.joinClan}>
 					<Text style={styles.textJoinClan}>{t('emptyClans.joinChannel')}</Text>
 				</TouchableOpacity>
 			</Block>
