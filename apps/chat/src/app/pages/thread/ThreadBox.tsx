@@ -83,8 +83,6 @@ const ThreadBox = () => {
 				if (value?.nameValueThread) {
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
-						// sleep for waiting server check exist after insert
-						await sleep(10);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
@@ -109,7 +107,7 @@ const ThreadBox = () => {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, currentClanId, currentChannel, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
+		[createThread, currentClanId, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
