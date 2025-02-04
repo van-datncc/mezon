@@ -50,7 +50,6 @@ import {
 export * from './animateScroll';
 export * from './audio';
 export * from './callbacks';
-export * from './checkTokenMarkdown';
 export * from './detectTokenMessage';
 export * from './file';
 export * from './forceReflow';
