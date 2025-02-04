@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannelMembers, useChatSending, usePermissionChecker } from '@mezon/core';
+import { useChannelMembers, useChatSending, useDirect, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -11,6 +11,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectDirectsOpenlist,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
@@ -21,7 +22,17 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { AMOUNT_TOKEN, EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, TypeMessage, getSrcEmoji } from '@mezon/utils';
+import {
+	AMOUNT_TOKEN,
+	EMOJI_GIVE_COFFEE,
+	EOverriddenPermission,
+	EPermission,
+	TOKEN_TO_AMOUNT,
+	ThreadStatus,
+	TypeMessage,
+	formatMoney,
+	getSrcEmoji
+} from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -61,6 +72,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
 	const navigation = useNavigation<any>();
+	const listDM = useSelector(selectDirectsOpenlist);
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
 	}, []);
@@ -95,6 +109,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
+	const directMessageId = useMemo(() => {
+		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === message?.user?.id);
+		return directMessage?.id;
+	}, [listDM, message?.user?.id]);
+
 	const handleActionEditMessage = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
@@ -119,6 +138,24 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				};
 				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
 				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
+				if (directMessageId) {
+					sendInviteMessage(
+						`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+						directMessageId,
+						ChannelStreamMode.STREAM_MODE_DM,
+						TypeMessage.SendToken
+					);
+				} else {
+					const response = createDirectMessageWithUser(message?.user?.id);
+					if (response?.channel_id) {
+						sendInviteMessage(
+							`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+							response?.channel_id,
+							ChannelStreamMode.STREAM_MODE_DM,
+							TypeMessage.SendToken
+						);
+					}
+				}
 			}
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
