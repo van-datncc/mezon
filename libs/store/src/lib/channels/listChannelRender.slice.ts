@@ -49,7 +49,6 @@ export const listChannelRenderSlice = createSlice({
 								...channel,
 								isFavor: true,
 								category_id: 'favorCate',
-								channel_id: `favor-${channel.id}`
 							});
 						}
 						listChannelRender.push(channel);
@@ -136,7 +135,7 @@ export const listChannelRenderSlice = createSlice({
 			};
 			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.id);
 			if (isExistChannel === -1 && clanId && state.listChannelRender[clanId]) {
-				const indexInsert = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.parrent_id);
+				const indexInsert = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.parrent_id && !channel.isFavor);
 
 				if (indexInsert === -1) {
 					return;
