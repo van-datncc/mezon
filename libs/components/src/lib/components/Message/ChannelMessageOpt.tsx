@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction, useEmojiConverted, useGifs } from '@mezon/core';
+import { useAuth, useChatReaction, useDirect, useEmojiConverted, useGifs, useSendInviteMessage } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -14,7 +14,6 @@ import {
 	selectDefaultCanvasByChannelId,
 	selectIsMessageChannelIdMatched,
 	selectMessageByMessageId,
-	selectTheme,
 	threadsActions,
 	topicsActions,
 	useAppDispatch,
@@ -91,7 +90,7 @@ const ChannelMessageOpt = ({
 	const doNotAllowCreateTopic = (isTopic && checkMessageOnTopic) || (isTopic && checkMessageHasTopic) || !hasPermission;
 	const createTopicMenu = useTopicMenuBuilder(message, doNotAllowCreateTopic);
 	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
-
+	const { createDirectMessageWithUser } = useDirect();
 	return (
 		<div
 			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-5' : 'top-0') : '-top-5'} ${isDifferentDay ? 'top-4' : ''} right-6 w-fit`}
@@ -197,9 +196,22 @@ const RecentEmoji: React.FC<RecentEmojiProps> = ({ message }) => {
 function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
-	const appearanceTheme = useSelector(selectTheme);
 	const { reactionMessageDispatch } = useChatReaction();
 	const channel = useAppSelector((state) => selectChannelById(state, message.channel_id ?? '')) || {};
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
+
+	const sendNotificationMessage = useCallback(
+		async (userId: string) => {
+			const response = await createDirectMessageWithUser(userId);
+			if (response.channel_id) {
+				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
+				sendInviteMessage('Tokens sent: 10,000₫', response.channel_id, channelMode, TypeMessage.SendToken);
+			}
+		},
+		[createDirectMessageWithUser, sendInviteMessage]
+	);
+
 	const handleItemClick = useCallback(async () => {
 		try {
 			await dispatch(
@@ -224,6 +236,8 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				isPublicChannel(channel),
 				message.content?.tp ?? ''
 			);
+
+			await sendNotificationMessage(message.sender_id || '');
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
 		}
@@ -390,14 +404,17 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 	}, [dispatch, message, messageId]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId === message.sender_id && !message?.content?.callLog?.callLogType, (builder) => {
-			builder.addMenuItem(
-				'edit',
-				'edit',
-				handleItemClick,
-				<Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />
-			);
-		});
+		builder.when(
+			userId === message.sender_id && !message?.content?.callLog?.callLogType && !(message.code === TypeMessage.SendToken),
+			(builder) => {
+				builder.addMenuItem(
+					'edit',
+					'edit',
+					handleItemClick,
+					<Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />
+				);
+			}
+		);
 	});
 }
 
