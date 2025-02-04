@@ -323,11 +323,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						);
 					} else if (eventType === 'CREATE_VOICE_ROOM') {
 						// eslint-disable-next-line no-console
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CREATE_VOICE_ROOM_RESPONSE' }),
-							appChannel.url ?? ''
-						);
-						// console.log('mezon app handle CREATE_VOICE_ROOM');
+						console.log('mezon app handle CREATE_VOICE_ROOM');
 					}
 				}
 			};
