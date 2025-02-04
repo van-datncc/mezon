@@ -115,7 +115,10 @@ export class MezonNotificationService {
 					if (e2eemess === 'true') {
 						msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string, true);
 					}
-					this.pushNotification(title, msgContent, image, link);
+					const isContentMessBlank = msgContent.trim() === '';
+					if (!isContentMessBlank) {
+						this.pushNotification(title, msgContent, image, link);
+					}
 					if (pushNotiCallback) {
 						pushNotiCallback(msg);
 					}
