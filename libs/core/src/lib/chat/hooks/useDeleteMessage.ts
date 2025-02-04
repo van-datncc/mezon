@@ -8,9 +8,10 @@ export type UseDeleteMessageOptions = {
 	channelId: string;
 	mode: number;
 	hasAttachment?: boolean;
+	isTopic?: boolean;
 };
 
-export function useDeleteMessage({ channelId, mode, hasAttachment }: UseDeleteMessageOptions) {
+export function useDeleteMessage({ channelId, mode, hasAttachment, isTopic }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isClanView = useSelector(selectClanView);
@@ -34,6 +35,21 @@ export function useDeleteMessage({ channelId, mode, hasAttachment }: UseDeleteMe
 					isPublicChannel: isPublicChannel(channel),
 					isClanView: isClanView as boolean
 				});
+				// console.log (isTopic)
+				if (isTopic) {
+					// console.log ({channelId: channelId})
+					const response = await socket.removeChatMessage(
+						payload.clan_id,
+						channel?.channel_id || '',
+						mode,
+						payload.is_public,
+						messageId,
+						hasAttachment,
+						channelId
+					);
+					// console.log ('check response: ', response)
+					return;
+				}
 
 				await socket.removeChatMessage(payload.clan_id, channelId, mode, payload.is_public, messageId, hasAttachment);
 			} catch (e) {

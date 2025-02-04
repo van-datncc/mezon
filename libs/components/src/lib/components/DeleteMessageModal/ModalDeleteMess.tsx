@@ -15,10 +15,11 @@ type ModalDeleteMessProps = {
 	isRemoveAttachmentNoContent?: boolean;
 	attachmentData?: ApiMessageAttachment;
 	isRemoveAttachmentAction?: boolean;
+	isTopic?: boolean;
 };
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
-	const { mess, closeModal, mode, isRemoveAttachmentNoContent, attachmentData, isRemoveAttachmentAction = false } = props;
+	const { mess, closeModal, mode, isRemoveAttachmentNoContent, attachmentData, isRemoveAttachmentAction = false, isTopic } = props;
 	const current = useCurrentInbox() || undefined;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const isEditing = useSelector(selectOpenEditMessageState);
@@ -27,8 +28,11 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
 		mode: mode,
-		hasAttachment: hasAttachment
+		hasAttachment: hasAttachment,
+		isTopic: isTopic
 	});
+	// eslint-disable-next-line no-console
+	console.log(mess, isTopic);
 
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 	const { editSendMessage } = useChatSending({ channelOrDirect: current, mode });

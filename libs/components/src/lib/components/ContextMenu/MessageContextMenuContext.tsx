@@ -147,7 +147,7 @@ export const MessageContextMenuProvider = ({
 		const appState = appStore.getState() as RootState;
 		const mode = getActiveMode(appState);
 		const message = getMessage(appState, isTopic, messageIdRef.current);
-		return <ModalDeleteMess mess={message} closeModal={closeDeleteMessageModal} mode={mode} />;
+		return <ModalDeleteMess mess={message} closeModal={closeDeleteMessageModal} mode={mode} isTopic={isTopic} />;
 	}, [messageIdRef.current]);
 
 	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
