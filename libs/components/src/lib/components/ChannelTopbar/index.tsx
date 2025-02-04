@@ -107,10 +107,12 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	);
 });
 
-const TopBarChannelApps = memo(({ channel, mode }: ChannelTopbarProps) => {
-	const appearanceTheme = useSelector(selectTheme);
-	// const enableVoiceChat = useSelector(selectEnableVoiceChannelApps);
+const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
+	const [joinVoice, setJoinVoice] = useState(true);
+	const [enableMic, setEnableMic] = useState(false);
+	const [enableVideo, setEnableVideo] = useState(false);
 	const enableVoiceChat = true;
+
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -121,9 +123,13 @@ const TopBarChannelApps = memo(({ channel, mode }: ChannelTopbarProps) => {
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<StartCallButton isTalking={true} />
-								<MicButton isTalking={true} />
-								<VideoButoon isEnable={false} />
+								<StartCallButton onClick={() => setJoinVoice(!joinVoice)} isTalking={joinVoice} />
+								{joinVoice && (
+									<>
+										<MicButton onClick={() => setEnableMic(!enableMic)} isTalking={enableMic} />
+										<VideoButoon onClick={() => setEnableVideo(!enableVideo)} isEnable={enableVideo} />
+									</>
+								)}
 							</div>
 						</div>
 
@@ -135,7 +141,7 @@ const TopBarChannelApps = memo(({ channel, mode }: ChannelTopbarProps) => {
 			)}
 		</>
 	);
-});
+};
 
 const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();

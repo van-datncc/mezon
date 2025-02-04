@@ -2,11 +2,12 @@ import { Icons } from '@mezon/ui';
 
 interface IVideoButoonProps {
 	isEnable: boolean;
+	onClick?: () => void;
 }
-export function VideoButoon({ isEnable }: IVideoButoonProps) {
+export function VideoButoon({ isEnable, onClick }: IVideoButoonProps) {
 	return (
 		<div className="relative leading-5 h-6">
-			<button className="focus-visible:outline-none" onContextMenu={(e) => e.preventDefault()}>
+			<button onClick={onClick} className="focus-visible:outline-none" onContextMenu={(e) => e.preventDefault()}>
 				{isEnable ? (
 					<Icons.IconMeetDM className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
 				) : (
