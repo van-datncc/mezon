@@ -250,7 +250,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 								return (
 									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
 										<ChannelListItem
-											isActive={currentChannelId === (item as IChannel).channel_id}
+											isActive={currentChannelId === (item as IChannel).channel_id && !(item as IChannel).isFavor}
 											key={item.id}
 											channel={item as ChannelThreads}
 											permissions={permissions}
