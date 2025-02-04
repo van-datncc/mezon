@@ -309,7 +309,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request.valueTextInput.trim());
+			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
