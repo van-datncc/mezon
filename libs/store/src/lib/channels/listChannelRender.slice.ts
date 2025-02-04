@@ -171,7 +171,18 @@ export const listChannelRenderSlice = createSlice({
 					count_mess_unread: 0
 				};
 			}
-		}
+		},
+    leaveChannelListRender : (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				const indexRemove = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				if (indexRemove === -1) {
+					return;
+				}
+        state.listChannelRender[clanId]?.splice(indexRemove, 1);
+				state.listChannelRender[clanId].join();
+			}
+		},
 	}
 });
 
