@@ -555,7 +555,7 @@ export const addThreadSocket = createAsyncThunk(
 			thunkAPI.dispatch(
 				listChannelRenderAction.addThreadToListRender({
 					clanId: clanId,
-					channel: channelData
+					channel: {...channelData, active : 1}
 				})
 			);
 		}

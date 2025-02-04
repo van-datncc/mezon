@@ -17,9 +17,10 @@ interface IChannelItemProps {
 	data: IChannel;
 	isUnRead?: boolean;
 	isActive?: boolean;
+	isFirstThread?: boolean;
 }
 
-function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChannelItemProps) {
+function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstThread }: IChannelItemProps) {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const numberNotification = useMemo(() => {
@@ -27,7 +28,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 	}, [data?.count_mess_unread]);
 
 	if (data.type === ChannelType.CHANNEL_TYPE_THREAD) {
-		return <ChannelListThreadItem thread={data} isActive={isActive} onPress={onPress} onLongPress={onLongPress} />;
+		return <ChannelListThreadItem thread={data} isActive={isActive} onPress={onPress} onLongPress={onLongPress} isFirstThread={isFirstThread} />;
 	}
 
 	return (

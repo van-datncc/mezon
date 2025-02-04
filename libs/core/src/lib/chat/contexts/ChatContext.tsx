@@ -597,7 +597,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			}
 
-			if (channel_desc.type == ChannelType.CHANNEL_TYPE_GROUP) {
+			if (channel_desc.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				dispatch(
 					directActions.addGroupUserWS({
 						channel_desc: { ...channel_desc, create_time_seconds: create_time_second },

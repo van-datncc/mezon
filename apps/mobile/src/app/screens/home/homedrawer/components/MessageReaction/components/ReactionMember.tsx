@@ -51,7 +51,7 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 					</View>
 				)}
 			</View>
-			<Text style={styles.memberName}>{reactionMember?.user?.display_name || reactionMember?.user?.username}</Text>
+			<Text style={styles.memberName}>{reactionMember?.clan_nick || reactionMember?.user?.display_name || reactionMember?.user?.username}</Text>
 			{reactionMember?.user?.display_name || reactionMember?.user?.username ? (
 				<Text style={styles.mentionText}>@{reactionMember?.user?.display_name || reactionMember?.user?.username}</Text>
 			) : null}
