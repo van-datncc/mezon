@@ -73,7 +73,7 @@ export function parseHtmlAsFormattedText(html: string): ApiFormattedText {
 	const fragment = document.createElement('div');
 	fragment.innerHTML = parseMarkdown(parseMarkdownLinks(html));
 	fixImageContent(fragment);
-	const text = fragment.innerText.trim().replace(/\u200b+/g, '');
+	const text = fragment.innerText;
 	const trimShift = fragment.innerText.indexOf(text[0]);
 	let textIndex = -trimShift;
 	let recursionDeepness = 0;

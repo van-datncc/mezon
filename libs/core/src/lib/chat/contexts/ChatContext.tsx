@@ -101,7 +101,7 @@ import {
 	ListActivity,
 	MessageButtonClicked,
 	MessageTypingEvent,
-	Notification,
+	NotificationInfo,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
@@ -417,13 +417,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 	const onnotification = useCallback(
-		async (notification: Notification) => {
+		async (notification: NotificationInfo) => {
 			const path = isElectron() ? window.location.hash : window.location.pathname;
 			const isFriendPageView = path.includes('/chat/direct/friends');
 			const isDirectViewPage = path.includes('/chat/direct/message/');
 
 			if (
-				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
+				(currentChannel?.channel_id !== notification?.channel_id && notification?.clan_id !== '0') ||
 				isDirectViewPage ||
 				isFriendPageView ||
 				(isElectron() && isFocusDesktop === false) ||
@@ -435,27 +435,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					isFriendPageView ||
 					isClanView ||
 					!currentDirectId ||
-					(currentDirectId && !RegExp(currentDirectId).test((notification as any).channel_id)) ||
+					(currentDirectId && !RegExp(currentDirectId).test(notification?.channel_id || '')) ||
 					(isElectron() && isFocusDesktop === false) ||
 					isTabVisible === false;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
-					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
+					dispatch(clansActions.updateClanBadgeCount({ clanId: notification?.clan_id || '', count: 1 }));
+
+					if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+						await dispatch(
+							channelsActions.addThreadSocket({
+								clanId: notification?.clan_id || '',
+								channelId: notification?.channel_id ?? '',
+								channel: {
+									...notification?.channel,
+									id: notification?.channel?.channel_id || notification?.channel_id
+								}
+							})
+						);
+					}
 					dispatch(
 						channelsActions.updateChannelBadgeCountAsync({
-							clanId: (notification as any).clan_id,
-							channelId: (notification as any).channel_id ?? '',
+							clanId: notification?.clan_id || '',
+							channelId: notification?.channel_id ?? '',
 							count: 1
 						})
 					);
 					dispatch(
 						listChannelsByUserActions.updateChannelBadgeCount({
-							channelId: (notification as any).channel_id,
+							channelId: notification?.channel_id || '',
 							count: 1
 						})
 					);
 
 					if (isNotCurrentDirect) {
-						dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
+						dispatch(directMetaActions.setCountMessUnread({ channelId: notification?.channel_id ?? '', isMention: true }));
 					}
 				}
 			}
