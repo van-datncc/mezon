@@ -1109,3 +1109,12 @@ export function getYouTubeEmbedSize(url: string) {
 	}
 	return { width: '400px', height: '225px' };
 }
+
+export const formatMoney = (number: number) => {
+	if (number === 0) {
+		return 0;
+	}
+	if (number) {
+		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	}
+};

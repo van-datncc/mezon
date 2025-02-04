@@ -8,8 +8,8 @@ import {
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
@@ -22,6 +22,7 @@ import {
 	selectIsShowMemberList,
 	selectIsShowPinBadgeByChannelId,
 	selectIsThreadModalVisible,
+	selectNotifiSettingsEntitiesById,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
@@ -278,7 +279,8 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.id || ''));
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 

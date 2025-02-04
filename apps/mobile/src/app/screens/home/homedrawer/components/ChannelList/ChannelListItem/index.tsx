@@ -9,6 +9,7 @@ import {
 } from '@mezon/mobile-components';
 import {
 	channelsActions,
+	directActions,
 	getStoreAsync,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
@@ -88,6 +89,7 @@ export const ChannelListItem = React.memo(
 					const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 					const isCached = channelsCache?.includes(channelId);
 					const store = await getStoreAsync();
+					store.dispatch(directActions.setDmGroupCurrentId(''));
 					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					timeoutRef.current = setTimeout(async () => {

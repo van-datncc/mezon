@@ -15,7 +15,7 @@ import {
 	selectCurrentUserId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
-	selectSelectedChannelNotificationSetting,
+	selectNotifiSettingsEntitiesById,
 	stickerSettingActions,
 	threadsActions,
 	useAppDispatch,
@@ -88,7 +88,7 @@ export const getNotificationLabel = (value: NotificationType) => {
 };
 
 const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
-	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(channel.id));
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClan = useSelector(selectCurrentClan);
