@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, checkTokenOnMarkdown } from '@mezon/utils';
+import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo } from 'react';
@@ -78,20 +78,6 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			isMobile?: boolean,
 			code?: number
 		) => {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const trimmedText = content?.t?.trim();
-			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
-				content.mk ?? [],
-				content.hg ?? [],
-				mentions ?? [],
-				content.ej ?? []
-			);
-			const validatedContent = {
-				...content,
-				t: trimmedText,
-				hg: validHashtagList,
-				ej: validEmojiList
-			};
 			if (!isFocusOnChannelInput && isShowCreateTopic) {
 				if (!currentTopicId) {
 					const topic = (await createTopic()) as ApiSdTopic;
@@ -104,11 +90,11 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 								anonymous: false,
 								attachments: attachments,
 								code: 0,
-								content: validatedContent,
+								content: content,
 								isMobile: isMobile,
 								isPublic: isPublic,
 								mentionEveryone: mentionEveryone,
-								mentions: validMentionList,
+								mentions: mentions,
 								references: references,
 								topicId: topic?.id as string
 							})
@@ -133,11 +119,11 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 						anonymous: false,
 						attachments: attachments,
 						code: 0,
-						content: validatedContent,
+						content: content,
 						isMobile: isMobile,
 						isPublic: isPublic,
 						mentionEveryone: mentionEveryone,
-						mentions: validMentionList,
+						mentions: mentions,
 						references: references,
 						topicId: currentTopicId as string
 					})
@@ -150,8 +136,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					clanId: getClanId || '',
 					mode,
 					isPublic: isPublic,
-					content: validatedContent,
-					mentions: validMentionList,
+					content: content,
+					mentions: mentions,
 					attachments,
 					references,
 					anonymous,
@@ -211,33 +197,22 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			if (!client || !session || !socket || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const { validHashtagList, validMentionList, validEmojiList } = checkTokenOnMarkdown(
-				content.mk ?? [],
-				content.hg ?? [],
-				mentions ?? [],
-				content.ej ?? []
-			);
-			const validatedContent = {
-				...content,
-				hg: validHashtagList,
-				ej: validEmojiList
-			};
+
 			await socket.updateChatMessage(
 				getClanId || '',
 				channelIdOrDirectId ?? '',
 				mode,
 				isPublic,
 				messageId,
-				validatedContent,
-				validMentionList,
+				content,
+				mentions,
 				attachments,
 				hide_editted,
 				topic_id,
 				false
 			);
 			if (topic_id) {
-				dispatch(topicsActions.updateInitMessage({ content: validatedContent, mentions: validMentionList }));
+				dispatch(topicsActions.updateInitMessage({ content: content, mentions: mentions }));
 			}
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
