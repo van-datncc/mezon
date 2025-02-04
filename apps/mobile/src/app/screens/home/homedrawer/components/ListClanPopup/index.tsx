@@ -2,6 +2,7 @@ import { PlusAltIcon, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	clansActions,
+	directActions,
 	getStoreAsync,
 	RootState,
 	selectAllClans,
@@ -68,8 +69,11 @@ export const ListClanPopup = React.memo(() => {
 
 	const handleChangeClan = useCallback(
 		async (clanId: string) => {
-			if (isTabletLandscape) navigation.navigate(APP_SCREEN.HOME as never);
 			const store = await getStoreAsync();
+			if (isTabletLandscape) {
+				navigation.navigate(APP_SCREEN.HOME as never);
+				store.dispatch(directActions.setDmGroupCurrentId(''));
+			}
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));

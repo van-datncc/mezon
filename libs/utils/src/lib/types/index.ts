@@ -147,6 +147,10 @@ export type IChannel = ApiChannelDescription & {
 	isFavor?: boolean;
 };
 
+export type INotificationUserChannel = ApiNotificationUserChannel & {
+	id: string;
+};
+
 export type IPinMessage = ApiPinMessage & {
 	id: string;
 };
@@ -1105,7 +1109,8 @@ export enum TypeMessage {
 	CreatePin = 7,
 	MessageBuzz = 8,
 	Topic = 9,
-	AuditLog = 10
+	AuditLog = 10,
+	SendToken = 11
 }
 
 export enum ServerSettingsMenuValue {

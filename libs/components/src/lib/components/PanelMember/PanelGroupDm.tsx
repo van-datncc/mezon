@@ -10,7 +10,7 @@ import {
 	removeMemberChannel,
 	selectCurrentUserId,
 	selectDirectById,
-	selectSelectedChannelNotificationSetting,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -36,7 +36,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const channel = useAppSelector((state) => selectDirectById(state, dmGroupId || ''));
 	const { navigate } = useAppNavigation();
 	const [popupLeave, setPopupLeave] = useState<boolean>(false);
-	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(dmGroupId || ''));
 	const [nameChildren, setNameChildren] = useState('');
 	const [mutedUntil, setmutedUntil] = useState('');
 	const handleLeaveDmGroup = async () => {

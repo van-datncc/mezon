@@ -27,7 +27,7 @@ import {
 	selectDmGroupCurrent,
 	selectFriendStatus,
 	selectHasKeyE2ee,
-	selectSelectedChannelNotificationSetting,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch
 } from '@mezon/store';
 import { ChannelMembersEntity, EPermission, EUserSettings, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
@@ -89,7 +89,7 @@ const PanelMember = ({
 	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
 	const memberIsClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
 	const { directId } = useAppParams();
-	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(directMessageValue?.dmID || ''));
 	const [nameChildren, setNameChildren] = useState('');
 	const [mutedUntil, setmutedUntil] = useState('');
 	const hasKeyE2ee = useSelector(selectHasKeyE2ee);

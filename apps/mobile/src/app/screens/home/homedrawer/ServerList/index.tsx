@@ -1,5 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
+import { selectLogoCustom } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
@@ -8,7 +8,6 @@ import LogoMezonDark from '../../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../../assets/svg/logoMezonLight.svg';
 import { MezonAvatar } from '../../../../componentUI';
 import { SeparatorWithLine } from '../../../../components/Common';
-import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
 import { ListClanPopup } from '../components/ListClanPopup';
 import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
@@ -19,15 +18,10 @@ const ServerList = React.memo(() => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
-	const isTabletLandscape = useTabletLandscape();
 	const logoCustom = useSelector(selectLogoCustom);
-	const dispatch = useAppDispatch();
 
 	const navigateToDM = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-		if (isTabletLandscape) {
-			dispatch(clansActions.setCurrentClanId('0'));
-		}
 	};
 
 	return (

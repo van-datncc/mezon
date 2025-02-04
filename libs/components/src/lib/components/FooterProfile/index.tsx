@@ -1,4 +1,4 @@
-import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
+import { useAuth, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	TOKEN_FAILED_STATUS,
@@ -17,10 +17,10 @@ import {
 	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
+import { MemberProfileType, TypeMessage, formatMoney } from '@mezon/utils';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
@@ -59,6 +59,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
 	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
 	const [isInputDisabled, setIsInputDisabled] = useState<boolean>(false);
+
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
 
 	const isMe = userId === myProfile?.userId;
 
@@ -101,6 +104,17 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
 	};
 
+	const sendNotificationMessage = useCallback(
+		async (userId: string, tokenValue: number) => {
+			const response = await createDirectMessageWithUser(userId);
+			if (response.channel_id) {
+				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
+				sendInviteMessage(`Tokens sent: ${formatMoney(tokenValue)}₫`, response.channel_id, channelMode, TypeMessage.SendToken);
+			}
+		},
+		[createDirectMessageWithUser, sendInviteMessage]
+	);
+
 	const handleSaveSendToken = async (id: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
@@ -128,6 +142,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
+			await sendNotificationMessage(infoSendToken?.receiver_id ?? userId, infoSendToken?.amount ?? token);
 		} catch (err) {
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}

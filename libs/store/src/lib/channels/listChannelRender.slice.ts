@@ -48,8 +48,7 @@ export const listChannelRenderSlice = createSlice({
 							listFavorChannel.push({
 								...channel,
 								isFavor: true,
-								category_id: 'favorCate',
-								channel_id: `favor-${channel.id}`
+								category_id: 'favorCate'
 							});
 						}
 						listChannelRender.push(channel);
@@ -142,7 +141,7 @@ export const listChannelRenderSlice = createSlice({
 			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
 			if (isExistChannel === -1 && clanId) {
 				const indexInsert = state.listChannelRender[clanId]?.findIndex(
-					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id
+					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id && !(channel as IChannel).isFavor
 				);
 
 				if (indexInsert === -1) {
@@ -160,7 +159,7 @@ export const listChannelRenderSlice = createSlice({
 			if (!state.listChannelRender[clanId]) {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
 			if (updateIndex === -1) {
 				return;
 			}
@@ -172,7 +171,7 @@ export const listChannelRenderSlice = createSlice({
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
 				if (indexUpdate === -1) {
 					return;
 				}
@@ -182,17 +181,17 @@ export const listChannelRenderSlice = createSlice({
 				};
 			}
 		},
-    leaveChannelListRender : (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
 				const indexRemove = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
 				if (indexRemove === -1) {
 					return;
 				}
-        state.listChannelRender[clanId]?.splice(indexRemove, 1);
+				state.listChannelRender[clanId]?.splice(indexRemove, 1);
 				state.listChannelRender[clanId].join();
 			}
-		},
+		}
 	}
 });
 

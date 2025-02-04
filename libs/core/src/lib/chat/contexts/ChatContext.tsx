@@ -124,7 +124,7 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useStore } from 'react-redux';
@@ -502,6 +502,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		},
 		[currentChannel?.channel_id, dispatch]
+	);
+
+	const oneventnotiuserchannel = useCallback(
+		(notiUserChannel: ApiNotificationUserChannel) => {
+			dispatch(notificationSettingActions.upsertNotiSetting(notiUserChannel));
+		},
+		[dispatch]
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
@@ -1331,6 +1338,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpinmessage = onpinmessage;
 
+			socket.oneventnotiuserchannel = oneventnotiuserchannel;
+
 			socket.onlastseenupdated = onlastseenupdated;
 
 			socket.onuserchannelremoved = onuserchannelremoved;
@@ -1407,6 +1416,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			oneventnotiuserchannel,
 			onlastseenupdated,
 			onuserchannelremoved,
 			onuserclanremoved,
@@ -1492,6 +1502,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oneventnotiuserchannel = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onlastseenupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncustomstatus = () => {};
@@ -1540,6 +1552,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		oneventnotiuserchannel,
 		onlastseenupdated,
 		onuserchannelremoved,
 		onuserclanremoved,
