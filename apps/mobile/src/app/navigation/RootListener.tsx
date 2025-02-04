@@ -14,6 +14,7 @@ import {
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
 	settingClanStickerActions,
@@ -41,7 +42,6 @@ import notifee from '@notifee/react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
-import useTabletLandscape from '../hooks/useTabletLandscape';
 import { handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
 
 const RootListener = () => {
@@ -49,21 +49,26 @@ const RootListener = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
-	const isTabletLandscape = useTabletLandscape();
 	const { handleReconnect } = useContext(ChatContext);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
+	const hasInternet = useSelector(selectHasInternetMobile);
 
 	useEffect(() => {
 		if (Platform.OS === 'ios') {
 			setupCallKeep();
 		}
-		setupNotificationListeners(navigation, isTabletLandscape);
-	}, [navigation, isTabletLandscape]);
+		setupNotificationListeners(navigation);
+	}, [navigation]);
+
+	useEffect(() => {
+		if (isLoggedIn && hasInternet) {
+			authLoader();
+		}
+	}, [isLoggedIn, hasInternet]);
 
 	useEffect(() => {
 		if (isLoggedIn) {
-			authLoader();
 			requestIdleCallback(() => {
 				setTimeout(() => {
 					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
@@ -72,7 +77,7 @@ const RootListener = () => {
 				}, 100);
 			});
 		}
-	}, [isLoggedIn]);
+	}, [hasInternet]);
 
 	// const refreshMessageInitApp = useCallback(async () => {
 	// 	dispatch(appActions.setLoadingMainMobile(false));

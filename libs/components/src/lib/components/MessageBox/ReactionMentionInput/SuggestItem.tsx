@@ -157,8 +157,10 @@ const SuggestItem = ({
 						>
 							{isHightLight ? HighlightMatchBold(display ?? '', valueHightLight ?? '') : display}
 						</span>
-						{count && count > 0 && (
-							<span className="h-8 px-2 bg-red-500 rounded-sm font-semibold text-white ml-2">{count > 99 ? '99+' : count}</span>
+						{Number(count) > 0 && (
+							<span className="h-8 px-2 bg-red-500 rounded-sm font-semibold text-white ml-2">
+								{Number(count) > 99 ? '99+' : Number(count)}
+							</span>
 						)}{' '}
 					</span>
 				)}
