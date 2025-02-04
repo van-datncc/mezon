@@ -532,6 +532,36 @@ export const addThreadToChannels = createAsyncThunk(
 	}
 );
 
+export const addThreadSocket = createAsyncThunk(
+	'channels/addThreadSocket',
+	async ({ clanId, channelId, channel }: { clanId: string; channelId: string; channel: any }, thunkAPI) => {
+		const channelData = selectChannelById2(getChannelsRootState(thunkAPI), channelId);
+		if (channelId && !channelData) {
+			if (channel) {
+				thunkAPI.dispatch(
+					channelsActions.upsertOne({
+						clanId: clanId,
+						channel: { ...channel, active: 1 } as ChannelsEntity
+					})
+				);
+				thunkAPI.dispatch(
+					listChannelRenderAction.addThreadToListRender({
+						clanId: clanId,
+						channel: { ...channel, active: 1 } as ChannelsEntity
+					})
+				);
+			}
+		} else {
+			thunkAPI.dispatch(
+				listChannelRenderAction.addThreadToListRender({
+					clanId: clanId,
+					channel: channelData
+				})
+			);
+		}
+	}
+);
+
 export const fetchChannels = createAsyncThunk(
 	'channels/fetchChannels',
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_CHANNEL, noCache }: fetchChannelsArgs, thunkAPI) => {
@@ -691,9 +721,6 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 		}
 		const entity = channelState.entities.entities[channelId];
 		if (!entity) {
-			if (clanId !== '0') {
-				await thunkAPI.dispatch(channelsActions.addThreadToChannels({ clanId, channelId }));
-			}
 			const state = thunkAPI.getState() as RootState;
 			const updatedEntity = state.channels.byClans[clanId].entities.entities[channelId];
 			const newCountMessUnread = isReset ? 0 : (updatedEntity?.count_mess_unread ?? 0) + count;
@@ -1205,6 +1232,7 @@ export const channelsActions = {
 	addFavoriteChannel,
 	removeFavoriteChannel,
 	addThreadToChannels,
+	addThreadSocket,
 	updateChannelBadgeCountAsync
 };
 

@@ -134,9 +134,16 @@ export const listChannelRenderSlice = createSlice({
 				...(channel as IChannel),
 				id: channel.id
 			};
-			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.id);
-			if (isExistChannel === -1 && clanId && state.listChannelRender[clanId]) {
-				const indexInsert = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.parrent_id);
+
+			if (!state.listChannelRender[clanId]) {
+				return;
+			}
+
+			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
+			if (isExistChannel === -1 && clanId) {
+				const indexInsert = state.listChannelRender[clanId]?.findIndex(
+					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id
+				);
 
 				if (indexInsert === -1) {
 					return;
@@ -148,6 +155,9 @@ export const listChannelRenderSlice = createSlice({
 		addBadgeToChannelRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (clanId === '0') {
+				return;
+			}
+			if (!state.listChannelRender[clanId]) {
 				return;
 			}
 			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
@@ -162,7 +172,7 @@ export const listChannelRenderSlice = createSlice({
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
 				if (indexUpdate === -1) {
 					return;
 				}
@@ -195,28 +205,21 @@ export const selectListChannelRenderByClanId = createSelector(
 );
 
 function sortChannels(channels: IChannel[]): IChannel[] {
-	const channelMap = new Map<string, IChannel>();
 	const sortedChannels: IChannel[] = [];
 
-	// Create a map of channels by their id
-	channels.forEach((channel) => {
-		channelMap.set(channel.id, channel);
-	});
-
-	// Use forEach to sort channels
+	// Add channel into list first
 	channels.forEach((channel) => {
 		if (!channel.parrent_id || channel.parrent_id === '0') {
 			sortedChannels.push(channel);
 			addChildren(channel, sortedChannels);
 		}
 	});
-
+	// Then add threads of a channel into list
 	function addChildren(parent: IChannel, acc: IChannel[]) {
 		channels
 			.filter((child) => child.parrent_id === parent.id)
 			.forEach((child) => {
 				acc.push(child);
-				addChildren(child, acc);
 			});
 	}
 
