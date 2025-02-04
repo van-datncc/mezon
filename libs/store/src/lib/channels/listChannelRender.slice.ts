@@ -150,7 +150,7 @@ export const listChannelRenderSlice = createSlice({
 			if (clanId === '0') {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			const updateIndex = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
 			if (updateIndex === -1) {
 				return;
 			}
@@ -162,7 +162,7 @@ export const listChannelRenderSlice = createSlice({
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
 				if (indexUpdate === -1) {
 					return;
 				}
