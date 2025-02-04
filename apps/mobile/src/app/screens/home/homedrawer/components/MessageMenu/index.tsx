@@ -13,7 +13,7 @@ import {
 	removeMemberChannel,
 	selectCurrentClan,
 	selectCurrentUserId,
-	selectSelectedChannelNotificationSetting,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
@@ -47,7 +47,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: messageInfo?.channel_id }));
 	}, []);
 
-	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(messageInfo?.channel_id));
 
 	const isDmUnmute = useMemo(() => {
 		return (

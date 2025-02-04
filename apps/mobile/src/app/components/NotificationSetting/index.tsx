@@ -4,11 +4,11 @@ import {
 	notifiReactMessageActions,
 	notificationSettingActions,
 	selectCurrentChannelId,
-	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiReactMessage,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ENotificationTypes } from '@mezon/utils';
@@ -57,7 +57,7 @@ export default function NotificationSetting({ channel }: { channel?: ChannelThre
 	const [isChecked, setIsChecked] = useState<boolean>(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const notifyReactMessage = useSelector(selectNotifiReactMessage);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannelId));
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [defaultNotifyName, setDefaultNotifyName] = useState('');

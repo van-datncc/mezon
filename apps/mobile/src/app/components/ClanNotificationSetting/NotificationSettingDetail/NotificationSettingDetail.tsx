@@ -3,7 +3,7 @@ import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	defaultNotificationCategoryActions,
 	notificationSettingActions,
-	selectCurrentChannelNotificatonSelected,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -17,6 +17,7 @@ import { style } from './NotificationSettingDetail.styles';
 
 const NotificationSettingDetail = ({ route }: { route: any }) => {
 	const { notifyChannelCategorySetting } = route.params || {};
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { t } = useTranslation(['clanNotificationsSetting']);
 	const [selectedOption, setSelectedOption] = useState(null);
@@ -30,7 +31,7 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: notifyChannelCategorySetting?.id || '' }));
 	}, []);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannelId));
 
 	const isUnmute = useMemo(() => {
 		return (
