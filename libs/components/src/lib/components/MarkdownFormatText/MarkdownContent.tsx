@@ -108,7 +108,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'break-spaces' }}
 			>
-				{contentBacktick?.trim()}
+				{contentBacktick}
 			</code>
 		</span>
 	);
@@ -128,12 +128,12 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 	return (
 		<div className={`relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
 			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
-				<CopyToClipboard text={`${contentBacktick?.trim()}`} onCopy={() => setCopied(true)}>
+				<CopyToClipboard text={`${contentBacktick}`} onCopy={() => setCopied(true)}>
 					<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 					</button>
 				</CopyToClipboard>
-				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick?.trim()}</code>
+				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
 			</pre>
 		</div>
 	);
