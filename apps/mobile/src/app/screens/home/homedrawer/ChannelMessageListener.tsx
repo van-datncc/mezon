@@ -3,6 +3,7 @@ import { ActionEmitEvent, changeClan, getUpdateOrAddClanChannelCache, save, STOR
 import {
 	channelsActions,
 	ChannelsEntity,
+	directActions,
 	getStoreAsync,
 	selectAllRolesClan,
 	selectAllUserClans,
@@ -90,6 +91,7 @@ const ChannelMessageListener = React.memo(() => {
 						}
 					} else {
 						if (currentDirectId) {
+							dispatch(directActions.setDmGroupCurrentId(''));
 							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 						}
 					}
