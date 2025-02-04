@@ -525,7 +525,7 @@ export const addThreadToChannels = createAsyncThunk(
 			thunkAPI.dispatch(
 				listChannelRenderAction.addThreadToListRender({
 					clanId: clanId,
-					channel: channelData
+					channel: {...channelData, active : 1}
 				})
 			);
 		}
@@ -555,7 +555,7 @@ export const addThreadSocket = createAsyncThunk(
 			thunkAPI.dispatch(
 				listChannelRenderAction.addThreadToListRender({
 					clanId: clanId,
-					channel: channelData
+					channel: {...channelData, active : 1}
 				})
 			);
 		}
@@ -614,10 +614,12 @@ export const fetchChannels = createAsyncThunk(
 				};
 			}
 
+      console.log('response.channeldesc: ', response.channeldesc);
 			const channels = response.channeldesc.map((channel) => ({
 				...mapChannelToEntity(channel),
 				last_seen_message: channel.last_seen_message ? channel.last_seen_message : { timestamp_seconds: 0 }
 			}));
+      console.log('channels: ', channels);
 
 			const [favorChannels, listCategory] = await Promise.all([
 				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId })),
