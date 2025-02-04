@@ -3,6 +3,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import { categoriesActions, selectCategoryExpandStateByCategoryId, useAppDispatch } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { memo, useCallback } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
 import { ChannelsPositionRef } from '../../../ChannelList';
@@ -79,8 +80,14 @@ const ChannelListSection = memo(({ data, channelsPositionRef }: IChannelListSect
 
 			{(data?.channels as IChannel[])?.map((item: IChannel, index: number) => {
 				return (
-					<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
-						<ChannelListItem data={item} key={`${item.id}_channel_item` + index} />
+					<View key={`${item.id}_channel_item` + index} onLayout={(event) => handlePositionChannel(item, event)}>
+						<ChannelListItem
+							data={item}
+							isFirstThread={
+								item?.type === ChannelType.CHANNEL_TYPE_THREAD &&
+								(data?.channels?.[index - 1] as IChannel)?.type !== ChannelType.CHANNEL_TYPE_THREAD
+							}
+						/>
 					</View>
 				);
 			})}
