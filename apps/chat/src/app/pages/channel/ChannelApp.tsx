@@ -11,21 +11,60 @@ export function ChannelApps({
 	miniAppRef: RefObject<HTMLIFrameElement>;
 	miniAppDataHash: string;
 }) {
-	// const { setClanId, setChannelId, startLocalStream } = useWebRTC();
+	// const handleJoinRoom = async () => {
+	// 	if (!roomName) return;
+	// 	setLoading(true);
 
-	// useEffect(() => {
-	// 	if (appChannel) {
-	// 		setClanId(appChannel.clan_id || '');
-	// 		setChannelId(appChannel.channel_id || '');
+	// 	try {
+	// 		const result = await dispatch(
+	// 			fetchJoinMezonMeet({
+	// 				channelId: channel.channel_id || '',
+	// 				roomName: roomName
+	// 			})
+	// 		).unwrap();
 
-	// 		startLocalStream().catch((err) => {
-	// 			console.error('Failed to start local WebRTC stream:', err);
-	// 		});
+	// 		if (result) {
+	// 			setToken(result);
+	// 		} else {
+	// 			setToken(null);
+	// 		}
+	// 	} catch (err) {
+	// 		console.error('Failed to join room:', err);
+	// 		setToken(null);
+	// 	} finally {
+	// 		setLoading(false);
 	// 	}
-	// }, [appChannel, setClanId, setChannelId, startLocalStream]);
+	// };
+
+	// const handleLeaveRoom = async () => {
+	// 	setToken(null);
+	// };
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 
 	return appChannel?.url ? (
-		<iframe ref={miniAppRef} title={appChannel?.url} src={`${appChannel?.url}#${miniAppDataHash}`} className="w-full h-full"></iframe>
+		<>
+			<iframe ref={miniAppRef} title={appChannel?.url} src={`${appChannel?.url}#${miniAppDataHash}`} className="w-full h-full"></iframe>
+
+			{/* <LiveKitRoom
+				video={false}
+				audio={true}
+				token={token}
+				serverUrl={serverUrl}
+				data-lk-theme="default"
+				style={{ height: 'calc(100vh - 117px)' }}
+			>
+				<RoomAudioRenderer />
+	
+				<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !p-[5px] !border-none">
+					<TrackToggle source={Track.Source.Microphone} />
+					<TrackToggle source={Track.Source.Camera} />
+					<TrackToggle source={Track.Source.ScreenShare} />
+					<DisconnectButton onClick={handleLeaveRoom} className="!p-[4px]">
+						Leave
+					</DisconnectButton>
+				</div>
+			</LiveKitRoom> */}
+		</>
 	) : (
 		<div className="w-full h-full flex items-center justify-center">
 			<Loading />

@@ -43,8 +43,10 @@ import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import FileModal from './TopBarComponents/FilesModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
+import { MicButton } from './TopBarComponents/SFUButton/MicIcon';
+import { StartCallButton } from './TopBarComponents/SFUButton/StartCallButton';
+import { VideoButoon } from './TopBarComponents/SFUButton/VideoButton';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
-
 export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
 	isChannelVoice?: boolean;
@@ -54,6 +56,7 @@ export type ChannelTopbarProps = {
 
 const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
+	const isChannelApps = channel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -67,7 +70,9 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			{shouldRender &&
-				(isChannelVoice ? (
+				(isChannelApps ? (
+					<TopBarChannelApps channel={channel} />
+				) : isChannelVoice ? (
 					<TopBarChannelVoice channel={channel} />
 				) : (
 					<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
@@ -98,6 +103,36 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 					</div>
 				</div>
 			</div>
+		</>
+	);
+});
+
+const TopBarChannelApps = memo(({ channel, mode }: ChannelTopbarProps) => {
+	const appearanceTheme = useSelector(selectTheme);
+	// const enableVoiceChat = useSelector(selectEnableVoiceChannelApps);
+	const enableVoiceChat = true;
+	return (
+		<>
+			<div className="justify-start items-center gap-1 flex">
+				<ChannelLabel channel={channel} />
+			</div>
+			{enableVoiceChat && (
+				<div className="items-center h-full ml-auto flex">
+					<div className="justify-end items-center gap-2 flex">
+						<div className="hidden sbm:flex">
+							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								<StartCallButton isTalking={true} />
+								<MicButton isTalking={true} />
+								<VideoButoon isEnable={false} />
+							</div>
+						</div>
+
+						<div className="sbm:hidden mr-5">
+							<ChannelListButton />
+						</div>
+					</div>
+				</div>
+			)}
 		</>
 	);
 });
