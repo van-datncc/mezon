@@ -85,7 +85,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	};
 	return (
 		<>
-			<div className="relative">
+			<div className="max-md:relative">
 				<Dropdown
 					label=""
 					trigger="click"
