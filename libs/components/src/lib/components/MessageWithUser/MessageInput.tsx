@@ -9,12 +9,14 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import {
+	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
 	MentionDataProps,
 	ThemeApp,
 	addMarkdownPrefix,
 	addMention,
+	adjustTokenPositions,
 	createFormattedString,
 	filterEmptyArrays,
 	generateNewPlaintext,
@@ -24,7 +26,6 @@ import {
 	updateMarkdownPositions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useModal } from 'react-modal-hook';
@@ -102,6 +103,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	// update prefix if type: c/pre/boldtext
+	const markdownHasPrefix = getMarkdownPrefixItems(channelDraftMessage.draftContent.mk ?? []);
+	const plaintextOriginal = channelDraftMessage.draftContent.t;
 	const updatePrefixDraftMesssage = useMemo(() => {
 		const originalDraftContent = {
 			hg: channelDraftMessage?.draftContent?.hg,
@@ -113,46 +116,57 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			cid: channelDraftMessage?.draftContent?.cid
 		};
 		// to get markdown will be add prefix include: code/pre/boldtext
-		const markdownHasPrefix = getMarkdownPrefixItems(channelDraftMessage.draftContent.mk ?? []);
 		// if markdown do not exist no need update
 		if (!markdownHasPrefix || markdownHasPrefix.length === 0) {
 			return {
-				...originalDraftContent,
-				t: channelDraftMessage.draftContent.t
+				updatedDraftContent: {
+					...originalDraftContent,
+					t: plaintextOriginal
+				},
+				mentionNewPos: channelDraftMessage.draftMention
 			};
 		} else {
-			const plaintextOriginal = channelDraftMessage.draftContent.t;
 			// to add `/``` or ** to token markdown
 			const addPrefix = addMarkdownPrefix(markdownHasPrefix, plaintextOriginal ?? '');
 			// to calculator new position of token markdown after added frefix
 			const updatedNewPos = updateMarkdownPositions(addPrefix ?? []);
 			// get the new plaintext with token added prefix
 			const newPlaintext = generateNewPlaintext(updatedNewPos, plaintextOriginal ?? '');
+			// update pos mention
+			const mentionNewPos = adjustTokenPositions(channelDraftMessage.draftMention ?? [], updatedNewPos, true);
+			const hashtagNewPos = adjustTokenPositions(originalDraftContent.hg ?? [] ?? [], updatedNewPos, true);
+			const emojiNewPos = adjustTokenPositions(originalDraftContent.ej ?? [] ?? [], updatedNewPos, true);
+
 			return {
-				...originalDraftContent,
-				t: newPlaintext
+				updatedDraftContent: {
+					...originalDraftContent,
+					t: newPlaintext,
+					hg: hashtagNewPos,
+					ej: emojiNewPos
+				},
+				mentionNewPos: mentionNewPos
 			};
 		}
 	}, [channelDraftMessage.draftContent.t]);
 
-	const processedContentDraft: IMessageSendPayload = useMemo(() => {
+	const { updatedDraftContent, mentionNewPos } = updatePrefixDraftMesssage;
+
+	const processedContentDraft = useMemo(() => {
 		return {
-			t: updatePrefixDraftMesssage?.t,
-			hg: updatePrefixDraftMesssage?.hg,
-			ej: updatePrefixDraftMesssage?.ej,
-			lk: updatePrefixDraftMesssage?.lk,
-			mk: updatePrefixDraftMesssage?.mk,
-			vk: updatePrefixDraftMesssage?.vk,
-			tp: updatePrefixDraftMesssage?.tp,
-			cid: updatePrefixDraftMesssage?.cid
+			t: updatedDraftContent?.t,
+			hg: updatedDraftContent?.hg,
+			ej: updatedDraftContent?.ej,
+			lk: updatedDraftContent?.lk,
+			mk: updatedDraftContent?.mk,
+			vk: updatedDraftContent?.vk,
+			tp: updatedDraftContent?.tp,
+			cid: updatedDraftContent?.cid
 		};
 	}, [channelDraftMessage?.draftTopicId, channelDraftMessage?.draftContent, updatePrefixDraftMesssage]);
 
-	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
-
 	const addMentionToContent = useMemo(
-		() => addMention(processedContentDraft, processedMentionDraft),
-		[processedContentDraft, processedMentionDraft]
+		() => addMention(processedContentDraft as IMessageSendPayload, mentionNewPos as IMentionOnMessage[]),
+		[processedContentDraft, mentionNewPos]
 	);
 
 	const attachmentOnMessage = useMemo(() => {
@@ -182,13 +196,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			e.stopPropagation();
 			textareaRef.current?.blur();
 
-			if (draftContent === '') {
+			if (draftContent?.trim() === '') {
 				showModal();
 			} else if (draftContent === originalContent) {
 				handleCancelEdit();
 			} else {
-				const processedContentDraftUpdated = prepareProcessedContent(processedContentDraft);
-				handleSend(filterEmptyArrays(processedContentDraftUpdated), message.id, processedMentionDraft, message?.content?.tp || '');
+				const { updatedProcessedContent, adjustedMentionsPos } = prepareProcessedContent(
+					processedContentDraft as IMessageSendPayload,
+					mentionNewPos as IMentionOnMessage[]
+				);
+				handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
 				handleCancelEdit();
 			}
 		}
@@ -206,8 +223,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			const processedContentDraftUpdated = prepareProcessedContent(processedContentDraft);
-			handleSend(filterEmptyArrays(processedContentDraftUpdated), message.id, processedMentionDraft, message?.content?.tp || '');
+			const { updatedProcessedContent, adjustedMentionsPos } = prepareProcessedContent(
+				processedContentDraft as IMessageSendPayload,
+				mentionNewPos as IMentionOnMessage[]
+			);
+			handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
 		}
 		handleCancelEdit();
 	};
@@ -267,6 +287,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			membersOfChild as ChannelMembersEntity[],
 			membersOfParent as ChannelMembersEntity[]
 		);
+
 		setChannelDraftMessage(
 			channelId,
 			messageId,

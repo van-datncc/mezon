@@ -130,16 +130,29 @@ export const processText = (inputString: string) => {
 	return { links, voiceRooms, markdowns };
 };
 ///////////////////////////////
-export const prepareProcessedContent = (processedContentDraft: IMessageSendPayload) => {
+export const prepareProcessedContent = (processedContentDraft: IMessageSendPayload, mentions: IMentionOnMessage[]) => {
 	const { text, entities } = parseHtmlAsFormattedText(processedContentDraft.t ?? '');
 	const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
-	return {
+	const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(
+		mk,
+		mentions,
+		processedContentDraft.hg ?? [],
+		processedContentDraft.ej ?? [],
+		text
+	);
+
+	const updatedProcessedContent = {
 		...processedContentDraft,
 		t: text,
+		hg: adjustedHashtagPos,
+		ej: adjustedEmojiPos,
 		mk
 	};
+
+	return { updatedProcessedContent, adjustedMentionsPos };
 };
+
 // to get markdown will be add prefix include: code/pre/boldtext
 export const getMarkdownPrefixItems = (draftContent: IMarkdownOnMessage[]) => {
 	return (
@@ -210,21 +223,21 @@ export const generateNewPlaintext = (updatedItems: INewPosMarkdown[], plaintext:
 	return newPlaintext;
 };
 // reduce position of token when remove the prefix
-export const adjustTokenPositions = (tokens: IMentionOnMessage[] | IHashtagOnMessage[] | IEmojiOnMessage[], markers: INewPosMarkdown[]) => {
-	//filter to get tokens outside markdown
-	const filteredTokens = tokens.filter(
-		(token) => !markers.some((marker) => (token.s ?? 0) >= (marker.ns ?? 0) && (token.e ?? 0) <= (marker.ne ?? 0))
-	);
-
+export const adjustTokenPositions = (
+	filteredTokens: (IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage)[],
+	markers: INewPosMarkdown[],
+	isCrease = false // Mặc định là false
+) => {
 	const combined = [...filteredTokens, ...markers].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+
 	let lastAccumulated = 0;
-	return combined.map((item) => {
+	const adjustedTokens = combined.map((item) => {
 		if ('markerNumber' in item) {
 			lastAccumulated = item.accumulatedMarkerTotal ?? lastAccumulated;
 			return item;
 		} else {
-			const adjustedS = (item.s ?? 0) - lastAccumulated;
-			const adjustedE = (item.e ?? 0) - lastAccumulated;
+			const adjustedS = isCrease ? (item.s ?? 0) + lastAccumulated : (item.s ?? 0) - lastAccumulated;
+			const adjustedE = isCrease ? (item.e ?? 0) + lastAccumulated : (item.e ?? 0) - lastAccumulated;
 
 			return {
 				...item,
@@ -233,4 +246,48 @@ export const adjustTokenPositions = (tokens: IMentionOnMessage[] | IHashtagOnMes
 			};
 		}
 	});
+
+	return adjustedTokens.filter((item) => !('markerNumber' in item));
+};
+
+// only accept token outside markdown
+export const filterTokensOutsideMarkdown = (tokens: IMentionOnMessage[] | IHashtagOnMessage[] | IEmojiOnMessage[], markers: INewPosMarkdown[]) => {
+	return tokens?.filter((token) => !markers.some((marker) => (token.s ?? 0) > (marker.ns ?? 0) && (token.e ?? 0) < (marker.ne ?? 0)));
+};
+//
+export const adjustPos = (
+	mk: INewPosMarkdown[],
+	mentionList: IMentionOnMessage[],
+	hashtagList: IHashtagOnMessage[],
+	emojiList: IEmojiOnMessage[],
+	text: string
+) => {
+	const markdownHasPrefix = getMarkdownPrefixItems(mk ?? []); // get markdown has prefix as: pre/code/bold
+	// add validate
+	const shouldBeAdjustMentionPos = markdownHasPrefix?.length > 0 && mentionList?.length > 0;
+	const shouldBeAdjustHashtagPos = markdownHasPrefix?.length > 0 && hashtagList?.length > 0;
+	const shouldBeAdjustEmojiPos = markdownHasPrefix?.length > 0 && emojiList?.length > 0;
+	const shouldBeAdjustToken = shouldBeAdjustMentionPos || shouldBeAdjustHashtagPos || shouldBeAdjustEmojiPos;
+	// add numberMarkder. Ex: pre:3; code: 2: bold:4
+	const addedNumberMarker = shouldBeAdjustToken ? addMarkdownPrefix(markdownHasPrefix, text) : [];
+	// calculate totalAaccumulateNumber:
+	// example: `1` ```2``` **3**
+	// accumulateNumber `1` is: 2;
+	// accumulateNumber ```2``` is: 8;
+	// accumulateNumber **3** is: 12;
+	const accumulateNumber = shouldBeAdjustToken ? updateMarkdownPositions(addedNumberMarker) : [];
+	// only accept token outside
+	const outsidePrefixMention = filterTokensOutsideMarkdown(mentionList, accumulateNumber);
+	const outsidePrefixHashtag = filterTokensOutsideMarkdown(hashtagList, accumulateNumber);
+	const outsidePrefixEmoji = filterTokensOutsideMarkdown(emojiList, accumulateNumber);
+	// result updated
+	const adjustedMentionsPos = shouldBeAdjustMentionPos ? adjustTokenPositions(outsidePrefixMention ?? [], accumulateNumber) : outsidePrefixMention;
+	const adjustedHashtagPos = shouldBeAdjustHashtagPos ? adjustTokenPositions(outsidePrefixHashtag ?? [], accumulateNumber) : outsidePrefixHashtag;
+	const adjustedEmojiPos = shouldBeAdjustEmojiPos ? adjustTokenPositions(outsidePrefixEmoji ?? [], accumulateNumber) : outsidePrefixEmoji;
+
+	return {
+		adjustedMentionsPos,
+		adjustedHashtagPos,
+		adjustedEmojiPos
+	};
 };

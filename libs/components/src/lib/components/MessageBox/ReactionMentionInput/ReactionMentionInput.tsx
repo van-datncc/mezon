@@ -70,9 +70,8 @@ import {
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadStatus,
-	addMarkdownPrefix,
 	addMention,
-	adjustTokenPositions,
+	adjustPos,
 	blankReferenceObj,
 	checkIsThread,
 	convertMentionOnfile,
@@ -82,15 +81,13 @@ import {
 	formatMentionsToString,
 	generateMentionItems,
 	getDisplayMention,
-	getMarkdownPrefixItems,
 	insertStringAt,
 	parseHtmlAsFormattedText,
 	parsePastedMentionData,
 	processMarkdownEntities,
 	searchMentionsHashtag,
 	threadError,
-	transformTextWithMentions,
-	updateMarkdownPositions
+	transformTextWithMentions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -314,22 +311,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		(anonymousMessage?: boolean) => {
 			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
-
-			//due to remove prefix ```/`/** so need adjust position of hashtag/emoji/mention
-			const markdownHasPrefix = getMarkdownPrefixItems(mk ?? []); // get mk has prefix: code/pre/bold
-			const shouldBeAdjustMentionPos = markdownHasPrefix.length > 0 && mentionList.length > 0;
-			const shouldBeAdjustHashtagPos = markdownHasPrefix.length > 0 && hashtagList.length > 0;
-			const shouldBeAdjustEmojiPos = markdownHasPrefix.length > 0 && emojiList.length > 0;
-			const shouldBeAdjustToken = shouldBeAdjustMentionPos || shouldBeAdjustHashtagPos || shouldBeAdjustEmojiPos;
-			// add number prefix to calculator
-			const addedNumberMarker = shouldBeAdjustToken ? addMarkdownPrefix(markdownHasPrefix, text) : [];
-			// add accumulateNumber prefix
-			const accumulateNumber = shouldBeAdjustToken ? updateMarkdownPositions(addedNumberMarker) : [];
-
-			const adjustedMentionsPos = shouldBeAdjustMentionPos ? adjustTokenPositions(mentionList ?? [], accumulateNumber) : mentionList;
-			const adjustedHashtagPos = shouldBeAdjustHashtagPos ? adjustTokenPositions(hashtagList ?? [], accumulateNumber) : hashtagList;
-			const adjustedEmojiPos = shouldBeAdjustEmojiPos ? adjustTokenPositions(emojiList ?? [], accumulateNumber) : emojiList;
-
+			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
 				t: text,
 				hg: adjustedHashtagPos as IHashtagOnMessage[],
