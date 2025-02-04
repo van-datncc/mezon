@@ -1,83 +1,48 @@
 import {
+	CarouselLayout,
+	Chat,
+	ChatIcon,
+	ChatToggle,
+	ConnectionStateToast,
+	ControlBarControls,
 	DisconnectButton,
+	FocusLayout,
+	FocusLayoutContainer,
 	GridLayout,
+	isTrackReference,
+	LayoutContextProvider,
+	LeaveIcon,
 	LiveKitRoom,
 	MediaDeviceMenu,
-	ParticipantPlaceholder,
 	ParticipantTile,
 	RoomAudioRenderer,
+	StartMediaButton,
 	TrackToggle,
-	usePreviewTracks,
-	useTracks
+	useCreateLayoutContext,
+	useLocalParticipantPermissions,
+	useMaybeLayoutContext,
+	usePersistentUserChoices,
+	usePinnedTracks,
+	useTracks,
+	WidgetState
 } from '@livekit/components-react';
 
 import '@livekit/components-styles';
-import { fetchJoinMezonMeet, useAppDispatch } from '@mezon/store';
+import { ChannelsEntity, fetchJoinMezonMeet, useAppDispatch } from '@mezon/store';
 
-import { facingModeFromLocalTrack, LocalAudioTrack, LocalVideoTrack, Track, TrackProcessor } from 'livekit-client';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ChannelVoiceProps {
-	channel: ApiChannelAppResponse;
+	channel: ChannelsEntity;
 	roomName: string;
-	videoProcessor?: TrackProcessor<Track.Kind.Video>;
 }
 
-const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoProcessor }) => {
+const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const [token, setToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
-
-	const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
-	const [videoEnabled, setVideoEnabled] = useState<boolean>(true);
-	const [audioDeviceId, setAudioDeviceId] = useState<string | null>(null);
-	const [videoDeviceId, setVideoDeviceId] = useState<string | null>(null);
-
-	useEffect(() => {
-		const loadDevices = async () => {
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			const audioInput = devices.find((device) => device.kind === 'audioinput');
-			const videoInput = devices.find((device) => device.kind === 'videoinput');
-
-			if (audioInput) setAudioDeviceId(audioInput.deviceId);
-			if (videoInput) setVideoDeviceId(videoInput.deviceId);
-		};
-
-		loadDevices();
-	}, []);
-
-	const tracks = usePreviewTracks({
-		audio: audioEnabled && audioDeviceId ? { deviceId: audioDeviceId } : false,
-		video: videoEnabled && videoDeviceId ? { deviceId: videoDeviceId, processor: videoProcessor } : false
-	});
-
-	const videoEl = useRef(null);
-
-	const videoTrack = useMemo(() => tracks?.filter((track) => track.kind === Track.Kind.Video)[0] as LocalVideoTrack, [tracks]);
-
-	const facingMode = useMemo(() => {
-		if (videoTrack) {
-			const { facingMode } = facingModeFromLocalTrack(videoTrack);
-			return facingMode;
-		} else {
-			return 'undefined';
-		}
-	}, [videoTrack]);
-
-	const audioTrack = useMemo(() => tracks?.filter((track) => track.kind === Track.Kind.Audio)[0] as LocalAudioTrack, [tracks]);
-
-	useEffect(() => {
-		if (videoEl.current && videoTrack) {
-			videoTrack.unmute();
-			videoTrack.attach(videoEl.current);
-		}
-
-		return () => {
-			videoTrack?.detach();
-		};
-	}, [videoTrack, videoEnabled, token]);
 
 	const handleJoinRoom = async () => {
 		if (!roomName) return;
@@ -104,128 +69,37 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoPro
 		}
 	};
 
-	const toggleAudio = async () => {
-		setAudioEnabled(!audioEnabled);
-	};
-
-	const toggleVideo = async () => {
-		setVideoEnabled(!videoEnabled);
-	};
-
 	const handleLeaveRoom = async () => {
 		setToken(null);
-		setAudioEnabled(true);
-		setVideoEnabled(true);
 	};
 
 	return (
 		<>
 			{!token || !serverUrl ? (
-				<div className="w-full h-full flex flex-col" data-lk-theme="default">
-					<div className="flex justify-center items-center" style={{ height: `calc(100vh - 116px)` }}>
-						{videoTrack && videoEnabled && (
-							<video
-								ref={videoEl}
-								width="1280"
-								height="720"
-								data-lk-facing-mode={facingMode}
-								style={{
-									transform: facingMode === 'user' ? 'rotateY(180deg)' : 'rotateY(0deg)'
-								}}
-							/>
-						)}
-						{(!videoTrack || !videoEnabled) && (
-							<div className="w-[1280px] h-[720px] flex flex-row justify-center items-center border-bgLightSecondary">
-								<ParticipantPlaceholder />
-							</div>
-						)}
-					</div>
-					<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !p-[6px] !border-none">
-						<div className="lk-button-group audio">
-							<TrackToggle initialState={audioEnabled} source={Track.Source.Microphone} onClick={toggleAudio}>
-								Microphone
-							</TrackToggle>
-							<div className="lk-button-group-menu">
-								<MediaDeviceMenu
-									initialSelection={audioDeviceId || 'default'}
-									kind="audioinput"
-									disabled={!audioTrack}
-									tracks={{ audioinput: audioTrack }}
-									onActiveDeviceChange={(_, id) => setAudioDeviceId(id)}
-								/>
-							</div>
+				<div className="w-full h-full bg-black flex justify-center items-center">
+					<div className="flex flex-col justify-center items-center gap-4 w-full">
+						{/* <div className="w-full flex gap-2 justify-center p-2">
+							{memberJoin.length > 0 && <UserListVoiceChannel memberJoin={memberJoin} memberMax={3}></UserListVoiceChannel>}
+						</div> */}
+						<div className="max-w-[350px] text-center text-3xl font-bold">
+							{channel?.channel_label && channel.channel_label.length > 20
+								? `${channel.channel_label.substring(0, 20)}...`
+								: channel?.channel_label}
 						</div>
-						<div className="lk-button-group video">
-							<TrackToggle initialState={videoEnabled} source={Track.Source.Camera} onClick={toggleVideo}>
-								Camera
-							</TrackToggle>
-							<div className="lk-button-group-menu">
-								<MediaDeviceMenu
-									initialSelection={videoDeviceId || 'default'}
-									kind="videoinput"
-									disabled={!videoTrack}
-									tracks={{ videoinput: videoTrack }}
-									onActiveDeviceChange={(_, id) => setVideoDeviceId(id)}
-								/>
-							</div>
-						</div>
+						No one is currently in voice
+						{/* {memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>} */}
 						<button
 							disabled={!roomName}
-							className={`bg-green-700 rounded-xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
+							className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
 							onClick={handleJoinRoom}
-							aria-label="Join Room"
 						>
-							{loading ? 'Joining...' : 'Join Room'}
+							{loading ? 'Joining...' : 'Join Voice'}
 						</button>
 					</div>
 				</div>
 			) : (
-				<LiveKitRoom
-					video={videoEnabled}
-					audio={audioEnabled}
-					token={token}
-					serverUrl={serverUrl}
-					data-lk-theme="default"
-					style={{ height: 'calc(100vh - 116px)' }}
-				>
-					<MyVideoConference />
-					<RoomAudioRenderer />
-					<div className="lk-control-bar dark:bg-bgSecondary600 bg-channelTextareaLight !pt-[6px] !pb-[14px] !border-none">
-						<div className="lk-button-group audio" data-lk-theme="default">
-							<TrackToggle source={Track.Source.Microphone} onClick={toggleAudio}>
-								Microphone
-							</TrackToggle>
-							<div className="lk-button-group-menu">
-								<MediaDeviceMenu
-									initialSelection={audioDeviceId || 'default'}
-									kind="audioinput"
-									disabled={!audioTrack}
-									tracks={{ audioinput: audioTrack }}
-									onActiveDeviceChange={(_, id) => setAudioDeviceId(id)}
-								/>
-							</div>
-						</div>
-						<div className="lk-button-group video" data-lk-theme="default">
-							<TrackToggle source={Track.Source.Camera} onClick={toggleVideo}>
-								Camera
-							</TrackToggle>
-							<div className="lk-button-group-menu">
-								<MediaDeviceMenu
-									initialSelection={videoDeviceId || 'default'}
-									kind="videoinput"
-									disabled={!videoTrack}
-									tracks={{ videoinput: videoTrack }}
-									onActiveDeviceChange={(_, id) => {
-										if (id !== 'default') setAudioDeviceId(id);
-									}}
-								/>
-							</div>
-						</div>
-						<TrackToggle source={Track.Source.ScreenShare}>ScreenShare</TrackToggle>
-						<DisconnectButton onClick={handleLeaveRoom} className="!p-[7px]">
-							Leave Room
-						</DisconnectButton>
-					</div>
+				<LiveKitRoom token={token} serverUrl={serverUrl} data-lk-theme="default">
+					<MyVideoConference onLeaveRoom={handleLeaveRoom} />
 				</LiveKitRoom>
 			)}
 		</>
@@ -234,18 +108,313 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName, videoPro
 
 export default ChannelVoice;
 
-function MyVideoConference() {
+interface MyVideoConferenceProps {
+	onLeaveRoom: () => void;
+}
+
+function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
+	const [widgetState, setWidgetState] = useState<WidgetState>({
+		showChat: false,
+		unreadMessages: 0,
+		showSettings: false
+	});
+	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
+
 	const tracks = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },
 			{ source: Track.Source.ScreenShare, withPlaceholder: false }
 		],
-		{ onlySubscribed: false }
+		{ updateOnlyOn: [RoomEvent.ActiveSpeakersChanged], onlySubscribed: false }
+	);
+
+	const widgetUpdate = (state: WidgetState) => {
+		setWidgetState(state);
+	};
+
+	const layoutContext = useCreateLayoutContext();
+
+	const screenShareTracks = tracks.filter(isTrackReference).filter((track) => track.publication.source === Track.Source.ScreenShare);
+
+	const focusTrack = usePinnedTracks(layoutContext)?.[0];
+	const carouselTracks = tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+
+	useEffect(() => {
+		// If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
+		if (screenShareTracks.some((track) => track.publication.isSubscribed) && lastAutoFocusedScreenShareTrack.current === null) {
+			layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: screenShareTracks[0] });
+			lastAutoFocusedScreenShareTrack.current = screenShareTracks[0];
+		} else if (
+			lastAutoFocusedScreenShareTrack.current &&
+			!screenShareTracks.some((track) => track.publication.trackSid === lastAutoFocusedScreenShareTrack.current?.publication?.trackSid)
+		) {
+			layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
+			lastAutoFocusedScreenShareTrack.current = null;
+		}
+		if (focusTrack && !isTrackReference(focusTrack)) {
+			const updatedFocusTrack = tracks.find(
+				(tr) => tr.participant.identity === focusTrack.participant.identity && tr.source === focusTrack.source
+			);
+			if (updatedFocusTrack !== focusTrack && isTrackReference(updatedFocusTrack)) {
+				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: updatedFocusTrack });
+			}
+		}
+	}, [
+		screenShareTracks.map((ref) => `${ref.publication.trackSid}_${ref.publication.isSubscribed}`).join(),
+		focusTrack?.publication?.trackSid,
+		tracks
+	]);
+
+	return (
+		<div className="lk-video-conference">
+			<LayoutContextProvider value={layoutContext} onWidgetChange={widgetUpdate}>
+				<div className="lk-video-conference-inner">
+					{!focusTrack ? (
+						<div className="lk-grid-layout-wrapper">
+							<GridLayout tracks={tracks}>
+								<ParticipantTile />
+							</GridLayout>
+						</div>
+					) : (
+						<div className="lk-focus-layout-wrapper">
+							<FocusLayoutContainer>
+								<CarouselLayout tracks={carouselTracks}>
+									<ParticipantTile />
+								</CarouselLayout>
+								{focusTrack && <FocusLayout trackRef={focusTrack} />}
+							</FocusLayoutContainer>
+						</div>
+					)}
+					<ControlBar controls={{ chat: true }} onLeaveRoom={onLeaveRoom} />
+				</div>
+				<Chat style={{ display: widgetState.showChat ? 'grid' : 'none' }} />
+			</LayoutContextProvider>
+			<RoomAudioRenderer />
+			<ConnectionStateToast />
+		</div>
+	);
+}
+
+interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
+	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
+	variation?: 'minimal' | 'verbose' | 'textOnly';
+	controls?: ControlBarControls;
+	saveUserChoices?: boolean;
+	onLeaveRoom: () => void;
+}
+
+function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom }: ControlBarProps) {
+	const [isChatOpen, setIsChatOpen] = React.useState(false);
+	const layoutContext = useMaybeLayoutContext();
+	React.useEffect(() => {
+		if (layoutContext?.widget.state?.showChat !== undefined) {
+			setIsChatOpen(layoutContext?.widget.state?.showChat);
+		}
+	}, [layoutContext?.widget.state?.showChat]);
+	const isTooLittleSpace = useMediaQuery(`(max-width: ${isChatOpen ? 1000 : 760}px)`);
+
+	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
+	variation ??= defaultVariation;
+
+	const visibleControls = { leave: true, ...controls };
+
+	const localPermissions = useLocalParticipantPermissions();
+
+	if (!localPermissions) {
+		visibleControls.camera = false;
+		visibleControls.chat = false;
+		visibleControls.microphone = false;
+		visibleControls.screenShare = false;
+	} else {
+		visibleControls.camera ??= localPermissions.canPublish;
+		visibleControls.microphone ??= localPermissions.canPublish;
+		visibleControls.screenShare ??= localPermissions.canPublish;
+		visibleControls.chat ??= localPermissions.canPublishData && controls?.chat;
+	}
+
+	const showIcon = React.useMemo(() => variation === 'minimal' || variation === 'verbose', [variation]);
+	const showText = React.useMemo(() => variation === 'textOnly' || variation === 'verbose', [variation]);
+
+	const browserSupportsScreenSharing = supportsScreenSharing();
+
+	const [isScreenShareEnabled, setIsScreenShareEnabled] = React.useState(false);
+
+	const onScreenShareChange = React.useCallback(
+		(enabled: boolean) => {
+			setIsScreenShareEnabled(enabled);
+		},
+		[setIsScreenShareEnabled]
+	);
+
+	const { saveAudioInputEnabled, saveVideoInputEnabled, saveAudioInputDeviceId, saveVideoInputDeviceId } = usePersistentUserChoices({
+		preventSave: !saveUserChoices
+	});
+
+	const microphoneOnChange = React.useCallback(
+		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveAudioInputEnabled(enabled) : null),
+		[saveAudioInputEnabled]
+	);
+
+	const cameraOnChange = React.useCallback(
+		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveVideoInputEnabled(enabled) : null),
+		[saveVideoInputEnabled]
 	);
 
 	return (
-		<GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
-			<ParticipantTile />
-		</GridLayout>
+		<div className="lk-control-bar">
+			{visibleControls.microphone && (
+				<div className="lk-button-group">
+					<TrackToggle
+						source={Track.Source.Microphone}
+						showIcon={showIcon}
+						onChange={microphoneOnChange}
+						onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Microphone, error })}
+					>
+						{showText && 'Microphone'}
+					</TrackToggle>
+					<div className="lk-button-group-menu">
+						<MediaDeviceMenu
+							kind="audioinput"
+							onActiveDeviceChange={(_kind, deviceId) => saveAudioInputDeviceId(deviceId ?? 'default')}
+						/>
+					</div>
+				</div>
+			)}
+			{visibleControls.camera && (
+				<div className="lk-button-group">
+					<TrackToggle
+						source={Track.Source.Camera}
+						showIcon={showIcon}
+						onChange={cameraOnChange}
+						onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Camera, error })}
+					>
+						{showText && 'Camera'}
+					</TrackToggle>
+					<div className="lk-button-group-menu">
+						<MediaDeviceMenu
+							kind="videoinput"
+							onActiveDeviceChange={(_kind, deviceId) => saveVideoInputDeviceId(deviceId ?? 'default')}
+						/>
+					</div>
+				</div>
+			)}
+			{visibleControls.screenShare && browserSupportsScreenSharing && (
+				<TrackToggle
+					source={Track.Source.ScreenShare}
+					captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
+					showIcon={showIcon}
+					onChange={onScreenShareChange}
+					onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
+				>
+					{showText && (isScreenShareEnabled ? 'Stop screen share' : 'Share screen')}
+				</TrackToggle>
+			)}
+			{visibleControls.chat && (
+				<ChatToggle>
+					{showIcon && <ChatIcon />}
+					{showText && 'Chat'}
+				</ChatToggle>
+			)}
+			{visibleControls.leave && (
+				<DisconnectButton onClick={onLeaveRoom}>
+					{showIcon && <LeaveIcon />}
+					{showText && 'Leave'}
+				</DisconnectButton>
+			)}
+			<StartMediaButton />
+		</div>
 	);
+}
+
+function useMediaQuery(query: string): boolean {
+	const getMatches = (query: string): boolean => {
+		// Prevents SSR issues
+		if (typeof window !== 'undefined') {
+			return window.matchMedia(query).matches;
+		}
+		return false;
+	};
+
+	const [matches, setMatches] = React.useState<boolean>(getMatches(query));
+
+	function handleChange() {
+		setMatches(getMatches(query));
+	}
+
+	useEffect(() => {
+		const matchMedia = window.matchMedia(query);
+
+		// Triggered at the first client-side load and if query changes
+		handleChange();
+
+		// Listen matchMedia
+		if (matchMedia.addListener) {
+			matchMedia.addListener(handleChange);
+		} else {
+			matchMedia.addEventListener('change', handleChange);
+		}
+
+		return () => {
+			if (matchMedia.removeListener) {
+				matchMedia.removeListener(handleChange);
+			} else {
+				matchMedia.removeEventListener('change', handleChange);
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [query]);
+
+	return matches;
+}
+
+function isEqualTrackRef(a?: TrackReferenceOrPlaceholder, b?: TrackReferenceOrPlaceholder): boolean {
+	if (a === undefined || b === undefined) {
+		return false;
+	}
+	if (isTrackReference(a) && isTrackReference(b)) {
+		return a.publication.trackSid === b.publication.trackSid;
+	} else {
+		return getTrackReferenceId(a) === getTrackReferenceId(b);
+	}
+}
+
+function getTrackReferenceId(trackReference: TrackReferenceOrPlaceholder | number) {
+	if (typeof trackReference === 'string' || typeof trackReference === 'number') {
+		return `${trackReference}`;
+	} else if (isTrackReferencePlaceholder(trackReference)) {
+		return `${trackReference.participant.identity}_${trackReference.source}_placeholder`;
+	} else if (isTrackReference(trackReference)) {
+		return `${trackReference.participant.identity}_${trackReference.publication.source}_${trackReference.publication.trackSid}`;
+	} else {
+		throw new Error(`Can't generate a id for the given track reference: ${trackReference}`);
+	}
+}
+
+function isTrackReferencePlaceholder(trackReference?: TrackReferenceOrPlaceholder): trackReference is TrackReferencePlaceholder {
+	if (!trackReference) {
+		return false;
+	}
+	return (
+		Object.prototype.hasOwnProperty.call(trackReference, 'participant') &&
+		Object.prototype.hasOwnProperty.call(trackReference, 'source') &&
+		typeof trackReference.publication === 'undefined'
+	);
+}
+
+type TrackReferenceOrPlaceholder = TrackReference | TrackReferencePlaceholder;
+
+type TrackReferencePlaceholder = {
+	participant: Participant;
+	publication?: never;
+	source: Track.Source;
+};
+
+type TrackReference = {
+	participant: Participant;
+	publication: TrackPublication;
+	source: Track.Source;
+};
+
+function supportsScreenSharing(): boolean {
+	return typeof navigator !== 'undefined' && navigator.mediaDevices && !!navigator.mediaDevices.getDisplayMedia;
 }
