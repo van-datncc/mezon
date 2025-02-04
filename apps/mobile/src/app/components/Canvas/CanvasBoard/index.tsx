@@ -1,4 +1,4 @@
-import { Block, Colors, useTheme } from '@mezon/mobile-ui';
+import { Block, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { style } from './styles';
 
 type ScreenChannelCanvas = typeof APP_SCREEN.MENU_CHANNEL.CANVAS;
 export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<ScreenChannelCanvas>) {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { clanId, channelId, canvasId } = route.params;
 	const authState = useSelector(getAuthState);
@@ -31,6 +31,15 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
     localStorage.setItem('persist:auth', JSON.stringify(authData));
     })();
 	true;
+	(function() {
+		const persistApp = JSON.parse(localStorage.getItem('persist:apps'));
+		if (persistApp) {
+			persistApp.theme = JSON.stringify("${theme}");
+			persistApp.themeApp = JSON.stringify("${theme}");
+			localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+		}
+	})();
+	true;
   `;
 
 	return (
@@ -43,13 +52,13 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 					height={'100%'}
 					zIndex={1}
 					width={'100%'}
-					backgroundColor={Colors.bgCharcoal}
+					backgroundColor={themeValue.charcoal}
 					flex={1}
 				>
 					<Chase color={'#cdcdcd'} />
 				</Block>
 			)}
-			<StatusBar barStyle="light-content" backgroundColor={Colors.bgCharcoal} />
+			<StatusBar barStyle={theme === ThemeModeBase.LIGHT ? 'dark-content' : 'light-content'} backgroundColor={themeValue.charcoal} />
 			<WebView
 				source={{
 					uri: uri

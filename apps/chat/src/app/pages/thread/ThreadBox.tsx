@@ -69,8 +69,6 @@ const ThreadBox = () => {
 		[currentChannel, currentChannelId, currentClanId, dispatch]
 	);
 
-	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -83,13 +81,11 @@ const ThreadBox = () => {
 				if (value?.nameValueThread) {
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
-						// sleep for waiting server check exist after insert
-						await sleep(10);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
-								channelType: thread.type as number,
+								channelType: ChannelType.CHANNEL_TYPE_THREAD,
 								isPublic: false
 							})
 						);
@@ -109,7 +105,7 @@ const ThreadBox = () => {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, currentClanId, currentChannel, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
+		[createThread, currentClanId, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
