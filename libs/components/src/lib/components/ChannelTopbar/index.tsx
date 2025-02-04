@@ -155,7 +155,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 								<div className="relative justify-start items-center gap-[15px] flex mr-4">
 									{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
 									{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-									<ThreadButton isLightMode={appearanceTheme === 'light'} />
+									<ThreadButton isLightMode={appearanceTheme === 'light'} fetchThreads={fetchThreads} />
 									<MuteButton isLightMode={appearanceTheme === 'light'} />
 									<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
 									<div onClick={() => setTurnOffThreadMessage()}>
