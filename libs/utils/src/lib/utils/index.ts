@@ -652,7 +652,7 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 	return matchPositions;
 };
 
-export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T {
+export function filterEmptyArrays<T extends Record<any, any>>(payload: T): T {
 	return Object.entries(payload)
 		.filter(([_, value]) => !(Array.isArray(value) && value.length === 0))
 		.reduce((acc, [key, value]) => {

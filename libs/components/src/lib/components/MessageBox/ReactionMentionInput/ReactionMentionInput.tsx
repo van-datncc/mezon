@@ -60,6 +60,8 @@ import {
 	CHANNEL_INPUT_ID,
 	ChannelMembersEntity,
 	GENERAL_INPUT_ID,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	MIN_THRESHOLD_CHARS,
@@ -69,6 +71,7 @@ import {
 	TITLE_MENTION_HERE,
 	ThreadStatus,
 	addMention,
+	adjustPos,
 	blankReferenceObj,
 	checkIsThread,
 	convertMentionOnfile,
@@ -306,17 +309,17 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request.valueTextInput.trim());
+			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
-
+			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
 				t: text,
-				hg: hashtagList,
-				ej: emojiList,
+				hg: adjustedHashtagPos as IHashtagOnMessage[],
+				ej: adjustedEmojiPos as IEmojiOnMessage[],
 				mk
 			};
 
-			const addMentionToPayload = addMention(payload, mentionList);
+			const addMentionToPayload = addMention(payload, adjustedMentionsPos);
 			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 
@@ -372,7 +375,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (isReplyOnChannel) {
 				props.onSend(
 					filterEmptyArrays(payload),
-					isPasteMulti ? mentionUpdated : mentionList,
+					isPasteMulti ? mentionUpdated : adjustedMentionsPos,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread, isPrivate },
@@ -405,7 +408,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			} else if (isReplyOnTopic) {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					adjustedMentionsPos,
 					attachmentData,
 					[dataReferencesTopic],
 					{ nameValueThread, isPrivate },
@@ -426,7 +429,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			} else {
 				props.onSend(
 					filterEmptyArrays(payload),
-					isPasteMulti ? mentionUpdated : mentionList,
+					isPasteMulti ? mentionUpdated : adjustedMentionsPos,
 					attachmentData,
 					undefined,
 					{ nameValueThread, isPrivate },
