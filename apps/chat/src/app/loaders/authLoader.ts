@@ -38,10 +38,18 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 	dispatch(directActions.fetchDirectMessage({}));
 	// check network not connect
 	if (!navigator.onLine) {
+		const splashScreen = document.getElementById('splash-screen');
+		const title = splashScreen?.querySelector('#splash-title') as HTMLSpanElement;
+		title && (title.textContent = 'Connecting ...');
 		await new Promise<void>((resolve) => {
 			const handleOnline = () => {
 				window.removeEventListener('online', handleOnline);
-				resolve();
+				setTimeout(() => {
+					if (splashScreen) {
+						splashScreen.style.display = 'none';
+					}
+					resolve();
+				}, 3000);
 			};
 			window.addEventListener('online', handleOnline);
 		});

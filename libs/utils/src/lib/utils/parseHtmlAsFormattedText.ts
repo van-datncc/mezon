@@ -128,6 +128,7 @@ function parseMarkdown(html: string) {
 
 	// Define a regex to match mentions
 	const mentionRegex = /@\[(.*?)\]\(\d+\)/g;
+	const mentionRegex1 = /::\[(.*?)\]\(\d+\)/g;
 
 	// Strip redundant nbsp's
 	parsedHtml = parsedHtml.replace(/&nbsp;/g, ' ');
@@ -142,7 +143,34 @@ function parseMarkdown(html: string) {
 	parsedHtml = parsedHtml.replace(/<div>/g, '\n');
 	parsedHtml = parsedHtml.replace(/<\/div>/g, '');
 
+	parsedHtml = parsedHtml.replace(mentionRegex1, (match, display) => {
+		return display;
+	});
+
 	// Pre
+	parsedHtml = parsedHtml.replace(/^`{3}[\n\r]?(.*?)[\n\r]?`{3}/gms, (match, p1, offset) => {
+		let data = '';
+		if (mentionRegex.test(p1)) {
+			data = match
+				.replace(mentionRegex, (match, display) => {
+					return '@' + display;
+				})
+				.replace(/`/g, `'`);
+		}
+		return data || `<pre>${p1}</pre>`;
+	});
+
+	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, (match, p1, offset) => {
+		let data = '';
+		if (mentionRegex.test(p1)) {
+			data = match
+				.replace(mentionRegex, (match, display) => {
+					return '@' + display;
+				})
+				.replace(/`/g, `'`);
+		}
+		return data || `<pre>${p1}</pre>`;
+	});
 
 	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, (match, p1, offset) => {
 		let data = '';
@@ -183,7 +211,7 @@ function parseMarkdown(html: string) {
 
 	return parsedHtml;
 }
-const LINK_TEMPLATE = /(?<!<a\s+href="[^"]*">[^<]*)(https?:\/\/(?:www\.)?([a-zA-Z0-9][a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(?:\/[^#\s<]+)?)(?![^<]*<\/a>)/g;
+const LINK_TEMPLATE = /(?<!<a\s+href="[^"]*">)(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z]{2,}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/gi;
 
 function parseMarkdownLinks(html: string) {
 	const isCodeBlock = html.startsWith('```') && html.endsWith('```');
