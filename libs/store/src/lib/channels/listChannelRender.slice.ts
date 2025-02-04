@@ -48,8 +48,7 @@ export const listChannelRenderSlice = createSlice({
 							listFavorChannel.push({
 								...channel,
 								isFavor: true,
-								category_id: 'favorCate',
-								channel_id: `favor-${channel.id}`
+								category_id: 'favorCate'
 							});
 						}
 						listChannelRender.push(channel);
@@ -142,7 +141,7 @@ export const listChannelRenderSlice = createSlice({
 			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
 			if (isExistChannel === -1 && clanId) {
 				const indexInsert = state.listChannelRender[clanId]?.findIndex(
-					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id
+					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id && !(channel as IChannel).isFavor
 				);
 
 				if (indexInsert === -1) {
@@ -160,7 +159,7 @@ export const listChannelRenderSlice = createSlice({
 			if (!state.listChannelRender[clanId]) {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
 			if (updateIndex === -1) {
 				return;
 			}
@@ -172,7 +171,7 @@ export const listChannelRenderSlice = createSlice({
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
 				if (indexUpdate === -1) {
 					return;
 				}
@@ -180,6 +179,17 @@ export const listChannelRenderSlice = createSlice({
 					...state.listChannelRender[clanId][indexUpdate],
 					count_mess_unread: 0
 				};
+			}
+		},
+		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				const indexRemove = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				if (indexRemove === -1) {
+					return;
+				}
+				state.listChannelRender[clanId]?.splice(indexRemove, 1);
+				state.listChannelRender[clanId].join();
 			}
 		}
 	}
@@ -205,30 +215,21 @@ export const selectListChannelRenderByClanId = createSelector(
 );
 
 function sortChannels(channels: IChannel[]): IChannel[] {
-	const channelMap = new Map<string, IChannel>();
 	const sortedChannels: IChannel[] = [];
 
-	// Create a map of channels by their id
-	channels.forEach((channel) => {
-		channelMap.set(channel.id, channel);
-	});
-
-	// Use forEach to sort channels
 	channels.forEach((channel) => {
 		if (!channel.parrent_id || channel.parrent_id === '0') {
 			sortedChannels.push(channel);
 			addChildren(channel, sortedChannels);
 		}
 	});
-
+	// Then add threads of a channel into list
 	function addChildren(parent: IChannel, acc: IChannel[]) {
 		channels
 			.filter((child) => child.parrent_id === parent.id)
 			.forEach((child) => {
 				acc.push(child);
-				addChildren(child, acc);
 			});
 	}
-
 	return sortedChannels;
 }

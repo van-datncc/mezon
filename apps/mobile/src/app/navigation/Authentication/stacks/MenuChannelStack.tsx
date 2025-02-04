@@ -1,4 +1,4 @@
-import { Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
+import { Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
@@ -85,9 +85,9 @@ export function MenuChannelStacks({}: any) {
 				options={{
 					headerTitle: '',
 					headerStyle: {
-						backgroundColor: Colors.bgCharcoal
+						backgroundColor: themeValue.charcoal
 					},
-					headerTintColor: Colors.white,
+					headerTintColor: themeValue.white,
 					headerLeftLabelVisible: false
 				}}
 			/>
