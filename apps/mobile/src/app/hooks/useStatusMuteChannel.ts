@@ -1,13 +1,19 @@
 import { ENotificationActive, ENotificationChannelId } from '@mezon/mobile-components';
-import { selectCurrentChannelNotificatonSelected, selectDefaultNotificationCategory, selectDefaultNotificationClan } from '@mezon/store-mobile';
+import {
+	selectCurrentChannel,
+	selectDefaultNotificationCategory,
+	selectDefaultNotificationClan,
+	selectNotifiSettingsEntitiesById
+} from '@mezon/store-mobile';
 import { NotificationType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const useStatusMuteChannel = () => {
+	const currentChannel = useSelector(selectCurrentChannel);
 	const [statusMute, setStatusMute] = useState<ENotificationActive>(ENotificationActive.ON);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel.id));
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
 		if (

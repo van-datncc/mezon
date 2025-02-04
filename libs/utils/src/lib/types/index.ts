@@ -147,6 +147,10 @@ export type IChannel = ApiChannelDescription & {
 	isFavor?: boolean;
 };
 
+export type INotificationUserChannel = ApiNotificationUserChannel & {
+	id: string;
+};
+
 export type IPinMessage = ApiPinMessage & {
 	id: string;
 };
