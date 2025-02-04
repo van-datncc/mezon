@@ -134,9 +134,16 @@ export const listChannelRenderSlice = createSlice({
 				...(channel as IChannel),
 				id: channel.id
 			};
-			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.id);
-			if (isExistChannel === -1 && clanId && state.listChannelRender[clanId]) {
-				const indexInsert = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelData.parrent_id);
+
+			if (!state.listChannelRender[clanId]) {
+				return;
+			}
+
+			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
+			if (isExistChannel === -1 && clanId) {
+				const indexInsert = state.listChannelRender[clanId]?.findIndex(
+					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id
+				);
 
 				if (indexInsert === -1) {
 					return;
@@ -150,7 +157,10 @@ export const listChannelRenderSlice = createSlice({
 			if (clanId === '0') {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+			if (!state.listChannelRender[clanId]) {
+				return;
+			}
+			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
 			if (updateIndex === -1) {
 				return;
 			}
