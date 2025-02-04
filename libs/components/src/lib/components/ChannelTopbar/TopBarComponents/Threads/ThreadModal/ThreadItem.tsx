@@ -157,7 +157,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 					<div className="flex flex-row items-center h-6">
 						<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
 						<span className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">
-							{user?.user?.display_name ?? username}:&nbsp;
+							{user?.clan_nick ?? user?.user?.display_name ?? username}:&nbsp;
 						</span>
 						<div className="overflow-hidden max-w-[140px]">
 							<ThreadModalContent message={message} thread={thread as ChannelsEntity} />
