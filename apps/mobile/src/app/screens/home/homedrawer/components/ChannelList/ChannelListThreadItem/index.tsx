@@ -2,7 +2,7 @@ import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
 import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
