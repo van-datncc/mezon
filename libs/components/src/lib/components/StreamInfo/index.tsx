@@ -101,9 +101,15 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 		type === ESummaryInfo.CALL ? redirectToCall() : redirectToStream();
 	};
 
+	// const streamAddress =
+	// 	type === ESummaryInfo.CALL
+	// 		? currentDmGroup?.usernames || ''
+	// 		: type === ESummaryInfo.STREAM
+	// 			? `${currentStreamInfo?.streamName} / ${currentStreamInfo?.clanName}`
+	// 			: '';
 	const streamAddress =
 		type === ESummaryInfo.CALL
-			? currentDmGroup?.usernames || ''
+			? (currentDmGroup?.usernames && currentDmGroup?.usernames[0]) || ''
 			: type === ESummaryInfo.STREAM
 				? `${currentStreamInfo?.streamName} / ${currentStreamInfo?.clanName}`
 				: '';
@@ -125,6 +131,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 					</div>
 					<button className="w-fit" onClick={handleClick}>
 						<div className="hover:underline font-medium text-xs dark:text-contentSecondary text-colorTextLightMode">
+							{/* {streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress} */}
 							{streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>
 					</button>
