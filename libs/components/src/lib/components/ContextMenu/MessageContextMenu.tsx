@@ -129,7 +129,7 @@ function MessageContextMenu({
 	const { reactionMessageDispatch } = useChatReaction();
 
 	const isMyMessage = useMemo(() => {
-		return message?.sender_id === userId && !message?.content?.callLog?.callLogType && !(message.code === TypeMessage.SendToken);
+		return message?.sender_id === userId && !message?.content?.callLog?.callLogType && !(message?.code === TypeMessage.SendToken);
 	}, [message?.sender_id, message?.content?.callLog?.callLogType, message?.code, userId]);
 
 	const checkMessageHasText = useMemo(() => {
