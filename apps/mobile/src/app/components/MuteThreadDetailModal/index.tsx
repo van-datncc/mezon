@@ -1,14 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AngleRight, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import {
-	DirectEntity,
-	notificationSettingActions,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectNotifiSettingsEntitiesById,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { DirectEntity, notificationSettingActions, selectCurrentClanId, selectNotifiSettingsEntitiesById, useAppDispatch } from '@mezon/store-mobile';
 import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS, IChannel } from '@mezon/utils';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
@@ -120,8 +113,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 			</View>
 		)
 	});
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannelId));
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 
