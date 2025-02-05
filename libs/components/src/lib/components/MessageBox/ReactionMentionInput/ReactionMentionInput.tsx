@@ -67,6 +67,7 @@ import {
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	MentionReactInputProps,
+	RequestInput,
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadStatus,
@@ -307,9 +308,17 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
 	const isSendMessageOnThreadBox = openThreadMessageState && !props.isTopic ? true : false;
 
+	const hasToken = mentionList.length > 0 || hashtagList.length > 0 || emojiList.length > 0; // no remove trim() if message has token
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
+			const emptyRequest: RequestInput = {
+				content: '',
+				valueTextInput: '',
+				mentionRaw: []
+			};
+			const checkedRequest = request ? request : emptyRequest;
+			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
@@ -328,7 +337,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
-						...request,
+						...checkedRequest,
 						valueTextInput: displayMarkup,
 						content: displayPlaintext
 					},

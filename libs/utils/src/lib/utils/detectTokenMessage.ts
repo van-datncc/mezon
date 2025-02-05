@@ -164,7 +164,7 @@ export const getMarkdownPrefixItems = (draftContent: IMarkdownOnMessage[]) => {
 
 // to add `/``` or ** to token markdown
 export const addMarkdownPrefix = (markdownItems: IMarkdownOnMessage[], plaintext: string): INewPosMarkdown[] => {
-	return markdownItems.map(({ type, s, e }) => {
+	return markdownItems?.map(({ type, s, e }) => {
 		let value = plaintext?.slice(s, e);
 		let markerNumber = 0;
 

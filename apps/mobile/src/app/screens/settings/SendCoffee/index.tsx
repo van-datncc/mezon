@@ -1,6 +1,8 @@
+import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { appActions, getStoreAsync, giveCoffeeActions, selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
-import { safeJSONParse } from 'mezon-js';
+import { appActions, getStoreAsync, giveCoffeeActions, selectAllAccount, selectDirectsOpenlist, selectUpdateToken } from '@mezon/store-mobile';
+import { TypeMessage, formatMoney } from '@mezon/utils';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useState } from 'react';
 import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -20,11 +22,19 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const [tokenCount, setTokenCount] = useState(jsonObject?.amount?.toString() || '1');
 	const [note, setNote] = useState(jsonObject?.note || 'send token');
 	const userProfile = useSelector(selectAllAccount);
+	const listDM = useSelector(selectDirectsOpenlist);
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
 	}, [userProfile?.wallet]);
 	const getTokenSocket = useSelector(selectUpdateToken(userProfile?.user?.id ?? ''));
+
+	const directMessageId = useMemo(() => {
+		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === jsonObject?.receiver_id);
+		return directMessage?.id;
+	}, [jsonObject?.receiver_id, listDM]);
 
 	const sendToken = async () => {
 		const store = await getStoreAsync();
@@ -58,6 +68,25 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
 			store.dispatch(giveCoffeeActions.updateTokenUser({ tokenEvent }));
 			store.dispatch(appActions.setLoadingMainMobile(false));
+
+			if (directMessageId) {
+				sendInviteMessage(
+					`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
+					directMessageId,
+					ChannelStreamMode.STREAM_MODE_DM,
+					TypeMessage.SendToken
+				);
+			} else {
+				const response = await createDirectMessageWithUser(jsonObject?.receiver_id);
+				if (response?.channel_id) {
+					sendInviteMessage(
+						`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
+						response?.channel_id,
+						ChannelStreamMode.STREAM_MODE_DM,
+						TypeMessage.SendToken
+					);
+				}
+			}
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			if (res?.action?.action?.requestStatus === 'rejected' || !res) {

@@ -452,7 +452,10 @@ export const selectGrouplMembers = createSelector(
 		if (!group?.user_id) {
 			return [];
 		}
-		const groupDisplayNames = group.usernames?.split(',');
+		// const groupDisplayNames = group.usernames?.split(',');
+		const groupUsername = group.usernames;
+		const groupDisplayNames = group.display_names;
+
 		const users = group?.user_id?.map((userId, index) => {
 			return {
 				channelId: groupId,
@@ -462,7 +465,7 @@ export const selectGrouplMembers = createSelector(
 					id: userId,
 					user_id: [userId],
 					avatar_url: group.channel_avatar?.[index],
-					username: groupDisplayNames?.[index],
+					username: groupUsername?.[index],
 					display_name: groupDisplayNames?.[index],
 					online: group.is_online?.[index]
 				},

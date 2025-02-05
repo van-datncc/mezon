@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction, useDirect, useEmojiConverted, useGifs, useSendInviteMessage } from '@mezon/core';
+import { useAuth, useChatReaction, useDirect, useEmojiConverted, useGifs, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import {
 	CanvasAPIEntity,
 	ChannelsEntity,
@@ -23,6 +23,7 @@ import { Icons } from '@mezon/ui';
 import {
 	AMOUNT_TOKEN,
 	EMOJI_GIVE_COFFEE,
+	EOverriddenPermission,
 	IMessageWithUser,
 	MenuBuilder,
 	SubPanelName,
@@ -78,12 +79,13 @@ const ChannelMessageOpt = ({
 }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const refOpt = useRef<HTMLDivElement>(null);
-	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
+	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
+	const isShowIconThread = !!(currentChannel && !Snowflake.isValid(currentChannel.parrent_id ?? '') && canManageThread);
 	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const replyMenu = useMenuReplyMenuBuilder(message, hasPermission);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
-	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread, hasPermission);
+	const threadMenu = useThreadMenuBuilder(message, isShowIconThread, hasPermission);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
@@ -453,7 +455,7 @@ function useReactMenuBuilder(message: IMessageWithUser) {
 	});
 }
 
-function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean, hasPermission: boolean) {
+function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boolean, hasPermission: boolean) {
 	const [thread, setThread] = useState(false);
 	const dispatch = useAppDispatch();
 
@@ -488,7 +490,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean, hasP
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setThread, thread, setValueThread]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(!isThread && hasPermission, (builder) => {
+		builder.when(isShowIconThread && hasPermission, (builder) => {
 			builder.addMenuItem('thread', 'thread', handleItemClick, <Icons.ThreadIcon isWhite={thread} />);
 		});
 	});

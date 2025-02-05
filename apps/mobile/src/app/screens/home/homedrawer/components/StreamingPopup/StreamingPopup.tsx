@@ -1,12 +1,4 @@
-import {
-	appActions,
-	selectAllAccount,
-	selectCurrentChannel,
-	selectCurrentClan,
-	selectStatusStream,
-	useAppDispatch,
-	videoStreamActions
-} from '@mezon/store-mobile';
+import { appActions, selectAllAccount, selectCurrentChannel, selectCurrentClan, useAppDispatch, videoStreamActions } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, PanResponder } from 'react-native';
@@ -19,7 +11,6 @@ const StreamingPopup = () => {
 	const isDragging = useRef(false);
 	const isFullScreen = useRef(true);
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
-	const streamPlay = useSelector(selectStatusStream);
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { handleChannelClick, disconnect } = useWebRTCStream();
@@ -70,7 +61,7 @@ const StreamingPopup = () => {
 	}, []);
 
 	const handleJoinStreamingRoom = useCallback(async () => {
-		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && streamPlay) {
+		if (currentClan && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 			disconnect();
 			handleChannelClick(
 				currentClan?.id as string,
@@ -119,7 +110,6 @@ const StreamingPopup = () => {
 		handleResizeStreamRoom();
 	}, []);
 
-	if (!streamPlay) return null;
 	return (
 		<Animated.View
 			{...panResponder.panHandlers}
