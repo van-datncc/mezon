@@ -5,6 +5,7 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import { Dimensions } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
+import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import HomeScreen from '../../screens/home/HomeScreen';
@@ -74,6 +75,7 @@ export const Authentication = memo(() => {
 			</RootStack.Navigator>
 			<CallingModalWrapper />
 			<StreamingWrapper />
+			<ChannelVoicePopup />
 		</BottomSheetModalProvider>
 	);
 });

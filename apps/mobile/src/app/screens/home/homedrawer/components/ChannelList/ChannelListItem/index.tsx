@@ -21,9 +21,9 @@ import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
-import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
+import JoinChannelVoiceBS from '../../ChannelVoice/JoinChannelVoiceBS';
 import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
 import ChannelItem from '../ChannelItem';
 import UserListVoiceChannel from '../ChannelListUserVoice';
@@ -50,12 +50,15 @@ export const ChannelListItem = React.memo(
 		const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
 
 		const isChannelVoice = useMemo(() => {
-			return props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+			return (
+				props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
+				props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+				props?.data?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
+			);
 		}, [props?.data?.type]);
 
 		const timeoutRef = useRef<any>();
 		const navigation = useNavigation<any>();
-		const isTabletLandscape = useTabletLandscape();
 
 		useEffect(() => {
 			const event = DeviceEventEmitter.addListener(ActionEmitEvent.CHANNEL_ID_ACTIVE, (channelId: string) => {
@@ -74,10 +77,11 @@ export const ChannelListItem = React.memo(
 
 		const handleRouteData = useCallback(
 			async (thread?: IChannel) => {
-				if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING || props?.data?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 					bottomSheetChannelStreamingRef.current?.present();
 					return;
 				}
+
 				if (props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
 						const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
@@ -108,15 +112,7 @@ export const ChannelListItem = React.memo(
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				}
 			},
-			[
-				isTabletLandscape,
-				navigation,
-				props?.data?.channel_id,
-				props?.data?.clan_id,
-				props?.data?.meeting_code,
-				props?.data?.status,
-				props?.data?.type
-			]
+			[navigation, props?.data?.channel_id, props?.data?.clan_id, props?.data?.meeting_code, props?.data?.status, props?.data?.type]
 		);
 
 		const handleLongPressChannel = useCallback(() => {
@@ -153,7 +149,11 @@ export const ChannelListItem = React.memo(
 				)}
 				<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['45%']}>
 					<SafeAreaView>
-						<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+						{props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+							<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+						) : (
+							<JoinChannelVoiceBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+						)}
 					</SafeAreaView>
 				</MezonBottomSheet>
 			</View>

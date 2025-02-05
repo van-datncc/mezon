@@ -33,7 +33,7 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 
 		const isThread = checkIsThread(channel as ChannelsEntity);
 
-		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
+		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 		const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 		const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;
 

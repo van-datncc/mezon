@@ -10,6 +10,7 @@ import categorySetting from './categorySetting.json';
 import channelCreator from './channelCreator.json';
 import channelMenu from './channelMenu.json';
 import channelSetting from './channelSetting.json';
+import channelVoice from './channelVoice.json';
 import clan from './clan.json';
 import clanEmojiSetting from './clanEmojiSetting.json';
 import clanIntegrationsSetting from './clanIntegrationsSetting.json';
@@ -92,5 +93,6 @@ export default {
 	activityApp,
 	auditLog,
 	ageRestricted,
-	recordChatMessage
+	recordChatMessage,
+	channelVoice
 };

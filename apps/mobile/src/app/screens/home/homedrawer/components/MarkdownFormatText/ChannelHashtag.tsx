@@ -30,7 +30,7 @@ export const ChannelHashtag = ({ channelHashtagId, currentChannelId, mode, hasht
 
 	const dataPress = `${channel.type}_${channel.channel_id}_${channel.clan_id}_${channel.status}_${channel.meeting_code}_${channel.category_id}`;
 
-	if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+	if (channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 		return `[${channel.channel_label}](##voice${JSON.stringify(dataPress)})`;
 	}
 	if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {

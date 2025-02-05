@@ -17,7 +17,9 @@ export const ChannelFavoriteItem = React.memo(({ channelId, onPress }: { channel
 		>
 			<Block style={styles.channelItem}>
 				<ChannelStatusIcon channel={channel} />
-				<Text style={styles.channelItemTitle}>{channel?.channel_label}</Text>
+				<Text numberOfLines={1} style={styles.channelItemTitle}>
+					{channel?.channel_label}
+				</Text>
 			</Block>
 		</TouchableOpacity>
 	);
