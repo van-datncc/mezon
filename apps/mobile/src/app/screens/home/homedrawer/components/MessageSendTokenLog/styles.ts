@@ -14,7 +14,8 @@ export const style = (colors: Attributes) =>
 		},
 		info: {
 			flexDirection: 'row',
-			justifyContent: 'center'
+			justifyContent: 'center',
+			marginBottom: size.s_4
 		},
 		title: {
 			color: colors.text,

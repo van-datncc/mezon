@@ -134,7 +134,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					TypeMessage.SendToken
 				);
 			} else {
-				const response = createDirectMessageWithUser(selectedUser?.id);
+				const response = await createDirectMessageWithUser(selectedUser?.id);
 				if (response?.channel_id) {
 					sendInviteMessage(
 						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,

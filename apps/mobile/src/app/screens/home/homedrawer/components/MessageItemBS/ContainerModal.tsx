@@ -124,7 +124,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
 
-	const handleActionGiveACoffee = () => {
+	const handleActionGiveACoffee = async () => {
 		onClose();
 		try {
 			if (userId !== message.sender_id) {
@@ -146,7 +146,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 						TypeMessage.SendToken
 					);
 				} else {
-					const response = createDirectMessageWithUser(message?.user?.id);
+					const response = await createDirectMessageWithUser(message?.user?.id);
 					if (response?.channel_id) {
 						sendInviteMessage(
 							`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,

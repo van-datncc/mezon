@@ -361,7 +361,7 @@ const MessageItem = React.memo(
 												callLog={message?.content?.callLog}
 											/>
 										) : isSendTokenLog ? (
-											<MessageSendTokenLog message={message} />
+											<MessageSendTokenLog messageContent={message?.content?.t} />
 										) : (
 											<RenderTextMarkdownContent
 												content={{

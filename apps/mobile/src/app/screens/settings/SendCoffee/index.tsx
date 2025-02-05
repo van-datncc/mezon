@@ -77,7 +77,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 					TypeMessage.SendToken
 				);
 			} else {
-				const response = createDirectMessageWithUser(jsonObject?.receiver_id);
+				const response = await createDirectMessageWithUser(jsonObject?.receiver_id);
 				if (response?.channel_id) {
 					sendInviteMessage(
 						`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
