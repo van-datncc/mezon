@@ -1,10 +1,9 @@
-import { selectBuzzStateByChannelId, selectEventsByChannelId, selectIsUnreadChannelById, selectTheme, useAppSelector } from '@mezon/store';
+import { notificationSettingActions, selectBuzzStateByChannelId, selectEventsByChannelId, selectIsUnreadChannelById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import BuzzBadge from '../BuzzBadge';
 import { Coords, classes } from '../ChannelLink';
@@ -29,7 +28,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	const numberNotification = thread.count_mess_unread ? thread.count_mess_unread : 0;
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
-	const appearanceTheme = useSelector(selectTheme);
+
 	const coords = useRef<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -48,12 +47,15 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		}
 	}));
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const dispatch = useAppDispatch();
+
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
 		const distanceToBottom = windowHeight - event.clientY;
 		coords.current = { mouseX, mouseY, distanceToBottom };
+    await dispatch(notificationSettingActions.getNotificationSetting({channelId : thread.id , isCurrentChannel :isActive }));
 		openProfileItem();
 	};
 
