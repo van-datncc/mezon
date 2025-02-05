@@ -18,7 +18,7 @@ export interface ChannelAppState {
 	loadingStatus: LoadingStatus;
 	roomName: string | null;
 	roomId: string | null;
-	enableVoice: boolean;
+	enableMic: boolean;
 	enableVideo: boolean;
 	enableCall: boolean;
 }
@@ -27,7 +27,7 @@ export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
 	roomId: '123',
-	enableVoice: false,
+	enableMic: false,
 	enableVideo: false,
 	enableCall: false
 };
@@ -65,7 +65,7 @@ export const channelAppSlice = createSlice({
 			state.roomId = action.payload;
 		},
 		setEnableVoice: (state, action: PayloadAction<boolean>) => {
-			state.enableVoice = action.payload;
+			state.enableMic = action.payload;
 		},
 		setEnableVideo: (state, action: PayloadAction<boolean>) => {
 			state.enableVideo = action.payload;
@@ -95,7 +95,7 @@ export const getChannelAppState = (rootState: { [CHANNEL_APP]: ChannelAppState }
 export const selectLoadingStatusChannelApp = createSelector(getChannelAppState, (state) => state.loadingStatus);
 export const selectEnableVideo = createSelector(getChannelAppState, (state) => state.enableVideo);
 export const selectGetRoomId = createSelector(getChannelAppState, (state) => state.roomId);
-export const selectEnableVoice = createSelector(getChannelAppState, (state) => state.enableVoice);
+export const selectEnableMic = createSelector(getChannelAppState, (state) => state.enableMic);
 export const selectEnableCall = createSelector(getChannelAppState, (state) => state.enableCall);
 export const selectRoomName = createSelector(getChannelAppState, (state) => state.roomName);
 export const channelAppReducer = channelAppSlice.reducer;

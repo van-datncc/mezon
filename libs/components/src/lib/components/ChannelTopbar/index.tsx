@@ -16,8 +16,9 @@ import {
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectEnableCall,
+	selectEnableMic,
 	selectEnableVideo,
-	selectEnableVoice,
+	selectGetRoomId,
 	selectIsPinModalVisible,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
@@ -113,30 +114,33 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 });
 
 const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
-	// const [joinVoice, setJoinVoice] = useState(true);
-	// const [enableMic, setEnableMic] = useState(false);
-	// const [enableVideo, setEnableVideo] = useState(false);
-	// const roomId = useSelector(selectGetRoomId);
-	const joinVoice = useSelector(selectEnableVoice);
+	const dispatch = useDispatch();
 
-	const enableMic = useSelector(selectEnableCall);
+	const joinVoice = useSelector(selectEnableCall);
+	const enableMic = useSelector(selectEnableMic);
 	const enableVideo = useSelector(selectEnableVideo);
-
+	const roomId = useSelector(selectGetRoomId);
 	return (
-		<>
-			<div className="justify-start items-center gap-1 flex">
-				<ChannelLabel channel={channel} />
-			</div>
-			{
+		roomId && (
+			<>
+				<div className="justify-start items-center gap-1 flex">
+					<ChannelLabel channel={channel} />
+				</div>
+
 				<div className="items-center h-full ml-auto flex">
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<StartCallButton onClick={() => channelAppActions.setEnableCall(!joinVoice)} isTalking={joinVoice} />
+								<StartCallButton onClick={() => dispatch(channelAppActions.setEnableCall(!joinVoice))} isJoinVoice={joinVoice} />
+
 								{joinVoice && (
 									<>
-										<MicButton onClick={() => channelAppActions.setEnableVoice(!enableMic)} isTalking={enableMic} />
-										<VideoButoon onClick={() => channelAppActions.setEnableVideo(!enableVideo)} isEnable={enableVideo} />
+										<MicButton onClick={() => dispatch(channelAppActions.setEnableVoice(!enableMic))} isTalking={enableMic} />
+
+										<VideoButoon
+											onClick={() => dispatch(channelAppActions.setEnableVideo(!enableVideo))}
+											isEnable={enableVideo}
+										/>
 									</>
 								)}
 							</div>
@@ -147,8 +151,8 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 						</div>
 					</div>
 				</div>
-			}
-		</>
+			</>
+		)
 	);
 };
 
