@@ -35,7 +35,7 @@ export function useDeleteMessage({ channelId, mode, hasAttachment, isTopic }: Us
 					isPublicChannel: isPublicChannel(channel),
 					isClanView: isClanView as boolean
 				});
-				
+
 				if (isTopic) {
 					const response = await socket.removeChatMessage(
 						payload.clan_id,
@@ -46,7 +46,7 @@ export function useDeleteMessage({ channelId, mode, hasAttachment, isTopic }: Us
 						hasAttachment,
 						channelId
 					);
-					
+
 					return;
 				}
 
