@@ -1,8 +1,5 @@
 import {
 	CarouselLayout,
-	Chat,
-	ChatIcon,
-	ChatToggle,
 	ConnectionStateToast,
 	ControlBarControls,
 	DisconnectButton,
@@ -20,18 +17,16 @@ import {
 	TrackToggle,
 	useCreateLayoutContext,
 	useLocalParticipantPermissions,
-	useMaybeLayoutContext,
 	usePersistentUserChoices,
 	usePinnedTracks,
-	useTracks,
-	WidgetState
+	useTracks
 } from '@livekit/components-react';
 
 import '@livekit/components-styles';
 import { ChannelsEntity, fetchJoinMezonMeet, useAppDispatch } from '@mezon/store';
 
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface ChannelVoiceProps {
 	channel: ChannelsEntity;
@@ -113,11 +108,6 @@ interface MyVideoConferenceProps {
 }
 
 function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
-	const [widgetState, setWidgetState] = useState<WidgetState>({
-		showChat: false,
-		unreadMessages: 0,
-		showSettings: false
-	});
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 
 	const tracks = useTracks(
@@ -127,10 +117,6 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 		],
 		{ updateOnlyOn: [RoomEvent.ActiveSpeakersChanged], onlySubscribed: false }
 	);
-
-	const widgetUpdate = (state: WidgetState) => {
-		setWidgetState(state);
-	};
 
 	const layoutContext = useCreateLayoutContext();
 
@@ -167,7 +153,7 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 
 	return (
 		<div className="lk-video-conference">
-			<LayoutContextProvider value={layoutContext} onWidgetChange={widgetUpdate}>
+			<LayoutContextProvider value={layoutContext}>
 				<div className="lk-video-conference-inner">
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper">
@@ -185,9 +171,8 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 							</FocusLayoutContainer>
 						</div>
 					)}
-					<ControlBar controls={{ chat: true }} onLeaveRoom={onLeaveRoom} />
+					<ControlBar onLeaveRoom={onLeaveRoom} />
 				</div>
-				<Chat style={{ display: widgetState.showChat ? 'grid' : 'none' }} />
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
 			<ConnectionStateToast />
@@ -204,14 +189,7 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom }: ControlBarProps) {
-	const [isChatOpen, setIsChatOpen] = React.useState(false);
-	const layoutContext = useMaybeLayoutContext();
-	React.useEffect(() => {
-		if (layoutContext?.widget.state?.showChat !== undefined) {
-			setIsChatOpen(layoutContext?.widget.state?.showChat);
-		}
-	}, [layoutContext?.widget.state?.showChat]);
-	const isTooLittleSpace = useMediaQuery(`(max-width: ${isChatOpen ? 1000 : 760}px)`);
+	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
 	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
 	variation ??= defaultVariation;
@@ -222,24 +200,22 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 
 	if (!localPermissions) {
 		visibleControls.camera = false;
-		visibleControls.chat = false;
 		visibleControls.microphone = false;
 		visibleControls.screenShare = false;
 	} else {
 		visibleControls.camera ??= localPermissions.canPublish;
 		visibleControls.microphone ??= localPermissions.canPublish;
 		visibleControls.screenShare ??= localPermissions.canPublish;
-		visibleControls.chat ??= localPermissions.canPublishData && controls?.chat;
 	}
 
-	const showIcon = React.useMemo(() => variation === 'minimal' || variation === 'verbose', [variation]);
-	const showText = React.useMemo(() => variation === 'textOnly' || variation === 'verbose', [variation]);
+	const showIcon = useMemo(() => variation === 'minimal' || variation === 'verbose', [variation]);
+	const showText = useMemo(() => variation === 'textOnly' || variation === 'verbose', [variation]);
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
 
-	const [isScreenShareEnabled, setIsScreenShareEnabled] = React.useState(false);
+	const [isScreenShareEnabled, setIsScreenShareEnabled] = useState(false);
 
-	const onScreenShareChange = React.useCallback(
+	const onScreenShareChange = useCallback(
 		(enabled: boolean) => {
 			setIsScreenShareEnabled(enabled);
 		},
@@ -250,12 +226,12 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 		preventSave: !saveUserChoices
 	});
 
-	const microphoneOnChange = React.useCallback(
+	const microphoneOnChange = useCallback(
 		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveAudioInputEnabled(enabled) : null),
 		[saveAudioInputEnabled]
 	);
 
-	const cameraOnChange = React.useCallback(
+	const cameraOnChange = useCallback(
 		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveVideoInputEnabled(enabled) : null),
 		[saveVideoInputEnabled]
 	);
@@ -308,12 +284,6 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 				>
 					{showText && (isScreenShareEnabled ? 'Stop screen share' : 'Share screen')}
 				</TrackToggle>
-			)}
-			{visibleControls.chat && (
-				<ChatToggle>
-					{showIcon && <ChatIcon />}
-					{showText && 'Chat'}
-				</ChatToggle>
 			)}
 			{visibleControls.leave && (
 				<DisconnectButton onClick={onLeaveRoom}>

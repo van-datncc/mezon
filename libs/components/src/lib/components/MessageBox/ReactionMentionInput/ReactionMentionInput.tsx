@@ -307,9 +307,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
 	const isSendMessageOnThreadBox = openThreadMessageState && !props.isTopic ? true : false;
 
+	const hasToken = mentionList.length > 0 || hashtagList.length > 0 || emojiList.length > 0; // no remove trim() if message has token
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(request.content.trim());
+			const { text, entities } = parseHtmlAsFormattedText(hasToken ? request.content : request.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {

@@ -3,6 +3,8 @@ import {
 	channelsActions,
 	ChannelsEntity,
 	clansActions,
+	EMarkAsReadType,
+	listChannelRenderAction,
 	markAsReadProcessing,
 	RootState,
 	selectChannelsByClanId,
@@ -82,6 +84,13 @@ export function useMarkAsRead() {
 						}))
 					})
 				);
+				dispatch(
+					listChannelRenderAction.handleMarkAsReadListRender({
+						type: EMarkAsReadType.CHANNEL,
+						channelId: channel.id,
+						clanId: channel.clan_id as string
+					})
+				);
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadChannel('error');
@@ -114,6 +123,13 @@ export function useMarkAsRead() {
 						channelIds
 					})
 				);
+				dispatch(
+					listChannelRenderAction.handleMarkAsReadListRender({
+						type: EMarkAsReadType.CATEGORY,
+						clanId: category.clan_id as string,
+						categoryId: category.id
+					})
+				);
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadCategory('error');
@@ -139,6 +155,12 @@ export function useMarkAsRead() {
 					})
 				);
 				dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: 0, isReset: true }));
+				dispatch(
+					listChannelRenderAction.handleMarkAsReadListRender({
+						type: EMarkAsReadType.CLAN,
+						clanId: clanId
+					})
+				);
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadClan('error');
