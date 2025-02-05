@@ -159,28 +159,28 @@ export const listChannelRenderSlice = createSlice({
 			if (!state.listChannelRender[clanId]) {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
-			if (updateIndex === -1) {
-				return;
-			}
-			state.listChannelRender[clanId][updateIndex] = {
-				...state.listChannelRender[clanId][updateIndex],
-				count_mess_unread: ((state.listChannelRender[clanId][updateIndex] as ChannelsEntity).count_mess_unread || 0) + 1
-			};
+      state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
+        if(channel.id === channelId){
+          return {
+            ...channel,
+            count_mess_unread : ((channel as IChannel).count_mess_unread || 0) + 1
+          }
+        }
+        return channel
+      })
 		},
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId]?.findIndex(
-					(channel) => channel.id === channelId && !(channel as IChannel).isFavor
-				);
-				if (indexUpdate === -1) {
-					return;
-				}
-				state.listChannelRender[clanId][indexUpdate] = {
-					...state.listChannelRender[clanId][indexUpdate],
-					count_mess_unread: 0
-				};
+				state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
+          if(channel.id === channelId){
+            return {
+              ...channel,
+              count_mess_unread : 0
+            }
+          }
+          return channel
+        })
 			}
 		},
 		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
