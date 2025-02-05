@@ -1,10 +1,56 @@
-import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant } from '@livekit/components-react';
-import { fetchJoinMezonMeet, selectEnableCall, selectEnableMic, selectEnableVideo, selectGetRoomId, useAppDispatch } from '@mezon/store';
+import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } from '@livekit/components-react';
+import {
+	channelAppActions,
+	fetchJoinMezonMeet,
+	selectEnableCall,
+	selectEnableMic,
+	selectEnableVideo,
+	selectGetRoomId,
+	useAppDispatch
+} from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import { RefObject, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: string | undefined }) {
+	const enableMic = useSelector(selectEnableMic);
+	const enableVideo = useSelector(selectEnableVideo);
+
+	return (
+		<LiveKitRoom
+			video={enableVideo}
+			audio={enableMic}
+			token={token}
+			serverUrl={serverUrl}
+			data-lk-theme="empty"
+			className="w-full h-full flex justify-center items-center"
+		>
+			<RoomAudioRenderer />
+			<div
+				style={{
+					position: 'relative',
+					width: '100%',
+					height: '100%',
+					backgroundColor: '#000',
+					overflow: 'hidden'
+				}}
+			>
+				<VideoConference
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: '100%',
+						height: '100%',
+						objectFit: 'cover'
+					}}
+				/>
+				<VideoControls />
+			</div>
+		</LiveKitRoom>
+	);
+}
 export function ChannelApps({
 	appChannel,
 	miniAppRef,
@@ -20,13 +66,15 @@ export function ChannelApps({
 
 	const [loading, setLoading] = useState(false);
 	const joinCall = useSelector(selectEnableCall);
-	const enableMic = useSelector(selectEnableMic);
-	const enableVideo = useSelector(selectEnableVideo);
 	const [token, setToken] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
+		dispatch(channelAppActions.setRoomId(null));
+	}, [appChannel, dispatch]);
+
+	useEffect(() => {
 		const fetchData = async () => {
-			if (!roomId || !joinCall) {
+			if (!roomId || !joinCall || !appChannel.channel_id) {
 				setToken(undefined);
 				return;
 			}
@@ -35,8 +83,8 @@ export function ChannelApps({
 			try {
 				const result = await dispatch(
 					fetchJoinMezonMeet({
-						channelId: appChannel.channel_id || '',
-						roomName: roomId
+						channelId: appChannel.channel_id,
+						roomName: appChannel.channel_id + '-' + roomId
 					})
 				).unwrap();
 
@@ -50,7 +98,7 @@ export function ChannelApps({
 		};
 
 		fetchData();
-	}, [appChannel.channel_id, dispatch, roomId, joinCall]);
+	}, [appChannel, dispatch, roomId, joinCall]);
 
 	return appChannel?.url ? (
 		<div className="flex flex-col w-full h-full">
@@ -60,37 +108,7 @@ export function ChannelApps({
 
 			{token ? (
 				<div className="h-[20%] flex justify-center items-center bg-gray-900 p-2">
-					<LiveKitRoom
-						video={enableVideo}
-						audio={enableMic}
-						token={token}
-						serverUrl={serverUrl}
-						data-lk-theme="empty"
-						className="w-full h-full flex justify-center items-center"
-					>
-						<RoomAudioRenderer />
-						{/* <div
-							style={{
-								position: 'relative',
-								width: '100%',
-								height: '100%',
-								backgroundColor: '#000',
-								overflow: 'hidden'
-							}}
-						>
-							<VideoConference
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									height: '100%',
-									objectFit: 'cover'
-								}}
-							/>
-						</div> */}
-						<VideoControls />
-					</LiveKitRoom>
+					<VideoRoom token={token} serverUrl={serverUrl} />
 				</div>
 			) : loading ? (
 				<div className="h-[20%] flex items-center justify-center">

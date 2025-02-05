@@ -26,7 +26,7 @@ export interface ChannelAppState {
 export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
-	roomId: '123',
+	roomId: null,
 	enableMic: false,
 	enableVideo: false,
 	enableCall: false
