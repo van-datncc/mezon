@@ -5815,7 +5815,7 @@ export const Spotify: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			enable-background="new 0 0 40 40"
+			enableBackground="new 0 0 40 40"
 			viewBox="0 0 40 40"
 			id="spotify"
 			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
