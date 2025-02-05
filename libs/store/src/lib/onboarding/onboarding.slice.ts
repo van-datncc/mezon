@@ -149,7 +149,7 @@ export const removeOnboardingTask = createAsyncThunk(
 
 export const enableOnboarding = createAsyncThunk(
 	'clans/updateClans',
-	async ({ clan_id, onboarding,banner }: { clan_id: string; onboarding: boolean; banner?:string }, thunkAPI) => {
+	async ({ clan_id, onboarding, banner }: { clan_id: string; onboarding: boolean; banner?: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
