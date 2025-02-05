@@ -14,7 +14,7 @@ type LabelDmProps = {
 const LabelDm = (props: LabelDmProps) => {
 	const { dmGroupId, currentDmGroup } = props;
 	const dispatch = useAppDispatch();
-	const initLabel = (currentDmGroup?.channel_label || currentDmGroup?.usernames) ?? '';
+	const initLabel = (currentDmGroup?.channel_label || currentDmGroup?.usernames?.join(',')) ?? '';
 	const [label, setLabel] = useState(initLabel);
 	const [openEditName, setOpenEditName] = useState(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -25,8 +25,7 @@ const LabelDm = (props: LabelDmProps) => {
 		distanceToBottom: 0
 	});
 	const isValidGroupName = useMemo(() => {
-		// return ValidateSpecialCharacters().test(label);
-		return ValidateSpecialCharacters().test(label[0]);
+		return ValidateSpecialCharacters().test(label);
 	}, [label]);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -65,9 +64,7 @@ const LabelDm = (props: LabelDmProps) => {
 	const handleSave = async () => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: dmGroupId || '',
-			// channel_label: label,
-			channel_label: label[0],
-
+			channel_label: label,
 			category_id: '0',
 			app_url: ''
 		};

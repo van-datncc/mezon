@@ -4,7 +4,6 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	RootState,
-	appActions,
 	directActions,
 	getStoreAsync,
 	selectDirectsOpenlistOrder,
@@ -43,11 +42,9 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-		dispatch(appActions.setHiddenBottomTabMobile(true));
 
 		return () => {
 			appStateSubscription.remove();
-			dispatch(appActions.setHiddenBottomTabMobile(false));
 		};
 	}, []);
 
