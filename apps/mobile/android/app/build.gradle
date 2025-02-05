@@ -83,7 +83,7 @@ android {
 
     namespace "com.mobile.mezon"
     defaultConfig {
-        applicationId "com.mobile.mezon"
+        applicationId "com.mezon.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 236
