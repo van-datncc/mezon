@@ -204,40 +204,40 @@ export const listChannelRenderSlice = createSlice({
 					if (!clanId || !channelId || !state.listChannelRender[clanId]) {
 						return;
 					}
-          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
-            if(channel.id === channelId || (channel as IChannel).parrent_id === channelId){
-              return {
-                ...channel,
-                count_mess_unread : 0
-              }
-            }
-            return channel
-          })
+					state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel) => {
+						if (channel.id === channelId || (channel as IChannel).parrent_id === channelId) {
+							return {
+								...channel,
+								count_mess_unread: 0
+							};
+						}
+						return channel;
+					});
 					break;
 				case EMarkAsReadType.CLAN:
-          if (!clanId || !state.listChannelRender[clanId]) {
+					if (!clanId || !state.listChannelRender[clanId]) {
 						return;
 					}
-          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
-              return {
-                ...channel,
-                count_mess_unread : 0
-              }
-          })
+					state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel) => {
+						return {
+							...channel,
+							count_mess_unread: 0
+						};
+					});
 					break;
 				case EMarkAsReadType.CATEGORY:
-          if (!clanId || !categoryId || !state.listChannelRender[clanId]) {
+					if (!clanId || !categoryId || !state.listChannelRender[clanId]) {
 						return;
 					}
-          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
-            if((channel as IChannel).category_id === categoryId){
-              return {
-                ...channel,
-                count_mess_unread : 0
-              }
-            }
-            return channel
-          })
+					state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel) => {
+						if ((channel as IChannel).category_id === categoryId) {
+							return {
+								...channel,
+								count_mess_unread: 0
+							};
+						}
+						return channel;
+					});
 					break;
 				default:
 					break;

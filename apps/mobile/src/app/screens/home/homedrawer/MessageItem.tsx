@@ -20,6 +20,7 @@ import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageCallLog } from './components/MessageCallLog';
+import MessageSendTokenLog from './components/MessageSendTokenLog';
 import MessageTopic from './components/MessageTopic/MessageTopic';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { MessageLineSystem } from './MessageLineSystem';
@@ -235,6 +236,10 @@ const MessageItem = React.memo(
 			return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
 		}, [isDM, message?.display_name, message?.user?.username]);
 
+		const isSendTokenLog = useMemo(() => {
+			return message?.code === TypeMessage.SendToken;
+		}, [message?.code]);
+
 		const handleLongPressMessage = useCallback(() => {
 			if (preventAction) return;
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
@@ -355,6 +360,8 @@ const MessageItem = React.memo(
 												senderId={message?.sender_id}
 												callLog={message?.content?.callLog}
 											/>
+										) : isSendTokenLog ? (
+											<MessageSendTokenLog messageContent={message?.content?.t} />
 										) : (
 											<RenderTextMarkdownContent
 												content={{
