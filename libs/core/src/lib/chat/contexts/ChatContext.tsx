@@ -265,17 +265,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			const contentOnMessage = (message.content as IMessageSendPayload).t;
+			const contentOnMessage = (message.content as IMessageSendPayload)?.t;
 			const isMessageBlankContent = contentOnMessage?.trim() === '';
 			if (isMessageBlankContent) {
 				// get mk token
-				const mkOnMessage = (message.content as IMessageSendPayload).mk;
+				const mkOnMessage = (message?.content as IMessageSendPayload)?.mk;
 				// add prefix into mk
 				const addPrefix = addMarkdownPrefix(mkOnMessage as IMarkdownOnMessage[], contentOnMessage);
 				// get content with prefix
 				const contentAddedPrefix = generateNewPlaintext(addPrefix as INewPosMarkdown[], contentOnMessage);
-				const prioritizedName = message.clan_nick || message.display_name || message.username;
-				const prioritizedAvatar = message.clan_avatar || message.avatar;
+				const prioritizedName = message?.clan_nick || message?.display_name || message?.username;
+				const prioritizedAvatar = message?.clan_avatar || message?.avatar;
 				const title = `${prioritizedName} send message for you`;
 				electronBridge.pushNotification(title, {
 					body: contentAddedPrefix,
