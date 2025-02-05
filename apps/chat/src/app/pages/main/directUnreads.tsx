@@ -31,8 +31,10 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 				<div>
 					<AvatarImage
 						draggable="false"
-						alt={direct.usernames || ''}
-						userName={direct.usernames}
+						// alt={direct.usernames || ''}
+						// userName={direct.usernames}
+						alt={(direct.usernames && direct.usernames[0]) ?? ''}
+						userName={(direct.usernames && direct.usernames[0]) ?? ''}
 						className="min-w-12 min-h-12 max-w-12 max-h-12"
 						srcImgProxy={
 							direct.type === ChannelType.CHANNEL_TYPE_DM

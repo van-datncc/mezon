@@ -19,7 +19,9 @@ import { AvatarImage } from '../AvatarImage/AvatarImage';
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
-	userName?: string;
+	// userName?: string;
+	userName?: string[];
+
 	mode: number;
 };
 
@@ -139,7 +141,9 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 
 type WelComeDmProps = {
 	name?: string;
-	userName?: string;
+	// userName?: string;
+	userName?: string[];
+
 	avatar?: string;
 	classNameSubtext: string;
 	showName: JSX.Element;
@@ -147,7 +151,9 @@ type WelComeDmProps = {
 };
 
 const WelComeDm = (props: WelComeDmProps) => {
-	const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
+	// const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
+	const { name = '', userName = [], avatar = '', classNameSubtext, showName, isDmGroup } = props;
+
 	const userID = useSelector(selectUserIdCurrentDm);
 	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
 
@@ -155,8 +161,10 @@ const WelComeDm = (props: WelComeDmProps) => {
 		<>
 			<AvatarImage
 				height={'75px'}
-				alt={userName}
-				userName={userName}
+				// alt={userName}
+				// userName={userName}
+				alt={userName[0]}
+				userName={userName[0]}
 				className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
 				srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 				src={avatar}
@@ -177,19 +185,25 @@ const WelComeDm = (props: WelComeDmProps) => {
 					)}
 				</p>
 			</div>
+			{/* {!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />} */}
 			{!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />}
 		</>
 	);
 };
 
 type StatusFriendProps = {
-	userName?: string;
+	// userName?: string;
+	userName?: string[];
+
 	checkAddFriend?: number;
 	userID: string;
 };
 
 const StatusFriend = memo((props: StatusFriendProps) => {
-	const { userName = '', checkAddFriend, userID } = props;
+	// const { userName = '', checkAddFriend, userID } = props;
+	// const { userName = '', checkAddFriend, userID } = props;
+	const { userName = [], checkAddFriend, userID } = props;
+
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
 
 	const title = useMemo(() => {
@@ -209,21 +223,22 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 		switch (checkAddFriend) {
 			case EStateFriend.MY_PENDING:
 				if (index === 0) {
-					acceptFriend(userName, userID);
+					acceptFriend(userName[0], userID);
 					break;
 				}
-				deleteFriend(userName, userID);
+				deleteFriend(userName[0], userID);
 				break;
 			case EStateFriend.OTHER_PENDING:
 				// return "Friend Request Sent"
 				break;
 			case EStateFriend.FRIEND:
-				deleteFriend(userName, userID);
+				deleteFriend(userName[0], userID);
 				break;
 			default:
 				addFriend({
 					ids: [userID],
-					usernames: [userName]
+					// usernames: [userName]
+					usernames: userName
 				});
 		}
 	};
