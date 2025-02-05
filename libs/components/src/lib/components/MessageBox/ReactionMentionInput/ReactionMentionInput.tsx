@@ -67,6 +67,7 @@ import {
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	MentionReactInputProps,
+	RequestInput,
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadStatus,
@@ -311,7 +312,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			const { text, entities } = parseHtmlAsFormattedText(hasToken ? request.content : request.content.trim());
+			const emptyRequest: RequestInput = {
+				content: '',
+				valueTextInput: '',
+				mentionRaw: []
+			};
+			const checkedRequest = request ? request : emptyRequest;
+			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
@@ -330,7 +337,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				props.handleConvertToFile(payload.t ?? '');
 				setRequestInput(
 					{
-						...request,
+						...checkedRequest,
 						valueTextInput: displayMarkup,
 						content: displayPlaintext
 					},
