@@ -25,7 +25,8 @@ const LabelDm = (props: LabelDmProps) => {
 		distanceToBottom: 0
 	});
 	const isValidGroupName = useMemo(() => {
-		return ValidateSpecialCharacters().test(label);
+		// return ValidateSpecialCharacters().test(label);
+		return ValidateSpecialCharacters().test(label[0]);
 	}, [label]);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -64,7 +65,9 @@ const LabelDm = (props: LabelDmProps) => {
 	const handleSave = async () => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: dmGroupId || '',
-			channel_label: label,
+			// channel_label: label,
+			channel_label: label[0],
+
 			category_id: '0',
 			app_url: ''
 		};

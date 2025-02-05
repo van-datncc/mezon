@@ -5815,7 +5815,7 @@ export const Spotify: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			enable-background="new 0 0 40 40"
+			enableBackground="new 0 0 40 40"
 			viewBox="0 0 40 40"
 			id="spotify"
 			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
@@ -6549,7 +6549,7 @@ export function PlayButton(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
 			<g id="SVGRepo_iconCarrier">
 				{' '}
-				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
+				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
 					{' '}
 					<g id="Dribbble-Light-Preview" transform="translate(-427.000000, -3765.000000)" fill="currentColor">
 						{' '}
@@ -6606,7 +6606,7 @@ export function PauseButton(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
 			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
 			<g id="SVGRepo_iconCarrier">
-				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
+				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
 					{' '}
 					<g id="Dribbble-Light-Preview" transform="translate(-67.000000, -3765.000000)" fill="currentColor">
 						{' '}

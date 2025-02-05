@@ -19,7 +19,8 @@ const Layout = memo((props: LayoutProps) => {
 					<div className="md:px-[32px] flex flex-col gap-[20px] text-center">
 						<div className="text-[36px] leading-[44px] font-semibold text-[#F4F7F9]">Overview</div>
 						<div className="text-[20px] leading-[30px] font-normal text-[#8FA7BF]">
-							Mezon is a communication platform <br /> that combines chat features with blockchain technology.{' '}
+							Mezon is a new way to communicate with your team.
+							<br /> It's faster, better organized, better for WFH.{' '}
 						</div>
 					</div>
 					<div className="md:px-[32px] flex items-stretch gap-[64px] max-lg:flex-col max-lg:gap-[32px]">
@@ -40,7 +41,7 @@ const Layout = memo((props: LayoutProps) => {
 										fontFamily: 'Poppins'
 									}}
 								>
-									Blockchain Integration
+									Work Station
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
 									Mezon combines traditional chat features with blockchain technology. This allows for a decentralized economy where
@@ -66,7 +67,7 @@ const Layout = memo((props: LayoutProps) => {
 										fontFamily: 'Poppins'
 									}}
 								>
-									Developer Empowerment
+									Ecosystem
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
 									Mezon provides API integration, enabling developers to create custom functionalities tailored to their
@@ -91,7 +92,7 @@ const Layout = memo((props: LayoutProps) => {
 										fontFamily: 'Poppins'
 									}}
 								>
-									Vision for the Future
+									AI Agent
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
 									Mezon aims to reshape online communities by merging communication, economy, and customization into a seamless
