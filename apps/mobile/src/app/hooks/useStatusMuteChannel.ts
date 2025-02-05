@@ -13,7 +13,7 @@ const useStatusMuteChannel = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [statusMute, setStatusMute] = useState<ENotificationActive>(ENotificationActive.ON);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel.id));
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.id));
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
 		if (
