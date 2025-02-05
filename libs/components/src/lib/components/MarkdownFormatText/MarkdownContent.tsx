@@ -108,7 +108,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'break-spaces' }}
 			>
-				{contentBacktick}
+				{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
 			</code>
 		</span>
 	);
@@ -133,7 +133,9 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 					</button>
 				</CopyToClipboard>
-				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
+				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>
+					{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
+				</code>
 			</pre>
 		</div>
 	);

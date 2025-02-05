@@ -72,15 +72,19 @@ import {
 	EEventStatus,
 	EOverriddenPermission,
 	ERepeatType,
+	IMarkdownOnMessage,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
+	INewPosMarkdown,
 	ModeResponsive,
 	NotificationCode,
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
-	electronBridge
+	addMarkdownPrefix,
+	electronBridge,
+	generateNewPlaintext
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -124,7 +128,7 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import { ApiChannelMessageHeader, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
+import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useStore } from 'react-redux';
@@ -261,6 +265,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			const contentOnMessage = (message.content as IMessageSendPayload)?.t;
+			const isMessageBlankContent = contentOnMessage?.trim() === '';
+			if (isMessageBlankContent) {
+				// get mk token
+				const mkOnMessage = (message?.content as IMessageSendPayload)?.mk;
+				// add prefix into mk
+				const addPrefix = addMarkdownPrefix(mkOnMessage as IMarkdownOnMessage[], contentOnMessage);
+				// get content with prefix
+				const contentAddedPrefix = generateNewPlaintext(addPrefix as INewPosMarkdown[], contentOnMessage);
+				const prioritizedName = message?.clan_nick || message?.display_name || message?.username;
+				const prioritizedAvatar = message?.clan_avatar || message?.avatar;
+				const title = `${prioritizedName} send message for you`;
+				electronBridge.pushNotification(title, {
+					body: contentAddedPrefix,
+					icon: prioritizedAvatar,
+					data: {
+						link: ''
+					}
+				});
+			}
+
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
@@ -502,6 +527,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		},
 		[currentChannel?.channel_id, dispatch]
+	);
+
+	const oneventnotiuserchannel = useCallback(
+		(notiUserChannel: ApiNotificationUserChannel) => {
+			dispatch(notificationSettingActions.upsertNotiSetting(notiUserChannel));
+		},
+		[dispatch]
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
@@ -1331,6 +1363,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpinmessage = onpinmessage;
 
+			socket.oneventnotiuserchannel = oneventnotiuserchannel;
+
 			socket.onlastseenupdated = onlastseenupdated;
 
 			socket.onuserchannelremoved = onuserchannelremoved;
@@ -1407,6 +1441,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			oneventnotiuserchannel,
 			onlastseenupdated,
 			onuserchannelremoved,
 			onuserclanremoved,
@@ -1492,6 +1527,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oneventnotiuserchannel = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onlastseenupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncustomstatus = () => {};
@@ -1540,6 +1577,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		oneventnotiuserchannel,
 		onlastseenupdated,
 		onuserchannelremoved,
 		onuserclanremoved,

@@ -48,8 +48,7 @@ export const listChannelRenderSlice = createSlice({
 							listFavorChannel.push({
 								...channel,
 								isFavor: true,
-								category_id: 'favorCate',
-								channel_id: `favor-${channel.id}`
+								category_id: 'favorCate'
 							});
 						}
 						listChannelRender.push(channel);
@@ -142,7 +141,7 @@ export const listChannelRenderSlice = createSlice({
 			const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
 			if (isExistChannel === -1 && clanId) {
 				const indexInsert = state.listChannelRender[clanId]?.findIndex(
-					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id
+					(channel) => (channel as IChannel)?.channel_id === channelData.parrent_id && !(channel as IChannel).isFavor
 				);
 
 				if (indexInsert === -1) {
@@ -160,7 +159,7 @@ export const listChannelRenderSlice = createSlice({
 			if (!state.listChannelRender[clanId]) {
 				return;
 			}
-			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			const updateIndex = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId && !(channel as IChannel).isFavor);
 			if (updateIndex === -1) {
 				return;
 			}
@@ -172,7 +171,9 @@ export const listChannelRenderSlice = createSlice({
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
 			if (state.listChannelRender[clanId]) {
-				const indexUpdate = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				const indexUpdate = state.listChannelRender[clanId]?.findIndex(
+					(channel) => channel.id === channelId && !(channel as IChannel).isFavor
+				);
 				if (indexUpdate === -1) {
 					return;
 				}
@@ -180,6 +181,66 @@ export const listChannelRenderSlice = createSlice({
 					...state.listChannelRender[clanId][indexUpdate],
 					count_mess_unread: 0
 				};
+			}
+		},
+		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+			if (state.listChannelRender[clanId]) {
+				const indexRemove = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				if (indexRemove === -1) {
+					return;
+				}
+				state.listChannelRender[clanId]?.splice(indexRemove, 1);
+				state.listChannelRender[clanId].join();
+			}
+		},
+		handleMarkAsReadListRender: (
+			state,
+			action: PayloadAction<{ channelId?: string; clanId?: string; categoryId?: string; type: EMarkAsReadType }>
+		) => {
+			const { channelId, clanId, categoryId, type } = action.payload;
+			switch (type) {
+				case EMarkAsReadType.CHANNEL:
+					if (!clanId || !channelId || !state.listChannelRender[clanId]) {
+						return;
+					}
+          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
+            if(channel.id === channelId || (channel as IChannel).parrent_id === channelId){
+              return {
+                ...channel,
+                count_mess_unread : 0
+              }
+            }
+            return channel
+          })
+					break;
+				case EMarkAsReadType.CLAN:
+          if (!clanId || !state.listChannelRender[clanId]) {
+						return;
+					}
+          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
+              return {
+                ...channel,
+                count_mess_unread : 0
+              }
+          })
+					break;
+				case EMarkAsReadType.CATEGORY:
+          if (!clanId || !categoryId || !state.listChannelRender[clanId]) {
+						return;
+					}
+          state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel)=>{
+            if((channel as IChannel).category_id === categoryId){
+              return {
+                ...channel,
+                count_mess_unread : 0
+              }
+            }
+            return channel
+          })
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -207,7 +268,6 @@ export const selectListChannelRenderByClanId = createSelector(
 function sortChannels(channels: IChannel[]): IChannel[] {
 	const sortedChannels: IChannel[] = [];
 
-	// Add channel into list first
 	channels.forEach((channel) => {
 		if (!channel.parrent_id || channel.parrent_id === '0') {
 			sortedChannels.push(channel);
@@ -222,6 +282,11 @@ function sortChannels(channels: IChannel[]): IChannel[] {
 				acc.push(child);
 			});
 	}
-
 	return sortedChannels;
+}
+
+export enum EMarkAsReadType {
+	CHANNEL,
+	CLAN,
+	CATEGORY
 }

@@ -652,7 +652,7 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 	return matchPositions;
 };
 
-export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T {
+export function filterEmptyArrays<T extends Record<any, any>>(payload: T): T {
 	return Object.entries(payload)
 		.filter(([_, value]) => !(Array.isArray(value) && value.length === 0))
 		.reduce((acc, [key, value]) => {
@@ -1109,3 +1109,12 @@ export function getYouTubeEmbedSize(url: string) {
 	}
 	return { width: '400px', height: '225px' };
 }
+
+export const formatMoney = (number: number) => {
+	if (number === 0) {
+		return 0;
+	}
+	if (number) {
+		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	}
+};

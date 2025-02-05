@@ -5,6 +5,7 @@ import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -167,6 +168,7 @@ export const leaveThread = createAsyncThunk(
 			if (response) {
 				thunkAPI.dispatch(channelsActions.removeByChannelID({ channelId: threadId, clanId }));
 				thunkAPI.dispatch(threadsActions.remove(threadId));
+        thunkAPI.dispatch(listChannelRenderAction.leaveChannelListRender({ channelId: threadId, clanId }))
 				await updateCacheThread(mezon, channelId, clanId, threadId);
 				return threadId;
 			}

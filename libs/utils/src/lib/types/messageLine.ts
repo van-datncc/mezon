@@ -41,6 +41,7 @@ export interface INewPos {
 	ns?: number;
 	markerNumber?: number;
 	value?: string;
+	accumulatedMarkerTotal?: number;
 }
 export interface IPre {
 	l?: string; // language
