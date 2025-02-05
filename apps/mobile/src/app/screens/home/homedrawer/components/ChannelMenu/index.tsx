@@ -18,7 +18,7 @@ import {
 	selectAllChannelsFavorite,
 	selectCurrentClan,
 	selectCurrentUserId,
-	selectSelectedChannelNotificationSetting,
+	selectNotifiSettingsEntitiesById,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -58,7 +58,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
-	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(channel?.channel_id));
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	const isChannelUnmute = useMemo(() => {

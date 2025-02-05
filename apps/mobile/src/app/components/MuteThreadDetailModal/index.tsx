@@ -4,8 +4,9 @@ import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	notificationSettingActions,
-	selectCurrentChannelNotificatonSelected,
+	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS, IChannel } from '@mezon/utils';
@@ -119,8 +120,8 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 			</View>
 		)
 	});
-
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannelId));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 

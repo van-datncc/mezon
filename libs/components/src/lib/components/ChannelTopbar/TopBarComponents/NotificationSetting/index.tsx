@@ -2,12 +2,13 @@ import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	notifiReactMessageActions,
 	notificationSettingActions,
+	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiReactMessage,
+	selectNotifiSettingsEntitiesById,
 	useAppDispatch
 } from '@mezon/store';
 import { ENotificationTypes, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
@@ -19,7 +20,8 @@ import { notiLabels, notificationTypesList } from '../../../PanelChannel';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
 
 const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRef?: RefObject<HTMLElement> }) => {
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.id || ''));
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);

@@ -40,7 +40,6 @@ import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../componentUI';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import SharingSuggestItem from './SharingSuggestItem';
@@ -164,7 +163,6 @@ export const Sharing = ({ data, onClose }) => {
 				isPublic: false
 			})
 		);
-		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			'0',
@@ -179,13 +177,6 @@ export const Sharing = ({ data, onClose }) => {
 			getAttachmentUnique(attachmentUpload) || [],
 			[]
 		);
-		navigation.goBack();
-		timerRef.current = setTimeout(() => {
-			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-				params: { directMessageId: channelSelected?.channel_id || '' }
-			});
-		}, 1000);
 	};
 
 	useEffect(() => {
