@@ -170,6 +170,19 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	const isNotThread = channel?.parrent_id === '0';
 
 	const isPrivateChannel = channel?.channel_private === ChannelStatusEnum.isPrivate;
+
+	const fetchThreads = async () => {
+		if (!channel?.channel_id) {
+			return;
+		}
+		const body = {
+			channelId: channel?.parrent_id !== '0' ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
+			clanId: channel?.clan_id ?? '',
+			page: 1
+		};
+		await dispatch(threadsActions.fetchThreads(body));
+	};
+
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -183,7 +196,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 								<div className="relative justify-start items-center gap-[15px] flex mr-4">
 									{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
 									{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-									<ThreadButton isLightMode={appearanceTheme === 'light'} />
+									<ThreadButton isLightMode={appearanceTheme === 'light'} fetchThreads={fetchThreads} />
 									<MuteButton isLightMode={appearanceTheme === 'light'} />
 									<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
 									<div onClick={() => setTurnOffThreadMessage()}>
@@ -257,13 +270,17 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
+function ThreadButton({ isLightMode, fetchThreads }: { isLightMode: boolean; fetchThreads: () => void }) {
 	const isShowThread = useSelector(selectIsThreadModalVisible);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
 	const dispatch = useDispatch();
+
 	const handleToggleThreads = () => {
+		if (!isShowThread) {
+			fetchThreads();
+		}
 		dispatch(threadsActions.toggleThreadModal());
 	};
 
