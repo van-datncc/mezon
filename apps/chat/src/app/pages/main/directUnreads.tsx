@@ -31,8 +31,6 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 				<div>
 					<AvatarImage
 						draggable="false"
-						// alt={direct.usernames || ''}
-						// userName={direct.usernames}
 						alt={direct.usernames?.toString() ?? ''}
 						userName={direct.usernames?.toString() ?? ''}
 						className="min-w-12 min-h-12 max-w-12 max-h-12"

@@ -20,7 +20,6 @@ export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
 	userName?: string;
-	// userName?: string[];
 
 	mode: number;
 };
@@ -142,7 +141,6 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 type WelComeDmProps = {
 	name?: string;
 	userName?: string;
-	// userName?: string[];
 
 	avatar?: string;
 	classNameSubtext: string;
@@ -151,7 +149,6 @@ type WelComeDmProps = {
 };
 
 const WelComeDm = (props: WelComeDmProps) => {
-	// const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
 	const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
 
 	const userID = useSelector(selectUserIdCurrentDm);
@@ -163,8 +160,6 @@ const WelComeDm = (props: WelComeDmProps) => {
 				height={'75px'}
 				alt={userName}
 				userName={userName}
-				// alt={userName[0]}
-				// userName={userName[0]}
 				className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
 				srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 				src={avatar}
@@ -193,16 +188,13 @@ const WelComeDm = (props: WelComeDmProps) => {
 
 type StatusFriendProps = {
 	userName?: string;
-	// userName?: string[];
 
 	checkAddFriend?: number;
 	userID: string;
 };
 
 const StatusFriend = memo((props: StatusFriendProps) => {
-	// const { userName = '', checkAddFriend, userID } = props;
 	const { userName = '', checkAddFriend, userID } = props;
-	// const { userName = [], checkAddFriend, userID } = props;
 
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
 
@@ -238,7 +230,6 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				addFriend({
 					ids: [userID],
 					usernames: [userName]
-					// usernames: userName
 				});
 		}
 	};

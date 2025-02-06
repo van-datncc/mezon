@@ -15,7 +15,6 @@ export type MessageProps = {
 	channelLabel: string;
 	avatarDM?: string;
 	userName?: string;
-	// userName?: string[];
 
 	isLastSeen?: boolean;
 	index: number;

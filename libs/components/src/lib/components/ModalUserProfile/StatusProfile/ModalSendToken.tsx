@@ -122,6 +122,7 @@ const ModalSendToken = ({
 
 		return Array.from(userMap.values());
 	};
+
 	const mergedUsers = mergeUniqueUsers(usersClan, listDM);
 
 	const filteredUsers = mergedUsers.filter((user: any) => user.username?.toLowerCase().includes(searchTerm.toLowerCase()) && user.id !== userId);

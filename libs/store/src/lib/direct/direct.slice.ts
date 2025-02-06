@@ -373,7 +373,6 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 			...channel_desc,
 			id: channel_desc.channel_id || '',
 			user_id: userIds,
-			// usernames: usernames.join(','),
 			usernames: usernames,
 			channel_avatar: avatars,
 			is_online: isOnline,
