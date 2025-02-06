@@ -1,4 +1,11 @@
-import { notificationSettingActions, selectBuzzStateByChannelId, selectEventsByChannelId, selectIsUnreadChannelById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	notificationSettingActions,
+	selectBuzzStateByChannelId,
+	selectEventsByChannelId,
+	selectIsUnreadChannelById,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -47,7 +54,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		}
 	}));
 
-  const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -55,7 +62,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		const windowHeight = window.innerHeight;
 		const distanceToBottom = windowHeight - event.clientY;
 		coords.current = { mouseX, mouseY, distanceToBottom };
-    await dispatch(notificationSettingActions.getNotificationSetting({channelId : thread.id , isCurrentChannel :isActive }));
+		await dispatch(notificationSettingActions.getNotificationSetting({ channelId: thread.id, isCurrentChannel: isActive }));
 		openProfileItem();
 	};
 
@@ -71,7 +78,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				rootRef={panelRef}
 			/>
 		);
-	}, []);
+	}, [thread.count_mess_unread]);
 
 	const [openDeleteModal, closeDeleteModal] = useModal(() => {
 		return <DeleteModal onClose={closeDeleteModal} channelLabel={thread.channel_label || ''} channelId={thread.channel_id as string} />;

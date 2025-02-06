@@ -220,8 +220,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								? 'assets/images/avatar-group.png'
 								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
 						}
-						// name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
-						name={(currentDmGroup?.usernames && currentDmGroup?.usernames[0]) || `${currentDmGroup?.creator_name}'s Group`}
+						name={currentDmGroup.channel_label ?? ''}
 						status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
 						isHideStatus={true}
 						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
@@ -334,7 +333,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								key={index}
 								height={'75px'}
 								alt={`Avatar ${index + 1}`}
-								userName={`Avatar ${index + 1}`}
+								username={`Avatar ${index + 1}`}
 								className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
 								srcImgProxy={createImgproxyUrl(avatar ?? '', {
 									width: 300,

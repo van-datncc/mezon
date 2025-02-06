@@ -30,7 +30,7 @@ import { style } from './styles';
 
 type Receiver = {
 	id?: string;
-	username?: string;
+	username?: Array<string>;
 	avatar_url?: string;
 };
 
@@ -71,7 +71,11 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				if (userId && !userMap.has(userId)) {
 					userMap.set(userId, {
 						id: userId,
-						username: itemUserClan?.user?.username ?? '',
+						username: [
+							typeof itemUserClan?.user?.username === 'string'
+								? itemUserClan?.user?.username
+								: (itemUserClan?.user?.username?.[0] ?? '')
+						] as Array<string>,
 						avatar_url: itemUserClan?.user?.avatar_url ?? ''
 					});
 				}
@@ -82,7 +86,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			if (userId && !userMap.has(userId)) {
 				userMap.set(userId, {
 					id: userId,
-					username: itemDM?.usernames ?? '',
+					username: [typeof itemDM?.usernames === 'string' ? itemDM?.usernames : (itemDM?.usernames?.[0] ?? '')] as Array<string>,
 					avatar_url: itemDM?.channel_avatar?.[0] ?? ''
 				});
 			}
@@ -93,7 +97,11 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			if (userId && !userMap.has(userId)) {
 				userMap.set(userId, {
 					id: userId,
-					username: itemFriend?.user?.display_name ?? itemFriend?.user?.username ?? '',
+					username: [
+						typeof itemFriend?.user?.display_name === 'string'
+							? itemFriend?.user?.display_name
+							: (itemFriend?.user?.display_name?.[0] ?? '')
+					] as Array<string>,
 					avatar_url: itemFriend?.user?.avatar_url ?? ''
 				});
 			}
@@ -136,7 +144,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 
 			const tokenEvent: ApiTokenSentEvent = {
 				sender_id: userProfile?.user?.id || '',
-				sender_name: userProfile?.user?.username || '',
+				sender_name: userProfile?.user?.username?.[0] || userProfile?.user?.username || '',
 				receiver_id: selectedUser?.id || '',
 				amount: Number(plainTokenCount || 1),
 				note: note || '',
@@ -197,7 +205,9 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	const filteredUsers = useMemo(() => {
-		return mergeUser.filter((user) => user.username.toLowerCase().includes(searchText.toLowerCase()));
+		return mergeUser.filter((user) =>
+			(typeof user?.username === 'string' ? user?.username : user?.username?.[0] || '')?.toLowerCase().includes(searchText.toLowerCase())
+		);
 	}, [mergeUser, searchText]);
 
 	const renderItem = ({ item }) => {
@@ -236,7 +246,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				<View>
 					<Text style={styles.title}>Send Token To ?</Text>
 					<TouchableOpacity style={[styles.textField, { height: size.s_50 }]} onPress={handleOpenBottomSheet}>
-						<Text style={styles.userName}>{selectedUser?.username}</Text>
+						<Text style={styles.username}>{selectedUser?.username}</Text>
 					</TouchableOpacity>
 				</View>
 				<View>

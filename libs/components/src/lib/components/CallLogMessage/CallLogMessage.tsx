@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 
 type CallLogMessageProps = {
 	userId: string;
-	userName: string;
+	username: string;
 	messageId: string;
 	channelId: string;
 	senderId: string;
@@ -78,7 +78,7 @@ const iconMap: { [key: string]: { icon: JSX.Element; text: string; colorClass: s
 	}
 };
 
-export default function CallLogMessage({ userId, userName, messageId, channelId, senderId, callLog, contentMsg }: CallLogMessageProps) {
+export default function CallLogMessage({ userId, username, messageId, channelId, senderId, callLog, contentMsg }: CallLogMessageProps) {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	const sessionUser = useSelector(selectSession);
@@ -92,7 +92,7 @@ export default function CallLogMessage({ userId, userName, messageId, channelId,
 
 	const { icon, text, colorClass, bgClass } = iconMap[key] || {
 		icon: <Icons.OutGoingCall defaultSize="w-6 h-6" />,
-		text: `${userName} started a ${callLog.isVideo ? 'video' : 'audio'} call`,
+		text: `${username} started a ${callLog.isVideo ? 'video' : 'audio'} call`,
 		colorClass: 'dark:text-textPrimary text-colorTextLightMode',
 		bgClass: ''
 	};

@@ -20,18 +20,20 @@ const MessageSendTokenLog = memo(({ messageContent }: MessageSendTokenLogProps) 
 	};
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.info}>
-				<Icons.Transaction height={size.s_50} width={size.s_50} color={baseColor.bgSuccess} />
-				<View>
-					<Text style={styles.title}>{messageContent}</Text>
-					<Text style={styles.lightTitle}>Transaction</Text>
+		<View style={{ flexDirection: 'row' }}>
+			<View style={styles.container}>
+				<View style={styles.info}>
+					<Icons.Transaction height={size.s_50} width={size.s_50} color={baseColor.bgSuccess} />
+					<View>
+						<Text style={styles.title}>{messageContent}</Text>
+						<Text style={styles.lightTitle}>Transaction</Text>
+					</View>
 				</View>
+				<View style={styles.seperatedItem} />
+				<TouchableOpacity style={styles.transaction} onPress={handleTransaction}>
+					<Text style={styles.buttonTitle}>Mezon transfer</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.seperatedItem} />
-			<TouchableOpacity style={styles.transaction} onPress={handleTransaction}>
-				<Text style={styles.buttonTitle}>Mezon transfer</Text>
-			</TouchableOpacity>
 		</View>
 	);
 });

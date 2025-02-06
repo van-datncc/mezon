@@ -48,8 +48,8 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		return usersNotInSelectedRole.filter((user) => {
 			const clanName = user?.clan_nick?.toLowerCase();
 			const displayName = user.user?.display_name?.toLowerCase();
-			const userName = user.user?.username?.toLowerCase();
-			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+			const username = user.user?.username?.toLowerCase();
+			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || username?.includes(lowerCaseSearchTerm);
 		});
 	}, [searchTerm, usersNotInSelectedRole]);
 
@@ -109,7 +109,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 									<ItemMemberModal
 										key={user?.id}
 										id={user?.id}
-										userName={user?.user?.username}
+										username={user?.user?.username}
 										displayName={user?.user?.display_name}
 										clanName={user?.clan_nick}
 										clanAvatar={user.clan_avatar}
@@ -148,7 +148,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 
 type ItemMemberModalProps = {
 	id?: string;
-	userName?: string;
+	username?: string;
 	displayName?: string;
 	clanName?: string;
 	clanAvatar?: string;
@@ -158,23 +158,23 @@ type ItemMemberModalProps = {
 };
 
 const ItemMemberModal = (props: ItemMemberModalProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked = false, onHandle } = props;
-	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked = false, onHandle } = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<li key={id}>
 			<label htmlFor={id} className="w-full inline-flex justify-between items-center">
 				<div className="inline-flex gap-x-2">
 					<AvatarImage
-						alt={userName}
-						userName={userName}
+						alt={username}
+						username={username}
 						className="min-w-5 min-h-5 max-w-5 max-h-5"
 						srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>
 					<p className="font-semibold one-line">{namePrioritize}</p>
-					<p className="text-contentTertiary one-line">{userName}</p>
+					<p className="text-contentTertiary one-line">{username}</p>
 				</div>
 				<input id={id} type="checkbox" checked={checked} onChange={(event) => onHandle(event.target.checked)} />
 			</label>

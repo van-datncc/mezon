@@ -22,20 +22,20 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		}
 	};
 
-	const handleAcceptFriend = (userName: string, id: string) => {
-		acceptFriend(userName, id);
+	const handleAcceptFriend = (username: string, id: string) => {
+		acceptFriend(username, id);
 	};
 
-	const handleDeleteFriend = (userName: string, id: string) => {
-		deleteFriend(userName, id);
+	const handleDeleteFriend = (username: string, id: string) => {
+		deleteFriend(username, id);
 	};
 
-	const handleBlockFriend = (userName: string, id: string) => {
-		blockFriend(userName, id);
+	const handleBlockFriend = (username: string, id: string) => {
+		blockFriend(username, id);
 	};
 
-	const handleUnBlockFriend = (userName: string, id: string) => {
-		unBlockFriend(userName, id);
+	const handleUnBlockFriend = (username: string, id: string) => {
+		unBlockFriend(username, id);
 	};
 
 	const userFriend = useMemo(() => {
@@ -55,7 +55,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
-						userNameAva={friend?.user?.username ?? ''}
+						usernameAva={friend?.user?.username ?? ''}
 						status={{ status: friend.user?.online, isMobile: false }}
 						isHideStatus={friend.state !== 0 ? true : false}
 						isHideIconStatus={friend.state !== 0 ? true : false}

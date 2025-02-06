@@ -63,16 +63,30 @@ export const ENTITY_CLASS_BY_NODE_NAME: Record<string, ApiMessageEntityTypes> = 
 const MAX_TAG_DEEPNESS = 3;
 
 export function escapeHtml(html: string) {
+	const parts = html.split(/(<a\b[^>]*>.*?<\/a>)/gi);
 	const fragment = document.createElement('div');
-	const text = document.createTextNode(html);
-	fragment.appendChild(text);
+
+	parts.forEach((part) => {
+		if (!part) return;
+
+		if (part.startsWith('<a')) {
+			const temp = document.createElement('div');
+			temp.innerHTML = part;
+			fragment.appendChild(temp.firstChild!);
+		} else {
+			// Escape non-link content
+			const text = document.createTextNode(part);
+			fragment.appendChild(text);
+		}
+	});
+
 	return fragment.innerHTML;
 }
 
 export function parseHtmlAsFormattedText(html: string): ApiFormattedText {
-	html = escapeHtml(html);
 	const fragment = document.createElement('div');
-	fragment.innerHTML = parseMarkdown(parseMarkdownLinks(html));
+	fragment.innerHTML = parseMarkdown(escapeHtml(parseMarkdownLinks(html)));
+
 	fixImageContent(fragment);
 	const text = fragment.innerText;
 	const trimShift = fragment.innerText.indexOf(text[0]);
@@ -128,8 +142,6 @@ function parseMarkdown(html: string) {
 	let parsedHtml = html.slice(0);
 
 	// Define a regex to match mentions
-	const mentionRegex = /@\[(.*?)\]\(\d+\)/g;
-	const emojiRegex = /::\[(.*?)\]\(\d+\)/g;
 
 	// Strip redundant nbsp's
 	parsedHtml = parsedHtml.replace(/&nbsp;/g, ' ');
@@ -144,74 +156,46 @@ function parseMarkdown(html: string) {
 	parsedHtml = parsedHtml.replace(/<div>/g, '\n');
 	parsedHtml = parsedHtml.replace(/<\/div>/g, '');
 
-	parsedHtml = parsedHtml.replace(emojiRegex, (match, display) => {
-		return display;
-	});
-
 	// Pre
-	parsedHtml = parsedHtml.replace(/^`{3}[\n\r]?(.*?)[\n\r]?`{3}/gms, (match, p1, offset) => {
-		let data = '';
-		if (mentionRegex.test(p1)) {
-			data = match
-				.replace(mentionRegex, (match, display) => {
-					return '@' + display;
-				})
-				.replace(/`/g, `'`);
-		}
-		return data || `<pre>${p1}</pre>`;
-	});
+	parsedHtml = parsedHtml.replace(/^`{3}[\n\r]?(.*?)[\n\r]?`{3}/gms, '<pre>$1</pre>');
+	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, '<pre>$1</pre>');
 
-	parsedHtml = parsedHtml.replace(/[`]{3}([^`]+)[`]{3}/g, (match, p1, offset) => {
-		let data = '';
-		if (mentionRegex.test(p1)) {
-			data = match
-				.replace(mentionRegex, (match, display) => {
-					return '@' + display;
-				})
-				.replace(/`/g, `'`);
-		}
-		return data || `<pre>${p1}</pre>`;
-	});
-
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, (match, p1, p2) => {
-		let data = '';
-		if (mentionRegex.test(p2)) {
-			data = match.replace(mentionRegex, (_, display) => {
-				return '@' + display;
-			});
-		}
-		return data || `<code>${p2}</code>`;
-	});
+	// Code
+	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, '<code>$2</code>');
 
 	// Process bold markdown, but skip mentions
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*\n]+)[*]{2}(?![^<]*<\/(code|pre)>)/g, (match, p1, p2) => {
-		let data = '';
-		if (mentionRegex.test(p2)) {
-			data = match.replace(mentionRegex, (_, display) => {
-				return '@' + display;
-			});
-		}
-		return data || `<b>${p2}</b>`;
-	});
-
-	parsedHtml = parsedHtml.replace(mentionRegex, (_, display) => {
-		return '@' + display;
-	});
+	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*\n]+)[*]{2}(?![^<]*<\/(code|pre)>)/g, '<b>$2</b>');
 
 	return parsedHtml;
 }
+
 const LINK_TEMPLATE = /(?<!<a\s+href="[^"]*">)(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z]{2,}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/gi;
 
 function parseMarkdownLinks(html: string) {
-	const isCodeBlock = html.startsWith('```') && html.endsWith('```');
-	const isInlineCode = html.startsWith('`') && html.endsWith('`');
+	const parts = html.split(/(`{1,3})/);
+	let isInCode = false;
+	let result = '';
 
-	if (isCodeBlock || isInlineCode) {
-		return html;
+	for (let i = 0; i < parts.length; i++) {
+		const part = parts[i];
+		if (part.match(/^`{1,3}$/)) {
+			isInCode = !isInCode;
+			result += part;
+			continue;
+		}
+
+		if (isInCode) {
+			result += part;
+		} else {
+			result += part.replace(LINK_TEMPLATE, (url) => {
+				return `<a href="${url}" target="_blank">${url}</a>`;
+			});
+		}
 	}
 
-	return html.replace(LINK_TEMPLATE, (url) => `<a href="${url}" target="_blank">${url}</a>`);
+	return result;
 }
+
 function getEntityDataFromNode(node: ChildNode, rawText: string, textIndex: number): { index: number; entity?: any } {
 	const type = getEntityTypeFromNode(node);
 

@@ -19,20 +19,19 @@ import { AvatarImage } from '../AvatarImage/AvatarImage';
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
-	// userName?: string;
-	userName?: string[];
+	username?: string;
 
 	mode: number;
 };
 
-function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
+function ChatWelCome({ name, username, avatarDM, mode }: ChatWelComeProp) {
 	const { directId } = useAppParams();
 	const directChannel = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const selectedChannel = directId ? directChannel : currentChannel;
 	const user = useSelector(selectMemberClanByUserId(selectedChannel?.creator_id as string));
 	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
-	const showName = <span className="font-medium">{name || userName}</span>;
+	const showName = <span className="font-medium">{name || username}</span>;
 
 	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
 	const isChannelThread = selectedChannel?.parrent_id !== ChannelIsNotThread.TRUE;
@@ -50,7 +49,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 									currentThread={currentChannel}
 									name={name}
 									classNameSubtext={classNameSubtext}
-									userName={user?.user?.username}
+									username={user?.user?.username}
 								/>
 							) : (
 								<WelComeChannel
@@ -64,7 +63,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 						{(isDm || isDmGroup) && (
 							<WelComeDm
 								name={name || `${selectedChannel?.creator_name}'s Groups`}
-								userName={userName}
+								username={username}
 								avatar={avatarDM}
 								classNameSubtext={classNameSubtext}
 								showName={showName}
@@ -116,12 +115,12 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 type WelcomeChannelThreadProps = {
 	name?: string;
 	classNameSubtext: string;
-	userName?: string;
+	username?: string;
 	currentThread: ChannelsEntity | null;
 };
 
 const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
-	const { name = '', classNameSubtext, userName = '', currentThread } = props;
+	const { name = '', classNameSubtext, username = '', currentThread } = props;
 	return (
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
@@ -133,7 +132,7 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 				</p>
 			</div>
 			<p className={classNameSubtext}>
-				Started by <span className="dark:text-white text-black font-medium">{userName}</span>
+				Started by <span className="dark:text-white text-black font-medium">{username}</span>
 			</p>
 		</>
 	);
@@ -141,8 +140,7 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 
 type WelComeDmProps = {
 	name?: string;
-	// userName?: string;
-	userName?: string[];
+	username?: string;
 
 	avatar?: string;
 	classNameSubtext: string;
@@ -151,8 +149,7 @@ type WelComeDmProps = {
 };
 
 const WelComeDm = (props: WelComeDmProps) => {
-	// const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
-	const { name = '', userName = [], avatar = '', classNameSubtext, showName, isDmGroup } = props;
+	const { name = '', username = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
 
 	const userID = useSelector(selectUserIdCurrentDm);
 	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
@@ -161,10 +158,8 @@ const WelComeDm = (props: WelComeDmProps) => {
 		<>
 			<AvatarImage
 				height={'75px'}
-				// alt={userName}
-				// userName={userName}
-				alt={userName[0]}
-				userName={userName[0]}
+				alt={username}
+				username={username}
 				className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
 				srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 				src={avatar}
@@ -175,7 +170,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 					{name}
 				</p>
 			</div>
-			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{userName}</p>}
+			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{username}</p>}
 			<div className="text-base">
 				<p className={classNameSubtext}>
 					{isDmGroup ? (
@@ -185,24 +180,20 @@ const WelComeDm = (props: WelComeDmProps) => {
 					)}
 				</p>
 			</div>
-			{/* {!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />} */}
-			{!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />}
+			{!isDmGroup && <StatusFriend username={username} checkAddFriend={checkAddFriend} userID={userID[0]} />}
 		</>
 	);
 };
 
 type StatusFriendProps = {
-	// userName?: string;
-	userName?: string[];
+	username?: string;
 
 	checkAddFriend?: number;
 	userID: string;
 };
 
 const StatusFriend = memo((props: StatusFriendProps) => {
-	// const { userName = '', checkAddFriend, userID } = props;
-	// const { userName = '', checkAddFriend, userID } = props;
-	const { userName = [], checkAddFriend, userID } = props;
+	const { username = '', checkAddFriend, userID } = props;
 
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
 
@@ -223,22 +214,21 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 		switch (checkAddFriend) {
 			case EStateFriend.MY_PENDING:
 				if (index === 0) {
-					acceptFriend(userName[0], userID);
+					acceptFriend(username, userID);
 					break;
 				}
-				deleteFriend(userName[0], userID);
+				deleteFriend(username, userID);
 				break;
 			case EStateFriend.OTHER_PENDING:
 				// return "Friend Request Sent"
 				break;
 			case EStateFriend.FRIEND:
-				deleteFriend(userName[0], userID);
+				deleteFriend(username, userID);
 				break;
 			default:
 				addFriend({
 					ids: [userID],
-					// usernames: [userName]
-					usernames: userName
+					usernames: [username]
 				});
 		}
 	};

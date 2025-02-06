@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		userInfoBox: { flexDirection: 'row', gap: size.s_14, alignItems: 'center', marginVertical: size.s_10 },
-		userName: {
+		username: {
 			fontSize: size.label,
 			color: colors.white,
 			fontWeight: '600'

@@ -13,7 +13,7 @@ const ExitSetting = (props: ModalExitProps) => {
 		dispatch(
 			auditLogFilterActions.setUser({
 				userId: '',
-				userName: UserAuditLog.ALL_USER_AUDIT
+				username: UserAuditLog.ALL_USER_AUDIT
 			})
 		);
 		onClose();

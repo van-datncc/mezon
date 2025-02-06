@@ -389,7 +389,7 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.small
 		},
-		userNameMessageBox: {
+		usernameMessageBox: {
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '700',

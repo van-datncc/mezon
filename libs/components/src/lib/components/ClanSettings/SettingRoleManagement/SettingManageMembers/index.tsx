@@ -32,9 +32,9 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 		const results = commonUsers.filter((member) => {
 			const clanName = member?.clan_nick?.toLowerCase();
 			const displayName = member.user?.display_name?.toLowerCase();
-			const userName = member.user?.username?.toLowerCase();
+			const username = member.user?.username?.toLowerCase();
 			const lowerCaseSearchTerm = searchTerm.toLowerCase();
-			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || username?.includes(lowerCaseSearchTerm);
 		});
 		setSearchResults(results || []);
 	}, [searchTerm, addUsers, clickRole]);
@@ -77,7 +77,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 						<ItemMember
 							key={member?.user?.id}
 							id={member?.user?.id}
-							userName={member?.user?.username}
+							username={member?.user?.username}
 							displayName={member?.user?.display_name}
 							clanName={member?.clan_nick}
 							clanAvatar={member.clan_avatar}
@@ -97,7 +97,7 @@ export default SettingManageMembers;
 
 type ItemMemberProps = {
 	id?: string;
-	userName?: string;
+	username?: string;
 	displayName?: string;
 	clanName?: string;
 	clanAvatar?: string;
@@ -107,21 +107,21 @@ type ItemMemberProps = {
 };
 
 const ItemMember = (props: ItemMemberProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', isNewRole, onRemove } = props;
-	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', isNewRole, onRemove } = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<li key={id} className="flex justify-between items-center">
 			<div className="flex gap-x-2">
 				<AvatarImage
-					alt={userName}
-					userName={userName}
+					alt={username}
+					username={username}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
 					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 				/>
 				<span className="dark:text-white text-black font-medium one-line">{namePrioritize}</span>
-				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{userName}</span>
+				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{username}</span>
 			</div>
 			{!isNewRole ? (
 				<div

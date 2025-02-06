@@ -33,7 +33,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 							searchText={searchText}
 							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.idDM)}
 							handleToggle={() => handleToggle(item.idDM, item.typeChat || 0, false)}
-							userName={item.userName}
+							username={item.username}
 							hiddenSubText={item.typeChat === ChannelType.CHANNEL_TYPE_GROUP}
 						/>
 					) : (
@@ -61,12 +61,12 @@ type ItemDmProps = {
 	searchText: string;
 	checked: boolean;
 	handleToggle: () => void;
-	userName?: string;
+	username?: string;
 	hiddenSubText: boolean;
 };
 
 const ItemDm = (props: ItemDmProps) => {
-	const { id, name, avatar, searchText, checked, handleToggle, userName, hiddenSubText } = props;
+	const { id, name, avatar, searchText, checked, handleToggle, username, hiddenSubText } = props;
 	return (
 		<>
 			<div className="flex-1 mr-1">
@@ -75,7 +75,7 @@ const ItemDm = (props: ItemDmProps) => {
 					avatarUrl={avatar}
 					showAvatar
 					valueHightLight={searchText}
-					subText={hiddenSubText ? '' : userName}
+					subText={hiddenSubText ? '' : username}
 					wrapSuggestItemStyle="gap-x-1"
 					subTextStyle="text-[13px]"
 					emojiId=""

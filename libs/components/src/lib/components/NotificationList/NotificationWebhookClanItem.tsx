@@ -53,7 +53,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
-					userName={message?.username}
+					username={message?.username}
 					srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : message.avatar) ?? '', {
 						width: 300,
 						height: 300,
