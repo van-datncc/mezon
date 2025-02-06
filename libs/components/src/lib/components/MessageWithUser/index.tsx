@@ -292,6 +292,7 @@ function MessageWithUser({
 																mode={mode}
 																channelLabel={channelLabel as string}
 																message={message}
+																isTopic={!!isTopic}
 															/>
 														)}
 														{!isEditing &&

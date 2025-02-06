@@ -1,7 +1,8 @@
 import {
+	ChannelsEntity, DirectEntity,
 	messagesActions,
 	referencesActions,
-	selectChannelById,
+	selectChannelById, selectCurrentChannel, selectCurrentDM,
 	selectDirectById,
 	selectIdMessageRefEdit,
 	selectOpenEditMessageState,
@@ -22,8 +23,8 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		return message.attachments;
 	}, [message.attachments]);
 
-	const selectedChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
-	const selectedDirect = useAppSelector((state) => selectDirectById(state, channelId));
+	const selectedChannel = useAppSelector(selectCurrentChannel) as ChannelsEntity;
+	const selectedDirect = useAppSelector(selectCurrentDM) as DirectEntity;
 
 	const currentDirectOrChannel = useMemo(() => {
 		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
@@ -70,8 +71,8 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	);
 
 	const handleSend = useCallback(
-		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[], topic_id: string) => {
-			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false, topic_id);
+		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[], topic_id: string, isTopic?: boolean) => {
+			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false, topic_id, isTopic);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? [], topic_id as string);
 			dispatch(referencesActions.setOpenEditMessageState(false));
 		},

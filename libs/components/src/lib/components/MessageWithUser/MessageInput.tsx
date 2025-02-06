@@ -1,10 +1,10 @@
 import { useChannelMembers, useEditMessage, useEmojiSuggestionContext, useEscapeKey } from '@mezon/core';
 import {
-	ChannelMembersEntity,
+	ChannelMembersEntity, MessagesEntity,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
-	selectChannelDraftMessage,
+	selectChannelDraftMessage, selectCurrentChannel,
 	selectTheme,
 	useAppSelector
 } from '@mezon/store';
@@ -44,7 +44,8 @@ type MessageInputProps = {
 	channelId: string;
 	mode: number;
 	channelLabel: string;
-	message: IMessageWithUser;
+	message: MessagesEntity;
+	isTopic: boolean;
 };
 
 type ChannelsMentionProps = {
@@ -53,7 +54,7 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
-const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message, isTopic }) => {
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
 		channelLabel,
@@ -205,7 +206,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					processedContentDraft as IMessageSendPayload,
 					mentionNewPos as IMentionOnMessage[]
 				);
-				handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
+				handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, isTopic ? channelId : message?.content?.tp  || '', isTopic);
 				handleCancelEdit();
 			}
 		}
@@ -227,7 +228,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				processedContentDraft as IMessageSendPayload,
 				mentionNewPos as IMentionOnMessage[]
 			);
-			handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
+			handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, isTopic ? channelId : message?.content?.tp  || '', isTopic);
 		}
 		handleCancelEdit();
 	};
