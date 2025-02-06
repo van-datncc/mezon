@@ -114,7 +114,7 @@ const ModalSendToken = ({
 			if (userId && !userMap.has(userId)) {
 				userMap.set(userId, {
 					id: userId,
-					username: itemDM?.usernames ?? '',
+					username: itemDM?.usernames?.[0] ?? '',
 					avatar_url: itemDM?.channel_avatar?.[0] ?? ''
 				});
 			}
