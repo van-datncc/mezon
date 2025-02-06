@@ -439,10 +439,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					(currentDirectId && !RegExp(currentDirectId).test(notification?.channel_id || '')) ||
 					(isElectron() && isFocusDesktop === false) ||
 					isTabVisible === false;
-          console.log('notification.code: ', notification);
-          console.log('notification: ', notification.code);
+
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
-          console.log("Noti");
 					dispatch(clansActions.updateClanBadgeCount({ clanId: notification?.clan_id || '', count: 1 }));
 					if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						await dispatch(
@@ -517,7 +515,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
-		console.log("Update Last Message");
     await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
 		dispatch(
 			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
