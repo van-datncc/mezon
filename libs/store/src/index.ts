@@ -13,6 +13,7 @@ export * from './lib/categories/categories.slice';
 export * from './lib/channelmembers/AllUsersChannelByAddChannel.slice';
 export * from './lib/channelmembers/channel.members';
 export * from './lib/channels/channelUser.slice';
+export * from './lib/channels/channelapp.slice';
 export * from './lib/channels/channelmeta.slice';
 export * from './lib/channels/channels.slice';
 export * from './lib/channels/hashtagDm.slice';

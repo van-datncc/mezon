@@ -14,6 +14,7 @@ import {
 	ETypeMission,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
+	channelAppActions,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
@@ -330,9 +331,18 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							JSON.stringify({ eventType: 'CLAN_USERS_RESPONSE', eventData: userChannels }),
 							appChannel.url ?? ''
 						);
+					} else if (eventType === 'JOIN_ROOM') {
+						const { roomId } = (eventData.eventData || {}) as any;
+						// console.log('mezon app handle JOIN_ROOM');
+						dispatch(channelAppActions.setRoomId(roomId));
+					} else if (eventType === 'LEAVE_ROOM') {
+						dispatch(channelAppActions.setRoomId(null));
+						// console.log('mezon app handle LEAVE_ROOM');
 					} else if (eventType === 'CREATE_VOICE_ROOM') {
 						// eslint-disable-next-line no-console
-						console.log('mezon app handle CREATE_VOICE_ROOM');
+						const { roomId } = (eventData.eventData || {}) as any;
+						dispatch(channelAppActions.createChannelAppMeet({ channelId, roomName: roomId }));
+						// console.log('mezon app handle CREATE_VOICE_ROOM');
 					}
 				}
 			};
