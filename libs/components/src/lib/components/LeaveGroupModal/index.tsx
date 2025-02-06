@@ -1,4 +1,12 @@
-import { directActions, DirectEntity, directMetaActions, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store';
+import {
+	channelMembersActions,
+	directActions,
+	DirectEntity,
+	directMetaActions,
+	selectAllAccount,
+	selectDmGroupCurrentId,
+	useAppDispatch
+} from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -12,14 +20,21 @@ function LeaveGroupModal({ groupWillBeLeave, onClose, navigateToFriends }: Leave
 	const [isChecked, setIsChecked] = useState(false);
 	const dispatch = useAppDispatch();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-
+	const userProfile = useSelector(selectAllAccount);
 	const handleCheckboxChange = () => {
 		setIsChecked(!isChecked);
 	};
 
 	const handleLeaveAndClose = async (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
-		await dispatch(directActions.closeDirectMessage({ channel_id: groupWillBeLeave.channel_id }));
+		await dispatch(
+			channelMembersActions.removeMemberChannel({
+				channelId: groupWillBeLeave.channel_id || '',
+				userIds: [userProfile?.user?.id || ''],
+				kickMember: false
+			})
+		);
+		dispatch(directActions.remove(groupWillBeLeave.channel_id as string));
 		const timestamp = Date.now() / 1000;
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: groupWillBeLeave.channel_id ?? '', timestamp }));
 		if (groupWillBeLeave.channel_id === currentDmGroupId) {
