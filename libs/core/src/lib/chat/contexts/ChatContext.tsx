@@ -439,10 +439,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					(currentDirectId && !RegExp(currentDirectId).test(notification?.channel_id || '')) ||
 					(isElectron() && isFocusDesktop === false) ||
 					isTabVisible === false;
-
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: notification?.clan_id || '', count: 1 }));
-					if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+					
+          if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						await dispatch(
 							channelsActions.addThreadSocket({
 								clanId: notification?.clan_id || '',
