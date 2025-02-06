@@ -286,7 +286,8 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		const memberResults = addPropsIntoListMember.some(
 			(item) =>
 				(item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText)) ||
-				(item.name && item.name.toUpperCase().includes(normalizedSearchText))
+				(typeof item.name === 'string' && item.name.toUpperCase().includes(normalizedSearchText)) ||
+				(Array.isArray(item.name) && item.name[0].toUpperCase().includes(normalizedSearchText))
 		);
 		const channelResults = listChannelSearch.some(
 			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText)
