@@ -119,6 +119,14 @@ function useChannelSeen(channelId: string) {
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
+	const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
+	useEffect(() => {
+		if (!statusFetchChannel) return;
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+
+	}, [statusFetchChannel, isFocusDesktop, isTabVisible]);
+
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
@@ -129,18 +137,14 @@ function useChannelSeen(channelId: string) {
 				})
 			);
 		}
-		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		if (!numberNotification && resetBadgeCount) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
-		}
-	}, [currentChannel?.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
+    if(resetBadgeCount){
+      dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+    }
+	}, [currentChannel?.id])
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
@@ -402,7 +406,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 							id="mainChat"
 							// eslint-disable-next-line @typescript-eslint/no-empty-function
-							onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+							onDragEnter={canSendMessage ? handleDragEnter : () => { }}
 						>
 							<div
 								className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
