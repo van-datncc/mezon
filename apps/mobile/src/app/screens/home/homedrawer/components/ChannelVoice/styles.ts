@@ -23,7 +23,7 @@ export const style = (colors: Attributes) =>
 		},
 		menuFooter: {
 			position: 'absolute',
-			bottom: '5%',
+			bottom: 0,
 			width: '100%',
 			padding: size.s_20,
 			gap: size.s_10,
@@ -50,7 +50,7 @@ export const style = (colors: Attributes) =>
 		},
 		subTitle: {
 			fontSize: size.s_14,
-			color: colors.textDisabled,
+			color: colors.white,
 			fontWeight: '400'
 		},
 		lineBtn: { width: '100%', alignItems: 'center', padding: size.s_6 },
@@ -60,7 +60,7 @@ export const style = (colors: Attributes) =>
 			position: 'relative',
 			width: size.s_60,
 			height: size.s_60,
-			backgroundColor: colors.badgeHighlight,
+			backgroundColor: colors.border,
 			borderRadius: size.s_30
 		},
 		addPeopleBtn: {
@@ -82,6 +82,27 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center'
 		},
 		participantView: {
-			height: 300
+			height: 350,
+			borderRadius: size.s_10
+		},
+		userView: {
+			display: 'flex',
+			justifyContent: 'center',
+			width: '90%',
+			height: 350,
+			backgroundColor: colors.border,
+			gap: size.s_10,
+			marginLeft: size.s_20,
+			marginRight: size.s_20,
+			marginBottom: size.s_20,
+			borderRadius: size.s_10
+		},
+		userName: {
+			position: 'absolute',
+			bottom: '3%',
+			backgroundColor: colors.selectedOverlay,
+			padding: size.s_6,
+			borderRadius: size.s_20,
+			left: '30%'
 		}
 	});

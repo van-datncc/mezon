@@ -166,7 +166,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 							position="relative"
 							width={size.s_50}
 							height={size.s_50}
-							backgroundColor={themeValue.badgeHighlight}
+							backgroundColor={themeValue.border}
 							borderRadius={size.s_30}
 						>
 							<Icons.ChatIcon />

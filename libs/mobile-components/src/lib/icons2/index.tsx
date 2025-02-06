@@ -2151,3 +2151,29 @@ export const Buzz = ({ width = 24, height = 24, color = '#AEAEAE', ...props }) =
 		</Svg>
 	);
 };
+
+export const ShareScreenIcon = ({ width = 24, height = 24, color = 'white', ...props }) => {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 32 32" {...props}>
+			<G id="SVGRepo_bgCarrier" stroke-width="0"></G>
+			<G id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></G>
+			<G id="SVGRepo_iconCarrier">
+				<G id="🔍-System-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+					<G id="ic_fluent_share_screen_28_filled" fill={color} fill-rule="nonzero">
+						<Path
+							d="M23.75,4.99939 C24.9926,4.99939 26,6.00675 26,7.24939 L26,7.24939 L26,20.75 C26,21.9926 24.9926,23 23.75,23 L23.75,23 L4.25,23 C3.00736,23 2,21.9926 2,20.75 L2,20.75 L2,7.24939 C2,6.00675 3.00736,4.99939 4.25,4.99939 L4.25,4.99939 Z M13.9975,8.62108995 C13.7985,8.62108995 13.6077,8.70032 13.467,8.84113 L10.217,12.0956 C9.92435,12.3887 9.92468,12.8636 10.2178,13.1563 C10.5109,13.449 10.9858,13.4487 11.2784,13.1556 L13.2477,11.1835 L13.2477,18.6285 C13.2477,19.0427 13.5835,19.3785 13.9977,19.3785 C14.4119,19.3785 14.7477,19.0427 14.7477,18.6285 L14.7477,11.1818 L16.7219,13.1559 C17.0148,13.4488 17.4897,13.4488 17.7826,13.1559 C18.0755,12.863 18.0755,12.3882 17.7826,12.0953 L14.5281,8.84076 C14.3873,8.70005 14.1965,8.62108995 13.9975,8.62108995 Z"
+							id="🎨-Color"
+						></Path>
+					</G>
+				</G>
+			</G>
+		</Svg>
+	);
+};
+export const ShareScreenSlashIcon = ({ width = 24, height = 24, color = 'white', ...props }) => {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 32 32" {...props}>
+			<Path d="M21.79 18l2 2H24v-2zM13 9.13V7l4 3.74-1.28 1.19 5.18 5.18L22 16V4.02H7.8l5.13 5.13c.03-.01.05-.02.07-.02zM1.11 2.98l.89.9v12.14l2 1.99L0 18v2h18.13l2.71 2.71 1.41-1.41L2.52 1.57 1.11 2.98zm7.97 7.97l1.59 1.59C9.13 12.92 7.96 13.71 7 15c.31-1.48.94-2.93 2.08-4.05z" />
+		</Svg>
+	);
+};

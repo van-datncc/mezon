@@ -141,7 +141,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }, refRBSheet: Reac
 							position="relative"
 							width={size.s_50}
 							height={size.s_50}
-							backgroundColor={themeValue.badgeHighlight}
+							backgroundColor={themeValue.border}
 							borderRadius={size.s_30}
 						>
 							<Icons.ChatIcon />
