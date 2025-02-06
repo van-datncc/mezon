@@ -30,26 +30,54 @@ type SoundPanel = {
 	id?: string;
 };
 
+export interface ClanSound {
+	category?: string;
+	clan_id?: string;
+	create_time?: string;
+	creator_id?: string;
+	id?: string;
+	shortname?: string;
+	source?: string;
+	logo?: string;
+	clan_name?: string;
+}
+
 const searchSounds = (sounds: ClanSound[], searchTerm: string) => {
 	if (!searchTerm) return sounds;
 	const lowerCaseSearchTerm = searchTerm.trim().toLowerCase();
-	return sounds.filter((item) => item?.name?.toLowerCase().includes(lowerCaseSearchTerm));
+	return sounds.filter((item) => item?.shortname?.toLowerCase().includes(lowerCaseSearchTerm));
 };
 
 function SoundSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 	const audio1 = 'https://cdn.mezon.vn/0/1821757488236597248/1787375123666309000/1738831579632_0Shrek__oh_hello_there__.mp3';
 	const audio2 = 'https://cdn.mezon.vn/0/1821757488236597248/1787375123666309000/1738831591788_0galaxy_meme.mp3';
 
-	const sounds = [
-		{ id: audio1, url: audio1 },
-		{ id: audio2, url: audio2 }
+	const clanSounds = [
+		{
+			id: '123',
+			url: audio1,
+			label: 'audio1',
+			category: 'Among Us',
+			creator_id: '1775731111020728320',
+			clan_id: '1775731152322039808',
+			clan_name: '🍻thaiphamquocdsdfsfsfsfs'
+		},
+		{
+			id: '456',
+			url: audio2,
+			label: 'audio2',
+			category: 'Among Us',
+			creator_id: '1775731111020728320',
+			clan_id: '1775731152322039808',
+			clan_name: '🍻thaiphamquocdsdfsfsfsfs'
+		}
 	];
 
 	// const clanSounds = useAppSelector(selectAllSoundSuggestion);
 	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
 	const currentTopicId = useSelector(selectCurrentTopicId);
-	const { valueInputToCheckHandleSearch, subPanelActive } = useSounds();
-	const [searchedSounds, setSearchSounds] = useState<ClanSound[]>([]);
+	// const { valueInputToCheckHandleSearch, subPanelActive } = useSounds();
+	// const [searchedSounds, setSearchSounds] = useState<ClanSound[]>([]);
 
 	// useEffect(() => {
 	// 	const result = searchSounds(clanSounds, valueInputToCheckHandleSearch ?? '');
@@ -119,17 +147,17 @@ function SoundSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 				</div> */}
 			</div>
 			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar" ref={containerRef}>
-				<AudioAttachment />
+				<AudioAttachment attachment={sounds} />
 			</div>
 		</div>
 	);
 }
 export default SoundSquare;
 
-const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSound }) => {
-	return (
-		<div className="w-auto pb-2 px-2">
-			<AudioAttachment />
-		</div>
-	);
-};
+// const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSound }) => {
+// 	return (
+// 		<div className="w-auto pb-2 px-2">
+// 			<AudioAttachment />
+// 		</div>
+// 	);
+// };
