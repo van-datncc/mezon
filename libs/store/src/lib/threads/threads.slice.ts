@@ -4,8 +4,8 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { listChannelRenderAction } from '../channels/listChannelRender.slice';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -85,6 +85,28 @@ const updateCacheThread = async (mezon: MezonValueContext, channelId: string, cl
 		fetchThreadsCached(mezon, channelId, clanId, undefined, { channeldesc: updatedChanneldesc });
 	}
 };
+
+const updateCacheOnThreadCreation = createAsyncThunk(
+	'threads/updateCache',
+	async ({ clanId, channelId, newThread }: { clanId: string; channelId: string; newThread: ApiChannelDescription }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await fetchThreadsCached(mezon, channelId, clanId);
+
+			if (response && response.channeldesc) {
+				await fetchThreadsCached.delete(mezon, channelId, clanId);
+				const timestamp = Date.now() / 1000;
+				const defaultResponse = [{ ...newThread, active: 1, last_sent_message: { timestamp_seconds: timestamp } }, ...response.channeldesc];
+
+				await fetchThreadsCached(mezon, channelId, clanId, undefined, {
+					channeldesc: defaultResponse.length > LIMIT ? defaultResponse.slice(0, -1) : defaultResponse
+				});
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+);
 
 const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
 	return threads.map((thread) => ({
@@ -168,7 +190,7 @@ export const leaveThread = createAsyncThunk(
 			if (response) {
 				thunkAPI.dispatch(channelsActions.removeByChannelID({ channelId: threadId, clanId }));
 				thunkAPI.dispatch(threadsActions.remove(threadId));
-        thunkAPI.dispatch(listChannelRenderAction.leaveChannelListRender({ channelId: threadId, clanId }))
+				thunkAPI.dispatch(listChannelRenderAction.leaveChannelListRender({ channelId: threadId, clanId }));
 				await updateCacheThread(mezon, channelId, clanId, threadId);
 				return threadId;
 			}
@@ -299,7 +321,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread, leaveThread };
+export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread, leaveThread, updateCacheOnThreadCreation };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
