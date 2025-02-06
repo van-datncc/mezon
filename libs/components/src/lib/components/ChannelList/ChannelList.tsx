@@ -27,12 +27,12 @@ import {
 	isWindowsDesktop,
 	toggleDisableHover
 } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
+import { useVirtualizer } from '../virtual-core/useVirtualizer';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
@@ -159,9 +159,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
 
-		setTimeout(() => {
-			dispatch(categoriesActions.setCtrlKFocusChannel(null));
-		}, 100);
+		dispatch(categoriesActions.setCtrlKFocusChannel(null));
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
