@@ -80,12 +80,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const dispatch = useAppDispatch();
 
-	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 
 	const firstChannelWithBadgeCount = useMemo(() => {
-		return channelsInClan?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
-	}, [channelsInClan]);
+		return listChannelRender?.find((item) => (item as IChannel)?.count_mess_unread && ((item as IChannel)?.count_mess_unread || 0 ) > 0) || null;
+	}, [listChannelRender]);
 
 	const data = useMemo(
 		() => [
