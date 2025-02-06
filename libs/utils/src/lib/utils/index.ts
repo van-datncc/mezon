@@ -311,10 +311,10 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
 	if (nameProp) {
-		// TODO: fix crash
-		if (Array.isArray(a[nameProp]) || Array.isArray(b[nameProp])) {
-			return 0;
-		}
+		// // TODO: fix crash
+		// if (Array.isArray(a[nameProp]) || Array.isArray(b[nameProp])) {
+		// 	return 0;
+		// }
 		const aNameIndex = a[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 		const bNameIndex = b[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
@@ -344,19 +344,14 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 }
 
 export function normalizeString(str: string): string {
-	// TODO: fix crash
-	if (typeof str === 'string' && str?.length)
-		return str
-			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '')
-			.toUpperCase();
-
-	return '';
+	return str
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toUpperCase();
 }
 
 export function searchMentionsHashtag(searchValue: string, list: MentionDataProps[]) {
 	if (!searchValue) return list;
-
 	// Normalize and remove diacritical marks from the search value
 	const normalizedSearchValue = normalizeString(searchValue).toUpperCase();
 	const filteredList: MentionDataProps[] = list.filter((mention) => {

@@ -62,8 +62,8 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-	// userName?: string;
-	userName?: string[];
+	userName?: string;
+	// userName?: string[];
 
 	userIdsFromThreadBox?: string[];
 	userIdsFromTopicBox?: string[];
@@ -328,8 +328,8 @@ type ChatMessageListProps = {
 	idMessageNotified: string;
 	lastMessageUnreadId: string;
 	avatarDM?: string;
-	// userName?: string;
-	userName?: string[];
+	userName?: string;
+	// userName?: string[];
 
 	channelId: string;
 	mode: number;

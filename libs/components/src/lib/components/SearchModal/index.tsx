@@ -78,7 +78,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			? listDM.map((itemDM: DirectEntity) => {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.usernames ?? '',
+						name: itemDM?.usernames?.toString() ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						displayName: itemDM.channel_label,
@@ -224,7 +224,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 		return previous;
 	}, [listDirectSearch, previousChannels, totalListSortedWithoutPreviousList]);
-
 	const listItemWithoutRecent = useMemo(() => {
 		if (normalizeSearchText.startsWith('@')) {
 			return totalListMembersSorted;

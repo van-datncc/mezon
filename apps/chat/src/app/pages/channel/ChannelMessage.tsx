@@ -14,8 +14,8 @@ export type MessageProps = {
 	isHighlight?: boolean;
 	channelLabel: string;
 	avatarDM?: string;
-	// userName?: string;
-	userName?: string[];
+	userName?: string;
+	// userName?: string[];
 
 	isLastSeen?: boolean;
 	index: number;

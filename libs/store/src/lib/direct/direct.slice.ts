@@ -316,7 +316,7 @@ const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
 		is_online: [true],
 		active: ActiveDm.OPEN_DM,
 		usernames: [message.username as string],
-		creator_name: message.username && message.username[0],
+		creator_name: message.username as string,
 		create_time_seconds: message.create_time_seconds,
 		update_time_seconds: message.create_time_seconds,
 		metadata: ['{}'],
@@ -380,7 +380,7 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 			metadata,
 			about_me: aboutMe,
 			active: 1,
-			channel_label: label.join(',')
+			channel_label: label.toString()
 		};
 
 		thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));

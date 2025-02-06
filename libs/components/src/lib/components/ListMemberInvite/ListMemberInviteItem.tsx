@@ -53,7 +53,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
 			// userName={dmGroup.usernames}
-			userName={dmGroup.usernames && dmGroup.usernames[0]}
+			userName={dmGroup.usernames?.toString()}
 		/>
 	) : (
 		<ItemInviteUser

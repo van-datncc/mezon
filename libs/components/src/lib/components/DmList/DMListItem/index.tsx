@@ -107,8 +107,8 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
 				// name={(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 				// userNameAva={directMessage?.usernames}
-				name={(directMessage?.channel_label || directMessage?.usernames?.join(',')) ?? `${directMessage.creator_name}'s Group` ?? ''}
-				userNameAva={directMessage?.usernames && directMessage?.usernames?.join(',')}
+				name={(directMessage?.channel_label || directMessage?.usernames?.toString()) ?? `${directMessage.creator_name}'s Group` ?? ''}
+				userNameAva={directMessage?.usernames && directMessage?.usernames?.toString()}
 				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
 				isHideStatus={true}
 				isHideIconStatus={false}
