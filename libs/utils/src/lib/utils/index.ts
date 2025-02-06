@@ -311,10 +311,6 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
 	if (nameProp) {
-		// // TODO: fix crash
-		// if (Array.isArray(a[nameProp]) || Array.isArray(b[nameProp])) {
-		// 	return 0;
-		// }
 		const aNameIndex = a[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 		const bNameIndex = b[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
