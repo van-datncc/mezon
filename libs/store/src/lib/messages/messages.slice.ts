@@ -25,7 +25,7 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	weakMapMemoize, current
+	weakMapMemoize
 } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
