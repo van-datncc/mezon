@@ -27,18 +27,20 @@ function LeaveGroupModal({ groupWillBeLeave, onClose, navigateToFriends }: Leave
 
 	const handleLeaveAndClose = async (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
-		await dispatch(
-			channelMembersActions.removeMemberChannel({
-				channelId: groupWillBeLeave.channel_id || '',
-				userIds: [userProfile?.user?.id || ''],
-				kickMember: false
-			})
-		);
-		dispatch(directActions.remove(groupWillBeLeave.channel_id as string));
-		const timestamp = Date.now() / 1000;
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: groupWillBeLeave.channel_id ?? '', timestamp }));
-		if (groupWillBeLeave.channel_id === currentDmGroupId) {
-			navigateToFriends();
+		if (groupWillBeLeave.channel_id) {
+			await dispatch(
+				channelMembersActions.removeMemberChannel({
+					channelId: groupWillBeLeave.channel_id,
+					userIds: [userProfile?.user?.id || ''],
+					kickMember: false
+				})
+			);
+			dispatch(directActions.remove(groupWillBeLeave.channel_id));
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: groupWillBeLeave.channel_id, timestamp }));
+			if (groupWillBeLeave.channel_id === currentDmGroupId) {
+				navigateToFriends();
+			}
 		}
 		onClose();
 	};
