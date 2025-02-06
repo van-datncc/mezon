@@ -442,7 +442,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: notification?.clan_id || '', count: 1 }));
 					
-          if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+					if (notification?.channel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						await dispatch(
 							channelsActions.addThreadSocket({
 								clanId: notification?.clan_id || '',
@@ -515,7 +515,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
-    await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
+		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
 		dispatch(
 			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
 		);
@@ -843,9 +843,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
-        dispatch(listChannelRenderAction.addChannelToListRender({type : channelCreated.channel_type ,...channelCreated}))
+				dispatch(listChannelRenderAction.addChannelToListRender({type : channelCreated.channel_type ,...channelCreated}))
 				
-        if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
 					const extendChannelCreated = {
 						...channelCreated,
