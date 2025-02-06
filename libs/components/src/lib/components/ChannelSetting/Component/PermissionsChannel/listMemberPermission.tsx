@@ -51,7 +51,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 		<ItemMemberPermission
 			key={user.id}
 			id={user.id}
-			userName={user.username}
+			username={user.username}
 			displayName={user.display_name}
 			clanName={user.clanNick}
 			clanAvatar={user.clanAvatar}
@@ -65,7 +65,7 @@ export default ListMemberPermission;
 
 type ItemMemberPermissionProps = {
 	id?: string;
-	userName?: string;
+	username?: string;
 	avatar?: string;
 	displayName?: string;
 	clanName?: string;
@@ -74,10 +74,10 @@ type ItemMemberPermissionProps = {
 };
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', onDelete } = props;
+	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', onDelete } = props;
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const isClanOwner = checkClanOwner(id);
-	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 
 	const handleDelete = () => {
@@ -90,15 +90,15 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 		<div className={`flex justify-between py-2 rounded`} key={id}>
 			<div className="flex gap-x-2 items-center">
 				<AvatarImage
-					alt={userName}
-					userName={userName}
+					alt={username}
+					username={username}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
 					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 					classNameText="text-[9px] pt-[3px]"
 				/>
 				<p className="text-sm font-semibold">{namePrioritize}</p>
-				<p className="text-contentTertiary font-light">{userName}</p>
+				<p className="text-contentTertiary font-light">{username}</p>
 			</div>
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs text-[#AEAEAE]">{isClanOwner && 'Clan Owner'}</p>

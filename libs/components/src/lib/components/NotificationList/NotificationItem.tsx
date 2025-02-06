@@ -16,12 +16,12 @@ function NotificationItem({ notify }: NotifyProps) {
 	const [openUserProfileModalInner, setOpenUserProfileModalInner] = useState<boolean>(false);
 
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id ?? ''));
-	const userName = notify?.content?.username || notify?.content?.sender_name;
+	const username = notify?.content?.username || notify?.content?.sender_name;
 	let notice = notify?.subject;
 
-	if (userName) {
-		const userNameLenght = userName.length;
-		notice = notify?.subject?.slice(userNameLenght);
+	if (username) {
+		const usernameLenght = username.length;
+		notice = notify?.subject?.slice(usernameLenght);
 	}
 
 	const handleClickNotificationItem = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -55,7 +55,7 @@ function NotificationItem({ notify }: NotifyProps) {
 					/>
 					<div className="flex flex-col gap-1">
 						<div>
-							<span className="font-bold">{user?.clan_nick || user?.user?.display_name || userName}</span>
+							<span className="font-bold">{user?.clan_nick || user?.user?.display_name || username}</span>
 							<span>{notice}</span>
 						</div>
 						<span className="text-zinc-400 text-[11px]">{convertTimeString(notify.create_time as string)}</span>

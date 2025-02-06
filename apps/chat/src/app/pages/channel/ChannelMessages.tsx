@@ -61,9 +61,7 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-	// userName?: string;
-	userName?: string[];
-
+	username?: string;
 	userIdsFromThreadBox?: string[];
 	userIdsFromTopicBox?: string[];
 	isThreadBox?: boolean;
@@ -82,7 +80,7 @@ function ChannelMessages({
 	channelId,
 	channelLabel,
 	avatarDM,
-	userName,
+	username,
 	mode,
 	userIdsFromThreadBox,
 	userIdsFromTopicBox,
@@ -282,7 +280,7 @@ function ChannelMessages({
 				idMessageNotified={idMessageNotified}
 				lastMessageUnreadId={lastMessageUnreadId as string}
 				avatarDM={avatarDM}
-				userName={userName}
+				username={username}
 				channelId={channelId}
 				mode={mode}
 				channelLabel={channelLabel}
@@ -323,8 +321,7 @@ type ChatMessageListProps = {
 	idMessageNotified: string;
 	lastMessageUnreadId: string;
 	avatarDM?: string;
-	// userName?: string;
-	userName?: string[];
+	username?: string;
 
 	channelId: string;
 	mode: number;
@@ -347,7 +344,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		idMessageNotified,
 		lastMessageUnreadId,
 		avatarDM,
-		userName,
+		username,
 		channelId,
 		mode,
 		channelLabel,
@@ -642,7 +639,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							message={entities[messageId]}
 							previousMessage={entities[messageIds[index - 1]]}
 							avatarDM={avatarDM}
-							userName={userName}
+							username={username}
 							messageId={messageId}
 							nextMessageId={messageIds[index + 1]}
 							channelId={channelId}
@@ -672,7 +669,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			lastMessageId,
 			lastMessageUnreadId,
 			mode,
-			userName,
+			username,
 			forceRender
 		]);
 

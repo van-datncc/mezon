@@ -20,7 +20,7 @@ export const style = (colors: Attributes) =>
 		userInfo: {
 			justifyContent: 'center'
 		},
-		userName: {
+		username: {
 			color: colors.white,
 			fontSize: size.s_18
 		},

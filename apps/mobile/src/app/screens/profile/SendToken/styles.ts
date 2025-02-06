@@ -79,7 +79,7 @@ export const style = (colors: Attributes) =>
 			padding: size.s_10,
 			marginVertical: size.s_2
 		},
-		userName: {
+		username: {
 			color: colors.text,
 			paddingHorizontal: size.s_10
 		},

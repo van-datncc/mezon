@@ -14,7 +14,7 @@ const ListMembers = (props: ListMembersProps) => {
 	return listItem.map((user: any) => (
 		<ItemMember
 			key={user?.id}
-			userName={user?.username}
+			username={user?.username}
 			displayName={user?.display_name}
 			clanAvatar={user.clanAvatar}
 			avatar={user?.avatar_url}
@@ -28,7 +28,7 @@ const ListMembers = (props: ListMembersProps) => {
 export default ListMembers;
 
 type ItemMemberProps = {
-	userName?: string;
+	username?: string;
 	displayName?: string;
 	clanName?: string;
 	clanAvatar?: string;
@@ -38,8 +38,8 @@ type ItemMemberProps = {
 };
 
 const ItemMember = (props: ItemMemberProps) => {
-	const { userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked, onChange } = props;
-	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const { username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked, onChange } = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<div className={`flex justify-between py-2 rounded hover:bg-[#E1E2E4] dark:hover:bg-[#43444B] px-[6px]`}>
@@ -55,15 +55,15 @@ const ItemMember = (props: ItemMemberProps) => {
 					<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
 				</div>
 				<AvatarImage
-					alt={userName}
-					userName={userName}
+					alt={username}
+					username={username}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
 					srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 					src={avatarPrioritize}
 					classNameText="text-[9px] pt-[3px]"
 				/>
 				<p className="text-sm one-line">{namePrioritize}</p>
-				<p className="text-contentTertiary font-light">{userName}</p>
+				<p className="text-contentTertiary font-light">{username}</p>
 			</label>
 		</div>
 	);

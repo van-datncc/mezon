@@ -162,7 +162,7 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
 								{usersClan.map((item) => (
 									<div key={item.id} onClick={() => addUser(item.id)}>
 										<ItemUser
-											userName={item.user?.username}
+											username={item.user?.username}
 											displayName={item.user?.display_name}
 											clanName={item.clan_nick}
 											avatar={item.user?.avatar_url}
@@ -180,7 +180,7 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
 });
 
 type ItemUserProps = {
-	userName?: string;
+	username?: string;
 	displayName?: string;
 	clanName?: string;
 	avatar?: string;
@@ -188,14 +188,14 @@ type ItemUserProps = {
 };
 
 const ItemUser = (props: ItemUserProps) => {
-	const { userName = '', displayName = '', clanName = '', avatar = '', avatarClan = '' } = props;
-	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const { username = '', displayName = '', clanName = '', avatar = '', avatarClan = '' } = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(avatarClan, avatar);
 	return (
 		<div className="rounded px-3 py-2 font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton dark:hover:text-white hover:text-black flex items-center gap-x-2">
 			<AvatarImage
-				alt={userName}
-				userName={userName}
+				alt={username}
+				username={username}
 				className="min-w-8 min-h-8 max-w-8 max-h-8"
 				srcImgProxy={createImgproxyUrl(avatarPrioritize ?? '')}
 				src={avatarPrioritize}

@@ -8,8 +8,8 @@ function UserListItem({ user, channelID, isPttList }: { user: IChannelMember; ch
 	const userStream = useAppSelector((state) => selectMemberClanByUserId2(state, user.user_id ?? ''));
 	const clanNick = member ? member?.clan_nick : userStream?.clan_nick;
 	const displayName = member ? member?.user?.display_name : userStream?.user?.display_name;
-	const userName = member ? member?.user?.username : userStream?.user?.username;
-	const name = getNameForPrioritize(clanNick, displayName, userName);
+	const username = member ? member?.user?.username : userStream?.user?.username;
+	const name = getNameForPrioritize(clanNick, displayName, username);
 	const clanAvatar = member ? member?.clan_avatar : userStream?.clan_avatar;
 	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
 	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
@@ -22,8 +22,8 @@ function UserListItem({ user, channelID, isPttList }: { user: IChannelMember; ch
 				<div className="w-8 h-8 mt-[-0.3rem]">
 					{member || userStream ? (
 						<AvatarImage
-							alt={userName || ''}
-							userName={userName}
+							alt={username || ''}
+							username={username}
 							className="min-w-8 min-h-8 max-w-8 max-h-8"
 							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}

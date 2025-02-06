@@ -106,7 +106,7 @@ function AllTabContent({ messageReplied, subject, lastMessageTopic, topic }: IMe
 					<AvatarImage
 						alt="user avatar"
 						className="w-11 h-10 rounded-full border-2 border-[#FFFFFF] dark:border-[#313338] z-10"
-						userName={lastSentUser?.user?.username}
+						username={lastSentUser?.user?.username}
 						srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : lastSentUser?.user?.avatar_url) ?? '', {
 							width: 300,
 							height: 300,
@@ -118,7 +118,7 @@ function AllTabContent({ messageReplied, subject, lastMessageTopic, topic }: IMe
 					{/* <AvatarImage
 						alt="second avatar"
 						className="w-8 h-8 rounded-lg border-2 border-[#FFFFFF] dark:border-[#313338] absolute -bottom-1 -right-2 z-0"
-						userName="Second User"
+						username="Second User"
 						srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : userLastSent?.user?.avatar_url) ?? '', {
 							width: 300,
 							height: 300,

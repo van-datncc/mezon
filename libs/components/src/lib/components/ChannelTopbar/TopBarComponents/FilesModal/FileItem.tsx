@@ -13,7 +13,7 @@ type FileItemProps = {
 
 const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 	const userSendAttachment = useAppSelector(selectMemberClanByUserId(attachmentData?.uploader ?? ''));
-	const userName = userSendAttachment?.user?.username;
+	const username = userSendAttachment?.user?.username;
 	const attachmentSendTime = convertTimeString(attachmentData?.create_time as string);
 	const fileType = getFileExtension(attachmentData?.filetype ?? '');
 
@@ -91,7 +91,7 @@ const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 								</span>
 							) : (
 								<p className="dark:text-textDarkTheme text-textLightTheme w-fit one-line">
-									Shared by {userName} <span className="text-sm text-gray-500">{attachmentSendTime}</span>
+									Shared by {username} <span className="text-sm text-gray-500">{attachmentSendTime}</span>
 								</p>
 							)}
 						</div>

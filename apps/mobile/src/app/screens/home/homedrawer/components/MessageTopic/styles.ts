@@ -24,7 +24,7 @@ export const style = (colors: Attributes) =>
 			fontSize: size.small,
 			color: colors.textLink
 		},
-		userName: {
+		username: {
 			fontSize: size.small,
 			fontWeight: 'bold'
 		}

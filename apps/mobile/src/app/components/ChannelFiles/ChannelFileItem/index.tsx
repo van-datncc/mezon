@@ -14,7 +14,7 @@ const ChannelFileItem = memo(({ file }: ChannelFileItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userSendAttachment = useAppSelector((state) => selectMemberClanByUserId2(state, file?.uploader ?? ''));
-	const userName = userSendAttachment?.user?.username;
+	const username = userSendAttachment?.user?.username;
 	const attachmentSendTime = convertTimeString(file?.create_time as string);
 
 	const onPressItem = () => {
@@ -30,7 +30,7 @@ const ChannelFileItem = memo(({ file }: ChannelFileItemProps) => {
 				</Text>
 				<View style={styles.footer}>
 					<Text style={styles.footerTitle} numberOfLines={1} ellipsizeMode="tail">
-						shared by {userName}
+						shared by {username}
 					</Text>
 					<Text style={styles.footerTime} numberOfLines={1}>
 						{attachmentSendTime}

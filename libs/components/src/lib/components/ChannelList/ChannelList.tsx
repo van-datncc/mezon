@@ -3,7 +3,6 @@ import {
 	ClansEntity,
 	FAVORITE_CATEGORY_ID,
 	categoriesActions,
-	selectChannelsByClanId,
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
@@ -83,7 +82,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 
 	const firstChannelWithBadgeCount = useMemo(() => {
-		return listChannelRender?.find((item) => (item as IChannel)?.count_mess_unread && ((item as IChannel)?.count_mess_unread || 0 ) > 0) || null;
+		return listChannelRender?.find((item) => (item as IChannel)?.count_mess_unread && ((item as IChannel)?.count_mess_unread || 0) > 0) || null;
 	}, [listChannelRender]);
 
 	const data = useMemo(

@@ -246,7 +246,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				<View>
 					<Text style={styles.title}>Send Token To ?</Text>
 					<TouchableOpacity style={[styles.textField, { height: size.s_50 }]} onPress={handleOpenBottomSheet}>
-						<Text style={styles.userName}>{selectedUser?.username}</Text>
+						<Text style={styles.username}>{selectedUser?.username}</Text>
 					</TouchableOpacity>
 				</View>
 				<View>

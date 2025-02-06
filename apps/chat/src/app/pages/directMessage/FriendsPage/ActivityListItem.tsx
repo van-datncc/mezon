@@ -29,7 +29,7 @@ const ActivityListItem = ({ user }: ActivityProps) => {
 					<MemberProfile
 						avatar={user?.user?.avatar_url ?? ''}
 						name={(user?.user?.display_name || user?.user?.username) ?? ''}
-						userNameAva={user?.user?.username ?? ''}
+						usernameAva={user?.user?.username ?? ''}
 						status={{ status: user?.user?.online, isMobile: false }}
 						isHideStatus={true}
 						isHideIconStatus={true}
