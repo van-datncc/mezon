@@ -545,7 +545,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(listChannelsByUserActions.remove(userID));
 				} else {
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string }));
+						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string, channelId: user.channel_id }));
 						// TODO: remove member group
 					}
 				}
