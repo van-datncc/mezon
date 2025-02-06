@@ -142,8 +142,6 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
-	// usernames?: string;
-	// usernames?: string[];
 	isRoleUser?: boolean;
 	isFavor?: boolean;
 };

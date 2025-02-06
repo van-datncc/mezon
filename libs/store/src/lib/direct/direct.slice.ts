@@ -179,11 +179,9 @@ function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 				if (!acc.some((existingUser) => existingUser.id === userId)) {
 					const user = {
 						avatar_url: dm?.channel_avatar ? dm?.channel_avatar[index] : '',
-						// display_name: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						display_name: dm?.usernames ? dm?.usernames[index] : '',
 
 						id: userId,
-						// username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						username: dm?.usernames ? dm?.usernames[index] : '',
 
 						online: dm?.is_online ? dm?.is_online[index] : false,

@@ -88,7 +88,6 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	};
 
 	const ref = useRef<HTMLDivElement>(null);
-
 	return (
 		<div
 			ref={ref}
@@ -105,8 +104,8 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		>
 			<MemberProfile
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
-				name={(directMessage?.channel_label || directMessage?.usernames?.toString()) ?? `${directMessage.creator_name}'s Group` ?? ''}
-				userNameAva={directMessage?.usernames && directMessage?.usernames?.toString()}
+				name={directMessage?.channel_label ?? ''}
+				userNameAva={directMessage?.channel_label ?? ''}
 				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
 				isHideStatus={true}
 				isHideIconStatus={false}

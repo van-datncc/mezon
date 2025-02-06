@@ -95,14 +95,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			? listGroup.map((itemGr: DirectEntity) => {
 					return {
 						id: itemGr?.channel_id ?? '',
-						name: itemGr?.channel_label ?? '',
+						name: itemGr?.usernames?.toString() ?? '',
 						avatarUser: 'assets/images/avatar-group.png',
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
 						typeChat: TypeSearch.Dm_Type,
 						count_messsage_unread: itemGr.count_mess_unread,
-						lastSeenTimeStamp: Number(itemGr?.last_seen_message?.timestamp_seconds || 0)
+						lastSeenTimeStamp: Number(itemGr?.last_seen_message?.timestamp_seconds || 0),
+						displayName: itemGr.channel_label
 					};
 				})
 			: [];

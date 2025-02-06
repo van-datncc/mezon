@@ -110,7 +110,6 @@ export const ChannelMessage: ChannelMessageComponent = ({
 					<OnBoardWelcome nextMessageId={nextMessageId} />
 				</div>
 			)}
-			{/* {message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />} */}
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 			{!message.isFirst && (
