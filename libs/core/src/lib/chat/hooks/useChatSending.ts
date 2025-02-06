@@ -189,7 +189,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			mentions: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
 			hide_editted?: boolean,
-			topic_id?: string
+			topic_id?: string,
+			isTopic?: boolean,
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -209,9 +210,9 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				attachments,
 				hide_editted,
 				topic_id,
-				false
+				!!isTopic
 			);
-			if (topic_id) {
+			if (topic_id && !isTopic) {
 				dispatch(topicsActions.updateInitMessage({ content: content, mentions: mentions }));
 			}
 		},
