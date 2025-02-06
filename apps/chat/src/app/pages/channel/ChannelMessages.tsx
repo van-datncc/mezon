@@ -23,7 +23,6 @@ import {
 	selectHasMoreBottomByChannelId2,
 	selectHasMoreMessageByChannelId2,
 	selectIdMessageToJump,
-	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectLastMessageByChannelId,
 	selectMessageEntitiesByChannelId,
@@ -97,7 +96,6 @@ function ChannelMessages({
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId2(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
-	const isJumpingToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
 	const isFetching = useSelector(selectMessageIsLoading);
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const getMemberIds = useAppSelector((state) => selectAllChannelMemberIds(state, channelId, isDM));
@@ -265,14 +263,11 @@ function ChannelMessages({
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	// Jump to present when user is jumping to present
-	useEffect(() => {
-		if (isJumpingToPresent) {
-			scrollToLastMessage().then(() => {
-				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: false }));
-				setAnchor.current = new Date().getTime();
-			});
-		}
-	}, [dispatch, isJumpingToPresent, channelId, scrollToLastMessage]);
+	// useEffect(() => {
+	// 	if (isJumpingToPresent) {
+	// 		setAnchor.current = new Date().getTime();
+	// 	}
+	// }, [dispatch, isJumpingToPresent, channelId, scrollToLastMessage]);
 
 	return (
 		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
@@ -380,6 +375,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const [isScrollDownNeeded, setIsScrollDownShown] = useState(false);
 
 		const [isNotchShown, setIsNotchShown] = useState<boolean | undefined>();
+
+		const [forceRender, setForceRender] = useState<boolean>(false);
 
 		const { withHistoryTriggers, backwardsTriggerRef, forwardsTriggerRef, fabTriggerRef } = useScrollHooks(
 			'thread',
@@ -601,16 +598,12 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		}, [firstMsgOfThisTopic]);
 
 		// Handle scroll to specific message (jump/pin)
+
+		const msgIdJumpHightlight = useRef<string | null>(null);
+
 		const timerRef = useRef<number | null>(null);
 		useEffect(() => {
 			if (!idMessageToJump?.id) return;
-
-			const clearTimer = () => {
-				if (timerRef.current) {
-					clearTimeout(timerRef.current);
-					timerRef.current = null;
-				}
-			};
 
 			const scrollToMessage = (messageId: string) => {
 				const messageElement = chatRef.current?.querySelector('#msg-' + messageId);
@@ -621,26 +614,26 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				}
 			};
 
-			clearTimer();
-
 			const isMessageExist = selectIsMessageIdExist(store.getState() as RootState, channelId, idMessageToJump?.id);
 
 			if (idMessageToJump && isMessageExist) {
 				if (idMessageToJump.id === 'temp') return;
 				scrollToMessage(idMessageToJump.id);
+				msgIdJumpHightlight.current = idMessageToJump.id;
+				dispatch(messagesActions.setIdMessageToJump(null));
+
 				timerRef.current = window.setTimeout(() => {
-					dispatch(messagesActions.setIdMessageToJump(null));
+					msgIdJumpHightlight.current = null;
+					setForceRender(!forceRender);
 				}, 1000);
 			}
-
-			return clearTimer;
 		}, [idMessageToJump]);
 
 		const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 
 		const renderedMessages = useMemo(() => {
 			return messageIds.map((messageId, index) => {
-				const checkMessageTargetToMoved = idMessageToJump?.id === messageId && messageId !== lastMessageId;
+				const checkMessageTargetToMoved = msgIdJumpHightlight.current === messageId && messageId !== lastMessageId;
 				const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
 				return (
 					<div className="message-list-item" key={messageId} id={'msg-' + messageId}>
@@ -679,7 +672,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			lastMessageId,
 			lastMessageUnreadId,
 			mode,
-			userName
+			userName,
+			forceRender
 		]);
 
 		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
