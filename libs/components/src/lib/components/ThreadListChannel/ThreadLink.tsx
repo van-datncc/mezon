@@ -71,7 +71,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				rootRef={panelRef}
 			/>
 		);
-	}, []);
+	}, [thread.count_mess_unread]);
 
 	const [openDeleteModal, closeDeleteModal] = useModal(() => {
 		return <DeleteModal onClose={closeDeleteModal} channelLabel={thread.channel_label || ''} channelId={thread.channel_id as string} />;
