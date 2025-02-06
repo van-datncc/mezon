@@ -109,6 +109,10 @@ const ModalCreate = (props: ModalCreateProps) => {
 			return;
 		}
 
+		if (currentModal === 0 && number === 2 && !contentSubmit.topic) {
+			return;
+		}
+
 		if (buttonWork || number < 1) {
 			setCurrentModal(number);
 		}
@@ -215,7 +219,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 		} else {
 			setButtonWork(true);
 		}
-		if (contentSubmit.topic !== '') {
+
+		if (contentSubmit.topic) {
 			setButtonWork(true);
 		}
 	}, [currentModal, contentSubmit.topic]);
