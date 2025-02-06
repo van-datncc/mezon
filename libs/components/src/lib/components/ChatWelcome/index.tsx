@@ -180,7 +180,6 @@ const WelComeDm = (props: WelComeDmProps) => {
 					)}
 				</p>
 			</div>
-			{/* {!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />} */}
 			{!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />}
 		</>
 	);
