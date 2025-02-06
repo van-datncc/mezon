@@ -25,7 +25,7 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	weakMapMemoize
+	weakMapMemoize, current
 } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
@@ -913,7 +913,9 @@ export const messagesSlice = createSlice({
 					id: channelId
 				});
 			}
-			const channelEntity = state.channelMessages[channelId];
+			const messageChannelId = topic_id !== '0' && topic_id && !content?.tp ? topic_id : channelId;
+			const channelEntity = state.channelMessages[messageChannelId];
+			
 			switch (code) {
 				case TypeMessage.Welcome:
 				case TypeMessage.CreateThread:
