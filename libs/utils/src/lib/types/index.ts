@@ -1272,7 +1272,7 @@ export enum UserAuditLog {
 
 export type IUserAuditLog = {
 	userId: string;
-	userName: string;
+	username: string;
 };
 
 export type IUserProfileActivity = {

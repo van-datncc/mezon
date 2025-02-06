@@ -194,7 +194,7 @@ const ModalSendToken = ({
 															<div className="flex items-center">
 																<AvatarImage
 																	alt={user?.username ?? ''}
-																	userName={user?.username ?? ''}
+																	username={user?.username ?? ''}
 																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
 																		width: 100,
 																		height: 100,

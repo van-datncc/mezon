@@ -42,7 +42,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 					<div className="flex items-center gap-x-4">
 						<AvatarImage
 							alt={userProfile?.user?.username || ''}
-							userName={userProfile?.user?.username}
+							username={userProfile?.user?.username}
 							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
 							srcImgProxy={createImgproxyUrl(urlImg ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 							src={urlImg}

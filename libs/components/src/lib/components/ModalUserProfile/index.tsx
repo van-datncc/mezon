@@ -174,7 +174,7 @@ const ModalUserProfile = ({
 		return message?.references?.[0].message_sender_display_name || message?.references?.[0].message_sender_username;
 	}, [userById, userID]);
 
-	const userNameShow = useMemo(() => {
+	const usernameShow = useMemo(() => {
 		if (isFooterProfile) {
 			return userProfile?.user?.username;
 		}
@@ -238,7 +238,7 @@ const ModalUserProfile = ({
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{checkAnonymous ? 'Anonymous' : userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
-						<p className="font-medium tracking-wide text-sm my-0">{userNameShow}</p>
+						<p className="font-medium tracking-wide text-sm my-0">{usernameShow}</p>
 					</div>
 
 					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}

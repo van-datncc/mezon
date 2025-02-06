@@ -16,7 +16,7 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_14,
 			fontWeight: '600'
 		},
-		userNameBox: {
+		usernameBox: {
 			backgroundColor: colors.secondary,
 			flexDirection: 'row',
 			alignItems: 'center',

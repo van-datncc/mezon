@@ -36,7 +36,7 @@ export default function FilterUserAuditLog() {
 		dispatch(
 			auditLogFilterActions.setUser({
 				userId: userSelected?.value || '',
-				userName: userSelected?.title || ''
+				username: userSelected?.title || ''
 			})
 		);
 		navigation.goBack();

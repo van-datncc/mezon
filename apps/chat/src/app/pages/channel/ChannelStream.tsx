@@ -240,7 +240,7 @@ function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserL
 function UserItem({ user }: { user: IChannelMember }) {
 	const member = useAppSelector((state) => selectMemberClanByGoogleId(state, user.user_id ?? ''));
 	const userStream = useAppSelector((state) => selectMemberClanByUserId2(state, user.user_id ?? ''));
-	const userName = member ? member?.user?.username : userStream?.user?.username;
+	const username = member ? member?.user?.username : userStream?.user?.username;
 	const clanAvatar = member ? member?.clan_avatar : userStream?.clan_avatar;
 	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
 	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
@@ -250,8 +250,8 @@ function UserItem({ user }: { user: IChannelMember }) {
 			<div className="w-14 h-14">
 				{member || userStream ? (
 					<AvatarImage
-						alt={userName || ''}
-						userName={userName}
+						alt={username || ''}
+						username={username}
 						className="min-w-14 min-h-14 max-w-14 max-h-14"
 						srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 						src={avatar}
@@ -268,7 +268,7 @@ type ChannelStreamProps = {
 	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	currentChannel: ChannelsEntity | null;
-	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, userName: string, gotifyToken: string) => void;
+	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, username: string, gotifyToken: string) => void;
 	streamVideoRef: RefObject<HTMLVideoElement>;
 	disconnect: () => void;
 	isStream: boolean;

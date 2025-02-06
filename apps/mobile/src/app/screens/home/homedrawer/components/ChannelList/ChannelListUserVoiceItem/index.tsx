@@ -19,8 +19,8 @@ const UserVoiceItem = React.memo(({ userVoice, isCategoryExpanded, index, totalM
 	const userStream = useAppSelector((state) => selectMemberClanByUserId2(state, userVoice?.user_id ?? ''));
 	const clanNick = member ? member?.clan_nick : userStream?.clan_nick;
 	const displayName = member ? member?.user?.display_name : userStream?.user?.display_name;
-	const userName = member ? member?.user?.username : userStream?.user?.username;
-	const name = getNameForPrioritize(clanNick, displayName, userName);
+	const username = member ? member?.user?.username : userStream?.user?.username;
+	const name = getNameForPrioritize(clanNick, displayName, username);
 	const clanAvatar = member ? member?.clan_avatar : userStream?.clan_avatar;
 	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
 	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);

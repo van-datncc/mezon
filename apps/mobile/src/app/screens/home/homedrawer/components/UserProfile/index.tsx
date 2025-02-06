@@ -243,7 +243,7 @@ const UserProfile = React.memo(
 				</View>
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
-						<Text style={[styles.userName]}>
+						<Text style={[styles.username]}>
 							{userById
 								? !isDM
 									? userById?.clan_nick ||

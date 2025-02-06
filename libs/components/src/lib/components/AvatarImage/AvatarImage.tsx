@@ -2,14 +2,14 @@ import { DetailedHTMLProps, ImgHTMLAttributes, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type AvatarImageProp = {
-	userName?: string;
+	username?: string;
 	alt: string;
 	isAnonymous?: boolean;
 	classNameText?: string;
 	srcImgProxy?: string;
 } & DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
+export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
 
 	const computedClassName = twMerge('size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className);
@@ -17,7 +17,7 @@ export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', i
 		setIsError(true);
 	};
 
-	if ((!src && !userName) || isAnonymous)
+	if ((!src && !username) || isAnonymous)
 		return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
 
 	if (srcImgProxy && src && isError) {
@@ -25,7 +25,7 @@ export const AvatarImage = ({ userName, src, srcImgProxy, alt, className = '', i
 	}
 
 	if (!src || isError) {
-		const avatarChar = userName?.charAt(0)?.toUpperCase() || '';
+		const avatarChar = username?.charAt(0)?.toUpperCase() || '';
 
 		return (
 			<div

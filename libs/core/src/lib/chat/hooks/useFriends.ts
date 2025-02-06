@@ -29,9 +29,9 @@ export function useFriends() {
 	);
 
 	const acceptFriend = useCallback(
-		(userName: string, id: string) => {
+		(username: string, id: string) => {
 			const body = {
-				usernames: [userName],
+				usernames: [username],
 				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestAddFriend(body));
@@ -40,9 +40,9 @@ export function useFriends() {
 	);
 
 	const deleteFriend = useCallback(
-		(userName: string, id: string) => {
+		(username: string, id: string) => {
 			const body = {
-				usernames: [userName],
+				usernames: [username],
 				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestDeleteFriend(body));
@@ -51,9 +51,9 @@ export function useFriends() {
 	);
 
 	const blockFriend = useCallback(
-		(userName: string, id: string) => {
+		(username: string, id: string) => {
 			const body = {
-				usernames: [userName],
+				usernames: [username],
 				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestBlockFriend(body));
@@ -62,9 +62,9 @@ export function useFriends() {
 	);
 
 	const unBlockFriend = useCallback(
-		(userName: string, id: string) => {
+		(username: string, id: string) => {
 			const body = {
-				usernames: [userName],
+				usernames: [username],
 				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestDeleteFriend(body));

@@ -66,7 +66,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 							/>
 						</Block>
 						<Block style={styles.messageBoxTop}>
-							<Text style={styles.userNameMessageBox}>
+							<Text style={styles.usernameMessageBox}>
 								{(currentDirectId
 									? uploader?.user?.display_name || uploader?.user?.username
 									: uploader?.clan_nick || uploader?.user?.display_name || uploader?.user?.username) || 'Anonymous'}

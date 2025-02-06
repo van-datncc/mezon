@@ -239,7 +239,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 									<div className="flex flex-row items-center gap-2">
 										<AvatarImage
 											alt={''}
-											userName={friend.user?.username}
+											username={friend.user?.username}
 											srcImgProxy={createImgproxyUrl(friend.user?.avatar_url ?? '', {
 												width: 100,
 												height: 100,

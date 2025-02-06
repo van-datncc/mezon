@@ -125,7 +125,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 			<View style={styles.clanProfileDetail}>
 				<View style={styles.nameWrapper}>
 					<Text style={styles.displayNameText}>{clanProfileValue?.displayName || clanProfileValue?.username}</Text>
-					<Text style={styles.userNameText}>{clanProfileValue?.username}</Text>
+					<Text style={styles.usernameText}>{clanProfileValue?.username}</Text>
 				</View>
 
 				<MezonInput

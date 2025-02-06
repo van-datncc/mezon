@@ -333,7 +333,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								key={index}
 								height={'75px'}
 								alt={`Avatar ${index + 1}`}
-								userName={`Avatar ${index + 1}`}
+								username={`Avatar ${index + 1}`}
 								className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
 								srcImgProxy={createImgproxyUrl(avatar ?? '', {
 									width: 300,

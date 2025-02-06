@@ -26,7 +26,7 @@ export const InfoUserMessage = React.memo(({ createTime, isShow, onPress, sender
 	if (isShow) {
 		return (
 			<TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.messageBoxTop}>
-				<Text style={{ ...styles.userNameMessageBox, color: colorSenderName }} numberOfLines={1} ellipsizeMode="tail">
+				<Text style={{ ...styles.usernameMessageBox, color: colorSenderName }} numberOfLines={1} ellipsizeMode="tail">
 					{senderDisplayName}
 				</Text>
 				<Text style={styles.dateMessageBox}>{createTime ? convertTimeString(createTime) : ''}</Text>

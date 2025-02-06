@@ -30,7 +30,7 @@ const style = (colors: Attributes) =>
 			gap: size.s_10,
 			alignItems: 'center'
 		},
-		userName: {
+		username: {
 			color: colors.bgViolet,
 			fontSize: size.label,
 			fontWeight: '600'
