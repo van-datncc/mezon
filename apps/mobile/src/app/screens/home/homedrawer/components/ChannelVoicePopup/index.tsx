@@ -61,19 +61,13 @@ const ChannelVoicePopup = () => {
 			if (data?.isEndCall) {
 				setVoicePlay(false);
 			}
-			setChannelId(data.channelID);
+			setChannelId(data.channelId);
 			setRoomName(data.roomName);
 		});
 		return () => {
 			eventOpenMezonMeet.remove();
 		};
 	}, [channelId, roomName]);
-
-	useEffect(() => {
-		if (roomName) {
-			handleJoinStreamingRoom();
-		}
-	}, [roomName]);
 
 	const handleJoinStreamingRoom = useCallback(async () => {
 		if (!roomName) return;
@@ -97,6 +91,12 @@ const ChannelVoicePopup = () => {
 			setToken(null);
 		}
 	}, [channelId, dispatch, roomName]);
+
+	useEffect(() => {
+		if (roomName && channelId) {
+			handleJoinStreamingRoom();
+		}
+	}, [channelId, handleJoinStreamingRoom, roomName]);
 
 	const handleResizeStreamRoom = () => {
 		if (isFullScreen.current) {
@@ -138,6 +138,7 @@ const ChannelVoicePopup = () => {
 			]}
 		>
 			<ChannelVoice
+				channelId={channelId}
 				token={token}
 				serverUrl={serverUrl}
 				isAnimationComplete={isAnimationComplete}

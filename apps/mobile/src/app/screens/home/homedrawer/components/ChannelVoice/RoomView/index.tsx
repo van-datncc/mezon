@@ -1,16 +1,33 @@
 import { useLocalParticipant, useParticipants, useRoomContext, useTracks, VideoTrack } from '@livekit/react-native';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	getUpdateOrAddClanChannelCache,
+	Icons,
+	jumpToChannel,
+	save,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE
+} from '@mezon/mobile-components';
 import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
+import { selectCurrentClanId } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { Track } from 'livekit-client';
 import React, { useCallback, useEffect } from 'react';
 import { DeviceEventEmitter, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../styles';
 
-const RoomView = ({ isAnimationComplete, onPressMinimizeRoom }: { isAnimationComplete: boolean; onPressMinimizeRoom: () => void }) => {
+const RoomView = ({
+	isAnimationComplete,
+	onPressMinimizeRoom,
+	channelId
+}: {
+	isAnimationComplete: boolean;
+	onPressMinimizeRoom: () => void;
+	channelId: string;
+}) => {
 	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -19,6 +36,7 @@ const RoomView = ({ isAnimationComplete, onPressMinimizeRoom }: { isAnimationCom
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const { isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled, localParticipant } = useLocalParticipant();
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		localParticipant.setCameraEnabled(false);
@@ -30,7 +48,7 @@ const RoomView = ({ isAnimationComplete, onPressMinimizeRoom }: { isAnimationCom
 
 		return (
 			<Block style={styles.userView}>
-				{participant.isCameraEnabled && trackRef ? (
+				{(participant.isCameraEnabled || participant.isScreenShareEnabled) && trackRef ? (
 					<VideoTrack trackRef={trackRef} style={styles.participantView} />
 				) : (
 					<Block display="flex" flexDirection="row" alignItems="center" justifyContent="center" marginBottom={10}>
@@ -69,12 +87,23 @@ const RoomView = ({ isAnimationComplete, onPressMinimizeRoom }: { isAnimationCom
 				screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
 			});
 		}
+		joinChannel();
 		onPressMinimizeRoom();
+	};
+
+	const joinChannel = async () => {
+		const clanId = currentClanId;
+		DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+			isFetchMemberChannelDM: true
+		});
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+		await jumpToChannel(channelId, clanId);
 	};
 
 	return (
 		<View style={styles.roomViewcontainer}>
-			<Block>
+			<Block marginBottom={'30%'}>
 				<FlatList data={participants} renderItem={renderParticipant} keyExtractor={(item) => item.identity} />
 			</Block>
 			{isAnimationComplete && (

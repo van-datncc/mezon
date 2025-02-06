@@ -30,8 +30,8 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }, refRBSheet: Reac
 	const handleJoinVoice = async () => {
 		if (!channel.meeting_code) return;
 		const data = {
-			channelId: channel.channel_id || '',
-			roomName: channel.meeting_code
+			channelId: channel?.channel_id || '',
+			roomName: channel?.meeting_code
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 		dismiss();

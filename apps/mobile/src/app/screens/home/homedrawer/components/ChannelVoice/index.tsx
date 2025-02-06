@@ -10,11 +10,13 @@ import { style } from './styles';
 const { width, height } = Dimensions.get('window');
 
 function ChannelVoice({
+	channelId,
 	token,
 	serverUrl,
 	onPressMinimizeRoom,
 	isAnimationComplete
 }: {
+	channelId: string;
 	onPressMinimizeRoom?: () => void;
 	token: string;
 	serverUrl: string;
@@ -67,7 +69,7 @@ function ChannelVoice({
 					</Block>
 				)}
 				<LiveKitRoom serverUrl={serverUrl} token={token} connect={true}>
-					<RoomView onPressMinimizeRoom={onPressMinimizeRoom} isAnimationComplete={isAnimationComplete} />
+					<RoomView channelId={channelId} onPressMinimizeRoom={onPressMinimizeRoom} isAnimationComplete={isAnimationComplete} />
 				</LiveKitRoom>
 			</Block>
 		</SafeAreaView>
