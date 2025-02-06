@@ -372,14 +372,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
-	const isChannelStream = currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING;
+	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 	return (
 		<>
 			<div className={`w-full ${!isChannelMezonVoice ? 'hidden' : ''}`}>
 				<ChannelVoice channel={currentChannel} roomName={currentChannel.meeting_code || ''} />
 			</div>
-			<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
+			<div className={`w-full relative ${isChannelMezonVoice ? 'hidden' : ''}`}>
 				{isChannelApp ? (
 					<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
 				) : (
