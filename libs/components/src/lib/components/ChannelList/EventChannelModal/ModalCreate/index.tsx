@@ -33,6 +33,12 @@ export type ModalCreateProps = {
 	eventId?: string;
 };
 
+enum EventTabIndex {
+	LOCATION = 0,
+	EVENTINFO = 1,
+	REVIEW = 2
+}
+
 const ModalCreate = (props: ModalCreateProps) => {
 	const { onClose, onCloseEventModal, eventId, clearEventId } = props;
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -109,7 +115,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			return;
 		}
 
-		if (currentModal === 0 && number === 2 && !contentSubmit.topic) {
+		if (currentModal === EventTabIndex.LOCATION && number === EventTabIndex.REVIEW && !contentSubmit.topic) {
 			return;
 		}
 
