@@ -79,9 +79,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
 						name: itemDM?.usernames?.toString() ?? '',
+						displayName: itemDM.channel_label,
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
-						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
 						type: ChannelType.CHANNEL_TYPE_DM,
@@ -95,15 +95,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			? listGroup.map((itemGr: DirectEntity) => {
 					return {
 						id: itemGr?.channel_id ?? '',
-						name: itemGr?.usernames?.toString() ?? '',
+						name: itemGr.usernames?.toString() ?? '',
+						displayName: itemGr.channel_label,
 						avatarUser: 'assets/images/avatar-group.png',
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
 						typeChat: TypeSearch.Dm_Type,
 						count_messsage_unread: itemGr.count_mess_unread,
-						lastSeenTimeStamp: Number(itemGr?.last_seen_message?.timestamp_seconds || 0),
-						displayName: itemGr.channel_label
+						lastSeenTimeStamp: Number(itemGr?.last_seen_message?.timestamp_seconds || 0)
 					};
 				})
 			: [];
