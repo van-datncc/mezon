@@ -33,6 +33,7 @@ import { canvasReducer } from './canvas/canvas.slice';
 import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
+import { channelAppReducer } from './channels/channelapp.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { CHANNEL_LIST_RENDER, listChannelRenderReducer } from './channels/listChannelRender.slice';
@@ -331,6 +332,7 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	videostream: videoStreamReducer,
+	channelApp: channelAppReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,

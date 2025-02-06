@@ -63,6 +63,13 @@ function Login() {
 		}
 	}, [redirectTo, isLogin, navigate]);
 
+	const reloadQR = async () => {
+		const qRInfo = await qRCode();
+		await setLoginId(qRInfo?.login_id as string);
+		await setCreateSecond(Number(qRInfo?.create_time_second));
+		setHidden(false);
+	};
+
 	return (
 		<div
 			className=" w-screen h-screen  overflow-x-hidden overflow-y-scroll  scrollbar-hide flex items-center"
@@ -77,7 +84,7 @@ function Login() {
 						<GoogleButtonLogin />
 						<LoginForm />
 					</div>
-					<QRSection loginId={loginId || ''} isExpired={hidden} />
+					<QRSection loginId={loginId || ''} isExpired={hidden} reloadQR={reloadQR} />
 				</div>
 			</div>
 		</div>

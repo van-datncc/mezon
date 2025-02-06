@@ -23,10 +23,22 @@ import {
 } from '@livekit/components-react';
 
 import '@livekit/components-styles';
-import { ChannelsEntity, fetchJoinMezonMeet, useAppDispatch } from '@mezon/store';
+import {
+	ChannelsEntity,
+	fetchJoinMezonMeet,
+	selectCurrentChannelId,
+	selectShowCamera,
+	selectShowMicrophone,
+	selectShowScreen,
+	selectToken,
+	selectVoiceChannelId,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 interface ChannelVoiceProps {
 	channel: ChannelsEntity;
@@ -34,10 +46,14 @@ interface ChannelVoiceProps {
 }
 
 const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
-	const [token, setToken] = useState<string | null>(null);
+	const token = useSelector(selectToken);
+	const voiceChannelId = useSelector(selectVoiceChannelId);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const showMicrophone = useSelector(selectShowMicrophone);
+	const showCamera = useSelector(selectShowCamera);
 
 	const handleJoinRoom = async () => {
 		if (!roomName) return;
@@ -52,56 +68,90 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 			).unwrap();
 
 			if (result) {
-				setToken(result);
+				dispatch(voiceActions.setToken(result));
+				dispatch(voiceActions.setVoiceChannelId(channel.channel_id || ''));
 			} else {
-				setToken(null);
+				dispatch(voiceActions.setToken(''));
 			}
 		} catch (err) {
 			console.error('Failed to join room:', err);
-			setToken(null);
+			dispatch(voiceActions.setToken(''));
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleLeaveRoom = async () => {
-		setToken(null);
+	const handleLeaveRoom = () => {
+		dispatch(voiceActions.resetVoiceSettings());
 	};
+
+	const isCurrentChannel = voiceChannelId === currentChannelId;
 
 	return (
 		<>
-			{!token || !serverUrl ? (
-				<div className="w-full h-full bg-black flex justify-center items-center">
-					<div className="flex flex-col justify-center items-center gap-4 w-full">
-						{/* <div className="w-full flex gap-2 justify-center p-2">
-							{memberJoin.length > 0 && <UserListVoiceChannel memberJoin={memberJoin} memberMax={3}></UserListVoiceChannel>}
-						</div> */}
-						<div className="max-w-[350px] text-center text-3xl font-bold">
-							{channel?.channel_label && channel.channel_label.length > 20
-								? `${channel.channel_label.substring(0, 20)}...`
-								: channel?.channel_label}
-						</div>
-						No one is currently in voice
-						{/* {memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>} */}
-						<button
-							disabled={!roomName}
-							className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
-							onClick={handleJoinRoom}
-						>
-							{loading ? 'Joining...' : 'Join Voice'}
-						</button>
-					</div>
-				</div>
+			{token == '' || !serverUrl ? (
+				<PreJoinChannelVoice channel={channel} roomName={roomName} loading={loading} handleJoinRoom={handleJoinRoom} />
 			) : (
-				<LiveKitRoom token={token} serverUrl={serverUrl} data-lk-theme="default">
-					<MyVideoConference onLeaveRoom={handleLeaveRoom} />
-				</LiveKitRoom>
+				<>
+					<PreJoinChannelVoice
+						channel={channel}
+						roomName={roomName}
+						loading={loading}
+						handleJoinRoom={handleJoinRoom}
+						isCurrentChannel={isCurrentChannel}
+					/>
+					<LiveKitRoom
+						key={token}
+						className={!isCurrentChannel ? 'hidden' : ''}
+						audio={showMicrophone}
+						video={showCamera}
+						token={token}
+						serverUrl={serverUrl}
+						data-lk-theme="default"
+					>
+						<MyVideoConference onLeaveRoom={handleLeaveRoom} />
+					</LiveKitRoom>
+				</>
 			)}
 		</>
 	);
 };
 
 export default ChannelVoice;
+
+interface PreJoinChannelVoiceProps {
+	channel: ChannelsEntity;
+	roomName: string;
+	loading: boolean;
+	handleJoinRoom: () => void;
+	isCurrentChannel?: boolean;
+}
+
+const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, roomName, loading, handleJoinRoom, isCurrentChannel }) => {
+	return (
+		<div className={`w-full h-full bg-black flex justify-center items-center ${isCurrentChannel ? 'hidden' : ''}`}>
+			<div className="flex flex-col justify-center items-center gap-4 w-full">
+				{/* <div className="w-full flex gap-2 justify-center p-2">
+			{memberJoin.length > 0 && <UserListVoiceChannel memberJoin={memberJoin} memberMax={3}></UserListVoiceChannel>}
+		</div> */}
+				<div className="max-w-[350px] text-center text-3xl font-bold">
+					{channel?.channel_label && channel.channel_label.length > 20
+						? `${channel.channel_label.substring(0, 20)}...`
+						: channel?.channel_label}
+				</div>
+				No one is currently in voice
+				{/* {memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>} */}
+				<button
+					disabled={!roomName}
+					className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
+					onClick={handleJoinRoom}
+				>
+					{loading ? 'Joining...' : 'Join Voice'}
+				</button>
+			</div>
+		</div>
+	);
+};
 
 interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
@@ -189,12 +239,15 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom }: ControlBarProps) {
+	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
 	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
 	variation ??= defaultVariation;
 
 	const visibleControls = { leave: true, ...controls };
+
+	const showScreen = useSelector(selectShowScreen);
 
 	const localPermissions = useLocalParticipantPermissions();
 
@@ -213,27 +266,25 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
 
-	const [isScreenShareEnabled, setIsScreenShareEnabled] = useState(false);
-
 	const onScreenShareChange = useCallback(
 		(enabled: boolean) => {
-			setIsScreenShareEnabled(enabled);
+			dispatch(voiceActions.setShowScreen(enabled));
 		},
-		[setIsScreenShareEnabled]
+		[dispatch]
 	);
 
-	const { saveAudioInputEnabled, saveVideoInputEnabled, saveAudioInputDeviceId, saveVideoInputDeviceId } = usePersistentUserChoices({
+	const { saveAudioInputDeviceId, saveVideoInputDeviceId } = usePersistentUserChoices({
 		preventSave: !saveUserChoices
 	});
 
 	const microphoneOnChange = useCallback(
-		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveAudioInputEnabled(enabled) : null),
-		[saveAudioInputEnabled]
+		(enabled: boolean, isUserInitiated: boolean) => isUserInitiated ?? dispatch(voiceActions.setShowMicrophone(enabled)),
+		[dispatch]
 	);
 
 	const cameraOnChange = useCallback(
-		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? saveVideoInputEnabled(enabled) : null),
-		[saveVideoInputEnabled]
+		(enabled: boolean, isUserInitiated: boolean) => isUserInitiated ?? dispatch(voiceActions.setShowCamera(enabled)),
+		[dispatch]
 	);
 
 	return (
@@ -282,7 +333,7 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					onChange={onScreenShareChange}
 					onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
 				>
-					{showText && (isScreenShareEnabled ? 'Stop screen share' : 'Share screen')}
+					{showText && (showScreen ? 'Stop screen share' : 'Share screen')}
 				</TrackToggle>
 			)}
 			{visibleControls.leave && (
