@@ -155,7 +155,7 @@ export const enableOnboarding = createAsyncThunk(
 
 			const response = await mezon.client.updateClanDesc(mezon.session, clan_id, {
 				is_onboarding: onboarding,
-        banner: banner
+				banner: banner
 			});
 
 			if (!response) {

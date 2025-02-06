@@ -38,8 +38,8 @@ const ClanEffects: React.FC<{
 	isShowCreateThread: boolean;
 	isShowCreateTopic: boolean;
 	userId?: string;
-	userName?: string;
-}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId, userName }) => {
+	username?: string;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId, username }) => {
 	// move code thanh.levan
 
 	const dispatch = useAppDispatch();
@@ -153,7 +153,7 @@ const ClanLayout = () => {
 				isShowCreateThread={isShowCreateThread}
 				isShowCreateTopic={isShowCreateTopic}
 				userId={userProfile?.user?.id || ''}
-				userName={userProfile?.user?.username || ''}
+				username={userProfile?.user?.username || ''}
 			/>
 		</>
 	);

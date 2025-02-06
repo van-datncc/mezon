@@ -42,7 +42,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			numberCharacterCollapse={30}
 			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
 			name={name || ''}
-			userNameAva={user?.user?.username}
+			usernameAva={user?.user?.username}
 			status={{ status: isMe ? true : !isOffline, isMobile }}
 			customStatus={displayCustomStatus}
 			isHideStatus={true}

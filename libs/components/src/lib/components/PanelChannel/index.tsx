@@ -146,6 +146,10 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				isPrivate: currentChannel.channel_private || 0
 			})
 		);
+		if (channel.count_mess_unread) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.id || '', count: -channel.count_mess_unread }));
+		}
+
 		handleCloseModalConfirm();
 		navigate(`/chat/clans/${currentClan?.id}/channels/${currentChannel.parrent_id}`);
 	};

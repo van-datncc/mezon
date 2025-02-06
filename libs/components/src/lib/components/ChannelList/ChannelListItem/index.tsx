@@ -27,8 +27,6 @@ type ChannelListItemProp = {
 };
 
 export type ChannelListItemRef = {
-	scrollIntoChannel: (options?: ScrollIntoViewOptions) => void;
-	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
 	channelId: string;
 	channelRef: ChannelLinkRef | null;
 	isInViewport: () => boolean;

@@ -4,6 +4,8 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
+import HomeScreen from '../../screens/home/HomeScreen';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { APP_SCREEN } from '../ScreenTypes';
@@ -20,6 +22,8 @@ const RootStack = createNativeStackNavigator();
 const Stack = createStackNavigator();
 
 export const Authentication = memo(() => {
+	const isTabletLandscape = useTabletLandscape();
+
 	return (
 		<BottomSheetModalProvider>
 			<RootStack.Navigator
@@ -33,7 +37,7 @@ export const Authentication = memo(() => {
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
 				<Stack.Screen
 					name={APP_SCREEN.HOME_DEFAULT}
-					component={HomeDefaultWrapper}
+					component={isTabletLandscape ? HomeScreen : HomeDefaultWrapper}
 					options={{
 						cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 						headerShown: false,

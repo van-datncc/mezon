@@ -66,7 +66,7 @@ export const style = (colors: Attributes) =>
 			fontWeight: '700',
 			fontSize: size.h5
 		},
-		userNameText: {
+		usernameText: {
 			color: colors.text,
 			fontSize: size.small
 		},

@@ -114,7 +114,7 @@ const ModalSendToken = ({
 			if (userId && !userMap.has(userId)) {
 				userMap.set(userId, {
 					id: userId,
-					username: itemDM?.usernames ?? '',
+					username: itemDM?.usernames?.[0] ?? '',
 					avatar_url: itemDM?.channel_avatar?.[0] ?? ''
 				});
 			}
@@ -122,6 +122,7 @@ const ModalSendToken = ({
 
 		return Array.from(userMap.values());
 	};
+
 	const mergedUsers = mergeUniqueUsers(usersClan, listDM);
 
 	const filteredUsers = mergedUsers.filter((user: any) => user.username?.toLowerCase().includes(searchTerm.toLowerCase()) && user.id !== userId);
@@ -193,7 +194,7 @@ const ModalSendToken = ({
 															<div className="flex items-center">
 																<AvatarImage
 																	alt={user?.username ?? ''}
-																	userName={user?.username ?? ''}
+																	username={user?.username ?? ''}
 																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
 																		width: 100,
 																		height: 100,

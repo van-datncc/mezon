@@ -41,10 +41,10 @@ export default function AuditLogComponent({ navigation }: MenuClanScreenProps<Cl
 	const styles = style(themeValue);
 
 	const displayUserName = useMemo(() => {
-		return userAuditLog?.userName && userAuditLog?.userName !== UserAuditLog.ALL_USER_AUDIT
-			? userAuditLog?.userName
+		return userAuditLog?.username && userAuditLog?.username !== UserAuditLog.ALL_USER_AUDIT
+			? userAuditLog?.username
 			: UserAuditLog.ALL_USER_AUDIT;
-	}, [userAuditLog?.userName]);
+	}, [userAuditLog?.username]);
 
 	const displayActionLog = useMemo(() => {
 		return actionAuditLog && actionAuditLog !== ActionLog.ALL_ACTION_AUDIT ? actionAuditLog : ActionLog.ALL_ACTION_AUDIT;
@@ -90,7 +90,7 @@ export default function AuditLogComponent({ navigation }: MenuClanScreenProps<Cl
 		dispatch(
 			auditLogFilterActions.setUser({
 				userId: '',
-				userName: ''
+				username: ''
 			})
 		);
 		dispatch(auditLogFilterActions.setAction(null));

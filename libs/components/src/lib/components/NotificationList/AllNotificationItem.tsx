@@ -109,12 +109,12 @@ function AllTabContent({ message, subject, code, senderId }: IMentionTabContent)
 	const clan = useAppSelector(selectClanById(message.clan_id as string));
 	const user = useSelector(selectMemberClanByUserId(senderId ?? ''));
 
-	const userName = message.username;
+	const username = message.username;
 	let subjectText = subject;
 
-	if (userName) {
-		const userNameLenght = userName.length;
-		subjectText = subject?.slice(userNameLenght);
+	if (username) {
+		const usernameLenght = username.length;
+		subjectText = subject?.slice(usernameLenght);
 	}
 
 	return (
@@ -129,7 +129,7 @@ function AllTabContent({ message, subject, code, senderId }: IMentionTabContent)
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
-					userName={message?.username}
+					username={message?.username}
 					srcImgProxy={createImgproxyUrl((priorityAvatar ? priorityAvatar : message.avatar || user?.user?.avatar_url) ?? '', {
 						width: 300,
 						height: 300,
@@ -175,7 +175,7 @@ function AllTabContent({ message, subject, code, senderId }: IMentionTabContent)
 					) : (
 						<div className="flex flex-col gap-1">
 							<div>
-								<span className="font-bold">{user?.user?.display_name || userName}</span>
+								<span className="font-bold">{user?.user?.display_name || username}</span>
 								<span>{subjectText}</span>
 							</div>
 							<span className="text-zinc-400 text-[11px]">{convertTimeString(message.create_time as string)}</span>

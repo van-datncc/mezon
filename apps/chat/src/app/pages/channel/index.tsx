@@ -382,7 +382,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
-	const isChannelStream = currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING;
+	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 	return (
 		<>

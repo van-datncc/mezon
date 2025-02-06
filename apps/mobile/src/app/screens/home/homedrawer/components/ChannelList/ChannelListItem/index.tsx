@@ -91,7 +91,7 @@ export const ChannelListItem = React.memo(
 					const store = await getStoreAsync();
 					store.dispatch(directActions.setDmGroupCurrentId(''));
 					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+					if (!isTabletLandscape) navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					timeoutRef.current = setTimeout(async () => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(

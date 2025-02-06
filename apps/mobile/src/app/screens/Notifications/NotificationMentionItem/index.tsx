@@ -70,7 +70,7 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 			: '';
 	}, [clan?.clan_name, channelInfo?.channel_label]);
 
-	const userName = useMemo(() => {
+	const username = useMemo(() => {
 		return getNameForPrioritize(notify?.content?.clan_nick, notify?.content?.display_name, notify?.content?.username);
 	}, [notify]);
 
@@ -88,12 +88,12 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 					<View style={styles.boxImage}>
 						<MezonAvatar
 							avatarUrl={priorityAvatar ? priorityAvatar : notify?.content?.avatar}
-							username={notify?.content?.userName}
+							username={notify?.content?.username}
 						></MezonAvatar>
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							<Text style={{ ...styles.username, color: colorsUsername }}>{userName} </Text>
+							<Text style={{ ...styles.username, color: colorsUsername }}>{username} </Text>
 							{subjectText}
 						</Text>
 						<View style={styles.contentMessage}>

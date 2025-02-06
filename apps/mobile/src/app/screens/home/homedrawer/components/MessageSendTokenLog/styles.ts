@@ -4,12 +4,12 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
-			width: size.s_100 * 2.5,
+			maxWidth: '95%',
 			borderRadius: size.s_12,
 			overflow: 'hidden',
 			marginTop: size.s_4,
-			paddingHorizontal: size.s_20,
-			paddingVertical: size.s_16,
+			paddingHorizontal: size.s_12,
+			paddingVertical: size.s_12,
 			backgroundColor: colors.secondaryLight
 		},
 		info: {
@@ -35,9 +35,9 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		buttonTitle: {
-			marginTop: size.s_4,
+			marginTop: size.s_8,
 			color: baseColor.blurple,
-			fontSize: size.s_16,
+			fontSize: size.s_14,
 			fontWeight: 'bold'
 		}
 	});

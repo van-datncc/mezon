@@ -15,7 +15,7 @@ export default function ClanProfileDetail({ value, onChange }: IClanProfileDetai
 		<View style={styles.clanProfileDetail}>
 			<View style={styles.nameWrapper}>
 				<Text style={styles.displayNameText}>{value?.displayName || value?.username}</Text>
-				<Text style={styles.userNameText}>{value?.username}</Text>
+				<Text style={styles.usernameText}>{value?.username}</Text>
 			</View>
 
 			<MezonInput

@@ -243,7 +243,7 @@ const UserProfile = React.memo(
 				</View>
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
-						<Text style={[styles.userName]}>
+						<Text style={[styles.username]}>
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
@@ -253,10 +253,12 @@ const UserProfile = React.memo(
 										user?.user?.display_name ||
 										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
-								: user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
-							{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+							{userById
+								? userById?.user?.username
+								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}

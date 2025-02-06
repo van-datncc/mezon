@@ -158,7 +158,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 				<AvatarImage
 					className="w-8 h-8"
 					alt="user avatar"
-					userName={user?.clan_nick || user?.user?.display_name || user?.user?.username}
+					username={user?.clan_nick || user?.user?.display_name || user?.user?.username}
 					srcImgProxy={createImgproxyUrl((user?.clan_avatar || user?.user?.avatar_url) ?? '', {
 						width: 300,
 						height: 300,

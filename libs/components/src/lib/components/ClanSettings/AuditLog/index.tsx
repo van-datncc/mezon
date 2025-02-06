@@ -84,7 +84,7 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 							<div className="max-sm:hidden">Filter by User</div>
 							<div className="flex items-center gap-1 cursor-pointer">
 								<div className=" one-line">
-									{userFilter && userFilter.userName !== UserAuditLog.ALL_USER_AUDIT ? userFilter.userName : 'All'}
+									{userFilter && userFilter.username !== UserAuditLog.ALL_USER_AUDIT ? userFilter.username : 'All'}
 								</div>
 								<Icons.ArrowDown />
 							</div>

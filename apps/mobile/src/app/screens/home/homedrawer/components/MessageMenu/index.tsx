@@ -47,6 +47,12 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: messageInfo?.channel_id }));
 	}, []);
 
+	const userName: string = useMemo(() => {
+		return (
+			messageInfo?.channel_label || (typeof messageInfo?.usernames === 'string' ? messageInfo?.usernames : messageInfo?.usernames?.[0] || '')
+		);
+	}, [messageInfo?.channel_label, messageInfo?.usernames]);
+
 	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(messageInfo?.channel_id));
 
 	const isDmUnmute = useMemo(() => {
@@ -232,14 +238,14 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
-								<Text style={styles.textAvatar}>{(messageInfo?.channel_label || messageInfo?.usernames)?.charAt?.(0)}</Text>
+								<Text style={styles.textAvatar}>{userName?.charAt?.(0)}</Text>
 							</View>
 						)}
 					</View>
 				)}
 				<View style={styles.titleWrapper}>
 					<Text style={styles.serverName} numberOfLines={2}>
-						{messageInfo?.channel_label || messageInfo?.usernames}
+						{userName}
 					</Text>
 					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id?.length + 1} members</Text>}
 				</View>

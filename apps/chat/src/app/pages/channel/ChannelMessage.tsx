@@ -14,8 +14,7 @@ export type MessageProps = {
 	isHighlight?: boolean;
 	channelLabel: string;
 	avatarDM?: string;
-	// userName?: string;
-	userName?: string[];
+	username?: string;
 
 	isLastSeen?: boolean;
 	index: number;
@@ -44,7 +43,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	channelLabel,
 	isHighlight,
 	avatarDM,
-	userName,
+	username,
 	isLastSeen,
 	nextMessageId,
 	checkMessageTargetToMoved,
@@ -111,8 +110,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 					<OnBoardWelcome nextMessageId={nextMessageId} />
 				</div>
 			)}
-			{/* {message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />} */}
-			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
+			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} username={username} mode={mode} />}
 
 			{!message.isFirst && (
 				<div

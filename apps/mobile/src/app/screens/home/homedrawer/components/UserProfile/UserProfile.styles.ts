@@ -33,7 +33,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: 8,
 			padding: size.s_20
 		},
-		userName: {
+		username: {
 			color: colors.textStrong,
 			fontSize: size.h6,
 			fontWeight: '600'
