@@ -5141,6 +5141,45 @@ export function VoiceIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export const ReloadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
+	return (
+		<svg
+			width="30"
+			height="30"
+			viewBox="0 0 24 24"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			fill="none"
+			{...props}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+					<g id="Reload">
+						<rect id="Rectangle" fillRule="nonzero" x="0" y="0" width="24" height="24"></rect>
+						<path
+							d="M4,13 C4,17.4183 7.58172,21 12,21 C16.4183,21 20,17.4183 20,13 C20,8.58172 16.4183,5 12,5 C10.4407,5 8.98566,5.44609 7.75543,6.21762"
+							id="Path"
+							stroke="#ffffff"
+							strokeWidth="2"
+							strokeLinecap="round"
+						></path>
+						<path
+							d="M9.2384,1.89795 L7.49856,5.83917 C7.27552,6.34441 7.50429,6.9348 8.00954,7.15784 L11.9508,8.89768"
+							id="Path"
+							stroke="#ffffff"
+							strokeWidth="2"
+							strokeLinecap="round"
+						></path>
+					</g>
+				</g>
+			</g>
+		</svg>
+	);
+};
+
 export function MacAppStoreDesktop(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="222" height="44" viewBox="0 0 222 44" fill="none" {...props}>

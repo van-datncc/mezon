@@ -17,10 +17,13 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	voiceChannelMember: IChannelMember[];
+	showMicrophone: boolean;
 	showCamera: boolean;
 	showScreen: boolean;
 	statusCall: boolean;
 	voiceConnectionState: boolean;
+	token?: string;
+	channelId?: string;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -69,10 +72,13 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	voiceChannelMember: [],
+	showMicrophone: false,
 	showCamera: false,
 	showScreen: false,
 	statusCall: false,
-	voiceConnectionState: false
+	voiceConnectionState: false,
+	token: '',
+	channelId: ''
 });
 
 export const voiceSlice = createSlice({
@@ -89,6 +95,18 @@ export const voiceSlice = createSlice({
 				.map((member) => member?.id);
 			voiceAdapter.removeMany(state, idsToRemove);
 		},
+		setVoiceChannelId: (state, action: PayloadAction<string>) => {
+			state.channelId = action.payload;
+		},
+		setToken: (state, action: PayloadAction<string>) => {
+			state.token = action.payload;
+		},
+		setShowMicrophone: (state, action: PayloadAction<boolean>) => {
+			state.showMicrophone = action.payload;
+		},
+		setShowCamera: (state, action: PayloadAction<boolean>) => {
+			state.showCamera = action.payload;
+		},
 		setShowScreen: (state, action: PayloadAction<boolean>) => {
 			state.showScreen = action.payload;
 		},
@@ -97,6 +115,12 @@ export const voiceSlice = createSlice({
 		},
 		setVoiceConnectionState: (state, action: PayloadAction<boolean>) => {
 			state.voiceConnectionState = action.payload;
+		},
+		resetVoiceSettings: (state) => {
+			state.token = '';
+			state.showMicrophone = false;
+			state.showCamera = false;
+			state.showScreen = false;
 		}
 		// ...
 	},
@@ -165,6 +189,14 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
+
+export const selectVoiceChannelId = createSelector(getVoiceState, (state) => state.channelId);
+
+export const selectToken = createSelector(getVoiceState, (state) => state.token);
+
+export const selectShowMicrophone = createSelector(getVoiceState, (state) => state.showMicrophone);
+
+export const selectShowCamera = createSelector(getVoiceState, (state) => state.showCamera);
 
 export const selectShowScreen = createSelector(getVoiceState, (state) => state.showScreen);
 
