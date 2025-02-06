@@ -92,8 +92,11 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 		return currentDmGroup?.type;
 	}, [currentDmGroup?.type]);
 
-	const dmLabel = useMemo(() => {
-		return currentDmGroup?.channel_label || currentDmGroup?.usernames || '';
+	const dmLabel: string = useMemo(() => {
+		return (
+			currentDmGroup?.channel_label ||
+			(typeof currentDmGroup?.usernames === 'string' ? currentDmGroup?.usernames : currentDmGroup?.usernames?.[0] || '')
+		);
 	}, [currentDmGroup?.channel_label, currentDmGroup?.usernames]);
 
 	const dmAvatar = useMemo(() => {

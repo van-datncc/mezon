@@ -119,7 +119,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 							placeholderTextColor="#535353"
 							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 							// @ts-expect-error
-							value={jsonObject?.receiver_name || 'KOMO'}
+							value={jsonObject?.receiver_name || 'KOMU'}
 							editable={false}
 						/>
 					</View>

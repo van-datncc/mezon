@@ -37,6 +37,10 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const { t } = useTranslation(['userProfile']);
 	const currenChannel = useCurrentChannel(channelId) as IChannel;
 
+	const userName: string = useMemo(() => {
+		return typeof currenChannel?.usernames === 'string' ? currenChannel?.usernames : currenChannel?.usernames?.[0] || '';
+	}, [currenChannel?.usernames]);
+
 	const isChannel = useMemo(() => {
 		return currenChannel?.parrent_id === '0';
 	}, [currenChannel?.parrent_id]);
@@ -77,7 +81,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const handleAcceptFriend = async () => {
 		const store = await getStoreAsync();
 		const body = {
-			usernames: [currenChannel?.usernames],
+			usernames: [userName],
 			ids: [currenChannel?.user_id?.[0]]
 		};
 		store.dispatch(friendsActions.sendRequestAddFriend(body));
@@ -86,7 +90,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const handleRemoveFriend = async () => {
 		const store = await getStoreAsync();
 		const body = {
-			usernames: [currenChannel?.usernames],
+			usernames: [userName],
 			ids: [currenChannel?.user_id?.[0]]
 		};
 		store.dispatch(friendsActions.sendRequestDeleteFriend(body));
@@ -102,7 +106,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 						height={size.s_100}
 						width={size.s_100}
 						avatarUrl={currenChannel?.channel_avatar?.[0]}
-						username={currenChannel?.usernames}
+						username={userName}
 					/>
 				)
 			) : (
@@ -122,12 +126,12 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 			{isDM ? (
 				<View>
 					<Text style={[styles.titleWelcomeMessage, isDMGroup && { textAlign: 'center' }]}>{currenChannel?.channel_label}</Text>
-					{!isDMGroup && <Text style={styles.subTitleUsername}>{currenChannel?.usernames}</Text>}
+					{!isDMGroup && <Text style={styles.subTitleUsername}>{userName}</Text>}
 					{isDMGroup ? (
 						<Text style={styles.subTitleWelcomeMessageCenter}>{"Welcome to your new group! Invite friends whenever you're ready"}</Text>
 					) : (
 						<Text style={styles.subTitleWelcomeMessage}>
-							{'This is the very beginning of your legendary conversation with ' + currenChannel?.usernames}
+							{'This is the very beginning of your legendary conversation with ' + userName}
 						</Text>
 					)}
 
