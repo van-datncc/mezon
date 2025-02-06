@@ -73,8 +73,19 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
 				<SingleBacktick contentBacktick={content} isInPinMsg={isInPinMsg} isLightMode={isLightMode} posInNotification={posInNotification} />
-			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !posInReply && !isLink ? (
-				<TripleBackticks contentBacktick={content} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !isLink ? (
+				!posInReply ? (
+					<TripleBackticks contentBacktick={content} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+				) : (
+					<div className={`relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+						<pre
+							className={`pre ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}
+							style={{ padding: 0 }}
+						>
+							<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{content}</code>
+						</pre>
+					</div>
+				)
 			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply && !isLink ? (
 				<SingleBacktick contentBacktick={content} isLightMode={isLightMode} />
 			) : null}
