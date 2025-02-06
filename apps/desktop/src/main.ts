@@ -1,6 +1,5 @@
 import { BrowserWindow, app, clipboard, dialog, ipcMain, nativeImage, screen, shell } from 'electron';
 import log from 'electron-log/main';
-import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -21,7 +20,6 @@ import {
 } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
-import { forceQuit } from './app/utils';
 import updateImagePopup from './assets/image-window/update_window_image';
 import openImagePopup from './assets/image-window/window_image';
 import { environment } from './environments/environment';
@@ -158,16 +156,6 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
-			try {
-				const updateCheckResult = await autoUpdater.checkForUpdates();
-				if (updateCheckResult?.downloadPromise) {
-					await updateCheckResult.downloadPromise;
-					forceQuit.enable();
-					return autoUpdater.quitAndInstall();
-				}
-			} catch (error) {
-				console.error('Update check failed:', error);
-			}
 			window.close();
 			break;
 		case CLOSE_IMAGE_WINDOW:

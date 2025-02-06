@@ -28,6 +28,7 @@ import {
 	eventManagementActions,
 	friendsActions,
 	giveCoffeeActions,
+	listChannelRenderAction,
 	listChannelsByUserActions,
 	mapMessageChannelToEntityAction,
 	mapNotificationToEntity,
@@ -842,6 +843,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
+				dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
