@@ -45,7 +45,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.usernames?.split?.(',') || [];
+		const usernameList = directMessage?.usernames || [];
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
@@ -100,7 +100,13 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 	useEffect(() => {
 		const searchDMListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SEARCH_DM, ({ searchText }) => {
-			if (searchText && !normalizeString(directMessage?.channel_label || directMessage?.usernames)?.includes(normalizeString(searchText))) {
+			if (
+				searchText &&
+				!normalizeString(
+					directMessage?.channel_label ||
+						(typeof directMessage?.usernames === 'string' ? directMessage?.usernames : directMessage?.usernames?.[0] || '')
+				)?.includes(normalizeString(searchText))
+			) {
 				setHiddenFlag(true);
 			} else {
 				setHiddenFlag(false);
@@ -151,7 +157,12 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 						)
 					) : (
 						<View style={styles.wrapperTextAvatar}>
-							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
+							<Text style={styles.textAvatar}>
+								{(
+									directMessage?.channel_label ||
+									(typeof directMessage?.usernames === 'string' ? directMessage?.usernames : directMessage?.usernames?.[0] || '')
+								)?.charAt?.(0)}
+							</Text>
 						</View>
 					)}
 					<TypingDmItem directMessage={directMessage} />

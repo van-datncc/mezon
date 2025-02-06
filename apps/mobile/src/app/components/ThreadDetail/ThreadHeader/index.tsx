@@ -41,7 +41,9 @@ export const ThreadHeader = memo(() => {
 		bottomSheetMenuCustom.current?.present();
 	};
 	const channelLabel = useMemo(() => {
-		return currentDmGroup?.channel_label || currentChannel?.channel_label || currentChannel?.usernames;
+		return (currentDmGroup?.channel_label ||
+			currentChannel?.channel_label ||
+			(typeof currentChannel?.usernames === 'string' ? currentChannel?.usernames : currentChannel?.usernames?.[0] || 'defaultLabel')) as string;
 	}, [currentDmGroup?.channel_label, currentChannel?.channel_label, currentChannel?.usernames]);
 
 	const isChannel = useMemo(() => {
@@ -100,7 +102,7 @@ export const ThreadHeader = memo(() => {
 						) : (
 							<MezonAvatar
 								avatarUrl={currentChannel?.channel_avatar?.[0]}
-								username={currentChannel?.channel_label || currentChannel?.usernames}
+								username={channelLabel}
 								userStatus={userStatus}
 								customStatus={status}
 							/>
@@ -114,7 +116,7 @@ export const ThreadHeader = memo(() => {
 				<View style={styles.channelText}>
 					{renderChannelIcon()}
 					<Text numberOfLines={1} style={styles.channelLabel}>
-						{currentChannel?.channel_label || currentChannel?.usernames}
+						{channelLabel}
 					</Text>
 				</View>
 			)}

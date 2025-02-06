@@ -5,8 +5,7 @@ import {
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	getUpdateOrAddClanChannelCache,
 	load,
-	save,
-	setDefaultChannelLoader
+	save
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
@@ -196,13 +195,16 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const channelId = linkMatch?.[2];
 			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
-				const joinAndChangeClan = async (store: any, clanId: string) => {
-					await Promise.all([
-						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
-					]);
-				};
-				await joinAndChangeClan(store, clanId);
+				const clanIdCache = load(STORAGE_CLAN_ID);
+				if (clanIdCache !== clanId || time) {
+					const joinAndChangeClan = async (store: any, clanId: string) => {
+						await Promise.all([
+							store.dispatch(clansActions.joinClan({ clanId: clanId })),
+							store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
+						]);
+					};
+					await joinAndChangeClan(store, clanId);
+				}
 				store.dispatch(
 					channelsActions.joinChannel({
 						clanId: clanId ?? '',
@@ -230,8 +232,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-				const clanIdCache = load(STORAGE_CLAN_ID);
-				store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
@@ -239,20 +239,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					});
 				}
 				store.dispatch(appActions.setLoadingMainMobile(false));
-				// force from killed app call in background apply for back fetch channels
-				if (time && Number(clanIdCache || 0) !== 0) {
-					const joinChangeFetchAndSetLoader = async (store: any, clanIdCache: string) => {
-						const [respCurrentClan, respChannel] = await Promise.all([
-							store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true })),
-							store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }))
-						]);
-
-						await setDefaultChannelLoader(respChannel.payload, clanIdCache);
-					};
-					setTimeout(async () => {
-						await joinChangeFetchAndSetLoader(store, clanIdCache);
-					}, 1000);
-				}
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);

@@ -20,7 +20,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const toggleEnableStatus = (enable: boolean) => {
-		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClan?.clan_id as string, onboarding: enable, banner : currentClan?.banner }));
+		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClan?.clan_id as string, onboarding: enable, banner: currentClan?.banner }));
 	};
 
 	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);

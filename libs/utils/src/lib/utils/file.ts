@@ -65,7 +65,7 @@ function processImageFile<T>(file: File): Promise<T> {
 }
 
 export function processFile<T>(file: File): Promise<T> {
-	if ((!file.type.startsWith('image/') && !file.type.startsWith('video/')) || file.type.endsWith('adobe.photoshop')) {
+	if (file.type.endsWith('adobe.photoshop') || (!file.type.startsWith('image/') && !file.type.startsWith('video/'))) {
 		return processNonMediaFile(file);
 	}
 

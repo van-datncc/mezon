@@ -3,7 +3,6 @@ import {
 	ClansEntity,
 	FAVORITE_CATEGORY_ID,
 	categoriesActions,
-	selectChannelsByClanId,
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
@@ -27,12 +26,12 @@ import {
 	isWindowsDesktop,
 	toggleDisableHover
 } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { MentionFloatButton } from '../MentionFloatButton';
 import { ThreadLinkWrapper } from '../ThreadListChannel';
+import { useVirtualizer } from '../virtual-core/useVirtualizer';
 import CategorizedItem from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
@@ -80,12 +79,11 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 	const dispatch = useAppDispatch();
 
-	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClan?.clan_id as string));
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 
 	const firstChannelWithBadgeCount = useMemo(() => {
-		return channelsInClan?.find((item) => item?.count_mess_unread && item?.count_mess_unread > 0) || null;
-	}, [channelsInClan]);
+		return listChannelRender?.find((item) => (item as IChannel)?.count_mess_unread && ((item as IChannel)?.count_mess_unread || 0) > 0) || null;
+	}, [listChannelRender]);
 
 	const data = useMemo(
 		() => [
@@ -159,9 +157,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
 
-		setTimeout(() => {
-			dispatch(categoriesActions.setCtrlKFocusChannel(null));
-		}, 100);
+		dispatch(categoriesActions.setCtrlKFocusChannel(null));
 	});
 
 	const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
