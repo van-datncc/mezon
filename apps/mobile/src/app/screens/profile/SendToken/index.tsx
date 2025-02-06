@@ -1,18 +1,22 @@
 import { BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
+	FriendsEntity,
 	appActions,
 	getStoreAsync,
 	giveCoffeeActions,
 	selectAllAccount,
 	selectAllDirectMessages,
+	selectAllFriends,
 	selectAllUserClans,
 	selectUpdateToken
 } from '@mezon/store-mobile';
+import { TypeMessage, formatMoney } from '@mezon/utils';
 import debounce from 'lodash.debounce';
-import { ChannelType, safeJSONParse } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useRef, useState } from 'react';
 import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -40,11 +44,17 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const userProfile = useSelector(selectAllAccount);
 	const usersClan = useSelector(selectAllUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
+	const friends = useSelector(selectAllFriends);
 	const BottomSheetRef = useRef<BottomSheetModal>(null);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const [selectedUser, setSelectedUser] = useState<Receiver>(null);
 	const [searchText, setSearchText] = useState<string>('');
 	const [plainTokenCount, setPlainTokenCount] = useState(0);
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
+	const friendList: FriendsEntity[] = useMemo(() => {
+		return friends?.filter((user) => user.state === 0) || [];
+	}, [friends]);
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
@@ -54,16 +64,18 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const mergeUser = useMemo(() => {
 		const userMap = new Map<string, Receiver>();
 
-		usersClan.forEach((itemUserClan) => {
-			const userId = itemUserClan?.id ?? '';
-			if (userId && !userMap.has(userId)) {
-				userMap.set(userId, {
-					id: userId,
-					username: itemUserClan?.user?.username ?? '',
-					avatar_url: itemUserClan?.user?.avatar_url ?? ''
-				});
-			}
-		});
+		usersClan
+			?.filter((item) => item?.user?.id !== userProfile?.user?.id)
+			?.forEach((itemUserClan) => {
+				const userId = itemUserClan?.id ?? '';
+				if (userId && !userMap.has(userId)) {
+					userMap.set(userId, {
+						id: userId,
+						username: itemUserClan?.user?.username ?? '',
+						avatar_url: itemUserClan?.user?.avatar_url ?? ''
+					});
+				}
+			});
 
 		listDM.forEach((itemDM: DirectEntity) => {
 			const userId = itemDM?.user_id?.[0] ?? '';
@@ -76,8 +88,24 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			}
 		});
 
+		friendList.forEach((itemFriend: FriendsEntity) => {
+			const userId = itemFriend?.user?.id ?? '';
+			if (userId && !userMap.has(userId)) {
+				userMap.set(userId, {
+					id: userId,
+					username: itemFriend?.user?.display_name ?? itemFriend?.user?.username ?? '',
+					avatar_url: itemFriend?.user?.avatar_url ?? ''
+				});
+			}
+		});
+
 		return Array.from(userMap.values());
-	}, [listDM, usersClan]);
+	}, [friendList, listDM, userProfile?.user?.id, usersClan]);
+
+	const directMessageId = useMemo(() => {
+		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === selectedUser?.id);
+		return directMessage?.id;
+	}, [listDM, selectedUser?.id]);
 
 	const sendToken = async () => {
 		const store = await getStoreAsync();
@@ -117,6 +145,24 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 
 			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
 			store.dispatch(appActions.setLoadingMainMobile(false));
+			if (directMessageId) {
+				sendInviteMessage(
+					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					directMessageId,
+					ChannelStreamMode.STREAM_MODE_DM,
+					TypeMessage.SendToken
+				);
+			} else {
+				const response = await createDirectMessageWithUser(selectedUser?.id);
+				if (response?.channel_id) {
+					sendInviteMessage(
+						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						response?.channel_id,
+						ChannelStreamMode.STREAM_MODE_DM,
+						TypeMessage.SendToken
+					);
+				}
+			}
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			if (res?.action?.action?.requestStatus === 'rejected' || !res) {

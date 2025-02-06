@@ -40,7 +40,6 @@ import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../componentUI';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import SharingSuggestItem from './SharingSuggestItem';

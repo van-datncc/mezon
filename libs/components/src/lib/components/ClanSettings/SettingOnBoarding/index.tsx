@@ -18,9 +18,9 @@ export enum EOnboardingStep {
 }
 const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
 	const toggleEnableStatus = (enable: boolean) => {
-		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClanId as string, onboarding: enable }));
+		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClan?.clan_id as string, onboarding: enable, banner : currentClan?.banner }));
 	};
 
 	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
@@ -28,7 +28,6 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 		setCurrentPage(page);
 	};
 
-	const currentClan = useSelector(selectCurrentClan);
 	const formOnboarding = useSelector(selectFormOnboarding);
 	const { sessionRef, clientRef } = useMezon();
 
@@ -65,7 +64,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 		dispatch(
 			onboardingActions.createOnboardingTask({
-				clan_id: currentClanId as string,
+				clan_id: currentClan?.clan_id as string,
 				content: formOnboardingData
 			})
 		);

@@ -14,7 +14,7 @@ type LabelDmProps = {
 const LabelDm = (props: LabelDmProps) => {
 	const { dmGroupId, currentDmGroup } = props;
 	const dispatch = useAppDispatch();
-	const initLabel = (currentDmGroup?.channel_label || currentDmGroup?.usernames) ?? '';
+	const initLabel = (currentDmGroup?.channel_label || currentDmGroup?.usernames?.join(',')) ?? '';
 	const [label, setLabel] = useState(initLabel);
 	const [openEditName, setOpenEditName] = useState(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);

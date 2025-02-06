@@ -3,9 +3,9 @@ import React, { memo } from 'react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
-import CallingModal from '../../components/CallingModal';
+import CallingModalWrapper from '../../components/CallingModalWrapper';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
-import StreamingPopup from '../../screens/home/homedrawer/components/StreamingPopup/StreamingPopup';
+import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
 import { FriendStacks } from './stacks/FriendStacks';
@@ -17,10 +17,9 @@ import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
 const RootStack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export const Authentication = memo(() => {
-	const Stack = createStackNavigator();
-
 	return (
 		<BottomSheetModalProvider>
 			<RootStack.Navigator
@@ -54,8 +53,8 @@ export const Authentication = memo(() => {
 
 				<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
 			</RootStack.Navigator>
-			<CallingModal />
-			<StreamingPopup />
+			<CallingModalWrapper />
+			<StreamingWrapper />
 		</BottomSheetModalProvider>
 	);
 });

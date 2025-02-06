@@ -55,7 +55,6 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.CHAT_STREAMING
 			});
-			return;
 		}
 		onPressMinimizeRoom();
 	};

@@ -124,7 +124,6 @@ function ClanGuideSetting() {
 					title="Clan Guide Banner"
 					description="The recommended minimum size is 1920x480 and recommended aspect ratio is 4:1."
 				/>
-				<div className="w-full aspect-[4] bg-black rounded"></div>
 			</div>
 		</div>
 	);
