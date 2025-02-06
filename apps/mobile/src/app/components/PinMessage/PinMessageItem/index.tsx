@@ -45,7 +45,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 		if (pinMessageItem.message_id && pinMessageItem.channel_id) {
 			dispatch(
 				messagesActions.jumpToMessage({
-					clanId: currentClanId,
+					clanId: isDmOrGroup ? '0' : currentClanId,
 					messageId: pinMessageItem.message_id ?? '',
 					channelId: pinMessageItem.channel_id ?? ''
 				})
