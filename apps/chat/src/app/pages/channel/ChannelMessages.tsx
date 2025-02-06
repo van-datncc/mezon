@@ -483,6 +483,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					if (lastMessage?.isSending && lastMessage?.attachments?.[0]) {
 						attachmentSending.current = lastMessage?.attachments[0].url;
 					}
+					// (lastMessage?.isSending && lastMessage?.sender_id === userId) ||
 					if (
 						(isAtBottom || (attachmentSending.current && attachmentSending.current === lastMessage?.attachments?.[0]?.url)) &&
 						!isAlreadyFocusing
