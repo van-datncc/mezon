@@ -383,9 +383,8 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 			channel_label: label.join(',')
 		};
 
+		thunkAPI.dispatch(directActions.upsertOne(directEntity));
 		thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
-		thunkAPI.dispatch(directActions.addMemberDmGroup(directEntity));
-
 		return directEntity;
 	} catch (error) {
 		captureSentryError(error, 'direct/addGroupUserWS');
@@ -436,39 +435,37 @@ export const directSlice = createSlice({
 				}
 			});
 		},
-		removeByUserId: (state, action: PayloadAction<{ userId: string; currentUserId: string }>) => {
-			const { userId, currentUserId } = action.payload;
+		removeByUserId: (state, action: PayloadAction<{ userId: string; currentUserId: string; channelId: string }>) => {
+			const { userId, currentUserId, channelId } = action.payload;
 			const { ids, entities } = state;
 
-			for (const id of ids) {
-				const item = entities[id];
-				if (!item || !item.user_id) continue;
+			const item = entities[channelId];
+			if (!item || !item.user_id) return;
 
-				const userIndex = item.user_id.indexOf(userId);
+			const userIndex = item.user_id.indexOf(userId);
 
-				if (userIndex !== -1) {
-					const newUserIds = item.user_id.filter((_, index) => index !== userIndex);
+			if (userIndex !== -1) {
+				const newUserIds = item.user_id.filter((_, index) => index !== userIndex);
 
-					if (newUserIds.length === 0 || newUserIds.includes(currentUserId)) {
-						directAdapter.removeOne(state, id);
-					} else {
-						const newUsernames = item.usernames?.filter((_, index) => index !== userIndex);
-						const newChannelAvatars = item.channel_avatar?.filter((_, index) => index !== userIndex);
-						const newIsOnline = item.is_online?.filter((_, index) => index !== userIndex);
-						const newMetadata = item.metadata?.filter((_, index) => index !== userIndex);
-						const newAboutMe = item.about_me?.filter((_, index) => index !== userIndex);
-						directAdapter.updateOne(state, {
-							id,
-							changes: {
-								user_id: newUserIds,
-								usernames: newUsernames,
-								channel_avatar: newChannelAvatars,
-								is_online: newIsOnline,
-								metadata: newMetadata,
-								about_me: newAboutMe
-							}
-						});
-					}
+				if (newUserIds.length === 1 && newUserIds.includes(currentUserId)) {
+					directAdapter.removeOne(state, channelId);
+				} else {
+					const newUsernames = item.usernames?.filter((_, index) => index !== userIndex);
+					const newChannelAvatars = item.channel_avatar?.filter((_, index) => index !== userIndex);
+					const newIsOnline = item.is_online?.filter((_, index) => index !== userIndex);
+					const newMetadata = item.metadata?.filter((_, index) => index !== userIndex);
+					const newAboutMe = item.about_me?.filter((_, index) => index !== userIndex);
+					directAdapter.updateOne(state, {
+						id: channelId,
+						changes: {
+							user_id: newUserIds,
+							usernames: newUsernames,
+							channel_avatar: newChannelAvatars,
+							is_online: newIsOnline,
+							metadata: newMetadata,
+							about_me: newAboutMe
+						}
+					});
 				}
 			}
 		},
