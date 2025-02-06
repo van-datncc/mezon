@@ -69,3 +69,27 @@ export const forceQuit = {
 		return this.value;
 	}
 };
+
+export function sanitizeUrl(url: string): string {
+	if (!url) return '';
+
+	try {
+		const encodedUrl = encodeURI(url);
+		const parsed = new URL(encodedUrl);
+
+		if (!['http:', 'https:', 'data:'].includes(parsed.protocol)) {
+			return '';
+		}
+		if (parsed.protocol === 'data:' && !encodedUrl.startsWith('data:image/')) {
+			return '';
+		}
+		return encodedUrl;
+	} catch (e) {
+		return '';
+	}
+}
+
+export function escapeHtml(unsafe: string): string {
+	if (!unsafe) return '';
+	return unsafe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}

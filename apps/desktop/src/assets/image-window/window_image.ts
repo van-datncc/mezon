@@ -4,6 +4,7 @@ import App from '../../app/app';
 import image_window_css from './image-window-css';
 
 import { ApiChannelAttachment } from 'mezon-js/api.gen';
+import { escapeHtml, sanitizeUrl } from '../../app/utils';
 import menu from '../menu-context';
 
 interface IAttachmentEntity extends ApiChannelAttachment {
@@ -122,10 +123,10 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   </div>
 </div>
 <div class="main-container">
-  <div id="channel-label" class="channel-label">${imageData.channelImagesData.channelLabel}</div>
+  <div id="channel-label" class="channel-label">${escapeHtml(imageData.channelImagesData.channelLabel)}</div>
   <div class="image-view">
     <div class="selected-image-wrapper">
-      <img id="selectedImage" class="selected-image" src="${imageData.url}" />
+      <img id="selectedImage" class="selected-image" src="${sanitizeUrl(imageData.url)}" />
     </div>
     <div id="thumbnails" class="thumbnail-container">
       <div id="thumbnails-content" class="thumbnails-content">
@@ -135,10 +136,10 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   </div>
   <div class="bottom-bar">
     <div class="sender-info">
-      <img id="userAvatar" src="${imageData.uploaderData.avatar}" class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+      <img id="userAvatar" src="${escapeHtml(imageData.uploaderData.avatar)}" class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
       <div>
-        <div id="username" class="username" style="font-weight: bold;">${imageData.uploaderData.name}</div>
-        <div id="timestamp" class="timestamp" style="font-size: 0.8em; color: #ccc;">${formatDateTime(imageData.create_time)}</div>
+        <div id="username" class="username" style="font-weight: bold;">${escapeHtml(imageData.uploaderData.name)}</div>
+        <div id="timestamp" class="timestamp" style="font-size: 0.8em; color: #ccc;">${escapeHtml(formatDateTime(imageData.create_time))}</div>
       </div>
     </div>
     <div class="image-controls">
@@ -243,7 +244,6 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
         url : '${imageData.url}',
           realUrl : '${imageData.realUrl}'
       };
-    
       document.getElementById('close-window').addEventListener('click', () => {
 		selectedImage.src = null;
     	window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
@@ -333,10 +333,10 @@ function formatDateTime(dateString) {
 export const listThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
-			const currentDate = formatDate(image.create_time);
-			const prevDate = index > 0 ? formatDate(listImage[index - 1].create_time) : null;
+			const currentDate = escapeHtml(formatDate(image.create_time));
+			const prevDate = index > 0 ? escapeHtml(formatDate(listImage[index - 1].create_time)) : null;
 			const dateLabel = currentDate !== prevDate ? `<div class="date-label">${currentDate}</div>` : '';
-			return ` <div class="thumbnail-wrapper" id="thumbnail-${index}"> ${dateLabel} <img class="thumbnail ${indexSelect === index ? 'active' : ''}"  src="${image.url}" alt="${image.filename}" /> </div> `;
+			return ` <div class="thumbnail-wrapper" id="thumbnail-${index}"> ${dateLabel} <img class="thumbnail ${indexSelect === index ? 'active' : ''}"  src="${escapeHtml(image.url)}" alt="${escapeHtml(image.filename)}" /> </div> `;
 		})
 		.join('');
 };
@@ -344,14 +344,14 @@ export const listThumnails = (listImage, indexSelect) => {
 export const scriptThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
-			const time = formatDateTime(image.create_time);
+			const time = escapeHtml(formatDateTime(image.create_time));
 			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
-        selectedImage.src = '${image.url}';
+        selectedImage.src = '${sanitizeUrl(image.url)}';
         document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
         document.getElementById('thumbnail-${index}').querySelector('.thumbnail').classList.add('active');
          document.getElementById('thumbnail-${index}').querySelector('.thumbnail').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        document.getElementById('userAvatar').src = "${image.uploaderData.avatar}"
-        document.getElementById('username').innerHTML  = "${image.uploaderData.name}"
+        document.getElementById('userAvatar').src = "${sanitizeUrl(image.uploaderData.avatar)}"
+        document.getElementById('username').innerHTML  = "${escapeHtml(image.uploaderData.name)}"
         document.getElementById('timestamp').innerHTML  = "${time}"
       currentImageUrl = {
         fileName : '${image.fileName}',

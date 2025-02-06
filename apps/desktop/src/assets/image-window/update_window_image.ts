@@ -1,24 +1,25 @@
 import { BrowserWindow } from 'electron';
 import App from '../../app/app';
+import { escapeHtml, sanitizeUrl } from '../../app/utils';
 import { ImageData, listThumnails, scriptThumnails } from './window_image';
 
 function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 	const activeIndex = imageData.channelImagesData.selectedImageIndex;
-	const time = formatDateTime(imageData.create_time);
+	const time = escapeHtml(formatDateTime(imageData.create_time));
 	imageWindow.webContents.executeJavaScript(`
-      document.getElementById('channel-label').innerHTML = '${imageData.channelImagesData.channelLabel}';
+      document.getElementById('channel-label').innerHTML = '${escapeHtml(imageData.channelImagesData.channelLabel)}';
     	document.getElementById('thumbnails-content').innerHTML = '${listThumnails(imageData.channelImagesData.images, activeIndex)}';
-      selectedImage.src = '${imageData.url}';
+      selectedImage.src = '${sanitizeUrl(imageData.url)}';
         document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
         document.getElementById('thumbnail-${activeIndex}')?.querySelector('.thumbnail').classList.add('active');
-        document.getElementById('userAvatar').src = "${imageData.uploaderData.avatar}"
-        document.getElementById('username').innerHTML  = "${imageData.uploaderData.name}"
-        document.getElementById('timestamp').innerHTML  = "${time}"
+        document.getElementById('userAvatar').src = "${sanitizeUrl(imageData.uploaderData.avatar)}"
+        document.getElementById('username').innerHTML  = "${escapeHtml(imageData.uploaderData.name)}"
+        document.getElementById('timestamp').innerHTML  = "${escapeHtml(time)}"
         ${App.imageScriptWindowLoaded === false ? `let currentIndex = ${activeIndex};` : `currentIndex = ${activeIndex};`}
         currentImageUrl = {
-        fileName : '${imageData.filename}',
-        url : '${imageData.url}',
-          realUrl : '${imageData.realUrl}'
+        fileName : '${escapeHtml(imageData.filename)}',
+        url : '${sanitizeUrl(imageData.url)}',
+          realUrl : '${sanitizeUrl(imageData.realUrl)}'
       };
       ${App.imageScriptWindowLoaded === false && scriptThumnails(imageData.channelImagesData.images, activeIndex)}
   `);
@@ -27,49 +28,38 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
       function handleKeydown(e){
 		switch (e.key) {
 			case 'ArrowUp':
-        if(currentIndex > 0){
-          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        currentIndex--;
-        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
-        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
-      
-      }
-				break;
-			case 'ArrowLeft':
-        if(currentIndex > 0){
-          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        currentIndex--;
-        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
-        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
+        case 'ArrowLeft':
+          if(currentIndex > 0){
+            document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+            currentIndex--;
+            const prevThumb = document.querySelectorAll('.thumbnail')[currentIndex];
+            prevThumb.classList.add('active');
+            prevThumb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            selectedImage.src = sanitizeUrl(prevThumb.src);
+          }
+          break;
 
-      }
-				break;
-			case 'ArrowDown':
-        if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
-          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        currentIndex++;
-        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
-        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
-        
-      }
-				break;
-			case 'ArrowRight':
-        if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
-          currentIndex++;
-          document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        document.querySelectorAll('.thumbnail')[currentIndex].classList.add('active');
-        document.querySelectorAll('.thumbnail')[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        selectedImage.src = document.querySelectorAll('.thumbnail')[currentIndex].src;
-
-      }
-				break;
+        case 'ArrowDown':
+        case 'ArrowRight':
+          if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
+            document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+            currentIndex++;
+            const nextThumb = document.querySelectorAll('.thumbnail')[currentIndex];
+            nextThumb.classList.add('active');
+            nextThumb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            selectedImage.src = sanitizeUrl(nextThumb.src);
+          }
+          break;
 		}
 	}
 
-    ${App.imageScriptWindowLoaded === false && `document.addEventListener('keydown', handleKeydown);`} 
+    ${
+		App.imageScriptWindowLoaded === false &&
+		`
+      document.addEventListener('keydown', handleKeydown);
+      window.sanitizeUrl = ${sanitizeUrl.toString()};
+    `
+	}
 `);
 	if (App.imageScriptWindowLoaded === false) {
 		App.imageScriptWindowLoaded = true;
