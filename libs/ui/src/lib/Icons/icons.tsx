@@ -6113,6 +6113,15 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function LoadingSpinner(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<circle className="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" strokeWidth="5" fill="none" />
+			<path className="opacity-75" fill="currentColor" d="M25 5a20 20 0 0114.14 34.14l-2.83-2.83A15 15 0 0025 10V5z" />
+		</svg>
+	);
+}
+
 export function StopCall(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
