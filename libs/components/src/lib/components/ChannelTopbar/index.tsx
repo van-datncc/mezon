@@ -188,7 +188,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 			return;
 		}
 		const body = {
-			channelId: channel?.parrent_id !== '0' ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
+			channelId: channel?.parrent_id !== '0' && channel?.parrent_id ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
 			clanId: channel?.clan_id ?? '',
 			page: 1
 		};

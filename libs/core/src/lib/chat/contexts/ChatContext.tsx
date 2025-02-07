@@ -842,7 +842,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated.creator_id === userId) {
-				if (channelCreated.parrent_id !== '') {
+				if (channelCreated.parrent_id) {
 					const thread: ChannelsEntity = {
 						id: channelCreated.channel_id as string,
 						active: 1,
@@ -860,7 +860,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(listChannelRenderAction.addThreadToListRender({ clanId: channelCreated?.clan_id as string, channel: thread }));
 				}
 
-				if (channelCreated.channel_private === 1 && channelCreated.parrent_id === '') {
+				if (channelCreated.channel_private === 1 && !channelCreated.parrent_id) {
 					dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 				}
 			}
