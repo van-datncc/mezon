@@ -122,21 +122,20 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [previousChannels]);
 
-	const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentChannel.clan_id as string))
+	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentChannel.clan_id as string));
 	const numberNotification = useMemo(() => {
-		const channel = listChannelRender?.find(channel => channel.id === currentChannel.id);
+		const channel = listChannelRender?.find((channel) => channel.id === currentChannel.id);
 		return (channel as IChannel)?.count_mess_unread || 0;
-	}, [listChannelRender,currentChannel.id])
+	}, [listChannelRender, currentChannel.id]);
 
 	useEffect(() => {
 		if (!statusFetchChannel) return;
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		if (isTabVisible) {
-			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }))
+			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-
 	}, [statusFetchChannel, isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
@@ -156,7 +155,7 @@ function useChannelSeen(channelId: string) {
 		if (resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [currentChannel?.id])
+	}, [currentChannel?.id]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
@@ -349,16 +348,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						);
 					} else if (eventType === 'JOIN_ROOM') {
 						const { roomId } = (eventData.eventData || {}) as any;
-						// console.log('mezon app handle JOIN_ROOM');
 						dispatch(channelAppActions.setRoomId(roomId));
 					} else if (eventType === 'LEAVE_ROOM') {
 						dispatch(channelAppActions.setRoomId(null));
-						// console.log('mezon app handle LEAVE_ROOM');
 					} else if (eventType === 'CREATE_VOICE_ROOM') {
 						// eslint-disable-next-line no-console
 						const { roomId } = (eventData.eventData || {}) as any;
 						dispatch(channelAppActions.createChannelAppMeet({ channelId, roomName: roomId }));
-						// console.log('mezon app handle CREATE_VOICE_ROOM');
 					}
 				}
 			};
@@ -418,7 +414,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 							id="mainChat"
 							// eslint-disable-next-line @typescript-eslint/no-empty-function
-							onDragEnter={canSendMessage ? handleDragEnter : () => { }}
+							onDragEnter={canSendMessage ? handleDragEnter : () => {}}
 						>
 							<div
 								className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
