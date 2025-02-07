@@ -56,7 +56,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		if (urlImage && fileInputRef.current) {
-			setUrlImage('');
+			setUrlImage(undefined);
 			onUpload('');
 			fileInputRef.current.value = '';
 		}
