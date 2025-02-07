@@ -15,30 +15,38 @@ import {
 	RoomAudioRenderer,
 	StartMediaButton,
 	TrackToggle,
+	useConnectionState,
 	useCreateLayoutContext,
 	useLocalParticipantPermissions,
 	usePersistentUserChoices,
 	usePinnedTracks,
+	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
 
 import '@livekit/components-styles';
+import { useAuth } from '@mezon/core';
 import {
 	ChannelsEntity,
-	fetchJoinMezonMeet,
+	generateMeetToken,
+	handleParticipantMeetState,
 	selectCurrentChannelId,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
 	selectToken,
 	selectVoiceChannelId,
+	selectVoiceChannelMembersByChannelId,
+	selectVoiceConnectionState,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
+import { ParticipantMeetState } from '@mezon/utils';
 
-import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { UserListStreamChannel } from './ChannelStream';
 
 interface ChannelVoiceProps {
 	channel: ChannelsEntity;
@@ -48,12 +56,26 @@ interface ChannelVoiceProps {
 const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const token = useSelector(selectToken);
 	const voiceChannelId = useSelector(selectVoiceChannelId);
+	const voiceConnectionState = useSelector(selectVoiceConnectionState);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
-	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
+	const { userProfile } = useAuth();
+
+	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
+		await dispatch(
+			handleParticipantMeetState({
+				clan_id: channel.clan_id,
+				channel_id: channelId,
+				user_id: userProfile?.user?.id,
+				display_name: userProfile?.user?.display_name,
+				state
+			})
+		);
+	};
 
 	const handleJoinRoom = async () => {
 		if (!roomName) return;
@@ -61,13 +83,17 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 
 		try {
 			const result = await dispatch(
-				fetchJoinMezonMeet({
+				generateMeetToken({
 					channelId: channel.channel_id || '',
 					roomName: roomName
 				})
 			).unwrap();
 
 			if (result) {
+				if (voiceChannelId) {
+					handleLeaveRoom();
+				}
+				await participantMeetState(ParticipantMeetState.JOIN, channel.channel_id as string);
 				dispatch(voiceActions.setToken(result));
 				dispatch(voiceActions.setVoiceChannelId(channel.channel_id || ''));
 			} else {
@@ -81,9 +107,16 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		}
 	};
 
-	const handleLeaveRoom = () => {
+	const handleLeaveRoom = async () => {
 		dispatch(voiceActions.resetVoiceSettings());
+		await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
 	};
+
+	useEffect(() => {
+		if (voiceConnectionState) {
+			handleLeaveRoom();
+		}
+	}, []);
 
 	const isCurrentChannel = voiceChannelId === currentChannelId;
 
@@ -128,19 +161,19 @@ interface PreJoinChannelVoiceProps {
 }
 
 const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, roomName, loading, handleJoinRoom, isCurrentChannel }) => {
+	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.channel_id as string));
 	return (
 		<div className={`w-full h-full bg-black flex justify-center items-center ${isCurrentChannel ? 'hidden' : ''}`}>
 			<div className="flex flex-col justify-center items-center gap-4 w-full">
-				{/* <div className="w-full flex gap-2 justify-center p-2">
-			{memberJoin.length > 0 && <UserListVoiceChannel memberJoin={memberJoin} memberMax={3}></UserListVoiceChannel>}
-		</div> */}
+				<div className="w-full flex gap-2 justify-center p-2">
+					{voiceChannelMembers.length > 0 && <UserListStreamChannel memberJoin={voiceChannelMembers} memberMax={3}></UserListStreamChannel>}
+				</div>
 				<div className="max-w-[350px] text-center text-3xl font-bold">
 					{channel?.channel_label && channel.channel_label.length > 20
 						? `${channel.channel_label.substring(0, 20)}...`
 						: channel?.channel_label}
 				</div>
-				No one is currently in voice
-				{/* {memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>} */}
+				{voiceChannelMembers.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>}
 				<button
 					disabled={!roomName}
 					className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
@@ -200,6 +233,14 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 		focusTrack?.publication?.trackSid,
 		tracks
 	]);
+
+	const dispatch = useAppDispatch();
+	const room = useRoomContext();
+	const connectionState = useConnectionState(room);
+
+	if (connectionState === ConnectionState.Connected) {
+		dispatch(voiceActions.setVoiceConnectionState(true));
+	}
 
 	return (
 		<div className="lk-video-conference">

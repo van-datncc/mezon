@@ -188,7 +188,7 @@ export type UserListStreamChannelProps = {
 	readonly isShowChat?: boolean;
 };
 
-function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserListStreamChannelProps) {
+export function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserListStreamChannelProps) {
 	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin);
 	const [remainingCount, setRemainingCount] = useState(0);
 
