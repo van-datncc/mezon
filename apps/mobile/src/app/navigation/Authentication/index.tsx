@@ -3,6 +3,7 @@ import React, { memo } from 'react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
+import { Dimensions } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreen from '../../screens/home/HomeScreen';
@@ -31,7 +32,8 @@ export const Authentication = memo(() => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					animation: 'ios_from_right'
+					fullScreenGestureEnabled: true,
+					animation: 'ios'
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
@@ -41,7 +43,9 @@ export const Authentication = memo(() => {
 					options={{
 						cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 						headerShown: false,
-						gestureDirection: 'horizontal'
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+						gestureResponseDistance: Dimensions.get('window').width
 					}}
 				/>
 				<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
