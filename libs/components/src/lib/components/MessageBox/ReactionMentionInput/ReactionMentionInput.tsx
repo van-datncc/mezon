@@ -88,7 +88,8 @@ import {
 	processMarkdownEntities,
 	searchMentionsHashtag,
 	threadError,
-	transformTextWithMentions
+	transformTextWithMentions,
+	updateMentionPositions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
@@ -540,6 +541,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const previousValue = prevValueRef.current;
 		const previousPlainText = prevPlainTextRef.current;
+		const newMentions = updateMentionPositions(mentions, newValue, newPlainTextValue);
 		dispatch(threadsActions.setMessageThreadError(''));
 		setUndoHistory((prevUndoHistory) => [
 			...prevUndoHistory,
@@ -555,11 +557,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				...request,
 				valueTextInput: newValue,
 				content: newPlainTextValue,
-				mentionRaw: mentions
+				mentionRaw: newMentions
 			},
 			isNotChannel
 		);
-		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
+		if (newMentions?.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
 			setMentionEveryone(false);
@@ -568,7 +570,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			props.onTyping();
 		}
 
-		const onlyMention = filterMentionsWithAtSign(mentions);
+		const onlyMention = filterMentionsWithAtSign(newMentions);
 		const convertToMarkUpString = formatMentionsToString(onlyMention);
 		const convertToPlainTextString = getDisplayMention(onlyMention);
 		const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);

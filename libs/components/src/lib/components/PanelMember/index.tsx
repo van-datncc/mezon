@@ -158,8 +158,8 @@ const PanelMember = ({
 
 	const handleClickMention = () => {
 		const mentionInInput = `@[${displayMentionName}](${member?.user?.id})`;
-		const mentionPlainTextIndex = request?.content ? request?.content?.length : 0;
-		const mentionInputValueIndex = request?.valueTextInput ? request?.valueTextInput?.length : 0;
+		const mentionPlainTextIndex = request?.content?.length ?? 0;
+		const mentionInputValueIndex = request?.valueTextInput?.length ?? 0;
 
 		const mentionItem: MentionItem = {
 			display: `@${displayMentionName}`,
