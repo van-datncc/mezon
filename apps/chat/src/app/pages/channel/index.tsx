@@ -125,7 +125,7 @@ function useChannelSeen(channelId: string) {
 	const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentChannel.clan_id as string))
 	const numberNotification = useMemo(() => {
 		const channel = listChannelRender?.find(channel => channel.id === currentChannel.id);
-		return (channel as IChannel).count_mess_unread || 0;
+		return (channel as IChannel)?.count_mess_unread || 0;
 	}, [listChannelRender,currentChannel.id])
 
 	useEffect(() => {
