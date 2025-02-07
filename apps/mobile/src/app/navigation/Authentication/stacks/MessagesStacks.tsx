@@ -22,7 +22,7 @@ export const MessagesStacks = ({}: any) => {
 				headerShown: true,
 				headerShadowVisible: true,
 				gestureEnabled: true,
-				gestureDirection: 'vertical',
+				gestureDirection: 'horizontal',
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec
