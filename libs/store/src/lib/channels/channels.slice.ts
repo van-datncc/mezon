@@ -272,10 +272,6 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string })
 				);
-				const thread: ChannelsEntity = { ...response, id: response.channel_id as string, active: 1 };
-				thunkAPI.dispatch(listChannelRenderAction.addThreadToListRender({ clanId: response.clan_id as string, channel: thread }));
-			} else {
-				thunkAPI.dispatch(listChannelRenderAction.addChannelToListRender(response));
 			}
 
 			return response;
@@ -555,7 +551,7 @@ export const addThreadSocket = createAsyncThunk(
 			thunkAPI.dispatch(
 				listChannelRenderAction.addThreadToListRender({
 					clanId: clanId,
-					channel: {...channelData, active : 1}
+					channel: { ...channelData, active: 1 }
 				})
 			);
 		}

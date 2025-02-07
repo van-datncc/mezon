@@ -1,9 +1,11 @@
 import { useAppNavigation, useIdleRender, usePathMatch } from '@mezon/core';
 import {
+	AppDispatch,
 	RootState,
 	appActions,
 	channelAppActions,
 	channelsActions,
+	generateMeetToken,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
@@ -17,7 +19,6 @@ import {
 	selectDefaultNotificationClan,
 	selectEnableCall,
 	selectEnableMic,
-	selectEnableVideo,
 	selectGetRoomId,
 	selectIsPinModalVisible,
 	selectIsShowChatStream,
@@ -36,7 +37,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, isMacDesktop } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, isMacDesktop, sleep } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -51,7 +52,6 @@ import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import { MicButton } from './TopBarComponents/SFUButton/MicIcon';
 import { StartCallButton } from './TopBarComponents/SFUButton/StartCallButton';
-import { VideoButoon } from './TopBarComponents/SFUButton/VideoButton';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
@@ -114,12 +114,43 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 });
 
 const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
-	const dispatch = useDispatch();
-
+	const dispatch = useDispatch<AppDispatch>();
 	const joinVoice = useSelector(selectEnableCall);
 	const enableMic = useSelector(selectEnableMic);
-	const enableVideo = useSelector(selectEnableVideo);
 	const roomId = useSelector(selectGetRoomId);
+	const joinCall = useSelector(selectEnableCall);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		dispatch(channelAppActions.setRoomId(null));
+	}, [channel, dispatch]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			if (!roomId || !joinCall || !channel) {
+				dispatch(channelAppActions.setRoomToken(undefined));
+				return;
+			}
+			setLoading(true);
+
+			try {
+				const channelId = String(channel.channel_id ?? '');
+				const roomName = `${channelId}-${roomId}`;
+
+				const result = await dispatch(generateMeetToken({ channelId, roomName })).unwrap();
+
+				dispatch(channelAppActions.setRoomToken(result || undefined));
+			} catch (err) {
+				console.error('Failed to join room:', err);
+			} finally {
+				sleep(2000);
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, [channel, dispatch, roomId, joinCall]);
+
 	return (
 		roomId && (
 			<>
@@ -131,18 +162,15 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<StartCallButton onClick={() => dispatch(channelAppActions.setEnableCall(!joinVoice))} isJoinVoice={joinVoice} />
+								<StartCallButton
+									loading={loading}
+									onClick={() => dispatch(channelAppActions.setEnableCall(!joinVoice))}
+									isJoinVoice={joinVoice}
+								/>
 
-								{joinVoice && (
-									<>
-										<MicButton onClick={() => dispatch(channelAppActions.setEnableVoice(!enableMic))} isTalking={enableMic} />
+								<MicButton onClick={() => dispatch(channelAppActions.setEnableVoice(!enableMic))} isTalking={enableMic} />
 
-										<VideoButoon
-											onClick={() => dispatch(channelAppActions.setEnableVideo(!enableVideo))}
-											isEnable={enableVideo}
-										/>
-									</>
-								)}
+								{/* <VideoButoon onClick={() => dispatch(channelAppActions.setEnableVideo(!enableVideo))} isEnable={enableVideo} /> */}
 							</div>
 						</div>
 
@@ -188,7 +216,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 			return;
 		}
 		const body = {
-			channelId: channel?.parrent_id !== '0' ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
+			channelId: channel?.parrent_id !== '0' && channel?.parrent_id ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
 			clanId: channel?.clan_id ?? '',
 			page: 1
 		};

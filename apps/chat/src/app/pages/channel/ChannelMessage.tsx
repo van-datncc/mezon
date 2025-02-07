@@ -128,6 +128,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 						showDivider={isDifferentDay}
 						checkMessageTargetToMoved={checkMessageTargetToMoved}
 						messageReplyHighlight={messageReplyHighlight}
+						isTopic={isTopic}
 					/>
 				</div>
 			)}

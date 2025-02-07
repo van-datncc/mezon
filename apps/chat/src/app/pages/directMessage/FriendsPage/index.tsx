@@ -108,7 +108,13 @@ const FriendsPage = () => {
 	};
 
 	const listFriendFilter = filterStatus(friends)
-		.filter((obj) => obj.user?.username?.includes(textSearch))
+		.filter((obj) => {
+			const normalizedUsername = (obj.user?.username || '').toLowerCase();
+			const normalizedDisplayName = (obj.user?.display_name || '').toLowerCase();
+			const normalizedSearchText = textSearch.toLowerCase();
+
+			return normalizedUsername.includes(normalizedSearchText) || normalizedDisplayName.includes(normalizedSearchText);
+		})
 		.sort((start, next) => {
 			const nameStart = (start.user?.display_name || start.user?.username) ?? '';
 			const nameNext = (next.user?.display_name || next.user?.username) ?? '';

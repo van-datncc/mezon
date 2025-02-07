@@ -1,6 +1,7 @@
 import { useChannelMembers, useEditMessage, useEmojiSuggestionContext, useEscapeKey } from '@mezon/core';
 import {
 	ChannelMembersEntity,
+	MessagesEntity,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
@@ -11,7 +12,6 @@ import {
 import {
 	IMentionOnMessage,
 	IMessageSendPayload,
-	IMessageWithUser,
 	MentionDataProps,
 	ThemeApp,
 	addMarkdownPrefix,
@@ -23,11 +23,12 @@ import {
 	getMarkdownPrefixItems,
 	prepareProcessedContent,
 	searchMentionsHashtag,
-	updateMarkdownPositions
+	updateMarkdownPositions,
+	updateMentionPositions
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalDeleteMess from '../../components/DeleteMessageModal/ModalDeleteMess';
@@ -44,7 +45,8 @@ type MessageInputProps = {
 	channelId: string;
 	mode: number;
 	channelLabel: string;
-	message: IMessageWithUser;
+	message: MessagesEntity;
+	isTopic: boolean;
 };
 
 type ChannelsMentionProps = {
@@ -53,7 +55,7 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
-const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message, isTopic }) => {
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
 		channelLabel,
@@ -205,7 +207,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					processedContentDraft as IMessageSendPayload,
 					mentionNewPos as IMentionOnMessage[]
 				);
-				handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
+				handleSend(
+					filterEmptyArrays(updatedProcessedContent as any),
+					message.id,
+					adjustedMentionsPos,
+					isTopic ? channelId : message?.content?.tp || '',
+					isTopic
+				);
 				handleCancelEdit();
 			}
 		}
@@ -227,59 +235,23 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				processedContentDraft as IMessageSendPayload,
 				mentionNewPos as IMentionOnMessage[]
 			);
-			handleSend(filterEmptyArrays(updatedProcessedContent as any), message.id, adjustedMentionsPos, message?.content?.tp || '');
+			handleSend(
+				filterEmptyArrays(updatedProcessedContent as any),
+				message.id,
+				adjustedMentionsPos,
+				isTopic ? channelId : message?.content?.tp || '',
+				isTopic
+			);
 		}
 		handleCancelEdit();
 	};
 
 	const [titleMention, setTitleMention] = useState('');
 
-	const findMentionIndex = (value: string, plainValue: string, mention: MentionItem, appearanceIndex: number) => {
-		const mentionMarkup = `@[${mention.display.slice(1)}](${mention.id})`;
-
-		let valueStartIndex = -1;
-		let count = 0;
-		for (let i = 0; i < value.length; i++) {
-			if (value.slice(i, i + mentionMarkup.length) === mentionMarkup) {
-				count++;
-				if (count === appearanceIndex) {
-					valueStartIndex = i;
-					break;
-				}
-			}
-		}
-
-		let plainValueStartIndex = -1;
-		count = 0;
-		for (let i = 0; i < plainValue.length; i++) {
-			if (plainValue.slice(i, i + mention.display.length) === mention.display) {
-				count++;
-				if (count === appearanceIndex) {
-					plainValueStartIndex = i;
-					break;
-				}
-			}
-		}
-
-		return {
-			valueStartIndex,
-			plainValueStartIndex
-		};
-	};
-
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const mentionAppearancesCount: Record<string, number> = {};
 
-		const newMentions: MentionItem[] = mentions.map((mention) => {
-			mentionAppearancesCount[mention.id] = (mentionAppearancesCount[mention.id] || 0) + 1;
-			const newMentionStartIndex = findMentionIndex(newValue, newPlainTextValue, mention, mentionAppearancesCount?.[mention.id]);
-			return {
-				...mention,
-				index: newMentionStartIndex.valueStartIndex,
-				plainTextIndex: newMentionStartIndex.plainValueStartIndex
-			};
-		});
+		const newMentions = updateMentionPositions(mentions, newValue, newPlainTextValue);
 
 		const { mentionList, hashtagList, emojiList } = processMention(
 			newMentions,
