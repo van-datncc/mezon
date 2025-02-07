@@ -310,14 +310,6 @@ const persisteduserChannelsReducer = persistReducer(
 	userChannelsReducer
 );
 
-const persistedStreamReducer = persistReducer(
-	{
-		key: 'stream',
-		storage
-	},
-	videoStreamReducer
-);
-
 const persistPoliciesReducer = persistReducer(
 	{
 		key: 'policiesReducer',
@@ -392,7 +384,7 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
-	videostream: persistedStreamReducer,
+	videostream: videoStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
