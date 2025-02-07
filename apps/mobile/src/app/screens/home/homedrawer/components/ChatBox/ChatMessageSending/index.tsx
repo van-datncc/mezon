@@ -180,7 +180,9 @@ export const ChatMessageSending = memo(
 					...(voiceLinkRoomOnMessage?.current || []),
 					...(markdownsOnMessage?.current || []),
 					...(boldsOnMessage?.current || [])
-				]
+				],
+				cid: messageActionNeedToResolve?.targetMessage?.content?.cid,
+				tp: messageActionNeedToResolve?.targetMessage?.content?.tp
 			};
 
 			const payloadThreadSendMessage: IPayloadThreadSendMessage = {
