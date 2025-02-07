@@ -18,6 +18,7 @@ export interface ChannelAppState {
 	loadingStatus: LoadingStatus;
 	roomName: string | null;
 	roomId: string | null;
+	roomToken: string | undefined;
 	enableMic: boolean;
 	enableVideo: boolean;
 	enableCall: boolean;
@@ -27,6 +28,7 @@ export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
 	roomId: null,
+	roomToken: undefined,
 	enableMic: false,
 	enableVideo: false,
 	enableCall: false
@@ -64,6 +66,9 @@ export const channelAppSlice = createSlice({
 		setRoomId: (state, action: PayloadAction<string | null>) => {
 			state.roomId = action.payload;
 		},
+		setRoomToken: (state, action: PayloadAction<string | undefined>) => {
+			state.roomToken = action.payload;
+		},
 		setEnableVoice: (state, action: PayloadAction<boolean>) => {
 			state.enableMic = action.payload;
 		},
@@ -98,6 +103,7 @@ export const selectGetRoomId = createSelector(getChannelAppState, (state) => sta
 export const selectEnableMic = createSelector(getChannelAppState, (state) => state.enableMic);
 export const selectEnableCall = createSelector(getChannelAppState, (state) => state.enableCall);
 export const selectRoomName = createSelector(getChannelAppState, (state) => state.roomName);
+export const selectLiveToken = createSelector(getChannelAppState, (state) => state.roomToken);
 export const channelAppReducer = channelAppSlice.reducer;
 
 // Export actions & reducer
