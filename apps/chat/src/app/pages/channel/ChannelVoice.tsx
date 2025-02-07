@@ -13,7 +13,6 @@ import {
 	MediaDeviceMenu,
 	ParticipantTile,
 	RoomAudioRenderer,
-	StartMediaButton,
 	TrackToggle,
 	useConnectionState,
 	useCreateLayoutContext,
@@ -38,11 +37,14 @@ import {
 	selectVoiceChannelId,
 	selectVoiceChannelMembersByChannelId,
 	selectVoiceConnectionState,
+	selectVoiceFullScreen,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
 import { ParticipantMeetState } from '@mezon/utils';
 
+import { Icons } from '@mezon/ui';
+import Tippy from '@tippy.js/react';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -63,6 +65,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
+	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const { userProfile } = useAuth();
 
 	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
@@ -120,6 +123,10 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 
 	const isCurrentChannel = voiceChannelId === currentChannelId;
 
+	const handleFullScreen = async () => {
+		dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
+	};
+
 	return (
 		<>
 			{token == '' || !serverUrl ? (
@@ -135,14 +142,14 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 					/>
 					<LiveKitRoom
 						key={token}
-						className={!isCurrentChannel ? 'hidden' : ''}
+						className={`${!isCurrentChannel ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
 						audio={showMicrophone}
 						video={showCamera}
 						token={token}
 						serverUrl={serverUrl}
 						data-lk-theme="default"
 					>
-						<MyVideoConference onLeaveRoom={handleLeaveRoom} />
+						<MyVideoConference onLeaveRoom={handleLeaveRoom} onFullScreen={handleFullScreen} />
 					</LiveKitRoom>
 				</>
 			)}
@@ -188,9 +195,10 @@ const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, room
 
 interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
+	onFullScreen: () => void;
 }
 
-function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
+function MyVideoConference({ onLeaveRoom, onFullScreen }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 
 	const tracks = useTracks(
@@ -262,7 +270,7 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 							</FocusLayoutContainer>
 						</div>
 					)}
-					<ControlBar onLeaveRoom={onLeaveRoom} />
+					<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} />
 				</div>
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
@@ -277,9 +285,10 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	controls?: ControlBarControls;
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
+	onFullScreen: () => void;
 }
 
-function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom }: ControlBarProps) {
+function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
@@ -289,6 +298,8 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 	const visibleControls = { leave: true, ...controls };
 
 	const showScreen = useSelector(selectShowScreen);
+
+	const isFullScreen = useSelector(selectVoiceFullScreen);
 
 	const localPermissions = useLocalParticipantPermissions();
 
@@ -329,7 +340,7 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 	);
 
 	return (
-		<div className="lk-control-bar">
+		<div className="lk-control-bar relative">
 			{visibleControls.microphone && (
 				<div className="lk-button-group">
 					<TrackToggle
@@ -383,7 +394,21 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					{showText && 'Leave'}
 				</DisconnectButton>
 			)}
-			<StartMediaButton />
+			<div onClick={onFullScreen} className="absolute bottom-6 !right-4">
+				{isFullScreen ? (
+					<Tippy content="Exit Full Screen" className={`whitespace-nowrap`}>
+						<span>
+							<Icons.ExitFullScreen />
+						</span>
+					</Tippy>
+				) : (
+					<Tippy content="Full Screen" className={`whitespace-nowrap`}>
+						<span>
+							<Icons.FullScreen />
+						</span>
+					</Tippy>
+				)}
+			</div>
 		</div>
 	);
 }
