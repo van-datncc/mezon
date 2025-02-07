@@ -1,7 +1,7 @@
 import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } from '@livekit/components-react';
 import {
 	channelAppActions,
-	fetchJoinMezonMeet,
+	generateMeetToken,
 	selectEnableCall,
 	selectEnableMic,
 	selectEnableVideo,
@@ -82,7 +82,7 @@ export function ChannelApps({
 
 			try {
 				const result = await dispatch(
-					fetchJoinMezonMeet({
+					generateMeetToken({
 						channelId: appChannel.channel_id,
 						roomName: appChannel.channel_id + '-' + roomId
 					})

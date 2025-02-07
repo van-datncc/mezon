@@ -1417,3 +1417,8 @@ export enum ERepeatType {
 	ANNUALLY = 5,
 	EVERY_WEEKDAY = 6
 }
+
+export enum ParticipantMeetState {
+	JOIN = 0,
+	LEAVE = 1
+}
