@@ -40,6 +40,7 @@ import {
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
+	selectListChannelRenderByClanId,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
@@ -58,6 +59,7 @@ import { Icons } from '@mezon/ui';
 import {
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
+	IChannel,
 	SubPanelName,
 	TIME_OFFSET,
 	isLinuxDesktop,
@@ -119,11 +121,21 @@ function useChannelSeen(channelId: string) {
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
-	const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
+
+	const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, currentChannel.clan_id as string))
+	const numberNotification = useMemo(() => {
+		const channel = listChannelRender?.find(channel => channel.id === currentChannel.id);
+		return (channel as IChannel).count_mess_unread || 0;
+	}, [listChannelRender,currentChannel.id])
+
 	useEffect(() => {
 		if (!statusFetchChannel) return;
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		if (isTabVisible) {
+			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }))
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
 
 	}, [statusFetchChannel, isFocusDesktop, isTabVisible]);
 
@@ -141,9 +153,9 @@ function useChannelSeen(channelId: string) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
-    if(resetBadgeCount){
-      dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
-    }
+		if (resetBadgeCount) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+		}
 	}, [currentChannel?.id])
 }
 
