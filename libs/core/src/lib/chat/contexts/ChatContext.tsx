@@ -3,6 +3,7 @@ import { captureSentryError } from '@mezon/logger';
 import {
 	ActivitiesEntity,
 	AttachmentEntity,
+	ChannelsEntity,
 	DMCallActions,
 	RootState,
 	accountActions,
@@ -265,7 +266,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
-			
+
 			if (message.topic_id && message.topic_id !== '0') {
 				const lastMsg: ApiChannelMessageHeader = {
 					content: message.content,
@@ -840,12 +841,34 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated.creator_id === userId) return;
+			if (channelCreated.creator_id === userId) {
+				if (channelCreated.parrent_id !== '') {
+					const thread: ChannelsEntity = {
+						id: channelCreated.channel_id as string,
+						active: 1,
+						category_id: channelCreated.category_id,
+						creator_id: channelCreated.creator_id,
+						parrent_id: channelCreated.parrent_id,
+						channel_id: channelCreated.channel_id,
+						channel_label: channelCreated.channel_label,
+						channel_private: channelCreated.channel_private,
+						type: channelCreated.channel_type,
+						status: channelCreated.status,
+						app_url: channelCreated.app_url,
+						clan_id: channelCreated.clan_id
+					};
+					dispatch(listChannelRenderAction.addThreadToListRender({ clanId: channelCreated?.clan_id as string, channel: thread }));
+				}
+
+				if (channelCreated.channel_private === 1 && channelCreated.parrent_id === '') {
+					dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
+				}
+			}
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
-				dispatch(listChannelRenderAction.addChannelToListRender({type : channelCreated.channel_type ,...channelCreated}))
-				
+				dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
+
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					const now = Math.floor(Date.now() / 1000);
 					const extendChannelCreated = {
