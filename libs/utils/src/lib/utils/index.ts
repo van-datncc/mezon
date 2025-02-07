@@ -1116,3 +1116,52 @@ export const formatMoney = (number: number) => {
 		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}
 };
+
+export const getMentionPositions = (value: string, plainValue: string, mention: MentionItem, appearanceIndex: number) => {
+	const mentionMarkup = `@[${mention.display.slice(1)}](${mention.id})`;
+
+	let valueStartIndex = -1;
+	let count = 0;
+	for (let i = 0; i < value.length; i++) {
+		if (value.slice(i, i + mentionMarkup.length) === mentionMarkup) {
+			count++;
+			if (count === appearanceIndex) {
+				valueStartIndex = i;
+				break;
+			}
+		}
+	}
+
+	let plainValueStartIndex = -1;
+	count = 0;
+	for (let i = 0; i < plainValue.length; i++) {
+		if (plainValue.slice(i, i + mention.display.length) === mention.display) {
+			count++;
+			if (count === appearanceIndex) {
+				plainValueStartIndex = i;
+				break;
+			}
+		}
+	}
+
+	return {
+		valueStartIndex,
+		plainValueStartIndex
+	};
+};
+
+export const updateMentionPositions = (mentions: MentionItem[], newValue: string, newPlainTextValue: string) => {
+	const mentionAppearancesCount: Record<string, number> = {};
+
+	const newMentions: MentionItem[] = mentions.map((mention) => {
+		mentionAppearancesCount[mention.id] = (mentionAppearancesCount[mention.id] || 0) + 1;
+		const newMentionStartIndex = getMentionPositions(newValue, newPlainTextValue, mention, mentionAppearancesCount?.[mention.id]);
+		return {
+			...mention,
+			index: newMentionStartIndex.valueStartIndex,
+			plainTextIndex: newMentionStartIndex.plainValueStartIndex
+		};
+	});
+
+	return newMentions;
+};
