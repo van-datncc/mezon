@@ -561,7 +561,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			},
 			isNotChannel
 		);
-		if (newMentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
+		if (newMentions?.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
 			setMentionEveryone(false);
