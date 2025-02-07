@@ -211,7 +211,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫`,
+					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 					response.channel_id,
 					channelMode,
 					TypeMessage.SendToken
