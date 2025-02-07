@@ -32,7 +32,7 @@ const TokenTransactionMessage = ({ message }: ITokenTransactionMessageProps) => 
 						</div>
 					</div>
 					<div className="p-3 flex justify-center">
-						<div onClick={handleToggleHistoryModal} className="cursor-pointer dark:text-blue-500 text-blue-600 font-semibold">
+						<div onClick={handleToggleHistoryModal} className="cursor-pointer dark:text-blue-500 text-blue-600 font-semibold text-[15px]">
 							Mezon transfer
 						</div>
 					</div>
