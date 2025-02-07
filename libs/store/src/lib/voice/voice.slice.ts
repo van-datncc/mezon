@@ -121,6 +121,8 @@ export const voiceSlice = createSlice({
 			state.showMicrophone = false;
 			state.showCamera = false;
 			state.showScreen = false;
+			state.voiceConnectionState = false;
+			state.channelId = '';
 		}
 		// ...
 	},
