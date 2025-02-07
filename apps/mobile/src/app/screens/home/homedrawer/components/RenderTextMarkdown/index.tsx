@@ -395,6 +395,12 @@ export const formatUrls = (text: string) => {
 };
 
 export const formatBlockCode = (text: string, isMessageReply: boolean) => {
+	const matchesUrls = text?.match?.(urlRegex);
+
+	if (matchesUrls) {
+		return formatUrls(text);
+	}
+
 	const addNewlinesToCodeBlock = (block) => {
 		if (isMessageReply) {
 			block = block.replace(/```|\n/g, '').trim();
@@ -501,7 +507,7 @@ export const RenderTextMarkdownContent = React.memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MARKDOWNS) {
-					if (element.type === EBacktickType.LINK) {
+					if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
 						formattedContent += formatUrls(contentInElement);
 					} else if (element.type === EBacktickType.BOLD) {
 						formattedContent += `**${contentInElement}**` ?? '';
@@ -603,7 +609,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{contentRender}
+				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
 			</Markdown>
 		);
 
