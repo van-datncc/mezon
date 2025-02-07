@@ -123,9 +123,9 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 
 	const isCurrentChannel = voiceChannelId === currentChannelId;
 
-	const handleFullScreen = async () => {
+	const handleFullScreen = useCallback(() => {
 		dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
-	};
+	}, [dispatch, isVoiceFullScreen]);
 
 	return (
 		<>
