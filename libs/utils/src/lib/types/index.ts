@@ -552,7 +552,7 @@ export enum SubPanelName {
 	EMOJI = 'EMOJI',
 	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
-	SOUNDS = 'SOUNS'
+	SOUNDS = 'SOUNDS'
 }
 
 export enum MemberProfileType {
