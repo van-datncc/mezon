@@ -122,10 +122,10 @@ const TabBar = React.memo(({ subPanelActive, onTabClick }: { subPanelActive: Sub
 				Stickers
 			</button>
 			<button className={getTabClassName(subPanelActive === SubPanelName.EMOJI)} onClick={() => onTabClick(SubPanelName.EMOJI)}>
-				Emoji
+				Emojis
 			</button>
 			<button className={getTabClassName(subPanelActive === SubPanelName.SOUND)} onClick={() => onTabClick(SubPanelName.SOUND)}>
-				Sound
+				Sounds
 			</button>
 		</div>
 	);

@@ -14,7 +14,7 @@ type AudioUIProps = {
 export const MessageAudioUI: React.FC<AudioUIProps> = ({ isPlaying, currentTime, duration, togglePlay, handleSaveImage, posInPopUp = false }) => (
 	<div
 		className={`inline-flex items-center justify-between gap-3 bg-bgSelectItem text-white rounded-full py-1.5 pl-1.5 pr-3.5 
-		${posInPopUp ? 'w-50 items-end rounded-none rounded-t-lg w-full' : 'w-60'} will-change-transform`}
+		${posInPopUp ? 'w-50 items-end rounded-none rounded-t-md w-full' : 'w-60'} will-change-transform`}
 	>
 		<button
 			onClick={togglePlay}
