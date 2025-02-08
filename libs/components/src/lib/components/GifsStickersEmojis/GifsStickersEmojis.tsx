@@ -124,7 +124,7 @@ const TabBar = React.memo(({ subPanelActive, onTabClick }: { subPanelActive: Sub
 			<button className={getTabClassName(subPanelActive === SubPanelName.EMOJI)} onClick={() => onTabClick(SubPanelName.EMOJI)}>
 				Emojis
 			</button>
-			<button className={getTabClassName(subPanelActive === SubPanelName.SOUND)} onClick={() => onTabClick(SubPanelName.SOUND)}>
+			<button className={getTabClassName(subPanelActive === SubPanelName.SOUNDS)} onClick={() => onTabClick(SubPanelName.SOUNDS)}>
 				Sounds
 			</button>
 		</div>
@@ -179,7 +179,7 @@ const ContentPanel = React.memo(
 				</div>
 			);
 		}
-		if (subPanelActive === SubPanelName.SOUND) {
+		if (subPanelActive === SubPanelName.SOUNDS) {
 			return (
 				<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
 					<SoundSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
