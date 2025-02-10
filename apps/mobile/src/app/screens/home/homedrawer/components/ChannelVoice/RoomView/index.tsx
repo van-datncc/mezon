@@ -46,14 +46,19 @@ const RoomView = ({
 	}, [localParticipant]);
 
 	const sortedParticipants = [...participants].sort((a, b) => (b.isScreenShareEnabled ? 1 : 0) - (a.isScreenShareEnabled ? 1 : 0));
-	const videoTracks = tracks.filter(
-		(t) =>
-			t.source === Track.Source.Camera ||
-			t.source === Track.Source.ScreenShare ||
-			t.participant.isCameraEnabled === true ||
-			t.participant.isScreenShareEnabled === true
-	);
-	const videoTrackCount = videoTracks.length + sortedParticipants.length;
+
+	const videoTrackCount = sortedParticipants.reduce((count, participant) => {
+		if (participant.isScreenShareEnabled) {
+			count += 1;
+		}
+		if (participant.isCameraEnabled || participant.isScreenShareEnabled) {
+			count += 1;
+		} else {
+			count += 1;
+		}
+		return count;
+	}, 0);
+
 	const isGridLayout = videoTrackCount >= 3;
 
 	const renderParticipant = (participant: LocalParticipant | RemoteParticipant) => {
