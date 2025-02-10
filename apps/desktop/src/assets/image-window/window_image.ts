@@ -125,7 +125,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
 <div class="main-container">
   <div id="channel-label" class="channel-label">${escapeHtml(imageData.channelImagesData.channelLabel)}</div>
   <div class="image-view">
-    <div class="selected-image-wrapper">
+    <div class="selected-image-wrapper" id="selected-image-wrapper">
       <img id="selectedImage" class="selected-image" src="${sanitizeUrl(imageData.url)}" />
     </div>
     <div id="thumbnails" class="thumbnail-container">
@@ -272,6 +272,13 @@ window.electron.handleActionShowImage('saveImage',currentImageUrl.url);
 
   });
 
+document.getElementById('selected-image-wrapper').addEventListener('click', (e)=>{
+      window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
+})
+
+document.getElementById('selectedImage').addEventListener('click', (e)=>{
+     e.stopPropagation();
+})
 
 document.addEventListener('keydown', (e) => {
 		switch (e.key) {
