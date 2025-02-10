@@ -371,6 +371,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		onClose();
 	};
 
+	const handleBuzzMessage = () => {
+		onClose();
+		sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+	};
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -427,6 +432,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
+			case EMessageActionType.Buzz:
+				handleBuzzMessage();
+				break;
 			default:
 				break;
 		}
@@ -470,6 +478,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.TopicDiscussion:
 				return <Icons.DiscussionIcon color={themeValue.text} width={size.s_32} height={size.s_32} />;
+			case EMessageActionType.Buzz:
+				return <Icons.Buzz color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
@@ -514,6 +524,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [
+			EMessageActionType.Buzz,
 			EMessageActionType.ResendMessage,
 			EMessageActionType.GiveACoffee,
 			EMessageActionType.EditMessage,
