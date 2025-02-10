@@ -56,6 +56,7 @@ import {
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	stickerSettingActions,
+	threadsActions,
 	toastActions,
 	topicsActions,
 	useAppDispatch,
@@ -594,6 +595,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
+
+					if (channel_desc.parrent_id) {
+						dispatch(
+							threadsActions.updateActiveCodeThread({
+								channelId: channel_desc.channel_id || '',
+								activeCode: ThreadStatus.joined
+							})
+						);
+					}
 				}
 				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					dispatch(
@@ -841,6 +851,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
+			if (channelCreated.parrent_id) {
+				dispatch(
+					threadsActions.updateCacheOnThreadCreation({
+						clanId: channelCreated.clan_id,
+						channelId: channelCreated.parrent_id,
+						newThread: {
+							...channelCreated,
+							type: channelCreated.channel_type,
+							last_sent_message: {
+								sender_id: channelCreated.creator_id
+							}
+						},
+						isThreadCreator: channelCreated.creator_id === userId
+					})
+				);
+			}
+
 			if (channelCreated.creator_id === userId) {
 				if (channelCreated.parrent_id) {
 					const thread: ChannelsEntity = {

@@ -1,5 +1,5 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
-import { useThreadMessage } from '@mezon/core';
+import { useAuth, useThreadMessage } from '@mezon/core';
 import {
 	channelsActions,
 	checkDuplicateThread,
@@ -32,6 +32,7 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { userId } = useAuth();
 
 	const membersOfParent = useAppSelector((state) =>
 		threadCurrentChannel?.parrent_id ? selectAllChannelMembers(state, threadCurrentChannel?.parrent_id as string) : null
@@ -102,7 +103,16 @@ const ThreadBox = () => {
 							threadsActions.updateCacheOnThreadCreation({
 								clanId: currentClanId || '',
 								channelId: currentChannelId as string,
-								newThread: thread
+								newThread: {
+									...thread,
+									last_sent_message: {
+										sender_id: userId,
+										content: JSON.stringify(content || {}),
+										attachment: JSON.stringify(attachments || []),
+										referece: JSON.stringify(references || [])
+									}
+								},
+								isThreadCreator: true
 							})
 						);
 					}

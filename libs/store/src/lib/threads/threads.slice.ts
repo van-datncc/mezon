@@ -1,11 +1,12 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, IThread, LIMIT, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { IMessageWithUser, IThread, LIMIT, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiChannelDescList, ApiChannelDescription } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { listChannelRenderAction } from '../channels/listChannelRender.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
+
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 60;
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -88,20 +89,61 @@ const updateCacheThread = async (mezon: MezonValueContext, channelId: string, cl
 
 const updateCacheOnThreadCreation = createAsyncThunk(
 	'threads/updateCache',
-	async ({ clanId, channelId, newThread }: { clanId: string; channelId: string; newThread: ApiChannelDescription }, thunkAPI) => {
+	async (
+		{
+			clanId,
+			channelId,
+			newThread,
+			isThreadCreator
+		}: { clanId: string; channelId: string; newThread: ApiChannelDescription; isThreadCreator: boolean },
+		thunkAPI
+	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await fetchThreadsCached(mezon, channelId, clanId);
 
+			if (!response.channeldesc) return;
+
 			if (response && response.channeldesc) {
+				if (response.channeldesc.find((thread) => thread.channel_id === newThread.channel_id)) {
+					const threads = response.channeldesc.map((thread) => {
+						if (thread.channel_id === newThread.channel_id) {
+							return {
+								...thread,
+								last_sent_message: {
+									...thread.last_sent_message,
+									sender_id: thread.creator_id
+								}
+							};
+						}
+
+						return thread;
+					});
+
+					return mapToThreadEntity(threads);
+				}
+
 				await fetchThreadsCached.delete(mezon, channelId, clanId);
 				const timestamp = Date.now() / 1000;
-				const defaultResponse = [{ ...newThread, active: 1, last_sent_message: { timestamp_seconds: timestamp } }, ...response.channeldesc];
-
+				const defaultResponse = [
+					{
+						...newThread,
+						active: isThreadCreator ? ThreadStatus.joined : ThreadStatus.activePublic,
+						last_sent_message: {
+							...newThread.last_sent_message,
+							timestamp_seconds: timestamp
+						}
+					},
+					...response.channeldesc
+				];
 				await fetchThreadsCached(mezon, channelId, clanId, undefined, {
 					channeldesc: defaultResponse.length > LIMIT ? defaultResponse.slice(0, -1) : defaultResponse
 				});
+
+				return mapToThreadEntity(defaultResponse.length > LIMIT ? defaultResponse.slice(0, -1) : defaultResponse);
 			}
+
+			return mapToThreadEntity(response.channeldesc);
 		} catch (e) {
 			console.error(e);
 		}
@@ -294,6 +336,11 @@ export const threadsSlice = createSlice({
 			.addCase(checkDuplicateThread.rejected, (state, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.payload as string;
+			})
+			.addCase(updateCacheOnThreadCreation.fulfilled, (state, action) => {
+				if (!action.payload) return;
+				threadsAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
 			});
 	}
 });
