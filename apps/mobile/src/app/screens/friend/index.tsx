@@ -35,7 +35,11 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 	};
 
 	const filteredFriendList = useMemo(() => {
-		return friendList.filter((friend) => normalizeString(friend?.user?.username).includes(normalizeString(searchText)));
+		return friendList.filter(
+			(friend) =>
+				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText)) ||
+				normalizeString(friend?.user?.username).includes(normalizeString(searchText))
+		);
 	}, [friendList, searchText]);
 
 	const friendRequestCount = useMemo(() => {
