@@ -4,7 +4,7 @@ import { referencesActions, selectCurrentClan, selectDataReferences, useAppSelec
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageAudio } from '../MessageWithUser/MessageAudio/MessageAudio';
 
@@ -323,13 +323,15 @@ function SoundSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 	);
 
 	// get list clan logo to show on leftside
-	const categoryLogo = sounds
-		.map((sound) => ({
-			id: sound.clan_id,
-			type: sound.clan_name,
-			url: sound.logo
-		}))
-		.filter((sound, index, self) => index === self.findIndex((s) => s.id === sound.id));
+	const categoryLogo = useMemo(() => {
+		return sounds
+			.map((sound) => ({
+				id: sound.clan_id,
+				type: sound.clan_name,
+				url: sound.logo
+			}))
+			.filter((sound, index, self) => index === self.findIndex((s) => s.id === sound.id));
+	}, [sounds]);
 
 	const [selectedType, setSelectedType] = useState('');
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -338,37 +340,43 @@ function SoundSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 
-	const onClickSendSound = (sound: ExtendedApiMessageAttachment) => {
-		if (isReplyAction) {
-			handleSend({ t: '' }, [], [sound], [dataReferences]);
-			dispatch(
-				referencesActions.setDataReferences({
-					channelId: currentId as string,
-					dataReferences: blankReferenceObj as ApiMessageRef
-				})
-			);
-		} else {
-			handleSend({ t: '' }, [], [sound], []);
-		}
-		setSubPanelActive(SubPanelName.NONE);
-	};
+	const onClickSendSound = useCallback(
+		(sound: ExtendedApiMessageAttachment) => {
+			if (isReplyAction) {
+				handleSend({ t: '' }, [], [sound], [dataReferences]);
+				dispatch(
+					referencesActions.setDataReferences({
+						channelId: currentId as string,
+						dataReferences: blankReferenceObj as ApiMessageRef
+					})
+				);
+			} else {
+				handleSend({ t: '' }, [], [sound], []);
+			}
+			setSubPanelActive(SubPanelName.NONE);
+		},
+		[isReplyAction, handleSend, dispatch, currentId, dataReferences, blankReferenceObj, setSubPanelActive]
+	);
+
 	const scrollToClanSidebar = useCallback(
 		(event: React.MouseEvent, clanName: string) => {
 			event.stopPropagation();
-			if (clanName !== selectedType) {
-				setSelectedType(clanName);
-				const categoryDiv = categoryRefs.current[clanName];
-				if (categoryDiv && containerRef.current) {
-					const containerTop = containerRef.current.getBoundingClientRect().top;
-					const categoryTop = categoryDiv.getBoundingClientRect().top;
-					const offset = 0;
-					const scrollTop = categoryTop - containerTop - offset;
-					containerRef.current.scrollTop += scrollTop;
-				}
-			}
+
+			if (clanName === selectedType) return;
+			setSelectedType(clanName);
+			const categoryDiv = categoryRefs.current[clanName];
+			const container = containerRef.current;
+			if (!categoryDiv || !container) return;
+			const containerTop = container.getBoundingClientRect().top;
+			const categoryTop = categoryDiv.getBoundingClientRect().top;
+			const offset = 0;
+			const scrollTop = categoryTop - containerTop - offset;
+
+			container.scrollTop += scrollTop;
 		},
 		[selectedType]
 	);
+
 	return (
 		<div ref={modalRef} tabIndex={-1} className="outline-none flex h-full w-full md:w-[500px] max-sm:ml-1">
 			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2 ">
@@ -456,7 +464,7 @@ interface ISoundPanelProps {
 	onClickSendSound: (sound: ExtendedApiMessageAttachment) => void;
 }
 
-const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSendSound }) => {
+export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, onClickSendSound }) => {
 	return (
 		<div className="w-auto pb-2 px-2">
 			<div className="grid grid-cols-2 gap-4">
@@ -466,14 +474,11 @@ const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSendSound })
 						className="relative flex flex-col justify-between items-start border border-gray-600 rounded-md w-full h-[7rem]"
 					>
 						<MessageAudio audioUrl={sound.url || ''} posInPopUp={true} />
-						<div className="flex justify-center w-full mt-1" title="Send the sound">
-							<Icons.SoundIcon
-								onClick={() => onClickSendSound(sound)}
-								className="w-10 h-10 text-[#2B2D31] dark:text-bgLightModeSecond dark:bg-bgLightModeSecond rounded-md"
-							/>
+						<div className="flex justify-center w-full mt-1" onClick={() => onClickSendSound(sound)} title="Send the sound">
+							<Icons.SoundIcon className="w-10 h-10 text-[#2B2D31] dark:text-bgLightModeSecond dark:bg-bgLightModeSecond rounded-md" />
 						</div>
 
-						<span title={sound.filename} className="text-xs mx-1 w-full truncate">
+						<span title={sound.filename} className="text-xs mx-1 w-full truncate cursor-text">
 							{sound.filename}
 						</span>
 					</div>
@@ -481,4 +486,4 @@ const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSendSound })
 			</div>
 		</div>
 	);
-};
+});
