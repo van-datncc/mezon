@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
-import { Icons, Image } from '@mezon/ui';
+import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -466,9 +466,12 @@ const SoundPanel: React.FC<ISoundPanelProps> = ({ soundList, onClickSendSound })
 						className="relative flex flex-col justify-between items-start border border-gray-600 rounded-md w-full h-[7rem]"
 					>
 						<MessageAudio audioUrl={sound.url || ''} posInPopUp={true} />
-						<button className="mx-auto" onClick={() => onClickSendSound(sound)}>
-							<Image className="w-[40px] h-[40px]  pointer-events-none" src={`assets/images/music.svg`} alt="music" />
-						</button>
+						<div className="flex justify-center w-full mt-1" title="Send the sound">
+							<Icons.SoundIcon
+								onClick={() => onClickSendSound(sound)}
+								className="w-10 h-10 text-[#2B2D31] dark:text-bgLightModeSecond dark:bg-bgLightModeSecond rounded-md"
+							/>
+						</div>
 
 						<span title={sound.filename} className="text-xs mx-1 w-full truncate">
 							{sound.filename}
