@@ -44,8 +44,9 @@ const Layout = memo((props: LayoutProps) => {
 									Work Station
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
-									Mezon combines traditional chat features with blockchain technology. This allows for a decentralized economy where
-									users can engage in peer-to-peer transactions and earn rewards.
+									A digital workspace that streamlines communication, collaboration, and task management by integrating with various
+									systems and tools. It provides structured spaces for teams, projects, and departments while ensuring seamless
+									access to information and workflows
 								</div>
 							</div>
 						</AnimatedSection>
@@ -70,8 +71,9 @@ const Layout = memo((props: LayoutProps) => {
 									Ecosystem
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
-									Mezon provides API integration, enabling developers to create custom functionalities tailored to their
-									communities. This fosters innovation and customization within the platform.
+									A dynamic digital environment that combines work and social elements, offering interactive and recreational
+									features. It supports virtual transactions, engagement activities, and community-building to enhance user
+									experience.
 								</div>
 							</div>
 						</AnimatedSection>
@@ -95,8 +97,8 @@ const Layout = memo((props: LayoutProps) => {
 									AI Agent
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
-									Mezon aims to reshape online communities by merging communication, economy, and customization into a seamless
-									platform that prioritizes both user engagement and developer creativity.
+									An intelligent system that automates tasks, assists with information management, and optimizes workflows. It
+									enhances productivity through features like reminders, monitoring, and automated communication.
 								</div>
 							</div>
 						</AnimatedSection>
