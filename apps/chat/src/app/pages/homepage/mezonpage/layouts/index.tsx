@@ -41,7 +41,7 @@ const Layout = memo((props: LayoutProps) => {
 										fontFamily: 'Poppins'
 									}}
 								>
-									Work Station
+									Workstation
 								</div>
 								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
 									A digital workspace that streamlines communication, collaboration, and task management by integrating with various
