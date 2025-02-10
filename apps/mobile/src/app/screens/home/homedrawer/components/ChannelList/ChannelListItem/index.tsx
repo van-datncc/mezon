@@ -21,6 +21,7 @@ import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
+import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import JoinChannelVoiceBS from '../../ChannelVoice/JoinChannelVoiceBS';
@@ -59,6 +60,7 @@ export const ChannelListItem = React.memo(
 
 		const timeoutRef = useRef<any>();
 		const navigation = useNavigation<any>();
+		const isTabletLandscape = useTabletLandscape();
 
 		useEffect(() => {
 			const event = DeviceEventEmitter.addListener(ActionEmitEvent.CHANNEL_ID_ACTIVE, (channelId: string) => {
@@ -112,7 +114,15 @@ export const ChannelListItem = React.memo(
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				}
 			},
-			[navigation, props?.data?.channel_id, props?.data?.clan_id, props?.data?.meeting_code, props?.data?.status, props?.data?.type]
+			[
+				isTabletLandscape,
+				navigation,
+				props?.data?.channel_id,
+				props?.data?.clan_id,
+				props?.data?.meeting_code,
+				props?.data?.status,
+				props?.data?.type
+			]
 		);
 
 		const handleLongPressChannel = useCallback(() => {

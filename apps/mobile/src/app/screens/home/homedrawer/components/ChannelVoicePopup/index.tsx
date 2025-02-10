@@ -1,8 +1,11 @@
+import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { fetchJoinMezonMeet } from '@mezon/store';
+import { generateMeetToken, handleParticipantMeetState, selectChannelById2, voiceActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
+import { ParticipantMeetState } from '@mezon/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder } from 'react-native';
+import { useSelector } from 'react-redux';
 import ChannelVoice from '../ChannelVoice';
 
 const ChannelVoicePopup = () => {
@@ -16,6 +19,8 @@ const ChannelVoicePopup = () => {
 	const [channelId, setChannelId] = useState();
 	const [roomName, setRoomName] = useState('');
 	const [token, setToken] = useState<string | null>(null);
+	const channel = useSelector((state) => selectChannelById2(state, channelId));
+	const { userProfile } = useAuth();
 
 	const panResponder = useRef(
 		PanResponder.create({
@@ -56,10 +61,30 @@ const ChannelVoicePopup = () => {
 		})
 	).current;
 
+	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
+		await dispatch(
+			handleParticipantMeetState({
+				clan_id: channel.clan_id,
+				channel_id: channelId,
+				user_id: userProfile?.user?.id,
+				display_name: userProfile?.user?.display_name,
+				state
+			})
+		);
+	};
+
+	const handleLeaveRoom = async (voiceChannelId: string) => {
+		if (voiceChannelId) {
+			await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
+			dispatch(voiceActions.resetVoiceSettings());
+		}
+	};
+
 	useEffect(() => {
 		const eventOpenMezonMeet = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_MEZON_MEET, async (data) => {
-			if (data?.isEndCall) {
+			if (data?.isEndCall || data?.voiceChannelId) {
 				setVoicePlay(false);
+				handleLeaveRoom(data?.voiceChannelId);
 			}
 			setChannelId(data.channelId);
 			setRoomName(data.roomName);
@@ -74,13 +99,15 @@ const ChannelVoicePopup = () => {
 
 		try {
 			const result = await dispatch(
-				fetchJoinMezonMeet({
+				generateMeetToken({
 					channelId,
 					roomName
 				})
 			).unwrap();
 
 			if (result) {
+				dispatch(voiceActions.setVoiceChannelId(channelId));
+				await participantMeetState(ParticipantMeetState.JOIN, channelId as string);
 				setToken(result);
 				setVoicePlay(true);
 			} else {

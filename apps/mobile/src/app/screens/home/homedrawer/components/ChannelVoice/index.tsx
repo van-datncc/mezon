@@ -1,9 +1,11 @@
 import { AudioSession, LiveKitRoom } from '@livekit/react-native';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { selectChannelById2 } from '@mezon/store';
 import React, { useEffect, useRef } from 'react';
 import { Dimensions, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSelector } from 'react-redux';
 import RoomView from './RoomView';
 import { style } from './styles';
 
@@ -25,6 +27,7 @@ function ChannelVoice({
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
+	const channel = useSelector((state) => selectChannelById2(state, channelId));
 
 	useEffect(() => {
 		const start = async () => {
@@ -58,7 +61,7 @@ function ChannelVoice({
 								<Icons.ChevronSmallDownIcon />
 							</TouchableOpacity>
 							<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
-								Voice Channel
+								{channel?.channel_label}
 							</Text>
 						</Block>
 						<Block flexDirection="row" alignItems="center" gap={size.s_20}>

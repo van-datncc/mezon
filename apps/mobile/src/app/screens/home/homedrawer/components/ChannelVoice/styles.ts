@@ -51,7 +51,9 @@ export const style = (colors: Attributes) =>
 		subTitle: {
 			fontSize: size.s_14,
 			color: colors.white,
-			fontWeight: '400'
+			fontWeight: '400',
+			flexGrow: 1,
+			flexShrink: 1
 		},
 		lineBtn: { width: '100%', alignItems: 'center', padding: size.s_6 },
 		menuIcon: {
@@ -82,19 +84,20 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center'
 		},
 		participantView: {
-			height: 350,
-			borderRadius: size.s_10
+			flex: 1,
+			width: '100%',
+			borderRadius: size.s_10,
+			overflow: 'hidden'
 		},
 		userView: {
 			display: 'flex',
+			flexDirection: 'row',
 			justifyContent: 'center',
-			width: '90%',
-			height: 350,
+			alignItems: 'center',
+			width: '100%',
+			height: 250,
 			backgroundColor: colors.border,
 			gap: size.s_10,
-			marginLeft: size.s_20,
-			marginRight: size.s_20,
-			marginBottom: size.s_20,
 			borderRadius: size.s_10
 		},
 		userName: {
@@ -103,6 +106,14 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.selectedOverlay,
 			padding: size.s_6,
 			borderRadius: size.s_20,
-			left: '30%'
+			left: 'auto'
+		},
+		focusIcon: {
+			position: 'absolute',
+			top: '3%',
+			right: '3%',
+			backgroundColor: colors.selectedOverlay,
+			borderRadius: size.s_30,
+			padding: size.s_4
 		}
 	});
