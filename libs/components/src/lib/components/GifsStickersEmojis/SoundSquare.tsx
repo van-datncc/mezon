@@ -434,31 +434,32 @@ interface ICategorizedSoundProps {
 	valueInputToCheckHandleSearch?: string;
 }
 
-const CategorizedSounds: React.FC<ICategorizedSoundProps> = ({ soundList, categoryName, onClickSendSound, valueInputToCheckHandleSearch }) => {
-	const soundListByCategoryName = soundList.filter((sound) => sound.clan_name === categoryName);
-	const [isShowSoundList, setIsShowSoundList] = useState(true);
-	const currentClan = useAppSelector(selectCurrentClan);
+const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
+	({ soundList, categoryName, onClickSendSound, valueInputToCheckHandleSearch }) => {
+		const soundListByCategoryName = useMemo(() => soundList.filter((sound) => sound.clan_name === categoryName), [soundList, categoryName]);
+		const [isShowSoundList, setIsShowSoundList] = useState(true);
+		const currentClan = useAppSelector(selectCurrentClan);
 
-	const handleToggleButton = () => {
-		setIsShowSoundList(!isShowSoundList);
-	};
+		const handleToggleButton = useCallback(() => {
+			setIsShowSoundList((prev) => !prev);
+		}, []);
 
-	return (
-		<div>
-			<button
-				onClick={handleToggleButton}
-				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black max-h-full"
-			>
-				<p className="uppercase">{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
-				<span className={`${isShowSoundList ? ' rotate-90' : ''}`}>
-					<Icons.ArrowRight />
-				</span>
-			</button>
-			{isShowSoundList && <SoundPanel soundList={soundListByCategoryName} onClickSendSound={onClickSendSound} />}
-		</div>
-	);
-};
-
+		return (
+			<div>
+				<button
+					onClick={handleToggleButton}
+					className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black max-h-full"
+				>
+					<p className="uppercase">{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
+					<span className={`${isShowSoundList ? ' rotate-90' : ''}`}>
+						<Icons.ArrowRight />
+					</span>
+				</button>
+				{isShowSoundList && <SoundPanel soundList={soundListByCategoryName} onClickSendSound={onClickSendSound} />}
+			</div>
+		);
+	}
+);
 interface ISoundPanelProps {
 	soundList: ExtendedApiMessageAttachment[];
 	onClickSendSound: (sound: ExtendedApiMessageAttachment) => void;
