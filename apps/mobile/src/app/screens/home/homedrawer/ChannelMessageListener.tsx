@@ -96,6 +96,13 @@ const ChannelMessageListener = React.memo(() => {
 								})
 							);
 						}
+					} else if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+						if (!channel.meeting_code) return;
+						const data = {
+							channelId: channel?.channel_id || '',
+							roomName: channel?.meeting_code
+						};
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 					} else {
 						if (currentDirectId) {
 							dispatch(directActions.setDmGroupCurrentId(''));
@@ -113,7 +120,18 @@ const ChannelMessageListener = React.memo(() => {
 				/* empty */
 			}
 		},
-		[currentClanId, dispatch, navigation, playStream]
+		[
+			currentClanId,
+			currentDirectId,
+			currentStreamInfo?.streamId,
+			disconnect,
+			dispatch,
+			handleChannelClick,
+			navigation,
+			playStream,
+			userProfile?.user?.id,
+			userProfile?.user?.username
+		]
 	);
 
 	useEffect(() => {

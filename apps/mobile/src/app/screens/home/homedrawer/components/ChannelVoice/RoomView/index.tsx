@@ -76,7 +76,13 @@ const RoomView = ({
 		return (
 			<>
 				{screenTrackRef && (
-					<Block style={[styles.userView, !isGridLayout ? { width: '100%', height: 250 } : { width: '48%', height: 150 }]}>
+					<Block
+						style={[
+							styles.userView,
+							!isGridLayout ? { width: '100%', height: 250 } : { width: '48%', height: 150 },
+							isTabletLandscape && { height: 250 }
+						]}
+					>
 						<VideoTrack trackRef={screenTrackRef} style={styles.participantView} />
 						<Block style={styles.userName} display="flex" flexDirection="row" alignItems="center" justifyContent="center">
 							<Icons.ShareScreenIcon height={size.s_14} />
@@ -95,7 +101,7 @@ const RoomView = ({
 				)}
 
 				{videoTrackRef && (
-					<Block style={[styles.userView, isGridLayout && { width: '48%', height: 150 }]}>
+					<Block style={[styles.userView, isGridLayout && { width: '48%', height: 150 }, isTabletLandscape && { height: 250 }]}>
 						<VideoTrack trackRef={videoTrackRef} style={styles.participantView} />
 						<Block style={styles.userName} display="flex" flexDirection="row" alignItems="center" justifyContent="center">
 							{participant.isMicrophoneEnabled ? (
@@ -109,7 +115,7 @@ const RoomView = ({
 				)}
 
 				{!videoTrackRef && (
-					<Block style={[styles.userView, isGridLayout && { width: '48%', height: 150 }]}>
+					<Block style={[styles.userView, isGridLayout && { width: '48%', height: 150 }, isTabletLandscape && { height: 250 }]}>
 						<Block display="flex" flexDirection="row" alignItems="center" justifyContent="center" marginBottom={10}>
 							<MezonAvatar width={size.s_50} height={size.s_50} username={participant.identity} avatarUrl={participant.metadata} />
 						</Block>
@@ -270,12 +276,12 @@ const RoomView = ({
 			{!isAnimationComplete ? (
 				renderFocusedParticipant()
 			) : (
-				<Block marginBottom={'30%'}>
+				<Block marginBottom={isTabletLandscape ? '5%' : '30%'}>
 					<ScrollView
 						style={{ marginLeft: size.s_10, marginRight: size.s_10 }}
 						contentContainerStyle={
 							isGridLayout
-								? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: size.s_10, alignItems: 'center' }
+								? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: size.s_10, alignItems: 'center' }
 								: { gap: size.s_10 }
 						}
 					>
@@ -284,7 +290,7 @@ const RoomView = ({
 				</Block>
 			)}
 			{isAnimationComplete && (
-				<Block style={[styles.menuFooter]}>
+				<Block style={[styles.menuFooter, isTabletLandscape && { bottom: 30 }]}>
 					<Block gap={size.s_20} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
 						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 							{isCameraEnabled ? <Icons.VideoIcon /> : <Icons.VideoSlashIcon />}
