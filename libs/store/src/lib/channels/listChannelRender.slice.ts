@@ -135,7 +135,7 @@ export const listChannelRenderSlice = createSlice({
 			if (indexOfNewCategory > oldIndexOfChannel) {
 				state.listChannelRender[clanId].splice(indexOfNewCategory - newChannelWithThreads.length + 1, 0, ...newChannelWithThreads);
 			} else {
-				state.listChannelRender[clanId].splice(indexOfNewCategory, 0, ...newChannelWithThreads);
+				state.listChannelRender[clanId].splice(indexOfNewCategory + 1, 0, ...newChannelWithThreads);
 			}
 		},
 		addCategoryToListRender: (state, action: PayloadAction<{ clanId: string; cate: ICategoryChannel }>) => {
