@@ -47,6 +47,7 @@ import {
 	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -165,6 +166,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -830,13 +832,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
-			if (e.count > 0) {
-				const reactionEntity = mapReactionToEntity(e);
-				dispatch(reactionActions.setReactionDataSocket(reactionEntity));
-				dispatch(messagesActions.updateMessageReactions(reactionEntity));
+			if (e.topic_id && e.topic_id !== '0' && e.topic_id !== e.channel_id && isFocusTopicBox) {
+				e.channel_id = e.topic_id;
 			}
+			const reactionEntity = mapReactionToEntity(e);
+			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
+			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch]
+		[dispatch, isFocusTopicBox]
 	);
 
 	const onchannelcreated = useCallback(

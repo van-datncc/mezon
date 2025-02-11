@@ -12,6 +12,7 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectClanView,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectCurrentTopicId,
@@ -127,6 +128,7 @@ function MessageContextMenu({
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
 	const { reactionMessageDispatch } = useChatReaction();
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId && !message?.content?.callLog?.callLogType && !(message?.code === TypeMessage.SendToken);
@@ -515,7 +517,9 @@ function MessageContextMenu({
 								message?.sender_id ?? '',
 								false,
 								isPublicChannel(currentChannel),
-								message.content?.tp ?? ''
+								message?.topic_id,
+								isFocusTopicBox,
+								message?.channel_id
 							);
 						}
 					} catch (error) {

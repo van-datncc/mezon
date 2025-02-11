@@ -1,5 +1,5 @@
 import { useAuth, useChatReaction, useUserById } from '@mezon/core';
-import { selectCurrentChannel, selectReactionsByEmojiIdFromMessage, useAppSelector } from '@mezon/store';
+import { selectClickedOnTopicStatus, selectCurrentChannel, selectReactionsByEmojiIdFromMessage, useAppSelector } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
 import {
 	EmojiDataOptionals,
@@ -21,6 +21,8 @@ type UserReactionPanelProps = {
 };
 
 const UserReactionPanel = forwardRef(({ emojiShowPanel, mode, message }: UserReactionPanelProps, ref: ForwardedRef<HTMLDivElement>) => {
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+
 	const { reactionMessageDispatch } = useChatReaction();
 	const userId = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -46,7 +48,9 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, mode, message }: UserRea
 			message_sender_id,
 			true,
 			isPublicChannel(currentChannel),
-			message.content?.tp || ''
+			message?.topic_id,
+			isFocusTopicBox,
+			message?.channel_id
 		);
 	};
 

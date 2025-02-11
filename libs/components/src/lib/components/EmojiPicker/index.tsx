@@ -93,12 +93,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const messageEmoji = useAppSelector((state) =>
 		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : channelID, props.messageEmojiId || '')
 	);
-	const { reactionMessageDispatch } = useChatReaction({
-		messageId: messageEmoji?.id,
-		channelIdOnMessage: messageEmoji?.channel_id,
-		topicIdOnMessage: messageEmoji?.topic_id as string,
-		isFocusTopicBox: isFocusTopicBox
-	});
+	const { reactionMessageDispatch } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const [emojiId, setEmojiId] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
@@ -116,7 +111,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					messageEmoji?.sender_id ?? '',
 					false,
 					isPublicChannel(currentChannel),
-					messageEmoji.content?.tp ?? ''
+					messageEmoji?.topic_id,
+					isFocusTopicBox,
+					messageEmoji?.channel_id
 				);
 				setSubPanelActive(SubPanelName.NONE);
 				dispatch(referencesActions.setIdReferenceMessageReaction(''));

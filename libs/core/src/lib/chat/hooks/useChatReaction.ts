@@ -23,20 +23,9 @@ export type UseMessageReactionOption = {
 interface ChatReactionProps {
 	isMobile?: boolean;
 	isClanViewMobile?: boolean;
-	messageId?: string;
-	channelIdOnMessage?: string;
-	topicIdOnMessage?: string;
-	isFocusTopicBox?: boolean;
 }
 
-export function useChatReaction({
-	isMobile = false,
-	isClanViewMobile = undefined,
-	isFocusTopicBox,
-	messageId,
-	channelIdOnMessage,
-	topicIdOnMessage
-}: ChatReactionProps = {}) {
+export function useChatReaction({ isMobile = false, isClanViewMobile = undefined }: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const checkIsClanView = useSelector(selectClanView);
@@ -44,12 +33,6 @@ export function useChatReaction({
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
-
-	// const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
-	// const currenTopicId = useSelector(selectCurrentTopicId);
-	// const messageReacted = useAppSelector((state) =>
-	// 	selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : channelIdOnMessage, messageId || '')
-	// );
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -131,7 +114,10 @@ export function useChatReaction({
 			message_sender_id: string,
 			action_delete: boolean,
 			is_public: boolean,
-			topic_id?: string
+			// reaction on topic
+			topic_id?: string,
+			isFocusTopicBox?: boolean,
+			channelIdOnMessage?: string
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
@@ -150,9 +136,7 @@ export function useChatReaction({
 				isClanView: isClanView as boolean
 			});
 
-			// console.log('isFocusTopicBox: ', isFocusTopicBox);
-
-			const payloadDispatchReaction = {
+			let payloadDispatchReaction = {
 				id,
 				clanId: currentActive.clanIdActive,
 				channelId: currentActive.channelIdActive,
@@ -165,13 +149,27 @@ export function useChatReaction({
 				actionDelete: action_delete,
 				isPublic: payload.is_public,
 				userId: userId as string,
-				topic_id
+				topic_id: topic_id
 			};
+			// Topic
+			const isMessageJustSent = topic_id && topic_id !== '0';
+			const isMessageByFetch = !isMessageJustSent;
+			const reactionMessageJustSent = isFocusTopicBox && isMessageJustSent;
+			const reactionMessageByFetch = isFocusTopicBox && isMessageByFetch;
 
-			if (isFocusTopicBox) {
-				// reaction on topic
-				// case: message just send
-				// console.log('messageReacted: ', messageReacted);
+			if (reactionMessageJustSent) {
+				payloadDispatchReaction = {
+					...payloadDispatchReaction,
+					channelId: channelIdOnMessage ?? '',
+					topic_id: topic_id
+				};
+			}
+
+			if (reactionMessageByFetch) {
+				payloadDispatchReaction = {
+					...payloadDispatchReaction,
+					topic_id: channelIdOnMessage ?? ''
+				};
 			}
 
 			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();
