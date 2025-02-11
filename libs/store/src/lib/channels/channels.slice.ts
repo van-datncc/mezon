@@ -376,24 +376,25 @@ export const changeCategoryOfChannel = createAsyncThunk('channels/changeCategory
 			channel_id: request.channel_id,
 			clan_id: clanId as string
 		});
-		if (response) {
-			thunkAPI.dispatch(
-				channelsActions.update({
-					clanId: clanId as string,
-					update: {
-						id: request.channel_id,
-						changes: { ...request }
-					}
-				})
-			);
-			thunkAPI.dispatch(
-				listChannelRenderAction.updateChannelPositionInRenderedList({
-					categoryId: request.category_id as string,
-					channelId: request.channel_id as string,
-					clanId: clanId as string
-				})
-			);
+		if (!response) {
+			return;
 		}
+		thunkAPI.dispatch(
+			channelsActions.update({
+				clanId: clanId as string,
+				update: {
+					id: request.channel_id,
+					changes: { ...request }
+				}
+			})
+		);
+		thunkAPI.dispatch(
+			listChannelRenderAction.updateChannelPositionInRenderedList({
+				categoryId: request.category_id as string,
+				channelId: request.channel_id as string,
+				clanId: clanId as string
+			})
+		);
 	} catch (err) {
 		captureSentryError(err, 'channels/changeCategoryOfChannel');
 		return thunkAPI.rejectWithValue(err);

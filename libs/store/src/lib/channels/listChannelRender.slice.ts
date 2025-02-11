@@ -112,29 +112,30 @@ export const listChannelRenderSlice = createSlice({
 		},
 		updateChannelPositionInRenderedList: (state, action: PayloadAction<{ channelId: string; clanId: string; categoryId: string }>) => {
 			const { channelId, clanId, categoryId } = action.payload;
-			if (state.listChannelRender[clanId]) {
-				const oldIndexOfChannel = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
-				const indexOfNewCategory = state.listChannelRender[clanId].findIndex((channel) => channel.id === categoryId);
-				if (oldIndexOfChannel === -1 || indexOfNewCategory === -1) {
-					return;
+			if (!state.listChannelRender[clanId]) {
+				return;
+			}
+			const oldIndexOfChannel = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+			const indexOfNewCategory = state.listChannelRender[clanId].findIndex((channel) => channel.id === categoryId);
+			if (oldIndexOfChannel === -1 || indexOfNewCategory === -1) {
+				return;
+			}
+
+			const newChannelWithThreads = state.listChannelRender[clanId].filter((item) => {
+				if ((item as IChannel).id === channelId || (item as IChannel).parrent_id === channelId) {
+					return {
+						...item,
+						category_id: categoryId
+					};
 				}
+			});
 
-				const newChannelWithThreads = state.listChannelRender[clanId].filter((item) => {
-					if ((item as IChannel).id === channelId || (item as IChannel).parrent_id === channelId) {
-						return {
-							...item,
-							category_id: categoryId
-						};
-					}
-				});
+			state.listChannelRender[clanId].splice(oldIndexOfChannel, newChannelWithThreads.length);
 
-				state.listChannelRender[clanId].splice(oldIndexOfChannel, newChannelWithThreads.length);
-
-				if (indexOfNewCategory > oldIndexOfChannel) {
-					state.listChannelRender[clanId].splice(indexOfNewCategory - newChannelWithThreads.length + 1, 0, ...newChannelWithThreads);
-				} else {
-					state.listChannelRender[clanId].splice(indexOfNewCategory, 0, ...newChannelWithThreads);
-				}
+			if (indexOfNewCategory > oldIndexOfChannel) {
+				state.listChannelRender[clanId].splice(indexOfNewCategory - newChannelWithThreads.length + 1, 0, ...newChannelWithThreads);
+			} else {
+				state.listChannelRender[clanId].splice(indexOfNewCategory, 0, ...newChannelWithThreads);
 			}
 		},
 		addCategoryToListRender: (state, action: PayloadAction<{ clanId: string; cate: ICategoryChannel }>) => {
