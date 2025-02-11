@@ -44,8 +44,8 @@ import {
 import { ParticipantMeetState } from '@mezon/utils';
 
 import { Icons } from '@mezon/ui';
-import Tippy from '@tippy.js/react';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import Tooltip from 'rc-tooltip';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { UserListStreamChannel } from './ChannelStream';
@@ -110,10 +110,10 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		}
 	};
 
-	const handleLeaveRoom = async () => {
+	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetVoiceSettings());
 		await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
-	};
+	}, [dispatch, voiceChannelId]);
 
 	useEffect(() => {
 		if (voiceConnectionState) {
@@ -124,8 +124,34 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const isCurrentChannel = voiceChannelId === currentChannelId;
 
 	const handleFullScreen = useCallback(() => {
-		dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
-	}, [dispatch, isVoiceFullScreen]);
+		const containerElement = document.getElementById('livekitRoom');
+		if (containerElement) {
+			if (!document.fullscreenElement) {
+				containerElement
+					.requestFullscreen()
+					.then(() => {
+						dispatch(voiceActions.setFullScreen(true));
+					})
+					.catch((err) => {
+						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+					});
+			} else {
+				document.exitFullscreen().then(() => {
+					dispatch(voiceActions.setFullScreen(false));
+				});
+			}
+		}
+	}, [dispatch]);
+
+	const handleScreenShare = useCallback(
+		(enabled: boolean) => {
+			if (enabled) {
+				dispatch(voiceActions.setFullScreen(false));
+			}
+			dispatch(voiceActions.setShowScreen(enabled));
+		},
+		[dispatch]
+	);
 
 	return (
 		<>
@@ -141,6 +167,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 						isCurrentChannel={isCurrentChannel}
 					/>
 					<LiveKitRoom
+						id="livekitRoom"
 						key={token}
 						className={`${!isCurrentChannel ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
 						audio={showMicrophone}
@@ -149,7 +176,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 						serverUrl={serverUrl}
 						data-lk-theme="default"
 					>
-						<MyVideoConference onLeaveRoom={handleLeaveRoom} onFullScreen={handleFullScreen} />
+						<MyVideoConference onLeaveRoom={handleLeaveRoom} onFullScreen={handleFullScreen} onScreenShare={handleScreenShare} />
 					</LiveKitRoom>
 				</>
 			)}
@@ -196,9 +223,10 @@ const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, room
 interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
+	onScreenShare: (enabled: boolean) => void;
 }
 
-function MyVideoConference({ onLeaveRoom, onFullScreen }: MyVideoConferenceProps) {
+function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 
 	const tracks = useTracks(
@@ -270,7 +298,7 @@ function MyVideoConference({ onLeaveRoom, onFullScreen }: MyVideoConferenceProps
 							</FocusLayoutContainer>
 						</div>
 					)}
-					<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} />
+					<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} onScreenShare={onScreenShare} />
 				</div>
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
@@ -286,9 +314,10 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
+	onScreenShare: (enabled: boolean) => void;
 }
 
-function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
+function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen, onScreenShare }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
@@ -317,13 +346,6 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 	const showText = useMemo(() => variation === 'textOnly' || variation === 'verbose', [variation]);
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
-
-	const onScreenShareChange = useCallback(
-		(enabled: boolean) => {
-			dispatch(voiceActions.setShowScreen(enabled));
-		},
-		[dispatch]
-	);
 
 	const { saveAudioInputDeviceId, saveVideoInputDeviceId } = usePersistentUserChoices({
 		preventSave: !saveUserChoices
@@ -382,7 +404,7 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					source={Track.Source.ScreenShare}
 					captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
 					showIcon={showIcon}
-					onChange={onScreenShareChange}
+					onChange={onScreenShare}
 					onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
 				>
 					{showText && (showScreen ? 'Stop screen share' : 'Share screen')}
@@ -394,19 +416,29 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					{showText && 'Leave'}
 				</DisconnectButton>
 			)}
-			<div onClick={onFullScreen} className="absolute bottom-6 !right-4">
+			<div onClick={onFullScreen} className="absolute bottom-6 !right-6">
 				{isFullScreen ? (
-					<Tippy content="Exit Full Screen" className={`whitespace-nowrap`}>
+					<Tooltip
+						placement="topRight"
+						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Exit Full Screen</span>}
+						overlayClassName="whitespace-nowrap z-50"
+						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+					>
 						<span>
 							<Icons.ExitFullScreen />
 						</span>
-					</Tippy>
+					</Tooltip>
 				) : (
-					<Tippy content="Full Screen" className={`whitespace-nowrap`}>
+					<Tooltip
+						placement="topRight"
+						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Full Screen</span>}
+						overlayClassName="whitespace-nowrap"
+						key={Number(isFullScreen)}
+					>
 						<span>
 							<Icons.FullScreen />
 						</span>
-					</Tippy>
+					</Tooltip>
 				)}
 			</div>
 		</div>
