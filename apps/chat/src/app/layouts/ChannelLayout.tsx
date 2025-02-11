@@ -1,19 +1,21 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useGifsStickersEmoji } from '@mezon/core';
 import {
+	selectClickedOnTopicStatus,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
-	selectStatusMenu
+	selectStatusMenu,
+	topicsActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
@@ -41,9 +43,22 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
+	//
+	const dispatch = useDispatch();
+
+	const onMouseDown = () => {
+		dispatch(topicsActions.setFocusTopicBox(false));
+	};
+
+	const openEmojiRightPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT;
+	const openEmojiBottomPanel = subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const openEmojiRightPanelOnChannelLayout = openEmojiRightPanel && !isFocusTopicBox;
+	const openEmojiBottomPanelOnChannelLayout = openEmojiBottomPanel && !isFocusTopicBox;
+	const openEmojiPanelOnTopic = (openEmojiRightPanel || openEmojiBottomPanel) && isFocusTopicBox;
 
 	return (
-		<div className="z-0 flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
+		<div onMouseDown={onMouseDown} className="flex flex-col z-20 flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible  relative">
 			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (
@@ -53,7 +68,7 @@ const ChannelLayout = () => {
 					>
 						<Outlet />
 					</div>
-					{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
+					{openEmojiRightPanelOnChannelLayout && (
 						<div
 							id="emojiPicker"
 							className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${(isShowCreateThread || isShowCreateTopic) && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && !isShowCreateTopic && 'ssm:right-44'}`}
@@ -63,7 +78,7 @@ const ChannelLayout = () => {
 							</div>
 						</div>
 					)}
-					{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
+					{openEmojiBottomPanelOnChannelLayout && (
 						<div
 							className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in min-[960px]:!left-24 `}
 							style={{
@@ -74,6 +89,20 @@ const ChannelLayout = () => {
 										? `${positionOfSmileButton.left - WIDTH_EMOJI_PANEL}px`
 										: `${positionOfSmileButton.right}px`
 							}}
+						>
+							<div className="mb-0 z-10 h-full">
+								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							</div>
+						</div>
+					)}
+					{openEmojiPanelOnTopic && (
+						<div
+							style={{
+								top: topPositionEmojiPanel
+							}}
+							onMouseDown={(e) => e.stopPropagation()}
+							id="emojiPickerTopic"
+							className={`z-50 absolute size-[500px] max-sm:hidden -right-[505px]`}
 						>
 							<div className="mb-0 z-10 h-full">
 								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />

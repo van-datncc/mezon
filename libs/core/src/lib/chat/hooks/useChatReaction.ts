@@ -23,9 +23,20 @@ export type UseMessageReactionOption = {
 interface ChatReactionProps {
 	isMobile?: boolean;
 	isClanViewMobile?: boolean;
+	messageId?: string;
+	channelIdOnMessage?: string;
+	topicIdOnMessage?: string;
+	isFocusTopicBox?: boolean;
 }
 
-export function useChatReaction({ isMobile = false, isClanViewMobile = undefined }: ChatReactionProps = {}) {
+export function useChatReaction({
+	isMobile = false,
+	isClanViewMobile = undefined,
+	isFocusTopicBox,
+	messageId,
+	channelIdOnMessage,
+	topicIdOnMessage
+}: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const checkIsClanView = useSelector(selectClanView);
@@ -33,6 +44,12 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
+
+	// const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	// const currenTopicId = useSelector(selectCurrentTopicId);
+	// const messageReacted = useAppSelector((state) =>
+	// 	selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : channelIdOnMessage, messageId || '')
+	// );
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -133,23 +150,31 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				isClanView: isClanView as boolean
 			});
 
-			return dispatch(
-				reactionActions.writeMessageReaction({
-					id,
-					clanId: currentActive.clanIdActive,
-					channelId: currentActive.channelIdActive,
-					mode: currentActive.modeActive,
-					messageId,
-					emoji_id,
-					emoji,
-					count,
-					messageSenderId: message_sender_id,
-					actionDelete: action_delete,
-					isPublic: payload.is_public,
-					userId: userId as string,
-					topic_id
-				})
-			).unwrap();
+			// console.log('isFocusTopicBox: ', isFocusTopicBox);
+
+			const payloadDispatchReaction = {
+				id,
+				clanId: currentActive.clanIdActive,
+				channelId: currentActive.channelIdActive,
+				mode: currentActive.modeActive,
+				messageId,
+				emoji_id,
+				emoji,
+				count,
+				messageSenderId: message_sender_id,
+				actionDelete: action_delete,
+				isPublic: payload.is_public,
+				userId: userId as string,
+				topic_id
+			};
+
+			if (isFocusTopicBox) {
+				// reaction on topic
+				// case: message just send
+				// console.log('messageReacted: ', messageReacted);
+			}
+
+			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();
 		},
 		[dispatch, isMobile, isClanView, userId, currentActive, addMemberToThread]
 	);

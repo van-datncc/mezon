@@ -3,7 +3,9 @@ import {
 	emojiSuggestionActions,
 	referencesActions,
 	selectClanView,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
+	selectCurrentTopicId,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	selectTheme,
@@ -83,16 +85,24 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}));
 	}, [categoriesEmoji, categoryIcons]);
 
-	const { reactionMessageDispatch } = useChatReaction();
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const currenTopicId = useSelector(selectCurrentTopicId);
+	const { directId } = useAppParams();
+	const isClanView = useSelector(selectClanView);
+	const channelID = isClanView ? currentChannel?.id : directId;
+	const messageEmoji = useAppSelector((state) =>
+		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : channelID, props.messageEmojiId || '')
+	);
+	const { reactionMessageDispatch } = useChatReaction({
+		messageId: messageEmoji?.id,
+		channelIdOnMessage: messageEmoji?.channel_id,
+		topicIdOnMessage: messageEmoji?.topic_id as string,
+		isFocusTopicBox: isFocusTopicBox
+	});
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const [emojiId, setEmojiId] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
-	const { directId } = useAppParams();
-
-	const isClanView = useSelector(selectClanView);
-	const channelID = isClanView ? currentChannel?.id : directId;
-	const messageEmoji = useAppSelector((state) => selectMessageByMessageId(state, channelID, props.messageEmojiId || ''));
 
 	const handleEmojiSelect = useCallback(
 		async (emojiId: string, emojiPicked: string) => {
