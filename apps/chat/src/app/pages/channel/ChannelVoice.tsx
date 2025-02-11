@@ -13,7 +13,6 @@ import {
 	MediaDeviceMenu,
 	ParticipantTile,
 	RoomAudioRenderer,
-	StartMediaButton,
 	TrackToggle,
 	useConnectionState,
 	useCreateLayoutContext,
@@ -38,12 +37,15 @@ import {
 	selectVoiceChannelId,
 	selectVoiceChannelMembersByChannelId,
 	selectVoiceConnectionState,
+	selectVoiceFullScreen,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
 import { ParticipantMeetState } from '@mezon/utils';
 
+import { Icons } from '@mezon/ui';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import Tooltip from 'rc-tooltip';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { UserListStreamChannel } from './ChannelStream';
@@ -63,6 +65,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
+	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const { userProfile } = useAuth();
 
 	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
@@ -107,10 +110,10 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		}
 	};
 
-	const handleLeaveRoom = async () => {
+	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetVoiceSettings());
 		await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
-	};
+	}, [dispatch, voiceChannelId]);
 
 	useEffect(() => {
 		if (voiceConnectionState) {
@@ -119,6 +122,32 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	}, []);
 
 	const isCurrentChannel = voiceChannelId === currentChannelId;
+	const containerRef = useRef<HTMLDivElement | null>(null);
+
+	const handleFullScreen = useCallback(() => {
+		if (!containerRef.current) return;
+
+		if (!document.fullscreenElement) {
+			containerRef.current
+				.requestFullscreen()
+				.then(() => dispatch(voiceActions.setFullScreen(true)))
+				.catch((err) => {
+					console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+				});
+		} else {
+			document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
+		}
+	}, [dispatch]);
+
+	const handleScreenShare = useCallback(
+		(enabled: boolean) => {
+			if (enabled) {
+				dispatch(voiceActions.setFullScreen(false));
+			}
+			dispatch(voiceActions.setShowScreen(enabled));
+		},
+		[dispatch]
+	);
 
 	return (
 		<>
@@ -134,15 +163,17 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 						isCurrentChannel={isCurrentChannel}
 					/>
 					<LiveKitRoom
+						ref={containerRef}
+						id="livekitRoom"
 						key={token}
-						className={!isCurrentChannel ? 'hidden' : ''}
+						className={`${!isCurrentChannel ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
 						audio={showMicrophone}
 						video={showCamera}
 						token={token}
 						serverUrl={serverUrl}
 						data-lk-theme="default"
 					>
-						<MyVideoConference onLeaveRoom={handleLeaveRoom} />
+						<MyVideoConference onLeaveRoom={handleLeaveRoom} onFullScreen={handleFullScreen} onScreenShare={handleScreenShare} />
 					</LiveKitRoom>
 				</>
 			)}
@@ -188,9 +219,11 @@ const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, room
 
 interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
+	onFullScreen: () => void;
+	onScreenShare: (enabled: boolean) => void;
 }
 
-function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
+function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 
 	const tracks = useTracks(
@@ -262,7 +295,7 @@ function MyVideoConference({ onLeaveRoom }: MyVideoConferenceProps) {
 							</FocusLayoutContainer>
 						</div>
 					)}
-					<ControlBar onLeaveRoom={onLeaveRoom} />
+					<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} onScreenShare={onScreenShare} />
 				</div>
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
@@ -277,9 +310,11 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	controls?: ControlBarControls;
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
+	onFullScreen: () => void;
+	onScreenShare: (enabled: boolean) => void;
 }
 
-function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom }: ControlBarProps) {
+function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen, onScreenShare }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
@@ -289,6 +324,8 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 	const visibleControls = { leave: true, ...controls };
 
 	const showScreen = useSelector(selectShowScreen);
+
+	const isFullScreen = useSelector(selectVoiceFullScreen);
 
 	const localPermissions = useLocalParticipantPermissions();
 
@@ -307,13 +344,6 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
 
-	const onScreenShareChange = useCallback(
-		(enabled: boolean) => {
-			dispatch(voiceActions.setShowScreen(enabled));
-		},
-		[dispatch]
-	);
-
 	const { saveAudioInputDeviceId, saveVideoInputDeviceId } = usePersistentUserChoices({
 		preventSave: !saveUserChoices
 	});
@@ -329,7 +359,7 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 	);
 
 	return (
-		<div className="lk-control-bar">
+		<div className="lk-control-bar relative">
 			{visibleControls.microphone && (
 				<div className="lk-button-group">
 					<TrackToggle
@@ -371,7 +401,7 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					source={Track.Source.ScreenShare}
 					captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
 					showIcon={showIcon}
-					onChange={onScreenShareChange}
+					onChange={onScreenShare}
 					onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
 				>
 					{showText && (showScreen ? 'Stop screen share' : 'Share screen')}
@@ -383,7 +413,31 @@ function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError
 					{showText && 'Leave'}
 				</DisconnectButton>
 			)}
-			<StartMediaButton />
+			<div onClick={onFullScreen} className="absolute bottom-6 !right-6">
+				{isFullScreen ? (
+					<Tooltip
+						placement="topRight"
+						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Exit Full Screen</span>}
+						overlayClassName="whitespace-nowrap z-50"
+						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+					>
+						<span>
+							<Icons.ExitFullScreen />
+						</span>
+					</Tooltip>
+				) : (
+					<Tooltip
+						placement="topRight"
+						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Full Screen</span>}
+						overlayClassName="whitespace-nowrap"
+						key={Number(isFullScreen)}
+					>
+						<span>
+							<Icons.FullScreen />
+						</span>
+					</Tooltip>
+				)}
+			</div>
 		</div>
 	);
 }
