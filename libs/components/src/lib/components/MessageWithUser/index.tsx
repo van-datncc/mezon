@@ -98,12 +98,12 @@ function MessageWithUser({
 		if (typeof message?.mentions === 'string') {
 			const parsedMentions = safeJSONParse(message?.mentions) as ApiMessageMention[] | undefined;
 			const userIdMention = userId;
-			const includesUser = parsedMentions?.some((mention) => mention.user_id === userIdMention);
+			const includesUser = parsedMentions?.some((mention) => mention?.user_id === userIdMention);
 			const includesRole = parsedMentions?.some((item) => user?.role_id?.includes(item?.role_id as string));
 			return includesUser || includesRole;
 		}
 		const userIdMention = userId;
-		const includesUser = message?.mentions?.some((mention) => mention.user_id === userIdMention);
+		const includesUser = message?.mentions?.some((mention) => mention?.user_id === userIdMention);
 		const includesRole = message?.mentions?.some((item) => user?.role_id?.includes(item?.role_id as string));
 		return includesUser || includesRole;
 	})();
