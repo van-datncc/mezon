@@ -1,4 +1,4 @@
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity, RootState, selectAllListAttachmentByChannel } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Dimensions, FlatList, View } from 'react-native';
@@ -18,7 +18,7 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
-		return (widthScreen - size.s_24) / 3;
+		return (widthScreen - size.s_40) / 3;
 	}, [widthScreen]);
 
 	const openImage = useCallback(
@@ -30,9 +30,9 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 	);
 
 	const renderItem = ({ item, index }) => (
-		<Block height={widthImage} width={widthImage} margin={size.s_4} key={`${index}_item_media_channel`}>
+		<View style={{ height: widthImage, width: widthImage, margin: size.s_4 }} key={`${index}_item_media_channel`}>
 			<MediaItem data={item} onPress={openImage} />
-		</Block>
+		</View>
 	);
 	const onCloseModalImage = useCallback(() => {
 		setVisibleImageModal(false);
