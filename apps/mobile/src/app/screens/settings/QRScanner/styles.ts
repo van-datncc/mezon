@@ -77,6 +77,7 @@ export const styles = StyleSheet.create({
 	},
 	popupLogin: {
 		position: 'absolute',
+		backgroundColor: '#242427',
 		flex: 1,
 		width: '100%',
 		height: '100%',
@@ -87,7 +88,9 @@ export const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	popupLoginSub: {
-		backgroundColor: '#1c1d22',
+		backgroundColor: '#191919',
+		borderColor: '#292929',
+		borderWidth: 1,
 		width: '90%',
 		paddingVertical: size.s_50,
 		paddingHorizontal: size.s_10,
@@ -113,7 +116,9 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_30
 	},
 	button: {
-		backgroundColor: '#3920cd',
+		backgroundColor: '#007e3f',
+		borderColor: '#292929',
+		borderWidth: 1,
 		padding: size.s_10,
 		borderRadius: size.s_6,
 		width: '90%',

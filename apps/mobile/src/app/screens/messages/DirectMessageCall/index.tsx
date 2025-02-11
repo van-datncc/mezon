@@ -1,3 +1,4 @@
+import { RTCView } from '@livekit/react-native-webrtc';
 import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -17,7 +18,6 @@ import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { RTCView } from 'react-native-webrtc';
 import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
 import { MezonConfirm } from '../../../componentUI';

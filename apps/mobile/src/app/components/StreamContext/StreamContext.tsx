@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
+import { MediaStream, RTCPeerConnection, RTCSessionDescription } from '@livekit/react-native-webrtc';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { MediaStream, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 
 interface WebRTCContextType {
 	isSupported: boolean;

@@ -1,7 +1,7 @@
 import { ActionEmitEvent, CrossIcon, getUpdateOrAddClanChannelCache, Icons, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store';
-import { channelsActions, createNewChannel, getStoreAsync, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { channelsActions, createNewChannel, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
@@ -22,8 +22,8 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 	const [isChannelPrivate, setChannelPrivate] = useState<boolean>(false);
 	const [channelName, setChannelName] = useState<string>('');
 	const [channelType, setChannelType] = useState<ChannelType>(ChannelType.CHANNEL_TYPE_CHANNEL);
+	const [channelTypeVoice, setChannelTypeVoice] = useState<number>(ChannelType.CHANNEL_TYPE_MEZON_VOICE);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const { categoryId } = route.params;
 
 	const { t } = useTranslation(['channelCreator']);
@@ -61,7 +61,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			type: channelType,
 			channel_label: channelName?.trim(),
 			channel_private: isChannelPrivate ? 1 : 0,
-			category_id: categoryId || currentChannel.category_id
+			category_id: categoryId
 		};
 		dispatch(appActions.setLoadingMainMobile(true));
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
@@ -79,7 +79,12 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			return;
 		}
 
-		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
+		if (
+			newChannelCreatedId &&
+			channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+			channelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
+			channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
+		) {
 			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 			requestAnimationFrame(async () => {
 				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));
@@ -116,7 +121,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 					]
 				}
 			] satisfies IMezonMenuSectionProps[],
-		[channelType]
+		[channelType, t, themeValue.text]
 	);
 
 	const channelTypeList = [
@@ -129,7 +134,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		{
 			title: t('fields.channelType.voice.title'),
 			description: t('fields.channelType.voice.description'),
-			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE,
+			value: channelTypeVoice,
 			icon: <Icons.VoiceNormalIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 		},
 		{
@@ -140,7 +145,23 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		}
 	];
 
+	const channelVoiceTypeList = [
+		{
+			title: t('fields.channelVoiceType.gMeet'),
+			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE
+		},
+		{
+			title: t('fields.channelVoiceType.mezon'),
+			value: ChannelType.CHANNEL_TYPE_MEZON_VOICE
+		}
+	];
+
 	function handleChannelTypeChange(value: number) {
+		setChannelType(value);
+	}
+
+	function handleChannelTypeVoiceChange(value: number) {
+		setChannelTypeVoice(value);
 		setChannelType(value);
 	}
 
@@ -157,6 +178,15 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 				/>
 
 				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
+
+				{channelType === channelTypeVoice && (
+					<MezonOption
+						title={t('fields.channelVoiceType.title')}
+						data={channelVoiceTypeList}
+						onChange={handleChannelTypeVoiceChange}
+						value={channelTypeVoice}
+					/>
+				)}
 
 				{channelType === ChannelType.CHANNEL_TYPE_CHANNEL && <MezonMenu menu={menuPrivate} />}
 			</ScrollView>

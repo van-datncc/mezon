@@ -1,0 +1,21 @@
+{
+    "joinChannelVoiceBS": {
+        "channelVoice": "channel voice",
+        "noOne": "Chưa có ai ở đây!",
+        "readyTalk": "Khi bạn sẵn sàng nói chuyện, chỉ cần tham gia vào.",
+        "joinVoice": "Tham gia Voice"
+    },
+    "selectAudioOutput": {
+        "title": "Chọn đầu ra âm thanh",
+        "speaker": "Loa ngoài",
+        "phone": "Điện thoại"
+    },
+    "channelVoiceRoom": {
+        "channelVoice": "channel voice",
+        "addPeople": "Thêm người vào cuộc trò chuyện giọng nói",
+        "leftTheGroup": "Đã rời nhóm, bạn đã được biết là đang ở đây!"
+    },
+    "noChannelVoice": "Không có channel voice",
+    "chat": "Trò chuyện",
+    "noDisplay": "Không hiển thị channel voice"
+}

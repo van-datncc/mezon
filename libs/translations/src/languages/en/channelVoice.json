@@ -1,0 +1,21 @@
+{
+    "joinChannelVoiceBS": {
+        "channelVoice": "channel voice",
+        "noOne": "No one's here yet!",
+        "readyTalk": "When you are ready to talk, just hop in.",
+        "joinVoice": "Join Voice"
+    },
+    "selectAudioOutput": {
+        "title": "Select Audio Output",
+        "speaker": "Speaker",
+        "phone": "Phone"
+    },
+    "channelVoiceRoom": {
+        "channelVoice": "channel voice",
+        "addPeople": "Add people to voice Chat",
+        "leftTheGroup": "Left the group known you are here!"
+    },
+    "noChannelVoice": "No channel voice available",
+    "chat": "Chat",
+    "noDisplay": "No display channel voice"
+}
