@@ -28,6 +28,11 @@
                 "title": "Stream",
                 "description": "Sharing hobbies activity"
             }
+        },
+        "channelVoiceType": {
+            "title": "Channel Voice Type",
+            "mezon": "MEZON MEET",
+            "gMeet": "GOOGLE MEET"
         }
     }
 }

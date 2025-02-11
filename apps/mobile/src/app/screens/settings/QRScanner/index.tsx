@@ -6,7 +6,7 @@ import { getStoreAsync } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
@@ -14,9 +14,6 @@ import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-cam
 import RNQRGenerator from 'rn-qr-generator';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { styles } from './styles';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import BG_LOGIN from './bgLoginQR.png';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import ICON_LOGIN from './iconLogin.png';
@@ -47,6 +44,17 @@ export const QRScanner = () => {
 
 	const requestCameraPermission = async () => {
 		const permission = await Camera.requestCameraPermission();
+		if (permission === 'denied') {
+			Alert.alert(
+				'Camera Permission Denied',
+				'Please allow camera access in your device settings.',
+				[
+					{ text: 'Cancel', style: 'cancel' },
+					{ text: 'Open Settings', onPress: () => Linking.openSettings() }
+				],
+				{ cancelable: false }
+			);
+		}
 		setHasPermission(permission === 'granted');
 	};
 
@@ -137,7 +145,7 @@ export const QRScanner = () => {
 	if (device == null || !hasPermission) {
 		return (
 			<View style={styles.wrapper}>
-				<ImageBackground source={BG_LOGIN} style={styles.popupLogin}>
+				<View style={styles.popupLogin}>
 					<Block
 						zIndex={100}
 						flexDirection={'row'}
@@ -158,14 +166,14 @@ export const QRScanner = () => {
 						</TouchableOpacity>
 					</Block>
 					<TouchableOpacity
-						style={[styles.button, styles.buttonBorder]}
+						style={[styles.button, styles.buttonBorder, { backgroundColor: '#292929' }]}
 						onPress={() => {
 							requestCameraPermission();
 						}}
 					>
 						<Text style={styles.buttonText}>Request Camera Permission</Text>
 					</TouchableOpacity>
-				</ImageBackground>
+				</View>
 			</View>
 		);
 	}
@@ -223,7 +231,7 @@ export const QRScanner = () => {
 					</TouchableOpacity>
 				</Block>
 			) : (
-				<ImageBackground source={BG_LOGIN} style={styles.popupLogin}>
+				<View style={styles.popupLogin}>
 					<View style={styles.popupLoginSub}>
 						<FastImage source={ICON_LOGIN} style={styles.iconLogin} />
 						<Text style={styles.title}>{isSuccess ? `You're in!` : `Log in on a new device?`}</Text>
@@ -236,12 +244,12 @@ export const QRScanner = () => {
 							<Text style={styles.buttonText}>{isSuccess ? 'Start talking' : 'Log in'}</Text>
 						</TouchableOpacity>
 						{!isSuccess && (
-							<TouchableOpacity style={[styles.button, { backgroundColor: 'transparent' }]} onPress={onGoback}>
+							<TouchableOpacity style={[styles.button, { backgroundColor: 'transparent', marginTop: size.s_10 }]} onPress={onGoback}>
 								<Text style={styles.buttonText}>Cancel</Text>
 							</TouchableOpacity>
 						)}
 					</View>
-				</ImageBackground>
+				</View>
 			)}
 		</View>
 	);

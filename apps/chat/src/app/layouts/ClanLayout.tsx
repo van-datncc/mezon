@@ -16,6 +16,7 @@ import {
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectStatusMenu,
+	selectVoiceFullScreen,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
@@ -93,6 +94,7 @@ const ClanLayout = () => {
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
 	const isJoin = useSelector(selectIsJoin);
+	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 
 	return (
 		<>
@@ -117,7 +119,7 @@ const ClanLayout = () => {
 				</div>
 			</div>
 			<div
-				className={`flex flex-1 shrink min-w-0 gap-2 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}
+				className={`flex flex-1 shrink min-w-0 gap-2 ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}
 			>
 				<div
 					className={`flex flex-col flex-1 shrink ${isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'max-sm:hidden' : ''} min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'group' : ''}`}
