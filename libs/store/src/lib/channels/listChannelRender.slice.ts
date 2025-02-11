@@ -280,6 +280,11 @@ function sortChannels(channels: IChannel[]): IChannel[] {
 			.filter((child) => child.parrent_id === parent.id)
 			.forEach((child) => {
 				acc.push(child);
+        if(parent.threadIds){
+          parent.threadIds.push(child.id);
+        }else{
+          parent.threadIds = [child.id];
+        };
 			});
 	}
 	return sortedChannels;

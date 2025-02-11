@@ -7,7 +7,7 @@ import {
 	selectCategoryExpandStateByCategoryId,
 	selectCurrentChannel,
 	selectIsUnreadChannelById,
-	selectListChannelRenderByClanId,
+	selectIsUnreadThreadInChannel,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -15,7 +15,7 @@ import {
 	VoiceEntity
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelThreads, IChannel } from '@mezon/utils';
+import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
@@ -95,17 +95,13 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 		setIsExpendedPttMems(!isExpandedPttMems);
 	};
 
-	const listChannelRender = useAppSelector(state => selectListChannelRenderByClanId(state, channel.clan_id as string)) || [];
-	const hasUnreadThread = useMemo(()=>{
-    return listChannelRender.some((thread)=>(thread as IChannel)?.parrent_id === channel.id && (thread as IChannel)?.count_mess_unread);
-	},[listChannelRender])
-
+  const hasUnread = useAppSelector(state=>selectIsUnreadThreadInChannel(state,channel.threadIds || []))
 	const renderChannelContent = useMemo(() => {
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-			(isCategoryExpanded || isUnreadChannel || hasUnreadThread || currentChannel?.id === channel.id || currentChannel?.parrent_id === channel.id)
+			(isCategoryExpanded || isUnreadChannel || hasUnread || currentChannel?.id === channel.id || currentChannel?.parrent_id === channel.id)
 		) {
 			return (
 				<div className={'pt-1'}>
