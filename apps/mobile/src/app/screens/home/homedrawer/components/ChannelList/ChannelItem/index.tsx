@@ -54,9 +54,8 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 					{data?.channel_label}
 				</Text>
 			</View>
-			{data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && data?.status === StatusVoiceChannel.No_Active && (
-				<ActivityIndicator color={themeValue.white} />
-			)}
+			{(data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || data?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) &&
+				data?.status === StatusVoiceChannel.No_Active && <ActivityIndicator color={themeValue.white} />}
 
 			<BuzzBadge channelId={data?.channel_id as string} clanId={data?.clan_id as string} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 

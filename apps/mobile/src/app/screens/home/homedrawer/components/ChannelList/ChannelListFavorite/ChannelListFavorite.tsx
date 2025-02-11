@@ -1,3 +1,4 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
 	ActionEmitEvent,
 	getUpdateOrAddClanChannelCache,
@@ -13,17 +14,21 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Linking, Text, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, Linking, SafeAreaView, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
+import { MezonBottomSheet } from '../../../../../../componentUI';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
+import JoinChannelVoiceBS from '../../ChannelVoice/JoinChannelVoiceBS';
+import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { ChannelFavoriteItem } from './ChannelFavoriteItem';
 import { style } from './styles';
 
 export const ChannelListFavorite = React.memo(() => {
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
+	const bottomSheetChannelStreamingRef = useRef<BottomSheetModal>(null);
+	const [currentChannel, setCurrentChannel] = useState<ChannelsEntity>();
 
 	const { themeValue } = useTheme();
 	const [isCollapse, setIsCollapse] = useState<boolean>(false);
@@ -32,7 +37,6 @@ export const ChannelListFavorite = React.memo(() => {
 	const handleCollapse = () => {
 		setIsCollapse(!isCollapse);
 	};
-	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const timeoutRef = useRef<any>();
 
@@ -44,6 +48,11 @@ export const ChannelListFavorite = React.memo(() => {
 
 	const handleScrollToChannelFavorite = useCallback(
 		async (channel?: ChannelsEntity) => {
+			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+				setCurrentChannel(channel);
+				bottomSheetChannelStreamingRef.current?.present();
+				return;
+			}
 			if (channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 				if (channel?.status === StatusVoiceChannel.Active && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
@@ -74,7 +83,7 @@ export const ChannelListFavorite = React.memo(() => {
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
 		},
-		[isTabletLandscape, navigation]
+		[navigation]
 	);
 
 	return (
@@ -93,11 +102,22 @@ export const ChannelListFavorite = React.memo(() => {
 					<Block display={isCollapse ? 'none' : 'flex'}>
 						{channelFavorites?.length
 							? channelFavorites?.map((channelId: string, index: number) => (
-									<ChannelFavoriteItem
-										onPress={handleScrollToChannelFavorite}
-										channelId={channelId}
-										key={`${index}_${channelId}_ChannelItemFavorite`}
-									/>
+									<Block>
+										<ChannelFavoriteItem
+											onPress={handleScrollToChannelFavorite}
+											channelId={channelId}
+											key={`${index}_${channelId}_ChannelItemFavorite`}
+										/>
+										<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['45%']}>
+											<SafeAreaView>
+												{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+													<JoinStreamingRoomBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
+												) : (
+													<JoinChannelVoiceBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
+												)}
+											</SafeAreaView>
+										</MezonBottomSheet>
+									</Block>
 								))
 							: null}
 					</Block>

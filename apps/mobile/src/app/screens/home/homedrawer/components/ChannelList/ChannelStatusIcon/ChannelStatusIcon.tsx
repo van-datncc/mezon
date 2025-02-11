@@ -14,7 +14,7 @@ export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: C
 	return (
 		<Block>
 			{channel?.channel_private === ChannelStatusEnum.isPrivate &&
-				channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+				(channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) &&
 				!isAgeRestrictedChannel && (
 					<Icons.VoiceLockIcon
 						width={size.s_18}
@@ -27,9 +27,14 @@ export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: C
 				!isAgeRestrictedChannel && (
 					<Icons.TextLockIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 				)}
-			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-				<Icons.VoiceNormalIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
-			)}
+			{channel?.channel_private !== ChannelStatusEnum.isPrivate &&
+				(channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) && (
+					<Icons.VoiceNormalIcon
+						width={size.s_18}
+						height={size.s_18}
+						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+					/>
+				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 				<Icons.TextIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 			)}

@@ -65,7 +65,14 @@ const ChannelMessageListener = React.memo(() => {
 				if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
-				} else if ([ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
+				} else if (
+					[
+						ChannelType.CHANNEL_TYPE_CHANNEL,
+						ChannelType.CHANNEL_TYPE_THREAD,
+						ChannelType.CHANNEL_TYPE_STREAMING,
+						ChannelType.CHANNEL_TYPE_MEZON_VOICE
+					].includes(type)
+				) {
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 					await jumpToChannel(channelId, clanId);
@@ -89,6 +96,13 @@ const ChannelMessageListener = React.memo(() => {
 								})
 							);
 						}
+					} else if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+						if (!channel.meeting_code) return;
+						const data = {
+							channelId: channel?.channel_id || '',
+							roomName: channel?.meeting_code
+						};
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 					} else {
 						if (currentDirectId) {
 							dispatch(directActions.setDmGroupCurrentId(''));
@@ -106,7 +120,18 @@ const ChannelMessageListener = React.memo(() => {
 				/* empty */
 			}
 		},
-		[currentClanId, dispatch, navigation, playStream]
+		[
+			currentClanId,
+			currentDirectId,
+			currentStreamInfo?.streamId,
+			disconnect,
+			dispatch,
+			handleChannelClick,
+			navigation,
+			playStream,
+			userProfile?.user?.id,
+			userProfile?.user?.username
+		]
 	);
 
 	useEffect(() => {
