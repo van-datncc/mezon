@@ -144,7 +144,7 @@ const TopicDiscussionBox = () => {
 						channelId={currentTopicId as string}
 						clanId={currentClanId as string}
 						type={ChannelType.CHANNEL_TYPE_CHANNEL}
-						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						mode={mode}
 						isTopicBox
 						userIdsFromTopicBox={allUserIdsInChannel}
 						topicId={currentTopicId}

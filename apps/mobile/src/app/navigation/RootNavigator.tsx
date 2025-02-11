@@ -22,6 +22,7 @@ import RootStack from './RootStack';
 const NavigationMain = memo(
 	(props) => {
 		const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
+		const { themeValue, themeBasic } = useTheme();
 
 		useEffect(() => {
 			const timer = setTimeout(() => {
@@ -42,8 +43,21 @@ const NavigationMain = memo(
 				}
 			}
 		};
+
+		const theme = {
+			dark: themeBasic === ThemeModeBase.DARK,
+			colors: {
+				background: themeValue.primary,
+				border: themeValue.primary,
+				card: themeValue.primary,
+				notification: themeValue.primary,
+				primary: themeValue.primary,
+				text: themeValue.text
+			}
+		};
+
 		return (
-			<NavigationContainer>
+			<NavigationContainer theme={theme}>
 				<NetInfoComp />
 				<RootListener />
 				<AuthenticationLoader />
