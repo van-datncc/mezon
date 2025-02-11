@@ -1,12 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import {
-	ActionEmitEvent,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import {
 	channelsActions,
 	directActions,

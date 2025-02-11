@@ -177,20 +177,112 @@ const RoomView = ({
 		);
 	}
 
+	const renderFocusedParticipant = () => {
+		if (isAnimationComplete) return null;
+		const otherParticipants = sortedParticipants.filter((p) => p.identity !== localParticipant.identity);
+		const selfParticipant = sortedParticipants.find((p) => p.identity === localParticipant.identity);
+
+		const screenShareOther = otherParticipants.find((p) => p.isScreenShareEnabled);
+		if (screenShareOther) {
+			const screenTrackRef = tracks.find((t) => t.participant.identity === screenShareOther.identity && t.source === Track.Source.ScreenShare);
+			if (screenTrackRef) {
+				return (
+					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={screenTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						</Block>
+					</Block>
+				);
+			}
+		}
+
+		if (selfParticipant?.isScreenShareEnabled) {
+			const selfScreenTrackRef = tracks.find(
+				(t) => t.participant.identity === selfParticipant.identity && t.source === Track.Source.ScreenShare
+			);
+			if (selfScreenTrackRef) {
+				return (
+					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={selfScreenTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						</Block>
+					</Block>
+				);
+			}
+		}
+
+		const cameraOther = otherParticipants.find((p) => p.isCameraEnabled);
+		if (cameraOther) {
+			const videoTrackRef = tracks.find((t) => t.participant.identity === cameraOther.identity && t.source === Track.Source.Camera);
+			if (videoTrackRef) {
+				return (
+					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={videoTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						</Block>
+					</Block>
+				);
+			}
+		}
+
+		if (selfParticipant?.isCameraEnabled) {
+			const videoTrackRef = tracks.find((t) => t.participant.identity === selfParticipant.identity && t.source === Track.Source.Camera);
+			if (videoTrackRef) {
+				return (
+					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={videoTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						</Block>
+					</Block>
+				);
+			}
+		}
+
+		const randomParticipant = sortedParticipants[0];
+		if (randomParticipant) {
+			return (
+				<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+					<Block display="flex" flexDirection="row" alignItems="center" justifyContent="center" marginBottom={10}>
+						<MezonAvatar
+							width={size.s_50}
+							height={size.s_50}
+							username={randomParticipant.identity}
+							avatarUrl={randomParticipant.metadata}
+						/>
+					</Block>
+					<Block style={styles.userName} display="flex" flexDirection="row" alignItems="center" justifyContent="center">
+						{randomParticipant.isMicrophoneEnabled ? (
+							<Icons.MicrophoneIcon height={size.s_14} />
+						) : (
+							<Icons.MicrophoneSlashIcon height={size.s_14} />
+						)}
+						<Text style={styles.subTitle}>{randomParticipant.identity || 'Unknown'}</Text>
+					</Block>
+				</Block>
+			);
+		}
+
+		return null;
+	};
+
 	return (
 		<View style={styles.roomViewcontainer}>
-			<Block marginBottom={'30%'}>
-				<ScrollView
-					style={{ marginLeft: size.s_10, marginRight: size.s_10 }}
-					contentContainerStyle={
-						isGridLayout
-							? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: size.s_10, alignItems: 'center' }
-							: { gap: size.s_10 }
-					}
-				>
-					{sortedParticipants.map((participant) => renderParticipant(participant))}
-				</ScrollView>
-			</Block>
+			{!isAnimationComplete ? (
+				renderFocusedParticipant()
+			) : (
+				<Block marginBottom={'30%'}>
+					<ScrollView
+						style={{ marginLeft: size.s_10, marginRight: size.s_10 }}
+						contentContainerStyle={
+							isGridLayout
+								? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: size.s_10, alignItems: 'center' }
+								: { gap: size.s_10 }
+						}
+					>
+						{sortedParticipants.map((participant) => renderParticipant(participant))}
+					</ScrollView>
+				</Block>
+			)}
 			{isAnimationComplete && (
 				<Block style={[styles.menuFooter]}>
 					<Block gap={size.s_20} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>

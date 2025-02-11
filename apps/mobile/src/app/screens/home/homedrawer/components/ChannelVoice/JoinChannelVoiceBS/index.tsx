@@ -94,7 +94,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }, refRBSheet: Reac
 					<Icons.UserPlusIcon />
 				</TouchableOpacity>
 			</Block>
-			<Block alignItems="center" gap={size.s_6}>
+			<Block alignItems="center" gap={size.s_6} marginTop={size.s_20}>
 				<Block
 					style={{
 						width: size.s_100,
@@ -108,7 +108,6 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }, refRBSheet: Reac
 					<Icons.VoiceNormalIcon width={size.s_36} height={size.s_36} />
 				</Block>
 				<Text style={styles.text}>{t('joinChannelVoiceBS.channelVoice')}</Text>
-				<Text style={styles.textDisable}>{t('joinChannelVoiceBS.noOne')}</Text>
 				<Text style={styles.textDisable}>{t('joinChannelVoiceBS.readyTalk')}</Text>
 			</Block>
 			<Block borderRadius={size.s_40} marginTop={size.s_20} marginBottom={size.s_10}>

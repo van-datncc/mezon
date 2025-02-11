@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import ChannelVoice from '../ChannelVoice';
 
 const ChannelVoicePopup = () => {
-	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL || `wss://meet.mezon.vn`;
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
 	const isFullScreen = useRef(true);
