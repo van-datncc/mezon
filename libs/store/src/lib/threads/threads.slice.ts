@@ -90,60 +90,17 @@ const updateCacheThread = async (mezon: MezonValueContext, channelId: string, cl
 const updateCacheOnThreadCreation = createAsyncThunk(
 	'threads/updateCache',
 	async (
-		{
-			clanId,
-			channelId,
-			newThread,
-			isThreadCreator
-		}: { clanId: string; channelId: string; newThread: ApiChannelDescription; isThreadCreator: boolean },
+		{ clanId, channelId, defaultThreadList }: { clanId: string; channelId: string; defaultThreadList: Array<ApiChannelDescription> },
 		thunkAPI
 	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await fetchThreadsCached(mezon, channelId, clanId);
+			await fetchThreadsCached.delete(mezon, channelId, clanId);
+			const threads = await fetchThreadsCached(mezon, channelId, clanId, undefined, {
+				channeldesc: defaultThreadList || []
+			});
 
-			if (!response.channeldesc) return;
-
-			if (response && response.channeldesc) {
-				if (response.channeldesc.find((thread) => thread.channel_id === newThread.channel_id)) {
-					const threads = response.channeldesc.map((thread) => {
-						if (thread.channel_id === newThread.channel_id) {
-							return {
-								...thread,
-								last_sent_message: {
-									...thread.last_sent_message,
-									sender_id: thread.creator_id
-								}
-							};
-						}
-
-						return thread;
-					});
-
-					return mapToThreadEntity(threads);
-				}
-
-				await fetchThreadsCached.delete(mezon, channelId, clanId);
-				const timestamp = Date.now() / 1000;
-				const defaultResponse = [
-					{
-						...newThread,
-						active: isThreadCreator ? ThreadStatus.joined : ThreadStatus.activePublic,
-						last_sent_message: {
-							...newThread.last_sent_message,
-							timestamp_seconds: timestamp
-						}
-					},
-					...response.channeldesc
-				];
-				await fetchThreadsCached(mezon, channelId, clanId, undefined, {
-					channeldesc: defaultResponse.length > LIMIT ? defaultResponse.slice(0, -1) : defaultResponse
-				});
-
-				return mapToThreadEntity(defaultResponse.length > LIMIT ? defaultResponse.slice(0, -1) : defaultResponse);
-			}
-
-			return mapToThreadEntity(response.channeldesc);
+			return mapToThreadEntity(threads.channeldesc || []);
 		} catch (e) {
 			console.error(e);
 		}

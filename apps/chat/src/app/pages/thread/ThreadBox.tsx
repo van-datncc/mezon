@@ -11,7 +11,6 @@ import {
 	selectCurrentClanId,
 	selectSession,
 	selectThreadCurrentChannel,
-	threadsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -97,22 +96,6 @@ const ThreadBox = () => {
 								clanId: currentClanId || '',
 								channelId: thread.channel_id as string,
 								isFetchingLatestMessages: true
-							})
-						);
-						await dispatch(
-							threadsActions.updateCacheOnThreadCreation({
-								clanId: currentClanId || '',
-								channelId: currentChannelId as string,
-								newThread: {
-									...thread,
-									last_sent_message: {
-										sender_id: userId,
-										content: JSON.stringify(content || {}),
-										attachment: JSON.stringify(attachments || []),
-										referece: JSON.stringify(references || [])
-									}
-								},
-								isThreadCreator: true
 							})
 						);
 					}
