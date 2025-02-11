@@ -39,7 +39,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useAppSelector(selectAllUserChannel);
+	const listOfChannelMember = useAppSelector(selectAllUserChannel(channel.channel_id));
 
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));

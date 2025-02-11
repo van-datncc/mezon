@@ -3,7 +3,7 @@ import { useAuth, useTopics } from '@mezon/core';
 import {
 	fetchMessages,
 	messagesActions,
-	selectAllUserIdChannels,
+	selectAllChannelMemberIds,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -12,7 +12,8 @@ import {
 	selectFirstMessageOfCurrentTopic,
 	selectSession,
 	topicsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, sleep } from '@mezon/utils';
@@ -30,7 +31,7 @@ const TopicDiscussionBox = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const allUserIdsInChannel = useSelector(selectAllUserIdChannels);
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId, false));
 	const { currentTopicInitMessage } = useTopics();
 	const sessionUser = useSelector(selectSession);
 	const { clientRef, sessionRef, socketRef } = useMezon();
