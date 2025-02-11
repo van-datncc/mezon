@@ -65,7 +65,7 @@ export function UserMentionList({ channelID, channelMode }: UserMentionListProps
 				color: item.color
 			})) ?? [];
 
-		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL || channelMode === ChannelStreamMode.STREAM_MODE_THREAD) {
 			return [...sortedMentionList, ...roleMentions, hardcodedUser];
 		} else {
 			return [...sortedMentionList];

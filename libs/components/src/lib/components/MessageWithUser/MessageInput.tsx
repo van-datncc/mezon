@@ -137,9 +137,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			// get the new plaintext with token added prefix
 			const newPlaintext = generateNewPlaintext(updatedNewPos, plaintextOriginal ?? '');
 			// update pos mention
-			const mentionNewPos = adjustTokenPositions(channelDraftMessage.draftMention ?? [], updatedNewPos, true);
-			const hashtagNewPos = adjustTokenPositions(originalDraftContent.hg ?? [] ?? [], updatedNewPos, true);
-			const emojiNewPos = adjustTokenPositions(originalDraftContent.ej ?? [] ?? [], updatedNewPos, true);
+			const mentionNewPos = adjustTokenPositions(channelDraftMessage?.draftMention ?? [], updatedNewPos, true);
+			const hashtagNewPos = adjustTokenPositions(originalDraftContent?.hg ?? [] ?? [], updatedNewPos, true);
+			const emojiNewPos = adjustTokenPositions(originalDraftContent?.ej ?? [] ?? [], updatedNewPos, true);
 
 			return {
 				updatedDraftContent: {
