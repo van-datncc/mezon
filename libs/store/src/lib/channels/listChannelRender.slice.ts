@@ -242,6 +242,21 @@ export const listChannelRenderSlice = createSlice({
 				default:
 					break;
 			}
+		},
+		handleMarkFavor: (state, action: PayloadAction<{ channelId: string; clanId: string; mark: boolean }>) => {
+			const { channelId, clanId, mark } = action.payload;
+			if (!state.listChannelRender[clanId]) {
+				return;
+			}
+      if(!mark){
+        state.listChannelRender[clanId] = state.listChannelRender[clanId].filter((channel) => !(channel.id === channelId && (channel as IChannel).category_id === 'favorCate'));
+        return;
+      }
+
+			const channelMark : IChannel = {...state.listChannelRender[clanId].filter((channel) => channel.id === channelId)[0] ,category_id : 'favorCate'};
+      state.listChannelRender[clanId]?.splice(1, 0, channelMark);
+			state.listChannelRender[clanId].join();
+
 		}
 	}
 });
