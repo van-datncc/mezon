@@ -76,7 +76,7 @@
     "mezon-js": "2.10.85",
     "mezon-js-protobuf": "1.7.6",
     "minio": "^7.1.3",
-    "nx-electron": "^18.0.1",
+    "nx-electron": "^20.0.0",
     "prismjs": "^1.29.0",
     "quill": "^2.0.2",
     "react": "18.2.0",
