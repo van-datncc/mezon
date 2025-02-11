@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	clansActions,
 	selectCategoryExpandStateByCategoryId,
+	selectCurrentChannel,
+	selectHasUnreadNoti,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
@@ -50,9 +52,10 @@ type ChannelLinkContentProps = {
 const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActive, permissions }) => {
 	const dispatch = useDispatch();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
+	const hasUnreadThread = useAppSelector((state) => selectHasUnreadNoti(state, channel.clan_id as string, channel.id))
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const channelMemberList = useMemo(() => {
 		if (
 			channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
@@ -98,7 +101,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-			(isCategoryExpanded || isUnreadChannel)
+			(isCategoryExpanded || isUnreadChannel || hasUnreadThread || currentChannel?.id === channel.id || currentChannel?.parrent_id === channel.id)
 		) {
 			return (
 				<div className={'pt-1'}>

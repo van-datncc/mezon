@@ -265,6 +265,21 @@ export const selectListChannelRenderByClanId = createSelector(
 	}
 );
 
+export const selectHasUnreadNoti = createSelector(
+	[
+		getListChannelRenderState,
+		(state: RootState, clanId: string, channelId: string) => {
+			return {clanId, channelId }
+		}
+	],
+	(state, payload) => {
+    const {clanId , channelId} = payload;
+
+    const listChannelThread = state.listChannelRender[clanId].filter(channel => ((channel as IChannel).id === channelId || (channel as IChannel).parrent_id === channelId) && (channel as IChannel).count_mess_unread);
+    return !!listChannelThread.length;
+  }
+);
+
 function sortChannels(channels: IChannel[]): IChannel[] {
 	const sortedChannels: IChannel[] = [];
 
