@@ -1,11 +1,11 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, RootState, directActions, selectDirectsOpenlistOrder, useAppDispatch } from '@mezon/store-mobile';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Pressable, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -23,6 +23,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const loadingStatus = useSelector((state: RootState) => state?.direct?.loadingStatus);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const [isDismissUI, setIsDismissUI] = useState<boolean>(false);
 
 	const dispatch = useAppDispatch();
 
@@ -31,6 +32,16 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		}, [dispatch])
 	);
+
+	useEffect(() => {
+		const event = DeviceEventEmitter.addListener(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, (isDismiss: true) => {
+			setIsDismissUI(isDismiss);
+		});
+
+		return () => {
+			event.remove();
+		};
+	}, []);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -63,6 +74,10 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		bottomSheetDMMessageRef.current?.present();
 		setDirectMessageSelected(directMessage);
 	}, []);
+
+	if (isDismissUI) {
+		return null;
+	}
 
 	return (
 		<View style={styles.container}>

@@ -31,7 +31,8 @@ export const Authentication = memo(() => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					...TransitionPresets.SlideFromRightIOS
+					...TransitionPresets.ModalFadeTransition,
+					animationEnabled: false
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
@@ -39,6 +40,7 @@ export const Authentication = memo(() => {
 					name={APP_SCREEN.HOME_DEFAULT}
 					component={isTabletLandscape ? HomeScreen : HomeDefaultWrapper}
 					options={{
+						animationEnabled: false,
 						headerShown: false,
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',
@@ -49,6 +51,7 @@ export const Authentication = memo(() => {
 					name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
 					component={DirectMessageDetailScreen}
 					options={{
+						animationEnabled: false,
 						headerShown: false,
 						headerShadowVisible: false,
 						gestureEnabled: true,
