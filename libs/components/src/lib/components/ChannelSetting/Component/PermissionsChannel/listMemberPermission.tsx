@@ -22,8 +22,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const { channel } = props;
 	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
-
-	const rawMembers = useSelector(selectAllUserChannel);
+	const rawMembers = useSelector(selectAllUserChannel(channel.channel_id || ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const deleteMember = async (userId: string) => {
