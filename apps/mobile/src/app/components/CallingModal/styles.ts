@@ -36,7 +36,7 @@ export const style = (colors: Attributes) =>
 			marginBottom: size.s_10,
 			marginRight: size.s_2
 		},
-		userName: {
+		username: {
 			fontSize: size.regular,
 			fontWeight: 'bold',
 			color: colors.white

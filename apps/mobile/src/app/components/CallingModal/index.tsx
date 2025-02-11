@@ -227,7 +227,7 @@ const CallingModal = () => {
 					<LottieView source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE} autoPlay loop style={styles.threeDot} />
 				</Block>
 
-				<Text numberOfLines={1} style={styles.userName}>
+				<Text numberOfLines={1} style={styles.username}>
 					{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
 					{/* @ts-expect-error */}
 					{callerInfo?.user?.username || ''}

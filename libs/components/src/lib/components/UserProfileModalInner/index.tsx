@@ -43,7 +43,7 @@ type UserProfileModalInnerProps = {
 	user?: ChannelMembersEntity;
 	avatar?: string;
 	name?: string;
-	userNameAva?: string;
+	usernameAva?: string;
 	status?: { status?: boolean; isMobile?: boolean };
 	customStatus?: string;
 };
@@ -62,7 +62,7 @@ const UserProfileModalInner = ({
 	user,
 	avatar,
 	name,
-	userNameAva,
+	usernameAva,
 	status,
 	customStatus
 }: UserProfileModalInnerProps) => {
@@ -230,7 +230,7 @@ const UserProfileModalInner = ({
 							<h3 className="text-2xl font-semibold">
 								{name || userById?.clan_nick || userById?.user?.display_name || userById?.user?.username || notify?.content?.username}
 							</h3>
-							<p className="text-sm font-normal">{userNameAva || userById?.user?.username || notify?.content?.username}</p>
+							<p className="text-sm font-normal">{usernameAva || userById?.user?.username || notify?.content?.username}</p>
 						</div>
 						<div className="flex-1 dark:bg-bgSearchHover bg-bgLightSearchHover rounded-lg shadow-shadowInbox">
 							<ProfileTabs activeTab={activeTab} onActiveTabChange={handleActiveTabChange} />

@@ -93,7 +93,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			size: SIZE_PAGE_SEARCH
 		};
 		setFiltersSearch(filter);
-		if ((optionFilter && userMention) || isSearchMessagePage) {
+		if (((optionFilter && userMention) || isSearchMessagePage) && !!currentChannel?.id) {
 			dispatch(searchMessagesActions.setCurrentPage(1));
 			dispatch(searchMessagesActions.fetchListSearchMessage(payload));
 		}

@@ -18,13 +18,8 @@ const ListMemberInvite = (props: ModalParam) => {
 
 	const filteredListDMBySearch = useMemo(() => {
 		return listDMInvite?.filter((dmGroup) => {
-			// if (dmGroup.usernames?.toLowerCase().includes(searchTerm.toLowerCase())) {
-			// 	return dmGroup.usernames?.toLowerCase().includes(searchTerm.toLowerCase());
-			// }
-
-			// return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());
-			if (dmGroup.usernames?.join(',')?.toLowerCase().includes(searchTerm.toLowerCase())) {
-				return dmGroup.usernames?.join(',')?.toLowerCase().includes(searchTerm.toLowerCase());
+			if (dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())) {
+				return dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase());
 			}
 
 			return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());

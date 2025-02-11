@@ -42,7 +42,7 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 				e.stopPropagation();
 			}}
 			alt={message.username ?? ''}
-			userName={message.username}
+			username={message.username}
 			data-popover-target="popover-content"
 			srcImgProxy={createImgproxyUrl(avatarUrl, { width: 100, height: 100, resizeType: 'fit' })}
 			src={avatarUrl}

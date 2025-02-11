@@ -40,7 +40,6 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	loadingStatus: 'not loaded',
 	error: null,
 	dataReferences: {},
-	idMessageToJump: '',
 	openEditMessageState: false,
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',

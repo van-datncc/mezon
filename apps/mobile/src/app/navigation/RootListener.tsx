@@ -221,15 +221,15 @@ const RootListener = () => {
 		}
 	}, [dispatch]);
 
-	const loadFRMConfig = async (userName: string) => {
+	const loadFRMConfig = async (username: string) => {
 		try {
-			if (!userName) {
+			if (!username) {
 				return;
 			}
 			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
 			if (fcmtoken) {
 				const { app_platform: platform } = appInfo;
-				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: userName, platform }));
+				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: username, platform }));
 			}
 		} catch (error) {
 			console.error('Error loading FCM config:', error);

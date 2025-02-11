@@ -7,7 +7,7 @@ export const style = (colors: Attributes) =>
 			gap: size.s_2,
 			justifyContent: 'center'
 		},
-		userNameMessageBox: {
+		usernameMessageBox: {
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '600',

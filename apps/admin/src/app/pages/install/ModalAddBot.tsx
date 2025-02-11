@@ -50,7 +50,7 @@ const ModalAddBot = (props: ModalAddBotProps) => {
 
 	return !openModalSuccess ? (
 		<div className="rounded overflow-hidden dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full pt-4 flex flex-col text-center gap-y-2">
-			<HeaderModal name={nameApp} userName={account?.user?.username} />
+			<HeaderModal name={nameApp} username={account?.user?.username} />
 			<SelectClan userId={account?.user?.id} selectClan={selectClan} setSelectClan={setSelectClan} />
 			<FooterModal name={nameApp} />
 			<ModalAsk handelBack={handleOpenModal} handleAddBot={handleAddBot} />
@@ -64,12 +64,12 @@ export default ModalAddBot;
 
 type HeaderModalProps = {
 	name?: string;
-	userName?: string;
+	username?: string;
 	isModalTry?: boolean;
 };
 
 export const HeaderModal = memo((props: HeaderModalProps) => {
-	const { name, userName, isModalTry } = props;
+	const { name, username, isModalTry } = props;
 
 	return (
 		<div className="px-4 dark:text-contentTertiary text-colorTextLightMode">
@@ -78,7 +78,7 @@ export const HeaderModal = memo((props: HeaderModalProps) => {
 			<p className="text-base">wants to access your Mezon account</p>
 			<p className="text-sm">
 				Signed in as
-				<span className="dark:text-white text-black">&nbsp;{userName}</span>
+				<span className="dark:text-white text-black">&nbsp;{username}</span>
 				<a href="#" className="text-primary">
 					&nbsp;Not you?
 				</a>

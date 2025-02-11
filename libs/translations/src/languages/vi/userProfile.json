@@ -14,8 +14,8 @@
     }
   },
   "kickUserClanModal": {
-    "kickFromServer": "Đuổi {{userName}} khỏi Clan",
-    "description": "Bạn có chắc chắn muốn đuổi {{userName}} khỏi clan? Họ có thể tham gia lại bằng lời mời mới.",
+    "kickFromServer": "Đuổi {{username}} khỏi Clan",
+    "description": "Bạn có chắc chắn muốn đuổi {{username}} khỏi clan? Họ có thể tham gia lại bằng lời mời mới.",
     "reasonKick": "LÝ DO ĐUỔI",
     "buttonName": "Đuổi"
   },

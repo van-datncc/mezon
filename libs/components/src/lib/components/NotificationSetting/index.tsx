@@ -121,15 +121,16 @@ const ModalNotificationSetting = (props: ModalParam) => {
 		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.id, notification_type: notification }));
 	};
 	const categorizedChannels = useCategorizedAllChannels();
-	const options = categorizedChannels.map((category) => {
+	const options = categorizedChannels.reduce<Array<{ id: string; label: string; title: string }>>((acc, category) => {
 		if ((category as IChannel).type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
-			return {
+			acc.push({
 				id: category.id,
-				label: (category as IChannel).channel_label || category.category_name,
+				label: (category as IChannel).channel_label || category.category_name || '',
 				title: (category as ICategoryChannel).channels ? 'category' : 'channel'
-			};
+			});
 		}
-	});
+		return acc;
+	}, []);
 	const [selectedOption, setSelectedOption] = useState(null);
 	const handleChange = (newValue: any) => {
 		setSelectedOption(newValue);

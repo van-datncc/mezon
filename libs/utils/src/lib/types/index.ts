@@ -142,8 +142,6 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
-	// usernames?: string;
-	// usernames?: string[];
 	isRoleUser?: boolean;
 	isFavor?: boolean;
 };
@@ -553,7 +551,8 @@ export enum SubPanelName {
 	STICKERS = 'STICKER',
 	EMOJI = 'EMOJI',
 	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
-	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM'
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
+	SOUNDS = 'SOUNDS'
 }
 
 export enum MemberProfileType {
@@ -1274,7 +1273,7 @@ export enum UserAuditLog {
 
 export type IUserAuditLog = {
 	userId: string;
-	userName: string;
+	username: string;
 };
 
 export type IUserProfileActivity = {

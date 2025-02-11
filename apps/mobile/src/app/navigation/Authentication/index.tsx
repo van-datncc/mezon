@@ -1,11 +1,14 @@
 import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { Dimensions } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
-import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
+import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
+import HomeScreen from '../../screens/home/HomeScreen';
+import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
 import { FriendStacks } from './stacks/FriendStacks';
@@ -16,10 +19,11 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
-const RootStack = createNativeStackNavigator();
-const Stack = createStackNavigator();
+const RootStack = createStackNavigator();
 
 export const Authentication = memo(() => {
+	const isTabletLandscape = useTabletLandscape();
+
 	return (
 		<BottomSheetModalProvider>
 			<RootStack.Navigator
@@ -27,17 +31,32 @@ export const Authentication = memo(() => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					animation: 'ios_from_right'
+					...TransitionPresets.ModalFadeTransition,
+					animationEnabled: false
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
-				<Stack.Screen
+				<RootStack.Screen
 					name={APP_SCREEN.HOME_DEFAULT}
-					component={HomeDefaultWrapper}
+					component={isTabletLandscape ? HomeScreen : HomeDefaultWrapper}
 					options={{
-						cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+						animationEnabled: false,
 						headerShown: false,
-						gestureDirection: 'horizontal'
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+						gestureResponseDistance: Dimensions.get('window').width
+					}}
+				/>
+				<RootStack.Screen
+					name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
+					component={DirectMessageDetailScreen}
+					options={{
+						animationEnabled: false,
+						headerShown: false,
+						headerShadowVisible: false,
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+						gestureResponseDistance: Dimensions.get('window').width
 					}}
 				/>
 				<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />

@@ -68,6 +68,8 @@ function createMutateFunction(
 	try {
 		({ offsetTop: elementTop, offsetHeight: elementHeight } = element);
 		({ scrollTop: currentScrollTop, offsetHeight: containerHeight, scrollHeight } = container);
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		if (elementTop === 0 && elementHeight === 0) return () => {};
 	} catch (error) {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		return () => {};

@@ -109,7 +109,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 	// 			: '';
 	const streamAddress =
 		type === ESummaryInfo.CALL
-			? (currentDmGroup?.usernames && currentDmGroup?.usernames[0]) || ''
+			? currentDmGroup?.usernames?.toString() || ''
 			: type === ESummaryInfo.STREAM
 				? `${currentStreamInfo?.streamName} / ${currentStreamInfo?.clanName}`
 				: '';
@@ -131,7 +131,6 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 					</div>
 					<button className="w-fit" onClick={handleClick}>
 						<div className="hover:underline font-medium text-xs dark:text-contentSecondary text-colorTextLightMode">
-							{/* {streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress} */}
 							{streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>
 					</button>

@@ -64,7 +64,7 @@ const AvatarProfile = ({
 			<div className="relative h-fit">
 				<AvatarImage
 					alt={username || ''}
-					userName={username}
+					username={username}
 					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}
 					srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 					src={avatar}

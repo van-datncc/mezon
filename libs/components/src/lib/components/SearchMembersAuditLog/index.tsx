@@ -19,15 +19,15 @@ type AvatarUserProps = {
 
 const AvatarUser = ({ user }: AvatarUserProps) => {
 	const userClan = useAppSelector(selectMemberClanByUserId(user?.id ?? ''));
-	const userName = userClan?.user?.username;
+	const username = userClan?.user?.username;
 	const avatar = getAvatarForPrioritize(userClan?.clan_avatar, userClan?.user?.avatar_url);
 	return (
 		<div className="w-6 h-6 rounded-full">
 			<div className="w-6 h-6">
 				{userClan ? (
 					<AvatarImage
-						alt={userName || ''}
-						userName={userName}
+						alt={username || ''}
+						username={username}
 						className="min-w-6 min-h-6 max-w-6 max-h-6"
 						srcImgProxy={createImgproxyUrl(avatar ?? '')}
 						src={avatar}
@@ -85,7 +85,7 @@ const SearchMemberAuditLogModal = ({
 		dispatch(
 			auditLogFilterActions.setUser({
 				userId: user.userId || '',
-				userName: user.name || ''
+				username: user.name || ''
 			})
 		);
 

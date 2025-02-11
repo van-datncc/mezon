@@ -5141,6 +5141,45 @@ export function VoiceIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export const ReloadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
+	return (
+		<svg
+			width="30"
+			height="30"
+			viewBox="0 0 24 24"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			fill="none"
+			{...props}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+					<g id="Reload">
+						<rect id="Rectangle" fillRule="nonzero" x="0" y="0" width="24" height="24"></rect>
+						<path
+							d="M4,13 C4,17.4183 7.58172,21 12,21 C16.4183,21 20,17.4183 20,13 C20,8.58172 16.4183,5 12,5 C10.4407,5 8.98566,5.44609 7.75543,6.21762"
+							id="Path"
+							stroke="#ffffff"
+							strokeWidth="2"
+							strokeLinecap="round"
+						></path>
+						<path
+							d="M9.2384,1.89795 L7.49856,5.83917 C7.27552,6.34441 7.50429,6.9348 8.00954,7.15784 L11.9508,8.89768"
+							id="Path"
+							stroke="#ffffff"
+							strokeWidth="2"
+							strokeLinecap="round"
+						></path>
+					</g>
+				</g>
+			</g>
+		</svg>
+	);
+};
+
 export function MacAppStoreDesktop(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="222" height="44" viewBox="0 0 222 44" fill="none" {...props}>
@@ -6074,12 +6113,21 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function LoadingSpinner(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+			<circle className="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" strokeWidth="5" fill="none" />
+			<path className="opacity-75" fill="currentColor" d="M25 5a20 20 0 0114.14 34.14l-2.83-2.83A15 15 0 0025 10V5z" />
+		</svg>
+	);
+}
+
 export function StopCall(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
-			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
 
 			<g id="SVGRepo_iconCarrier">
 				{' '}
@@ -6097,7 +6145,7 @@ export function StartCall(props: React.HTMLAttributes<SVGElement>) {
 		<svg width="24px" height="24px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
-			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
 
 			<g id="SVGRepo_iconCarrier">
 				{' '}
@@ -6153,7 +6201,7 @@ export function ShareScreen({ isShowShareScreen = false, isShowLine = false, ...
 	return (
 		<svg width="32px" height="32px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
 			<g id="SVGRepo_iconCarrier">
 				<g id="🔍-System-Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
 					{' '}
@@ -6621,6 +6669,25 @@ export function PauseButton(props: React.HTMLAttributes<SVGElement>) {
 						</g>{' '}
 					</g>{' '}
 				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
+export function SoundIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path
+					d="M9 19C9 20.1046 7.65685 21 6 21C4.34315 21 3 20.1046 3 19C3 17.8954 4.34315 17 6 17C7.65685 17 9 17.8954 9 19ZM9 19V5L21 3V17M21 17C21 18.1046 19.6569 19 18 19C16.3431 19 15 18.1046 15 17C15 15.8954 16.3431 15 18 15C19.6569 15 21 15.8954 21 17ZM9 9L21 7"
+					stroke="#000000"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				></path>{' '}
 			</g>
 		</svg>
 	);

@@ -14,8 +14,8 @@
     }
   },
   "kickUserClanModal": {
-    "kickFromServer": "Kick {{userName}} from Clan",
-    "description":"Are you sure you want to kick {{userName}} from the clan? They will be able to rejoin again with a new invite.",
+    "kickFromServer": "Kick {{username}} from Clan",
+    "description": "Are you sure you want to kick {{username}} from the clan? They will be able to rejoin again with a new invite.",
     "reasonKick": "REASON FOR KICK",
     "buttonName": "Kick"
   },
@@ -29,7 +29,7 @@
   },
   "userInfoDM": {
     "menu": {
-      "removeFromGroup":"Remove From Group"
+      "removeFromGroup": "Remove From Group"
     },
     "mezonMemberSince": "MEZON MEMBER SINCE"
   },

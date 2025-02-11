@@ -18,6 +18,9 @@ export interface ChannelAppState {
 	loadingStatus: LoadingStatus;
 	roomName: string | null;
 	roomId: string | null;
+	channelId: string | null;
+	clanId: string | null;
+	roomToken: string | undefined;
 	enableMic: boolean;
 	enableVideo: boolean;
 	enableCall: boolean;
@@ -27,9 +30,12 @@ export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
 	roomId: null,
+	clanId: null,
+	roomToken: undefined,
 	enableMic: false,
 	enableVideo: false,
-	enableCall: false
+	enableCall: false,
+	channelId: null
 };
 
 export const createChannelAppMeet = createAsyncThunk(
@@ -63,6 +69,15 @@ export const channelAppSlice = createSlice({
 		},
 		setRoomId: (state, action: PayloadAction<string | null>) => {
 			state.roomId = action.payload;
+		},
+		setClanId: (state, action: PayloadAction<string | null>) => {
+			state.clanId = action.payload;
+		},
+		setChannelId: (state, action: PayloadAction<string | null>) => {
+			state.channelId = action.payload;
+		},
+		setRoomToken: (state, action: PayloadAction<string | undefined>) => {
+			state.roomToken = action.payload;
 		},
 		setEnableVoice: (state, action: PayloadAction<boolean>) => {
 			state.enableMic = action.payload;
@@ -98,6 +113,10 @@ export const selectGetRoomId = createSelector(getChannelAppState, (state) => sta
 export const selectEnableMic = createSelector(getChannelAppState, (state) => state.enableMic);
 export const selectEnableCall = createSelector(getChannelAppState, (state) => state.enableCall);
 export const selectRoomName = createSelector(getChannelAppState, (state) => state.roomName);
+export const selectLiveToken = createSelector(getChannelAppState, (state) => state.roomToken);
+export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
+export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
+
 export const channelAppReducer = channelAppSlice.reducer;
 
 // Export actions & reducer

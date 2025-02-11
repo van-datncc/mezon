@@ -30,7 +30,7 @@ export default function UserInfoSearch({ onSelectUserInfo, userData }: UserInfoS
 				avatarUrl={userData?.avatarUrl}
 			/>
 			<Block>
-				<Text style={styles.userName}>{userData?.display}</Text>
+				<Text style={styles.username}>{userData?.display}</Text>
 				<Text style={styles.subUserName}>{userData?.subDisplay}</Text>
 			</Block>
 		</TouchableOpacity>

@@ -33,6 +33,12 @@ export type ModalCreateProps = {
 	eventId?: string;
 };
 
+enum EventTabIndex {
+	LOCATION = 0,
+	EVENTINFO = 1,
+	REVIEW = 2
+}
+
 const ModalCreate = (props: ModalCreateProps) => {
 	const { onClose, onCloseEventModal, eventId, clearEventId } = props;
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -106,6 +112,14 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const handleCurrentModal = (number: number) => {
 		if (errorOption || errorTime) {
+			return;
+		}
+
+		if (!option) {
+			return;
+		}
+
+		if (currentModal === EventTabIndex.LOCATION && number === EventTabIndex.REVIEW && !contentSubmit.topic) {
 			return;
 		}
 
@@ -215,7 +229,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 		} else {
 			setButtonWork(true);
 		}
-		if (contentSubmit.topic !== '') {
+
+		if (contentSubmit.topic) {
 			setButtonWork(true);
 		}
 	}, [currentModal, contentSubmit.topic]);

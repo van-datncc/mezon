@@ -56,7 +56,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 							<AvatarImage
 								className="w-5 h-5"
 								alt="user avatar"
-								userName={messageUsernameSenderRef}
+								username={messageUsernameSenderRef}
 								srcImgProxy={createImgproxyUrl(
 									(!isClanView
 										? (message?.references?.[0]?.mesages_sender_avatar ?? '')

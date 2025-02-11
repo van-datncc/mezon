@@ -102,18 +102,12 @@ const UserProfile = React.memo(
 			async (userId: string) => {
 				const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
 				if (directMessage?.id) {
-					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-						params: { directMessageId: directMessage?.id }
-					});
+					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: directMessage?.id });
 					return;
 				}
 				const response = await createDirectMessageWithUser(userId);
 				if (response?.channel_id) {
-					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-						params: { directMessageId: response?.channel_id }
-					});
+					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
 				}
 			},
 			[createDirectMessageWithUser, listDM, navigation]
@@ -243,7 +237,7 @@ const UserProfile = React.memo(
 				</View>
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
-						<Text style={[styles.userName]}>
+						<Text style={[styles.username]}>
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
@@ -253,10 +247,12 @@ const UserProfile = React.memo(
 										user?.user?.display_name ||
 										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
-								: user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
-							{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+							{userById
+								? userById?.user?.username
+								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}

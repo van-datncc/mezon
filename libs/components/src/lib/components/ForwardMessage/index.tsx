@@ -197,11 +197,10 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 			? listDM.map((itemDM: DirectEntity) => {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.usernames ?? '',
+						name: itemDM?.usernames?.toString() ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
-						userName: itemDM?.usernames,
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeSearch: TypeSearch.Dm_Type
@@ -216,7 +215,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						avatarUser: 'assets/images/avatar-group.png',
 						idDM: itemGr?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
-						userName: itemGr?.usernames,
 						displayName: itemGr.channel_label,
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						typeSearch: TypeSearch.Dm_Type

@@ -25,14 +25,14 @@ const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEnt
 					</Block>
 					<Text style={styles.clanName}>{currentClan?.clan_name}</Text>
 					<Text style={styles.textError}>
-						{t('kickUserClanModal.kickFromServer', { userName: user?.user?.username || user?.['username'] })}
+						{t('kickUserClanModal.kickFromServer', { username: user?.user?.username || user?.['username'] })}
 					</Text>
 					<Text style={styles.description}>
-						{t('kickUserClanModal.description', { userName: user?.user?.username || user?.['username'] })}
+						{t('kickUserClanModal.description', { username: user?.user?.username || user?.['username'] })}
 					</Text>
 					<Block style={styles.textAreaBox}>
 						<MezonInput
-							label={t('kickUserClanModal.reasonKick', { userName: user?.user?.username || user?.['username'] })}
+							label={t('kickUserClanModal.reasonKick', { username: user?.user?.username || user?.['username'] })}
 							titleUppercase
 							textarea
 							onTextChange={setReason}
@@ -44,7 +44,7 @@ const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEnt
 
 				<MezonButton
 					onPress={onRemoveUserClan}
-					title={t('kickUserClanModal.buttonName', { userName: user?.user?.username || user?.['username'] })}
+					title={t('kickUserClanModal.buttonName', { username: user?.user?.username || user?.['username'] })}
 					type={EMezonButtonTheme.THEME}
 					size={EMezonButtonSize.LG}
 					titleStyle={styles.textButton}

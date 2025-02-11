@@ -311,10 +311,6 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
 	if (nameProp) {
-		// TODO: fix crash
-		if (Array.isArray(a[nameProp]) || Array.isArray(b[nameProp])) {
-			return 0;
-		}
 		const aNameIndex = a[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 		const bNameIndex = b[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
 
@@ -344,19 +340,16 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 }
 
 export function normalizeString(str: string): string {
-	// TODO: fix crash
-	if (typeof str === 'string' && str?.length)
+	if (str?.length)
 		return str
 			.normalize('NFD')
 			.replace(/[\u0300-\u036f]/g, '')
 			.toUpperCase();
-
 	return '';
 }
 
 export function searchMentionsHashtag(searchValue: string, list: MentionDataProps[]) {
 	if (!searchValue) return list;
-
 	// Normalize and remove diacritical marks from the search value
 	const normalizedSearchValue = normalizeString(searchValue).toUpperCase();
 	const filteredList: MentionDataProps[] = list.filter((mention) => {
@@ -1108,9 +1101,12 @@ export function isYouTubeShorts(url: string) {
 	return /youtube\.com\/shorts\//.test(url);
 }
 
-export function getYouTubeEmbedSize(url: string) {
+export function getYouTubeEmbedSize(url: string, isSearchMessage?: boolean) {
 	if (isYouTubeShorts(url)) {
 		return { width: '169px', height: '300px' };
+	}
+	if (isSearchMessage) {
+		return { width: `${400 * 0.65}px`, height: `${225 * 0.65}px` };
 	}
 	return { width: '400px', height: '225px' };
 }
@@ -1122,4 +1118,53 @@ export const formatMoney = (number: number) => {
 	if (number) {
 		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}
+};
+
+export const getMentionPositions = (value: string, plainValue: string, mention: MentionItem, appearanceIndex: number) => {
+	const mentionMarkup = `@[${mention.display.slice(1)}](${mention.id})`;
+
+	let valueStartIndex = -1;
+	let count = 0;
+	for (let i = 0; i < value.length; i++) {
+		if (value.slice(i, i + mentionMarkup.length) === mentionMarkup) {
+			count++;
+			if (count === appearanceIndex) {
+				valueStartIndex = i;
+				break;
+			}
+		}
+	}
+
+	let plainValueStartIndex = -1;
+	count = 0;
+	for (let i = 0; i < plainValue.length; i++) {
+		if (plainValue.slice(i, i + mention.display.length) === mention.display) {
+			count++;
+			if (count === appearanceIndex) {
+				plainValueStartIndex = i;
+				break;
+			}
+		}
+	}
+
+	return {
+		valueStartIndex,
+		plainValueStartIndex
+	};
+};
+
+export const updateMentionPositions = (mentions: MentionItem[], newValue: string, newPlainTextValue: string) => {
+	const mentionAppearancesCount: Record<string, number> = {};
+
+	const newMentions: MentionItem[] = mentions.map((mention) => {
+		mentionAppearancesCount[mention.id] = (mentionAppearancesCount[mention.id] || 0) + 1;
+		const newMentionStartIndex = getMentionPositions(newValue, newPlainTextValue, mention, mentionAppearancesCount?.[mention.id]);
+		return {
+			...mention,
+			index: newMentionStartIndex.valueStartIndex,
+			plainTextIndex: newMentionStartIndex.plainValueStartIndex
+		};
+	});
+
+	return newMentions;
 };

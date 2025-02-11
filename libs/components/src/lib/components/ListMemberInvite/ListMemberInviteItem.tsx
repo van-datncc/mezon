@@ -52,15 +52,14 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			label={dmGroup.channel_label}
 			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
-			// userName={dmGroup.usernames}
-			userName={dmGroup.usernames && dmGroup.usernames[0]}
+			username={dmGroup.usernames?.toString()}
 		/>
 	) : (
 		<ItemInviteUser
 			userId={user?.id}
 			avatar={user?.user?.avatar_url}
 			displayName={user?.user?.display_name}
-			userName={user?.user?.username}
+			username={user?.user?.username}
 			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick('', 0, user?.id)}
 		/>
@@ -74,17 +73,17 @@ type ItemInviteDMProps = {
 	avatar?: string;
 	label?: string;
 	isInviteSent?: boolean;
-	userName?: string;
+	username?: string;
 	onHandle: () => void;
 };
 
 const ItemInviteDM = (props: ItemInviteDMProps) => {
-	const { channelID = '', type = '', avatar = '', label = '', isInviteSent = false, userName = '', onHandle } = props;
+	const { channelID = '', type = '', avatar = '', label = '', isInviteSent = false, username = '', onHandle } = props;
 	return (
 		<div key={channelID} className="flex items-center justify-between h-fit group rounded-md dark:hover:bg-[#393c41] hover:bg-[#d1d2d4] p-1">
 			<AvatarImage
-				alt={userName}
-				userName={userName}
+				alt={username}
+				username={username}
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
 				srcImgProxy={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : createImgproxyUrl(avatar ?? '')}
 				src={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : avatar}
@@ -111,18 +110,18 @@ type ItemInviteUserProps = {
 	userId?: string;
 	avatar?: string;
 	displayName?: string;
-	userName?: string;
+	username?: string;
 	isInviteSent?: boolean;
 	onHandle?: () => void;
 };
 
 const ItemInviteUser = (props: ItemInviteUserProps) => {
-	const { userId = '', avatar = '', displayName = '', userName = '', isInviteSent = false, onHandle } = props;
+	const { userId = '', avatar = '', displayName = '', username = '', isInviteSent = false, onHandle } = props;
 	return (
 		<div key={userId} className="flex items-center justify-between h-14">
 			<AvatarImage
-				alt={userName}
-				userName={userName}
+				alt={username}
+				username={username}
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
 				srcImgProxy={createImgproxyUrl(avatar ?? '')}
 				src={avatar}

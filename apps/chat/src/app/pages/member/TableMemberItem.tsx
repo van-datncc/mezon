@@ -117,7 +117,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					<div className="flex flex-row gap-2 items-center">
 						<AvatarImage
 							alt={username}
-							userName={username}
+							username={username}
 							className="min-w-9 min-h-9 max-w-9 max-h-9"
 							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}

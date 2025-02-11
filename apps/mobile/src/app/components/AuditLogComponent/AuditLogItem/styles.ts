@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
-		userName: {
+		username: {
 			fontSize: size.s_14,
 			color: colors.text
 		},

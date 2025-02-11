@@ -59,7 +59,7 @@ export type MemberProfileProps = {
 	countMember?: number;
 	dataMemberCreate?: DataMemberCreate;
 	isHiddenAvatarPanel?: boolean;
-	userNameAva?: string;
+	usernameAva?: string;
 	hideLongName?: boolean;
 	isDM?: boolean;
 	isMute?: boolean;
@@ -95,7 +95,7 @@ export function MemberProfile({
 	countMember,
 	dataMemberCreate,
 	isHiddenAvatarPanel,
-	userNameAva,
+	usernameAva,
 	hideLongName,
 	isDM,
 	isMute,
@@ -238,7 +238,7 @@ export function MemberProfile({
 		[isFooter, user?.user?.id, userProfile?.user?.id]
 	);
 
-	const userName = isFooter ? userProfile?.user?.username || '' : name || '';
+	const username = isFooter ? userProfile?.user?.username || '' : name || '';
 
 	const subNameRef = useRef<HTMLInputElement>(null);
 	const minWidthNameMain = subNameRef.current?.offsetWidth;
@@ -310,7 +310,7 @@ export function MemberProfile({
 				user={user}
 				avatar={avatar}
 				name={name}
-				userNameAva={userNameAva}
+				usernameAva={usernameAva}
 				status={status}
 				customStatus={customStatus || metaDataDM?.status}
 			/>
@@ -362,8 +362,8 @@ export function MemberProfile({
 			>
 				<div className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					<AvatarImage
-						alt={userName}
-						userName={userNameAva ?? userName}
+						alt={username}
+						username={usernameAva ?? username}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
 						classNameText="font-semibold"
 						srcImgProxy={createImgproxyUrl(avatar ?? '')}
@@ -436,7 +436,7 @@ export function MemberProfile({
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>
-									{isListFriend && <span className="hidden group-hover/list_friends:inline">&nbsp;{userNameAva}</span>}
+									{isListFriend && <span className="hidden group-hover/list_friends:inline">&nbsp;{usernameAva}</span>}
 								</p>
 								{isOwnerClanOrGroup && (
 									<button className="w-[14px] h-[14px] ml-1">

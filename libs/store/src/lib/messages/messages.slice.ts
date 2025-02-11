@@ -427,7 +427,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if (state.loadingStatus === 'loading' || state.idMessageToJump?.id) {
 				return;
 			}
 
@@ -913,7 +913,9 @@ export const messagesSlice = createSlice({
 					id: channelId
 				});
 			}
-			const channelEntity = state.channelMessages[channelId];
+			const messageChannelId = topic_id !== '0' && topic_id && !content?.tp ? topic_id : channelId;
+			const channelEntity = state.channelMessages[messageChannelId];
+
 			switch (code) {
 				case TypeMessage.Welcome:
 				case TypeMessage.CreateThread:

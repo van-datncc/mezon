@@ -179,11 +179,9 @@ function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 				if (!acc.some((existingUser) => existingUser.id === userId)) {
 					const user = {
 						avatar_url: dm?.channel_avatar ? dm?.channel_avatar[index] : '',
-						// display_name: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						display_name: dm?.usernames ? dm?.usernames[index] : '',
 
 						id: userId,
-						// username: dm?.usernames ? dm?.usernames.split(',')[index] : '',
 						username: dm?.usernames ? dm?.usernames[index] : '',
 
 						online: dm?.is_online ? dm?.is_online[index] : false,
@@ -316,7 +314,7 @@ const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
 		is_online: [true],
 		active: ActiveDm.OPEN_DM,
 		usernames: [message.username as string],
-		creator_name: message.username && message.username[0],
+		creator_name: message.username as string,
 		create_time_seconds: message.create_time_seconds,
 		update_time_seconds: message.create_time_seconds,
 		metadata: ['{}'],
@@ -373,19 +371,17 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 			...channel_desc,
 			id: channel_desc.channel_id || '',
 			user_id: userIds,
-			// usernames: usernames.join(','),
 			usernames: usernames,
 			channel_avatar: avatars,
 			is_online: isOnline,
 			metadata,
 			about_me: aboutMe,
 			active: 1,
-			channel_label: label.join(',')
+			channel_label: label.toString()
 		};
 
+		thunkAPI.dispatch(directActions.upsertOne(directEntity));
 		thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
-		thunkAPI.dispatch(directActions.addMemberDmGroup(directEntity));
-
 		return directEntity;
 	} catch (error) {
 		captureSentryError(error, 'direct/addGroupUserWS');
@@ -436,39 +432,37 @@ export const directSlice = createSlice({
 				}
 			});
 		},
-		removeByUserId: (state, action: PayloadAction<{ userId: string; currentUserId: string }>) => {
-			const { userId, currentUserId } = action.payload;
+		removeByUserId: (state, action: PayloadAction<{ userId: string; currentUserId: string; channelId: string }>) => {
+			const { userId, currentUserId, channelId } = action.payload;
 			const { ids, entities } = state;
 
-			for (const id of ids) {
-				const item = entities[id];
-				if (!item || !item.user_id) continue;
+			const item = entities[channelId];
+			if (!item || !item.user_id) return;
 
-				const userIndex = item.user_id.indexOf(userId);
+			const userIndex = item.user_id.indexOf(userId);
 
-				if (userIndex !== -1) {
-					const newUserIds = item.user_id.filter((_, index) => index !== userIndex);
+			if (userIndex !== -1) {
+				const newUserIds = item.user_id.filter((_, index) => index !== userIndex);
 
-					if (newUserIds.length === 0 || newUserIds.includes(currentUserId)) {
-						directAdapter.removeOne(state, id);
-					} else {
-						const newUsernames = item.usernames?.filter((_, index) => index !== userIndex);
-						const newChannelAvatars = item.channel_avatar?.filter((_, index) => index !== userIndex);
-						const newIsOnline = item.is_online?.filter((_, index) => index !== userIndex);
-						const newMetadata = item.metadata?.filter((_, index) => index !== userIndex);
-						const newAboutMe = item.about_me?.filter((_, index) => index !== userIndex);
-						directAdapter.updateOne(state, {
-							id,
-							changes: {
-								user_id: newUserIds,
-								usernames: newUsernames,
-								channel_avatar: newChannelAvatars,
-								is_online: newIsOnline,
-								metadata: newMetadata,
-								about_me: newAboutMe
-							}
-						});
-					}
+				if (newUserIds.length === 1 && newUserIds.includes(currentUserId)) {
+					directAdapter.removeOne(state, channelId);
+				} else {
+					const newUsernames = item.usernames?.filter((_, index) => index !== userIndex);
+					const newChannelAvatars = item.channel_avatar?.filter((_, index) => index !== userIndex);
+					const newIsOnline = item.is_online?.filter((_, index) => index !== userIndex);
+					const newMetadata = item.metadata?.filter((_, index) => index !== userIndex);
+					const newAboutMe = item.about_me?.filter((_, index) => index !== userIndex);
+					directAdapter.updateOne(state, {
+						id: channelId,
+						changes: {
+							user_id: newUserIds,
+							usernames: newUsernames,
+							channel_avatar: newChannelAvatars,
+							is_online: newIsOnline,
+							metadata: newMetadata,
+							about_me: newAboutMe
+						}
+					});
 				}
 			}
 		},

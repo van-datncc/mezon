@@ -16,12 +16,12 @@ type AuditLogItemProps = {
 export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 	const auditLogTime = convertTimeString(data?.time_log as string);
 	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(data?.user_id ?? ''));
-	const userName = userAuditLogItem?.user?.username;
+	const username = userAuditLogItem?.user?.username;
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userMention = useAppSelector(selectMemberClanByUserId(data?.entity_id ?? ''));
-	const userNameMention = userMention?.user?.username;
+	const usernameMention = userMention?.user?.username;
 	const clanRole = useSelector(selectRoleByRoleId(data?.entity_id ?? ''));
 	const channel = useAppSelector((state) => selectChannelById(state, data?.channel_id || ''));
 	const { t } = useTranslation('auditLog');
@@ -36,7 +36,7 @@ export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 	const actionText = isAddAction ? t('auditLogItem.add') : t('auditLogItem.remove');
 	const targetEntity =
 		data?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT || data?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT
-			? userNameMention
+			? usernameMention
 			: clanRole?.title;
 
 	return (
@@ -51,12 +51,12 @@ export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 			borderColor={themeValue.tertiary}
 			marginVertical={size.s_6}
 		>
-			<MezonAvatar avatarUrl={avatar} username={userName} height={size.s_36} width={size.s_36} />
+			<MezonAvatar avatarUrl={avatar} username={username} height={size.s_36} width={size.s_36} />
 			<Block flex={1}>
 				<Block>
 					{isChannelAction && data?.channel_id !== '0' ? (
 						<Text style={styles.actionText}>
-							<Text style={styles.userName}>{userName}</Text>{' '}
+							<Text style={styles.username}>{username}</Text>{' '}
 							<Text>
 								{actionText} {targetEntity} ({data?.entity_id}) {t('auditLogItem.toChannel')}
 							</Text>
@@ -67,7 +67,7 @@ export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 						</Text>
 					) : (
 						<Text style={styles.actionText}>
-							<Text style={styles.userName}>{userName}</Text> <Text style={styles.lowercase}>{data?.action_log}</Text>
+							<Text style={styles.username}>{username}</Text> <Text style={styles.lowercase}>{data?.action_log}</Text>
 							<Text>
 								{' '}
 								#{data?.entity_name || data?.entity_id} {data?.entity_name && `(${data?.entity_id})`}

@@ -73,10 +73,10 @@ type AuditLogItemProps = {
 const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 	const auditLogTime = convertTimeString(logItem?.time_log as string);
 	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem?.user_id ?? ''));
-	const userName = userAuditLogItem?.user?.username;
+	const username = userAuditLogItem?.user?.username;
 	const userMention = useAppSelector(selectMemberClanByUserId(logItem?.entity_id ?? ''));
 	const clanRole = useSelector(selectRoleByRoleId(logItem?.entity_id ?? ''));
-	const userNameMention = userMention?.user?.username;
+	const usernameMention = userMention?.user?.username;
 	const channel = useAppSelector((state) => selectChannelById(state, logItem?.channel_id || ''));
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
 
@@ -86,8 +86,8 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 				<div className="w-10 h-10">
 					{userAuditLogItem ? (
 						<AvatarImage
-							alt={userName || ''}
-							userName={userName}
+							alt={username || ''}
+							username={username}
 							className="min-w-10 min-h-10 max-w-10 max-h-10"
 							srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 							src={avatar}
@@ -109,7 +109,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 						logItem?.action_log === ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT) &&
 					logItem?.channel_id !== '0' ? (
 						<span>
-							<span>{userName}</span>{' '}
+							<span>{username}</span>{' '}
 							<span className="lowercase">
 								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
 								logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
@@ -121,7 +121,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 								logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
 								logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
 								logItem?.action_log === ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT
-									? userNameMention
+									? usernameMention
 									: clanRole?.title}{' '}
 								({logItem?.entity_id}) to channel
 							</span>
@@ -132,7 +132,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 						</span>
 					) : (
 						<span>
-							<span>{userName}</span> <span className="lowercase">{logItem?.action_log}</span>
+							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
 							<strong className="dark:text-white text-black font-medium">
 								{' '}
 								#{logItem?.entity_name || logItem?.entity_id} {logItem?.entity_name && `(${logItem?.entity_id})`}

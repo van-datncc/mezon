@@ -133,6 +133,15 @@ const persistedMessageReducer = persistReducer(
 	messagesReducer
 );
 
+const persistedDirectReducer = persistReducer(
+	{
+		key: 'directMessage',
+		storage,
+		blacklist: ['currentDirectMessageId', 'statusDMChannelUnread', 'socketStatus', 'loadingStatus']
+	},
+	directReducer
+);
+
 const persistedCatReducer = persistReducer(
 	{
 		key: 'categories',
@@ -301,14 +310,6 @@ const persisteduserChannelsReducer = persistReducer(
 	userChannelsReducer
 );
 
-const persistedStreamReducer = persistReducer(
-	{
-		key: 'stream',
-		storage
-	},
-	videoStreamReducer
-);
-
 const persistPoliciesReducer = persistReducer(
 	{
 		key: 'policiesReducer',
@@ -365,7 +366,7 @@ const reducer = {
 	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
-	direct: directReducer,
+	direct: persistedDirectReducer,
 	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
@@ -383,7 +384,7 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
-	videostream: persistedStreamReducer,
+	videostream: videoStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
 	activitiesapi: activitiesAPIReducer,
@@ -424,7 +425,7 @@ export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
 
-const LIMIT_CHANNEL_CACHE = 10;
+// const LIMIT_CHANNEL_CACHE = 10;
 const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Check if the action is of type 'persist/REHYDRATE' and the key is 'channels'
 	if (action.type === 'persist/REHYDRATE' && action?.key === 'channels') {
@@ -437,20 +438,20 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 		}
 	}
 	// comment logic cache messages
-	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
-		const { channelMessages } = action.payload || {};
-		if (channelMessages && typeof channelMessages === 'object') {
-			const keys = Object.keys(channelMessages);
-			if (channelMessages && keys?.length > LIMIT_CHANNEL_CACHE) {
-				while (keys.length > LIMIT_CHANNEL_CACHE) {
-					const oldestKey = keys.shift();
-					if (oldestKey) {
-						delete channelMessages[oldestKey];
-					}
-				}
-			}
-		}
-	}
+	// if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
+	// 	const { channelMessages } = action.payload || {};
+	// 	if (channelMessages && typeof channelMessages === 'object') {
+	// 		const keys = Object.keys(channelMessages);
+	// 		if (channelMessages && keys?.length > LIMIT_CHANNEL_CACHE) {
+	// 			while (keys.length > LIMIT_CHANNEL_CACHE) {
+	// 				const oldestKey = keys.shift();
+	// 				if (oldestKey) {
+	// 					delete channelMessages[oldestKey];
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 	// Pass the action to the next middleware or reducer
 	return next(action);
 };

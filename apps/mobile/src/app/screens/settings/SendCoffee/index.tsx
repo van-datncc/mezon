@@ -21,6 +21,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState(jsonObject?.amount?.toString() || '1');
 	const [note, setNote] = useState(jsonObject?.note || 'send token');
+	const [plainTokenCount, setPlainTokenCount] = useState(1);
 	const userProfile = useSelector(selectAllAccount);
 	const listDM = useSelector(selectDirectsOpenlist);
 	const { createDirectMessageWithUser } = useDirect();
@@ -39,7 +40,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	const sendToken = async () => {
 		const store = await getStoreAsync();
 		try {
-			if (Number(tokenCount || 0) <= 0) {
+			if (Number(plainTokenCount || 0) <= 0) {
 				Toast.show({
 					type: 'error',
 					text1: 'Token amount must be greater than zero'
@@ -47,7 +48,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				return;
 			}
 
-			if (Number(tokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
 				Toast.show({
 					type: 'error',
 					text1: 'Token amount exceeds wallet balance'
@@ -61,7 +62,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				sender_name: userProfile?.user?.username || '',
 				receiver_id: jsonObject?.receiver_id || '',
 				extra_attribute: jsonObject?.extra_attribute || '',
-				amount: Number(tokenCount || 1),
+				amount: Number(plainTokenCount || 1),
 				note: note || ''
 			};
 
@@ -71,7 +72,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
+					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -80,7 +81,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				const response = await createDirectMessageWithUser(jsonObject?.receiver_id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(Number(tokenCount || 1))}₫`,
+						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -107,6 +108,22 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 		navigation.pop(2);
 	};
 
+	const handleChangeText = (text: string) => {
+		let sanitizedText = text.replace(/[^0-9]/g, '');
+
+		if (sanitizedText === '') {
+			setTokenCount('0');
+			setPlainTokenCount(0);
+			return;
+		}
+
+		sanitizedText = sanitizedText.replace(/^0+/, '');
+		const numericValue = parseInt(sanitizedText, 10) || 0;
+
+		setPlainTokenCount(numericValue);
+		setTokenCount(numericValue.toLocaleString());
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView style={styles.form}>
@@ -119,7 +136,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 							placeholderTextColor="#535353"
 							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 							// @ts-expect-error
-							value={jsonObject?.receiver_name || 'KOMO'}
+							value={jsonObject?.receiver_name || 'KOMU'}
 							editable={false}
 						/>
 					</View>
@@ -133,7 +150,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 							keyboardType="numeric"
 							placeholderTextColor="#535353"
 							editable={!jsonObject?.amount}
-							onChangeText={(text) => setTokenCount(text)}
+							onChangeText={handleChangeText}
 						/>
 					</View>
 				</View>

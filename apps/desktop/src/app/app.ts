@@ -194,7 +194,17 @@ export default class App {
 			}
 		});
 
-		App.application.on('before-quit', () => {
+		App.application.on('before-quit', async () => {
+			try {
+				const updateCheckResult = await autoUpdater.checkForUpdates();
+				if (updateCheckResult?.downloadPromise) {
+					await updateCheckResult.downloadPromise;
+					forceQuit.enable();
+					return autoUpdater.quitAndInstall();
+				}
+			} catch (error) {
+				console.error('Update check failed:', error);
+			}
 			tray.destroy();
 			App.application.exit();
 		});

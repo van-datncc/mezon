@@ -35,6 +35,7 @@ import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MentionItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
@@ -156,11 +157,32 @@ const PanelMember = ({
 	};
 
 	const handleClickMention = () => {
-		const mention = `@[${displayMentionName}](${member?.user?.id})`;
+		const mentionInInput = `@[${displayMentionName}](${member?.user?.id})`;
+		const mentionPlainTextIndex = request?.content?.length ?? 0;
+		const mentionInputValueIndex = request?.valueTextInput?.length ?? 0;
+
+		const mentionItem: MentionItem = {
+			display: `@${displayMentionName}`,
+			id: member?.user?.id as string,
+			childIndex: 0,
+			index: mentionInputValueIndex,
+			plainTextIndex: mentionPlainTextIndex
+		};
+
 		if (request?.valueTextInput) {
-			setRequestInput({ ...request, valueTextInput: request?.valueTextInput + mention });
+			setRequestInput({
+				...request,
+				valueTextInput: request?.valueTextInput + mentionInInput + ' ',
+				content: request?.content + `@${displayMentionName} `,
+				mentionRaw: [...request.mentionRaw, mentionItem]
+			});
 		} else {
-			setRequestInput({ ...request, valueTextInput: mention });
+			setRequestInput({
+				...request,
+				valueTextInput: mentionInInput + ' ',
+				content: `@${displayMentionName} `,
+				mentionRaw: [mentionItem]
+			});
 		}
 	};
 

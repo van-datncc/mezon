@@ -6,6 +6,7 @@ import {
 	channelsActions,
 	clansActions,
 	hasGrandchildModal,
+	listChannelRenderAction,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
 	selectCategoryById,
@@ -120,11 +121,13 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const maskFavoriteChannel = () => {
 		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel.id, clan_id: currentClan?.id }));
+		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: true }))
 		setIsShowPanelChannel(false);
 	};
 
 	const removeFavoriteChannel = () => {
 		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel.id, clanId: currentClan?.id || '' }));
+		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: false }))
 		setIsShowPanelChannel(false);
 	};
 
@@ -146,6 +149,10 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				isPrivate: currentChannel.channel_private || 0
 			})
 		);
+		if (channel.count_mess_unread) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.id || '', count: -channel.count_mess_unread }));
+		}
+
 		handleCloseModalConfirm();
 		navigate(`/chat/clans/${currentClan?.id}/channels/${currentChannel.parrent_id}`);
 	};

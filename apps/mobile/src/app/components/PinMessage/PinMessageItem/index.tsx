@@ -45,17 +45,14 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 		if (pinMessageItem.message_id && pinMessageItem.channel_id) {
 			dispatch(
 				messagesActions.jumpToMessage({
-					clanId: currentClanId,
+					clanId: isDmOrGroup ? '0' : currentClanId,
 					messageId: pinMessageItem.message_id ?? '',
 					channelId: pinMessageItem.channel_id ?? ''
 				})
 			);
 		}
 		if (isDmOrGroup) {
-			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-				params: { directMessageId: pinMessageItem?.channel_id }
-			});
+			navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: pinMessageItem?.channel_id });
 		} else {
 			navigation.goBack();
 		}
