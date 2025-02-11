@@ -23,7 +23,7 @@ export const style = (colors: Attributes) =>
 		},
 		menuFooter: {
 			position: 'absolute',
-			bottom: 0,
+			bottom: 5,
 			width: '100%',
 			padding: size.s_20,
 			gap: size.s_10,
