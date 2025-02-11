@@ -122,24 +122,20 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	}, []);
 
 	const isCurrentChannel = voiceChannelId === currentChannelId;
+	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleFullScreen = useCallback(() => {
-		const containerElement = document.getElementById('livekitRoom');
-		if (containerElement) {
-			if (!document.fullscreenElement) {
-				containerElement
-					.requestFullscreen()
-					.then(() => {
-						dispatch(voiceActions.setFullScreen(true));
-					})
-					.catch((err) => {
-						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-					});
-			} else {
-				document.exitFullscreen().then(() => {
-					dispatch(voiceActions.setFullScreen(false));
+		if (!containerRef.current) return;
+
+		if (!document.fullscreenElement) {
+			containerRef.current
+				.requestFullscreen()
+				.then(() => dispatch(voiceActions.setFullScreen(true)))
+				.catch((err) => {
+					console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
 				});
-			}
+		} else {
+			document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
 		}
 	}, [dispatch]);
 
@@ -167,6 +163,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 						isCurrentChannel={isCurrentChannel}
 					/>
 					<LiveKitRoom
+						ref={containerRef}
 						id="livekitRoom"
 						key={token}
 						className={`${!isCurrentChannel ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
