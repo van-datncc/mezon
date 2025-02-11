@@ -479,7 +479,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.TopicDiscussion:
 				return <Icons.DiscussionIcon color={themeValue.text} width={size.s_32} height={size.s_32} />;
 			case EMessageActionType.Buzz:
-				return <Icons.Buzz color={themeValue.text} width={size.s_24} height={size.s_24} />;
+				return <Icons.Buzz color={baseColor.red} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
@@ -654,8 +654,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					{messageActionList.attract.map((action) => {
 						return (
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
-								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
-								<Text style={styles.actionText}>{action.title}</Text>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
 							</Pressable>
 						);
 					})}
