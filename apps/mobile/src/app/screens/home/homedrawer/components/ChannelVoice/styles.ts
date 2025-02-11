@@ -15,19 +15,19 @@ export const style = (colors: Attributes) =>
 		menuHeader: {
 			width: '100%',
 			backgroundColor: transparent,
-			padding: 10,
-			borderRadius: 10,
+			padding: size.s_10,
+			borderRadius: size.s_10,
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between'
 		},
 		menuFooter: {
 			position: 'absolute',
-			bottom: 5,
-			width: '100%',
-			padding: size.s_20,
-			gap: size.s_10,
+			borderRadius: size.s_80,
+			backgroundColor: colors.secondary,
+			padding: size.s_10,
 			alignItems: 'center',
+			alignSelf: 'center',
 			justifyContent: 'center'
 		},
 		textMenuItem: {
@@ -60,10 +60,10 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			position: 'relative',
-			width: size.s_60,
-			height: size.s_60,
+			width: size.s_50,
+			height: size.s_50,
 			backgroundColor: colors.border,
-			borderRadius: size.s_30
+			borderRadius: size.s_50
 		},
 		addPeopleBtn: {
 			padding: size.s_20,

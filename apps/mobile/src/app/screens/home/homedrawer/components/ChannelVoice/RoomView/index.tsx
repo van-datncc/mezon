@@ -12,7 +12,7 @@ import { selectCurrentClanId, selectVoiceChannelId } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { LocalParticipant, RemoteParticipant, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
@@ -79,8 +79,8 @@ const RoomView = ({
 					<Block
 						style={[
 							styles.userView,
-							!isGridLayout ? { width: '100%', height: 250 } : { width: '48%', height: 150 },
-							isTabletLandscape && { height: 250 }
+							!isGridLayout ? { width: '100%', height: size.s_150 + size.s_100 } : { width: '48%', height: size.s_150 },
+							isTabletLandscape && { height: size.s_150 + size.s_100 }
 						]}
 					>
 						<VideoTrack trackRef={screenTrackRef} style={styles.participantView} />
@@ -173,8 +173,8 @@ const RoomView = ({
 	if (focusedScreenShare) {
 		return (
 			<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-				<Block style={{ height: 300, width: '100%', alignSelf: 'center' }}>
-					<VideoTrack trackRef={focusedScreenShare} style={{ height: 300, width: '100%', alignSelf: 'center' }} />
+				<Block style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center' }}>
+					<VideoTrack trackRef={focusedScreenShare} style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center' }} />
 				</Block>
 				<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
 					<Icons.ArrowShrinkIcon height={size.s_16} />
@@ -194,8 +194,8 @@ const RoomView = ({
 			if (screenTrackRef) {
 				return (
 					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={screenTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						<Block style={{ height: size.s_100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={screenTrackRef} style={{ height: size.s_100, width: '100%', alignSelf: 'center' }} />
 						</Block>
 					</Block>
 				);
@@ -209,8 +209,8 @@ const RoomView = ({
 			if (selfScreenTrackRef) {
 				return (
 					<Block style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<Block style={{ height: 100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={selfScreenTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
+						<Block style={{ height: size.s_100, width: '100%', alignSelf: 'center' }}>
+							<VideoTrack trackRef={selfScreenTrackRef} style={{ height: size.s_100, width: '100%', alignSelf: 'center' }} />
 						</Block>
 					</Block>
 				);
@@ -278,7 +278,7 @@ const RoomView = ({
 			) : (
 				<Block marginBottom={isTabletLandscape ? '5%' : '30%'}>
 					<ScrollView
-						style={{ marginLeft: size.s_10, marginRight: size.s_10 }}
+						style={{ marginHorizontal: size.s_10 }}
 						contentContainerStyle={
 							isGridLayout
 								? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: size.s_10, alignItems: 'center' }
@@ -290,8 +290,8 @@ const RoomView = ({
 				</Block>
 			)}
 			{isAnimationComplete && (
-				<Block style={[styles.menuFooter, isTabletLandscape && { bottom: 30 }]}>
-					<Block gap={size.s_20} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
+				<Block style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_50 }]}>
+					<Block gap={size.s_16} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_6}>
 						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 							{isCameraEnabled ? <Icons.VideoIcon /> : <Icons.VideoSlashIcon />}
 						</TouchableOpacity>

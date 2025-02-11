@@ -2,7 +2,7 @@ import { AudioSession, LiveKitRoom } from '@livekit/react-native';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2 } from '@mezon/store';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
@@ -26,7 +26,6 @@ function ChannelVoice({
 }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const bottomSheetInviteRef = useRef(null);
 	const channel = useSelector((state) => selectChannelById2(state, channelId));
 
 	useEffect(() => {
@@ -40,14 +39,14 @@ function ChannelVoice({
 		};
 	}, []);
 
-	const handleAddPeopleToVoice = () => {
-		bottomSheetInviteRef.current.present();
-	};
-
 	return (
-		<SafeAreaView>
+		<SafeAreaView edges={['top', 'bottom']}>
 			<Block
-				style={{ width: isAnimationComplete ? width : 200, height: isAnimationComplete ? height : 100, backgroundColor: themeValue?.primary }}
+				style={{
+					width: isAnimationComplete ? width : size.s_100 * 2,
+					height: isAnimationComplete ? height : size.s_150,
+					backgroundColor: themeValue?.primary
+				}}
 			>
 				{isAnimationComplete && (
 					<Block style={[styles.menuHeader]}>
@@ -63,11 +62,6 @@ function ChannelVoice({
 							<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
 								{channel?.channel_label}
 							</Text>
-						</Block>
-						<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-							<TouchableOpacity onPress={handleAddPeopleToVoice} style={styles.buttonCircle}>
-								<Icons.UserPlusIcon />
-							</TouchableOpacity>
 						</Block>
 					</Block>
 				)}

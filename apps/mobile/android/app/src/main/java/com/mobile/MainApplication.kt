@@ -17,6 +17,7 @@ import com.facebook.soloader.SoLoader
 import com.mezon.mobile.SharedPreferencesPackage;
 import com.livekit.reactnative.LiveKitReactNative
 import com.livekit.reactnative.audio.AudioType
+import com.mezon.mobile.FullScreenNotificationIncomingCallPackage;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -29,6 +30,7 @@ class MainApplication : Application(), ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           val packages = PackageList(this).packages.toMutableList()
+          packages.add(FullScreenNotificationIncomingCallPackage())
           packages.add(SharedPreferencesPackage())
           return packages;
         }
