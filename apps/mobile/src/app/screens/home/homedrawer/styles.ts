@@ -211,10 +211,9 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border,
-			backgroundColor: colors.primary,
-			paddingHorizontal: size.s_14,
-			paddingVertical: size.s_8,
-			paddingBottom: size.s_12
+			paddingRight: size.s_14
+			// paddingVertical: size.s_8,
+			// paddingBottom: size.s_12
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
@@ -243,7 +242,11 @@ export const style = (colors: Attributes) =>
 			top: size.s_6
 		},
 		iconBar: {
-			paddingRight: size.s_14
+			paddingRight: size.s_14,
+			height: '100%',
+			paddingTop: size.s_10,
+			paddingBottom: size.s_12,
+			paddingLeft: size.s_14
 		},
 		wrapperServerList: {
 			height: '100%',

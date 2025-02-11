@@ -1,12 +1,16 @@
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
+import { ChannelBadgeUnread } from '../../ChannelBadgeUnread';
 import { ChannelStatusIcon } from '../../ChannelStatusIcon';
 import { style } from './styles';
 
 export const ChannelFavoriteItem = React.memo(({ channelId, onPress }: { channelId: string; onPress: (channel: ChannelsEntity) => void }) => {
 	const channel = useAppSelector((state) => selectChannelById(state, channelId || ''));
+	const numberNotification = useMemo(() => {
+		return channel?.count_mess_unread ? channel?.count_mess_unread : 0;
+	}, [channel?.count_mess_unread]);
 
 	const styles = style(useTheme().themeValue);
 	return (
@@ -14,11 +18,15 @@ export const ChannelFavoriteItem = React.memo(({ channelId, onPress }: { channel
 			onPress={() => {
 				onPress(channel);
 			}}
+			style={styles.favoriteItem}
 		>
 			<Block style={styles.channelItem}>
 				<ChannelStatusIcon channel={channel} />
-				<Text style={styles.channelItemTitle}>{channel?.channel_label}</Text>
+				<Text numberOfLines={1} style={styles.channelItemTitle}>
+					{channel?.channel_label}
+				</Text>
 			</Block>
+			{Number(numberNotification || 0) > 0 && <ChannelBadgeUnread countMessageUnread={Number(numberNotification || 0)} />}
 		</TouchableOpacity>
 	);
 });

@@ -8,7 +8,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			paddingRight: Metrics.size.xl
+			paddingRight: Metrics.size.m
 		},
 
 		channelListItemActive: {
@@ -18,7 +18,6 @@ export const style = (colors: Attributes) =>
 		},
 
 		channelListItem: {
-			paddingHorizontal: Metrics.size.m,
 			flexDirection: 'row',
 			alignItems: 'center',
 			paddingVertical: size.s_8,
@@ -39,7 +38,8 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_15,
 			fontWeight: '600',
 			marginLeft: size.s_10,
-			color: colors.channelNormal
+			color: colors.channelNormal,
+			maxWidth: '80%'
 		},
 
 		channelListItemTitleActive: {

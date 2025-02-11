@@ -15,6 +15,9 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import com.mezon.mobile.SharedPreferencesPackage;
+import com.livekit.reactnative.LiveKitReactNative
+import com.livekit.reactnative.audio.AudioType
+import com.mezon.mobile.FullScreenNotificationIncomingCallPackage;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -27,6 +30,7 @@ class MainApplication : Application(), ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           val packages = PackageList(this).packages.toMutableList()
+          packages.add(FullScreenNotificationIncomingCallPackage())
           packages.add(SharedPreferencesPackage())
           return packages;
         }
@@ -44,6 +48,7 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    LiveKitReactNative.setup(this, AudioType.CommunicationAudioType())
     SoLoader.init(this, false)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.

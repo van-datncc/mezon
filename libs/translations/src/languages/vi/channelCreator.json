@@ -25,5 +25,10 @@
         "description": "Hẹn gặp nhau cùng với giọng nói, video và chia sẻ màn hình"
       }
     }
+  },
+  "channelVoiceType": {
+    "title": "Loại kênh giọng nói",
+    "mezon": "MEZON MEET",
+    "gMeet": "GOOGLE MEET"
   }
 }
