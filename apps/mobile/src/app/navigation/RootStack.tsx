@@ -20,8 +20,7 @@ const RootStack = (props) => {
 			screenOptions={{
 				headerShown: false,
 				cardStyle: { backgroundColor: themeValue.primary },
-				gestureDirection: 'horizontal',
-				gestureEnabled: true
+				gestureDirection: 'horizontal'
 			}}
 		>
 			{isLoggedIn ? (

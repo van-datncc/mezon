@@ -343,6 +343,7 @@ const SearchMessageChannel = () => {
 			currentPage={currentPage}
 			totalResult={totalResult}
 			channelId={currentChannelId || ''}
+			isDm
 		/>
 	);
 };

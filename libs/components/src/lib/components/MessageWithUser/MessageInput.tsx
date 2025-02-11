@@ -6,6 +6,7 @@ import {
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectChannelDraftMessage,
+	selectCurrentChannelId,
 	selectTheme,
 	useAppSelector
 } from '@mezon/store';
@@ -56,8 +57,9 @@ type ChannelsMentionProps = {
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message, isTopic }) => {
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
-		channelId,
+		isTopic ? currentChannelId || '' : channelId,
 		channelLabel,
 		mode,
 		message

@@ -7,7 +7,8 @@ import {
 	load,
 	save
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, messagesActions, topicsActions } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -188,11 +189,15 @@ export const navigateToNotification = async (store: any, notification: any, navi
 
 		// IF is notification to channel
 		if (linkMatch) {
+			const clanId = linkMatch?.[1];
+			const channelId = linkMatch?.[2];
+			store.dispatch(
+				messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage: true, noCache: true })
+			);
+			await sleep(200);
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
-			const clanId = linkMatch?.[1];
-			const channelId = linkMatch?.[2];
 			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
 				const clanIdCache = load(STORAGE_CLAN_ID);
@@ -232,6 +237,16 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
+				store.dispatch(
+					messagesActions.fetchMessages({
+						clanId: '0',
+						channelId: messageId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true
+					})
+				);
+				await sleep(200);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: messageId });
 				}
@@ -301,11 +316,15 @@ export const setupNotificationListeners = async (navigation) => {
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 				store.dispatch(appActions.setIsFromFCMMobile(true));
 				if (remoteMessage?.notification?.title) {
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, true);
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
 						time: 1
 					});
+					setTimeout(() => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, false);
+					}, 3000);
 				}
 			}
 		});

@@ -1,10 +1,8 @@
 import {
-	ChannelsEntity,
-	DirectEntity,
 	messagesActions,
 	referencesActions,
-	selectCurrentChannel,
-	selectCurrentDM,
+	selectChannelById,
+	selectDirectById,
 	selectIdMessageRefEdit,
 	selectOpenEditMessageState,
 	useAppSelector
@@ -24,8 +22,8 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		return message.attachments;
 	}, [message.attachments]);
 
-	const selectedChannel = useAppSelector(selectCurrentChannel) as ChannelsEntity;
-	const selectedDirect = useAppSelector(selectCurrentDM) as DirectEntity;
+	const selectedChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
+	const selectedDirect = useAppSelector((state) => selectDirectById(state, channelId));
 
 	const currentDirectOrChannel = useMemo(() => {
 		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
