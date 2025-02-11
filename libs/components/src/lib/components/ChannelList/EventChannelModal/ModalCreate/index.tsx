@@ -115,6 +115,10 @@ const ModalCreate = (props: ModalCreateProps) => {
 			return;
 		}
 
+		if (!option) {
+			return;
+		}
+
 		if (currentModal === EventTabIndex.LOCATION && number === EventTabIndex.REVIEW && !contentSubmit.topic) {
 			return;
 		}
