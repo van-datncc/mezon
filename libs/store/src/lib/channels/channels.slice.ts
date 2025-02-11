@@ -330,6 +330,7 @@ export interface IUpdateChannelRequest {
 	age_restricted?: number;
 	parrent_id?: string;
 	channel_private?: number;
+	category_name?: string;
 }
 
 export const updateChannel = createAsyncThunk('channels/updateChannel', async (body: IUpdateChannelRequest, thunkAPI) => {
@@ -363,6 +364,40 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 	} catch (error) {
 		captureSentryError(error, 'channels/updateChannel');
 		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const changeCategoryOfChannel = createAsyncThunk('channels/changeCategoryOfChannel', async (request: IUpdateChannelRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const state = thunkAPI.getState() as RootState;
+		const clanId = state.clans.currentClanId;
+		const response = await mezon.client.changeChannelCategory(mezon.session, request.category_id as string, {
+			channel_id: request.channel_id,
+			clan_id: clanId as string
+		});
+		if (!response) {
+			return;
+		}
+		thunkAPI.dispatch(
+			channelsActions.update({
+				clanId: clanId as string,
+				update: {
+					id: request.channel_id,
+					changes: { ...request }
+				}
+			})
+		);
+		thunkAPI.dispatch(
+			listChannelRenderAction.updateChannelPositionInRenderedList({
+				categoryId: request.category_id as string,
+				channelId: request.channel_id as string,
+				clanId: clanId as string
+			})
+		);
+	} catch (err) {
+		captureSentryError(err, 'channels/changeCategoryOfChannel');
+		return thunkAPI.rejectWithValue(err);
 	}
 });
 
@@ -1229,7 +1264,8 @@ export const channelsActions = {
 	removeFavoriteChannel,
 	addThreadToChannels,
 	addThreadSocket,
-	updateChannelBadgeCountAsync
+	updateChannelBadgeCountAsync,
+	changeCategoryOfChannel
 };
 
 /*

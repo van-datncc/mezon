@@ -8,6 +8,7 @@ import {
 	appActions,
 	giveCoffeeActions,
 	messagesActions,
+	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -75,6 +76,12 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const listDM = useSelector(selectDirectsOpenlist);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
+	const userProfile = useSelector(selectAllAccount);
+
+	const tokenInWallet = useMemo(() => {
+		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
+	}, [userProfile?.wallet]);
+
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
 	}, []);
@@ -127,6 +134,13 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const handleActionGiveACoffee = async () => {
 		onClose();
 		try {
+			if (TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10 > tokenInWallet) {
+				Toast.show({
+					type: 'error',
+					text1: 'Token amount exceeds wallet balance'
+				});
+				return;
+			}
 			if (userId !== message.sender_id) {
 				const coffeeEvent = {
 					channel_id: message.channel_id,
@@ -371,6 +385,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		onClose();
 	};
 
+	const handleBuzzMessage = () => {
+		onClose();
+		sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+	};
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -427,6 +446,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
+			case EMessageActionType.Buzz:
+				handleBuzzMessage();
+				break;
 			default:
 				break;
 		}
@@ -470,6 +492,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.TopicDiscussion:
 				return <Icons.DiscussionIcon color={themeValue.text} width={size.s_32} height={size.s_32} />;
+			case EMessageActionType.Buzz:
+				return <Icons.Buzz color={baseColor.red} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
@@ -483,7 +507,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
 		const isHideTopicDiscussion =
-			message?.topic_id || message?.code === TypeMessage.Topic || isDM || !canSendMessage || currentChannelId !== message?.channel_id;
+			(message?.topic_id && message?.topic_id !== '0') ||
+			message?.code === TypeMessage.Topic ||
+			isDM ||
+			!canSendMessage ||
+			currentChannelId !== message?.channel_id;
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
@@ -522,9 +550,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
+		const attractActionList = [EMessageActionType.Buzz];
+
 		return {
+			attract: availableMessageActions.filter((action) => attractActionList.includes(action.type)),
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
+			normal: availableMessageActions.filter(
+				(action) => ![...frequentActionList, ...warningActionList, ...mediaList, ...attractActionList].includes(action.type)
+			),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
 	}, [
@@ -634,6 +667,16 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
 						<Icons.ReactionIcon color={themeValue.text} height={size.s_30} width={size.s_30} />
 					</Pressable>
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.attract.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
+							</Pressable>
+						);
+					})}
 				</View>
 				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {

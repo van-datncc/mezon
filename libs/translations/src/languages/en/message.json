@@ -19,7 +19,8 @@
         "copyMediaLink": "Copy Media Link",
         "giveACoffee": "Give A Coffee",
         "topicDiscussion": "Topic Discussion",
-        "resend": "Resend"
+        "resend": "Resend",
+        "buzz": "Buzz"
     },
     "chatBox": {
         "replyingTo": "Replying to",

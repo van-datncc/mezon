@@ -1,5 +1,13 @@
 import { useAppNavigation } from '@mezon/core';
-import { CategoriesEntity, channelsActions, IUpdateChannelRequest, selectAllCategories, useAppDispatch } from '@mezon/store';
+import {
+	CategoriesEntity,
+	channelsActions,
+	IUpdateChannelRequest,
+	selectAllCategories,
+	selectChannelById,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -11,21 +19,21 @@ export type CategoryChannelProps = {
 const SettingCategoryChannel = (props: CategoryChannelProps) => {
 	const { channel } = props;
 	const listCategory = useSelector(selectAllCategories);
-	const channelID = channel.channel_id;
-	const channelLabel = channel.channel_label;
+	const realTimeChannel = useAppSelector((state) => selectChannelById(state, channel.channel_id || ''));
 	const dispatch = useAppDispatch();
 	const navigator = useAppNavigation();
 	const handleMoveChannelToNewCategory = async (category: CategoriesEntity) => {
 		const updateChannel: IUpdateChannelRequest = {
 			category_id: category.id,
-			channel_id: channelID ?? '',
-			channel_label: channelLabel,
+			category_name: category.category_name,
+			channel_id: realTimeChannel.channel_id ?? '',
+			channel_label: realTimeChannel.channel_label ?? '',
 			app_url: '',
-			parrent_id: channel?.parrent_id,
-			channel_private: channel?.channel_private
+			parrent_id: realTimeChannel?.parrent_id,
+			channel_private: realTimeChannel?.channel_private
 		};
-		await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
-			const channelLink = navigator.toChannelPage(channelID ?? '', channel.clan_id ?? '');
+		await dispatch(channelsActions.changeCategoryOfChannel(updateChannel)).then(() => {
+			const channelLink = navigator.toChannelPage(realTimeChannel.channel_id ?? '', realTimeChannel.clan_id ?? '');
 			navigator.navigate(channelLink);
 		});
 	};
@@ -36,14 +44,14 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 				<h3 className="font-bold text-xl">Category</h3>
 
 				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Channel name</p>
-				<div className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded">{channel.channel_label}</div>
+				<div className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded">{realTimeChannel.channel_label}</div>
 				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mt-4">Category</p>
 				<Dropdown
 					trigger="click"
 					dismissOnClick={false}
 					renderTrigger={() => (
 						<div className="w-full h-12 rounded-md dark:bg-black bg-white flex flex-row px-3 justify-between items-center uppercase">
-							<p>{channel.category_name}</p>
+							<p>{realTimeChannel.category_name}</p>
 							<div>
 								<Icons.ArrowDownFill />
 							</div>
@@ -54,7 +62,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 					className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px]"
 				>
 					{listCategory.map((category) => {
-						if (category.id !== channel.category_id) {
+						if (category.id !== realTimeChannel.category_id) {
 							return (
 								<div
 									key={category.id}
