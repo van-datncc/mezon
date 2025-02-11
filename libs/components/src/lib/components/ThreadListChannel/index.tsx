@@ -6,7 +6,6 @@ import {
 	selectChannelMetaById,
 	selectCloseMenu,
 	selectCurrentChannelId,
-	selectHasUnreadNoti,
 	threadsActions,
 	useAppDispatch,
 	useAppSelector
@@ -34,7 +33,6 @@ export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, is
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const threadMeta = useAppSelector((state) => selectChannelMetaById(state, thread?.id));
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, thread.category_id as string));
-  const hasUnread = useAppSelector((state) => selectHasUnreadNoti(state, thread.clan_id as string, thread.id))
 	const closeMenu = useAppSelector(selectCloseMenu);
 	const dispatch = useAppDispatch();
 	const { setStatusMenu } = useMenu();
@@ -55,12 +53,13 @@ export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, is
 	const isShowThread = (thread: IChannel) => {
 		return (
 			(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
-			(thread?.count_mess_unread ?? 0) > 0 
+			(thread?.count_mess_unread ?? 0) > 0 || 
+      thread.id === currentChannelId 
 		);
 	};
 
-	const shouldShow = thread?.active === 1 || isShowThread(thread);
-	if ((!shouldShow || !isCategoryExpanded ) && !hasUnread && thread.id !== currentChannelId) {
+	const shouldShow = (thread?.active === 1 && isCategoryExpanded) || isShowThread(thread);
+	if (!shouldShow) {
 		return null;
 	}
 
