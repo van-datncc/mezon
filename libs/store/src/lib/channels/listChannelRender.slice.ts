@@ -277,11 +277,20 @@ export const listChannelRenderSlice = createSlice({
 				return;
 			}
       if(!mark){
+        const markIndex = state.listChannelRender[clanId].findIndex(channel=>channel.id === channelId && (channel as IChannel).category_id === 'favorCate')
+        if(markIndex === -1){
+          return
+        }
+        const listFavor = (state.listChannelRender[clanId][0] as ICategoryChannel).channels.filter(channel=> (channel as string) !== channelId)
+        state.listChannelRender[clanId][0] = {...state.listChannelRender[clanId][0], channels : listFavor as string[]}
+
+
         state.listChannelRender[clanId] = state.listChannelRender[clanId].filter((channel) => !(channel.id === channelId && (channel as IChannel).category_id === 'favorCate'));
         return;
       }
 
 			const channelMark : IChannel = {...state.listChannelRender[clanId].filter((channel) => channel.id === channelId)[0] ,category_id : 'favorCate'};
+      ((state.listChannelRender[clanId][0] as ICategoryChannel).channels as string[]).push(channelId)
       state.listChannelRender[clanId]?.splice(1, 0, channelMark);
 			state.listChannelRender[clanId].join();
 
