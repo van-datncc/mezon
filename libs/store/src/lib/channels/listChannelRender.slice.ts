@@ -36,7 +36,7 @@ export const listChannelRenderSlice = createSlice({
 				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 				const listFavorChannel: IChannel[] = [];
 				listCategory.map((category) => {
-					const categoryChannels = sortChannels(listChannelPriority, category.id)
+					const categoryChannels = sortChannels(listChannelPriority, category.id);
 					const listChannelIds = categoryChannels.map((channel) => channel.id);
 					const categoryWithChannels: ICategoryChannel = {
 						...category,
@@ -296,44 +296,45 @@ export const selectListChannelRenderByClanId = createSelector(
 
 function prioritizeChannel(channels: IChannel[]): IChannel[] {
 	return channels.sort((a, b) => {
-	  const aParrentId = a.parrent_id ?? '';
-	  const bParrentId = b.parrent_id ?? '';
-  
-	  if ((aParrentId === '0' || aParrentId === '') && bParrentId !== '0') {
-		return -1;
-	  }
-	  if (aParrentId !== '0' && (bParrentId === '0' || bParrentId === '')) {
-		return 1;
-	  }
-	  if (aParrentId === '0' || aParrentId === '') {
-		const aChannelId = a.channel_id ?? '';
-		const bChannelId = b.channel_id ?? '';
-		return aChannelId < bChannelId ? -1 : aChannelId > bChannelId ? 1 : 0;
-	  }
-	  return aParrentId < bParrentId ? -1 : aParrentId > bParrentId ? 1 : 0;
+		const aParrentId = a.parrent_id ?? '';
+		const bParrentId = b.parrent_id ?? '';
+
+		if ((aParrentId === '0' || aParrentId === '') && bParrentId !== '0') {
+			return -1;
+		}
+		if (aParrentId !== '0' && (bParrentId === '0' || bParrentId === '')) {
+			return 1;
+		}
+		if (aParrentId === '0' || aParrentId === '') {
+			const aChannelId = a.channel_id ?? '';
+			const bChannelId = b.channel_id ?? '';
+			return aChannelId < bChannelId ? -1 : aChannelId > bChannelId ? 1 : 0;
+		}
+		return aParrentId < bParrentId ? -1 : aParrentId > bParrentId ? 1 : 0;
 	});
-  }
-  
+}
+
 function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 	const sortedChannels: IChannel[] = [];
-	var indexThread = 0;
+	let indexThread = channels.length;
 	const numOfChannel = channels.length;
-	for(let i = 0; i < numOfChannel; i++)if(channels[i].parrent_id !== '0' && channels[i].parrent_id !== undefined){
-		indexThread = i;
-		break;
-	}
+	for (let i = 0; i < numOfChannel; i++)
+		if (channels[i].parrent_id !== '0' && channels[i].parrent_id !== undefined) {
+			indexThread = i;
+			break;
+		}
 
 	const numOfParrent = indexThread;
-	for(let i = 0; i<numOfParrent; i++){
+	for (let i = 0; i < numOfParrent; i++) {
 		const channel = channels[i];
-		if (channel.category_id === categoryId){
+		if (channel.category_id === categoryId) {
 			sortedChannels.push(channel);
-			for(;indexThread <numOfChannel; indexThread++){
+			for (; indexThread < numOfChannel; indexThread++) {
 				const thread = channels[indexThread];
-				if(thread.parrent_id === channel.id){
+				if (thread.parrent_id === channel.id) {
 					sortedChannels.push(thread);
 				} else {
-					indexThread --;
+					indexThread--;
 					break;
 				}
 			}
