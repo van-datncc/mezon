@@ -524,7 +524,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [
-			EMessageActionType.Buzz,
 			EMessageActionType.ResendMessage,
 			EMessageActionType.GiveACoffee,
 			EMessageActionType.EditMessage,
@@ -533,9 +532,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
+		const attractActionList = [EMessageActionType.Buzz];
+
 		return {
+			attract: availableMessageActions.filter((action) => attractActionList.includes(action.type)),
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
+			normal: availableMessageActions.filter(
+				(action) => ![...frequentActionList, ...warningActionList, ...mediaList, ...attractActionList].includes(action.type)
+			),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
 	}, [
@@ -645,6 +649,16 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
 						<Icons.ReactionIcon color={themeValue.text} height={size.s_30} width={size.s_30} />
 					</Pressable>
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.attract.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.actionText}>{action.title}</Text>
+							</Pressable>
+						);
+					})}
 				</View>
 				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {
