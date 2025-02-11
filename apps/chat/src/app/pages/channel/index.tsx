@@ -527,6 +527,7 @@ const SearchMessageChannel = () => {
 			currentPage={currentPage}
 			totalResult={totalResult}
 			channelId={currentChannel?.id || ''}
+			isDm={false}
 		/>
 	);
 };
