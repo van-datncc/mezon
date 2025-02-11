@@ -35,6 +35,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import {
+	ChannelMembersEntity,
 	Direction_Mode,
 	EOverriddenPermission,
 	animateScroll,
@@ -63,7 +64,7 @@ type ChannelMessagesProps = {
 	mode: number;
 	username?: string;
 	userIdsFromThreadBox?: string[];
-	userIdsFromTopicBox?: string[];
+	userIdsFromTopicBox?: string[] | ChannelMembersEntity[];
 	isThreadBox?: boolean;
 	isTopicBox?: boolean;
 	topicId?: string;

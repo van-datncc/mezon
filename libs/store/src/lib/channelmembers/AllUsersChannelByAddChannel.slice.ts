@@ -1,9 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
-import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
+import { IUserChannel, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiAllUsersAddChannelResponse } from 'mezon-js/api.gen';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { ChannelMembersEntity } from './channel.members';
 
@@ -11,13 +11,13 @@ export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
 
 const ADD_CHANNEL_USERS_CACHE_TIME = 1000 * 60 * 60;
 
-export interface UsersByAddChannelState extends EntityState<string, string> {
+export interface UsersByAddChannelState extends EntityState<IUserChannel, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 }
 
 export const UserChannelAdapter = createEntityAdapter({
-	selectId: (userId: string) => userId || ''
+	selectId: (userChannel: IUserChannel) => userChannel.channel_id || ''
 });
 
 export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapter.getInitialState({
@@ -27,9 +27,6 @@ export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapte
 
 export const fetchUserChannelsCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channelId: string, limit: number, defaultResponse?: ApiAllUsersAddChannelResponse) => {
-		if (defaultResponse) {
-			return { ...defaultResponse, time: Date.now() };
-		}
 		const response = await mezon.client.listChannelUsersUC(mezon.session, channelId, limit);
 		return { ...response, time: Date.now() };
 	},
@@ -41,32 +38,6 @@ export const fetchUserChannelsCached = memoizeAndTrack(
 		}
 	}
 );
-
-export const updateCacheUserChannels = async (mezon: MezonValueContext, channelId: string, userIdToLeave?: string, userIdsToAdd?: string[]) => {
-	const response = await fetchUserChannelsCached(mezon, channelId, 500);
-	if (response && response.user_ids) {
-		let updateUserIds = response.user_ids;
-
-		// remove user
-		if (userIdToLeave) {
-			updateUserIds = updateUserIds.filter((user_id: string) => user_id !== userIdToLeave);
-		}
-
-		// add users
-		if (userIdsToAdd && userIdsToAdd.length > 0) {
-			userIdsToAdd.forEach((userId: string) => {
-				const isAlreadyExists = updateUserIds.some((user_id: string) => user_id === userId);
-				if (!isAlreadyExists) {
-					updateUserIds.push(userId);
-				}
-			});
-		}
-
-		// update cache
-		fetchUserChannelsCached.delete(mezon, channelId, 500);
-		fetchUserChannelsCached(mezon, channelId, 500, { user_ids: updateUserIds });
-	}
-};
 
 export const fetchUserChannels = createAsyncThunk(
 	'allUsersByAddChannel/fetchUserChannels',
@@ -80,7 +51,18 @@ export const fetchUserChannels = createAsyncThunk(
 
 			const response = await fetchUserChannelsCached(mezon, channelId, 500);
 
-			return response;
+			if (Date.now() - response.time > 1000) {
+				return {
+					channelId: channelId,
+					user_ids: {},
+					fromCache: true
+				};
+			}
+			return {
+				channelId: channelId,
+				user_ids: response,
+				fromCache: false
+			};
 		} catch (error) {
 			captureSentryError(error, 'allUsersByAddChannel/fetchUserChannels');
 			return thunkAPI.rejectWithValue(error);
@@ -96,18 +78,68 @@ export const userChannelsSlice = createSlice({
 		upsertMany: UserChannelAdapter.upsertMany,
 		remove: UserChannelAdapter.removeOne,
 		update: UserChannelAdapter.updateOne,
-		removeMany: UserChannelAdapter.removeMany
+		removeMany: UserChannelAdapter.removeMany,
+		addUserChannel: (state, action: PayloadAction<{ channelId: string; userAdds: Array<string> }>) => {
+			const { channelId, userAdds } = action.payload;
+
+			if (userAdds.length <= 0) return;
+
+			const existingChannel = state.entities[channelId];
+
+			if (existingChannel) {
+				const updatedUserIds = Array.from(new Set([...(existingChannel.user_ids || []), ...userAdds]));
+
+				UserChannelAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						user_ids: updatedUserIds
+					}
+				});
+			} else {
+				UserChannelAdapter.addOne(state, {
+					id: channelId,
+					user_ids: userAdds
+				});
+			}
+		},
+		removeUserChannel: (state, action: PayloadAction<{ channelId: string; userRemoves: Array<string> }>) => {
+			const { channelId, userRemoves } = action.payload;
+
+			if (userRemoves.length <= 0) return;
+			const existingChannel = state.entities[channelId];
+
+			if (existingChannel) {
+				const updatedUserIds = (existingChannel.user_ids || []).filter((userId) => !userRemoves.includes(userId));
+				UserChannelAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						user_ids: updatedUserIds
+					}
+				});
+			}
+		}
 	},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchUserChannels.fulfilled, (state: UsersByAddChannelState, actions) => {
-				state.loadingStatus = 'loaded';
-				if (actions.payload?.user_ids) {
-					UserChannelAdapter.setAll(state, actions.payload.user_ids);
-				} else {
-					state.error = 'No data received';
+			.addCase(
+				fetchUserChannels.fulfilled,
+				(
+					state: UsersByAddChannelState,
+					action: PayloadAction<{ channelId: string; user_ids: ApiAllUsersAddChannelResponse; fromCache?: boolean }>
+				) => {
+					state.loadingStatus = 'loaded';
+					if (action.payload.fromCache) return;
+					if (action.payload?.user_ids) {
+						const userIdsEntity = {
+							id: action.payload.channelId,
+							...action.payload.user_ids
+						};
+						UserChannelAdapter.upsertOne(state, userIdsEntity);
+					} else {
+						state.error = 'No data received';
+					}
 				}
-			})
+			)
 			.addCase(fetchUserChannels.pending, (state: UsersByAddChannelState) => {
 				state.loadingStatus = 'loading';
 			})
@@ -128,21 +160,22 @@ export const userChannelsReducer = userChannelsSlice.reducer;
 const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 export const getUserChannelsState = (rootState: { [ALL_USERS_BY_ADD_CHANNEL]: UsersByAddChannelState }): UsersByAddChannelState =>
 	rootState[ALL_USERS_BY_ADD_CHANNEL];
-const { selectAll } = UserChannelAdapter.getSelectors();
-export const selectAllUserIdChannels = createSelector(getUserChannelsState, selectAll);
+const { selectAll, selectEntities } = UserChannelAdapter.getSelectors();
 
-export const selectAllUserChannel = createSelector([selectAllUserIdChannels, getUsersClanState], (channelMembers, usersClanState) => {
-	let membersOfChannel: ChannelMembersEntity[] = [];
+export const selectUserChannelUCEntities = createSelector(getUserChannelsState, selectEntities);
+export const selectAllUserChannel = (channelId: string) =>
+	createSelector([selectUserChannelUCEntities, getUsersClanState], (channelMembers, usersClanState) => {
+		let membersOfChannel: ChannelMembersEntity[] = [];
 
-	if (!usersClanState?.ids?.length) return membersOfChannel;
+		if (!usersClanState?.ids?.length) return membersOfChannel;
 
-	const members = { ids: channelMembers };
+		const members = { ids: channelMembers[channelId].user_ids };
 
-	if (!members?.ids) return membersOfChannel;
-	const ids = members.ids || [];
-	membersOfChannel = ids.map((id) => ({
-		...usersClanState.entities[id]
-	}));
+		if (!members?.ids) return membersOfChannel;
+		const ids = members.ids || [];
+		membersOfChannel = ids.map((id) => ({
+			...usersClanState.entities[id]
+		}));
 
-	return membersOfChannel;
-});
+		return membersOfChannel;
+	});
