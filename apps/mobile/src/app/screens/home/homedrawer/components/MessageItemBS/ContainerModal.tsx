@@ -385,6 +385,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		onClose();
 	};
 
+	const handleBuzzMessage = () => {
+		onClose();
+		sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+	};
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -441,6 +446,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
+			case EMessageActionType.Buzz:
+				handleBuzzMessage();
+				break;
 			default:
 				break;
 		}
@@ -484,6 +492,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.TopicDiscussion:
 				return <Icons.DiscussionIcon color={themeValue.text} width={size.s_32} height={size.s_32} />;
+			case EMessageActionType.Buzz:
+				return <Icons.Buzz color={baseColor.red} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
@@ -540,9 +550,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
+		const attractActionList = [EMessageActionType.Buzz];
+
 		return {
+			attract: availableMessageActions.filter((action) => attractActionList.includes(action.type)),
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
+			normal: availableMessageActions.filter(
+				(action) => ![...frequentActionList, ...warningActionList, ...mediaList, ...attractActionList].includes(action.type)
+			),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
 	}, [
@@ -652,6 +667,16 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
 						<Icons.ReactionIcon color={themeValue.text} height={size.s_30} width={size.s_30} />
 					</Pressable>
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.attract.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
+							</Pressable>
+						);
+					})}
 				</View>
 				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {
