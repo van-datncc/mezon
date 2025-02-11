@@ -49,3 +49,14 @@ export const convertInitialMessageOfTopic = (message: ChannelMessage): MessagesE
 		content: safeJSONParse(entity.content || '')
 	};
 };
+
+export const convertSearchMessage = (message: ChannelMessage): MessagesEntity => {
+	const entity = mapMessageChannelToEntity(message) as MessagesEntity;
+
+	return {
+		...entity,
+		mentions: parseArrayField(entity.mentions),
+		attachments: parseArrayField(entity.attachments),
+		references: parseArrayField(entity.references)
+	};
+};

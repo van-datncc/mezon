@@ -10,7 +10,8 @@ import {
 	convertTimeHour
 } from '@mezon/utils';
 import classNames from 'classnames';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -93,6 +94,13 @@ function MessageWithUser({
 	const hasIncludeMention = (() => {
 		if (typeof message?.content?.t == 'string') {
 			if (message?.content.t?.includes('@here')) return true;
+		}
+		if (typeof message?.mentions === 'string') {
+			const parsedMentions = safeJSONParse(message?.mentions) as ApiMessageMention[] | undefined;
+			const userIdMention = userId;
+			const includesUser = parsedMentions?.some((mention) => mention.user_id === userIdMention);
+			const includesRole = parsedMentions?.some((item) => user?.role_id?.includes(item?.role_id as string));
+			return includesUser || includesRole;
 		}
 		const userIdMention = userId;
 		const includesUser = message?.mentions?.some((mention) => mention.user_id === userIdMention);
