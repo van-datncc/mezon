@@ -86,14 +86,14 @@ export const ChannelListItem = React.memo(
 				} else {
 					const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 					const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-					const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-					const isCached = channelsCache?.includes(channelId);
+					// const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+					// const isCached = channelsCache?.includes(channelId);
 					const store = await getStoreAsync();
 					store.dispatch(directActions.setDmGroupCurrentId(''));
 					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, 100);
 					if (!isTabletLandscape) navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					timeoutRef.current = setTimeout(async () => {
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, isCached ? 100 : 0);
 						store.dispatch(
 							channelsActions.joinChannel({
 								clanId: clanId ?? '',
