@@ -134,6 +134,11 @@
             "glob": "apps/desktop/package.json",
             "input": "./",
             "output": "./"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/desktop/src/appx/",
+            "output": "./appx/"
           }
         ]
       },
