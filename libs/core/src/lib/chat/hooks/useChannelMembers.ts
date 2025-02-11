@@ -71,7 +71,10 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 
 	return useMemo(
 		() => ({
-			membersOfParent: mode === ChannelStreamMode.STREAM_MODE_CHANNEL && channel?.parrent_id !== '0' ? membersOfParent : membersOfChild,
+			membersOfParent:
+				(mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) && channel?.parrent_id !== '0'
+					? membersOfParent
+					: membersOfChild,
 			membersOfChild,
 			addMemberToThread,
 			joinningToThread
