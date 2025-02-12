@@ -99,7 +99,7 @@ const MessageItem = React.memo(
 
 			if (!userId) return false;
 			const hasHereMention = message?.content?.t?.includes('@here') ?? false;
-			const hasUserMention = message?.mentions?.some((mention) => mention?.user_id === userId);
+			const hasUserMention = message?.mentions?.some?.((mention) => mention?.user_id === userId);
 			const isReplyToUser = message?.references?.[0]?.message_sender_id === userId;
 
 			return hasHereMention || hasUserMention || isReplyToUser;
