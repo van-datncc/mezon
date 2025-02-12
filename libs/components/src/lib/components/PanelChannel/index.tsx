@@ -244,14 +244,14 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0') {
-			if (channel.parrent_id === '0') {
+			if (channel.parrent_id === '0' || !channel.parrent_id) {
 				setNameChildren('Mute Channel');
 			} else {
 				setNameChildren('Mute Thread');
 			}
 			setmutedUntil('');
 		} else {
-			if (channel.parrent_id === '0') {
+			if (channel.parrent_id === '0' || !channel.parrent_id) {
 				setNameChildren('Unmute Channel');
 			} else {
 				setNameChildren('Unmute Thread');
@@ -357,7 +357,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 					<ItemPanel children="Hide Names" type="checkbox" />
 				</GroupPanels>
 			)}
-			{channel.parrent_id === '0' ? (
+			{channel.parrent_id === '0' || !channel.parrent_id ? (
 				<>
 					<GroupPanels>
 						{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
