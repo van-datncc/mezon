@@ -855,7 +855,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
 			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch, isFocusTopicBox]
+		[dispatch, isFocusTopicBox, currenTopicId]
 	);
 
 	const onchannelcreated = useCallback(
