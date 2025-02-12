@@ -1,7 +1,7 @@
 import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
 
-import { size, useTheme } from '@mezon/mobile-ui';
+import { size } from '@mezon/mobile-ui';
 import { Platform } from 'react-native';
 import UpdateGateScreen from '../../../screens/updateGate/UpdateGateScreen';
 import { APP_SCREEN } from '../../ScreenTypes';
@@ -9,7 +9,6 @@ import { APP_SCREEN } from '../../ScreenTypes';
 // eslint-disable-next-line no-empty-pattern
 export const ServersStacks = ({}: any) => {
 	const Stack = createStackNavigator();
-	const { themeValue } = useTheme();
 
 	return (
 		<Stack.Navigator

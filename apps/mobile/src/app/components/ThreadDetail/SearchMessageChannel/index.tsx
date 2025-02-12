@@ -4,9 +4,10 @@ import { DirectEntity, searchMessagesActions, selectCurrentClanId, useAppDispatc
 import { IChannel, SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
 import { createContext, useCallback, useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useBackHardWare from '../../../hooks/useBackHardWare';
+import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
 import InputSearchMessageChannel from './InputSearchMessageChannel';
 import SearchMessagePage from './SearchMessagePage';
 import SearchOptionPage from './SearchOptionPage';
@@ -29,9 +30,8 @@ const Backspace = 'Backspace';
 export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
-	const { themeValue } = useTheme();
 	const { currentChannel, typeSearch } = route?.params || {};
-
+	const { themeValue } = useTheme();
 	const [userMention, setUserMention] = useState<IUerMention>();
 	const [isSearchMessagePage, setSearchMessagePage] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -107,7 +107,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
-			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+			<View style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+				<StatusBarHeight />
 				<InputSearchMessageChannel
 					onKeyPress={handleKeyPress}
 					optionFilter={optionFilter}
@@ -133,7 +134,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						searchText={searchText}
 					/>
 				)}
-			</SafeAreaView>
+			</View>
 		</SearchMessageChannelContext.Provider>
 	);
 };

@@ -4,8 +4,8 @@ import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Dimensions, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -60,64 +60,63 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 	};
 
 	return (
-		<SafeAreaView>
-			<Block
-				style={{
-					width: isAnimationComplete ? width : 200,
-					height: isAnimationComplete ? height : 100,
-					backgroundColor: themeValue?.primary
-				}}
-			>
-				<Block style={styles.container}>
-					{isAnimationComplete && (
-						<Block style={[styles.menuHeader]}>
-							<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-								<TouchableOpacity
-									onPress={() => {
-										onPressMinimizeRoom();
-									}}
-									style={styles.buttonCircle}
-								>
-									<Icons.ChevronSmallDownIcon />
-								</TouchableOpacity>
-							</Block>
-							<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-								<TouchableOpacity onPress={handleAddPeopleToVoice} style={styles.buttonCircle}>
-									<Icons.UserPlusIcon />
-								</TouchableOpacity>
-							</Block>
+		<Block
+			style={{
+				width: isAnimationComplete ? width : 200,
+				height: isAnimationComplete ? height : 100,
+				backgroundColor: themeValue?.primary
+			}}
+		>
+			{isAnimationComplete && <StatusBarHeight />}
+			<Block style={styles.container}>
+				{isAnimationComplete && (
+					<Block style={[styles.menuHeader]}>
+						<Block flexDirection="row" alignItems="center" gap={size.s_20}>
+							<TouchableOpacity
+								onPress={() => {
+									onPressMinimizeRoom();
+								}}
+								style={styles.buttonCircle}
+							>
+								<Icons.ChevronSmallDownIcon />
+							</TouchableOpacity>
 						</Block>
-					)}
-
-					<Block
-						style={{
-							...styles.userStreamingRoomContainer,
-							width: isAnimationComplete ? '100%' : '100%',
-							height: isAnimationComplete ? '60%' : '100%'
-						}}
-					>
-						<StreamingScreenComponent />
+						<Block flexDirection="row" alignItems="center" gap={size.s_20}>
+							<TouchableOpacity onPress={handleAddPeopleToVoice} style={styles.buttonCircle}>
+								<Icons.UserPlusIcon />
+							</TouchableOpacity>
+						</Block>
 					</Block>
-					{isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
-					{isAnimationComplete && (
-						<Block style={[styles.menuFooter]}>
-							<Block borderRadius={size.s_40} backgroundColor={themeValue.secondary}>
-								<Block gap={size.s_40} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
-									<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-										<Icons.ChatIcon />
-									</TouchableOpacity>
+				)}
 
-									<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
-										<Icons.PhoneCallIcon />
-									</TouchableOpacity>
-								</Block>
+				<Block
+					style={{
+						...styles.userStreamingRoomContainer,
+						width: isAnimationComplete ? '100%' : '100%',
+						height: isAnimationComplete ? '60%' : '100%'
+					}}
+				>
+					<StreamingScreenComponent />
+				</Block>
+				{isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
+				{isAnimationComplete && (
+					<Block style={[styles.menuFooter]}>
+						<Block borderRadius={size.s_40} backgroundColor={themeValue.secondary}>
+							<Block gap={size.s_40} flexDirection="row" alignItems="center" justifyContent="space-between" padding={size.s_14}>
+								<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
+									<Icons.ChatIcon />
+								</TouchableOpacity>
+
+								<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
+									<Icons.PhoneCallIcon />
+								</TouchableOpacity>
 							</Block>
 						</Block>
-					)}
-				</Block>
-				<InviteToChannel isUnknownChannel={false} ref={bottomSheetInviteRef} />
+					</Block>
+				)}
 			</Block>
-		</SafeAreaView>
+			<InviteToChannel isUnknownChannel={false} ref={bottomSheetInviteRef} />
+		</Block>
 	);
 }
 

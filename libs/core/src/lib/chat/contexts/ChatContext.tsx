@@ -549,6 +549,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					// TODO:  backend send clan_id
 					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: clanId as string }));
 					dispatch(listChannelsByUserActions.remove(userID));
+					dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: user.channel_id, clanId: user.clan_id }));
 				} else {
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string, channelId: user.channel_id }));
@@ -598,7 +599,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
-
+					dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					if (channel_desc.parrent_id) {
 						dispatch(
 							threadsActions.updateActiveCodeThread({
@@ -964,6 +965,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
+				dispatch(listChannelRenderAction.updateClanBadgeRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
+				dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
 			}
 		},
 		[dispatch, currentChannelId, clanId, userId]

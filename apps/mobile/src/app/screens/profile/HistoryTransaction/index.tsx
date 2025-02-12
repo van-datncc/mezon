@@ -5,7 +5,7 @@ import { FlashList } from '@shopify/flash-list';
 import { ApiWalletLedger } from 'mezon-js/api.gen';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
@@ -60,7 +60,7 @@ export const HistoryTransactionScreen = ({ navigation }: SettingScreenProps<Scre
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<FlashList
 				data={walletLedger}
 				renderItem={renderItem}
@@ -87,6 +87,6 @@ export const HistoryTransactionScreen = ({ navigation }: SettingScreenProps<Scre
 					<Text style={styles.title}>Next page</Text>
 				</TouchableOpacity>
 			</View>
-		</SafeAreaView>
+		</View>
 	);
 };

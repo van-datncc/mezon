@@ -12,7 +12,7 @@ import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Linking, SafeAreaView, View } from 'react-native';
+import { DeviceEventEmitter, Linking, View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
@@ -151,13 +151,11 @@ export const ChannelListItem = React.memo(
 					/>
 				)}
 				<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['45%']}>
-					<SafeAreaView>
-						{props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-							<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
-						) : (
-							<JoinChannelVoiceBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
-						)}
-					</SafeAreaView>
+					{props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+						<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+					) : (
+						<JoinChannelVoiceBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+					)}
 				</MezonBottomSheet>
 			</View>
 		);

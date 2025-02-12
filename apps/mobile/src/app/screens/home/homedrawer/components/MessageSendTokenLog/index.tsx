@@ -15,6 +15,9 @@ const MessageSendTokenLog = memo(({ messageContent }: MessageSendTokenLogProps) 
 	const navigation = useNavigation<any>();
 	const styles = style(themeValue);
 
+	const [title, ...descriptionData] = messageContent.split(' | ');
+	const description = descriptionData.join(' | ');
+
 	const handleTransaction = () => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HISTORY_TRANSACTION });
 	};
@@ -25,8 +28,11 @@ const MessageSendTokenLog = memo(({ messageContent }: MessageSendTokenLogProps) 
 				<View style={styles.info}>
 					<Icons.Transaction height={size.s_50} width={size.s_50} color={baseColor.bgSuccess} />
 					<View>
-						<Text style={styles.title}>{messageContent}</Text>
-						<Text style={styles.lightTitle}>Transaction</Text>
+						<Text style={styles.title}>{title}</Text>
+						<Text style={styles.transactionTitle}>
+							{'Detail: '}
+							<Text style={styles.lightTitle}>{description}</Text>
+						</Text>
 					</View>
 				</View>
 				<View style={styles.seperatedItem} />

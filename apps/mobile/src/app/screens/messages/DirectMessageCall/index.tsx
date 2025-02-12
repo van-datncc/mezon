@@ -13,14 +13,14 @@ import {
 import { IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useEffect, useState } from 'react';
-import { BackHandler, Text, TouchableOpacity } from 'react-native';
+import { BackHandler, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
 import { MezonConfirm } from '../../../componentUI';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { useWebRTCCallMobile } from '../../../hooks/useWebRTCCallMobile';
 import { style } from './styles';
 
@@ -145,7 +145,8 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	};
 
 	return (
-		<SafeAreaView edges={['top']} style={styles.container}>
+		<View style={styles.container}>
+			<StatusBarHeight />
 			{isShowControl && (
 				<Block style={[styles.menuHeader]}>
 					<Block flexDirection="row" alignItems="center" gap={size.s_20}>
@@ -229,6 +230,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			>
 				<Text style={styles.titleConfirm}>Are you sure you want to end the call?</Text>
 			</MezonConfirm>
-		</SafeAreaView>
+		</View>
 	);
 });
