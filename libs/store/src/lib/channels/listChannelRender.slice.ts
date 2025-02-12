@@ -331,9 +331,10 @@ function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 			sortedChannels.push(channel);
 			for (; indexThread < numOfChannel; indexThread++) {
 				const thread = channels[indexThread];
+				const parrentId = thread.parrent_id || '';
 				if (thread.parrent_id === channel.id) {
 					sortedChannels.push(thread);
-				} else {
+				} else if (channel.id < parrentId) {
 					indexThread--;
 					break;
 				}
