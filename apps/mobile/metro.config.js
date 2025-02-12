@@ -12,6 +12,7 @@ const { assetExts, sourceExts } = defaultConfig.resolver;
  */
 const customConfig = {
 	transformer: {
+		ramBundle: 'index',
 		babelTransformerPath: require.resolve('react-native-svg-transformer'),
 		getTransformOptions: async () => ({
 			transform: {

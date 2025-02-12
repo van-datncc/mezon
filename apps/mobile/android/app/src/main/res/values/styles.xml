@@ -5,7 +5,9 @@
     </style>
     <style name="BootTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">true</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:statusBarColor">@color/black</item>
     </style>
     <style name="incomingCall" parent="Theme.AppCompat.Light.NoActionBar">color
         <item name="colorPrimaryDark">#000000</item>
