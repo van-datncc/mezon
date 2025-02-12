@@ -32,7 +32,7 @@ const ChannelLayout = () => {
 					>
 						<Outlet />
 					</div>
-					shouldRender && <ReactionEmojiPanel closeMenu={closeMenu} currentChannelId={currentChannel?.channel_id ?? ''} />
+					{shouldRender && <ReactionEmojiPanel closeMenu={closeMenu} currentChannelId={currentChannel?.channel_id ?? ''} />}
 				</>
 			)}
 		</div>
