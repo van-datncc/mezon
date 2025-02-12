@@ -1,4 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, save, STORAGE_IS_LAST_ACTIVE_TAB_DM } from '@mezon/mobile-components';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -13,6 +13,7 @@ const HomeScreen = React.memo(() => {
 	const [isDismissUI, setIsDismissUI] = useState<boolean>(false);
 
 	useEffect(() => {
+		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
 		const event = DeviceEventEmitter.addListener(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, (isDismiss: true) => {
 			setIsDismissUI(isDismiss);
 		});

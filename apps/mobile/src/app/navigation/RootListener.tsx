@@ -74,7 +74,7 @@ const RootListener = () => {
 					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
 						console.error('Error in tasks:', error);
 					});
-				}, 100);
+				}, 1000);
 			});
 		}
 	}, [isLoggedIn]);

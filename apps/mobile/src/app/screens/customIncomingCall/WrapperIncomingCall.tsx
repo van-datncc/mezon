@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import * as React from 'react';
 import { useMemo } from 'react';
 import { StatusBar } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../../configs/toastConfig';
 import IncomingHomeScreen from './IncomingHomeScreen';
@@ -22,7 +23,11 @@ export default function WrapperIncomingCall(props: any) {
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 			<StatusBar backgroundColor="#09090C" barStyle="light-content" />
 			<ChatContextProvider>
-				<NavigationContainer>
+				<NavigationContainer
+					onReady={async () => {
+						await BootSplash.hide({ fade: true });
+					}}
+				>
 					<IncomingHomeScreen {...props} />
 				</NavigationContainer>
 			</ChatContextProvider>
