@@ -294,8 +294,24 @@ export const listChannelRenderSlice = createSlice({
       ((state.listChannelRender[clanId][0] as ICategoryChannel).channels as string[]).push(channelId)
       state.listChannelRender[clanId]?.splice(1, 0, channelMark);
 			state.listChannelRender[clanId].join();
+		},
+    sortCategoryChannel: (state, action: PayloadAction<{ clanId:string, listCategoryOrder : ICategoryChannel[]}>) => {
+      const { listCategoryOrder, clanId } = action.payload;
+			const listChannel = state.listChannelRender[clanId].filter(channel=> !channel.isFavor) || [];
+      const listChannelFavor = state.listChannelRender[clanId].filter(channel=> channel.isFavor)
 
-		}
+				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
+				listCategoryOrder.map((category) => {
+          const channelAndThread = listChannel.filter(channel => (channel.category_id === category.id || category.id === channel.id))
+          channelAndThread.map((channel)=>{
+            listChannelRender.push(channel);
+          })
+				
+				});
+
+				state.listChannelRender[clanId] = [...listChannelFavor, ...listChannelRender];
+			
+		},
 	}
 });
 
