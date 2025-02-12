@@ -852,14 +852,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
 			const reactionEntity = mapReactionToEntity(e);
-			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0') {
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox) {
 				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
 			}
 
 			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
 			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch]
+		[dispatch, isFocusTopicBox]
 	);
 
 	const onchannelcreated = useCallback(
