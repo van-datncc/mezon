@@ -1,6 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectMessageByMessageId, useAppSelector } from '@mezon/store-mobile';
-import { ETokenMessage, IExtendedMessage, TypeMessage, getSrcEmoji } from '@mezon/utils';
+import { ETokenMessage, IExtendedMessage, getSrcEmoji } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { Text } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -19,17 +18,21 @@ type IEmojiMarkup = {
 };
 
 const EMOJI_KEY = '[ICON_EMOJI]';
-export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage; channelId?: string; messageId?: string; styleText?: any }) => {
+export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage; styleText?: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t, ej = [] } = props.content || {};
 	const emojis = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 	const elements: ElementToken[] = [...emojis].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
-	const message = useAppSelector((state) => selectMessageByMessageId(state, props?.channelId, props?.messageId));
 
 	const contentTitle = () => {
 		const [title] = (t ?? '').split(' | ');
 		return <Text style={[styles.message, props?.styleText && props?.styleText]}>{title}</Text>;
+	};
+
+	const checkTokenMessage = (text: string) => {
+		const pattern = /^Tokens sent:.*\|.*/;
+		return pattern.test(text);
 	};
 
 	const EmojiMarkup = ({ shortname, emojiid }: IEmojiMarkup) => {
@@ -101,7 +104,7 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 
 	return (
 		<Text style={[styles.dmMessageContainer, props?.styleText && props?.styleText]} numberOfLines={1}>
-			{message?.code === TypeMessage.SendToken ? contentTitle() : convertTextToEmoji()}
+			{checkTokenMessage(t) ? contentTitle() : convertTextToEmoji()}
 		</Text>
 	);
 });
