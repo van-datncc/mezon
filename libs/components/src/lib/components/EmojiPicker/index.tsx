@@ -1,11 +1,8 @@
-import { useAppParams, useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
+import { useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
 	emojiSuggestionActions,
 	referencesActions,
-	selectClanView,
-	selectClickedOnTopicStatus,
 	selectCurrentChannel,
-	selectCurrentTopicId,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	selectTheme,
@@ -22,6 +19,10 @@ export type EmojiCustomPanelOptions = {
 	isReaction?: boolean;
 	onClickAddButton?: () => void;
 	onClose: () => void;
+	isFocusTopicBox?: boolean;
+	currenTopicId?: string;
+	directId?: string;
+	isClanView: boolean;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -85,13 +86,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}));
 	}, [categoriesEmoji, categoryIcons]);
 
-	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
-	const currenTopicId = useSelector(selectCurrentTopicId);
-	const { directId } = useAppParams();
-	const isClanView = useSelector(selectClanView);
-	const channelID = isClanView ? currentChannel?.id : directId;
+	const channelID = props.isClanView ? currentChannel?.id : props.directId;
 	const messageEmoji = useAppSelector((state) =>
-		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : channelID, props.messageEmojiId || '')
+		selectMessageByMessageId(state, props.isFocusTopicBox ? props.currenTopicId : channelID, props.messageEmojiId || '')
 	);
 	const { reactionMessageDispatch } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
@@ -111,7 +108,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					messageEmoji?.sender_id ?? '',
 					false,
 					isPublicChannel(currentChannel),
-					isFocusTopicBox,
+					props.isFocusTopicBox,
 					messageEmoji?.channel_id
 				);
 				setSubPanelActive(SubPanelName.NONE);

@@ -2,6 +2,7 @@ import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useGifsStickersEmoji } from '@mezon/core';
 import {
 	selectClickedOnTopicStatus,
+	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
@@ -9,6 +10,7 @@ import {
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { memo } from 'react';
 import { useSelector } from 'react-redux';
 
 const HEIGHT_EMOJI_PANEL = 457;
@@ -16,10 +18,10 @@ const WIDTH_EMOJI_PANEL = 500;
 
 type ReactionEmojiPannelProps = {
 	closeMenu: boolean;
-	isShowCreateThread: boolean;
+	currentChannelId: string;
 };
 
-const ReactionEmojiPanel = ({ closeMenu, isShowCreateThread }: ReactionEmojiPannelProps) => {
+const ReactionEmojiPanel = memo(({ closeMenu, currentChannelId }: ReactionEmojiPannelProps) => {
 	const reactionTopState = useSelector(selectReactionTopState);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -37,6 +39,8 @@ const ReactionEmojiPanel = ({ closeMenu, isShowCreateThread }: ReactionEmojiPann
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
 	const topPositionEmojiPanel = distanceToBottom < HEIGHT_EMOJI_PANEL ? 'auto' : `${positionOfSmileButton.top - 100}px`;
+
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId));
 
 	return (
 		<>
@@ -75,6 +79,6 @@ const ReactionEmojiPanel = ({ closeMenu, isShowCreateThread }: ReactionEmojiPann
 			)}
 		</>
 	);
-};
+});
 
 export default ReactionEmojiPanel;
