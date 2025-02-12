@@ -334,7 +334,7 @@ function combineMessageReactions(state: ReactionState, combinedId: string): Emoj
 				channel_id: ''
 			};
 		}
-
+		if (!reaction.sender_name) continue;
 		const newSender = {
 			sender_id: reaction.sender_id,
 			count: reaction.count

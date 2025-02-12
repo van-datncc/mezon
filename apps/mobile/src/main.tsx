@@ -9,6 +9,8 @@ notifee.onBackgroundEvent(async () => {});
 if (__DEV__) {
 	require('../reactotronConfig');
 }
+
+registerGlobals();
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const offer = remoteMessage?.data?.offer;
 	if (offer) {
@@ -19,12 +21,7 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 });
 AppRegistry.registerComponent('ComingCallApp', () => CustomIncomingCall);
 AppRegistry.registerComponent('Mobile', () => HeadlessCheck);
-registerGlobals();
 
-function HeadlessCheck({ isHeadless }) {
-	if (isHeadless) {
-		return null;
-	}
-
+function HeadlessCheck() {
 	return <App />;
 }

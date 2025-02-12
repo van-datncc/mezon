@@ -156,6 +156,13 @@ function MessageContextMenu({
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 
+	const notAllowedType =
+		message?.code !== TypeMessage.CreateThread &&
+		message?.code !== TypeMessage.CreatePin &&
+		message?.code !== TypeMessage.MessageBuzz &&
+		message?.code !== TypeMessage.AuditLog &&
+		message?.code !== TypeMessage.Welcome;
+
 	const handleAddToNote = useCallback(() => {
 		if (!message || !currentChannel || !currentClanId) return;
 
@@ -617,6 +624,7 @@ function MessageContextMenu({
 			);
 		});
 		message?.code !== TypeMessage.Topic &&
+			notAllowedType &&
 			!isTopic &&
 			canSendMessage &&
 			builder.when(checkPos && hasPermissionCreateTopic, (builder) => {

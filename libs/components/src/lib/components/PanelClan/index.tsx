@@ -70,7 +70,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, [defaultNotificationClan?.notification_setting_type]);
 
 	const handleInvitePeople = () => {
-		dispatch(clansActions.toggleInvitePeople({ status: true }));
+		dispatch(clansActions.toggleInvitePeople({ status: true, clanId: clan?.clan_id }));
 	};
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile, setIsShowSettingProfileInitTab, setClanIdSettingProfile } =
 		useSettingFooter();

@@ -9,6 +9,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.mezon.mobile.CustomClientFactory;
+import com.zoontek.rnbootsplash.RNBootSplash;
 
 class MainActivity : ReactActivity() {
 
@@ -19,7 +20,8 @@ class MainActivity : ReactActivity() {
   override fun getMainComponentName(): String = "Mobile"
 
  override fun onCreate(savedInstanceState: Bundle?) {
-     super.onCreate(null);
+   RNBootSplash.init(this, R.style.BootTheme)
+   super.onCreate(null);
  }
 
   override fun onNewIntent(intent: Intent) {

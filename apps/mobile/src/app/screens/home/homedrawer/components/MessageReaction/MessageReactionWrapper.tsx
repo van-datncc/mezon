@@ -82,6 +82,8 @@ export const MessageReactionWrapper = React.memo(
 						return null;
 					}
 					if (!emojiItemData?.emojiId) return null;
+					const countReacts = calculateTotalCount(emojiItemData.senders);
+
 					return (
 						<Pressable
 							delayLongPress={200}
@@ -109,7 +111,7 @@ export const MessageReactionWrapper = React.memo(
 								style={styles.iconEmojiReaction}
 								resizeMode={'contain'}
 							/>
-							<Text style={styles.reactCount}>{calculateTotalCount(emojiItemData.senders)}</Text>
+							<Text style={styles.reactCount}>{countReacts}</Text>
 						</Pressable>
 					);
 				})}

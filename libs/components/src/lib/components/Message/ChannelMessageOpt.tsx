@@ -128,6 +128,12 @@ function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: b
 	const realTimeMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, message?.id || ''));
 	const dispatch = useAppDispatch();
 	const clanId = useSelector(selectCurrentClanId);
+	const notAllowedType =
+		message?.code !== TypeMessage.CreateThread &&
+		message?.code !== TypeMessage.CreatePin &&
+		message?.code !== TypeMessage.MessageBuzz &&
+		message?.code !== TypeMessage.AuditLog &&
+		message?.code !== TypeMessage.Welcome;
 
 	const setIsShowCreateTopic = useCallback(
 		(isShowCreateTopic: boolean, channelId?: string) => {
@@ -158,7 +164,7 @@ function useTopicMenuBuilder(message: IMessageWithUser, doNotAllowCreateTopic: b
 		const plugin = {
 			setup: (builder: MenuBuilder) => {
 				builder.when(
-					clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic && !doNotAllowCreateTopic,
+					clanId && clanId !== '0' && realTimeMessage?.code !== TypeMessage.Topic && !doNotAllowCreateTopic && notAllowedType,
 					(builder: MenuBuilder) => {
 						builder.addMenuItem(
 							'topic',

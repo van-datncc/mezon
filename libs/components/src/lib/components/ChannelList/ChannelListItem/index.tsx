@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	clansActions,
 	selectCategoryExpandStateByCategoryId,
+	selectCurrentChannel,
 	selectIsUnreadChannelById,
+	selectIsUnreadThreadInChannel,
 	selectStreamMembersByChannelId,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector,
@@ -52,7 +54,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
 	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const channelMemberList = useMemo(() => {
 		if (
 			channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
@@ -93,13 +95,14 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 		setIsExpendedPttMems(!isExpandedPttMems);
 	};
 
+  const hasUnread = useAppSelector(state=>selectIsUnreadThreadInChannel(state,channel.threadIds || []))
 	const renderChannelContent = useMemo(() => {
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-			(isCategoryExpanded || isUnreadChannel)
+			(isCategoryExpanded || isUnreadChannel || hasUnread || currentChannel?.id === channel.id || currentChannel?.parrent_id === channel.id)
 		) {
 			return (
 				<div className={'pt-1'}>
