@@ -30,20 +30,21 @@ export const listChannelRenderSlice = createSlice({
 	reducers: {
 		mapListChannelRender: (state, action: PayloadAction<DataChannelAndCate>) => {
 			const { listChannel, listCategory, clanId, listChannelFavor } = action.payload;
+			// Prioritize moving channel forward thread
+			const listChannelPriority = prioritizeChannel(listChannel);
 			if (!state.listChannelRender[clanId]) {
 				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 				const listFavorChannel: IChannel[] = [];
 				listCategory.map((category) => {
-					const categoryChannels = listChannel.filter((channel) => channel && channel.category_id === category.id) as IChannel[];
+					const categoryChannels = sortChannels(listChannelPriority, category.id);
 					const listChannelIds = categoryChannels.map((channel) => channel.id);
-					const sortChannelList = sortChannels(categoryChannels);
 					const categoryWithChannels: ICategoryChannel = {
 						...category,
 						channels: listChannelIds
 					};
 
 					listChannelRender.push(categoryWithChannels);
-					sortChannelList.forEach((channel) => {
+					categoryChannels.forEach((channel) => {
 						if (listChannelFavor.includes(channel.id)) {
 							listFavorChannel.push({
 								...channel,
@@ -276,24 +277,31 @@ export const listChannelRenderSlice = createSlice({
 			if (!state.listChannelRender[clanId]) {
 				return;
 			}
-      if(!mark){
-        const markIndex = state.listChannelRender[clanId].findIndex(channel=>channel.id === channelId && (channel as IChannel).category_id === FAVORITE_CATEGORY_ID)
-        if(markIndex === -1){
-          return
-        }
-        const listFavor = (state.listChannelRender[clanId][0] as ICategoryChannel).channels.filter(channel=> (channel as string) !== channelId)
-        state.listChannelRender[clanId][0] = {...state.listChannelRender[clanId][0], channels : listFavor as string[]}
+			if (!mark) {
+				const markIndex = state.listChannelRender[clanId].findIndex(
+					(channel) => channel.id === channelId && (channel as IChannel).category_id === FAVORITE_CATEGORY_ID
+				);
+				if (markIndex === -1) {
+					return;
+				}
+				const listFavor = (state.listChannelRender[clanId][0] as ICategoryChannel).channels.filter(
+					(channel) => (channel as string) !== channelId
+				);
+				state.listChannelRender[clanId][0] = { ...state.listChannelRender[clanId][0], channels: listFavor as string[] };
 
+				state.listChannelRender[clanId] = state.listChannelRender[clanId].filter(
+					(channel) => !(channel.id === channelId && (channel as IChannel).category_id === FAVORITE_CATEGORY_ID)
+				);
+				return;
+			}
 
-        state.listChannelRender[clanId] = state.listChannelRender[clanId].filter((channel) => !(channel.id === channelId && (channel as IChannel).category_id === FAVORITE_CATEGORY_ID));
-        return;
-      }
-
-			const channelMark : IChannel = {...state.listChannelRender[clanId].filter((channel) => channel.id === channelId)[0] ,category_id : FAVORITE_CATEGORY_ID};
-      ((state.listChannelRender[clanId][0] as ICategoryChannel).channels as string[]).push(channelId)
-      state.listChannelRender[clanId]?.splice(1, 0, channelMark);
+			const channelMark: IChannel = {
+				...state.listChannelRender[clanId].filter((channel) => channel.id === channelId)[0],
+				category_id: FAVORITE_CATEGORY_ID
+			};
+			((state.listChannelRender[clanId][0] as ICategoryChannel).channels as string[]).push(channelId);
+			state.listChannelRender[clanId]?.splice(1, 0, channelMark);
 			state.listChannelRender[clanId].join();
-
 		}
 	}
 });
@@ -317,22 +325,51 @@ export const selectListChannelRenderByClanId = createSelector(
 	}
 );
 
-function sortChannels(channels: IChannel[]): IChannel[] {
-	const sortedChannels: IChannel[] = [];
+function prioritizeChannel(channels: IChannel[]): IChannel[] {
+	return channels.sort((a, b) => {
+		const aParrentId = a.parrent_id ?? '';
+		const bParrentId = b.parrent_id ?? '';
 
-	channels.forEach((channel) => {
-		if (!channel.parrent_id || channel.parrent_id === '0') {
-			sortedChannels.push(channel);
-			addChildren(channel, sortedChannels);
+		if ((aParrentId === '0' || aParrentId === '') && bParrentId !== '0') {
+			return -1;
 		}
+		if (aParrentId !== '0' && (bParrentId === '0' || bParrentId === '')) {
+			return 1;
+		}
+		if (aParrentId === '0' || aParrentId === '') {
+			const aChannelId = a.channel_id ?? '';
+			const bChannelId = b.channel_id ?? '';
+			return aChannelId < bChannelId ? -1 : aChannelId > bChannelId ? 1 : 0;
+		}
+		return aParrentId < bParrentId ? -1 : aParrentId > bParrentId ? 1 : 0;
 	});
-	// Then add threads of a channel into list
-	function addChildren(parent: IChannel, acc: IChannel[]) {
-		channels
-			.filter((child) => child.parrent_id === parent.id)
-			.forEach((child) => {
-				acc.push(child);
-			});
+}
+
+function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
+	const sortedChannels: IChannel[] = [];
+	let indexThread = channels.length;
+	const numOfChannel = channels.length;
+	for (let i = 0; i < numOfChannel; i++)
+		if (channels[i].parrent_id !== '0' && channels[i].parrent_id !== undefined) {
+			indexThread = i;
+			break;
+		}
+
+	const numOfParrent = indexThread;
+	for (let i = 0; i < numOfParrent; i++) {
+		const channel = channels[i];
+		if (channel.category_id === categoryId) {
+			sortedChannels.push(channel);
+			for (; indexThread < numOfChannel; indexThread++) {
+				const thread = channels[indexThread];
+				if (thread.parrent_id === channel.id) {
+					sortedChannels.push(thread);
+				} else {
+					indexThread--;
+					break;
+				}
+			}
+		}
 	}
 	return sortedChannels;
 }
