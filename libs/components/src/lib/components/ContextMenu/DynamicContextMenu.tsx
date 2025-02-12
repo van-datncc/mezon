@@ -3,6 +3,7 @@ import {
 	selectClanView,
 	selectClickedOnTopicStatus,
 	selectCurrentChannel,
+	selectCurrentTopicId,
 	selectMessageByMessageId,
 	selectTheme,
 	useAppSelector
@@ -32,10 +33,13 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	const { reactionMessageDispatch } = useChatReaction();
 	const userId = useAuth();
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const currenTopicId = useSelector(selectCurrentTopicId);
 
 	const isClanView = useSelector(selectClanView);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, messageId || ''));
+	const currentMessage = useAppSelector((state) =>
+		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : currentChannel?.channel_id, messageId || '')
+	);
 	const handleClickEmoji = useCallback(
 		async (emojiId: string, emojiShortCode: string) => {
 			await reactionMessageDispatch(

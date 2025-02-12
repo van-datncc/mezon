@@ -53,6 +53,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
+	selectCurrentTopicId,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
@@ -171,6 +172,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const isClanView = useSelector(selectClanView);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 	const allThreads = useSelector(selectAllThreads);
+	const currenTopicId = useSelector(selectCurrentTopicId);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -845,8 +847,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
-			if (e.topic_id && e.topic_id !== '0' && e.topic_id !== e.channel_id && isFocusTopicBox) {
-				e.channel_id = e.topic_id;
+			const isMessageByfetch = e.topic_id === '0' && isFocusTopicBox;
+			if (isMessageByfetch) {
+				e.channel_id = currenTopicId ?? '';
 			}
 			const reactionEntity = mapReactionToEntity(e);
 			dispatch(reactionActions.setReactionDataSocket(reactionEntity));

@@ -6,6 +6,7 @@ import {
 	selectAllChannelMembers,
 	selectClanView,
 	selectCurrentChannel,
+	selectCurrentTopicId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	useAppDispatch,
@@ -33,6 +34,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
+	const currenTopicId = useSelector(selectCurrentTopicId);
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -168,7 +170,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			if (reactionMessageByFetch) {
 				payloadDispatchReaction = {
 					...payloadDispatchReaction,
-					topic_id: channelIdOnMessage ?? ''
+					topic_id: undefined
 				};
 			}
 
