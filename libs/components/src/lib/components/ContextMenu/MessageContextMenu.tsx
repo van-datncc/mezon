@@ -160,8 +160,8 @@ function MessageContextMenu({
 		message?.code !== TypeMessage.CreateThread &&
 		message?.code !== TypeMessage.CreatePin &&
 		message?.code !== TypeMessage.MessageBuzz &&
-		message.code !== TypeMessage.AuditLog &&
-		message.code !== TypeMessage.Welcome;
+		message?.code !== TypeMessage.AuditLog &&
+		message?.code !== TypeMessage.Welcome;
 
 	const handleAddToNote = useCallback(() => {
 		if (!message || !currentChannel || !currentClanId) return;
