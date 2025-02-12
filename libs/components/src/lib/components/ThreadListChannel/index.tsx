@@ -51,16 +51,15 @@ export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, is
 	};
 
 	const isShowThread = (thread: IChannel) => {
-		const threadId = thread.id;
 		return (
 			(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
-			(thread?.count_mess_unread ?? 0) > 0 ||
-			threadId === currentChannelId
+			(thread?.count_mess_unread ?? 0) > 0 || 
+      thread.id === currentChannelId 
 		);
 	};
 
-	const shouldShow = thread?.active === 1 || isShowThread(thread);
-	if (!shouldShow || !isCategoryExpanded) {
+	const shouldShow = (thread?.active === 1 && isCategoryExpanded) || isShowThread(thread);
+	if (!shouldShow) {
 		return null;
 	}
 

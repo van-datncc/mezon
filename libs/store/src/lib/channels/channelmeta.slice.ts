@@ -151,3 +151,17 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 	}
 	return false;
 });
+
+export const selectIsUnreadThreadInChannel =  createSelector([getChannelMetaState, selectChannelMetaEntities, (state, listThreadIds : string[])=>listThreadIds], (state, channelEntites,listThreadIds) => {
+	
+
+	for (let index = 0; index < listThreadIds.length; index++) {
+		const channel = state?.entities?.[listThreadIds[index]];
+    if(!channel) continue;
+		if (channelEntites?.[channel?.id]?.isMute === true) continue;
+		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp < channel?.lastSentTimestamp ) {
+			return true;
+		}
+	}
+	return false;
+});
