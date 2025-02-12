@@ -14,9 +14,9 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, StatusBar, View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import ShareLocationConfirmModal from '../../../../../components/ShareLocationConfirmModal';
+import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import ChannelMessagesWrapper from '../../ChannelMessagesWrapper';
 import { ChatBox } from '../../ChatBox';
 import PanelKeyboard from '../../PanelKeyboard';
@@ -104,12 +104,13 @@ export default function TopicDiscussion() {
 	}, [navigation]);
 
 	return (
-		<SafeAreaView edges={['top']} style={styles.channelView}>
+		<View style={styles.channelView}>
+			<StatusBarHeight />
 			<TopicHeader
 				mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 				handleBack={onGoBack}
 			/>
-			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={0}>
 				<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
 					<View style={{ flex: 1 }}>
 						<ChannelMessagesWrapper
@@ -138,6 +139,6 @@ export default function TopicDiscussion() {
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 				/>
 			</KeyboardAvoidingView>
-		</SafeAreaView>
+		</View>
 	);
 }

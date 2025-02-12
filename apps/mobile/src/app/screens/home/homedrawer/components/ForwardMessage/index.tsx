@@ -19,12 +19,13 @@ import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { MezonInput } from '../../../../../componentUI';
 import { SeparatorWithLine } from '../../../../../components/Common';
+import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import ForwardMessageItem from './ForwardMessageItem/ForwardMessageItem';
 import { styles } from './styles';
 
@@ -227,51 +228,50 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 
 	return (
 		<Modal isVisible={show} hasBackdrop={false} style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}>
-			<SafeAreaView style={{ flex: 1 }}>
-				<Block flex={1} marginTop={size.s_34}>
-					<Block flexDirection="row" justifyContent="center" marginBottom={size.s_18}>
-						<Block position="absolute" left={0}>
-							<TouchableOpacity onPress={() => onClose()}>
-								<Icons.CloseLargeIcon color={themeValue.textStrong} />
-							</TouchableOpacity>
-						</Block>
-						<Text h3 color={themeValue.white}>
-							{t('forwardTo')}
-						</Text>
-					</Block>
-
-					<MezonInput
-						placeHolder={t('search')}
-						onTextChange={setSearchText}
-						value={searchText}
-						prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
-						inputWrapperStyle={{ backgroundColor: themeValue.primary, paddingHorizontal: size.s_6 }}
-					/>
-
-					<Block flex={1}>
-						<FlashList
-							keyboardShouldPersistTaps="handled"
-							data={filteredForwardObjects}
-							ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
-							keyExtractor={(item) => item?.channelId?.toString()}
-							renderItem={renderForwardObject}
-							estimatedItemSize={size.s_60}
-						/>
-					</Block>
-
-					<Block paddingTop={size.s_10}>
-						<TouchableOpacity
-							style={[styles.btn, !selectedForwardObjectsRef.current?.length && { backgroundColor: themeValue.charcoal }]}
-							onPress={handleForward}
-						>
-							<Text style={styles.btnText}>
-								{'Send'}
-								{count}
-							</Text>
+			<StatusBarHeight />
+			<Block flex={1} marginTop={size.s_34}>
+				<Block flexDirection="row" justifyContent="center" marginBottom={size.s_18}>
+					<Block position="absolute" left={0}>
+						<TouchableOpacity onPress={() => onClose()}>
+							<Icons.CloseLargeIcon color={themeValue.textStrong} />
 						</TouchableOpacity>
 					</Block>
+					<Text h3 color={themeValue.white}>
+						{t('forwardTo')}
+					</Text>
 				</Block>
-			</SafeAreaView>
+
+				<MezonInput
+					placeHolder={t('search')}
+					onTextChange={setSearchText}
+					value={searchText}
+					prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+					inputWrapperStyle={{ backgroundColor: themeValue.primary, paddingHorizontal: size.s_6 }}
+				/>
+
+				<Block flex={1}>
+					<FlashList
+						keyboardShouldPersistTaps="handled"
+						data={filteredForwardObjects}
+						ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
+						keyExtractor={(item) => item?.channelId?.toString()}
+						renderItem={renderForwardObject}
+						estimatedItemSize={size.s_60}
+					/>
+				</Block>
+
+				<Block paddingTop={size.s_10}>
+					<TouchableOpacity
+						style={[styles.btn, !selectedForwardObjectsRef.current?.length && { backgroundColor: themeValue.charcoal }]}
+						onPress={handleForward}
+					>
+						<Text style={styles.btnText}>
+							{'Send'}
+							{count}
+						</Text>
+					</TouchableOpacity>
+				</Block>
+			</Block>
 		</Modal>
 	);
 };

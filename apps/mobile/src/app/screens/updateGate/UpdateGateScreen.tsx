@@ -1,11 +1,10 @@
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
-import { BackHandler, Linking, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { BackHandler, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const UpdateGateScreen = ({ route }) => {
 	const storeUrl = route?.params?.storeUrl;
@@ -30,7 +29,7 @@ const UpdateGateScreen = ({ route }) => {
 		<Modal isVisible={true} animationIn={'fadeIn'} coverScreen={true} backdropColor={Colors.secondary} backdropOpacity={1}>
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<PanGestureHandler onGestureEvent={handleGestureEvent}>
-					<SafeAreaView style={styles.container}>
+					<View style={styles.container}>
 						<Block />
 						<Block alignSelf={'center'} marginBottom={size.s_50}>
 							<FastImage
@@ -56,7 +55,7 @@ const UpdateGateScreen = ({ route }) => {
 								<Text style={styles.titleBtn}>Update Now</Text>
 							</Block>
 						</TouchableOpacity>
-					</SafeAreaView>
+					</View>
 				</PanGestureHandler>
 			</GestureHandlerRootView>
 		</Modal>

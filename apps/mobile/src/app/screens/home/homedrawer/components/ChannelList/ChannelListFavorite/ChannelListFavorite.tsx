@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Linking, SafeAreaView, Text, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, Linking, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
@@ -109,13 +109,11 @@ export const ChannelListFavorite = React.memo(() => {
 											key={`${index}_${channelId}_ChannelItemFavorite`}
 										/>
 										<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['45%']}>
-											<SafeAreaView>
-												{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-													<JoinStreamingRoomBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
-												) : (
-													<JoinChannelVoiceBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
-												)}
-											</SafeAreaView>
+											{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+												<JoinStreamingRoomBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
+											) : (
+												<JoinChannelVoiceBS channel={currentChannel} ref={bottomSheetChannelStreamingRef} />
+											)}
 										</MezonBottomSheet>
 									</Block>
 								))

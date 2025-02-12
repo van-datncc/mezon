@@ -20,7 +20,7 @@ import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -135,7 +135,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				return;
 			}
 
-			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet)) {
 				Toast.show({
 					type: 'error',
 					text1: t('toast.error.exceedWallet')
@@ -157,7 +157,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (directMessageId) {
 				sendInviteMessage(
-					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -166,7 +166,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				const response = await createDirectMessageWithUser(selectedUser?.id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -242,7 +242,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ScrollView style={styles.form}>
 				<Text style={styles.heading}>{t('sendToken')}</Text>
 				<View>
@@ -319,6 +319,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					</Block>
 				</Block>
 			</BottomSheetModal>
-		</SafeAreaView>
+		</View>
 	);
 };

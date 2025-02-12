@@ -7,7 +7,6 @@ import {
 	channelMembersActions,
 	selectAccountCustomStatus,
 	selectCurrentClanId,
-	selectUpdateToken,
 	selectUserStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -47,7 +46,6 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
-	const getTokenSocket = useSelector(selectUpdateToken(user?.userId ?? ''));
 	const memberStatus = useMemberStatus(user?.userId || '');
 	const userStatus = useSelector(selectUserStatus);
 
@@ -116,7 +114,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
 	};
 
-	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus, duration: number, noClearStatus: boolean) => {
+	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus, duration?: number, noClearStatus?: boolean) => {
 		userStatusBottomSheetRef?.current?.dismiss();
 		setIsVisibleAddStatusUserModal(false);
 		dispatch(
@@ -219,9 +217,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<Block flexDirection="row" alignItems="center" gap={size.s_10} marginTop={size.s_10}>
 						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
 						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
-							<Text
-								style={styles.text}
-							>{`${t('token')} ${formatNumber(Number(tokenInWallet) + Number(getTokenSocket), 'vi-VN', 'VND')}`}</Text>
+							<Text style={styles.text}>{`${t('token')} ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}</Text>
 						</TouchableOpacity>
 					</Block>
 					{userCustomStatus ? (

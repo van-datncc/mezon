@@ -21,7 +21,6 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { UserStatus } from '../../../components/UserStatus';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -210,7 +209,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	};
 
 	return (
-		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
+		<View style={styles.dmMessageContainer}>
 			<View style={styles.headerWrapper}>
 				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
 					{isTypeDMGroup ? (
@@ -243,6 +242,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 				</View>
 			</View>
 			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
-		</SafeAreaView>
+		</View>
 	);
 };

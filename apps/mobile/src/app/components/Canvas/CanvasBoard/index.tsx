@@ -2,7 +2,7 @@ import { Block, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useState } from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import { Chase } from 'react-native-animated-spinkit';
 import { WebView } from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -43,7 +43,7 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
   `;
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			{loading && (
 				<Block
 					alignItems={'center'}
@@ -72,6 +72,6 @@ export function CanvasScreen({ navigation, route }: MenuChannelScreenProps<Scree
 					setLoading(false);
 				}}
 			/>
-		</SafeAreaView>
+		</View>
 	);
 }

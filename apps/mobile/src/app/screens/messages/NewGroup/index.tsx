@@ -7,11 +7,11 @@ import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Pressable, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import { useThrottledCallback } from 'use-debounce';
 import { EFriendItemAction } from '../../../components/FriendItem';
 import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
@@ -104,7 +104,8 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: themeValue.primary }}>
+		<View style={{ flex: 1, backgroundColor: themeValue.primary }}>
+			<StatusBarHeight />
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.newGroupContainer}>
 					<View style={styles.headerWrapper}>
@@ -154,6 +155,6 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 					<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 				</View>
 			</TouchableWithoutFeedback>
-		</SafeAreaView>
+		</View>
 	);
 };
