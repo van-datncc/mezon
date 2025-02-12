@@ -8,6 +8,7 @@ import { ChatContextProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { Platform, StatusBar } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
 import VersionInfo from 'react-native-version-info';
@@ -57,7 +58,12 @@ const NavigationMain = memo(
 		};
 
 		return (
-			<NavigationContainer theme={theme}>
+			<NavigationContainer
+				theme={theme}
+				onReady={async () => {
+					await BootSplash.hide({ fade: true });
+				}}
+			>
 				<NetInfoComp />
 				<RootListener />
 				<AuthenticationLoader />

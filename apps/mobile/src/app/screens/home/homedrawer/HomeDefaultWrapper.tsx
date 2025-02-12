@@ -4,7 +4,6 @@ import { sleep } from '@mezon/utils';
 import notifee from '@notifee/react-native';
 import React, { useEffect } from 'react';
 import { Platform, StatusBar } from 'react-native';
-import BootSplash from 'react-native-bootsplash';
 import HomeDefault from './HomeDefault';
 import SwipeBackContainer from './SwipeBackContainer';
 
@@ -35,7 +34,6 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-			await BootSplash.hide({ fade: true });
 		} catch (error) {
 			console.error('Error in tasks:', error);
 		}
