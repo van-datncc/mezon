@@ -10,7 +10,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelIsNotThread, createImgproxyUrl } from '@mezon/utils';
+import { createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -34,7 +34,7 @@ function ChatWelCome({ name, username, avatarDM, mode }: ChatWelComeProp) {
 	const showName = <span className="font-medium">{name || username}</span>;
 
 	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
-	const isChannelThread = selectedChannel?.parrent_id !== ChannelIsNotThread.TRUE;
+	const isChannelThread = mode === ChannelStreamMode.STREAM_MODE_THREAD;
 	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
