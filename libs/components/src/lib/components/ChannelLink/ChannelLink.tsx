@@ -335,11 +335,11 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
 							onClick={handleCreateLinkInvite}
 						/>
-						{numberNotification !== 0 && (
+						{numberNotification && numberNotification > 0 ? (
 							<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs">
 								{numberNotification}
 							</div>
-						)}
+						) : null}
 					</>
 				)}
 			</div>
