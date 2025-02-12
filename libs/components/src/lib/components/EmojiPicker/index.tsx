@@ -111,7 +111,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					messageEmoji?.sender_id ?? '',
 					false,
 					isPublicChannel(currentChannel),
-					messageEmoji?.topic_id,
 					isFocusTopicBox,
 					messageEmoji?.channel_id
 				);

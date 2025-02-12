@@ -51,7 +51,6 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 				userId.userId ?? '',
 				false,
 				isPublicChannel(currentChannel),
-				currentMessage?.topic_id,
 				isFocusTopicBox,
 				currentMessage?.channel_id
 			);

@@ -251,7 +251,6 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				message?.sender_id ?? '',
 				false,
 				isPublicChannel(channel),
-				message?.topic_id,
 				isFocusTopicBox,
 				message?.channel_id
 			);

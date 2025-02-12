@@ -524,7 +524,6 @@ function MessageContextMenu({
 								message?.sender_id ?? '',
 								false,
 								isPublicChannel(currentChannel),
-								message?.topic_id,
 								isFocusTopicBox,
 								message?.channel_id
 							);

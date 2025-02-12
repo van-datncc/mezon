@@ -45,21 +45,10 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			userId.userId ?? '',
 			false,
 			isPublicChannel(currentChannel),
-			currentMessage?.topic_id,
 			isFocusTopicBox,
 			currentMessage?.channel_id
 		);
-	}, [
-		reactionMessageDispatch,
-		messageId,
-		emojiId,
-		emojiShortCode,
-		userId.userId,
-		currentChannel,
-		currentMessage?.topic_id,
-		isFocusTopicBox,
-		currentMessage?.channel_id
-	]);
+	}, [reactionMessageDispatch, messageId, emojiId, emojiShortCode, userId.userId, currentChannel, isFocusTopicBox, currentMessage?.channel_id]);
 
 	return (
 		<div

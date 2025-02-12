@@ -48,7 +48,6 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, mode, message }: UserRea
 			message_sender_id,
 			true,
 			isPublicChannel(currentChannel),
-			message?.topic_id,
 			isFocusTopicBox,
 			message?.channel_id
 		);

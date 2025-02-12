@@ -41,7 +41,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			message_sender_id ?? '',
 			false,
 			isPublicChannel(currentChannel),
-			message?.topic_id,
 			isFocusTopicBox,
 			message?.channel_id
 		);

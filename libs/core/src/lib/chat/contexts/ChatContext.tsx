@@ -281,6 +281,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					sender_id: message.sender_id,
 					timestamp_seconds: message.create_time_seconds
 				};
+
 				dispatch(topicsActions.setTopicLastSent({ topicId: message.topic_id || '', lastSentMess: lastMsg }));
 			}
 
@@ -288,6 +289,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
+				if (message.topic_id && message.topic_id !== '0') {
+					mess.channel_id = mess.topic_id ?? '';
+				}
 				mess.isMe = senderId === userId;
 
 				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
@@ -847,15 +851,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
-			const isMessageByfetch = e.topic_id === '0' && isFocusTopicBox;
-			if (isMessageByfetch) {
-				e.channel_id = currenTopicId ?? '';
-			}
 			const reactionEntity = mapReactionToEntity(e);
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0') {
+				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
+			}
+
 			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
 			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch, isFocusTopicBox, currenTopicId]
+		[dispatch]
 	);
 
 	const onchannelcreated = useCallback(

@@ -117,7 +117,6 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			action_delete: boolean,
 			is_public: boolean,
 			// reaction on topic
-			topic_id?: string,
 			isFocusTopicBox?: boolean,
 			channelIdOnMessage?: string
 		) => {
@@ -138,7 +137,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				isClanView: isClanView as boolean
 			});
 
-			let payloadDispatchReaction = {
+			const payloadDispatchReaction = {
 				id,
 				clanId: currentActive.clanIdActive,
 				channelId: currentActive.channelIdActive,
@@ -151,28 +150,8 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				actionDelete: action_delete,
 				isPublic: payload.is_public,
 				userId: userId as string,
-				topic_id: topic_id
+				topic_id: isFocusTopicBox ? channelIdOnMessage : ''
 			};
-			// Topic
-			const isMessageJustSent = topic_id && topic_id !== '0';
-			const isMessageByFetch = !isMessageJustSent;
-			const reactionMessageJustSent = isFocusTopicBox && isMessageJustSent;
-			const reactionMessageByFetch = isFocusTopicBox && isMessageByFetch;
-
-			if (reactionMessageJustSent && isClanView) {
-				payloadDispatchReaction = {
-					...payloadDispatchReaction,
-					channelId: channelIdOnMessage ?? '',
-					topic_id: topic_id
-				};
-			}
-
-			if (reactionMessageByFetch && isClanView) {
-				payloadDispatchReaction = {
-					...payloadDispatchReaction,
-					topic_id: undefined
-				};
-			}
 
 			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();
 		},
