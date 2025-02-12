@@ -83,6 +83,8 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					<DmListItemLastMessage
 						content={typeof content === 'object' ? content : safeJSONParse(content || '{}')}
 						styleText={{ color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }}
+						messageId={directMessage?.last_sent_message?.id}
+						channelId={directMessage?.channel_id}
 					/>
 				)}
 			</View>

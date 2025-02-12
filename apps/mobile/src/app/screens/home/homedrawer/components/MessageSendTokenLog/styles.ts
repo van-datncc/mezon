@@ -39,5 +39,9 @@ export const style = (colors: Attributes) =>
 			color: baseColor.blurple,
 			fontSize: size.s_14,
 			fontWeight: 'bold'
+		},
+		transactionTitle: {
+			color: baseColor.blurple,
+			fontSize: size.small
 		}
 	});

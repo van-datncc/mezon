@@ -133,7 +133,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				return;
 			}
 
-			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet)) {
 				Toast.show({
 					type: 'error',
 					text1: 'Token amount exceeds wallet balance'
@@ -155,7 +155,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -164,7 +164,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				const response = await createDirectMessageWithUser(selectedUser?.id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
