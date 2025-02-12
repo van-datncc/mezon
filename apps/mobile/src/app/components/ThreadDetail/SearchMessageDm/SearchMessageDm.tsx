@@ -9,6 +9,7 @@ import MessagesSearchTab from '../../MessagesSearchTab';
 import { SearchMessageChannelContext } from '../SearchMessageChannel';
 import HeaderTabSearch from '../SearchMessageChannel/SearchMessagePage/HeaderTabSearch';
 import HeaderSearchMessageDm from './HeaderSearchMessageDm/HeaderSearchMessageDm';
+import StatusBarHeight from "../../StatusBarHeight/StatusBarHeight";
 export enum ACTIVE_TAB {
 	MESSAGES = 0
 }
@@ -83,6 +84,7 @@ export default function SearchMessageDm({ navigation, route }: any) {
 
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
+			<StatusBarHeight />
 			<Block width={'100%'} height={'100%'} backgroundColor={themeValue.primary}>
 				<HeaderSearchMessageDm onChangeText={handleTextChange} />
 				<HeaderTabSearch tabList={TabList} activeTab={activeTab} onPress={handelHeaderTabChange} />

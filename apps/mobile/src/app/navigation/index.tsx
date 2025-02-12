@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/react-native';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import codePush from 'react-native-code-push';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import 'react-native-svg';
 import RootNavigation from './RootNavigator';
@@ -38,13 +37,11 @@ const mezon: CreateMezonClientOptions = {
 
 const App = (props) => {
 	return (
-		<SafeAreaProvider>
-			<I18nextProvider i18n={i18n}>
-				<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
-					<RootNavigation {...props} />
-				</MezonContextProvider>
-			</I18nextProvider>
-		</SafeAreaProvider>
+		<I18nextProvider i18n={i18n}>
+			<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
+				<RootNavigation {...props} />
+			</MezonContextProvider>
+		</I18nextProvider>
 	);
 };
 

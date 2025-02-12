@@ -6,7 +6,7 @@ import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -127,7 +127,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ScrollView style={styles.form}>
 				<Text style={styles.heading}>{t('receiverInfo')}</Text>
 				<View>
@@ -195,6 +195,6 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 					</TouchableOpacity>
 				</View>
 			</Modal>
-		</SafeAreaView>
+		</View>
 	);
 };
