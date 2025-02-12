@@ -11,13 +11,13 @@ import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions, channelsActions, clansActions, directActions, messagesActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter, Platform, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import SwipeBackContainer from '../../home/homedrawer/SwipeBackContainer';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
+import StatusBarHeight from "../../../components/StatusBarHeight/StatusBarHeight";
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
 	const { themeValue, themeBasic } = useTheme();
@@ -196,7 +196,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [from, navigation]);
 
 	return (
-		<SwipeBackContainer>
+		<View style={{ flex: 1 }}>
+			<StatusBarHeight />
 			<HeaderDirectMessage
 				handleBack={handleBack}
 				navigateToThreadDetail={navigateToThreadDetail}
@@ -210,6 +211,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				firstUserId={firstUserId}
 			/>
 			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
-		</SwipeBackContainer>
+		</View>
 	);
 };

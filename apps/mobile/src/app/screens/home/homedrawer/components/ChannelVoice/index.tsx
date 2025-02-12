@@ -3,9 +3,9 @@ import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2 } from '@mezon/store';
 import React, { useEffect } from 'react';
-import { Dimensions, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import RoomView from './RoomView';
 import { style } from './styles';
 
@@ -40,7 +40,8 @@ function ChannelVoice({
 	}, []);
 
 	return (
-		<SafeAreaView edges={['top', 'bottom']}>
+		<View>
+			<StatusBarHeight />
 			<Block
 				style={{
 					width: isAnimationComplete ? width : size.s_100 * 2,
@@ -69,7 +70,7 @@ function ChannelVoice({
 					<RoomView channelId={channelId} onPressMinimizeRoom={onPressMinimizeRoom} isAnimationComplete={isAnimationComplete} />
 				</LiveKitRoom>
 			</Block>
-		</SafeAreaView>
+		</View>
 	);
 }
 

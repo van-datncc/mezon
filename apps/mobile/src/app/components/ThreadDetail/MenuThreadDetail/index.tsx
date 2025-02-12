@@ -6,8 +6,8 @@ import { style } from './style';
 
 import { useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import useBackHardWare from '../../../hooks/useBackHardWare';
+import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
 import { ActionRow } from '../ActionRow';
 import { AssetsViewer } from '../AssetViewer';
 import { ThreadHeader } from '../ThreadHeader';
@@ -30,13 +30,12 @@ export default function MenuThreadDetail(props: { route: any }) {
 
 	return (
 		<threadDetailContext.Provider value={channel}>
-			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
-				<View style={styles.container}>
-					<ThreadHeader />
-					<ActionRow />
-					<AssetsViewer channelId={channel?.channel_id} />
-				</View>
-			</SafeAreaView>
+			<StatusBarHeight />
+			<View style={styles.container}>
+				<ThreadHeader />
+				<ActionRow />
+				<AssetsViewer channelId={channel?.channel_id} />
+			</View>
 		</threadDetailContext.Provider>
 	);
 }

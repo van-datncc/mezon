@@ -2,7 +2,6 @@ import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
 import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../../configs/toastConfig';
 import { style as _style } from './style';
@@ -65,52 +64,50 @@ export const MezonModal = (props: IMezonModalProps) => {
 	return (
 		<Modal visible={visible} animationType={animationType} transparent={true}>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<SafeAreaView style={{ flex: 1 }}>
-					<View style={[styles.container, containerStyle]}>
-						{rightClose ? (
-							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
-								{visibleBackButton ? (
-									<Pressable onPress={() => onBack && onBack()}>
-										<ArrowLeftIcon height={size.s_20} width={size.s_20} />
-									</Pressable>
-								) : (
-									<View />
-								)}
+				<View style={[styles.container, containerStyle]}>
+					{rightClose ? (
+						<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
+							{visibleBackButton ? (
+								<Pressable onPress={() => onBack && onBack()}>
+									<ArrowLeftIcon height={size.s_20} width={size.s_20} />
+								</Pressable>
+							) : (
+								<View />
+							)}
+							<Pressable onPress={() => setVisible(false)}>
+								<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
+							</Pressable>
+						</View>
+					) : (
+						<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
+							<View style={styles.headerContent}>
 								<Pressable onPress={() => setVisible(false)}>
 									<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
 								</Pressable>
-							</View>
-						) : (
-							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
-								<View style={styles.headerContent}>
-									<Pressable onPress={() => setVisible(false)}>
-										<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
-									</Pressable>
-									{isTitleString ? (
-										<Text style={[styles.textTitle, titleStyle]}>{title}</Text>
-									) : (
-										<View style={titleStyle}>{title}</View>
-									)}
-									<Block width={size.s_60}>
-										{rightBtnText ? (
-											<Pressable onPress={() => onClickRightBtn()}>
-												<Text style={styles.confirm}>{rightBtnText}</Text>
-											</Pressable>
-										) : null}
-									</Block>
-								</View>
-								{confirmText ? (
-									<Pressable onPress={() => pressConfirm()}>
-										<Text style={styles.confirm}>{confirmText}</Text>
-									</Pressable>
+								{isTitleString ? (
+									<Text style={[styles.textTitle, titleStyle]}>{title}</Text>
 								) : (
-									<View />
+									<View style={titleStyle}>{title}</View>
 								)}
+								<Block width={size.s_60}>
+									{rightBtnText ? (
+										<Pressable onPress={() => onClickRightBtn()}>
+											<Text style={styles.confirm}>{rightBtnText}</Text>
+										</Pressable>
+									) : null}
+								</Block>
 							</View>
-						)}
-						<View style={[styles.fill, style]}>{children}</View>
-					</View>
-				</SafeAreaView>
+							{confirmText ? (
+								<Pressable onPress={() => pressConfirm()}>
+									<Text style={styles.confirm}>{confirmText}</Text>
+								</Pressable>
+							) : (
+								<View />
+							)}
+						</View>
+					)}
+					<View style={[styles.fill, style]}>{children}</View>
+				</View>
 			</TouchableWithoutFeedback>
 			<Toast config={toastConfig} />
 		</Modal>

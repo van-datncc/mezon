@@ -4,11 +4,11 @@ import { Formik } from 'formik';
 import React from 'react';
 import { Alert, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 import Button from '../../../components/auth/Button';
 import { FooterAuth } from '../../../components/auth/FooterAuth';
 import { TextInputUser } from '../../../components/auth/TextInput';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -33,7 +33,8 @@ const RegisterScreen = () => {
 	const navigation = useNavigation();
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+		<View style={{ flex: 1, backgroundColor: Colors.secondary }}>
+			<StatusBarHeight />
 			<LinearGradient
 				start={{ x: 0, y: 1 }}
 				end={{ x: 1, y: 0 }}
@@ -128,7 +129,7 @@ const RegisterScreen = () => {
 					<FooterAuth content={'Have an account!'} onPress={() => navigation.navigate(APP_SCREEN.LOGIN as never)} title={'Login'} />
 				</KeyboardAvoidingView>
 			</LinearGradient>
-		</SafeAreaView>
+		</View>
 	);
 };
 

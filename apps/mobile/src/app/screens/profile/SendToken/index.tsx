@@ -240,7 +240,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ScrollView style={styles.form}>
 				<Text style={styles.heading}>Send Token</Text>
 				<View>
@@ -317,6 +317,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					</Block>
 				</Block>
 			</BottomSheetModal>
-		</SafeAreaView>
+		</View>
 	);
 };

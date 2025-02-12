@@ -3,9 +3,9 @@ import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { sleep } from '@mezon/utils';
 import notifee from '@notifee/react-native';
 import React, { useEffect } from 'react';
-import { Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar, View } from 'react-native';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import HomeDefault from './HomeDefault';
-import SwipeBackContainer from './SwipeBackContainer';
 
 const HomeDefaultWrapper = React.memo((props: any) => {
 	const { themeValue, themeBasic } = useTheme();
@@ -40,9 +40,10 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 	};
 
 	return (
-		<SwipeBackContainer>
+		<View style={{ flex: 1 }}>
+			<StatusBarHeight />
 			<HomeDefault {...props} />
-		</SwipeBackContainer>
+		</View>
 	);
 });
 
