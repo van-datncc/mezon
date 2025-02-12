@@ -7,6 +7,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentVoiceChannelId,
 	selectInviteChannelId,
+	selectInviteClanId,
 	selectInvitePeopleStatus,
 	selectIsShowEmptyCategory,
 	settingClanStickerActions,
@@ -200,6 +201,7 @@ const InviteClanModal: React.FC = () => {
 	const dispatch = useDispatch();
 	const invitePeopleStatus = useSelector(selectInvitePeopleStatus);
 	const invitePeopleChannelId = useSelector(selectInviteChannelId);
+	const invitePeopleClanId = useSelector(selectInviteClanId);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(
 		() => (
 			<ModalInvite
@@ -208,9 +210,10 @@ const InviteClanModal: React.FC = () => {
 				}}
 				channelID={invitePeopleChannelId}
 				open={true}
+				clanId={invitePeopleClanId}
 			/>
 		),
-		[invitePeopleChannelId]
+		[invitePeopleChannelId, invitePeopleClanId]
 	);
 
 	useEffect(() => {
