@@ -360,7 +360,6 @@ const PanelMember = ({
 										<ItemPanelMember children="Call" />
 									</>
 								)}
-								<ItemPanelMember children="Add Note" />
 								<ItemPanelMember children="Add Friend Nickname" />
 							</>
 						)}
@@ -488,7 +487,6 @@ const PanelMember = ({
 					)}
 					{!isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (
 						<GroupPanelMember>
-							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
 							<ItemPanelMember onClick={handleRemoveMember} children={`Kick ${member?.user?.username}`} danger />
 							<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
