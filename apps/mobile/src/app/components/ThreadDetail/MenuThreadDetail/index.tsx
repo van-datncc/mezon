@@ -30,11 +30,13 @@ export default function MenuThreadDetail(props: { route: any }) {
 
 	return (
 		<threadDetailContext.Provider value={channel}>
-			<StatusBarHeight />
-			<View style={styles.container}>
-				<ThreadHeader />
-				<ActionRow />
-				<AssetsViewer channelId={channel?.channel_id} />
+			<View style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+				<StatusBarHeight />
+				<View style={styles.container}>
+					<ThreadHeader />
+					<ActionRow />
+					<AssetsViewer channelId={channel?.channel_id} />
+				</View>
 			</View>
 		</threadDetailContext.Provider>
 	);

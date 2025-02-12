@@ -1,8 +1,10 @@
 import { ETypeSearch, IOption, IUerMention } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, searchMessagesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { IChannel, SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
 import { createContext, useCallback, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useBackHardWare from '../../../hooks/useBackHardWare';
 import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
@@ -29,7 +31,7 @@ export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const { currentChannel, typeSearch } = route?.params || {};
-
+	const { themeValue } = useTheme();
 	const [userMention, setUserMention] = useState<IUerMention>();
 	const [isSearchMessagePage, setSearchMessagePage] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -105,32 +107,34 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
-			<StatusBarHeight />
-			<InputSearchMessageChannel
-				onKeyPress={handleKeyPress}
-				optionFilter={optionFilter}
-				inputValue={searchText}
-				onChangeText={handleSearchText}
-				onChangeOptionFilter={handleOptionFilter}
-				userMention={userMention}
-				currentChannel={currentChannel}
-			/>
-			{isSearchMessagePage ? (
-				<SearchMessagePage
-					isSearchMessagePage={isSearchMessagePage}
+			<View style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+				<StatusBarHeight />
+				<InputSearchMessageChannel
+					onKeyPress={handleKeyPress}
+					optionFilter={optionFilter}
+					inputValue={searchText}
+					onChangeText={handleSearchText}
+					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
 					currentChannel={currentChannel}
-					searchText={searchText}
-					typeSearch={typeSearch}
 				/>
-			) : (
-				<SearchOptionPage
-					optionFilter={optionFilter}
-					currentChannel={currentChannel}
-					onSelect={handleSelectUserInfo}
-					searchText={searchText}
-				/>
-			)}
+				{isSearchMessagePage ? (
+					<SearchMessagePage
+						isSearchMessagePage={isSearchMessagePage}
+						userMention={userMention}
+						currentChannel={currentChannel}
+						searchText={searchText}
+						typeSearch={typeSearch}
+					/>
+				) : (
+					<SearchOptionPage
+						optionFilter={optionFilter}
+						currentChannel={currentChannel}
+						onSelect={handleSelectUserInfo}
+						searchText={searchText}
+					/>
+				)}
+			</View>
 		</SearchMessageChannelContext.Provider>
 	);
 };
