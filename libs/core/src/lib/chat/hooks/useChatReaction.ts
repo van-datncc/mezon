@@ -159,7 +159,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			const reactionMessageJustSent = isFocusTopicBox && isMessageJustSent;
 			const reactionMessageByFetch = isFocusTopicBox && isMessageByFetch;
 
-			if (reactionMessageJustSent) {
+			if (reactionMessageJustSent && isClanView) {
 				payloadDispatchReaction = {
 					...payloadDispatchReaction,
 					channelId: channelIdOnMessage ?? '',
@@ -167,7 +167,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				};
 			}
 
-			if (reactionMessageByFetch) {
+			if (reactionMessageByFetch && isClanView) {
 				payloadDispatchReaction = {
 					...payloadDispatchReaction,
 					topic_id: undefined
