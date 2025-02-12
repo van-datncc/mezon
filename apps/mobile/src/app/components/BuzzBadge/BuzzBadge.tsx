@@ -47,4 +47,4 @@ function BuzzBadge({ channelId, clanId, mode, customStyles }: BuzzBadgeProps) {
 	);
 }
 
-export default React.memo(BuzzBadge);
+export default BuzzBadge;

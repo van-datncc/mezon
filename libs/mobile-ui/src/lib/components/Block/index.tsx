@@ -217,4 +217,6 @@ const Block = forwardRef((props: BlockProps, ref: React.ForwardedRef<View>) => {
 	);
 });
 
+Block.displayName = 'Block';
+
 export default Block;

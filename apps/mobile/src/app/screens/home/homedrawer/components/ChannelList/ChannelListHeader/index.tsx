@@ -1,5 +1,5 @@
 import { ActionEmitEvent, ETypeSearch, Icons, VerifyIcon } from '@mezon/mobile-components';
-import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel, selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useEffect, useRef } from 'react';
@@ -57,23 +57,25 @@ const ChannelListHeader = () => {
 					</Text>
 					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
 				</View>
-				<Block flexDirection={'row'} alignItems={'center'}>
+				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<Text numberOfLines={1} style={styles.subTitle}>
 						{`${members} ${t('info.members')}`}
 					</Text>
-					<Block
-						width={size.s_4}
-						height={size.s_4}
-						borderRadius={size.s_4}
-						backgroundColor={themeValue.textDisabled}
-						marginHorizontal={size.s_8}
+					<View
+						style={{
+							width: size.s_4,
+							height: size.s_4,
+							borderRadius: size.s_4,
+							backgroundColor: themeValue.textDisabled,
+							marginHorizontal: size.s_8
+						}}
 					/>
 					<Text numberOfLines={1} style={styles.subTitle}>
 						Community
 					</Text>
-				</Block>
+				</View>
 			</TouchableOpacity>
-			<Block marginTop={size.s_10} flexDirection={'row'} gap={size.s_8}>
+			<View style={{ marginTop: size.s_10, flexDirection: 'row', gap: size.s_8 }}>
 				<TouchableOpacity activeOpacity={0.8} onPress={navigateToSearchPage} style={styles.wrapperSearch}>
 					<Icons.MagnifyingIcon color={themeValue.text} height={size.s_18} width={size.s_18} />
 					<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
@@ -84,9 +86,9 @@ const ChannelListHeader = () => {
 				<TouchableOpacity activeOpacity={0.8} onPress={onOpenEvent} style={styles.iconWrapper}>
 					<Icons.CalendarIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 				</TouchableOpacity>
-			</Block>
+			</View>
 		</View>
 	);
 };
 
-export default memo(ChannelListHeader);
+export default memo(ChannelListHeader, () => true);
