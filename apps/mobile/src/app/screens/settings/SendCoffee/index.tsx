@@ -50,7 +50,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				return;
 			}
 
-			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet)) {
 				Toast.show({
 					type: 'error',
 					text1: t('toast.error.exceedWallet')
@@ -74,7 +74,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 
 			if (directMessageId) {
 				sendInviteMessage(
-					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -83,7 +83,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				const response = await createDirectMessageWithUser(jsonObject?.receiver_id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
