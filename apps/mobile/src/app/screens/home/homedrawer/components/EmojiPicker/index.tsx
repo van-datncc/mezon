@@ -18,6 +18,8 @@ import React, { MutableRefObject, useCallback, useEffect, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { EMessageActionType } from '../../enums';
+import { IMessageActionNeedToResolve } from '../../types';
 import EmojiSelector from './EmojiSelector';
 import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
@@ -27,6 +29,7 @@ export type IProps = {
 	onDone: () => void;
 	bottomSheetRef: MutableRefObject<BottomSheetMethods>;
 	directMessageId?: string;
+	messageActionNeedToResolve?: IMessageActionNeedToResolve | null;
 };
 
 interface TextTabProps {
@@ -48,7 +51,7 @@ function TextTab({ selected, title, onPress }: TextTabProps) {
 
 type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
-function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
+function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActionNeedToResolve }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -67,10 +70,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		initLoader();
 	}, []);
 
-	useEffect(() => {
-		stickerLoader();
-	}, [clanId, currentDirectMessage?.channel_id]);
-
 	const initLoader = async () => {
 		const promises = [];
 		const store = await getStoreAsync();
@@ -85,6 +84,10 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		promises.push(store.dispatch(settingClanStickerActions.fetchStickerByUserId({})));
 		await Promise.all(promises);
 	}, []);
+
+	useEffect(() => {
+		stickerLoader();
+	}, [clanId, currentDirectMessage?.channel_id, stickerLoader]);
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -104,10 +107,32 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	);
 
 	function handleSelected(type: ExpressionType, data: any) {
+		let messageRef;
+		if (messageActionNeedToResolve?.type === EMessageActionType.Reply) {
+			const targetMessage = messageActionNeedToResolve?.targetMessage;
+			messageRef = {
+				message_id: '',
+				message_ref_id: targetMessage?.id,
+				ref_type: 0,
+				message_sender_id: targetMessage?.sender_id,
+				message_sender_username: targetMessage?.username,
+				mesages_sender_avatar: targetMessage?.clan_avatar ? targetMessage?.clan_avatar : targetMessage?.avatar,
+				message_sender_clan_nick: targetMessage?.clan_nick,
+				message_sender_display_name: targetMessage?.display_name,
+				content: JSON.stringify(targetMessage?.content),
+				has_attachment: Boolean(targetMessage?.attachments?.length),
+				channel_id: targetMessage?.channel_id ?? '',
+				mode: targetMessage?.mode ?? 0,
+				channel_label: targetMessage?.channel_label
+			};
+		} else {
+			messageRef = {};
+		}
+
 		if (type === 'gif') {
-			handleSend({ t: '' }, [], [{ url: data }], []);
+			handleSend({ t: '' }, [], [{ url: data }], [messageRef]);
 		} else if (type === 'sticker') {
-			handleSend({ t: '' }, [], [{ url: data, height: 40, width: 40, filetype: 'image/gif' }], []);
+			handleSend({ t: '' }, [], [{ url: data, height: 40, width: 40, filetype: 'image/gif' }], [messageRef]);
 		} else {
 			/* empty */
 		}
