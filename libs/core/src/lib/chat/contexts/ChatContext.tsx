@@ -965,6 +965,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
+				dispatch(listChannelRenderAction.updateClanBadgeRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
 				dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
 			}
 		},
