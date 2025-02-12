@@ -23,18 +23,16 @@ const ChannelLayout = () => {
 
 	return (
 		<div onMouseDown={onMouseDown} className="flex flex-col z-20 flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible  relative">
-			{shouldRender && isChannelVoice && (
+			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
-			)}
-			{shouldRender && !isChannelVoice && (
+			) : (
 				<>
 					<div
 						className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`} ${isChannelStream ? 'justify-center items-center mx-4' : ''}`}
 					>
 						<Outlet />
 					</div>
-
-					<ReactionEmojiPanel closeMenu={closeMenu} currentChannelId={currentChannel?.channel_id ?? ''} />
+					shouldRender && <ReactionEmojiPanel closeMenu={closeMenu} currentChannelId={currentChannel?.channel_id ?? ''} />
 				</>
 			)}
 		</div>
