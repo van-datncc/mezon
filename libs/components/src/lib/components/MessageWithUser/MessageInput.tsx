@@ -6,6 +6,7 @@ import {
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectChannelDraftMessage,
+	selectCurrentChannelId,
 	selectTheme,
 	useAppSelector
 } from '@mezon/store';
@@ -56,8 +57,9 @@ type ChannelsMentionProps = {
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message, isTopic }) => {
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
-		channelId,
+		isTopic ? currentChannelId || '' : channelId,
 		channelLabel,
 		mode,
 		message
@@ -105,8 +107,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	// update prefix if type: c/pre/boldtext
-	const markdownHasPrefix = getMarkdownPrefixItems(channelDraftMessage.draftContent.mk ?? []);
-	const plaintextOriginal = channelDraftMessage.draftContent.t;
+	const markdownHasPrefix = getMarkdownPrefixItems(channelDraftMessage?.draftContent?.mk ?? []);
+	const plaintextOriginal = channelDraftMessage?.draftContent?.t;
 	const updatePrefixDraftMesssage = useMemo(() => {
 		const originalDraftContent = {
 			hg: channelDraftMessage?.draftContent?.hg,
@@ -125,7 +127,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					...originalDraftContent,
 					t: plaintextOriginal
 				},
-				mentionNewPos: channelDraftMessage.draftMention
+				mentionNewPos: channelDraftMessage?.draftMention
 			};
 		} else {
 			// to add `/``` or ** to token markdown
@@ -135,9 +137,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			// get the new plaintext with token added prefix
 			const newPlaintext = generateNewPlaintext(updatedNewPos, plaintextOriginal ?? '');
 			// update pos mention
-			const mentionNewPos = adjustTokenPositions(channelDraftMessage.draftMention ?? [], updatedNewPos, true);
-			const hashtagNewPos = adjustTokenPositions(originalDraftContent.hg ?? [] ?? [], updatedNewPos, true);
-			const emojiNewPos = adjustTokenPositions(originalDraftContent.ej ?? [] ?? [], updatedNewPos, true);
+			const mentionNewPos = adjustTokenPositions(channelDraftMessage?.draftMention ?? [], updatedNewPos, true);
+			const hashtagNewPos = adjustTokenPositions(originalDraftContent?.hg ?? [] ?? [], updatedNewPos, true);
+			const emojiNewPos = adjustTokenPositions(originalDraftContent?.ej ?? [] ?? [], updatedNewPos, true);
 
 			return {
 				updatedDraftContent: {
@@ -149,7 +151,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				mentionNewPos: mentionNewPos
 			};
 		}
-	}, [channelDraftMessage.draftContent.t]);
+	}, [channelDraftMessage?.draftContent?.t]);
 
 	const { updatedDraftContent, mentionNewPos } = updatePrefixDraftMesssage;
 

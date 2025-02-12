@@ -34,7 +34,12 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
-import { ApiNotifiReactMessage, ApiNotificationChannelCategorySetting, ApiPermissionRoleChannel } from 'mezon-js/dist/api.gen';
+import {
+	ApiAllUsersAddChannelResponse,
+	ApiNotifiReactMessage,
+	ApiNotificationChannelCategorySetting,
+	ApiPermissionRoleChannel
+} from 'mezon-js/dist/api.gen';
 import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
 import { ILongPressType } from '../hooks';
@@ -148,6 +153,10 @@ export type IChannel = ApiChannelDescription & {
 };
 
 export type INotificationUserChannel = ApiNotificationUserChannel & {
+	id: string;
+};
+
+export type IUserChannel = ApiAllUsersAddChannelResponse & {
 	id: string;
 };
 

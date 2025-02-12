@@ -1,3 +1,4 @@
+import { registerGlobals } from '@livekit/react-native';
 import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import { AppRegistry } from 'react-native';
@@ -18,6 +19,7 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 });
 AppRegistry.registerComponent('ComingCallApp', () => CustomIncomingCall);
 AppRegistry.registerComponent('Mobile', () => HeadlessCheck);
+registerGlobals();
 
 function HeadlessCheck({ isHeadless }) {
 	if (isHeadless) {

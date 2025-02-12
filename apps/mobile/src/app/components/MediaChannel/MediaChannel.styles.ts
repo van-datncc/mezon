@@ -28,7 +28,7 @@ export const style = (colors: Attributes) =>
 			paddingBottom: size.s_50,
 			justifyContent: 'flex-start',
 			alignItems: 'flex-start',
-			paddingHorizontal: size.s_10,
+			paddingHorizontal: size.s_8,
 			flexGrow: 1
 		}
 	});

@@ -2,11 +2,11 @@ import { Block, useTheme } from '@mezon/mobile-ui';
 import { default as React, memo, useEffect } from 'react';
 import { style } from './styles';
 
+import { RTCView } from '@livekit/react-native-webrtc';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
-import { RTCView } from 'react-native-webrtc';
 import Images from '../../../../../../../assets/Images';
 import { useWebRTCStream } from '../../../../../../components/StreamContext/StreamContext';
 export function StreamingScreen() {

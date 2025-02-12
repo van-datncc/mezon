@@ -1,4 +1,4 @@
-import { ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
@@ -6,9 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Keyboard, Linking, Text, View } from 'react-native';
+import { DeviceEventEmitter, FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../utils/helpers';
 import { ChannelItem } from '../ChannelItem';
@@ -26,9 +25,11 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	const styles = style(themeValue);
 	const timeoutRef = useRef<NodeJS.Timeout>();
 	const navigation = useNavigation<any>();
-	const isTabletLandscape = useTabletLandscape();
 	const listVoiceChannel = useMemo(
-		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE),
+		() =>
+			listChannelSearch?.filter(
+				(channel) => channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
+			),
 		[listChannelSearch]
 	);
 	const listTextChannel = useMemo(
@@ -63,6 +64,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 			}
+
 			const clanId = channelData?.clan_id;
 			const store = await getStoreAsync();
 			// Join clan
@@ -72,7 +74,8 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 				});
 			}
-			if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+
+			if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 				const channelId = channelData?.channel_id;
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
@@ -85,9 +88,17 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 				// Set cache
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			} else if (channelData?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+				navigation.goBack();
+				if (!channelData.meeting_code) return;
+				const data = {
+					channelId: channelData?.channel_id || '',
+					roomName: channelData?.meeting_code
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 			}
 		},
-		[currentClanId, isTabletLandscape, navigation]
+		[currentClanId, navigation]
 	);
 
 	const renderItem = ({ item }) => {

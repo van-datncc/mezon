@@ -54,7 +54,8 @@
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
         "target": [
           "nsis",
-          "portable"
+          "portable",
+          "appx"
         ],
         "appId": "app.mezon.ai",
         "publish": [
@@ -84,6 +85,13 @@
         ],
         "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
       },
+      "appx": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
+        "publisherDisplayName": "NCCPLUS",
+        "identityName": "MEZON.Mezon",
+        "displayName": "MEZON"
+       },
       "linux": {
         "icon": "apps/desktop/src/assets/linux-icon.icns",
         "category": "Utility",
@@ -190,7 +198,8 @@
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis",
-            "portable"
+            "portable",
+            "appx"
           ],
           "appId": "app.mezon.ai",
           "publish": [
@@ -220,6 +229,13 @@
           ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
+      "appx": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
+        "publisherDisplayName": "NCCPLUS",
+        "identityName": "MEZON.Mezon",
+        "displayName": "MEZON"
+       },
         "linux": {
           "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",
@@ -281,7 +297,8 @@
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis",
-            "portable"
+            "portable",
+            "appx"
           ],
           "appId": "app.mezon.ai",
           "publish": [
@@ -310,6 +327,13 @@
           ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
+      "appx": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
+        "publisherDisplayName": "NCCPLUS",
+        "identityName": "MEZON.Mezon",
+        "displayName": "MEZON"
+       },
         "linux": {
           "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",

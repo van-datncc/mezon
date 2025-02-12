@@ -98,6 +98,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
   const hasUnread = useAppSelector(state=>selectIsUnreadThreadInChannel(state,channel.threadIds || []))
 	const renderChannelContent = useMemo(() => {
 		if (
+			channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channel.type !== ChannelType.CHANNEL_TYPE_APP &&

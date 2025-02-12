@@ -5,6 +5,7 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import { Dimensions } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
+import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import HomeScreen from '../../screens/home/HomeScreen';
@@ -31,7 +32,8 @@ export const Authentication = memo(() => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					...TransitionPresets.SlideFromRightIOS
+					...TransitionPresets.ModalFadeTransition,
+					animationEnabled: false
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigatorWrapper} />
@@ -39,6 +41,7 @@ export const Authentication = memo(() => {
 					name={APP_SCREEN.HOME_DEFAULT}
 					component={isTabletLandscape ? HomeScreen : HomeDefaultWrapper}
 					options={{
+						animationEnabled: false,
 						headerShown: false,
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',
@@ -49,6 +52,7 @@ export const Authentication = memo(() => {
 					name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
 					component={DirectMessageDetailScreen}
 					options={{
+						animationEnabled: false,
 						headerShown: false,
 						headerShadowVisible: false,
 						gestureEnabled: true,
@@ -71,6 +75,7 @@ export const Authentication = memo(() => {
 			</RootStack.Navigator>
 			<CallingModalWrapper />
 			<StreamingWrapper />
+			<ChannelVoicePopup />
 		</BottomSheetModalProvider>
 	);
 });

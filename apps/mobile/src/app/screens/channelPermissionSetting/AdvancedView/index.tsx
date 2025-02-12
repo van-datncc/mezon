@@ -17,7 +17,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation('channelSetting');
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const allUserInChannel = useSelector(selectAllUserChannel);
+	const allUserInChannel = useSelector(selectAllUserChannel(channel.channel_id));
 
 	const listOfRoleAndMemberInChannel = useMemo(() => {
 		if ((!listOfChannelRole?.length && !allUserInChannel?.length) || !!channel?.channel_private) {

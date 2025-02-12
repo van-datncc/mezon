@@ -1,20 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { captureSentryError } from '@mezon/logger';
 import {
-	ActivitiesEntity,
-	AttachmentEntity,
-	ChannelsEntity,
-	DMCallActions,
-	RootState,
 	accountActions,
 	acitvitiesActions,
+	ActivitiesEntity,
 	appActions,
 	attachmentActions,
+	AttachmentEntity,
 	audioCallActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
 	channelsActions,
+	ChannelsEntity,
 	channelsSlice,
 	clanMembersMetaActions,
 	clansActions,
@@ -24,6 +22,7 @@ import {
 	directMembersMetaActions,
 	directMetaActions,
 	directSlice,
+	DMCallActions,
 	e2eeActions,
 	emojiSuggestionActions,
 	eventManagementActions,
@@ -43,7 +42,9 @@ import {
 	policiesActions,
 	reactionActions,
 	rolesClanActions,
+	RootState,
 	selectAllTextChannel,
+	selectAllThreads,
 	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
@@ -56,6 +57,7 @@ import {
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	stickerSettingActions,
+	threadsActions,
 	toastActions,
 	topicsActions,
 	useAppDispatch,
@@ -72,17 +74,18 @@ import {
 	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
+	electronBridge,
 	EOverriddenPermission,
 	ERepeatType,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
+	LIMIT,
 	ModeResponsive,
 	NotificationCode,
+	ThreadStatus,
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
-	ThreadStatus,
-	TypeMessage,
-	electronBridge
+	TypeMessage
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -125,7 +128,7 @@ import {
 	VoiceLeavedEvent,
 	WebrtcSignalingFwd
 } from 'mezon-js';
-import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -165,6 +168,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
+	const allThreads = useSelector(selectAllThreads);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -594,6 +598,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
+
+					if (channel_desc.parrent_id) {
+						dispatch(
+							threadsActions.updateActiveCodeThread({
+								channelId: channel_desc.channel_id || '',
+								activeCode: ThreadStatus.joined
+							})
+						);
+					}
 				}
 				if (channel_desc.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					dispatch(
@@ -643,7 +656,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				);
 			}
 			if (userAdds.status !== ADD_ROLE_CHANNEL_STATUS) {
-				dispatch(userChannelsActions.upsertMany(userIds));
+				dispatch(userChannelsActions.addUserChannel({ channelId: channel_desc.channel_id as string, userAdds: userIds }));
 			}
 		},
 		[userId, clanIdActive, dispatch]
@@ -841,6 +854,28 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
+			if (channelCreated.parrent_id) {
+				const now = Date.now() / 1000;
+				const newThread = {
+					...channelCreated,
+					type: channelCreated.channel_type,
+					last_sent_message: {
+						sender_id: channelCreated.creator_id,
+						timestamp_seconds: now
+					},
+					active: channelCreated.creator_id === userId ? ThreadStatus.joined : ThreadStatus.activePublic
+				};
+				const defaultThreadList: ApiChannelDescription[] = [newThread, ...((allThreads || []) as ApiChannelDescription[])];
+
+				dispatch(
+					threadsActions.updateCacheOnThreadCreation({
+						clanId: channelCreated.clan_id,
+						channelId: channelCreated.parrent_id,
+						defaultThreadList: defaultThreadList.length > LIMIT ? defaultThreadList.slice(0, -1) : defaultThreadList
+					})
+				);
+			}
+
 			if (channelCreated.creator_id === userId) {
 				if (channelCreated.parrent_id) {
 					const thread: ChannelsEntity = {
@@ -901,7 +936,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			}
 		},
-		[dispatch]
+		[dispatch, allThreads]
 	);
 
 	const onclandeleted = useCallback(

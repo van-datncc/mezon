@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { updateCacheUserChannels } from '../channelmembers/AllUsersChannelByAddChannel.slice';
+import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
@@ -21,7 +21,7 @@ export const addChannelUsers = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			if (channelId && channelType) {
-				await updateCacheUserChannels(mezon, channelId, undefined, userIds);
+				thunkAPI.dispatch(userChannelsActions.addUserChannel({ channelId: channelId, userAdds: userIds }));
 			}
 			return response;
 		} catch (error) {
@@ -57,7 +57,7 @@ export const removeChannelUsers = createAsyncThunk(
 					repace: true
 				};
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-				await updateCacheUserChannels(mezon, channelId, userId, undefined);
+				thunkAPI.dispatch(userChannelsActions.removeUserChannel({ channelId: channelId, userRemoves: userIds }));
 			}
 			return response;
 		} catch (error) {
