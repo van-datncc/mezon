@@ -155,7 +155,7 @@ const ChannelVoicePopup = () => {
 	if (!voicePlay) return null;
 	return (
 		<Animated.View
-			{...panResponder.panHandlers}
+			{...(!isAnimationComplete ? panResponder.panHandlers : {})}
 			style={[
 				pan?.getLayout(),
 				{

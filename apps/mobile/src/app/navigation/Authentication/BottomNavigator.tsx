@@ -1,8 +1,7 @@
 import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React, { memo, useEffect } from 'react';
-import BootSplash from 'react-native-bootsplash';
+import React, { memo } from 'react';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import Notifications from '../../screens/Notifications';
 import HomeScreen from '../../screens/home/HomeScreen';
@@ -16,10 +15,6 @@ const TabStack = createBottomTabNavigator();
 const BottomNavigator = memo(({ isLastActiveTabDm = false }: { isLastActiveTabDm: boolean }) => {
 	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-
-	useEffect(() => {
-		BootSplash.hide({ fade: true });
-	}, []);
 
 	return (
 		<TabStack.Navigator
