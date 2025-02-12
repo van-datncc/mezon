@@ -7,6 +7,7 @@ import { IModeKeyboardPicker } from './components';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
+import { IMessageActionNeedToResolve } from './types';
 
 interface IProps {
 	directMessageId?: string;
@@ -21,6 +22,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const timer = useRef<NodeJS.Timeout | null>(null);
 	const animatedHeight = useRef(new Animated.Value(0)).current;
+	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 
 	const onShowKeyboardBottomSheet = useCallback(
 		(isShow: boolean, type?: IModeKeyboardPicker) => {
@@ -83,6 +85,15 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
 	}, [onShowKeyboardBottomSheet]);
 
+	useEffect(() => {
+		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
+			setMessageActionNeedToResolve(value);
+		});
+		return () => {
+			showKeyboard.remove();
+		};
+	}, []);
+
 	return (
 		<>
 			<Animated.View
@@ -94,7 +105,12 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 				<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
 					{typeKeyboardBottomSheet === 'emoji' ? (
-						<EmojiPicker onDone={onClose} bottomSheetRef={bottomPickerRef} directMessageId={props?.directMessageId || ''} />
+						<EmojiPicker
+							onDone={onClose}
+							bottomSheetRef={bottomPickerRef}
+							directMessageId={props?.directMessageId || ''}
+							messageActionNeedToResolve={messageActionNeedToResolve}
+						/>
 					) : typeKeyboardBottomSheet === 'attachment' ? (
 						<AttachmentPicker currentChannelId={props?.currentChannelId} currentClanId={props?.currentClanId} onCancel={onClose} />
 					) : (
