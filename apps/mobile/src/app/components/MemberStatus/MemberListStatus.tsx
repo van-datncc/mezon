@@ -15,7 +15,6 @@ import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, SectionList, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../screens/home/homedrawer/components/InviteToChannel';
@@ -124,69 +123,67 @@ export const MemberListStatus = React.memo(() => {
 	};
 
 	return (
-		<ScrollView style={styles.container}>
-			<View>
-				{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
-					<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={styles.actionItem}>
-						<View style={[styles.actionIconWrapper]}>
-							<Icons.GroupIcon height={20} width={20} color={baseColor.white} />
-						</View>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.actionTitle}>{t('message:newMessage.newGroup')}</Text>
-							<Text style={styles.newGroupContent} numberOfLines={1}>
-								{t('message:newMessage.createGroupWith')} {currentChannel?.channel_label}
-							</Text>
-						</View>
-						<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
-					</TouchableOpacity>
-				) : null}
+		<View style={styles.container}>
+			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
+				<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={styles.actionItem}>
+					<View style={[styles.actionIconWrapper]}>
+						<Icons.GroupIcon height={20} width={20} color={baseColor.white} />
+					</View>
+					<View style={{ flex: 1 }}>
+						<Text style={styles.actionTitle}>{t('message:newMessage.newGroup')}</Text>
+						<Text style={styles.newGroupContent} numberOfLines={1}>
+							{t('message:newMessage.createGroupWith')} {currentChannel?.channel_label}
+						</Text>
+					</View>
+					<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
+				</TouchableOpacity>
+			) : null}
 
-				{currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM ? (
-					<Pressable
-						onPress={() => {
-							handleAddOrInviteMembers(isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers);
-						}}
-					>
-						<View style={styles.inviteBtn}>
-							<View style={styles.iconNameWrapper}>
-								<View style={styles.iconWrapper}>
-									<Icons.UserPlusIcon height={20} width={20} color={baseColor.white} />
-								</View>
-								<Text style={styles.textInvite}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
+			{currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM ? (
+				<Pressable
+					onPress={() => {
+						handleAddOrInviteMembers(isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers);
+					}}
+				>
+					<View style={styles.inviteBtn}>
+						<View style={styles.iconNameWrapper}>
+							<View style={styles.iconWrapper}>
+								<Icons.UserPlusIcon height={20} width={20} color={baseColor.white} />
 							</View>
-							<View>
-								<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
-							</View>
+							<Text style={styles.textInvite}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
 						</View>
-					</Pressable>
-				) : null}
+						<View>
+							<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
+						</View>
+					</View>
+				</Pressable>
+			) : null}
 
-				{onlineMembers?.length > 0 || offlineMembers?.length > 0 ? (
-					<SectionList
-						sections={[
-							{ title: 'Member', data: onlineMembers },
-							{ title: 'Offline', data: offlineMembers }
-						]}
-						keyExtractor={(_, index) => `channelMember[${index}]`}
-						renderItem={renderMemberItem}
-						renderSectionHeader={({ section: { title } }) => (
-							<Text style={styles.text}>
-								{title} - {title === 'Member' ? onlineMembers?.length : offlineMembers?.length}
-							</Text>
-						)}
-						contentContainerStyle={{ paddingBottom: size.s_60 }}
-						nestedScrollEnabled
-						removeClippedSubviews={true}
-						showsVerticalScrollIndicator={false}
-						stickySectionHeadersEnabled={false}
-						initialNumToRender={10}
-						maxToRenderPerBatch={10}
-						windowSize={5}
-					/>
-				) : null}
-			</View>
-			<UserInformationBottomSheet userId={selectedUser?.user?.id} user={selectedUser} onClose={onClose} currentChannel={currentChannel} />
+			{onlineMembers?.length > 0 || offlineMembers?.length > 0 ? (
+				<SectionList
+					sections={[
+						{ title: 'Member', data: onlineMembers },
+						{ title: 'Offline', data: offlineMembers }
+					]}
+					keyExtractor={(_, index) => `channelMember[${index}]`}
+					renderItem={renderMemberItem}
+					renderSectionHeader={({ section: { title } }) => (
+						<Text style={styles.text}>
+							{title} - {title === 'Member' ? onlineMembers?.length : offlineMembers?.length}
+						</Text>
+					)}
+					contentContainerStyle={{ paddingBottom: size.s_60 }}
+					nestedScrollEnabled
+					removeClippedSubviews={true}
+					showsVerticalScrollIndicator={false}
+					stickySectionHeadersEnabled={false}
+					initialNumToRender={10}
+					maxToRenderPerBatch={10}
+					windowSize={5}
+				/>
+			) : null}
+			<UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={onClose} />
 			<InviteToChannel isUnknownChannel={false} ref={bottomSheetRef} isDMThread={isDMThread} />
-		</ScrollView>
+		</View>
 	);
 });
