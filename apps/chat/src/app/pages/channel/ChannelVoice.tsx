@@ -41,7 +41,7 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import { ParticipantMeetState } from '@mezon/utils';
+import { isLinuxDesktop, isWindowsDesktop, ParticipantMeetState } from '@mezon/utils';
 
 import { Icons } from '@mezon/ui';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
@@ -156,8 +156,8 @@ const ChannelVoice = () => {
 
 	return (
 		<div
-			className={`h-full ${!isChannelMezonVoice ? 'hidden' : ''} absolute bottom-0 right-0 z-30`}
-			style={{ width: 'calc(100% - 72px - 272px)' }}
+			className={`h-full ${!isChannelMezonVoice ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
+			style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
 		>
 			{token === '' || !serverUrl ? (
 				<PreJoinChannelVoice
