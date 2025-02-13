@@ -47,6 +47,12 @@ export enum EFriendState {
 	Block
 }
 
+export const formatDate = (dateString: string) => {
+	const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+	const date = new Date(dateString);
+	return date.toLocaleDateString('en-US', options);
+};
+
 const UserProfile = React.memo(
 	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel }: userProfileProps) => {
 		const { themeValue } = useTheme();
@@ -225,7 +231,7 @@ const UserProfile = React.memo(
 							avatarUrl={
 								!isDM
 									? messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url
-									: userById?.user?.avatar_url || user?.user?.avatar_url || messageAvatar
+									: userById?.user?.avatar_url || user?.user?.avatar_url || user?.avatar_url || messageAvatar
 							}
 							username={user?.user?.username}
 							userStatus={userStatus}
@@ -247,7 +253,10 @@ const UserProfile = React.memo(
 										user?.user?.display_name ||
 										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
-								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
+								: user?.display_name ||
+									user?.username ||
+									user?.user?.display_name ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
@@ -290,6 +299,14 @@ const UserProfile = React.memo(
 
 					{isShowUserContent && (
 						<View style={[styles.roleGroup]}>
+							{!isDMGroup && (userById?.user?.create_time || user?.create_time || user?.user?.create_time) && (
+								<View style={styles.memberSince}>
+									<Text style={styles.title}>{t('userInfoDM.mezonMemberSince')}</Text>
+									<Text style={styles.subUserName}>
+										{formatDate(userById?.user?.create_time || user?.create_time || user?.user?.create_time)}
+									</Text>
+								</View>
+							)}
 							{!!userById?.user?.about_me && (
 								<Block padding={size.s_16}>
 									<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
@@ -315,7 +332,9 @@ const UserProfile = React.memo(
 									</View>
 								</Block>
 							) : null}
-							{isDMGroup && !isCheckOwner && isChannelOwner && <UserInfoDm currentChannel={currentChannel} user={userById} />}
+							{isDMGroup && !isCheckOwner && isChannelOwner && (
+								<UserInfoDm currentChannel={currentChannel} user={userById || (user as any)} />
+							)}
 							{showAction && !isKicked && <UserSettingProfile user={userById || (user as any)} />}
 						</View>
 					)}
