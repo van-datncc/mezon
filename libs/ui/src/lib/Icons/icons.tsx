@@ -5816,7 +5816,7 @@ export function CDNIcon(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				{' '}
 				<title>91</title> <defs> </defs>{' '}
-				<g stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
+				<g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
 					{' '}
 					<g fill="currentColor">
 						{' '}
