@@ -451,13 +451,13 @@ export const RenderTextMarkdownContent = React.memo(
 		const lkm = Array.isArray(lk) ? lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })) : [];
 		const vkm = Array.isArray(vk) ? vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })) : [];
 		const elements: ElementToken[] = [
-			...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
+			...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
 			...hgm,
 			...ejm,
 			...mkm,
 			...lkm,
 			...vkm
-		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		]?.sort?.((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		let lastIndex = 0;
 

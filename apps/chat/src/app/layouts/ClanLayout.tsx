@@ -17,6 +17,7 @@ import {
 	selectIsShowCreateTopic,
 	selectStatusMenu,
 	selectVoiceFullScreen,
+	topicsActions,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
@@ -24,7 +25,7 @@ import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation } from 'react-router-dom';
 import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
@@ -94,6 +95,10 @@ const ClanLayout = () => {
 	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 	const isInCall = useSelector(selectIsInCall);
 	const isJoin = useSelector(selectIsJoin);
+	const dispatch = useDispatch();
+	const onMouseDown = () => {
+		dispatch(topicsActions.setFocusTopicBox(true));
+	};
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 
 	return (
@@ -135,13 +140,13 @@ const ClanLayout = () => {
 				)}
 			</div>
 			{isShowCreateThread && !isShowCreateTopic && (
-				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 					<ThreadsMain />
 				</div>
 			)}
 
 			{isShowCreateTopic && !isShowCreateThread && (
-				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDown} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 					<TopicDiscussionMain />
 				</div>
 			)}

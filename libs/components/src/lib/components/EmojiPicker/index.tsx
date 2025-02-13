@@ -1,8 +1,7 @@
-import { useAppParams, useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
+import { useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
 	emojiSuggestionActions,
 	referencesActions,
-	selectClanView,
 	selectCurrentChannel,
 	selectMessageByMessageId,
 	selectModeResponsive,
@@ -20,6 +19,10 @@ export type EmojiCustomPanelOptions = {
 	isReaction?: boolean;
 	onClickAddButton?: () => void;
 	onClose: () => void;
+	isFocusTopicBox?: boolean;
+	currenTopicId?: string;
+	directId?: string;
+	isClanView: boolean;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -83,16 +86,15 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}));
 	}, [categoriesEmoji, categoryIcons]);
 
+	const channelID = props.isClanView ? currentChannel?.id : props.directId;
+	const messageEmoji = useAppSelector((state) =>
+		selectMessageByMessageId(state, props.isFocusTopicBox ? props.currenTopicId : channelID, props.messageEmojiId || '')
+	);
 	const { reactionMessageDispatch } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const [emojiId, setEmojiId] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
-	const { directId } = useAppParams();
-
-	const isClanView = useSelector(selectClanView);
-	const channelID = isClanView ? currentChannel?.id : directId;
-	const messageEmoji = useAppSelector((state) => selectMessageByMessageId(state, channelID, props.messageEmojiId || ''));
 
 	const handleEmojiSelect = useCallback(
 		async (emojiId: string, emojiPicked: string) => {
@@ -106,7 +108,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					messageEmoji?.sender_id ?? '',
 					false,
 					isPublicChannel(currentChannel),
-					messageEmoji.content?.tp ?? ''
+					props.isFocusTopicBox,
+					messageEmoji?.channel_id
 				);
 				setSubPanelActive(SubPanelName.NONE);
 				dispatch(referencesActions.setIdReferenceMessageReaction(''));

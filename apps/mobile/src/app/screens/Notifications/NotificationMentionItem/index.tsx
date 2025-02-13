@@ -1,4 +1,5 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectClanById, useAppSelector } from '@mezon/store-mobile';
 import { getNameForPrioritize } from '@mezon/utils';
@@ -7,7 +8,6 @@ import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { MezonAvatar } from '../../../componentUI';
-import { useMessageParser } from '../../../hooks/useMessageParser';
 import MessageNotification from '../MessageNotification';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { style } from './NotificationMentionItem.styles';
@@ -62,7 +62,8 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 	const data = parseObject(notify?.content);
 	const clan = useAppSelector(selectClanById(notify?.content?.clan_id as string));
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(notify?.sender_id);
-	const { messageTimeDifference } = useMessageParser(data);
+	const unixTimestamp = Math.floor(new Date(data?.create_time).getTime() / 1000);
+	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
 	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 	const subjectText = useMemo(() => {
 		return clan?.clan_name && channelInfo?.channel_label
