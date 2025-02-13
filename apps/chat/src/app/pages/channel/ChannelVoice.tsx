@@ -152,8 +152,6 @@ const ChannelVoice = () => {
 		[dispatch]
 	);
 
-	if (!isChannelMezonVoice) return null;
-
 	const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 
 	return (
