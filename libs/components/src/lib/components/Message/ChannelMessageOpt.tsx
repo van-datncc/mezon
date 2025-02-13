@@ -9,6 +9,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectChannelById,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDefaultCanvasByChannelId,
@@ -210,6 +211,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const channel = useAppSelector((state) => selectChannelById(state, message.channel_id ?? '')) || {};
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	const sendNotificationMessage = useCallback(
 		async (userId: string) => {
@@ -249,7 +251,8 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				message?.sender_id ?? '',
 				false,
 				isPublicChannel(channel),
-				message.content?.tp ?? ''
+				isFocusTopicBox,
+				message?.channel_id
 			);
 
 			await sendNotificationMessage(message.sender_id || '');

@@ -40,13 +40,14 @@ export type MessageItemProps = {
 	currentClanId?: string;
 	showUserInformation?: boolean;
 	preventAction?: boolean;
+	isSearchTab?: boolean;
 };
 
 const MessageItem = React.memo(
 	(props: MessageItemProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
-		const { mode, isNumberOfLine, showUserInformation = false, preventAction = false, channelId = '' } = props;
+		const { mode, isNumberOfLine, showUserInformation = false, preventAction = false, channelId = '', isSearchTab = false } = props;
 		const dispatch = useAppDispatch();
 		const { t } = useTranslation('message');
 		const message: MessagesEntity = props?.message;
@@ -247,7 +248,7 @@ const MessageItem = React.memo(
 						showHighlightReply && styles.highlightMessageMention
 					]}
 				>
-					<RenderMessageItemRef message={message} preventAction={preventAction} />
+					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						{/* <AvatarMessage
 							onPress={onPressInfoUser}
