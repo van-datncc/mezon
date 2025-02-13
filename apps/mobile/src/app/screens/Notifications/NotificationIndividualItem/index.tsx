@@ -1,17 +1,18 @@
+import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
-import { selectMemberClanByUserId } from '@mezon/store-mobile';
+import { selectMemberClanByUserId2 } from '@mezon/store-mobile';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonAvatar } from '../../../componentUI';
-import { useMessageParser } from '../../../hooks/useMessageParser';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { style } from './NotificationIndividualItem.styles';
 
 function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
-	const user = useSelector(selectMemberClanByUserId(notify.sender_id ?? ''));
+	const user = useSelector((state) => selectMemberClanByUserId2(state, notify?.sender_id ?? ''));
 	const username = notify?.content?.username || user?.user?.display_name || user?.user?.username;
-	const { messageTimeDifference } = useMessageParser(notify?.content);
+	const unixTimestamp = Math.floor(new Date(notify?.content?.create_time).getTime() / 1000);
+	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
 	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);

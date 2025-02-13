@@ -1,5 +1,5 @@
 import { hasNonEmptyChannels } from '@mezon/mobile-components';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useRef } from 'react';
@@ -79,7 +79,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 						categorizedChannels?.map((item, index) => {
 							return renderItemChannelList({ item, index });
 						})}
-					<Block height={80} />
+					<View style={{ height: 80 }} />
 				</ScrollView>
 
 				<ButtonNewUnread />
