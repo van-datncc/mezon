@@ -171,8 +171,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
-	const allThreads = useSelector(selectAllThreads);
 	const currenTopicId = useSelector(selectCurrentTopicId);
+
+	const allThreads = useSelector(selectAllThreads);
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -853,14 +854,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
 			const reactionEntity = mapReactionToEntity(e);
-			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox) {
+
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox && currenTopicId) {
 				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
 			}
 
 			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
 			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch, isFocusTopicBox]
+		[dispatch, isFocusTopicBox, currenTopicId]
 	);
 
 	const onchannelcreated = useCallback(
