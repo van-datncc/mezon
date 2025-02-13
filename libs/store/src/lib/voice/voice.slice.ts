@@ -23,7 +23,6 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	showScreen: boolean;
 	statusCall: boolean;
 	voiceConnectionState: boolean;
-	token?: string;
 	fullScreen?: boolean;
 	isJoined: boolean;
 }
@@ -79,7 +78,6 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	showScreen: false,
 	statusCall: false,
 	voiceConnectionState: false,
-	token: '',
 	voiceInfo: null,
 	fullScreen: false,
 	isJoined: false
@@ -105,9 +103,6 @@ export const voiceSlice = createSlice({
 		setVoiceInfo: (state, action: PayloadAction<IvoiceInfo>) => {
 			state.voiceInfo = action.payload;
 		},
-		setToken: (state, action: PayloadAction<string>) => {
-			state.token = action.payload;
-		},
 		setShowMicrophone: (state, action: PayloadAction<boolean>) => {
 			state.showMicrophone = action.payload;
 		},
@@ -127,7 +122,6 @@ export const voiceSlice = createSlice({
 			state.fullScreen = action.payload;
 		},
 		resetVoiceSettings: (state) => {
-			state.token = '';
 			state.showMicrophone = false;
 			state.showCamera = false;
 			state.showScreen = false;
@@ -207,8 +201,6 @@ export const selectVoiceEntities = createSelector(getVoiceState, selectEntities)
 export const selectVoiceJoined = createSelector(getVoiceState, (state) => state.isJoined);
 
 export const selectVoiceInfo = createSelector(getVoiceState, (state) => state.voiceInfo);
-
-export const selectToken = createSelector(getVoiceState, (state) => state.token);
 
 export const selectShowMicrophone = createSelector(getVoiceState, (state) => state.showMicrophone);
 

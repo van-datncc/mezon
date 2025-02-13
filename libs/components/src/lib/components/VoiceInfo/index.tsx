@@ -2,9 +2,10 @@ import { useAppNavigation, useAuth } from '@mezon/core';
 import { handleParticipantMeetState, selectTheme, selectVoiceInfo, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ParticipantMeetState } from '@mezon/utils';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
-const VoiceInfo = () => {
+const VoiceInfo = React.memo(() => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const { toChannelPage, navigate } = useAppNavigation();
@@ -67,6 +68,6 @@ const VoiceInfo = () => {
 			</div>
 		</div>
 	);
-};
+});
 
 export default VoiceInfo;

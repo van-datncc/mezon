@@ -29,11 +29,11 @@ import {
 	ChannelsEntity,
 	generateMeetToken,
 	handleParticipantMeetState,
+	selectCurrentChannel,
 	selectCurrentClan,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
-	selectToken,
 	selectVoiceChannelMembersByChannelId,
 	selectVoiceFullScreen,
 	selectVoiceInfo,
@@ -45,18 +45,14 @@ import { ParticipantMeetState } from '@mezon/utils';
 
 import { Icons } from '@mezon/ui';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import { ChannelType } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { UserListStreamChannel } from './ChannelStream';
 
-interface ChannelVoiceProps {
-	channel?: ChannelsEntity;
-	roomName: string;
-}
-
-const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
-	const token = useSelector(selectToken);
+const ChannelVoice = () => {
+	const [token, setToken] = useState('');
 	const isJoined = useSelector(selectVoiceJoined);
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -67,28 +63,33 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
+	const containerRef = useRef<HTMLDivElement | null>(null);
 
-	const participantMeetState = async (state: ParticipantMeetState, clanId: string, channelId: string): Promise<void> => {
+	const participantMeetState = async (state: ParticipantMeetState, clanId?: string, channelId?: string): Promise<void> => {
+		if (!clanId || !channelId || !userProfile?.user?.id) return;
+
 		await dispatch(
 			handleParticipantMeetState({
 				clan_id: clanId,
 				channel_id: channelId,
-				user_id: userProfile?.user?.id,
-				display_name: userProfile?.user?.display_name,
+				user_id: userProfile.user.id,
+				display_name: userProfile.user.display_name,
 				state
 			})
 		);
 	};
 
 	const handleJoinRoom = async () => {
-		if (!roomName) return;
+		if (!currentClan || !currentChannel?.meeting_code) return;
 		setLoading(true);
 
 		try {
 			const result = await dispatch(
 				generateMeetToken({
-					channelId: channel?.channel_id || '',
-					roomName: roomName
+					channelId: currentChannel?.channel_id as string,
+					roomName: currentChannel?.meeting_code
 				})
 			).unwrap();
 
@@ -96,34 +97,35 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 				if (isJoined && voiceInfo) {
 					handleLeaveRoom();
 				}
-				await participantMeetState(ParticipantMeetState.JOIN, channel?.clan_id as string, channel?.channel_id as string);
+				await participantMeetState(ParticipantMeetState.JOIN, currentChannel?.clan_id as string, currentChannel?.channel_id as string);
 				dispatch(voiceActions.setJoined(true));
-				dispatch(voiceActions.setToken(result));
+				setToken(result);
 				dispatch(
 					voiceActions.setVoiceInfo({
 						clanId: currentClan?.clan_id as string,
 						clanName: currentClan?.clan_name as string,
-						channelId: channel?.channel_id as string,
-						channelLabel: channel?.channel_label as string
+						channelId: currentChannel?.channel_id as string,
+						channelLabel: currentChannel?.channel_label as string
 					})
 				);
 			} else {
-				dispatch(voiceActions.setToken(''));
+				setToken('');
 			}
 		} catch (err) {
-			console.error('Failed to join room:', err);
-			dispatch(voiceActions.setToken(''));
+			console.error('Failed to generate token room:', err);
+			setToken('');
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	const handleLeaveRoom = useCallback(async () => {
-		dispatch(voiceActions.resetVoiceSettings());
-		await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo?.clanId as string, voiceInfo?.channelId as string);
-	}, [dispatch, voiceInfo]);
+		if (!voiceInfo?.clanId || !voiceInfo?.channelId) return;
 
-	const containerRef = useRef<HTMLDivElement | null>(null);
+		setToken('');
+		dispatch(voiceActions.resetVoiceSettings());
+		await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo.clanId, voiceInfo.channelId);
+	}, [dispatch, voiceInfo]);
 
 	const handleFullScreen = useCallback(() => {
 		if (!containerRef.current) return;
@@ -150,17 +152,27 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		[dispatch]
 	);
 
-	const isShow = isJoined && voiceInfo?.clanId === channel?.clan_id && voiceInfo?.channelId === channel?.channel_id;
+	if (!isChannelMezonVoice) return null;
+
+	const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 
 	return (
-		<>
-			{token == '' || !serverUrl ? (
-				<PreJoinChannelVoice channel={channel} roomName={roomName} loading={loading} handleJoinRoom={handleJoinRoom} />
+		<div
+			className={`h-full ${!isChannelMezonVoice ? 'hidden' : ''} absolute bottom-0 right-0 z-30`}
+			style={{ width: 'calc(100% - 72px - 272px)' }}
+		>
+			{token === '' || !serverUrl ? (
+				<PreJoinChannelVoice
+					channel={currentChannel || undefined}
+					roomName={currentChannel?.meeting_code}
+					loading={loading}
+					handleJoinRoom={handleJoinRoom}
+				/>
 			) : (
 				<>
 					<PreJoinChannelVoice
-						channel={channel}
-						roomName={roomName}
+						channel={currentChannel || undefined}
+						roomName={currentChannel?.meeting_code}
 						loading={loading}
 						handleJoinRoom={handleJoinRoom}
 						isCurrentChannel={isShow}
@@ -180,7 +192,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 					</LiveKitRoom>
 				</>
 			)}
-		</>
+		</div>
 	);
 };
 
@@ -188,7 +200,7 @@ export default ChannelVoice;
 
 interface PreJoinChannelVoiceProps {
 	channel?: ChannelsEntity;
-	roomName: string;
+	roomName?: string;
 	loading: boolean;
 	handleJoinRoom: () => void;
 	isCurrentChannel?: boolean;
