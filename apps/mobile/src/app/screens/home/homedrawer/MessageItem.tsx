@@ -99,7 +99,7 @@ const MessageItem = React.memo(
 
 			if (!userId) return false;
 			const hasHereMention = message?.content?.t?.includes('@here') ?? false;
-			const hasUserMention = message?.mentions?.some((mention) => mention?.user_id === userId);
+			const hasUserMention = message?.mentions?.some?.((mention) => mention?.user_id === userId);
 			const isReplyToUser = message?.references?.[0]?.message_sender_id === userId;
 
 			return hasHereMention || hasUserMention || isReplyToUser;
@@ -111,7 +111,7 @@ const MessageItem = React.memo(
 
 		const isTimeGreaterThan5Minutes = useMemo(() => {
 			if (message?.create_time && previousMessage?.create_time) {
-				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 2 * 60 * 1000;
+				return Date.parse(message.create_time) - Date.parse(previousMessage?.create_time) < 2 * 60 * 1000;
 			}
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);

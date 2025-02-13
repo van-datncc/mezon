@@ -19,7 +19,8 @@ import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useRef, useState } from 'react';
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -36,11 +37,12 @@ type Receiver = {
 
 type ScreenSendToken = typeof APP_SCREEN.SETTINGS.SEND_TOKEN;
 export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<ScreenSendToken>) => {
+	const { t } = useTranslation(['token']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState('0');
-	const [note, setNote] = useState('send token');
+	const [note, setNote] = useState(t('sendToken'));
 	const userProfile = useSelector(selectAllAccount);
 	const usersClan = useSelector(selectAllUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -121,22 +123,22 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			if (!selectedUser) {
 				Toast.show({
 					type: 'error',
-					text1: 'You must select a user to receive'
+					text1: t('toast.error.mustSelectUser')
 				});
 				return;
 			}
 			if (Number(plainTokenCount || 0) <= 0) {
 				Toast.show({
 					type: 'error',
-					text1: 'Token amount must be greater than zero'
+					text1: t('toast.error.amountMustThanZero')
 				});
 				return;
 			}
 
-			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet)) {
 				Toast.show({
 					type: 'error',
-					text1: 'Token amount exceeds wallet balance'
+					text1: t('toast.error.exceedWallet')
 				});
 				return;
 			}
@@ -155,7 +157,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -164,7 +166,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				const response = await createDirectMessageWithUser(selectedUser?.id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -176,7 +178,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			if (res?.action?.action?.requestStatus === 'rejected' || !res) {
 				Toast.show({
 					type: 'error',
-					text1: 'An error occurred, please try again'
+					text1: t('toast.error.anErrorOccurred')
 				});
 			} else {
 				setShowConfirmModal(true);
@@ -240,17 +242,17 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ScrollView style={styles.form}>
-				<Text style={styles.heading}>Send Token</Text>
+				<Text style={styles.heading}>{t('sendToken')}</Text>
 				<View>
-					<Text style={styles.title}>Send Token To ?</Text>
+					<Text style={styles.title}>{t('sendTokenTo')}</Text>
 					<TouchableOpacity style={[styles.textField, { height: size.s_50 }]} onPress={handleOpenBottomSheet}>
 						<Text style={styles.username}>{selectedUser?.username}</Text>
 					</TouchableOpacity>
 				</View>
 				<View>
-					<Text style={styles.title}>Token</Text>
+					<Text style={styles.title}>{t('token')}</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={styles.textInput}
@@ -262,7 +264,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					</View>
 				</View>
 				<View>
-					<Text style={styles.title}>Note</Text>
+					<Text style={styles.title}>{t('note')}</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={[styles.textInput, { height: size.s_100, paddingVertical: size.s_10, paddingTop: size.s_10 }]}
@@ -278,7 +280,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				</View>
 			</ScrollView>
 			<Pressable style={styles.button} onPress={sendToken}>
-				<Text style={styles.buttonTitle}>Send Token</Text>
+				<Text style={styles.buttonTitle}>{t('sendToken')}</Text>
 			</Pressable>
 			<Modal
 				isVisible={showConfirmModal}
@@ -292,7 +294,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			>
 				<View style={styles.modalContainer}>
 					<View style={styles.heading}>
-						<Text style={styles.heading}>Token sent successful</Text>
+						<Text style={styles.heading}>{t('toast.success.sendSuccess')}</Text>
 					</View>
 					<TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmSuccessful}>
 						<Text style={styles.buttonTitle}>Ok</Text>
@@ -317,6 +319,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					</Block>
 				</Block>
 			</BottomSheetModal>
-		</SafeAreaView>
+		</View>
 	);
 };

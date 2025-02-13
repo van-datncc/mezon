@@ -3,7 +3,7 @@ import { EOptionOverridesType, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { useMemo, useState } from 'react';
-import { SafeAreaView, ScrollView, TextInput } from 'react-native';
+import { ScrollView, TextInput, View } from 'react-native';
 import { CategoryChannelItem } from '../CategoryChannelItem';
 import { style } from './NotificationOverrides.styles';
 
@@ -34,7 +34,7 @@ const NotificationOverrides = () => {
 	};
 
 	return (
-		<SafeAreaView>
+		<View style={{ flex: 1 }}>
 			<Block backgroundColor={themeValue.primary} width={'100%'} height={'100%'}>
 				<Block
 					paddingHorizontal={size.s_20}
@@ -78,7 +78,7 @@ const NotificationOverrides = () => {
 						: null}
 				</ScrollView>
 			</Block>
-		</SafeAreaView>
+		</View>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { ActionEmitEvent, Icons, PaperclipIcon, convertTimestampToTimeAgo } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, PaperclipIcon, STORAGE_MY_USER_ID, convertTimestampToTimeAgo, load } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectIsUnreadDMById } from '@mezon/store-mobile';
@@ -26,6 +26,10 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
 	const [hiddenFlag, setHiddenFlag] = useState(false);
+	const isYourAccount = useMemo(() => {
+		const userId = load(STORAGE_MY_USER_ID);
+		return userId?.toString() === directMessage?.last_sent_message?.sender_id?.toString();
+	}, [directMessage?.last_sent_message?.sender_id]);
 
 	const redirectToMessageDetail = async () => {
 		await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -61,7 +65,11 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 			return (
 				<View style={styles.contentMessage}>
 					<Text
-						style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }]}
+						style={[
+							styles.defaultText,
+							styles.lastMessage,
+							{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
+						]}
 						numberOfLines={1}
 					>
 						{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
@@ -75,14 +83,20 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 		return (
 			<View style={styles.contentMessage}>
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }]}>
+				<Text
+					style={[
+						styles.defaultText,
+						styles.lastMessage,
+						{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
+					]}
+				>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 				</Text>
 				{!!content && (
 					<DmListItemLastMessage
 						content={typeof content === 'object' ? content : safeJSONParse(content || '{}')}
-						styleText={{ color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }}
+						styleText={{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }}
 					/>
 				)}
 			</View>
@@ -172,7 +186,11 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 				<View style={styles.messageContent}>
 					<Text
 						numberOfLines={1}
-						style={[styles.defaultText, styles.channelLabel, { color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }]}
+						style={[
+							styles.defaultText,
+							styles.channelLabel,
+							{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
+						]}
 					>
 						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 					</Text>
@@ -186,7 +204,13 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 						}
 					/>
 					{lastMessageTime ? (
-						<Text style={[styles.defaultText, styles.dateTime, { color: isUnReadChannel ? themeValue.white : themeValue.textDisabled }]}>
+						<Text
+							style={[
+								styles.defaultText,
+								styles.dateTime,
+								{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
+							]}
+						>
 							{lastMessageTime}
 						</Text>
 					) : null}

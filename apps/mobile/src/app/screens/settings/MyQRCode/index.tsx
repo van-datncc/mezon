@@ -3,7 +3,7 @@ import { selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SafeAreaView, Text } from 'react-native';
+import { Text } from 'react-native';
 import { Grid } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
@@ -44,49 +44,47 @@ export const MyQRCode = () => {
 	}, [genQRCode]);
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<LinearGradient start={{ x: 0, y: 1 }} end={{ x: 1, y: 0 }} colors={[themeValue.primary, themeValue.secondaryLight]} style={styles.card}>
-				<Block
-					flexDirection={'row'}
-					alignItems={'center'}
-					paddingBottom={size.s_14}
-					gap={size.s_14}
-					borderBottomColor={themeValue.border}
-					borderBottomWidth={1}
-				>
-					<FastImage
-						source={{
-							uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 200, height: 200, resizeType: 'fit' })
-						}}
-						style={styles.avatar}
-					/>
-					<Block>
-						<Text style={styles.nameProfile}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
-						<Text style={styles.tokenProfile}>Token: {Number(tokenInWallet) + Number(getTokenSocket)}</Text>
-					</Block>
+		<LinearGradient start={{ x: 0, y: 1 }} end={{ x: 1, y: 0 }} colors={[themeValue.primary, themeValue.secondaryLight]} style={styles.card}>
+			<Block
+				flexDirection={'row'}
+				alignItems={'center'}
+				paddingBottom={size.s_14}
+				gap={size.s_14}
+				borderBottomColor={themeValue.border}
+				borderBottomWidth={1}
+			>
+				<FastImage
+					source={{
+						uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 200, height: 200, resizeType: 'fit' })
+					}}
+					style={styles.avatar}
+				/>
+				<Block>
+					<Text style={styles.nameProfile}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
+					<Text style={styles.tokenProfile}>Token: {Number(tokenInWallet) + Number(getTokenSocket)}</Text>
 				</Block>
-				{urlQRCode ? (
-					isTabletLandscape ? (
-						<Block
-							height={size.s_100 * 3.6}
-							width={size.s_100 * 3.6}
-							backgroundColor={'white'}
-							alignSelf="center"
-							justifyContent="center"
-							marginVertical={size.s_40}
-						>
-							<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
-						</Block>
-					) : (
+			</Block>
+			{urlQRCode ? (
+				isTabletLandscape ? (
+					<Block
+						height={size.s_100 * 3.6}
+						width={size.s_100 * 3.6}
+						backgroundColor={'white'}
+						alignSelf="center"
+						justifyContent="center"
+						marginVertical={size.s_40}
+					>
 						<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
-					)
-				) : (
-					<Block height={size.s_100 * 2.5} alignItems={'center'} justifyContent={'center'}>
-						<Grid color={themeValue.text} size={size.s_50} />
 					</Block>
-				)}
-				<Block height={size.s_50} />
-			</LinearGradient>
-		</SafeAreaView>
+				) : (
+					<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
+				)
+			) : (
+				<Block height={size.s_100 * 2.5} alignItems={'center'} justifyContent={'center'}>
+					<Grid color={themeValue.text} size={size.s_50} />
+				</Block>
+			)}
+			<Block height={size.s_50} />
+		</LinearGradient>
 	);
 };

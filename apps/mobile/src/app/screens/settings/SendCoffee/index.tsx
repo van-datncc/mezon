@@ -5,7 +5,8 @@ import { TypeMessage, formatMoney } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useState } from 'react';
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -15,12 +16,13 @@ import { style } from './styles';
 type ScreenSettingSendCoffee = typeof APP_SCREEN.SETTINGS.SEND_COFFEE;
 export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<ScreenSettingSendCoffee>) => {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation(['token']);
 	const styles = style(themeValue);
 	const { formValue } = route.params;
 	const jsonObject: ApiTokenSentEvent = safeJSONParse(formValue || '{}');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [tokenCount, setTokenCount] = useState(jsonObject?.amount?.toString() || '1');
-	const [note, setNote] = useState(jsonObject?.note || 'send token');
+	const [note, setNote] = useState(jsonObject?.note || t('sendToken'));
 	const [plainTokenCount, setPlainTokenCount] = useState(1);
 	const userProfile = useSelector(selectAllAccount);
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -43,15 +45,15 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 			if (Number(plainTokenCount || 0) <= 0) {
 				Toast.show({
 					type: 'error',
-					text1: 'Token amount must be greater than zero'
+					text1: t('toast.error.amountMustThanZero')
 				});
 				return;
 			}
 
-			if (Number(plainTokenCount || 0) > Number(tokenInWallet) + Number(getTokenSocket)) {
+			if (Number(plainTokenCount || 0) > Number(tokenInWallet)) {
 				Toast.show({
 					type: 'error',
-					text1: 'Token amount exceeds wallet balance'
+					text1: t('toast.error.exceedWallet')
 				});
 				return;
 			}
@@ -72,7 +74,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 
 			if (directMessageId) {
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 					directMessageId,
 					ChannelStreamMode.STREAM_MODE_DM,
 					TypeMessage.SendToken
@@ -81,7 +83,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				const response = await createDirectMessageWithUser(jsonObject?.receiver_id);
 				if (response?.channel_id) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(Number(plainTokenCount || 1))}₫`,
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
 						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -93,7 +95,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 			if (res?.action?.action?.requestStatus === 'rejected' || !res) {
 				Toast.show({
 					type: 'error',
-					text1: 'An error occurred, please try again'
+					text1: t('toast.error.anErrorOccurred')
 				});
 			} else {
 				setShowConfirmModal(true);
@@ -125,11 +127,11 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<ScrollView style={styles.form}>
-				<Text style={styles.heading}>Receiver Information</Text>
+				<Text style={styles.heading}>{t('receiverInfo')}</Text>
 				<View>
-					<Text style={styles.title}>User name</Text>
+					<Text style={styles.title}>{t('username')}</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={styles.textInput}
@@ -142,7 +144,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 					</View>
 				</View>
 				<View>
-					<Text style={styles.title}>Token count</Text>
+					<Text style={styles.title}>{t('tokenCount')}</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={styles.textInput}
@@ -155,7 +157,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 					</View>
 				</View>
 				<View>
-					<Text style={styles.title}>Note</Text>
+					<Text style={styles.title}>{t('note')}</Text>
 					<View style={styles.textField}>
 						<TextInput
 							style={[styles.textInput, { height: size.s_100, paddingVertical: size.s_10, paddingTop: size.s_10 }]}
@@ -172,7 +174,7 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 				</View>
 			</ScrollView>
 			<Pressable style={styles.button} onPress={sendToken}>
-				<Text style={styles.buttonTitle}>Send Token</Text>
+				<Text style={styles.buttonTitle}>{t('sendToken')}</Text>
 			</Pressable>
 			<Modal
 				isVisible={showConfirmModal}
@@ -186,13 +188,13 @@ export const SendCoffeeScreen = ({ navigation, route }: SettingScreenProps<Scree
 			>
 				<View style={styles.modalContainer}>
 					<View style={styles.heading}>
-						<Text style={styles.heading}>Token sent successful</Text>
+						<Text style={styles.heading}>{t('toast.success.sendSuccess')}</Text>
 					</View>
 					<TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmSuccessful}>
 						<Text style={styles.buttonTitle}>Ok</Text>
 					</TouchableOpacity>
 				</View>
 			</Modal>
-		</SafeAreaView>
+		</View>
 	);
 };

@@ -25,6 +25,16 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 	const emojis = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 	const elements: ElementToken[] = [...emojis].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
+	const contentTitle = () => {
+		const [title] = (t ?? '').split(' | ');
+		return <Text style={[styles.message, props?.styleText && props?.styleText]}>{title}</Text>;
+	};
+
+	const checkTokenMessage = (text: string) => {
+		const pattern = /^Tokens sent:.*\|.*/;
+		return pattern.test(text);
+	};
+
 	const EmojiMarkup = ({ shortname, emojiid }: IEmojiMarkup) => {
 		const srcEmoji = getSrcEmoji(emojiid);
 
@@ -94,7 +104,7 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 
 	return (
 		<Text style={[styles.dmMessageContainer, props?.styleText && props?.styleText]} numberOfLines={1}>
-			{convertTextToEmoji()}
+			{checkTokenMessage(t) ? contentTitle() : convertTextToEmoji()}
 		</Text>
 	);
 });

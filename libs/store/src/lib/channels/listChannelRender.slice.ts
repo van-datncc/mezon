@@ -1,7 +1,9 @@
+import { captureSentryError } from '@mezon/logger';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { CategoriesEntity } from '../categories/categories.slice';
+import { clansActions } from '../clans/clans.slice';
 import { RootState } from '../store';
 import { ChannelsEntity, IUpdateChannelRequest } from './channels.slice';
 
@@ -14,6 +16,21 @@ export interface ChannelListRenderState {
 export const initialListChannelRenderState: ChannelListRenderState = {
 	listChannelRender: {}
 };
+
+export const updateClanBadgeRender = createAsyncThunk(
+	'listRender/updateClanBadge',
+	async ({ channelId, clanId }: { channelId: string; clanId: string }, thunkAPI) => {
+		try {
+			const state = thunkAPI.getState() as RootState;
+			const listChannelRender = state.CHANNEL_LIST_RENDER.listChannelRender[clanId];
+			const channelDelete = listChannelRender.filter((channel) => channelId === channel.id);
+			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel).count_mess_unread || 0) * -1 }));
+		} catch (error) {
+			captureSentryError(error, 'listRender/updateClanBadge');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
 
 export interface DataChannelAndCate {
 	listChannel: IChannel[];
@@ -322,7 +339,8 @@ export const listChannelRenderSlice = createSlice({
 });
 
 export const listChannelRenderAction = {
-	...listChannelRenderSlice.actions
+	...listChannelRenderSlice.actions,
+	updateClanBadgeRender
 };
 
 export const listChannelRenderReducer = listChannelRenderSlice.reducer;

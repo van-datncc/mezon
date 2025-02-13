@@ -43,6 +43,7 @@ import screenStack from './screenStack.json';
 import searchMessageChannel from './searchMessageChannel.json';
 import setting from './setting.json';
 import streamingRoom from './streamingRoom.json';
+import token from './token.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
 
@@ -94,5 +95,6 @@ export default {
 	auditLog,
 	ageRestricted,
 	recordChatMessage,
-	channelVoice
+	channelVoice,
+	token
 };

@@ -1,4 +1,4 @@
-import { ChatContext, useMemberStatus } from '@mezon/core';
+import { ChatContext } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_CLAN_ID,
@@ -11,10 +11,9 @@ import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions, channelsActions, clansActions, directActions, messagesActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter, Platform, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import SwipeBackContainer from '../../home/homedrawer/SwipeBackContainer';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
@@ -30,36 +29,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const isFetchMemberChannelDmRef = useRef(false);
 	const { handleReconnect } = useContext(ChatContext);
 
-	const isModeDM = useMemo(() => {
-		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
-	}, [currentDmGroup?.type]);
-
-	const isTypeDMGroup = useMemo(() => {
-		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
-	}, [currentDmGroup?.type]);
-
 	const dmType = useMemo(() => {
 		return currentDmGroup?.type;
 	}, [currentDmGroup?.type]);
-
-	const dmLabel = useMemo(() => {
-		return (currentDmGroup?.channel_label ||
-			(typeof currentDmGroup?.usernames === 'string' ? currentDmGroup?.usernames : currentDmGroup?.usernames?.[0] || '')) as string;
-	}, [currentDmGroup?.channel_label, currentDmGroup?.usernames]);
-
-	const dmAvatar = useMemo(() => {
-		return currentDmGroup?.channel_avatar?.[0];
-	}, [currentDmGroup?.channel_avatar?.[0]]);
-
-	const firstUserId = useMemo(() => {
-		return currentDmGroup?.user_id?.[0];
-	}, [currentDmGroup?.user_id?.[0]]);
-
-	const userStatus = useMemberStatus(isModeDM ? firstUserId : '');
-
-	const navigateToThreadDetail = useCallback(() => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
-	}, [currentDmGroup, navigation]);
 
 	const fetchMemberChannel = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
@@ -187,29 +159,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		};
 	}, [directMessageId, dmType, handleAppStateChange]);
 
-	const handleBack = useCallback(() => {
-		if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
-			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-			return;
-		}
-		navigation.goBack();
-	}, [from, navigation]);
-
 	return (
-		<SwipeBackContainer>
-			<HeaderDirectMessage
-				handleBack={handleBack}
-				navigateToThreadDetail={navigateToThreadDetail}
-				isTypeDMGroup={isTypeDMGroup}
-				dmAvatar={dmAvatar}
-				dmLabel={dmLabel}
-				userStatus={userStatus}
-				styles={styles}
-				themeValue={themeValue}
-				directMessageId={directMessageId}
-				firstUserId={firstUserId}
-			/>
-			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
-		</SwipeBackContainer>
+		<View style={{ flex: 1 }}>
+			<StatusBarHeight />
+			<HeaderDirectMessage from={from} styles={styles} themeValue={themeValue} directMessageId={directMessageId} />
+			{directMessageId && (
+				<ChatMessageWrapper directMessageId={directMessageId} isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM} currentClanId={'0'} />
+			)}
+		</View>
 	);
 };

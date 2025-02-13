@@ -24,46 +24,13 @@ export const checkNotificationPermission = async () => {
 	if (Platform.OS === 'ios') await notifee.requestPermission();
 
 	if (Platform.OS === 'android' && Platform.Version >= 33) {
-		const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-			Alert.alert('Notification Permission', 'Notifications are disabled. Please enable them in settings.', [
-				{
-					text: 'Cancel',
-					style: 'cancel'
-				},
-				{
-					text: 'OK',
-					onPress: () => {
-						openAppSettings();
-					}
-				}
-			]);
-		}
+		await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 	} else {
 		const authorizationStatus = await messaging().hasPermission();
 
 		if (authorizationStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
 			// Permission has not been requested yet
 			await requestNotificationPermission();
-		} else if (authorizationStatus === messaging.AuthorizationStatus.DENIED) {
-			// Permission has been denied
-			Alert.alert('Notification Permission', 'Notifications are disabled. Please enable them in settings.', [
-				{
-					text: 'Cancel',
-					style: 'cancel'
-				},
-				{
-					text: 'OK',
-					onPress: () => {
-						openAppSettings();
-					}
-				}
-			]);
-		} else if (
-			authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-			authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
-		) {
-			// Permission is granted
 		}
 	}
 };
@@ -194,7 +161,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			store.dispatch(
 				messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage: true, noCache: true })
 			);
-			await sleep(200);
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
@@ -246,7 +212,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 						isClearMessage: true
 					})
 				);
-				await sleep(200);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: messageId });
 				}
@@ -291,9 +256,13 @@ const processNotification = async ({ notification, navigation, time = 0 }) => {
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
+		// DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, true);
 		setTimeout(() => {
 			navigateToNotification(store, notification, navigation, time);
 		}, time);
+		// setTimeout(() => {
+		// 	DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, false);
+		// }, 3000);
 	} else {
 		navigateToNotification(store, notification, navigation);
 	}
@@ -316,15 +285,11 @@ export const setupNotificationListeners = async (navigation) => {
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 				store.dispatch(appActions.setIsFromFCMMobile(true));
 				if (remoteMessage?.notification?.title) {
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, true);
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
 						time: 1
 					});
-					setTimeout(() => {
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, false);
-					}, 3000);
 				}
 			}
 		});
@@ -346,7 +311,8 @@ export const setupNotificationListeners = async (navigation) => {
 			case EventType.PRESS:
 				processNotification({
 					notification: detail.notification,
-					navigation
+					navigation,
+					time: 1
 				});
 				break;
 		}

@@ -127,17 +127,17 @@ function AllTabContent({ messageReplied, subject, lastMessageTopic, topic }: IMe
 						src={priorityAvatar ? priorityAvatar : user?.user?.avatar_url || user?.user?.avatar_url}
 					/> */}
 				</div>
-				<div className="h-full w-full">
+				<div className="h-full flex-1 max-w-full min-w-0">
 					<div>
 						<div className="text-[12px] font-bold uppercase">{subject}</div>
 					</div>
 					<div>
-						<div className="text-[12px] ">
+						<div className="text-[12px] w-fit max-w-full break-words whitespace-normal">
 							<b className="font-semibold">Replied to</b>: {messageRl ? messageRl?.t : 'Unreachable message'}
 						</div>
 					</div>
 					<div>
-						<div className="text-[13px] ">
+						<div className="text-[13px] w-fit max-w-full break-words whitespace-normal">
 							<b className="font-semibold">{lastSentUser ? lastSentUser?.user?.username : 'Sender'}</b>:{' '}
 							{lastMsgTopic ? lastMsgTopic?.t : 'Unreachable message'}
 						</div>
