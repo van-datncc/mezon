@@ -6,10 +6,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { EmptySearchPage } from '../../EmptySearchPage';
 import MessagesSearchTab from '../../MessagesSearchTab';
+import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
 import { SearchMessageChannelContext } from '../SearchMessageChannel';
 import HeaderTabSearch from '../SearchMessageChannel/SearchMessagePage/HeaderTabSearch';
 import HeaderSearchMessageDm from './HeaderSearchMessageDm/HeaderSearchMessageDm';
-import StatusBarHeight from "../../StatusBarHeight/StatusBarHeight";
 export enum ACTIVE_TAB {
 	MESSAGES = 0
 }

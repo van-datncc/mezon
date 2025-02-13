@@ -6,6 +6,7 @@ import {
 	selectAllChannelMembers,
 	selectClanView,
 	selectCurrentChannel,
+	selectCurrentTopicId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	useAppDispatch,
@@ -33,6 +34,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
+	const currenTopicId = useSelector(selectCurrentTopicId);
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -114,7 +116,9 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			message_sender_id: string,
 			action_delete: boolean,
 			is_public: boolean,
-			topic_id?: string
+			// reaction on topic
+			isFocusTopicBox?: boolean,
+			channelIdOnMessage?: string
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
@@ -133,23 +137,23 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				isClanView: isClanView as boolean
 			});
 
-			return dispatch(
-				reactionActions.writeMessageReaction({
-					id,
-					clanId: currentActive.clanIdActive,
-					channelId: currentActive.channelIdActive,
-					mode: currentActive.modeActive,
-					messageId,
-					emoji_id,
-					emoji,
-					count,
-					messageSenderId: message_sender_id,
-					actionDelete: action_delete,
-					isPublic: payload.is_public,
-					userId: userId as string,
-					topic_id
-				})
-			).unwrap();
+			const payloadDispatchReaction = {
+				id,
+				clanId: currentActive.clanIdActive,
+				channelId: currentActive.channelIdActive,
+				mode: currentActive.modeActive,
+				messageId,
+				emoji_id,
+				emoji,
+				count,
+				messageSenderId: message_sender_id,
+				actionDelete: action_delete,
+				isPublic: payload.is_public,
+				userId: userId as string,
+				topic_id: isFocusTopicBox ? channelIdOnMessage : ''
+			};
+
+			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();
 		},
 		[dispatch, isMobile, isClanView, userId, currentActive, addMemberToThread]
 	);

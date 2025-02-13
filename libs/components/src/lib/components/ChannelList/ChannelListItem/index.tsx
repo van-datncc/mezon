@@ -95,7 +95,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 		setIsExpendedPttMems(!isExpandedPttMems);
 	};
 
-  const hasUnread = useAppSelector(state=>selectIsUnreadThreadInChannel(state,channel.threadIds || []))
+	const hasUnread = useAppSelector((state) => selectIsUnreadThreadInChannel(state, channel.threadIds || []));
 	const renderChannelContent = useMemo(() => {
 		if (
 			channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&

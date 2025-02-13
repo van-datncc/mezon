@@ -13,11 +13,11 @@ import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
-import StatusBarHeight from "../../../components/StatusBarHeight/StatusBarHeight";
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
 	const { themeValue, themeBasic } = useTheme();
