@@ -914,7 +914,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
 				customSuggestionsContainer={(children: React.ReactNode) => {
-					return <CustomModalMentions isThreadBox={props.isThread} children={children} titleModalMention={titleModalMention} />;
+					return (
+						<CustomModalMentions
+							isThreadBoxOrTopicBox={props.isThread || props.isTopic}
+							children={children}
+							titleModalMention={titleModalMention}
+						/>
+					);
 				}}
 				onClick={handleShowModalE2ee}
 			>
