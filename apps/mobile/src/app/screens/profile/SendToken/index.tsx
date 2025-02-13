@@ -20,7 +20,7 @@ import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
