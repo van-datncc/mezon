@@ -83,7 +83,8 @@ function MyApp() {
 	const { userProfile } = useAuth();
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
-	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+	const clans = useSelector(selectAllClans);
+	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy && clans?.length === 0);
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
