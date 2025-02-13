@@ -53,8 +53,8 @@ export const ThreadLinkWrapper: React.FC<ThreadLinkWrapperProps> = ({ thread, is
 	const isShowThread = (thread: IChannel) => {
 		return (
 			(threadMeta?.isMute !== true && threadMeta?.lastSeenTimestamp < threadMeta?.lastSentTimestamp) ||
-			(thread?.count_mess_unread ?? 0) > 0 || 
-      thread.id === currentChannelId 
+			(thread?.count_mess_unread ?? 0) > 0 ||
+			thread.id === currentChannelId
 		);
 	};
 

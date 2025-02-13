@@ -146,7 +146,7 @@ export type ChannelThreads = IChannel & {
 export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
-  threadIds?:string[];
+	threadIds?: string[];
 	description?: string;
 	isRoleUser?: boolean;
 	isFavor?: boolean;
