@@ -156,7 +156,7 @@ const ChannelVoice = () => {
 
 	return (
 		<div
-			className={`h-full ${!isChannelMezonVoice ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
+			className={`${!isChannelMezonVoice ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
 			style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
 		>
 			{token === '' || !serverUrl ? (
