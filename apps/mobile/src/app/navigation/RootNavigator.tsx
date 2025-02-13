@@ -16,7 +16,6 @@ import MezonUpdateVersionModal from '../componentUI/MezonUpdateVersionModal';
 import NetInfoComp from '../components/NetworkInfo';
 import { WebRTCStreamProvider } from '../components/StreamContext/StreamContext';
 import { toastConfig } from '../configs/toastConfig';
-import { AuthenticationLoader } from './Authentication/AuthenticationLoader';
 import RootListener from './RootListener';
 import RootStack from './RootStack';
 
@@ -66,7 +65,6 @@ const NavigationMain = memo(
 			>
 				<NetInfoComp />
 				<RootListener />
-				<AuthenticationLoader />
 				<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />
 				<RootStack {...props} />
 			</NavigationContainer>

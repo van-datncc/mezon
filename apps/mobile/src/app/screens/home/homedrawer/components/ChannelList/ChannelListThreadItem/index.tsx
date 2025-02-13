@@ -1,4 +1,4 @@
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -39,15 +39,15 @@ const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, is
 		<View key={thread.id} style={[styles.channelListLink]}>
 			<View style={[styles.threadItem]}>
 				{isFirstThread ? (
-					<Block top={-size.s_14}>
+					<View style={{ top: -size.s_14 }}>
 						<ShortCornerIcon width={size.s_12} height={size.s_16} />
-					</Block>
+					</View>
 				) : (
-					<Block top={-size.s_20}>
+					<View style={{ top: -size.s_20 }}>
 						<LongCornerIcon width={size.s_12} height={size.s_36} />
 						{/*hardcode virtual view to connect thread lines */}
-						<Block backgroundColor={'#535353'} width={1.2} height={size.s_10} position={'absolute'} top={-5} left={0.3} />
-					</Block>
+						<View style={{ backgroundColor: '#535353', width: 1.2, height: size.s_10, position: 'absolute', top: -5, left: 0.3 }} />
+					</View>
 				)}
 				<TouchableOpacity
 					style={[
