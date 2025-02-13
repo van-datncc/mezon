@@ -292,8 +292,7 @@ const persistedOnboardingReducer = persistReducer(
 const persistedVoiceReducer = persistReducer(
 	{
 		key: VOICE_FEATURE_KEY,
-		storage,
-		whitelist: ['voiceConnectionState', 'channelId']
+		storage
 	},
 	voiceReducer
 );

@@ -29,15 +29,15 @@ import {
 	ChannelsEntity,
 	generateMeetToken,
 	handleParticipantMeetState,
-	selectCurrentChannelId,
+	selectCurrentClan,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
 	selectToken,
-	selectVoiceChannelId,
 	selectVoiceChannelMembersByChannelId,
-	selectVoiceConnectionState,
 	selectVoiceFullScreen,
+	selectVoiceInfo,
+	selectVoiceJoined,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
@@ -51,27 +51,27 @@ import { useSelector } from 'react-redux';
 import { UserListStreamChannel } from './ChannelStream';
 
 interface ChannelVoiceProps {
-	channel: ChannelsEntity;
+	channel?: ChannelsEntity;
 	roomName: string;
 }
 
 const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 	const token = useSelector(selectToken);
-	const voiceChannelId = useSelector(selectVoiceChannelId);
-	const voiceConnectionState = useSelector(selectVoiceConnectionState);
+	const isJoined = useSelector(selectVoiceJoined);
+	const voiceInfo = useSelector(selectVoiceInfo);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const { userProfile } = useAuth();
+	const currentClan = useSelector(selectCurrentClan);
 
-	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
+	const participantMeetState = async (state: ParticipantMeetState, clanId: string, channelId: string): Promise<void> => {
 		await dispatch(
 			handleParticipantMeetState({
-				clan_id: channel.clan_id,
+				clan_id: clanId,
 				channel_id: channelId,
 				user_id: userProfile?.user?.id,
 				display_name: userProfile?.user?.display_name,
@@ -87,18 +87,26 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		try {
 			const result = await dispatch(
 				generateMeetToken({
-					channelId: channel.channel_id || '',
+					channelId: channel?.channel_id || '',
 					roomName: roomName
 				})
 			).unwrap();
 
 			if (result) {
-				if (voiceChannelId) {
+				if (isJoined && voiceInfo) {
 					handleLeaveRoom();
 				}
-				await participantMeetState(ParticipantMeetState.JOIN, channel.channel_id as string);
+				await participantMeetState(ParticipantMeetState.JOIN, channel?.clan_id as string, channel?.channel_id as string);
+				dispatch(voiceActions.setJoined(true));
 				dispatch(voiceActions.setToken(result));
-				dispatch(voiceActions.setVoiceChannelId(channel.channel_id || ''));
+				dispatch(
+					voiceActions.setVoiceInfo({
+						clanId: currentClan?.clan_id as string,
+						clanName: currentClan?.clan_name as string,
+						channelId: channel?.channel_id as string,
+						channelLabel: channel?.channel_label as string
+					})
+				);
 			} else {
 				dispatch(voiceActions.setToken(''));
 			}
@@ -112,16 +120,9 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 
 	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetVoiceSettings());
-		await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
-	}, [dispatch, voiceChannelId]);
+		await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo?.clanId as string, voiceInfo?.channelId as string);
+	}, [dispatch, voiceInfo]);
 
-	useEffect(() => {
-		if (voiceConnectionState) {
-			handleLeaveRoom();
-		}
-	}, []);
-
-	const isCurrentChannel = voiceChannelId === currentChannelId;
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleFullScreen = useCallback(() => {
@@ -149,6 +150,8 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 		[dispatch]
 	);
 
+	const isShow = isJoined && voiceInfo?.clanId === channel?.clan_id && voiceInfo?.channelId === channel?.channel_id;
+
 	return (
 		<>
 			{token == '' || !serverUrl ? (
@@ -160,13 +163,13 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 						roomName={roomName}
 						loading={loading}
 						handleJoinRoom={handleJoinRoom}
-						isCurrentChannel={isCurrentChannel}
+						isCurrentChannel={isShow}
 					/>
 					<LiveKitRoom
 						ref={containerRef}
 						id="livekitRoom"
 						key={token}
-						className={`${!isCurrentChannel ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
+						className={`${!isShow ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
 						audio={showMicrophone}
 						video={showCamera}
 						token={token}
@@ -184,7 +187,7 @@ const ChannelVoice: React.FC<ChannelVoiceProps> = ({ channel, roomName }) => {
 export default ChannelVoice;
 
 interface PreJoinChannelVoiceProps {
-	channel: ChannelsEntity;
+	channel?: ChannelsEntity;
 	roomName: string;
 	loading: boolean;
 	handleJoinRoom: () => void;
@@ -192,16 +195,16 @@ interface PreJoinChannelVoiceProps {
 }
 
 const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, roomName, loading, handleJoinRoom, isCurrentChannel }) => {
-	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.channel_id as string));
+	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel?.channel_id as string));
 	return (
 		<div className={`w-full h-full bg-black flex justify-center items-center ${isCurrentChannel ? 'hidden' : ''}`}>
-			<div className="flex flex-col justify-center items-center gap-4 w-full">
+			<div className="flex flex-col justify-center items-center gap-4 w-full text-white">
 				<div className="w-full flex gap-2 justify-center p-2">
 					{voiceChannelMembers.length > 0 && <UserListStreamChannel memberJoin={voiceChannelMembers} memberMax={3}></UserListStreamChannel>}
 				</div>
 				<div className="max-w-[350px] text-center text-3xl font-bold">
-					{channel?.channel_label && channel.channel_label.length > 20
-						? `${channel.channel_label.substring(0, 20)}...`
+					{channel?.channel_label && channel?.channel_label.length > 20
+						? `${channel?.channel_label.substring(0, 20)}...`
 						: channel?.channel_label}
 				</div>
 				{voiceChannelMembers.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in voice</div>}

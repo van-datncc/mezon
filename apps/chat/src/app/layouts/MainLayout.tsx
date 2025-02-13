@@ -5,6 +5,7 @@ import {
 	selectAllAccount,
 	selectAnyUnreadChannel,
 	selectBadgeCountAllClan,
+	selectCurrentChannel,
 	useAppDispatch
 } from '@mezon/store';
 import { MessageCrypt } from '@mezon/utils';
@@ -15,9 +16,11 @@ import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
+import { ChannelType } from 'mezon-js';
 import { memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
+import ChannelVoice from '../pages/channel/ChannelVoice';
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
@@ -113,6 +116,10 @@ const MainLayout = memo(
 		const handleClickingOutside = () => {
 			dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		};
+		const currentChannel = useSelector(selectCurrentChannel);
+
+		const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
+
 		return (
 			<div
 				id="main-layout"
@@ -122,6 +129,12 @@ const MainLayout = memo(
 					event.preventDefault();
 				}}
 			>
+				<div
+					className={`h-full ${!isChannelMezonVoice ? 'hidden' : ''} absolute bottom-0 right-0 z-30`}
+					style={{ width: 'calc(100% - 72px - 272px)' }}
+				>
+					<ChannelVoice channel={currentChannel ?? undefined} roomName={currentChannel?.meeting_code || ''} />
+				</div>
 				<Outlet />
 				<GlobalEventListener />
 			</div>

@@ -146,7 +146,7 @@ export type ChannelThreads = IChannel & {
 export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
-  threadIds?:string[];
+	threadIds?: string[];
 	description?: string;
 	isRoleUser?: boolean;
 	isFavor?: boolean;
@@ -1433,3 +1433,10 @@ export enum ParticipantMeetState {
 	JOIN = 0,
 	LEAVE = 1
 }
+
+export type IvoiceInfo = {
+	clanId: string;
+	clanName: string;
+	channelId: string;
+	channelLabel: string;
+};
