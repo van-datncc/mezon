@@ -1,6 +1,6 @@
-import { Attributes, Block, size, useTheme } from '@mezon/mobile-ui';
+import { Attributes, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 
@@ -10,14 +10,14 @@ const MessageItemSkeleton = ({ skeletonNumber }: { skeletonNumber: number }) => 
 	return (
 		<>
 			{Array.from({ length: skeletonNumber }).map((_, index) => (
-				<Block style={styles.wrapper} key={index}>
+				<View style={styles.wrapper} key={index}>
 					<ShimmerPlaceHolder
 						shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 						shimmerStyle={styles.avatar}
 						LinearGradient={LinearGradient}
 					/>
 
-					<Block>
+					<View>
 						<ShimmerPlaceHolder
 							width={100}
 							shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
@@ -38,8 +38,8 @@ const MessageItemSkeleton = ({ skeletonNumber }: { skeletonNumber: number }) => 
 								LinearGradient={LinearGradient}
 							/>
 						) : null}
-					</Block>
-				</Block>
+					</View>
+				</View>
 			))}
 		</>
 	);
