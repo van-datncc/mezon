@@ -70,9 +70,9 @@ const ChannelList = () => {
 
 	const renderItem = useCallback(({ item, index }) => {
 		if (index === 0) {
-			return <ChannelListBackground />;
+			return <ChannelListBackground currentClan={currentClan} />;
 		} else if (index === 1) {
-			return <ChannelListHeader />;
+			return <ChannelListHeader currentClan={currentClan} />;
 		} else if (item.channels) {
 			return (
 				<View onLayout={(e) => handleLayout(e, item)} key={`${item?.category_id}_${index}_ItemChannelList}`}>
@@ -103,7 +103,16 @@ const ChannelList = () => {
 							return renderItemChannelList({ item, index });
 						})} */}
 
-				<FlatList data={data} renderItem={renderItem} keyExtractor={keyExtractor} removeClippedSubviews={true} />
+				<FlatList
+					data={data}
+					renderItem={renderItem}
+					keyExtractor={keyExtractor}
+					removeClippedSubviews={true}
+					maxToRenderPerBatch={10}
+					updateCellsBatchingPeriod={50}
+					initialNumToRender={25}
+					windowSize={21}
+				/>
 				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />

@@ -5,7 +5,7 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 
-export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: ChannelsEntity; isUnRead?: boolean }) => {
+export const ChannelStatusIcon = ({ channel, isUnRead }: { channel: ChannelsEntity; isUnRead?: boolean }) => {
 	const { themeValue } = useTheme();
 
 	const isAgeRestrictedChannel = channel?.age_restricted === 1;
@@ -47,4 +47,4 @@ export const ChannelStatusIcon = React.memo(({ channel, isUnRead }: { channel: C
 			)}
 		</>
 	);
-});
+};

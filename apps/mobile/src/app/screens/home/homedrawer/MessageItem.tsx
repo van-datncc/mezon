@@ -3,7 +3,7 @@ import { ActionEmitEvent, load, STORAGE_MY_USER_ID, validLinkGoogleMapRegex, val
 import { Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useState } from 'react';
-import { Animated, DeviceEventEmitter, Image, PanResponder, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
@@ -15,6 +15,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import Entypo from 'react-native-vector-icons/Entypo';
+import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
@@ -250,21 +251,12 @@ const MessageItem = React.memo(
 				>
 					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-						{/* <AvatarMessage
+						<AvatarMessage
 							onPress={onPressInfoUser}
 							id={message?.user?.id}
 							avatar={messageAvatar}
 							username={usernameMessage}
 							isShow={!isCombine || !!message?.references?.length || showUserInformation}
-						/> */}
-						<Image
-							source={{ uri: message.avatar }}
-							style={{
-								width: 30,
-								height: 30,
-								borderRadius: 15,
-								marginHorizontal: 8
-							}}
 						/>
 
 						<Pressable

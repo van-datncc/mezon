@@ -342,6 +342,13 @@ const persistAccountReducer = persistReducer(
 	},
 	accountReducer
 );
+const persistListChannelRenderReducer = persistReducer(
+	{
+		key: CHANNEL_LIST_RENDER,
+		storage
+	},
+	listChannelRenderReducer
+);
 
 const reducer = {
 	app: persistedAppReducer,
@@ -414,7 +421,7 @@ const reducer = {
 	[EMBED_MESSAGE]: embedReducer,
 	topicdiscussions: persistedTopicReducer,
 	walletLedger: walletLedgerReducer,
-	[CHANNEL_LIST_RENDER]: listChannelRenderReducer
+	[CHANNEL_LIST_RENDER]: persistListChannelRenderReducer
 };
 
 let storeInstance = configureStore({

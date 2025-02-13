@@ -1,6 +1,6 @@
 import { ActionEmitEvent, ETypeSearch, Icons, VerifyIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel, selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
+import { getStoreAsync, selectCurrentChannel, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,13 +9,10 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
-const ChannelListHeader = () => {
-	const currentClan = useSelector(selectCurrentClan);
+const ChannelListHeader = ({ currentClan }) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['clanMenu']);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
-	const currentChannel = useSelector(selectCurrentChannel);
-
 	const styles = style(themeValue);
 	const members = useSelector(selectMembersClanCount);
 	const previousClanName = useRef<string | null>(null);
@@ -26,7 +23,9 @@ const ChannelListHeader = () => {
 
 	const clanName = !currentClan?.id || currentClan?.id === '0' ? previousClanName.current : currentClan?.clan_name;
 
-	const navigateToSearchPage = () => {
+	const navigateToSearchPage = async () => {
+		const store = await getStoreAsync();
+		const currentChannel = selectCurrentChannel(store.getState() as any);
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
@@ -91,4 +90,4 @@ const ChannelListHeader = () => {
 	);
 };
 
-export default memo(ChannelListHeader, () => true);
+export default memo(ChannelListHeader);

@@ -1,6 +1,13 @@
 import { Icons, STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
+import {
+	selectCurrentStreamInfo,
+	selectStreamMembersByChannelId,
+	useAppDispatch,
+	useAppSelector,
+	usersStreamActions,
+	videoStreamActions
+} from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
@@ -21,7 +28,7 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const streamChannelMember = useAppSelector((state) => selectStreamMembersByChannelId(state, currentStreamInfo?.streamId || ''));
 	const isTabletLandscape = useTabletLandscape();
 
 	const userId = useMemo(() => {

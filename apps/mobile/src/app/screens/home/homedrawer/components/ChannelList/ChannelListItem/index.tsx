@@ -12,7 +12,7 @@ import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Linking, View } from 'react-native';
+import { DeviceEventEmitter, Linking } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
@@ -42,7 +42,6 @@ export const ChannelListItem = React.memo(
 		const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 		const [isActive, setIsActive] = useState<boolean>(false);
 		const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
-
 		const isChannelVoice = useMemo(() => {
 			return (
 				props?.data?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
@@ -128,7 +127,7 @@ export const ChannelListItem = React.memo(
 
 		if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
 		return (
-			<View>
+			<>
 				{!isChannelVoice && (
 					<ChannelItem
 						isFirstThread={props?.isFirstThread}
@@ -157,7 +156,7 @@ export const ChannelListItem = React.memo(
 						<JoinChannelVoiceBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
 					)}
 				</MezonBottomSheet>
-			</View>
+			</>
 		);
 	},
 	(prevProps, nextProps) => {
