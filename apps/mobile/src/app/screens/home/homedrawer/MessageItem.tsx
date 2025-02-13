@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, load, STORAGE_MY_USER_ID, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Block, Text, useTheme } from '@mezon/mobile-ui';
+import { Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, messagesActions, MessagesEntity, seenMessagePool, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
@@ -99,7 +99,7 @@ const MessageItem = React.memo(
 
 			if (!userId) return false;
 			const hasHereMention = message?.content?.t?.includes('@here') ?? false;
-			const hasUserMention = message?.mentions?.some((mention) => mention?.user_id === userId);
+			const hasUserMention = message?.mentions?.some?.((mention) => mention?.user_id === userId);
 			const isReplyToUser = message?.references?.[0]?.message_sender_id === userId;
 
 			return hasHereMention || hasUserMention || isReplyToUser;
@@ -339,14 +339,18 @@ const MessageItem = React.memo(
 								mode={mode}
 							/>
 
-							<Block {...(message?.content?.fwd && { display: 'flex' })}>
-								<Block {...(message?.content?.fwd && { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 })}>
+							<View style={{ ...(message?.content?.fwd && { display: 'flex' }) }}>
+								<View style={{ ...(message?.content?.fwd && { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 }) }}>
 									{!!message?.content?.fwd && (
 										<Text style={styles.forward}>
 											<Entypo name="forward" size={15} /> Forwarded
 										</Text>
 									)}
-									<Block opacity={message.isError || message?.isErrorRetry ? 0.6 : 1}>
+									<View
+										style={{
+											opacity: message.isError || message?.isErrorRetry ? 0.6 : 1
+										}}
+									>
 										{isInviteLink || isGoogleMapsLink ? (
 											<RenderMessageBlock
 												isGoogleMapsLink={isGoogleMapsLink}
@@ -396,7 +400,7 @@ const MessageItem = React.memo(
 													channelId={message?.channel_id || ''}
 												/>
 											))}
-									</Block>
+									</View>
 									{message?.attachments?.length > 0 && (
 										<MessageAttachment
 											attachments={message?.attachments}
@@ -405,8 +409,8 @@ const MessageItem = React.memo(
 											onLongPressImage={onLongPressImage}
 										/>
 									)}
-								</Block>
-							</Block>
+								</View>
+							</View>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 							{!preventAction ? (
 								<MessageAction

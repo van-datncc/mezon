@@ -123,7 +123,7 @@ const LabelDm = (props: LabelDmProps) => {
 			)}
 			{isShowPanel && (
 				<PanelMember
-					name={currentDmGroup.channel_label}
+					name={currentDmGroup?.channel_label}
 					coords={coords}
 					onClose={() => setIsShowPanel(false)}
 					isMemberDMGroup={false}

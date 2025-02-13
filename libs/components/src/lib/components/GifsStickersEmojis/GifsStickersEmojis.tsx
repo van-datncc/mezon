@@ -1,5 +1,5 @@
-import { useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
+import { useAppParams, useGifsStickersEmoji } from '@mezon/core';
+import { selectClanView, selectClickedOnTopicStatus, selectCurrentChannel, selectCurrentTopicId, selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
@@ -151,6 +151,10 @@ const ContentPanel = React.memo(
 		isShowEmojiPicker: boolean;
 		idMessageRefReaction?: string;
 	}) => {
+		const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+		const currenTopicId = useSelector(selectCurrentTopicId);
+		const { directId } = useAppParams();
+		const isClanView = useSelector(selectClanView);
 		if (subPanelActive === SubPanelName.GIFS) {
 			return (
 				<div className={`flex h-full pr-1 w-full ${contentWidthClass}`}>
@@ -175,7 +179,15 @@ const ContentPanel = React.memo(
 		if (subPanelActive === SubPanelName.EMOJI || isShowEmojiPicker) {
 			return (
 				<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
-					<EmojiPickerComp mode={mode} messageEmojiId={idMessageRefReaction} onClose={onClose} />
+					<EmojiPickerComp
+						isFocusTopicBox={isFocusTopicBox}
+						currenTopicId={currenTopicId ?? ''}
+						directId={directId}
+						isClanView={isClanView}
+						mode={mode}
+						messageEmojiId={idMessageRefReaction}
+						onClose={onClose}
+					/>
 				</div>
 			);
 		}
