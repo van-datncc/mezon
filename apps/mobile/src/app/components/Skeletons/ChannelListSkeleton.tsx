@@ -1,6 +1,6 @@
-import { Attributes, Block, size, useTheme } from '@mezon/mobile-ui';
+import { Attributes, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 
@@ -9,23 +9,23 @@ const ChannelListSkeleton = ({ numberSkeleton }: { numberSkeleton: number }) => 
 	const styles = style(themeValue);
 
 	return (
-		<Block paddingHorizontal={size.s_10}>
-			<Block gap={size.s_10} flexDirection="row" alignItems="center" justifyContent="space-between">
+		<View style={{ paddingHorizontal: size.s_10 }}>
+			<View style={{ gap: size.s_10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 				<ShimmerPlaceHolder
 					shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 					shimmerStyle={styles.bigText}
 					LinearGradient={LinearGradient}
 				/>
-			</Block>
+			</View>
 			{Array.from({ length: numberSkeleton }).map((_, index) => (
-				<Block key={`ChannelListSkeleton_${index}`}>
+				<View key={`ChannelListSkeleton_${index}`}>
 					<ShimmerPlaceHolder
 						shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 						shimmerStyle={styles.normalText}
 						LinearGradient={LinearGradient}
 					/>
 					{index % 2 ? (
-						<Block>
+						<View>
 							<ShimmerPlaceHolder
 								shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 								shimmerStyle={styles.mediumText}
@@ -36,9 +36,9 @@ const ChannelListSkeleton = ({ numberSkeleton }: { numberSkeleton: number }) => 
 								shimmerStyle={styles.smallText}
 								LinearGradient={LinearGradient}
 							/>
-						</Block>
+						</View>
 					) : (
-						<Block>
+						<View>
 							<ShimmerPlaceHolder
 								shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 								shimmerStyle={styles.smallText}
@@ -54,11 +54,11 @@ const ChannelListSkeleton = ({ numberSkeleton }: { numberSkeleton: number }) => 
 								shimmerStyle={styles.mediumText}
 								LinearGradient={LinearGradient}
 							/>
-						</Block>
+						</View>
 					)}
-				</Block>
+				</View>
 			))}
-		</Block>
+		</View>
 	);
 };
 

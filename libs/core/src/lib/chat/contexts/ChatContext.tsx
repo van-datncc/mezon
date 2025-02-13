@@ -608,7 +608,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
-					dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
+
+					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
+					}
+
 					if (channel_desc.parrent_id) {
 						dispatch(
 							threadsActions.updateActiveCodeThread({
@@ -1684,3 +1688,4 @@ const ChatContextConsumer = ChatContext.Consumer;
 ChatContextProvider.displayName = 'ChatContextProvider';
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
