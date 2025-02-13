@@ -135,7 +135,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 
 	const renderMessageItem = (message: MessagesEntity, index: number) => (
 		<TouchableOpacity onPress={() => handleJumpMessage(message)} key={`${message?.id}_${index}`} style={styles.messageItem}>
-			<MessageItem message={message} messageId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} preventAction />
+			<MessageItem message={message} messageId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} preventAction isSearchTab={true} />
 		</TouchableOpacity>
 	);
 
