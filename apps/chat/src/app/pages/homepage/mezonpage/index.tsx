@@ -211,7 +211,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 				</div>
 			</button>
 			{isOpen && (
-				<div className="absolute z-50 flex flex-col gap-1">
+				<div className="absolute z-50 flex flex-col gap-1 left-[2px]">
 					<a className="cursor-pointer block " href={downloadUrl} target="_blank" rel="noreferrer">
 						<div className="bg-black py-1 max-md:py-[2px] px-[10px] max-md:px-2 w-[180px] max-md:w-[125px] flex items-center gap-[10px] rounded-md border-[1.5px] border-white">
 							<Icons.CDNIcon className="w-[29px] h-[29px] max-md:w-[20px] max-md:h-[20px]" />
