@@ -36,8 +36,8 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const status = userStatus?.status || 'online';
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
-		const parse = safeJSONParse(userProfile?.wallet ?? '').value;
-		return parse ?? 0;
+		const parse = safeJSONParse(userProfile?.wallet ?? '').value || 0;
+		return parse;
 	}, [userProfile?.wallet]);
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);

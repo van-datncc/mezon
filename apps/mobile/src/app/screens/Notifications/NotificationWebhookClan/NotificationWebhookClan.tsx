@@ -1,11 +1,11 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { selectClanById, useAppSelector } from '@mezon/store-mobile';
 import { INotification } from '@mezon/utils';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { MezonAvatar } from '../../../componentUI';
-import { useMessageParser } from '../../../hooks/useMessageParser';
 import { parseObject } from '../NotificationMentionItem';
 import MessageWebhookClan from './MessageWebhookClan';
 import { style } from './styles';
@@ -15,7 +15,8 @@ function NotificationWebhookClan({ notify }: { notify: INotification }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(notify?.sender_id);
-	const { messageTimeDifference } = useMessageParser(notify?.content);
+	const unixTimestamp = Math.floor(new Date(notify?.content?.create_time).getTime() / 1000);
+	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
 	const data = parseObject(notify?.content);
 	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 

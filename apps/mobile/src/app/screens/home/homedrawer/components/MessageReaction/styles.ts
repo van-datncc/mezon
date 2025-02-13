@@ -127,8 +127,7 @@ export const style = (colors: Attributes) =>
 		removeEmojiContainer: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			alignItems: 'center',
-			height: size.s_30
+			alignItems: 'center'
 		},
 		confirmDeleteEmoji: {
 			flexDirection: 'row',

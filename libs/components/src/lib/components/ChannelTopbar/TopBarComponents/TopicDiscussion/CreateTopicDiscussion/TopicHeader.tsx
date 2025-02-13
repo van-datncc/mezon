@@ -27,12 +27,16 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 
 	const { setRequestInput, request } = useMessageValue();
 
-	const handleCloseModal = useCallback(() => {
-		setTurnOffThreadMessage();
-		setIsShowCreateTopic(false);
-		dispatch(topicsActions.setCurrentTopicId(''));
-		setRequestInput({ ...request, valueTextInput: '' }, true);
-	}, [dispatch]);
+	const handleCloseModal = useCallback(
+		(event?: React.MouseEvent) => {
+			event?.stopPropagation();
+			setTurnOffThreadMessage();
+			setIsShowCreateTopic(false);
+			dispatch(topicsActions.setCurrentTopicId(''));
+			setRequestInput({ ...request, valueTextInput: '' }, true);
+		},
+		[dispatch]
+	);
 
 	return (
 		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[60px] border-b-[1px] dark:border-bgTertiary border-bgLightTertiary z-10 dark:bg-bgPrimary bg-bgLightPrimary">
@@ -40,7 +44,7 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 				<Icons.TopicIcon />
 				<span className="text-base font-semibold dark:text-white text-colorTextLightMode">{'Topic'}</span>
 			</div>
-			<button onClick={handleCloseModal} className="relative right-0">
+			<button onClick={(e) => handleCloseModal(e)} className="relative right-0">
 				<Icons.Close />
 			</button>
 		</div>

@@ -121,13 +121,13 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const maskFavoriteChannel = () => {
 		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel.id, clan_id: currentClan?.id }));
-		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: true }))
+		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: true }));
 		setIsShowPanelChannel(false);
 	};
 
 	const removeFavoriteChannel = () => {
 		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel.id, clanId: currentClan?.id || '' }));
-		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: false }))
+		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClan?.id as string, mark: false }));
 		setIsShowPanelChannel(false);
 	};
 
