@@ -34,6 +34,7 @@ function MezonPage() {
 
 	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-x64.dmg`;
 	const portableUrl = `https://cdn.mezon.vn/release/mezon-${version}-win-x64-portable.exe`;
+	const microsoftStoreUrl = `https://apps.microsoft.com/detail/9pf25lf1fj17?hl=en-US&gl=VN`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -132,7 +133,7 @@ function MezonPage() {
 							) : (
 								<DropdownButton
 									icon={
-										<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+										<a className="cursor-pointer" href={microsoftStoreUrl} target="_blank" rel="noreferrer">
 											<Icons.MicrosoftDropdown className="max-w-full max-md:h-[32px] max-md:w-full" />
 										</a>
 									}
@@ -210,7 +211,16 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 				</div>
 			</button>
 			{isOpen && (
-				<div className="absolute mt-[8px] z-50 flex flex-col gap-1">
+				<div className="absolute z-50 flex flex-col gap-1">
+					<a className="cursor-pointer block " href={downloadUrl} target="_blank" rel="noreferrer">
+						<div className="bg-black py-1 max-md:py-[2px] px-[10px] max-md:px-2 w-[180px] max-md:w-[125px] flex items-center gap-[10px] rounded-md border-[1.5px] border-white">
+							<Icons.CDNIcon className="w-[29px] h-[29px] max-md:w-[20px] max-md:h-[20px]" />
+							<div>
+								<div className="text-xs max-md:text-[9px]">Get it from</div>
+								<div className="font-semibold max-md:text-[12px] leading-[20px] max-md:leading-[13px]">CDN Url</div>
+							</div>
+						</div>
+					</a>
 					{downloadLinks.map((link, index) => (
 						<a key={index} className="cursor-pointer block" href={link.url} target="_blank" rel="noreferrer">
 							{link.icon}
