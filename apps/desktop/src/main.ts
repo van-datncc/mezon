@@ -34,6 +34,8 @@ export type ImageWindowProps = {
 	checkListAttachment: boolean;
 };
 
+app.setAppUserModelId('app.mezon.ai');
+
 export default class Main {
 	static initialize() {
 		if (SquirrelEvents.handleEvents()) {

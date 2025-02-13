@@ -211,7 +211,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border,
-			paddingRight: size.s_14,
+			paddingRight: size.s_14
 			// paddingVertical: size.s_8,
 			// paddingBottom: size.s_12
 		},
@@ -246,7 +246,7 @@ export const style = (colors: Attributes) =>
 			height: '100%',
 			paddingTop: size.s_10,
 			paddingBottom: size.s_12,
-			paddingLeft: size.s_14,
+			paddingLeft: size.s_14
 		},
 		wrapperServerList: {
 			height: '100%',
