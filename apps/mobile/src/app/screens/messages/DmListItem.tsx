@@ -28,7 +28,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const dispatch = useAppDispatch();
 	const [hiddenFlag, setHiddenFlag] = useState(false);
 	const userProfile = useAuth();
-	const isYourAccount = (userProfile.userId = directMessage?.last_sent_message?.sender_id);
+	const isYourAccount = userProfile.userId === directMessage?.last_sent_message?.sender_id;
 
 	const redirectToMessageDetail = async () => {
 		await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -96,8 +96,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					<DmListItemLastMessage
 						content={typeof content === 'object' ? content : safeJSONParse(content || '{}')}
 						styleText={{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }}
-						messageId={directMessage?.last_sent_message?.id}
-						channelId={directMessage?.channel_id}
 					/>
 				)}
 			</View>

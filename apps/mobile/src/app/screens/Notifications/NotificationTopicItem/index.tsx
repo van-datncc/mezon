@@ -1,4 +1,5 @@
 import { useAuth, useGetPriorityNameFromUserClan } from '@mezon/core';
+import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	TopicDiscussionsEntity,
@@ -15,7 +16,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { MezonAvatar } from '../../../componentUI';
-import { useMessageParser } from '../../../hooks/useMessageParser';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { parseObject } from '../NotificationMentionItem';
 import { style } from './styles';
@@ -35,7 +35,8 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 	const { priorityAvatar: priorityAvatarSender } = useGetPriorityNameFromUserClan(notify?.last_sent_message?.sender_id);
 	const { priorityAvatar: priorityAvatarContentSender } = useGetPriorityNameFromUserClan(notify?.message?.sender_id);
 	const message = Object.assign({}, data, { create_time: notify?.create_time, avatar: priorityAvatarContentSender });
-	const { messageTimeDifference } = useMessageParser(message);
+	const unixTimestamp = Math.floor(new Date(message?.create_time).getTime() / 1000);
+	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
 	const initMessage = safeJSONParse(notify?.last_sent_message?.content || '')?.t;
 	const userIds = notify?.last_sent_message?.repliers;
 	const [subjectTopic, setSubjectTopic] = useState('');
