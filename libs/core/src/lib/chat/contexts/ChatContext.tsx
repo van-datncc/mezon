@@ -72,7 +72,6 @@ import { useMezon } from '@mezon/transport';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
 	AMOUNT_TOKEN,
-	ChannelStatusEnum,
 	EEventAction,
 	EEventStatus,
 	electronBridge,
@@ -600,15 +599,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
-          if(channel_desc.parrent_id !== '0'){
-            const thread : ChannelsEntity = {
-              ...channel,
-              active : 1
-            }
-            dispatch(listChannelRenderAction.addThreadToListRender({channel : thread,clanId : channel.clan_id as string }));
-          }else{
-            dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
-          }
+					if (channel_desc.parrent_id !== '0') {
+						const thread: ChannelsEntity = {
+							...channel,
+							active: 1
+						}
+						dispatch(listChannelRenderAction.addThreadToListRender({ channel: thread, clanId: channel.clan_id as string }));
+					} else {
+						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
+					}
 					if (channel_desc.parrent_id) {
 						dispatch(
 							threadsActions.updateActiveCodeThread({
