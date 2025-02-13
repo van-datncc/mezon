@@ -181,7 +181,7 @@ module.exports = {
             opacity: 1
           },
           '100%': {
-            transform: "scale(1,1)"
+            transform: "scale(1)"
           }
         },
         fly_in: {

@@ -11,8 +11,7 @@ import {
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
-	SidebarLogoItem,
-	SidebarTooltip
+	SidebarLogoItem
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
@@ -418,43 +417,37 @@ const SidebarMenu = memo(
 					className={`top-0 left-0 right-0 flex flex-col items-center py-4 px-3 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-screen'} `}
 				>
 					<div className="flex flex-col gap-3 ">
-						<SidebarTooltip titleTooltip="Direct Message">
-							<SidebarLogoItem />
-						</SidebarTooltip>
+						<SidebarLogoItem />
 						{!!listUnreadDM?.length &&
 							listUnreadDM.map((dmGroupChatUnread) => (
-								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-									<DirectUnread directMessage={dmGroupChatUnread} />
-								</SidebarTooltip>
+
+								<DirectUnread directMessage={dmGroupChatUnread} />
+
 							))}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
 					<div className="flex flex-col gap-3 ">
 						{clans.map((clan: IClan) => {
 							return (
-								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name} clan={clan}>
-									<SidebarClanItem
-										linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
-										option={clan}
-										active={isClanView && currentClanId === clan.clan_id}
-									/>
-								</SidebarTooltip>
+								<SidebarClanItem
+									linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
+									option={clan}
+									active={isClanView && currentClanId === clan.clan_id}
+								/>
 							);
 						})}
 					</div>
 					<div className="mt-3">
-						<SidebarTooltip titleTooltip="Add Clan">
-							<NavLinkComponent>
-								<div
-									className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
-									onClick={openCreateClanModal}
-								>
-									<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-										<p className="text-2xl font-bold text-[#155EEF]">+</p>
-									</div>
+						<NavLinkComponent>
+							<div
+								className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
+								onClick={openCreateClanModal}
+							>
+								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+									<p className="text-2xl font-bold text-[#155EEF]">+</p>
 								</div>
-							</NavLinkComponent>
-						</SidebarTooltip>
+							</div>
+						</NavLinkComponent>
 					</div>
 				</div>
 			</div>
