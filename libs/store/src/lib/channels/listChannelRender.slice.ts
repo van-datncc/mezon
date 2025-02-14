@@ -24,7 +24,7 @@ export const updateClanBadgeRender = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 			const listChannelRender = state.CHANNEL_LIST_RENDER.listChannelRender[clanId];
 			const channelDelete = listChannelRender.filter((channel) => channelId === channel.id);
-			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel).count_mess_unread || 0) * -1 }));
+			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel)?.count_mess_unread || 0) * -1 }));
 		} catch (error) {
 			captureSentryError(error, 'listRender/updateClanBadge');
 			return thunkAPI.rejectWithValue(error);
