@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, useFriends } from '@mezon/core';
+import { ChatContext, ChatContextProvider, useFriends, useIdleRender } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -114,6 +114,7 @@ const MainLayout = memo(
 		const handleClickingOutside = () => {
 			dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		};
+		const shouldRender = useIdleRender();
 
 		return (
 			<div
@@ -124,7 +125,7 @@ const MainLayout = memo(
 					event.preventDefault();
 				}}
 			>
-				<ChannelVoice />
+				{shouldRender && <ChannelVoice />}
 				<Outlet />
 				<GlobalEventListener />
 			</div>
