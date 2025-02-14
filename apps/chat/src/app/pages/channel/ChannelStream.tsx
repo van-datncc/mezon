@@ -11,6 +11,7 @@ import {
 	selectMemberClanByUserId2,
 	selectRemoteVideoStream,
 	selectStatusStream,
+	selectStreamMembersByChannelId,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector,
@@ -265,7 +266,6 @@ function UserItem({ user }: { user: IChannelMember }) {
 }
 
 type ChannelStreamProps = {
-	memberJoin: IChannelMember[];
 	currentStreamInfo: IStreamInfo | null;
 	currentChannel: ChannelsEntity | null;
 	handleChannelClick: (clanId: string, channelId: string, userId: string, streamId: string, username: string, gotifyToken: string) => void;
@@ -274,8 +274,9 @@ type ChannelStreamProps = {
 	isStream: boolean;
 };
 
+// TODO: improve later
+
 export default function ChannelStream({
-	memberJoin,
 	currentStreamInfo,
 	currentChannel,
 	handleChannelClick,
@@ -283,6 +284,7 @@ export default function ChannelStream({
 	disconnect,
 	isStream
 }: ChannelStreamProps) {
+	const memberJoin = useAppSelector((state) => selectStreamMembersByChannelId(state, currentChannel?.channel_id || ''));
 	const streamPlay = useSelector(selectStatusStream);
 	const isJoin = useSelector(selectIsJoin);
 	const appearanceTheme = useSelector(selectTheme);
