@@ -27,7 +27,6 @@ import '@livekit/components-styles';
 import { useAuth } from '@mezon/core';
 import {
 	ChannelsEntity,
-	ClansEntity,
 	generateMeetToken,
 	getStoreAsync,
 	handleParticipantMeetState,
@@ -70,18 +69,6 @@ const ChannelVoice = memo(
 		const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 		const containerRef = useRef<HTMLDivElement | null>(null);
 
-		const [currentClan, setCurrentClan] = useState<ClansEntity | null>(null);
-
-		useEffect(() => {
-			const fetchClan = async () => {
-				const store = await getStoreAsync();
-				const clan = selectCurrentClan(store.getState());
-				setCurrentClan(clan);
-			};
-
-			fetchClan();
-		}, []);
-
 		const participantMeetState = async (state: ParticipantMeetState, clanId?: string, channelId?: string): Promise<void> => {
 			if (!clanId || !channelId || !userProfile?.user?.id) return;
 
@@ -97,6 +84,8 @@ const ChannelVoice = memo(
 		};
 
 		const handleJoinRoom = async () => {
+			const store = await getStoreAsync();
+			const currentClan = selectCurrentClan(store.getState());
 			if (!currentClan || !currentChannel?.meeting_code) return;
 			setLoading(true);
 
@@ -167,9 +156,7 @@ const ChannelVoice = memo(
 			[dispatch]
 		);
 
-		const isShow = useMemo(() => {
-			return isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
-		}, [isJoined, voiceInfo, currentChannel]);
+		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 
 		return (
 			<div
