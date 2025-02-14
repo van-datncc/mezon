@@ -14,11 +14,11 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 	const styles = style(themeValue);
 	const { removeMemberChannel } = useChannelMembersActions();
 	const { dismiss } = useBottomSheetModal();
-	const formatDate = (dateString: string) => {
-		const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-		const date = new Date(dateString);
-		return date.toLocaleDateString('en-US', options);
-	};
+	// const formatDate = (dateString: string) => {
+	// 	const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+	// 	const date = new Date(dateString);
+	// 	return date.toLocaleDateString('en-US', options);
+	// };
 
 	const settingsMenu: IMezonMenuItemProps[] = [
 		{
@@ -33,7 +33,7 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 	const handleRemoveMemberChannel = async () => {
 		if (user) {
 			dismiss();
-			const userIds = [user?.user?.id ?? ''];
+			const userIds = [user?.id ?? ''];
 			await removeMemberChannel({ channelId: currentChannel?.channel_id || '', userIds });
 		}
 	};
@@ -50,8 +50,8 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 			{/* <Text style={styles.title}>ABOUT ME</Text>
 				<Text style={styles.desc}>{user?.user?.about_me}</Text> */}
 			<View>
-				<Text style={styles.title}>{t('userInfoDM.mezonMemberSince')}</Text>
-				<Text style={styles.desc}>{formatDate(user?.user?.create_time)}</Text>
+				{/*<Text style={styles.title}>{t('userInfoDM.mezonMemberSince')}</Text>*/}
+				{/*<Text style={styles.desc}>{formatDate(user?.user?.create_time)}</Text>*/}
 			</View>
 			<MezonMenu menu={menu} />
 		</View>
