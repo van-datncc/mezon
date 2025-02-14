@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, load, STORAGE_MY_USER_ID, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { size, Text, useTheme } from '@mezon/mobile-ui';
+import { Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
@@ -213,39 +213,6 @@ const MessageItem = React.memo(
 			outputRange: ['transparent', themeValue.secondaryWeight]
 		});
 
-		if (isMessageSystem) {
-			return (
-				<View>
-					<Pressable
-						disabled={isMessageCallLog}
-						delayLongPress={300}
-						onPressIn={handlePressIn}
-						onPressOut={handlePressOut}
-						onLongPress={handleLongPressMessage}
-					>
-						<MessageLineSystem message={message} />
-					</Pressable>
-					{!preventAction ? (
-						<View style={{ marginLeft: size.s_60 }}>
-							<MessageAction
-								message={message}
-								mode={mode}
-								preventAction={preventAction}
-								openEmojiPicker={() => {
-									DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
-										type: EMessageBSToShow.MessageAction,
-										senderDisplayName,
-										message,
-										isOnlyEmoji: true
-									});
-								}}
-							/>
-						</View>
-					) : null}
-				</View>
-			);
-		}
-
 		const panResponder = PanResponder.create({
 			onMoveShouldSetPanResponder: (_, gestureState) => {
 				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 && gestureState.dx < -8) {
@@ -280,30 +247,34 @@ const MessageItem = React.memo(
 				>
 					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-						<AvatarMessage
-							onPress={onPressInfoUser}
-							id={message?.user?.id}
-							avatar={messageAvatar}
-							username={usernameMessage}
-							isShow={!isCombine || !!message?.references?.length || showUserInformation}
-						/>
+						{!isMessageSystem && (
+							<AvatarMessage
+								onPress={onPressInfoUser}
+								id={message?.user?.id}
+								avatar={messageAvatar}
+								username={usernameMessage}
+								isShow={!isCombine || !!message?.references?.length || showUserInformation}
+							/>
+						)}
 
 						<Pressable
 							disabled={isMessageCallLog}
-							style={[styles.rowMessageBox]}
+							style={[styles.rowMessageBox, isMessageSystem && { width: '100%' }]}
 							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
 							onLongPress={handleLongPressMessage}
 						>
-							<InfoUserMessage
-								onPress={onPressInfoUser}
-								senderDisplayName={senderDisplayName}
-								isShow={!isCombine || !!message?.references?.length || showUserInformation}
-								createTime={message?.create_time}
-								messageSenderId={message?.sender_id}
-								mode={mode}
-							/>
+							{!isMessageSystem && (
+								<InfoUserMessage
+									onPress={onPressInfoUser}
+									senderDisplayName={senderDisplayName}
+									isShow={!isCombine || !!message?.references?.length || showUserInformation}
+									createTime={message?.create_time}
+									messageSenderId={message?.sender_id}
+									mode={mode}
+								/>
+							)}
 
 							<View style={message?.content?.fwd ? { display: 'flex' } : undefined}>
 								<View style={message?.content?.fwd ? { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 } : undefined}>
@@ -313,7 +284,9 @@ const MessageItem = React.memo(
 										</Text>
 									)}
 									<View style={{ opacity: message.isError || message?.isErrorRetry ? 0.6 : 1 }}>
-										{isInviteLink || isGoogleMapsLink ? (
+										{isMessageSystem ? (
+											<MessageLineSystem message={message} />
+										) : isInviteLink || isGoogleMapsLink ? (
 											<RenderMessageBlock
 												isGoogleMapsLink={isGoogleMapsLink}
 												isInviteLink={isInviteLink}

@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, FaceIcon, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { calculateTotalCount, EmojiDataOptionals, getSrcEmoji, SenderInfoOptionals, TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -79,7 +79,13 @@ export const MessageReactionWrapper = React.memo(
 		}, []);
 
 		return (
-			<View style={[styles.reactionWrapper, messageReactions.length > 0 && styles.reactionSpace, isMessageSystem && { paddingTop: 0 }]}>
+			<View
+				style={[
+					styles.reactionWrapper,
+					messageReactions.length > 0 && styles.reactionSpace,
+					isMessageSystem && { paddingTop: 0, marginLeft: size.s_40 }
+				]}
+			>
 				{messageReactions?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const isMyReaction = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 
