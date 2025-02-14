@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { MessagesEntity, selectAllAccount, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
@@ -78,6 +79,7 @@ function MessageWithUser({
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
+	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 
 	const modalState = useRef({
 		profileItem: false
@@ -143,10 +145,8 @@ function MessageWithUser({
 	);
 
 	const handleOpenShortUser = useCallback(
-		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
-			if (checkAnonymous) {
-				return;
-			}
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string, isClickOnReply = false) => {
+			setIsAnonymousOnModal(isClickOnReply);
 			if (modalState.current.profileItem) {
 				return;
 			}
@@ -169,7 +169,7 @@ function MessageWithUser({
 			openProfileItem();
 			modalState.current.profileItem = true;
 		},
-		[checkAnonymous, mode]
+		[mode]
 	);
 
 	const isDM = useMemo(() => {
@@ -183,6 +183,7 @@ function MessageWithUser({
 	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.sender_id]);
 
 	const messageHour = message ? convertTimeHour(message.create_time) : '';
+	const [isAnonymousOnModal, setIsAnonymousOnModal] = useState<boolean>(false);
 
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
@@ -208,6 +209,7 @@ function MessageWithUser({
 					avatar={avatar}
 					name={message?.clan_nick || message?.display_name || message?.username}
 					isDM={isDM}
+					checkAnonymous={isAnonymousOnModal}
 				/>
 			</div>
 		);
@@ -232,7 +234,17 @@ function MessageWithUser({
 									<MessageReply
 										message={message}
 										mode={mode}
-										onClick={(e) => handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string)}
+										onClick={
+											checkAnonymousOnReplied
+												? () => {}
+												: (e) =>
+														handleOpenShortUser(
+															e,
+															message?.references?.[0]?.message_sender_id as string,
+															checkAnonymousOnReplied
+														)
+										}
+										isAnonymousReplied={checkAnonymousOnReplied}
 									/>
 								)}
 								<div
@@ -258,7 +270,7 @@ function MessageWithUser({
 													message={message}
 													isEditing={isEditing}
 													mode={mode}
-													onClick={(e) => handleOpenShortUser(e, message?.sender_id)}
+													onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
 												/>
 											)}
 										</div>
@@ -271,7 +283,7 @@ function MessageWithUser({
 													<MessageHead
 														message={message}
 														mode={mode}
-														onClick={(e) => handleOpenShortUser(e, message?.sender_id)}
+														onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
 													/>
 												)}
 											</div>

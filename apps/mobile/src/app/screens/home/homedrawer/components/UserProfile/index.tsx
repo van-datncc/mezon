@@ -43,7 +43,7 @@ interface userProfileProps {
 export enum EFriendState {
 	Friend,
 	SentRequestFriend,
-	ReceivedRequestFriend,
+	ReceivedRequestFriend
 }
 
 export const formatDate = (dateString: string) => {

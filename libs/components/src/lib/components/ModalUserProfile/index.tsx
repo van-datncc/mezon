@@ -51,6 +51,7 @@ type ModalUserProfileProps = {
 	rootRef?: RefObject<HTMLElement>;
 	activityByUserId?: ApiUserActivity;
 	isUserRemoved?: boolean;
+	checkAnonymous?: boolean;
 };
 
 export type OpenModalProps = {
@@ -80,7 +81,8 @@ const ModalUserProfile = ({
 	onClose,
 	rootRef,
 	activityByUserId,
-	isUserRemoved
+	isUserRemoved,
+	checkAnonymous
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { userId } = useAuth();
@@ -153,7 +155,6 @@ const ModalUserProfile = ({
 	}, [userProfile?.user?.avatar_url, isFooterProfile, userID, message?.avatar, userById?.user?.avatar_url]);
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
