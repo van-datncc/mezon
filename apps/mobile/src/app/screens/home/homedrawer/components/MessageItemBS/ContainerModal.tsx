@@ -610,7 +610,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			senderId: senderId ?? '',
 			countToRemove: 1,
 			actionDelete: false,
-			topicId: message.content?.tp || ''
+			topicId: message.topic_id || ''
 		} as IReactionMessageProps);
 
 		onClose();

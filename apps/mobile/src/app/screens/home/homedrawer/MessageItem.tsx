@@ -345,7 +345,7 @@ const MessageItem = React.memo(
 								</View>
 							</View>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-							{!preventAction ? (
+							{!preventAction && !!message?.reactions?.length ? (
 								<MessageAction
 									message={message}
 									mode={mode}
@@ -377,8 +377,16 @@ const MessageItem = React.memo(
 	},
 	(prevProps, nextProps) => {
 		return (
-			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id + prevProps?.message?.code ===
-			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id + nextProps?.message?.code
+			prevProps?.message?.id +
+				prevProps?.message?.update_time +
+				prevProps?.previousMessage?.id +
+				prevProps?.message?.code +
+				prevProps?.message?.reactions ===
+			nextProps?.message?.id +
+				nextProps?.message?.update_time +
+				nextProps?.previousMessage?.id +
+				nextProps?.message?.code +
+				nextProps?.message?.reactions
 		);
 	}
 );

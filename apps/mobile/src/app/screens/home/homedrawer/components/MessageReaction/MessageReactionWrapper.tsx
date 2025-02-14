@@ -52,10 +52,10 @@ export const MessageReactionWrapper = React.memo(
 					senderId: userId ?? '',
 					countToRemove: countToRemove,
 					actionDelete: true,
-					topicId: message.content?.tp || ''
+					topicId: message.topic_id || ''
 				} as IReactionMessageProps);
 			},
-			[message?.channel_id, message.content?.tp, message?.id, mode, userId]
+			[message?.channel_id, message.topic_id, message?.id, mode, userId]
 		);
 
 		const onReactItemLongPress = (emojiId: string) => {
@@ -74,7 +74,7 @@ export const MessageReactionWrapper = React.memo(
 		}, []);
 
 		return (
-			<View style={[styles.reactionWrapper, messageReactions.length > 0 && styles.reactionSpace]}>
+			<View style={[styles.reactionWrapper, styles.reactionSpace]}>
 				{messageReactions?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const isMyReaction = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 
@@ -100,7 +100,7 @@ export const MessageReactionWrapper = React.memo(
 									senderId: userId ?? '',
 									countToRemove: 1,
 									actionDelete: false,
-									topicId: message.content?.tp || ''
+									topicId: message.topic_id || ''
 								} as IReactionMessageProps);
 							}}
 							key={index + emojiItemData.emojiId}

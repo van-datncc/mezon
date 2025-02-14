@@ -91,6 +91,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, 100);
 				if (!isTabletLandscape) navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				timeoutRef.current = setTimeout(async () => {
+					DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
 					store.dispatch(
 						channelsActions.joinChannel({
 							clanId: clanId ?? '',
