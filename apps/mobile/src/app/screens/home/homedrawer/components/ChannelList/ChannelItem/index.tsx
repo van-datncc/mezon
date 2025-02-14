@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React from 'react';
@@ -21,7 +21,7 @@ interface IChannelItemProps {
 }
 
 function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstThread }: IChannelItemProps) {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const numberNotification = data?.count_mess_unread ? data?.count_mess_unread : 0;
 
@@ -37,7 +37,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 			style={[
 				styles.channelListLink,
 				isActive && styles.channelListItemActive,
-				isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
+				isActive && { backgroundColor: themeBasic === ThemeModeBase.LIGHT ? themeValue.secondaryWeight : themeValue.secondaryLight }
 			]}
 		>
 			<View style={[styles.channelListItem]}>

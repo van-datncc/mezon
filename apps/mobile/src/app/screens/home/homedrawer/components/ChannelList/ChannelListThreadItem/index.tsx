@@ -1,4 +1,4 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -18,7 +18,7 @@ interface IChannelListThreadItemProps {
 }
 
 const ChannelListThreadItem = ({ onPress, onLongPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) => {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
@@ -37,11 +37,11 @@ const ChannelListThreadItem = ({ onPress, onLongPress, thread, isActive, isFirst
 		<View key={thread.id} style={[styles.channelListLink]}>
 			<View style={[styles.threadItem]}>
 				{isFirstThread ? (
-					<View style={{ marginTop: -size.s_14 }}>
+					<View style={{ top: -size.s_14 }}>
 						<ShortCornerIcon width={size.s_12} height={size.s_16} />
 					</View>
 				) : (
-					<View style={{ marginTop: -size.s_20 }}>
+					<View style={{ top: -size.s_20 }}>
 						<LongCornerIcon width={size.s_12} height={size.s_36} />
 						{/*hardcode virtual view to connect thread lines */}
 						<View
@@ -59,7 +59,7 @@ const ChannelListThreadItem = ({ onPress, onLongPress, thread, isActive, isFirst
 				<TouchableOpacity
 					style={[
 						styles.boxThread,
-						isActive && { backgroundColor: theme === 'dark' ? themeValue.secondaryLight : themeValue.secondaryWeight }
+						isActive && { backgroundColor: themeBasic === ThemeModeBase.DARK ? themeValue.secondaryLight : themeValue.secondaryWeight }
 					]}
 					activeOpacity={1}
 					onPress={onPressThreadItem}
@@ -69,7 +69,9 @@ const ChannelListThreadItem = ({ onPress, onLongPress, thread, isActive, isFirst
 						style={[
 							styles.titleThread,
 							(isUnReadChannel || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive,
-							isActive && { backgroundColor: theme === 'dark' ? themeValue.secondaryLight : themeValue.secondaryWeight }
+							isActive && {
+								backgroundColor: themeBasic === ThemeModeBase.DARK ? themeValue.secondaryLight : themeValue.secondaryWeight
+							}
 						]}
 						numberOfLines={1}
 					>
