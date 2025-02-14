@@ -8,7 +8,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, selectVoiceChannelId } from '@mezon/store';
+import { selectCurrentClanId } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { LocalParticipant, RemoteParticipant, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -37,7 +37,7 @@ const RoomView = ({
 	const isTabletLandscape = useTabletLandscape();
 	const { isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled, localParticipant } = useLocalParticipant();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const voiceChannelId = useSelector(selectVoiceChannelId);
+	const voiceChannelId = null;
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 
 	useEffect(() => {

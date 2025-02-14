@@ -354,15 +354,12 @@ export const listChannelRenderReducer = listChannelRenderSlice.reducer;
 export const getListChannelRenderState = (rootState: { [CHANNEL_LIST_RENDER]: ChannelListRenderState }): ChannelListRenderState =>
 	rootState[CHANNEL_LIST_RENDER];
 
-export const selectListChannelRenderByClanId = createSelector(
-	[getListChannelRenderState, (state: RootState, clanId?: string) => clanId],
-	(state, clanId) => {
-		if (!clanId || !state.listChannelRender[clanId]) {
-			return undefined;
-		}
-		return state.listChannelRender[clanId];
+export const selectListChannelRenderByClanId = createSelector([getListChannelRenderState, (state, clanId?: string) => clanId], (state, clanId) => {
+	if (!clanId || !state.listChannelRender[clanId]) {
+		return undefined;
 	}
-);
+	return state.listChannelRender[clanId];
+});
 
 function prioritizeChannel(channels: IChannel[]): IChannel[] {
 	return channels.sort((a, b) => {
