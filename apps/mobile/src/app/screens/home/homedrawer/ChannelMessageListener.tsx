@@ -10,13 +10,14 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
+	selectGrouplMembers,
 	selectStatusStream,
 	useAppDispatch,
 	videoStreamActions
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DeviceEventEmitter, Linking, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../components/StreamContext/StreamContext';
@@ -36,12 +37,18 @@ const ChannelMessageListener = React.memo(() => {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const { handleChannelClick, disconnect } = useWebRTCStream();
 	const { userProfile } = useAuth();
+	const membersDM = useSelector((state) => selectGrouplMembers(state, currentDirectId));
+
+	const listUser = useMemo(() => {
+		if (!!currentDirectId && currentDirectId !== '0') return membersDM;
+		else return usersClan;
+	}, [currentDirectId, membersDM, usersClan]);
 
 	const onMention = useCallback(
 		async (mentionedUser: string) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
-				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
+				const clanUser = listUser?.find((userClan) => tagName === userClan?.user?.username);
 				const isRoleMention = rolesInClan?.some((role) => tagName === role?.id);
 				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
@@ -52,7 +59,7 @@ const ChannelMessageListener = React.memo(() => {
 				/* empty */
 			}
 		},
-		[usersClan, rolesInClan]
+		[listUser, rolesInClan]
 	);
 
 	const onChannelMention = useCallback(

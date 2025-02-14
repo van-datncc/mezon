@@ -13,10 +13,11 @@ type MessageReplyProps = {
 	message: IMessageWithUser;
 	mode?: number;
 	onClick?: (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => void;
+	isAnonymousReplied?: boolean;
 };
 
 // TODO: refactor component for message lines
-const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) => {
+const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode, isAnonymousReplied }) => {
 	const senderIdMessageRef = message?.references?.[0]?.message_sender_id as string;
 	const messageIdRef = message?.references?.[0]?.message_ref_id;
 	const hasAttachmentInMessageRef = message?.references?.[0]?.has_attachment;
@@ -68,7 +69,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 										? (message?.references?.[0]?.mesages_sender_avatar ?? '')
 										: messageSender?.clan_avatar || messageSender?.user?.avatar_url
 								}
-								isAnonymous={message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}
+								isAnonymous={isAnonymousReplied}
 							/>
 						</div>
 
