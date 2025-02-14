@@ -79,7 +79,7 @@ export function ChannelApps({
 	);
 
 	useEffect(() => {
-		if (!appChannel.url) return;
+		if (!appChannel?.url) return;
 		setLoading(true);
 
 		const joinRoom = async () => {
