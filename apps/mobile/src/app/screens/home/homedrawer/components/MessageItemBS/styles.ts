@@ -18,7 +18,6 @@ export const style = (colors: Attributes) =>
 		},
 		reactWrapper: {
 			flexDirection: 'row',
-			gap: 20,
 			justifyContent: 'space-between',
 			padding: size.s_12,
 			alignItems: 'center'

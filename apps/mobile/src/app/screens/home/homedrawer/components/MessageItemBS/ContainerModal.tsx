@@ -675,16 +675,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>
-					{messageActionList.attract.map((action) => {
-						return (
-							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
-								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
-								<Text style={styles.warningActionText}>{action.title}</Text>
-							</Pressable>
-						);
-					})}
-				</View>
-				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {
 						return (
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
@@ -700,6 +690,16 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
 								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.actionText}>{action.title}</Text>
+							</Pressable>
+						);
+					})}
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.attract.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
 							</Pressable>
 						);
 					})}
