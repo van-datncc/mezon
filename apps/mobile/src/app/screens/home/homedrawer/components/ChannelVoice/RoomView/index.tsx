@@ -4,11 +4,13 @@ import {
 	getUpdateOrAddClanChannelCache,
 	Icons,
 	jumpToChannel,
+	load,
 	save,
+	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId } from '@mezon/store';
+import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { LocalParticipant, RemoteParticipant, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -22,13 +24,16 @@ import { style } from '../styles';
 const RoomView = ({
 	isAnimationComplete,
 	onPressMinimizeRoom,
-	channelId
+	channelId,
+	clanId
 }: {
 	isAnimationComplete: boolean;
 	onPressMinimizeRoom: () => void;
 	channelId: string;
+	clanId: string;
 }) => {
 	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
+	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const room = useRoomContext();
@@ -36,8 +41,7 @@ const RoomView = ({
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const { isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled, localParticipant } = useLocalParticipant();
-	const currentClanId = useSelector(selectCurrentClanId);
-	const voiceChannelId = null;
+	const voiceInfo = useSelector(selectVoiceInfo);
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 
 	useEffect(() => {
@@ -147,8 +151,8 @@ const RoomView = ({
 
 	const handleEndCall = useCallback(() => {
 		room.disconnect();
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, voiceChannelId });
-	}, [room, voiceChannelId]);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: voiceInfo?.clanId, channelId: voiceInfo?.channelId });
+	}, [room, voiceInfo?.channelId, voiceInfo?.clanId]);
 
 	const handleShowChat = () => {
 		if (!isTabletLandscape) {
@@ -161,11 +165,22 @@ const RoomView = ({
 	};
 
 	const joinChannel = async () => {
-		const clanId = currentClanId;
+		const clanIdCache = load(STORAGE_CLAN_ID);
+		if (clanIdCache !== clanId) {
+			const joinAndChangeClan = async (clanId: string) => {
+				await Promise.all([
+					dispatch(clansActions.joinClan({ clanId: clanId })),
+					dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
+				]);
+			};
+			await joinAndChangeClan(clanId);
+		}
 		DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
 			isFetchMemberChannelDM: true
 		});
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+		save(STORAGE_CLAN_ID, clanId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		await jumpToChannel(channelId, clanId);
 	};
