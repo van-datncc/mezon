@@ -406,7 +406,7 @@ export function MemberProfile({
 									<span
 										className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode ${isFooter ? 'leading-[18px]' : ''}`}
 									>
-										{!status ? 'Offline' : 'Online'}
+										{userStatus || !status ? 'Offline' : 'Online'}
 									</span>
 								)}
 
