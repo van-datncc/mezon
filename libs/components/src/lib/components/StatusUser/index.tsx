@@ -57,27 +57,47 @@ const StatusUser = memo((props: StatusUserProps) => {
 			break;
 	}
 
+	const renderTypingIndicator = () => (
+		<span
+			className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${
+				checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'
+			}`}
+		>
+			<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
+		</span>
+	);
+
+	const renderStatusIcon = () => {
+		if (isTyping && checkTypingUser) {
+			return <Icons.IconLoadingTyping bgFill="bg-colorSuccess" />;
+		}
+
+		if (customStatus) {
+			return <UserStatusIcon status={customStatus} />;
+		}
+
+		if (status?.isMobile) {
+			return <Icons.IconMobileDevice defaultSize="w-3 h-3" />;
+		}
+
+		if (status?.status) {
+			return <Icons.OnlineStatus defaultSize={sizeStatusIcon} />;
+		}
+
+		return <Icons.OfflineStatus defaultSize={sizeStatusIcon} />;
+	};
+
 	return checkDmGroup ? (
-		isTyping && checkTypingUser && (
-			<span
-				className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'}`}
-			>
-				<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
-			</span>
-		)
+		isTyping && checkTypingUser ? (
+			renderTypingIndicator()
+		) : null
 	) : (
 		<span
-			className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'}`}
+			className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${
+				checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'
+			}`}
 		>
-			{isTyping && checkTypingUser ? (
-				<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
-			) : status?.isMobile ? (
-				<Icons.IconMobileDevice defaultSize={'w-3 h-3'} />
-			) : status?.status ? (
-				<>{customStatus ? <UserStatusIcon status={customStatus} /> : <Icons.OnlineStatus defaultSize={sizeStatusIcon} />}</>
-			) : (
-				<Icons.OfflineStatus defaultSize={sizeStatusIcon} />
-			)}
+			{renderStatusIcon()}
 		</span>
 	);
 });

@@ -95,7 +95,7 @@ const ModalUserProfile = ({
 	const statusOnline = useMemo(() => {
 		if (userProfile?.user?.metadata && userId === userID) {
 			const metadata = safeJSONParse(userProfile?.user?.metadata);
-			return metadata;
+			return metadata?.user_status;
 		}
 		if (userMetaById) {
 			return userMetaById as any;
