@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, load, STORAGE_MY_USER_ID, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
@@ -214,7 +214,36 @@ const MessageItem = React.memo(
 		});
 
 		if (isMessageSystem) {
-			return <MessageLineSystem message={message} />;
+			return (
+				<View>
+					<Pressable
+						disabled={isMessageCallLog}
+						delayLongPress={300}
+						onPressIn={handlePressIn}
+						onPressOut={handlePressOut}
+						onLongPress={handleLongPressMessage}
+					>
+						<MessageLineSystem message={message} />
+					</Pressable>
+					{!preventAction ? (
+						<View style={{ marginLeft: size.s_60 }}>
+							<MessageAction
+								message={message}
+								mode={mode}
+								preventAction={preventAction}
+								openEmojiPicker={() => {
+									DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
+										type: EMessageBSToShow.MessageAction,
+										senderDisplayName,
+										message,
+										isOnlyEmoji: true
+									});
+								}}
+							/>
+						</View>
+					) : null}
+				</View>
+			);
 		}
 
 		const panResponder = PanResponder.create({
