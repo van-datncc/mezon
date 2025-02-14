@@ -9,6 +9,7 @@ import {
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
+	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -120,6 +121,7 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 	const roomId = useSelector(selectGetRoomId);
 	const joinCall = useSelector(selectEnableCall);
 	const [loading, setLoading] = useState(false);
+	const appChannel = useSelector(selectAppChannelById(channel?.channel_id || ''));
 
 	useEffect(() => {
 		dispatch(channelAppActions.setRoomId(null));
@@ -127,15 +129,15 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			if (!roomId || !joinCall || !channel) {
+			if (!roomId || !joinCall || !appChannel || !appChannel.url) {
 				dispatch(channelAppActions.setRoomToken(undefined));
 				return;
 			}
 			setLoading(true);
 
 			try {
-				const channelId = String(channel.channel_id ?? '');
-				const roomName = `${channelId}-${roomId}`;
+				const channelId = String(appChannel.channel_id ?? '');
+				const roomName = `${appChannel?.url}-${roomId}`;
 
 				const result = await dispatch(generateMeetToken({ channelId, roomName })).unwrap();
 
@@ -148,7 +150,7 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 		};
 
 		fetchData();
-	}, [channel, dispatch, roomId, joinCall]);
+	}, [channel, dispatch, roomId, joinCall, appChannel]);
 
 	return (
 		roomId && (

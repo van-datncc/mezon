@@ -77,6 +77,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userProfile = useSelector(selectAllAccount);
+	const isMessageSystem =
+		message?.code === TypeMessage.Welcome ||
+		message?.code === TypeMessage.CreateThread ||
+		message?.code === TypeMessage.CreatePin ||
+		message?.code === TypeMessage.AuditLog;
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
@@ -511,7 +516,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			message?.code === TypeMessage.Topic ||
 			isDM ||
 			!canSendMessage ||
-			currentChannelId !== message?.channel_id;
+			currentChannelId !== message?.channel_id ||
+			isMessageSystem;
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
@@ -521,7 +527,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
-			isMyMessage && EMessageActionType.GiveACoffee,
+			(isMyMessage || isMessageSystem) && EMessageActionType.GiveACoffee,
 			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
 		];
 

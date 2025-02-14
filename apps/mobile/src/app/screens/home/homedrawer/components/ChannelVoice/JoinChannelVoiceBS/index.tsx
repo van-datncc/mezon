@@ -31,7 +31,8 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }, refRBSheet: Reac
 		if (!channel.meeting_code) return;
 		const data = {
 			channelId: channel?.channel_id || '',
-			roomName: channel?.meeting_code
+			roomName: channel?.meeting_code,
+			clanId: currentClanId
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 		dismiss();
