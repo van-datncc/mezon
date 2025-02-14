@@ -150,8 +150,8 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 	}, [elements, t, allUserIdsInChannel, styles, handleJumpToPinMessage, onMention]);
 
 	return (
-		<View style={[styles.wrapperMessageBox, { marginVertical: size.s_10 }]}>
-			<View style={{ marginLeft: size.s_10 }}>
+		<View style={[styles.wrapperMessageBox, { marginVertical: size.s_10, paddingLeft: 0 }]}>
+			<View>
 				{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon />}
 				{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon color={themeValue.text} width={size.s_20} height={size.s_20} />}
 				{message?.code === TypeMessage.CreatePin && <Icons.PinIcon color={themeValue.text} width={size.s_20} height={size.s_20} />}

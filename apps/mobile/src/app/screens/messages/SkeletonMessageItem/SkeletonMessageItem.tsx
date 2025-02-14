@@ -9,7 +9,7 @@ export default function SkeletonMessageItem({ numberSkeleton }: { numberSkeleton
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	return (
-		<View style={{ flex: 1 }}>
+		<View>
 			{Array.from({ length: numberSkeleton }).map((_, index) => (
 				<View key={`MessageItemSkeleton_${index}`} style={[styles.messageItem, { flexDirection: 'row' }]}>
 					<ShimmerPlaceHolder

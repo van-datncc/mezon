@@ -1,6 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannelMembersActions } from '@mezon/core';
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

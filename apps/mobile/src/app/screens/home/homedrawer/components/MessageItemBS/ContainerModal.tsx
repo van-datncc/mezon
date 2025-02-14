@@ -77,6 +77,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userProfile = useSelector(selectAllAccount);
+	const isMessageSystem =
+		message?.code === TypeMessage.Welcome ||
+		message?.code === TypeMessage.CreateThread ||
+		message?.code === TypeMessage.CreatePin ||
+		message?.code === TypeMessage.AuditLog;
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
@@ -511,7 +516,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			message?.code === TypeMessage.Topic ||
 			isDM ||
 			!canSendMessage ||
-			currentChannelId !== message?.channel_id;
+			currentChannelId !== message?.channel_id ||
+			isMessageSystem;
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
@@ -521,7 +527,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
-			isMyMessage && EMessageActionType.GiveACoffee,
+			(isMyMessage || isMessageSystem) && EMessageActionType.GiveACoffee,
 			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
 		];
 
@@ -610,7 +616,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			senderId: senderId ?? '',
 			countToRemove: 1,
 			actionDelete: false,
-			topicId: message.content?.tp || ''
+			topicId: message.topic_id || ''
 		} as IReactionMessageProps);
 
 		onClose();
@@ -669,16 +675,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>
-					{messageActionList.attract.map((action) => {
-						return (
-							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
-								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
-								<Text style={styles.warningActionText}>{action.title}</Text>
-							</Pressable>
-						);
-					})}
-				</View>
-				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {
 						return (
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
@@ -694,6 +690,16 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
 								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.actionText}>{action.title}</Text>
+							</Pressable>
+						);
+					})}
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.attract.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
 							</Pressable>
 						);
 					})}

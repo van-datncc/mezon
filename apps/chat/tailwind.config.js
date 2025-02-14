@@ -175,13 +175,21 @@ module.exports = {
         scale_up: {
           '0%': {
             opacity: 0.5,
-            transform: 'scale(0.2,0.2)'
+            transform: 'scale(0.8,0.8)'
           },
           '50%': {
             opacity: 1
           },
           '100%': {
-            transform: "scale(1,1)"
+            transform: "scale(1)"
+          }
+        },
+        height_logo:{
+          from : {
+            height:'0px'
+          },
+          to : {
+            height:'48px'
           }
         },
         fly_in: {
@@ -251,7 +259,8 @@ module.exports = {
       rotation: 'rotation 6s linear infinite',
       spin: 'spin 1s linear infinite',
       faded_input: 'faded_input 0.05s ease-in-out forwards',
-      scale_up: 'scale_up 0.15s ease-in-out forwards',
+      scale_up: 'scale_up 0.5s ease-in-out forwards',
+      height_logo: 'height_logo 0.5s ease-in-out forwards',
       fly_in: 'fly_in 0.2s ease-in-out forwards',
       slide_in: 'slide_in 0.5s ease-in-out forwards',
       pulse: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',

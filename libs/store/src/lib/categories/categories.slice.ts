@@ -88,8 +88,11 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 	if (!response.categorydesc) {
 		return { categories: [], clanId: clanId };
 	}
+
+  const sortCate = (response.categorydesc || []).sort((a : ApiCategoryDesc, b: ApiCategoryDesc) => (a.category_order || 1) - (b.category_order || 1))
+
 	const payload: FetchCategoriesPayload = {
-		categories: response.categorydesc.map(mapCategoryToEntity),
+		categories: sortCate.map(mapCategoryToEntity),
 		clanId: clanId
 	};
 	return payload;

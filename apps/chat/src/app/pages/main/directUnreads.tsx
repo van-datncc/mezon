@@ -26,9 +26,8 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: direct.id || '', timestamp }));
 	};
 	return (
-		<NavLink to="#" onClick={handleClick} draggable="false">
-			<NavLinkComponent>
-				<div>
+		<NavLink to="#" onClick={handleClick} draggable="false" className="animate-height_logo ">
+				<div className="relative animate-scale_up origin-center delay-200">
 					<AvatarImage
 						draggable="false"
 						alt={direct.usernames?.toString() ?? ''}
@@ -47,7 +46,6 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 						</div>
 					)}
 				</div>
-			</NavLinkComponent>
 		</NavLink>
 	);
 }
