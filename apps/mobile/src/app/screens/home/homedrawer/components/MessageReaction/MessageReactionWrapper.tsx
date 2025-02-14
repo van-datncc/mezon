@@ -79,7 +79,6 @@ export const MessageReactionWrapper = React.memo(
 		}, []);
 
 		return (
-			<View style={[styles.reactionWrapper, styles.reactionSpace]}>
 			<View
 				style={[
 					styles.reactionWrapper,
