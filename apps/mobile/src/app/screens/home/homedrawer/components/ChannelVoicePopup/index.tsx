@@ -61,10 +61,10 @@ const ChannelVoicePopup = () => {
 		})
 	).current;
 
-	const participantMeetState = async (state: ParticipantMeetState, channelId: string): Promise<void> => {
+	const participantMeetState = async (state: ParticipantMeetState, clanId: string, channelId: string): Promise<void> => {
 		await dispatch(
 			handleParticipantMeetState({
-				clan_id: channel.clan_id,
+				clan_id: clanId,
 				channel_id: channelId,
 				user_id: userProfile?.user?.id,
 				display_name: userProfile?.user?.display_name,
@@ -73,28 +73,28 @@ const ChannelVoicePopup = () => {
 		);
 	};
 
-	const handleLeaveRoom = async (voiceChannelId: string) => {
-		if (voiceChannelId) {
-			await participantMeetState(ParticipantMeetState.LEAVE, voiceChannelId as string);
+	const handleLeaveRoom = async (clanId: string, channelId: string) => {
+		if (clanId && channelId) {
+			await participantMeetState(ParticipantMeetState.LEAVE, clanId, channelId);
 			dispatch(voiceActions.resetVoiceSettings());
 		}
 	};
 
 	useEffect(() => {
 		const eventOpenMezonMeet = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_MEZON_MEET, async (data) => {
-			if (data?.isEndCall || data?.voiceChannelId) {
+			if (data?.isEndCall || data?.clanId) {
 				setVoicePlay(false);
-				handleLeaveRoom(data?.voiceChannelId);
+				handleLeaveRoom(data?.clanId, data?.channelId);
 			}
-			setChannelId(data.channelId);
-			setRoomName(data.roomName);
+			setChannelId(data?.channelId);
+			setRoomName(data?.roomName);
 		});
 		return () => {
 			eventOpenMezonMeet.remove();
 		};
 	}, [channelId, roomName]);
 
-	const handleJoinStreamingRoom = useCallback(async () => {
+	const handleJoinChannelVoice = useCallback(async () => {
 		if (!roomName) return;
 
 		try {
@@ -106,9 +106,17 @@ const ChannelVoicePopup = () => {
 			).unwrap();
 
 			if (result) {
-				dispatch(voiceActions.setVoiceChannelId(channelId));
-				await participantMeetState(ParticipantMeetState.JOIN, channelId as string);
+				dispatch(
+					voiceActions.setVoiceInfo({
+						clanId: channel?.clan_id as string,
+						clanName: channel?.clan_name as string,
+						channelId: channel?.channel_id as string,
+						channelLabel: channel?.channel_label as string
+					})
+				);
+				await participantMeetState(ParticipantMeetState.JOIN, channel?.clan_id as string, channel?.channel_id as string);
 				setToken(result);
+				dispatch(voiceActions.setJoined(true));
 				setVoicePlay(true);
 			} else {
 				setToken(null);
@@ -117,13 +125,13 @@ const ChannelVoicePopup = () => {
 			console.error('Failed to join room:', err);
 			setToken(null);
 		}
-	}, [channelId, dispatch, roomName]);
+	}, [channel?.channel_id, channel?.channel_label, channelId, dispatch, roomName]);
 
 	useEffect(() => {
 		if (roomName && channelId) {
-			handleJoinStreamingRoom();
+			handleJoinChannelVoice();
 		}
-	}, [channelId, handleJoinStreamingRoom, roomName]);
+	}, [channelId, handleJoinChannelVoice, roomName]);
 
 	const handleResizeStreamRoom = () => {
 		if (isFullScreen.current) {
