@@ -1,11 +1,14 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
+import { selectCurrentClan } from '@mezon/store-mobile';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
 import { style } from './styles';
 
-const ChannelListBackground = ({ currentClan }) => {
+const ChannelListBackground = () => {
+	const currentClan = useSelector(selectCurrentClan);
 	const previousBanner = useRef<string | null>(null);
 
 	useEffect(() => {

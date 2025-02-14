@@ -3,6 +3,7 @@ import { selectIsShowEmptyCategory, selectListChannelRenderByClanId } from '@mez
 import { appActions, selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { FlatList, InteractionManager, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -70,9 +71,9 @@ const ChannelList = () => {
 
 	const renderItem = useCallback(({ item, index }) => {
 		if (index === 0) {
-			return <ChannelListBackground currentClan={currentClan} />;
+			return <ChannelListBackground />;
 		} else if (index === 1) {
-			return <ChannelListHeader currentClan={currentClan} />;
+			return <ChannelListHeader />;
 		} else if (item.channels) {
 			return (
 				<View onLayout={(e) => handleLayout(e, item)} key={`${item?.category_id}_${index}_ItemChannelList}`}>
@@ -83,10 +84,7 @@ const ChannelList = () => {
 			return (
 				<ChannelListItem
 					data={item}
-					// isFirstThread={
-					// 	item?.type === ChannelType.CHANNEL_TYPE_THREAD &&
-					// 	(data?.channels?.[index - 1] as IChannel)?.type !== ChannelType.CHANNEL_TYPE_THREAD
-					// }
+					isFirstThread={item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD}
 				/>
 			);
 		}
@@ -98,11 +96,6 @@ const ChannelList = () => {
 		<>
 			<View style={styles.mainList}>
 				{/* <ChannelListScroll channelsPositionRef={channelsPositionRef} flashListRef={flashListRef} /> */}
-				{/* {!!categorizedChannels?.length &&
-						categorizedChannels?.map((item, index) => {
-							return renderItemChannelList({ item, index });
-						})} */}
-
 				<FlatList
 					data={data}
 					renderItem={renderItem}
@@ -110,7 +103,7 @@ const ChannelList = () => {
 					removeClippedSubviews={true}
 					maxToRenderPerBatch={10}
 					updateCellsBatchingPeriod={50}
-					initialNumToRender={25}
+					initialNumToRender={20}
 					windowSize={21}
 				/>
 				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />

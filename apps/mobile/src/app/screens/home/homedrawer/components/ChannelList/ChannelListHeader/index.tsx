@@ -1,6 +1,6 @@
 import { ActionEmitEvent, ETypeSearch, Icons, VerifyIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { getStoreAsync, selectCurrentChannel, selectMembersClanCount } from '@mezon/store-mobile';
+import { getStoreAsync, selectCurrentChannel, selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,10 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
-const ChannelListHeader = ({ currentClan }) => {
+const ChannelListHeader = () => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['clanMenu']);
+	const currentClan = useSelector(selectCurrentClan);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const styles = style(themeValue);
 	const members = useSelector(selectMembersClanCount);
