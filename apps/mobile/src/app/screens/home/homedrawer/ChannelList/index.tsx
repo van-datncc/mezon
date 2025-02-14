@@ -104,7 +104,7 @@ const ChannelList = () => {
 					maxToRenderPerBatch={10}
 					updateCellsBatchingPeriod={50}
 					initialNumToRender={20}
-					windowSize={21}
+					windowSize={5}
 				/>
 				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />
 				<View style={{ height: 80 }} />
