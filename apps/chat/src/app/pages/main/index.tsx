@@ -32,6 +32,7 @@ import {
 	selectAudioEndTone,
 	selectAudioRingTone,
 	selectChatStreamWidth,
+	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -51,7 +52,6 @@ import {
 	selectOpenModalE2ee,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
-	selectStreamMembersByChannelId,
 	selectTheme,
 	selectToastErrorStatus,
 	useAppDispatch,
@@ -83,7 +83,8 @@ function MyApp() {
 	const { userProfile } = useAuth();
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
-	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+	const numberOfCLanJoined = useSelector(selectClanNumber);
+	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy && numberOfCLanJoined === 0);
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
@@ -251,7 +252,6 @@ function MyApp() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 	const openModalE2ee = useSelector(selectOpenModalE2ee);
@@ -304,7 +304,6 @@ function MyApp() {
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
-					memberJoin={streamChannelMember}
 					currentChannel={currentChannel}
 					currentStreamInfo={currentStreamInfo}
 					handleChannelClick={handleChannelClick}

@@ -1,4 +1,12 @@
-import { categoriesActions, CategoriesEntity, listChannelRenderAction, selectAllCategories, selectCurrentClanId, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	categoriesActions,
+	CategoriesEntity,
+	listChannelRenderAction,
+	selectAllCategories,
+	selectCurrentClanId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { ICategoryChannel } from '@mezon/utils';
 import { ApiCategoryOrderUpdate } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
@@ -60,12 +68,12 @@ const CategoryOrderSetting = () => {
 				listCate.push({
 					...category,
 					id: category.id,
-					channels: [],
-				})
+					channels: []
+				});
 				return {
 					category_id: category.category_id,
 					order: index + 1
-				}
+				};
 			}) || [];
 
 		dispatch(
@@ -75,7 +83,7 @@ const CategoryOrderSetting = () => {
 			})
 		);
 
-		dispatch(listChannelRenderAction.sortCategoryChannel({ listCategoryOrder: listCate, clanId: currentClanId || '' }))
+		dispatch(listChannelRenderAction.sortCategoryChannel({ listCategoryOrder: listCate, clanId: currentClanId || '' }));
 
 		setHasChanged(false);
 	};

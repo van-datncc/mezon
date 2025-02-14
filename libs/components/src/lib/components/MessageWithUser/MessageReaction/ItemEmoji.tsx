@@ -1,5 +1,5 @@
 import { useAuth, useChatReaction } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectClickedOnTopicStatus, selectCurrentChannel } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import Tooltip from 'rc-tooltip';
 import { memo, useMemo } from 'react';
@@ -19,6 +19,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const count = calculateTotalCount(emoji.senders);
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -40,7 +41,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			message_sender_id ?? '',
 			false,
 			isPublicChannel(currentChannel),
-			message.content?.tp ?? ''
+			isFocusTopicBox,
+			message?.channel_id
 		);
 	}
 

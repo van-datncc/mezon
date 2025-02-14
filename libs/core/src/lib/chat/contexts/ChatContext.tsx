@@ -48,10 +48,12 @@ import {
 	selectAllUserClans,
 	selectChannelsByClanId,
 	selectClanView,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
+	selectCurrentTopicId,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
@@ -164,10 +166,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const streamChannelMember = useAppSelector((state) => selectStreamMembersByChannelId(state, currentStreamInfo?.streamId || ''));
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const userCallId = useSelector(selectUserCallId);
 	const isClanView = useSelector(selectClanView);
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const currenTopicId = useSelector(selectCurrentTopicId);
+
 	const allThreads = useSelector(selectAllThreads);
 
 	const clanIdActive = useMemo(() => {
@@ -277,6 +282,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					sender_id: message.sender_id,
 					timestamp_seconds: message.create_time_seconds
 				};
+
 				dispatch(topicsActions.setTopicLastSent({ topicId: message.topic_id || '', lastSentMess: lastMsg }));
 			}
 
@@ -284,6 +290,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const senderId = message.sender_id;
 				const timestamp = Date.now() / 1000;
 				const mess = await dispatch(mapMessageChannelToEntityAction({ message, lock: true })).unwrap();
+				if (message.topic_id && message.topic_id !== '0') {
+					mess.channel_id = mess.topic_id ?? '';
+				}
 				mess.isMe = senderId === userId;
 
 				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
@@ -599,7 +608,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
-					dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
+
+					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
+					}
+
 					if (channel_desc.parrent_id) {
 						dispatch(
 							threadsActions.updateActiveCodeThread({
@@ -844,13 +857,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
-			if (e.count > 0) {
-				const reactionEntity = mapReactionToEntity(e);
-				dispatch(reactionActions.setReactionDataSocket(reactionEntity));
-				dispatch(messagesActions.updateMessageReactions(reactionEntity));
+			const reactionEntity = mapReactionToEntity(e);
+
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox && currenTopicId) {
+				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
 			}
+
+			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
+			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
-		[dispatch]
+		[dispatch, isFocusTopicBox, currenTopicId]
 	);
 
 	const onchannelcreated = useCallback(

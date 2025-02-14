@@ -1,5 +1,12 @@
 import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
-import { selectClanView, selectCurrentChannel, selectMessageByMessageId, useAppSelector } from '@mezon/store';
+import {
+	selectClanView,
+	selectClickedOnTopicStatus,
+	selectCurrentChannel,
+	selectCurrentTopicId,
+	selectMessageByMessageId,
+	useAppSelector
+} from '@mezon/store';
 import { getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,10 +26,15 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 	const { reactionMessageDispatch } = useChatReaction();
 	const getUrl = getSrcEmoji(emojiId);
 	const userId = useAuth();
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const currenTopicId = useSelector(selectCurrentTopicId);
 
 	const isClanView = useSelector(selectClanView);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentMessage = useAppSelector((state) => selectMessageByMessageId(state, currentChannel?.channel_id, messageId || ''));
+	const currentMessage = useAppSelector((state) =>
+		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : currentChannel?.channel_id, messageId || '')
+	);
+
 	const handleClickEmoji = useCallback(async () => {
 		await reactionMessageDispatch(
 			'',
@@ -33,9 +45,10 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			userId.userId ?? '',
 			false,
 			isPublicChannel(currentChannel),
-			currentMessage?.content?.tp ?? ''
+			isFocusTopicBox,
+			currentMessage?.channel_id
 		);
-	}, [reactionMessageDispatch, messageId, emojiId, emojiShortCode, userId.userId, currentChannel, currentMessage?.content?.tp]);
+	}, [reactionMessageDispatch, messageId, emojiId, emojiShortCode, userId.userId, currentChannel, isFocusTopicBox, currentMessage?.channel_id]);
 
 	return (
 		<div
