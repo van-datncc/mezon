@@ -24,7 +24,7 @@ export const updateClanBadgeRender = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 			const listChannelRender = state.CHANNEL_LIST_RENDER.listChannelRender[clanId];
 			const channelDelete = listChannelRender.filter((channel) => channelId === channel.id);
-			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel).count_mess_unread || 0) * -1 }));
+			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel)?.count_mess_unread || 0) * -1 }));
 		} catch (error) {
 			captureSentryError(error, 'listRender/updateClanBadge');
 			return thunkAPI.rejectWithValue(error);
@@ -92,12 +92,12 @@ export const listChannelRenderSlice = createSlice({
 				id: action.payload.channel_id || ''
 			};
 			const clanId = channelData.clan_id;
-      
+
 			if (clanId && state.listChannelRender[clanId]) {
-        const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
-        if(isExistChannel !== -1){
-          return;
-        }
+				const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
+				if (isExistChannel !== -1) {
+					return;
+				}
 
 				const indexInsert = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.category_id);
 				if (indexInsert === -1) {

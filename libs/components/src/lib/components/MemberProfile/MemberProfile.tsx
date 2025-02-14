@@ -297,7 +297,7 @@ export function MemberProfile({
 				onOpenProfile={openUserProfile}
 			/>
 		);
-	}, [coords]);
+	}, [coords, user]);
 
 	const [openUserProfile, closeUserProfile] = useModal(() => {
 		modalState.current.userProfile = true;
@@ -315,7 +315,7 @@ export function MemberProfile({
 				customStatus={customStatus || metaDataDM?.status}
 			/>
 		);
-	});
+	}, [user]);
 
 	const closeModal = useCallback((modalType: ModalType) => {
 		switch (modalType) {
