@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, FaceIcon, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
-import { calculateTotalCount, EmojiDataOptionals, getSrcEmoji, SenderInfoOptionals } from '@mezon/utils';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { calculateTotalCount, EmojiDataOptionals, getSrcEmoji, SenderInfoOptionals, TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Pressable, Text, View } from 'react-native';
@@ -32,6 +32,11 @@ export const MessageReactionWrapper = React.memo(
 		const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 		const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 		const bottomSheetRef = useRef<BottomSheetModal>(null);
+		const isMessageSystem =
+			message?.code === TypeMessage.Welcome ||
+			message?.code === TypeMessage.CreateThread ||
+			message?.code === TypeMessage.CreatePin ||
+			message?.code === TypeMessage.AuditLog;
 
 		const userId = useMemo(() => {
 			return load(STORAGE_MY_USER_ID);
@@ -52,10 +57,10 @@ export const MessageReactionWrapper = React.memo(
 					senderId: userId ?? '',
 					countToRemove: countToRemove,
 					actionDelete: true,
-					topicId: message.content?.tp || ''
+					topicId: message.topic_id || ''
 				} as IReactionMessageProps);
 			},
-			[message?.channel_id, message.content?.tp, message?.id, mode, userId]
+			[message?.channel_id, message.topic_id, message?.id, mode, userId]
 		);
 
 		const onReactItemLongPress = (emojiId: string) => {
@@ -74,7 +79,13 @@ export const MessageReactionWrapper = React.memo(
 		}, []);
 
 		return (
-			<View style={[styles.reactionWrapper, messageReactions.length > 0 && styles.reactionSpace]}>
+			<View
+				style={[
+					styles.reactionWrapper,
+					styles.reactionSpace,
+					isMessageSystem && { paddingTop: 0, marginLeft: size.s_40 }
+				]}
+			>
 				{messageReactions?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const isMyReaction = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 
@@ -100,7 +111,7 @@ export const MessageReactionWrapper = React.memo(
 									senderId: userId ?? '',
 									countToRemove: 1,
 									actionDelete: false,
-									topicId: message.content?.tp || ''
+									topicId: message.topic_id || ''
 								} as IReactionMessageProps);
 							}}
 							key={index + emojiItemData.emojiId}

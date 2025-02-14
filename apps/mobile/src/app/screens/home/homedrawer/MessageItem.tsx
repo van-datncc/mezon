@@ -213,10 +213,6 @@ const MessageItem = React.memo(
 			outputRange: ['transparent', themeValue.secondaryWeight]
 		});
 
-		if (isMessageSystem) {
-			return <MessageLineSystem message={message} />;
-		}
-
 		const panResponder = PanResponder.create({
 			onMoveShouldSetPanResponder: (_, gestureState) => {
 				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 && gestureState.dx < -8) {
@@ -251,30 +247,34 @@ const MessageItem = React.memo(
 				>
 					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-						<AvatarMessage
-							onPress={onPressInfoUser}
-							id={message?.user?.id}
-							avatar={messageAvatar}
-							username={usernameMessage}
-							isShow={!isCombine || !!message?.references?.length || showUserInformation}
-						/>
+						{!isMessageSystem && (
+							<AvatarMessage
+								onPress={onPressInfoUser}
+								id={message?.user?.id}
+								avatar={messageAvatar}
+								username={usernameMessage}
+								isShow={!isCombine || !!message?.references?.length || showUserInformation}
+							/>
+						)}
 
 						<Pressable
 							disabled={isMessageCallLog}
-							style={[styles.rowMessageBox]}
+							style={[styles.rowMessageBox, isMessageSystem && { width: '100%' }]}
 							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
 							onLongPress={handleLongPressMessage}
 						>
-							<InfoUserMessage
-								onPress={onPressInfoUser}
-								senderDisplayName={senderDisplayName}
-								isShow={!isCombine || !!message?.references?.length || showUserInformation}
-								createTime={message?.create_time}
-								messageSenderId={message?.sender_id}
-								mode={mode}
-							/>
+							{!isMessageSystem && (
+								<InfoUserMessage
+									onPress={onPressInfoUser}
+									senderDisplayName={senderDisplayName}
+									isShow={!isCombine || !!message?.references?.length || showUserInformation}
+									createTime={message?.create_time}
+									messageSenderId={message?.sender_id}
+									mode={mode}
+								/>
+							)}
 
 							<View style={message?.content?.fwd ? { display: 'flex' } : undefined}>
 								<View style={message?.content?.fwd ? { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 } : undefined}>
@@ -284,7 +284,9 @@ const MessageItem = React.memo(
 										</Text>
 									)}
 									<View style={{ opacity: message.isError || message?.isErrorRetry ? 0.6 : 1 }}>
-										{isInviteLink || isGoogleMapsLink ? (
+										{isMessageSystem ? (
+											<MessageLineSystem message={message} />
+										) : isInviteLink || isGoogleMapsLink ? (
 											<RenderMessageBlock
 												isGoogleMapsLink={isGoogleMapsLink}
 												isInviteLink={isInviteLink}
@@ -345,7 +347,7 @@ const MessageItem = React.memo(
 								</View>
 							</View>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-							{!preventAction ? (
+							{!preventAction && !!message?.reactions?.length ? (
 								<MessageAction
 									message={message}
 									mode={mode}
@@ -377,8 +379,16 @@ const MessageItem = React.memo(
 	},
 	(prevProps, nextProps) => {
 		return (
-			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id + prevProps?.message?.code ===
-			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id + nextProps?.message?.code
+			prevProps?.message?.id +
+				prevProps?.message?.update_time +
+				prevProps?.previousMessage?.id +
+				prevProps?.message?.code +
+				prevProps?.message?.reactions ===
+			nextProps?.message?.id +
+				nextProps?.message?.update_time +
+				nextProps?.previousMessage?.id +
+				nextProps?.message?.code +
+				nextProps?.message?.reactions
 		);
 	}
 );

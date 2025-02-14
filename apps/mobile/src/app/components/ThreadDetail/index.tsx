@@ -49,6 +49,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const isLoading = useMemo(() => ['loading']?.includes(loadingStatus), [loadingStatus]);
 	const [page, setPage] = useState<number>(1);
 	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(false);
+	const [isPaginationVisible, setIsPaginationVisible] = useState<boolean>(false);
 
 	const fetchThreads = useCallback(
 		async (currentPage: number) => {
@@ -64,6 +65,11 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 				setIsNextDisabled(true);
 			} else {
 				setIsNextDisabled(false);
+			}
+			if (currentPage === 1 && response?.length < LIMIT) {
+				setIsPaginationVisible(false);
+			} else {
+				setIsPaginationVisible(true);
 			}
 		},
 		[currentChannel?.channel_id, currentChannel?.clan_id, currentChannel?.parrent_id, dispatch, isThread]
@@ -91,6 +97,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 
 	const debouncedSetSearchText = useCallback((value) => {
 		setSearchText(value);
+		setPage(1);
 	}, []);
 
 	return (
@@ -149,23 +156,25 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 						)}
 					</ScrollView>
 
-					<View style={styles.paginationContainer}>
-						<TouchableOpacity
-							style={[styles.paginationButton]}
-							onPress={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
-							disabled={page === 1}
-						>
-							<MaterialIcons style={page === 1 ? styles.disableButton : styles.normalButton} name="navigate-before" size={20} />
-						</TouchableOpacity>
-						<Text style={styles.textPage}>{page}</Text>
-						<TouchableOpacity
-							style={styles.paginationButton}
-							onPress={() => setPage((prevPage) => prevPage + 1)}
-							disabled={isNextDisabled}
-						>
-							<MaterialIcons style={isNextDisabled ? styles.disableButton : styles.normalButton} name="navigate-next" size={20} />
-						</TouchableOpacity>
-					</View>
+					{isPaginationVisible && (
+						<View style={styles.paginationContainer}>
+							<TouchableOpacity
+								style={[styles.paginationButton]}
+								onPress={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
+								disabled={page === 1}
+							>
+								<MaterialIcons style={page === 1 ? styles.disableButton : styles.normalButton} name="navigate-before" size={20} />
+							</TouchableOpacity>
+							<Text style={styles.textPage}>{page}</Text>
+							<TouchableOpacity
+								style={styles.paginationButton}
+								onPress={() => setPage((prevPage) => prevPage + 1)}
+								disabled={isNextDisabled}
+							>
+								<MaterialIcons style={isNextDisabled ? styles.disableButton : styles.normalButton} name="navigate-next" size={20} />
+							</TouchableOpacity>
+						</View>
+					)}
 				</View>
 			)}
 		</View>

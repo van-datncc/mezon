@@ -10,6 +10,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_10
 		},
 		container: {
+			paddingTop: size.s_6,
 			marginVertical: size.s_2,
 			marginBottom: size.s_4,
 			flexDirection: 'row',

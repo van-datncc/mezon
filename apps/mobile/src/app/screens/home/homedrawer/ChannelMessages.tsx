@@ -112,6 +112,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				});
 
 				setTimeout(() => {
+					dispatch(messagesActions.setIdMessageToJump(null));
 					flatListRef?.current?.scrollToIndex?.({
 						animated: true,
 						index: indexToJump

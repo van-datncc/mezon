@@ -13,12 +13,14 @@ const { width, height } = Dimensions.get('window');
 
 function ChannelVoice({
 	channelId,
+	clanId,
 	token,
 	serverUrl,
 	onPressMinimizeRoom,
 	isAnimationComplete
 }: {
 	channelId: string;
+	clanId: string;
 	onPressMinimizeRoom?: () => void;
 	token: string;
 	serverUrl: string;
@@ -67,7 +69,12 @@ function ChannelVoice({
 					</View>
 				)}
 				<LiveKitRoom serverUrl={serverUrl} token={token} connect={true}>
-					<RoomView channelId={channelId} onPressMinimizeRoom={onPressMinimizeRoom} isAnimationComplete={isAnimationComplete} />
+					<RoomView
+						channelId={channelId}
+						clanId={clanId}
+						onPressMinimizeRoom={onPressMinimizeRoom}
+						isAnimationComplete={isAnimationComplete}
+					/>
 				</LiveKitRoom>
 			</View>
 		</View>

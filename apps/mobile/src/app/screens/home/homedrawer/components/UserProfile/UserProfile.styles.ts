@@ -119,5 +119,8 @@ export const style = (colors: Attributes) =>
 			fontSize: size.h7,
 			fontWeight: 'bold'
 		},
-		statusUser: { right: size.s_8, bottom: size.s_4 }
+		statusUser: { right: size.s_8, bottom: size.s_4 },
+		memberSince: {
+			marginVertical: size.s_8
+		}
 	});
