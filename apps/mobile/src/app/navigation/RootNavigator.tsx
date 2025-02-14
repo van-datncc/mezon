@@ -6,7 +6,7 @@ import React, { memo, useEffect, useMemo } from 'react';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
 import { Platform, StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import codePush from 'react-native-code-push';
@@ -92,13 +92,15 @@ const RootNavigation = (props) => {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<CustomStatusBar />
-			<ChatContextProvider>
-				<WebRTCStreamProvider>
-					<NavigationMain {...props} />
-				</WebRTCStreamProvider>
-			</ChatContextProvider>
-			<Toast config={toastConfig} />
+			<ThemeProvider>
+				<CustomStatusBar />
+				<ChatContextProvider>
+					<WebRTCStreamProvider>
+						<NavigationMain {...props} />
+					</WebRTCStreamProvider>
+				</ChatContextProvider>
+				<Toast config={toastConfig} />
+			</ThemeProvider>
 		</MezonStoreProvider>
 	);
 };

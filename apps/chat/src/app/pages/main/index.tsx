@@ -52,7 +52,6 @@ import {
 	selectOpenModalE2ee,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
-	selectStreamMembersByChannelId,
 	selectTheme,
 	selectToastErrorStatus,
 	useAppDispatch,
@@ -253,7 +252,6 @@ function MyApp() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 	const openModalE2ee = useSelector(selectOpenModalE2ee);
@@ -306,7 +304,6 @@ function MyApp() {
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
-					memberJoin={streamChannelMember}
 					currentChannel={currentChannel}
 					currentStreamInfo={currentStreamInfo}
 					handleChannelClick={handleChannelClick}
