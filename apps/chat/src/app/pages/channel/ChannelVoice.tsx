@@ -39,6 +39,7 @@ import {
 	selectVoiceInfo,
 	selectVoiceJoined,
 	useAppDispatch,
+	useAppSelector,
 	voiceActions
 } from '@mezon/store';
 import { isLinuxDesktop, isWindowsDesktop, ParticipantMeetState } from '@mezon/utils';
@@ -205,7 +206,7 @@ interface PreJoinChannelVoiceProps {
 }
 
 const PreJoinChannelVoice: React.FC<PreJoinChannelVoiceProps> = ({ channel, roomName, loading, handleJoinRoom, isCurrentChannel }) => {
-	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel?.channel_id as string));
+	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel?.channel_id as string));
 	return (
 		<div className={`w-full h-full bg-black flex justify-center items-center ${isCurrentChannel ? 'hidden' : ''}`}>
 			<div className="flex flex-col justify-center items-center gap-4 w-full text-white">
