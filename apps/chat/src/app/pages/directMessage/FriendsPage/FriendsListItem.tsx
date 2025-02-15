@@ -57,8 +57,8 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
 						usernameAva={friend?.user?.username ?? ''}
 						status={{ status: friend.user?.online, isMobile: false }}
-						isHideStatus={friend.state !== 0 ? true : false}
-						isHideIconStatus={friend.state !== 0 ? true : false}
+						isHideStatus={friend.state !== 0}
+						isHideIconStatus={friend.state !== 0}
 						isHideAnimation={true}
 						key={friend.user?.id}
 						numberCharacterCollapse={100}
