@@ -72,15 +72,19 @@ const StatusUser = memo((props: StatusUserProps) => {
 			return <Icons.IconLoadingTyping bgFill="bg-colorSuccess" />;
 		}
 
-		if (customStatus) {
-			return <UserStatusIcon status={customStatus} />;
-		}
-
-		if (status?.isMobile) {
-			return <Icons.IconMobileDevice defaultSize="w-3 h-3" />;
+		if (status?.status === false) {
+			return <Icons.OfflineStatus defaultSize={sizeStatusIcon} />;
 		}
 
 		if (status?.status) {
+			if (customStatus) {
+				return <UserStatusIcon status={customStatus} />;
+			}
+
+			if (status?.isMobile) {
+				return <Icons.IconMobileDevice defaultSize="w-3 h-3" />;
+			}
+
 			return <Icons.OnlineStatus defaultSize={sizeStatusIcon} />;
 		}
 
