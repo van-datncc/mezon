@@ -16,7 +16,7 @@ import {
 } from '@livekit/components-react';
 import { useAppDispatch, voiceActions } from '@mezon/store';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ControlBar } from '../ControlBar/ControlBar';
 
 interface MyVideoConferenceProps {
@@ -38,10 +38,14 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 
 	const layoutContext = useCreateLayoutContext();
 
-	const screenShareTracks = tracks.filter(isTrackReference).filter((track) => track.publication.source === Track.Source.ScreenShare);
+	const screenShareTracks = useMemo(() => {
+		return tracks.filter(isTrackReference).filter((track) => track.publication.source === Track.Source.ScreenShare);
+	}, [tracks]);
 
 	const focusTrack = usePinnedTracks(layoutContext)?.[0];
-	const carouselTracks = tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+	const carouselTracks = useMemo(() => {
+		return tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+	}, [tracks, focusTrack]);
 
 	useEffect(() => {
 		// If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
@@ -55,6 +59,7 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 			layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
 			lastAutoFocusedScreenShareTrack.current = null;
 		}
+
 		if (focusTrack && !isTrackReference(focusTrack)) {
 			const updatedFocusTrack = tracks.find(
 				(tr) => tr.participant.identity === focusTrack.participant.identity && tr.source === focusTrack.source
@@ -63,11 +68,7 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: updatedFocusTrack });
 			}
 		}
-	}, [
-		screenShareTracks.map((ref) => `${ref.publication.trackSid}_${ref.publication.isSubscribed}`).join(),
-		focusTrack?.publication?.trackSid,
-		tracks
-	]);
+	}, [screenShareTracks, focusTrack?.publication?.trackSid, tracks]);
 
 	const dispatch = useAppDispatch();
 	const room = useRoomContext();
