@@ -1,19 +1,18 @@
-/* eslint-disable prettier/prettier */
 import {
-    CarouselLayout,
-    ConnectionStateToast,
-    FocusLayout,
-    FocusLayoutContainer,
-    GridLayout,
-    isTrackReference,
-    LayoutContextProvider,
-    ParticipantTile,
-    RoomAudioRenderer,
-    useConnectionState,
-    useCreateLayoutContext,
-    usePinnedTracks,
-    useRoomContext,
-    useTracks
+	CarouselLayout,
+	ConnectionStateToast,
+	FocusLayout,
+	FocusLayoutContainer,
+	GridLayout,
+	isTrackReference,
+	LayoutContextProvider,
+	ParticipantTile,
+	RoomAudioRenderer,
+	useConnectionState,
+	useCreateLayoutContext,
+	usePinnedTracks,
+	useRoomContext,
+	useTracks
 } from '@livekit/components-react';
 import { useAppDispatch, voiceActions } from '@mezon/store';
 import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';

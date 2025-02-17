@@ -1,12 +1,11 @@
-/* eslint-disable prettier/prettier */
 import {
-    ControlBarControls,
-    DisconnectButton,
-    LeaveIcon,
-    MediaDeviceMenu,
-    TrackToggle,
-    useLocalParticipantPermissions,
-    usePersistentUserChoices
+	ControlBarControls,
+	DisconnectButton,
+	LeaveIcon,
+	MediaDeviceMenu,
+	TrackToggle,
+	useLocalParticipantPermissions,
+	usePersistentUserChoices
 } from '@livekit/components-react';
 import { selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
