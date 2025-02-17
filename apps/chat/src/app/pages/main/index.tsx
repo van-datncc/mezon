@@ -420,7 +420,7 @@ const SidebarMenu = memo(
 				countUnreadRender.current = listUnreadDM.map(channel=>channel.id);
 				timerRef.current = setTimeout(() => {
 					setListDmRender(listUnreadDM);
-				}, 3000)
+				}, 1000)
 			}
     
 		}, [listUnreadDM])
@@ -433,7 +433,7 @@ const SidebarMenu = memo(
 				<div
 					className={`top-0 left-0 right-0 flex flex-col items-center py-4 px-3 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-screen'} `}
 				>
-					<div className="flex flex-col gap-3 ">
+					<div className="flex flex-col ">
 						<SidebarLogoItem />
 						{!!listDmRender?.length &&
 							listDmRender.map((dmGroupChatUnread) => (

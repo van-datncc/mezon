@@ -33,7 +33,7 @@ function DirectUnread({ directMessage, checkMoveOut }: DirectMessUnreadProp) {
 	},[checkMoveOut])
 
 	return (
-		<NavLink to="#" onClick={handleClick} draggable="false" className={`animate-height_logo ${isMoveOutAnimation ? 'animate-move_out_logo ' :''}`}>
+		<NavLink to="#" onClick={handleClick} draggable="false" className={`flex items-end animate-height_logo ${isMoveOutAnimation ? 'animate-move_out_logo ' :''}`}>
 			<div className={`relative animate-scale_up origin-center delay-200 ${isMoveOutAnimation ? '!animate-scale_down !delay-0' : ''}`}>
 				<AvatarImage
 					draggable="false"
