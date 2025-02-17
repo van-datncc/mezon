@@ -118,6 +118,10 @@ export const Routes = memo(() => {
 										loader: loaderWithStore(loginLoader),
 										element: <LoginDesktop />
 									}
+									// {
+									// 	path: 'login/callback',
+									// 	element: <LoginCallback />
+									//   }
 								]
 							},
 							{
