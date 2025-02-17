@@ -429,6 +429,7 @@ const SidebarMenu = memo(
 						{clans.map((clan: IClan) => {
 							return (
 								<SidebarClanItem
+                  key={clan.id}
 									linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
 									option={clan}
 									active={isClanView && currentClanId === clan.clan_id}
