@@ -41,9 +41,6 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 	}, [tracks]);
 
 	const focusTrack = usePinnedTracks(layoutContext)?.[0];
-	const carouselTracks = useMemo(() => {
-		return tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
-	}, [tracks, focusTrack]);
 
 	useEffect(() => {
 		// If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
@@ -99,7 +96,7 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 							<FocusLayoutContainer isShowMember={isShowMember}>
 								{focusTrack && <FocusLayout trackRef={focusTrack} />}
 								{isShowMember && (
-									<CarouselLayout tracks={carouselTracks}>
+									<CarouselLayout tracks={tracks}>
 										<ParticipantTile />
 									</CarouselLayout>
 								)}
@@ -123,40 +120,6 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 			<RoomAudioRenderer />
 			<ConnectionStateToast />
 		</div>
-	);
-}
-
-function isEqualTrackRef(a?: TrackReferenceOrPlaceholder, b?: TrackReferenceOrPlaceholder): boolean {
-	if (a === undefined || b === undefined) {
-		return false;
-	}
-	if (isTrackReference(a) && isTrackReference(b)) {
-		return a.publication.trackSid === b.publication.trackSid;
-	} else {
-		return getTrackReferenceId(a) === getTrackReferenceId(b);
-	}
-}
-
-function getTrackReferenceId(trackReference: TrackReferenceOrPlaceholder | number) {
-	if (typeof trackReference === 'string' || typeof trackReference === 'number') {
-		return `${trackReference}`;
-	} else if (isTrackReferencePlaceholder(trackReference)) {
-		return `${trackReference.participant.identity}_${trackReference.source}_placeholder`;
-	} else if (isTrackReference(trackReference)) {
-		return `${trackReference.participant.identity}_${trackReference.publication.source}_${trackReference.publication.trackSid}`;
-	} else {
-		throw new Error(`Can't generate a id for the given track reference: ${trackReference}`);
-	}
-}
-
-function isTrackReferencePlaceholder(trackReference?: TrackReferenceOrPlaceholder): trackReference is TrackReferencePlaceholder {
-	if (!trackReference) {
-		return false;
-	}
-	return (
-		Object.prototype.hasOwnProperty.call(trackReference, 'participant') &&
-		Object.prototype.hasOwnProperty.call(trackReference, 'source') &&
-		typeof trackReference.publication === 'undefined'
 	);
 }
 
