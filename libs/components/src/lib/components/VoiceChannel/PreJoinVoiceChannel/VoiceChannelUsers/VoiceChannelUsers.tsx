@@ -1,7 +1,8 @@
+import { useWindowSize } from '@mezon/core';
 import { selectMemberClanByGoogleId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannelMember, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
 export type VoiceChannelUsersProps = {
@@ -36,14 +37,9 @@ export function VoiceChannelUsers({ memberJoin = [], memberMax, isShowChat }: Vo
 		setRemainingCount(extraMembers > 0 ? extraMembers : 0);
 	}, [memberJoin, memberMax, isShowChat]);
 
-	useEffect(() => {
+	useWindowSize(() => {
 		handleSizeWidth();
-		window.addEventListener('resize', handleSizeWidth);
-
-		return () => {
-			window.removeEventListener('resize', handleSizeWidth);
-		};
-	}, [handleSizeWidth]);
+	});
 
 	return (
 		<div className="flex items-center gap-2">
@@ -60,28 +56,26 @@ export function VoiceChannelUsers({ memberJoin = [], memberMax, isShowChat }: Vo
 }
 
 function UserItem({ user }: { user: IChannelMember }) {
-	const member = useAppSelector((state) => selectMemberClanByGoogleId(state, user.user_id ?? ''));
-	const userStream = useAppSelector((state) => selectMemberClanByUserId2(state, user.user_id ?? ''));
-	const username = member ? member?.user?.username : userStream?.user?.username;
-	const clanAvatar = member ? member?.clan_avatar : userStream?.clan_avatar;
-	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
-	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
+	const userId = user.user_id ?? '';
+	const member = useAppSelector((state) => selectMemberClanByGoogleId(state, userId));
+	const userStream = useAppSelector((state) => selectMemberClanByUserId2(state, userId));
+
+	const data = member || userStream;
+	const username = data?.user?.username;
+	const avatar = getAvatarForPrioritize(data?.clan_avatar, data?.user?.avatar_url);
+	const avatarUrl = createImgproxyUrl(avatar ?? '', {
+		width: 300,
+		height: 300,
+		resizeType: 'fit'
+	});
 
 	return (
-		<div className="w-14 h-14 rounded-full">
-			<div className="w-14 h-14">
-				{member || userStream ? (
-					<AvatarImage
-						alt={username || ''}
-						username={username}
-						className="min-w-14 min-h-14 max-w-14 max-h-14"
-						srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-						src={avatar}
-					/>
-				) : (
-					<Icons.AvatarUser />
-				)}
-			</div>
+		<div className="size-14 rounded-full">
+			{data ? (
+				<AvatarImage alt={username || ''} username={username} className="size-14" srcImgProxy={avatarUrl} src={avatar} />
+			) : (
+				<Icons.AvatarUser />
+			)}
 		</div>
 	);
 }

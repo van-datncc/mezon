@@ -11,7 +11,7 @@ import { selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions }
 import { Icons } from '@mezon/ui';
 import { Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
@@ -56,8 +56,8 @@ export function ControlBar({
 		visibleControls.screenShare ??= localPermissions.canPublish;
 	}
 
-	const showIcon = useMemo(() => variation === 'minimal' || variation === 'verbose', [variation]);
-	const showText = useMemo(() => variation === 'textOnly' || variation === 'verbose', [variation]);
+	const showIcon = variation === 'minimal' || variation === 'verbose';
+	const showText = variation === 'textOnly' || variation === 'verbose';
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
 
