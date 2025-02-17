@@ -25,6 +25,7 @@ const EmbedsPage = loadable(() => import('../pages/embeds'));
 const GeneralInformation = loadable(() => import('../pages/AppGeneralInformation'));
 const Installation = loadable(() => import('../pages/installation'));
 const Install = loadable(() => import('../pages/install'));
+const OAuth2 = loadable(() => import('../pages/OAuth2'));
 
 export const Routes = () => {
 	const dispatch = useAppDispatch();
@@ -95,6 +96,10 @@ export const Routes = () => {
 										{
 											path: 'installation',
 											element: <Installation />
+										},
+										{
+											path: 'oauth2',
+											element: <OAuth2 />
 										},
 										{
 											path: 'flow',
