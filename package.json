@@ -74,7 +74,7 @@
     "memoizee": "^0.4.17",
     "mezon-active-windows": "0.1.38",
     "mezon-js": "2.10.90",
-    "mezon-js-protobuf": "1.7.10",
+    "mezon-js-protobuf": "1.7.11",
     "minio": "^7.1.3",
     "nx-electron": "^18.0.1",
     "prismjs": "^1.29.0",
