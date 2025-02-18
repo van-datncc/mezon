@@ -338,7 +338,7 @@ export function MemberProfile({
 		closeModal(ModalType.UserProfile);
 	};
 
-	const userStatus = useMemo(() => {
+	const userStatus: EUserStatus = useMemo(() => {
 		if (isFooter && userProfile?.user?.metadata) {
 			const metadata = safeJSONParse(userProfile?.user?.metadata) as any;
 			return metadata?.user_status;
@@ -406,7 +406,7 @@ export function MemberProfile({
 									<span
 										className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode ${isFooter ? 'leading-[18px]' : ''}`}
 									>
-										{userStatus || !status ? 'Offline' : 'Online'}
+										{typeof userStatus === 'string' && userStatus ? userStatus : !status?.status ? 'Offline' : 'Online'}
 									</span>
 								)}
 
