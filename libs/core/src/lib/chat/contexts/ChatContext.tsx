@@ -380,6 +380,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
 					);
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
+          dispatch(threadsActions.updateLastSentInThread({channelId : message.channel_id ,lastSentTime : timestamp}))
 				}
 				// check
 			} catch (error) {
