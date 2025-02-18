@@ -90,7 +90,7 @@ const ChannelList = () => {
 		}
 	}, []);
 
-	const keyExtractor = useCallback((item) => item.id + item.isFavor?.toString(), []);
+	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
 
 	return (
 		<>
