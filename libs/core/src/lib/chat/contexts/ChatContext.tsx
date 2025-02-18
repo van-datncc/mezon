@@ -999,6 +999,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelupdated = useCallback(
 		(channelUpdated: ChannelUpdatedEvent) => {
+			channelUpdated.channel_private = channelUpdated.channel_private ? 1 : 0;
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 			}
@@ -1050,7 +1051,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 									channel: { ...channelUpdated, active: 1, id: channelUpdated.channel_id }
 								})
 							);
-							dispatch(listChannelsByUserActions.add({ id: channelUpdated.channel_id as string, ...channelUpdated }));
+							dispatch(
+								channelsActions.createChannelSocket({
+									...channelUpdated
+								})
+							);
+							dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
+
 							dispatch(
 								listChannelRenderAction.addChannelToListRender({
 									type: channelUpdated.channel_type,
