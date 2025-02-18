@@ -1012,16 +1012,52 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			if (channelUpdated) {
 				//TODO: improve update once item
-				if (channelUpdated.channel_label === '') {
+				if (channelUpdated.channel_private !== undefined) {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					if (channelUpdated.creator_id !== userId) {
+
+					if (channelUpdated.creator_id === userId) {
 						dispatch(
 							channelsActions.update({
 								clanId: channelUpdated.clan_id,
-								update: { id: channelUpdated.channel_id, changes: { ...channelUpdated } }
+								update: {
+									id: channelUpdated.channel_id,
+									changes: { ...channelUpdated }
+								}
 							})
 						);
 						dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
+						dispatch(
+							listChannelRenderAction.updateChannelInListRender({
+								channelId: channelUpdated.channel_id,
+								clanId: channelUpdated.clan_id as string,
+								dataUpdate: { ...channelUpdated }
+							})
+						);
+					} else {
+						if (channelUpdated.channel_private) {
+							dispatch(channelsActions.remove({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
+							dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
+							dispatch(
+								listChannelRenderAction.deleteChannelInListRender({
+									channelId: channelUpdated.channel_id,
+									clanId: channelUpdated.clan_id as string
+								})
+							);
+						} else {
+							dispatch(
+								channelsActions.add({
+									clanId: channelUpdated.clan_id as string,
+									channel: { ...channelUpdated, active: 1, id: channelUpdated.channel_id }
+								})
+							);
+							dispatch(listChannelsByUserActions.add({ id: channelUpdated.channel_id as string, ...channelUpdated }));
+							dispatch(
+								listChannelRenderAction.addChannelToListRender({
+									type: channelUpdated.channel_type,
+									...channelUpdated
+								})
+							);
+						}
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
