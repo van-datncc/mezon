@@ -24,6 +24,7 @@ const ChannelLayout = () => {
 	const dispatch = useDispatch();
 
 	const onMouseDown = () => {
+		setSubPanelActive(SubPanelName.NONE);
 		dispatch(topicsActions.setFocusTopicBox(false));
 	};
 	const shouldRender = useIdleRender();
