@@ -1,11 +1,11 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { selectIsShowEmptyCategory, selectListChannelRenderByClanId } from '@mezon/store';
-import { appActions, channelsActions, selectCurrentClan, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
+import { channelsActions, selectCurrentClan, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { FlatList, InteractionManager, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -14,6 +14,7 @@ import ChannelListBottomSheet from '../components/ChannelList/ChannelListBottomS
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import { ChannelListItem } from '../components/ChannelList/ChannelListItem';
 import ChannelListLoading from '../components/ChannelList/ChannelListLoading';
+import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
@@ -34,6 +35,7 @@ const ChannelList = () => {
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 	const [refreshing, setRefreshing] = useState(false);
 	const dispatch = useAppDispatch();
+	const itemRefs = useRef({});
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
@@ -75,17 +77,9 @@ const ChannelList = () => {
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 
-	const handleLayout = useCallback(
-		(event, item) => {
-			if (item) {
-				const { y } = event?.nativeEvent?.layout || {};
-				InteractionManager.runAfterInteractions(() => {
-					dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
-				});
-			}
-		},
-		[dispatch]
-	);
+	const handleLayout = useCallback(() => {
+		// 	empty
+	}, []);
 
 	const renderItem = useCallback(({ item, index }) => {
 		if (index === 0) {
@@ -94,16 +88,20 @@ const ChannelList = () => {
 			return <ChannelListHeader />;
 		} else if (item.channels) {
 			return (
-				<View onLayout={(e) => handleLayout(e, item)} key={`${item?.category_id}_${index}_ItemChannelList}`}>
-					<ChannelListSection channelsPositionRef={channelsPositionRef} data={item} />
-				</View>
+				<ChannelListSection channelsPositionRef={channelsPositionRef} data={item} key={`${item?.category_id}_${index}_ItemChannelList}`} />
 			);
 		} else {
 			return (
-				<ChannelListItem
-					data={item}
-					isFirstThread={item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD}
-				/>
+				<View
+					ref={(ref) => (itemRefs.current[item?.channel_id?.toString()] = ref)}
+					onLayout={() => handleLayout()}
+					key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
+				>
+					<ChannelListItem
+						data={item}
+						isFirstThread={item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD}
+					/>
+				</View>
 			);
 		}
 	}, []);
@@ -113,8 +111,9 @@ const ChannelList = () => {
 	return (
 		<>
 			<View style={styles.mainList}>
-				{/* <ChannelListScroll channelsPositionRef={channelsPositionRef} flashListRef={flashListRef} /> */}
+				<ChannelListScroll itemRefs={itemRefs} flashListRef={flashListRef} />
 				<FlatList
+					ref={flashListRef}
 					data={data}
 					renderItem={renderItem}
 					keyExtractor={keyExtractor}
@@ -124,6 +123,7 @@ const ChannelList = () => {
 					initialNumToRender={20}
 					windowSize={5}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+					stickyHeaderIndices={[1]}
 				/>
 				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />
 				<View style={{ height: 80 }} />

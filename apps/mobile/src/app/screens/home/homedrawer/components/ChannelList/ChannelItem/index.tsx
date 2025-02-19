@@ -31,8 +31,8 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 	return (
 		<TouchableOpacity
-			activeOpacity={1}
-			onPress={() => onPress()}
+			activeOpacity={0.8}
+			onPress={onPress}
 			onLongPress={onLongPress}
 			style={[
 				styles.channelListLink,

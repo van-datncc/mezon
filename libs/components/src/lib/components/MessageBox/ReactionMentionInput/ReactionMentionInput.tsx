@@ -638,6 +638,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 				if (editorRef.current?.id === targetInputId) {
 					textFieldEdit.insert(editorRef.current, `::[${emojiKey}](${emojiValue})${' '}`);
+					dispatch(
+						emojiSuggestionActions.setSuggestionEmojiObjPicked({
+							shortName: '',
+							id: '',
+							isReset: true
+						})
+					);
 				}
 			}
 		}
