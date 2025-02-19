@@ -97,7 +97,7 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 								{focusTrack && <FocusLayout trackRef={focusTrack} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile />
+										<ParticipantTile className="!w-[220px] !hight-[140px]" />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>
