@@ -28,6 +28,7 @@ import darkMentionsInputStyle from './StyleSearchMessagesDark';
 import lightMentionsInputStyle from './StyleSearchMessagesLight';
 
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
+import { useDebouncedCallback } from 'use-debounce';
 import { UserMentionList } from '../UserMentionList';
 import SelectItemUser from './SelectItemUser';
 import { hasKeySearch, searchFieldName } from './constant';
@@ -228,7 +229,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		[channelId, valueInputSearch]
 	);
 
-	useEffect(() => {
+	const debouncedFetchSearchMessages = useDebouncedCallback(async () => {
 		if (search) {
 			const requestFilter = [
 				...(search.filters || []),
@@ -238,7 +239,11 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const requestBody = { ...search, filters: requestFilter, from: currentPage, size: SIZE_PAGE_SEARCH };
 			fetchSearchMessages(requestBody);
 		}
-	}, [channelId, currentClanId, currentPage, fetchSearchMessages, search]);
+	}, 150);
+
+	useEffect(() => {
+		debouncedFetchSearchMessages();
+	}, [channelId, currentClanId, currentPage, debouncedFetchSearchMessages, fetchSearchMessages, search]);
 
 	useEffect(() => {
 		document.addEventListener('click', handleOutsideClick);
