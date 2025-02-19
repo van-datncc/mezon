@@ -20,7 +20,7 @@ const LoginCallback = () => {
 		}
 	}, [code, state, dispatch, navigate]);
 
-	return <div className="bg-white w-screen h-screen flex justify-center items-center">Processing login...</div>;
+	return <div className="bg-[#313338] text-white w-screen h-screen flex justify-center items-center">Processing login...</div>;
 };
 
 export default LoginCallback;
