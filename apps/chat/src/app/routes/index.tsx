@@ -54,6 +54,8 @@ const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 const ChannelSettingMain = loadable(() => import('../pages/setting/channelSetting'));
 const GuideMain = loadable(() => import('../pages/guide'));
 const CanvasLayout = loadable(() => import('../layouts/CanvasLayout'));
+const LoginCallback = loadable(() => import('../pages/loginCallback'));
+
 // Components
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
@@ -90,6 +92,10 @@ export const Routes = memo(() => {
 								path: '/mezon',
 								element: <InitialRoutes />
 							},
+							{
+								path: 'login/callback',
+								element: <LoginCallback />
+							},
 							isElectron()
 								? {
 										path: '/',
@@ -118,10 +124,6 @@ export const Routes = memo(() => {
 										loader: loaderWithStore(loginLoader),
 										element: <LoginDesktop />
 									}
-									// {
-									// 	path: 'login/callback',
-									// 	element: <LoginCallback />
-									//   }
 								]
 							},
 							{
