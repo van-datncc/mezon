@@ -1,6 +1,5 @@
 import {
 	ConnectionStateToast,
-	FocusLayout,
 	GridLayout,
 	isTrackReference,
 	LayoutContextProvider,
@@ -14,7 +13,7 @@ import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ControlBar } from '../ControlBar/ControlBar';
 import { CarouselLayout } from './FocusLayout/CarouselLayout/CarouselLayout';
-import { FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
+import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
 import { ParticipantTile } from './ParticipantTile/ParticipantTile';
 
 interface MyVideoConferenceProps {
