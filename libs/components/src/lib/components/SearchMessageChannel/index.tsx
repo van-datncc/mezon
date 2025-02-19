@@ -68,7 +68,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	);
 	const searchedRequest = useSelector((state) => selectSearchedRequestByChannelId(state, channelId));
 
-	const valueInputSearch = useSelector(selectValueInputSearchMessage(channelId));
+	const valueInputSearch = useSelector((state) => selectValueInputSearchMessage(state, channelId));
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, channelId));
 
 	const userListData = UserMentionList({
