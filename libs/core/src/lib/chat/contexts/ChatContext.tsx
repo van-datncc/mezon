@@ -380,7 +380,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
 					);
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
-          dispatch(threadsActions.updateLastSentInThread({channelId : message.channel_id ,lastSentTime : timestamp}))
+					dispatch(threadsActions.updateLastSentInThread({ channelId: message.channel_id, lastSentTime: timestamp }));
 				}
 				// check
 			} catch (error) {
@@ -1017,6 +1017,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				if (channelUpdated.channel_private !== undefined) {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
+					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string };
 
 					if (channelUpdated.creator_id === userId) {
 						dispatch(
@@ -1047,25 +1048,46 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								})
 							);
 						} else {
-							dispatch(
-								channelsActions.add({
-									clanId: channelUpdated.clan_id as string,
-									channel: { ...channelUpdated, active: 1, id: channelUpdated.channel_id }
-								})
-							);
-							dispatch(
-								channelsActions.createChannelSocket({
-									...channelUpdated
-								})
-							);
-							dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
-
-							dispatch(
-								listChannelRenderAction.addChannelToListRender({
-									type: channelUpdated.channel_type,
-									...channelUpdated
-								})
-							);
+							if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+								dispatch(
+									channelsActions.add({
+										clanId: channelUpdated.clan_id as string,
+										channel: { ...channel, active: 1, id: channel.channel_id }
+									})
+								);
+								dispatch(
+									channelsActions.createChannelSocket({
+										...channel
+									})
+								);
+								dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
+								if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+									dispatch(
+										listChannelRenderAction.addChannelToListRender({
+											type: channel.type,
+											...channelUpdated
+										})
+									);
+								}
+								if (channel.parrent_id) {
+									dispatch(
+										threadsActions.updateActiveCodeThread({
+											channelId: channel.channel_id || '',
+											activeCode: ThreadStatus.joined
+										})
+									);
+								}
+							}
+							if (channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+								dispatch(
+									channelsActions.joinChat({
+										clanId: channel.clan_id,
+										channelId: channel.channel_id as string,
+										channelType: channel.type as number,
+										isPublic: channel.channel_private === 1
+									})
+								);
+							}
 						}
 					}
 				} else {
