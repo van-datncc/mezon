@@ -1,23 +1,21 @@
 import {
-	CarouselLayout,
 	ConnectionStateToast,
 	FocusLayout,
-	FocusLayoutContainer,
 	GridLayout,
 	isTrackReference,
 	LayoutContextProvider,
-	ParticipantTile,
 	RoomAudioRenderer,
-	useConnectionState,
 	useCreateLayoutContext,
 	usePinnedTracks,
-	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
-import { useAppDispatch, voiceActions } from '@mezon/store';
-import { ConnectionState, Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
-import { useEffect, useMemo, useRef } from 'react';
+import { Icons } from '@mezon/ui';
+import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ControlBar } from '../ControlBar/ControlBar';
+import { CarouselLayout } from './FocusLayout/CarouselLayout/CarouselLayout';
+import { FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
+import { ParticipantTile } from './ParticipantTile/ParticipantTile';
 
 interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
@@ -43,9 +41,6 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 	}, [tracks]);
 
 	const focusTrack = usePinnedTracks(layoutContext)?.[0];
-	const carouselTracks = useMemo(() => {
-		return tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
-	}, [tracks, focusTrack]);
 
 	useEffect(() => {
 		// If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
@@ -70,13 +65,21 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 		}
 	}, [screenShareTracks, focusTrack?.publication?.trackSid, tracks]);
 
-	const dispatch = useAppDispatch();
-	const room = useRoomContext();
-	const connectionState = useConnectionState(room);
+	const [isShowMember, setIsShowMember] = useState<boolean>(true);
 
-	if (connectionState === ConnectionState.Connected) {
-		dispatch(voiceActions.setVoiceConnectionState(true));
-	}
+	const handleShowMember = useCallback(() => {
+		setIsShowMember((prevState) => !prevState);
+	}, []);
+
+	const [isHovered, setIsHovered] = useState(false);
+
+	const handleMouseEnter = () => {
+		setIsHovered(true);
+	};
+
+	const handleMouseLeave = () => {
+		setIsHovered(false);
+	};
 
 	return (
 		<div className="lk-video-conference">
@@ -89,13 +92,26 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 							</GridLayout>
 						</div>
 					) : (
-						<div className="lk-focus-layout-wrapper">
-							<FocusLayoutContainer>
-								<CarouselLayout tracks={carouselTracks}>
-									<ParticipantTile />
-								</CarouselLayout>
+						<div className="lk-focus-layout-wrapper" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+							<FocusLayoutContainer isShowMember={isShowMember}>
 								{focusTrack && <FocusLayout trackRef={focusTrack} />}
+								{isShowMember && (
+									<CarouselLayout tracks={tracks}>
+										<ParticipantTile />
+									</CarouselLayout>
+								)}
 							</FocusLayoutContainer>
+							{isHovered && (
+								<div
+									className={`absolute left-1/2 ${isShowMember ? 'bottom-[100px]' : 'bottom-[8px]'} transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-2 rounded-[20px] bg-[#2B2B2B] hover:bg-[#4d4d4d]`}
+									onClick={handleShowMember}
+								>
+									<Icons.ArrowDown />
+									<span>
+										<Icons.MemberList defaultFill="text-white" />
+									</span>
+								</div>
+							)}
 						</div>
 					)}
 					<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} onScreenShare={onScreenShare} />
@@ -104,40 +120,6 @@ export function MyVideoConference({ onLeaveRoom, onFullScreen, onScreenShare }: 
 			<RoomAudioRenderer />
 			<ConnectionStateToast />
 		</div>
-	);
-}
-
-function isEqualTrackRef(a?: TrackReferenceOrPlaceholder, b?: TrackReferenceOrPlaceholder): boolean {
-	if (a === undefined || b === undefined) {
-		return false;
-	}
-	if (isTrackReference(a) && isTrackReference(b)) {
-		return a.publication.trackSid === b.publication.trackSid;
-	} else {
-		return getTrackReferenceId(a) === getTrackReferenceId(b);
-	}
-}
-
-function getTrackReferenceId(trackReference: TrackReferenceOrPlaceholder | number) {
-	if (typeof trackReference === 'string' || typeof trackReference === 'number') {
-		return `${trackReference}`;
-	} else if (isTrackReferencePlaceholder(trackReference)) {
-		return `${trackReference.participant.identity}_${trackReference.source}_placeholder`;
-	} else if (isTrackReference(trackReference)) {
-		return `${trackReference.participant.identity}_${trackReference.publication.source}_${trackReference.publication.trackSid}`;
-	} else {
-		throw new Error(`Can't generate a id for the given track reference: ${trackReference}`);
-	}
-}
-
-function isTrackReferencePlaceholder(trackReference?: TrackReferenceOrPlaceholder): trackReference is TrackReferencePlaceholder {
-	if (!trackReference) {
-		return false;
-	}
-	return (
-		Object.prototype.hasOwnProperty.call(trackReference, 'participant') &&
-		Object.prototype.hasOwnProperty.call(trackReference, 'source') &&
-		typeof trackReference.publication === 'undefined'
 	);
 }
 
