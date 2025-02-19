@@ -65,4 +65,4 @@ export const fcmActions = { ...fcmSlice.actions, registFcmDeviceToken };
 
 export const getFcmState = (rootState: { [FCM_FEATURE_KEY]: fcm }): fcm => rootState[FCM_FEATURE_KEY];
 
-export const selectGotifyToken = createSelector(getFcmState, (state) => state.token);
+export const selectGotifyToken = createSelector(getFcmState, (state) => state?.token);
