@@ -1,8 +1,8 @@
 import { useAppNavigation } from '@mezon/core';
-import { toastActions } from '@mezon/store';
+import { selectCurrentClanId, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { KOMU_CLAN_ID, WELCOME_CHANNEL_ID } from '@mezon/utils';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 type ModalUnknowChannelProps = {
 	onClose: () => void;
@@ -12,14 +12,28 @@ type ModalUnknowChannelProps = {
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const dispatch = useDispatch();
 	const { onClose, isError = false } = props;
-	const { navigate, toChannelPage } = useAppNavigation();
+	const { navigate, toChannelPage, toMembersPage, toFriendPage } = useAppNavigation();
 	const resetErrorToastStatus = () => {
 		dispatch(toastActions.setErrorToastStatus(false));
 	};
 
+	const currentClanId = useSelector(selectCurrentClanId);
+	const welcomeChannelId = useSelector(state => selectWelcomeChannelByClanId(state, currentClanId as string))
+
 	const directToWelcomeChannel = () => {
 		resetErrorToastStatus();
-		navigate(toChannelPage(WELCOME_CHANNEL_ID, KOMU_CLAN_ID));
+		if (!currentClanId) {
+			navigate(toFriendPage());
+			return;
+		}
+
+		if (welcomeChannelId) {
+			navigate(toChannelPage(welcomeChannelId, currentClanId));
+			return
+		}
+
+		navigate(toMembersPage(currentClanId))
+
 	};
 
 	const onCloseAndReset = () => {
