@@ -16,10 +16,6 @@ export function useAppNavigation() {
 		return `/`;
 	}, []);
 
-  const toFriendPage = useCallback(() => {
-		return `/chat/direct/friends`;
-	}, []);
-
 	const toDirectMessagePage = useCallback(() => {
 		return `/direct-message`;
 	}, []);
@@ -79,7 +75,6 @@ export function useAppNavigation() {
 			toMessageChannel,
 			toChannelSettingPage,
 			toGuidePage,
-      toFriendPage
 		}),
 		[
 			navigate,
@@ -96,7 +91,6 @@ export function useAppNavigation() {
 			toMessageChannel,
 			toChannelSettingPage,
 			toGuidePage,
-      toFriendPage
 		]
 	);
 }
