@@ -4,14 +4,16 @@ import { TrackLoop, useVisualStableUpdate } from '@livekit/components-react';
 import { useWindowSize } from '@mezon/core';
 import { HTMLAttributes, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-const MIN_WIDTH = 220;
+const MIN_HEIGHT = 130;
+const MIN_WIDTH = 140;
 const MIN_VISIBLE_TILES = 1;
 const ASPECT_RATIO = 16 / 10;
+const ASPECT_RATIO_INVERT = (1 - ASPECT_RATIO) * -1;
 
 export interface CarouselLayoutProps extends HTMLAttributes<HTMLMediaElement> {
 	tracks: TrackReferenceOrPlaceholder[];
 	children: ReactNode;
-	orientation?: 'horizontal';
+	orientation?: 'vertical' | 'horizontal';
 }
 
 export function CarouselLayout({ tracks, orientation, ...props }: CarouselLayoutProps) {
@@ -37,16 +39,20 @@ export function CarouselLayout({ tracks, orientation, ...props }: CarouselLayout
 	});
 
 	const { width, height } = dimensions;
-	const carouselOrientation = orientation;
+	const carouselOrientation = orientation ? orientation : height >= width ? 'vertical' : 'horizontal';
 
-	const tileSpan = Math.max(height * ASPECT_RATIO, MIN_WIDTH);
+	const tileSpan =
+		carouselOrientation === 'vertical' ? Math.max(width * ASPECT_RATIO_INVERT, MIN_HEIGHT) : Math.max(height * ASPECT_RATIO, MIN_WIDTH);
 	const scrollBarWidth = getScrollBarWidth();
 
-	const tilesThatFit = Math.max((width - scrollBarWidth) / tileSpan, MIN_VISIBLE_TILES);
+	const tilesThatFit =
+		carouselOrientation === 'vertical'
+			? Math.max((height - scrollBarWidth) / tileSpan, MIN_VISIBLE_TILES)
+			: Math.max((width - scrollBarWidth) / tileSpan, MIN_VISIBLE_TILES);
 
-	let maxVisibleTiles = Math.floor(tilesThatFit);
+	let maxVisibleTiles = Math.round(tilesThatFit);
 	if (Math.abs(tilesThatFit - prevTiles) < 0.5) {
-		maxVisibleTiles = Math.min(maxVisibleTiles, Math.floor(width / tileSpan));
+		maxVisibleTiles = Math.round(prevTiles);
 	} else if (prevTiles !== tilesThatFit) {
 		setPrevTiles(tilesThatFit);
 	}
