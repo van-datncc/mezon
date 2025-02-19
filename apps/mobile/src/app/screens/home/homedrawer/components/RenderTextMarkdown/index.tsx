@@ -8,14 +8,15 @@ import {
 	selectChannelsEntities,
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
-import { EBacktickType, ETokenMessage, IExtendedMessage } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
+import WebView from 'react-native-webview';
 import { useStore } from 'react-redux';
 import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -165,6 +166,21 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		privateChannel: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight
+		},
+		viewYoutube: {
+			flex: 1,
+			padding: size.s_10,
+			backgroundColor: colors.border,
+			width: '90%',
+			maxWidth: size.s_400,
+			borderRadius: size.s_4,
+			height: size.s_220
+		},
+		borderLeftView: {
+			borderLeftWidth: size.s_4,
+			borderLeftColor: 'red',
+			borderRadius: size.s_4,
+			height: size.s_220
 		}
 	});
 };
@@ -239,11 +255,35 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 	link: (node, children, parent, styles, onLinkPress) => {
 		const payload = node?.attributes?.href;
 		const content = node?.children[0]?.content;
+		const widthScreen = Dimensions.get('screen').width;
+
 		if (payload === EDITED_FLAG) {
 			return (
 				<Text key={node.key} style={[styles.editedText]}>
 					{content}
 				</Text>
+			);
+		}
+
+		if (isYouTubeLink(payload)) {
+			const videoUrl = getYouTubeEmbedUrl(payload);
+			return (
+				<View style={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}>
+					<Text
+						key={node.key}
+						style={[styles.link]}
+						onPress={() => openUrl(node.attributes.href, onLinkPress)}
+						onLongPress={onLongPress && onLongPress}
+					>
+						{children}
+					</Text>
+					<View style={{ display: 'flex', flexDirection: 'row' }}>
+						<View style={styles.borderLeftView} />
+						<View style={styles.viewYoutube}>
+							<WebView source={{ uri: videoUrl }} allowsFullscreenVideo={true} javaScriptEnabled={true} domStorageEnabled={true} />
+						</View>
+					</View>
+				</View>
 			);
 		}
 
