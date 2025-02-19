@@ -3,6 +3,7 @@ import { getStoreAsync, RootState, selectCurrentClanId, selectWelcomeChannelByCl
 import { Icons } from '@mezon/ui';
 import { FRIEND_PAGE_LINK } from '@mezon/utils';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 type ModalUnknowChannelProps = {
 	onClose: () => void;
@@ -12,7 +13,9 @@ type ModalUnknowChannelProps = {
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const dispatch = useDispatch();
 	const { onClose, isError = false } = props;
-	const { navigate, toChannelPage, toMembersPage } = useAppNavigation();
+	const { toChannelPage, toMembersPage } = useAppNavigation();
+	const navigate = useNavigate();
+
 	const resetErrorToastStatus = () => {
 		dispatch(toastActions.setErrorToastStatus(false));
 	};
