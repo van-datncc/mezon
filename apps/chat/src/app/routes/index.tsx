@@ -38,7 +38,7 @@ import ProtectedRoutes from './ProtectedRoutes';
 import ThreadsRoutes from './ThreadsRoutes';
 
 const Login = loadable(() => import('../pages/login'));
-const LoginDesktop = loadable(() => import('../pages/loginDesktop'));
+// const LoginDesktop = loadable(() => import('../pages/loginDesktop'));
 const Main = loadable(() => import('../pages/main'));
 const DirectMain = loadable(() => import('../pages/directMessage'));
 const InvitePage = loadable(() => import('../pages/invite'));
@@ -114,16 +114,16 @@ export const Routes = memo(() => {
 								path: 'desktop',
 								element: <GuessLayout />,
 								children: [
-									{
-										path: 'login',
-										loader: loaderWithStore(loginLoader),
-										element: <Login />
-									},
-									{
-										path: 'login-desktop',
-										loader: loaderWithStore(loginLoader),
-										element: <LoginDesktop />
-									}
+									isElectron()
+										? {
+												path: 'login',
+												loader: loaderWithStore(loginLoader),
+												element: <Login />
+											}
+										: {
+												path: 'mezon',
+												element: <InitialRoutes />
+											}
 								]
 							},
 							{
