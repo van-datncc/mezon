@@ -72,7 +72,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 		dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
 	};
 	const checkPrivateChannel = useMemo(() => {
-		return channel.channel_private ? 1 : 0;
+		return channel.channel_private;
 	}, [channel.channel_private]);
 
 	const renderChannelLink = () => {
