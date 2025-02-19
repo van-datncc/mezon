@@ -3,7 +3,7 @@ import { ActionEmitEvent, load, STORAGE_MY_USER_ID, validLinkGoogleMapRegex, val
 import { Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useState } from 'react';
-import { Animated, DeviceEventEmitter, PanResponder, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
@@ -237,7 +237,15 @@ const MessageItem = React.memo(
 
 		return (
 			<Animated.View {...panResponder?.panHandlers} style={[{ backgroundColor: bgColor }, { transform: [{ translateX }] }]}>
-				<View
+				<Pressable
+					android_ripple={{
+						color: themeValue.secondaryLight
+					}}
+					disabled={isMessageCallLog || isGoogleMapsLink}
+					delayLongPress={300}
+					onPressIn={Platform.OS === 'ios' ? handlePressIn : undefined}
+					onPressOut={Platform.OS === 'ios' ? handlePressOut : undefined}
+					onLongPress={handleLongPressMessage}
 					style={[
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
@@ -257,14 +265,7 @@ const MessageItem = React.memo(
 							/>
 						)}
 
-						<Pressable
-							disabled={isMessageCallLog}
-							style={[styles.rowMessageBox, isMessageSystem && { width: '100%' }]}
-							delayLongPress={300}
-							onPressIn={handlePressIn}
-							onPressOut={handlePressOut}
-							onLongPress={handleLongPressMessage}
-						>
+						<View style={[styles.rowMessageBox, isMessageSystem && { width: '100%' }]}>
 							{!isMessageSystem && (
 								<InfoUserMessage
 									onPress={onPressInfoUser}
@@ -363,9 +364,9 @@ const MessageItem = React.memo(
 								/>
 							) : null}
 							{message?.code === TypeMessage.Topic && <MessageTopic message={message} avatar={messageAvatar} />}
-						</Pressable>
+						</View>
 					</View>
-				</View>
+				</Pressable>
 
 				{/*<NewMessageRedLine*/}
 				{/*	channelId={props?.channelId}*/}
