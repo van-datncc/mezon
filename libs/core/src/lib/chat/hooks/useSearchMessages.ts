@@ -26,7 +26,7 @@ export function useSearchMessages() {
 	const messageSearchByChannelId = useAppSelector((state) =>
 		selectMessageSearchByChannelId(state, isClanView ? currentChannelId : currentDirectId)
 	);
-	const valueSearchMessage = useSelector(selectValueInputSearchMessage((isClanView ? currentChannelId : currentDirectId) ?? ''));
+	const valueSearchMessage = useSelector((state) => selectValueInputSearchMessage(state, (isClanView ? currentChannelId : currentDirectId) ?? ''));
 
 	const fetchSearchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
