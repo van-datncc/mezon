@@ -1,9 +1,9 @@
 import { useChatSending, useCurrentInbox, useDeleteMessage, useEditMessage, useEscapeKeyClose } from '@mezon/core';
-import { selectOpenEditMessageState } from '@mezon/store';
+import { selectCurrentTopicId, selectOpenEditMessageState, topicsActions } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
 
 type ModalDeleteMessProps = {
@@ -20,9 +20,11 @@ type ModalDeleteMessProps = {
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { mess, closeModal, mode, isRemoveAttachmentNoContent, attachmentData, isRemoveAttachmentAction = false, isTopic } = props;
+	const dispatch = useDispatch();
 	const current = useCurrentInbox() || undefined;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const isEditing = useSelector(selectOpenEditMessageState);
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isInitialRender, setIsInitialRender] = useState(isEditing);
 	const hasAttachment = !!mess?.attachments?.length;
 	const { deleteSendMessage } = useDeleteMessage({
@@ -43,15 +45,26 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 	const removeLastFile = mess.content.t === '' && mess.attachments?.length === 1;
 
+	const handleDeleteMessage = async () => {
+		if (!mess?.content?.tp) {
+			await deleteSendMessage(mess.id);
+			return;
+		}
+
+		if (mess.content.tp === currentTopicId) {
+			dispatch(topicsActions.setCurrentTopicId(''));
+			dispatch(topicsActions.setIsShowCreateTopic(false));
+			await deleteSendMessage(mess.id);
+		}
+	};
+
 	const handleAction = useCallback(() => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
 			editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
-		} else if (removeLastFile) {
-			deleteSendMessage(mess.id);
 		} else {
-			deleteSendMessage(mess.id);
+			handleDeleteMessage();
 		}
 		handleCancelEdit();
 		closeModal();
