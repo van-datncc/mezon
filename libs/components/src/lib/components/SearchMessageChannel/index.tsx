@@ -65,7 +65,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? '')),
 		[mode, currentChannel, currentDmGroupId]
 	);
-	const searchedRequest = useSelector(selectSearchedRequestByChannelId(channelId));
+	const searchedRequest = useSelector((state) => selectSearchedRequestByChannelId(state, channelId));
 
 	const valueInputSearch = useSelector(selectValueInputSearchMessage(channelId));
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, channelId));
