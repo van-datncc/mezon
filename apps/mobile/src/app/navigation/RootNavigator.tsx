@@ -24,25 +24,26 @@ const NavigationMain = memo(
 		const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
 		const { themeValue, themeBasic } = useTheme();
 
-		useEffect(() => {
-			const timer = setTimeout(() => {
-				checkForUpdate();
-			}, 2000);
-			return () => clearTimeout(timer);
-		}, []);
+		// comment logic check new version on code-push
+		// useEffect(() => {
+		// 	const timer = setTimeout(() => {
+		// 		checkForUpdate();
+		// 	}, 2000);
+		// 	return () => clearTimeout(timer);
+		// }, []);
 
-		const checkForUpdate = async () => {
-			const update = await codePush.checkForUpdate(
-				Platform.OS === 'ios' ? process.env.NX_CODE_PUSH_KEY_IOS_MOBILE : (process.env.NX_CODE_PUSH_KEY_ANDROID_MOBILE as string)
-			);
-			if (update) {
-				if (update.failedInstall) {
-					/* empty */
-				} else if (VersionInfo.appVersion === update.appVersion) {
-					setIsShowUpdateModal(true);
-				}
-			}
-		};
+		// const checkForUpdate = async () => {
+		// 	const update = await codePush.checkForUpdate(
+		// 		Platform.OS === 'ios' ? process.env.NX_CODE_PUSH_KEY_IOS_MOBILE : (process.env.NX_CODE_PUSH_KEY_ANDROID_MOBILE as string)
+		// 	);
+		// 	if (update) {
+		// 		if (update.failedInstall) {
+		// 			/* empty */
+		// 		} else if (VersionInfo.appVersion === update.appVersion) {
+		// 			setIsShowUpdateModal(true);
+		// 		}
+		// 	}
+		// };
 
 		const theme = {
 			dark: themeBasic === ThemeModeBase.DARK,
@@ -65,7 +66,7 @@ const NavigationMain = memo(
 			>
 				<NetInfoComp />
 				<RootListener />
-				<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />
+				{/*<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />*/}
 				<RootStack {...props} />
 			</NavigationContainer>
 		);
