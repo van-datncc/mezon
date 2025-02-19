@@ -82,7 +82,7 @@ const MessageItem = React.memo(
 		const userId = load(STORAGE_MY_USER_ID);
 		const hasIncludeMention = userId
 			? message?.content?.t?.includes('@here') ||
-				message?.mentions?.some((mention) => mention?.user_id === userId) ||
+				message?.mentions?.some?.((mention) => mention?.user_id === userId) ||
 				message?.references?.[0]?.message_sender_id === userId
 			: false;
 
@@ -121,7 +121,7 @@ const MessageItem = React.memo(
 			? message?.display_name || message?.username || ''
 			: message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 
-		const usernameMessage = isDM ? message?.display_name || message?.user?.username : message?.user?.username;
+		const usernameMessage = isDM ? message?.display_name || message?.user?.username : checkAnonymous ? 'Anonymous' : message?.user?.username;
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
 

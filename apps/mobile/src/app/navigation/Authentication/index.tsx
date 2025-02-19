@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Dimensions, Platform } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -33,7 +33,6 @@ export const Authentication = memo(() => {
 					headerShown: false,
 					gestureEnabled: Platform.OS === 'ios',
 					gestureDirection: 'horizontal',
-					...TransitionPresets.ModalFadeTransition,
 					animationEnabled: false
 				}}
 			>
