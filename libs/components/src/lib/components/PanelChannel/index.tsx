@@ -17,6 +17,7 @@ import {
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiSettingsEntitiesById,
+	selectWelcomeChannelByClanId,
 	stickerSettingActions,
 	threadsActions,
 	useAppDispatch,
@@ -93,6 +94,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClan = useSelector(selectCurrentClan);
+	const welcomeChannelId = useSelector(state => selectWelcomeChannelByClanId(state,currentClan?.clan_id as string))
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
 	const [nameChildren, setNameChildren] = useState('');
@@ -436,7 +438,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 							{channel.type === typeChannel.voice && (
 								<ItemPanel children="Create Voice Channel" onClick={handleOpenCreateChannelModal} />
 							)}
-							<ItemPanel onClick={handleDeleteChannel} children="Delete Channel" danger />
+							{welcomeChannelId !== channel.id &&
+								<ItemPanel onClick={handleDeleteChannel} children="Delete Channel" danger />
+							}
 						</GroupPanels>
 					)}
 				</>
