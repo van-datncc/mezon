@@ -142,7 +142,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 					icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
 				}
 			] satisfies IMezonMenuItemProps[],
-		[navigation, t, themeValue.textStrong]
+		[navigation, t, themeValue.textStrong, i18n.language]
 	);
 
 	const PaymentMenu = useMemo(
@@ -237,7 +237,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				// 	icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 				// },
 			] satisfies IMezonMenuItemProps[],
-		[themeValue.textStrong]
+		[themeValue.textStrong, i18n.language]
 	);
 
 	const SupportMenu = useMemo(
@@ -288,7 +288,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 					icon: <Icons.DoorExitIcon color={baseColor.redStrong} width={size.s_24} height={size.s_24} />
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[i18n.language]
 	);
 
 	const menu: IMezonMenuSectionProps[] = [
@@ -322,7 +322,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			return menu;
 		}
 		return filteredMenu;
-	}, [filteredMenu, themeValue.textStrong]);
+	}, [filteredMenu, themeValue.textStrong, i18n.language]);
 
 	const debouncedHandleSearchChange = useCallback(
 		debounce((text) => {
