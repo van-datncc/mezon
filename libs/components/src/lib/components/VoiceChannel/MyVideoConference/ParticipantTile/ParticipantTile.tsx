@@ -6,8 +6,6 @@ import {
 	FocusToggle,
 	LockLockedIcon,
 	ParticipantContext,
-	ParticipantName,
-	ParticipantPlaceholder,
 	ScreenShareIcon,
 	TrackMutedIndicator,
 	TrackRefContext,
@@ -20,9 +18,12 @@ import {
 	useMaybeTrackRefContext,
 	useParticipantTile
 } from '@livekit/components-react';
+import { selectMemberClanByUserName, useAppSelector } from '@mezon/store';
+import { createImgproxyUrl } from '@mezon/utils';
 import type { Participant } from 'livekit-client';
 import { Track } from 'livekit-client';
-import { PropsWithChildren, forwardRef, useCallback } from 'react';
+import { PropsWithChildren, forwardRef, useCallback, useMemo } from 'react';
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
 export function ParticipantContextIfNeeded(
 	props: React.PropsWithChildren<{
@@ -89,6 +90,13 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 		[trackReference, layoutContext]
 	);
 
+	const username = trackReference.participant.identity;
+	const member = useAppSelector((state) => selectMemberClanByUserName(state, username));
+	const voiceUsername = member?.clan_nick || username;
+	const avatar = useMemo(() => {
+		return member?.clan_avatar || member?.user?.avatar_url || 'assets/images/mezon-logo-white.svg';
+	}, [member]);
+
 	return (
 		<div ref={ref} style={{ position: 'relative' }} {...elementProps}>
 			<TrackRefContextIfNeeded trackRef={trackReference}>
@@ -110,7 +118,15 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								)
 							)}
 							<div className="lk-participant-placeholder">
-								<ParticipantPlaceholder />
+								{member && (
+									<AvatarImage
+										alt={username || ''}
+										username={username}
+										className="w-20 h-20"
+										srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 320, height: 320, resizeType: 'fit' })}
+										src={avatar}
+									/>
+								)}
 							</div>
 							<div className="lk-participant-metadata">
 								<div className="lk-participant-metadata-item">
@@ -124,12 +140,12 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 												}}
 												show={'muted'}
 											></TrackMutedIndicator>
-											<ParticipantName />
+											<span>{voiceUsername}</span>
 										</>
 									) : (
 										<>
 											<ScreenShareIcon style={{ marginRight: '0.25rem' }} />
-											<ParticipantName>&apos;s screen</ParticipantName>
+											<span>{voiceUsername} &apos;s screen</span>
 										</>
 									)}
 								</div>
