@@ -99,4 +99,3 @@ export const TOKEN_TO_AMOUNT = {
 export const ADD_ROLE_CHANNEL_STATUS = 'Add Role Channel';
 export const KOMU_CLAN_ID = '1779484504377790464';
 export const WELCOME_CHANNEL_ID = '1827883133219901440';
-export const FRIEND_PAGE_LINK = '/chat/direct/friends';
