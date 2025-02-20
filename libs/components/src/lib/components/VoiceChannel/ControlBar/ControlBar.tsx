@@ -1,18 +1,12 @@
-import {
-	ControlBarControls,
-	DisconnectButton,
-	LeaveIcon,
-	MediaDeviceMenu,
-	TrackToggle,
-	useLocalParticipantPermissions,
-	usePersistentUserChoices
-} from '@livekit/components-react';
-import { selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
+import { ControlBarControls, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
+import { selectShowCamera, selectShowMicrophone, selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
+import { TrackToggle } from './TrackToggle/TrackToggle';
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 	variation?: 'minimal' | 'verbose' | 'textOnly';
@@ -41,6 +35,8 @@ export function ControlBar({
 	const visibleControls = { leave: true, ...controls };
 
 	const showScreen = useSelector(selectShowScreen);
+	const showCamera = useSelector(selectShowCamera);
+	const showMicrophone = useSelector(selectShowMicrophone);
 
 	const isFullScreen = useSelector(selectVoiceFullScreen);
 
@@ -55,9 +51,6 @@ export function ControlBar({
 		visibleControls.microphone ??= localPermissions.canPublish;
 		visibleControls.screenShare ??= localPermissions.canPublish;
 	}
-
-	const showIcon = variation === 'minimal' || variation === 'verbose';
-	const showText = variation === 'textOnly' || variation === 'verbose';
 
 	const browserSupportsScreenSharing = supportsScreenSharing();
 
@@ -76,84 +69,134 @@ export function ControlBar({
 	);
 
 	return (
-		<div className="lk-control-bar relative">
-			{visibleControls.microphone && (
-				<div className="lk-button-group">
-					<TrackToggle
-						source={Track.Source.Microphone}
-						showIcon={showIcon}
-						onChange={microphoneOnChange}
-						onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Microphone, error })}
-					>
-						{showText && 'Microphone'}
-					</TrackToggle>
-					<div className="lk-button-group-menu">
+		<div className="lk-control-bar justify-between">
+			<div className="flex justify-start gap-4">
+				<span>
+					<Icons.VoiceSoundControlIcon className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+				</span>
+				<span>
+					<Icons.VoiceEmojiControlIcon className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+				</span>
+			</div>
+			<div className="flex justify-center gap-3">
+				{visibleControls.microphone && (
+					<div className="relative">
+						<Tooltip
+							placement="top"
+							overlay={
+								<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">
+									{showMicrophone ? 'Turn Off Microphone' : 'Turn On Microphone'}
+								</span>
+							}
+							overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+							getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+						>
+							<TrackToggle
+								className="w-14 h-14 rounded-full flex justify-center items-center"
+								source={Track.Source.Microphone}
+								onChange={microphoneOnChange}
+								onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Microphone, error })}
+							/>
+						</Tooltip>
 						<MediaDeviceMenu
 							kind="audioinput"
 							onActiveDeviceChange={(_kind, deviceId) => saveAudioInputDeviceId(deviceId ?? 'default')}
 						/>
 					</div>
-				</div>
-			)}
-			{visibleControls.camera && (
-				<div className="lk-button-group">
-					<TrackToggle
-						source={Track.Source.Camera}
-						showIcon={showIcon}
-						onChange={cameraOnChange}
-						onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Camera, error })}
-					>
-						{showText && 'Camera'}
-					</TrackToggle>
-					<div className="lk-button-group-menu">
+				)}
+				{visibleControls.camera && (
+					<div className="relative">
+						<Tooltip
+							placement="top"
+							overlay={
+								<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">{showCamera ? 'Turn Off Camera' : 'Turn On Camera'}</span>
+							}
+							overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+							getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+						>
+							<TrackToggle
+								className="w-14 h-14 rounded-full flex justify-center items-center"
+								source={Track.Source.Camera}
+								onChange={cameraOnChange}
+								onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Camera, error })}
+							/>
+						</Tooltip>
 						<MediaDeviceMenu
 							kind="videoinput"
 							onActiveDeviceChange={(_kind, deviceId) => saveVideoInputDeviceId(deviceId ?? 'default')}
 						/>
 					</div>
-				</div>
-			)}
-			{visibleControls.screenShare && browserSupportsScreenSharing && (
-				<TrackToggle
-					source={Track.Source.ScreenShare}
-					captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
-					showIcon={showIcon}
-					onChange={onScreenShare}
-					onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
-				>
-					{showText && (showScreen ? 'Stop screen share' : 'Share screen')}
-				</TrackToggle>
-			)}
-			{visibleControls.leave && (
-				<DisconnectButton onClick={onLeaveRoom}>
-					{showIcon && <LeaveIcon />}
-					{showText && 'Leave'}
-				</DisconnectButton>
-			)}
-			<div onClick={onFullScreen} className="absolute bottom-6 !right-6">
-				{isFullScreen ? (
+				)}
+				{visibleControls.screenShare && browserSupportsScreenSharing && (
 					<Tooltip
-						placement="topRight"
-						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Exit Full Screen</span>}
-						overlayClassName="whitespace-nowrap z-50"
+						placement="top"
+						overlay={
+							<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">{showScreen ? 'Stop screen share' : 'Share Your Screen'}</span>
+						}
+						overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
 						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
 					>
-						<span>
-							<Icons.ExitFullScreen />
-						</span>
-					</Tooltip>
-				) : (
-					<Tooltip
-						placement="topRight"
-						overlay={<span className="bg-[#2B2B2B] p-2 rounded text-[16px] absolute bottom-[5px] -right-[16px]">Full Screen</span>}
-						overlayClassName="whitespace-nowrap"
-						key={Number(isFullScreen)}
-					>
-						<span>
-							<Icons.FullScreen />
-						</span>
+						<TrackToggle
+							className="w-14 h-14 rounded-full flex justify-center items-center"
+							source={Track.Source.ScreenShare}
+							captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
+							onChange={onScreenShare}
+							onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
+						/>
 					</Tooltip>
 				)}
+				{visibleControls.leave && (
+					<Tooltip
+						placement="top"
+						overlay={<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">Disconnect</span>}
+						overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+					>
+						<div
+							onClick={onLeaveRoom}
+							className="w-14 h-14 bg-[#da373c] hover:bg-[#a12829] rounded-full flex justify-center items-center"
+						>
+							<Icons.EndCall className="w-6 h-6" />
+						</div>
+					</Tooltip>
+				)}
+			</div>
+			<div className="flex justify-end gap-4">
+				<Tooltip
+					placement="top"
+					overlay={<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">Pop Out</span>}
+					overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+					getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+				>
+					<span>
+						<Icons.VoicePopOutIcon className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+					</span>
+				</Tooltip>
+				<div onClick={onFullScreen}>
+					{isFullScreen ? (
+						<Tooltip
+							placement="topRight"
+							overlay={<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">Exit Full Screen</span>}
+							overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+							getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+						>
+							<span>
+								<Icons.ExitFullScreen className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+							</span>
+						</Tooltip>
+					) : (
+						<Tooltip
+							placement="topRight"
+							overlay={<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">Full Screen</span>}
+							overlayClassName="whitespace-nowrap !p-0 !pt-4"
+							key={Number(isFullScreen)}
+						>
+							<span>
+								<Icons.FullScreen className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+							</span>
+						</Tooltip>
+					)}
+				</div>
 			</div>
 		</div>
 	);

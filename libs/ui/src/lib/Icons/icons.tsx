@@ -6798,3 +6798,159 @@ export function OAuth2Setting(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function VoicePopOutIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="controlIcon_f1ceac"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="M15 2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0V4.41l-4.3 4.3a1 1 0 1 1-1.4-1.42L19.58 3H16a1 1 0 0 1-1-1Z"
+				className=""
+			></path>
+			<path
+				fill="currentColor"
+				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 1 0-2 0v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h6a1 1 0 1 0 0-2H5Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function VoiceEmojiControlIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="controlIcon_f1ceac iconHover__26d03"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22ZM6.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-9.8 1.17a1 1 0 0 1 1.39.27 3.5 3.5 0 0 0 5.82 0 1 1 0 0 1 1.66 1.12 5.5 5.5 0 0 1-9.14 0 1 1 0 0 1 .27-1.4Z"
+				clip-rule="evenodd"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function VoiceSoundControlIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="controlIcon_f1ceac iconHover__26d03"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="M14.24 1.03a1 1 0 0 1 .73 1.21l-1 4a1 1 0 0 1-1.94-.48l1-4a1 1 0 0 1 1.21-.73ZM20.7 4.7a1 1 0 0 0-1.4-1.4l-4 4a1 1 0 0 0 1.4 1.4l4-4Z"
+				className=""
+			></path>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M15.14 20.14c1.78-1.78.7-5.75-2.42-8.86-3.11-3.12-7.08-4.2-8.86-2.42A3.13 3.13 0 0 0 3 11V11l-1.16 8.92a2 2 0 0 0 2.24 2.24L13 21c.86-.04 1.6-.32 2.14-.86Zm-1.3-3.4a9.61 9.61 0 0 0-2.53-4.05 9.61 9.61 0 0 0-4.05-2.53c-1.27-.35-1.82-.05-1.99.11-.16.17-.46.72-.11 2a9.61 9.61 0 0 0 2.53 4.04 9.61 9.61 0 0 0 4.05 2.53c1.27.35 1.82.05 1.99-.11.16-.17.46-.72.11-2Z"
+				clip-rule="evenodd"
+				className=""
+			></path>
+			<path
+				fill="currentColor"
+				d="M7.05 3.32a1 1 0 0 1 1.9-.64l1 3a1 1 0 1 1-1.9.64l-1-3ZM22.97 9.76a1 1 0 0 0-1.21-.73l-4 1a1 1 0 1 0 .48 1.94l4-1a1 1 0 0 0 .73-1.21ZM20.68 16.95a1 1 0 0 0 .64-1.9l-3-1a1 1 0 0 0-.64 1.9l3 1Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export const VoiceMicIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
+		<g transform="scale(1.3)">
+			<path
+				fillRule="evenodd"
+				d="M2.975 8.002a.5.5 0 0 1 .547.449 4.5 4.5 0 0 0 8.956 0 .5.5 0 1 1 .995.098A5.502 5.502 0 0 1 8.5 13.478V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .448-.547z"
+				clipRule="evenodd"
+			/>
+			<path d="M5 3a3 3 0 1 1 6 0v5a3 3 0 0 1-6 0z" />
+		</g>
+	</svg>
+);
+
+export const VoiceMicDisabledIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
+		<g transform="scale(1.3)">
+			<path d="M12.227 11.52a5.477 5.477 0 0 0 1.246-2.97.5.5 0 0 0-.995-.1 4.478 4.478 0 0 1-.962 2.359l-1.07-1.07C10.794 9.247 11 8.647 11 8V3a3 3 0 0 0-6 0v1.293L1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708zM8 12.5c.683 0 1.33-.152 1.911-.425l.743.743c-.649.359-1.378.59-2.154.66V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .995-.098A4.5 4.5 0 0 0 8 12.5z" />
+			<path d="M8.743 10.907 5 7.164V8a3 3 0 0 0 3.743 2.907z" />
+		</g>
+	</svg>
+);
+
+export const VoiceCameraIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
+		<g transform="scale(1.5)">
+			<path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h8A1.5 1.5 0 0 1 11 4.5v7A1.5 1.5 0 0 1 9.5 13h-8A1.5 1.5 0 0 1 0 11.5zM15.2 3.6l-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
+		</g>
+	</svg>
+);
+
+export const VoiceCameraDisabledIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
+		<g transform="scale(1.5)">
+			<path d="M1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708L11 10.293V4.5A1.5 1.5 0 0 0 9.5 3H3.707zM0 4.5a1.5 1.5 0 0 1 .943-1.393l9.532 9.533c-.262.224-.603.36-.975.36h-8A1.5 1.5 0 0 1 0 11.5z" />
+			<path d="m15.2 3.6-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
+		</g>
+	</svg>
+);
+
+export const VoiceScreenShareStopIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
+		<g fill="currentColor" transform="scale(1.2)">
+			<path d="M7.28 4.22a.75.75 0 0 0-1.06 1.06L8.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L10 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L11.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L10 6.94z" />
+			<path
+				fillRule="evenodd"
+				d="M2.75 0A2.75 2.75 0 0 0 0 2.75v10.5A2.75 2.75 0 0 0 2.75 16h14.5A2.75 2.75 0 0 0 20 13.25V2.75A2.75 2.75 0 0 0 17.25 0zM1.5 2.75c0-.69.56-1.25 1.25-1.25h14.5c.69 0 1.25.56 1.25 1.25v10.5c0 .69-.56 1.25-1.25 1.25H2.75c-.69 0-1.25-.56-1.25-1.25z"
+				clipRule="evenodd"
+			/>
+		</g>
+	</svg>
+);
+
+export const VoiceScreenShareIcon = (props: React.HTMLAttributes<SVGElement>) => (
+	<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
+		<g transform="scale(1.2)">
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M0 2.75A2.75 2.75 0 0 1 2.75 0h14.5A2.75 2.75 0 0 1 20 2.75v10.5A2.75 2.75 0 0 1 17.25 16H2.75A2.75 2.75 0 0 1 0 13.25V2.75ZM2.75 1.5c-.69 0-1.25.56-1.25 1.25v10.5c0 .69.56 1.25 1.25 1.25h14.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25H2.75Z"
+				clipRule="evenodd"
+			/>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M9.47 4.22a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1-1.06 1.06l-.97-.97v4.69a.75.75 0 0 1-1.5 0V6.56l-.97.97a.75.75 0 0 1-1.06-1.06l2.25-2.25Z"
+				clipRule="evenodd"
+			/>
+		</g>
+	</svg>
+);
