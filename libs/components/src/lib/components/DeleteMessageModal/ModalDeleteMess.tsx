@@ -1,5 +1,6 @@
 import { useChatSending, useCurrentInbox, useDeleteMessage, useEditMessage, useEscapeKeyClose } from '@mezon/core';
 import { selectCurrentTopicId, selectOpenEditMessageState, topicsActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -33,9 +34,9 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		hasAttachment: hasAttachment,
 		isTopic: isTopic
 	});
-
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 	const { editSendMessage } = useChatSending({ channelOrDirect: current, mode });
+	const [isLoading, setIsLoading] = useState(false);
 
 	const messagePreviewWithAttachmentRemove = {
 		...mess,
@@ -48,35 +49,38 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const handleDeleteMessage = async () => {
 		if (!mess?.content?.tp) {
 			await deleteSendMessage(mess.id);
+			setIsLoading(false);
 			return;
 		}
 
 		if (mess.content.tp === currentTopicId) {
+			await deleteSendMessage(mess.id);
+			setIsLoading(false);
 			dispatch(topicsActions.setCurrentTopicId(''));
 			dispatch(topicsActions.setIsShowCreateTopic(false));
-			await deleteSendMessage(mess.id);
 		}
 	};
 
-	const handleAction = useCallback(() => {
+	const handleAction = useCallback(async () => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
-			editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
+			await editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
 		} else {
-			handleDeleteMessage();
+			setIsLoading(true);
+			await handleDeleteMessage();
 		}
 		handleCancelEdit();
 		closeModal();
 	}, [isRemoveAttachmentNoContent, attachmentData, mess, removeLastFile, editSendMessage, deleteSendMessage, handleCancelEdit, closeModal]);
 
-	const handleEnter = (e: KeyboardEvent) => {
+	const handleEnter = async (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.stopPropagation();
 			if (isInitialRender) {
 				setIsInitialRender(false);
 			} else {
-				handleAction();
+				await handleAction();
 			}
 		}
 	};
@@ -118,11 +122,20 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 						/>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
-						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
+						<button
+							onClick={closeModal}
+							className="px-4 py-2 hover:underline rounded disabled:cursor-not-allowed disabled:hover:no-underline disabled:opacity-85"
+							disabled={isLoading}
+						>
 							Cancel
 						</button>
-						<button onClick={handleAction} className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white">
-							{isRemoveAttachmentNoContent ? 'Remove' : 'Delete'}
+						<button
+							onClick={handleAction}
+							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white disabled:cursor-not-allowed disabled:opacity-85 disabled:hover:opacity-85 flex"
+							disabled={isLoading}
+						>
+							{isRemoveAttachmentNoContent ? 'Remove ' : 'Delete '}
+							{isLoading && <Icons.IconLoadingTyping />}
 						</button>
 					</div>
 				</div>
