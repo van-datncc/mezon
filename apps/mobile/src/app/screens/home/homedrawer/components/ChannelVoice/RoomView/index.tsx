@@ -10,7 +10,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
+import { clansActions, selectMemberClanByUserName, selectVoiceInfo, useAppDispatch, useAppSelector } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { LocalParticipant, RemoteParticipant, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -65,6 +65,14 @@ const RoomView = ({
 
 	const isGridLayout = videoTrackCount >= 3;
 
+	const members = useAppSelector((state) => {
+		const membersData = {};
+		sortedParticipants.forEach((participant) => {
+			membersData[participant.identity] = selectMemberClanByUserName(state, participant.identity);
+		});
+		return membersData;
+	});
+
 	const renderParticipant = (participant: LocalParticipant | RemoteParticipant) => {
 		const videoTrackRef = tracks.find(
 			(t) => t.participant.identity === participant.identity && t.source === Track.Source.Camera && t.participant.isCameraEnabled === true
@@ -76,6 +84,10 @@ const RoomView = ({
 		};
 
 		const isFocusedScreen = focusedScreenShare === screenTrackRef;
+		const member = members[participant.identity];
+		const voiceUsername = member?.clan_nick || member?.user?.display_name || participant.identity;
+		const avatar = member?.clan_avatar || member?.user?.avatar_url || 'assets/images/mezon-logo-white.svg';
+		const isLoading = !member;
 
 		return (
 			<>
@@ -95,7 +107,7 @@ const RoomView = ({
 								ellipsizeMode="tail"
 								style={[styles.subTitle, isFocusedScreen ? { width: '100%' } : { width: '48%' }]}
 							>
-								{participant.identity} {isFocusedScreen && `(Share Screen)`}
+								{voiceUsername} {isFocusedScreen && `(Share Screen)`}
 							</Text>
 						</View>
 						<TouchableOpacity style={styles.focusIcon} onPress={() => handleFocusScreen(screenTrackRef)}>
@@ -113,7 +125,7 @@ const RoomView = ({
 							) : (
 								<Icons.MicrophoneSlashIcon height={size.s_14} />
 							)}
-							<Text style={styles.subTitle}>{participant.identity || 'Unknown'}</Text>
+							<Text style={styles.subTitle}>{voiceUsername || 'Unknown'}</Text>
 						</View>
 					</View>
 				)}
@@ -121,7 +133,11 @@ const RoomView = ({
 				{!videoTrackRef && (
 					<View style={[styles.userView, isGridLayout && { width: '48%', height: 150 }, isTabletLandscape && { height: 250 }]}>
 						<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-							<MezonAvatar width={size.s_50} height={size.s_50} username={participant.identity} avatarUrl={participant.metadata} />
+							{isLoading ? (
+								<Icons.LoadingIcon width={24} height={24} />
+							) : (
+								<MezonAvatar width={size.s_50} height={size.s_50} username={voiceUsername} avatarUrl={avatar} />
+							)}
 						</View>
 						<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
 							{participant.isMicrophoneEnabled ? (
@@ -129,7 +145,11 @@ const RoomView = ({
 							) : (
 								<Icons.MicrophoneSlashIcon height={size.s_14} />
 							)}
-							<Text style={styles.subTitle}>{participant.identity || 'Unknown'}</Text>
+							{isLoading ? (
+								<Icons.LoadingIcon width={24} height={24} />
+							) : (
+								<Text style={styles.subTitle}>{voiceUsername || 'Unknown'}</Text>
+							)}
 						</View>
 					</View>
 				)}
@@ -261,15 +281,13 @@ const RoomView = ({
 
 		const randomParticipant = sortedParticipants[0];
 		if (randomParticipant) {
+			const member = members[randomParticipant.identity];
+			const voiceUsername = member?.clan_nick || member?.user?.display_name || randomParticipant.identity;
+			const avatar = member?.clan_avatar || member?.user?.avatar_url || 'assets/images/mezon-logo-white.svg';
 			return (
 				<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 					<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-						<MezonAvatar
-							width={size.s_50}
-							height={size.s_50}
-							username={randomParticipant.identity}
-							avatarUrl={randomParticipant.metadata}
-						/>
+						<MezonAvatar width={size.s_50} height={size.s_50} username={voiceUsername} avatarUrl={avatar} />
 					</View>
 					<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
 						{randomParticipant.isMicrophoneEnabled ? (
@@ -277,7 +295,7 @@ const RoomView = ({
 						) : (
 							<Icons.MicrophoneSlashIcon height={size.s_14} />
 						)}
-						<Text style={styles.subTitle}>{randomParticipant.identity || 'Unknown'}</Text>
+						<Text style={styles.subTitle}>{voiceUsername || 'Unknown'}</Text>
 					</View>
 				</View>
 			);
