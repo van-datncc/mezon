@@ -490,7 +490,7 @@ export const clansActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = clansAdapter.getSelectors();
+const { selectAll, selectEntities, selectById } = clansAdapter.getSelectors();
 
 export const getClansState = (rootState: { [CLANS_FEATURE_KEY]: ClansState }): ClansState => rootState[CLANS_FEATURE_KEY];
 export const selectAllClans = createSelector(getClansState, selectAll);
@@ -528,3 +528,6 @@ export const selectBadgeCountByClanId = (clanId: string) =>
 export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
 export const selectInviteChannelId = createSelector(getClansState, (state) => state.inviteChannelId);
 export const selectInviteClanId = createSelector(getClansState, (state) => state.inviteClanId);
+export const selectWelcomeChannelByClanId = createSelector([getClansState, (state, clanId: string) => clanId], (state, clanId) => {
+	return selectById(state, clanId).welcome_channel_id || null;
+});

@@ -3,7 +3,7 @@ import { LoadingStatus, SearchFilter } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { safeJSONParse } from 'mezon-js';
-import { ApiSearchMessageDocument } from 'mezon-js/api.gen';
+import { ApiSearchMessageDocument, ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const SEARCH_MESSAGES_FEATURE_KEY = 'searchMessages';
 
@@ -32,6 +32,7 @@ export interface SearchMessageState extends EntityState<SearchMessageEntity, str
 	totalResult: number;
 	currentPage: number;
 	valueInputSearch: Record<string, string>;
+	searchedRequest: Record<string, ApiSearchMessageRequest>;
 }
 
 export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
@@ -68,7 +69,8 @@ export const initialSearchMessageState: SearchMessageState = SearchMessageAdapte
 	isSearchMessage: {},
 	totalResult: 0,
 	currentPage: 1,
-	valueInputSearch: {}
+	valueInputSearch: {},
+	searchedRequest: {}
 });
 
 export const searchMessageSlice = createSlice({
@@ -90,6 +92,10 @@ export const searchMessageSlice = createSlice({
 		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
 			const { channelId, value } = action.payload;
 			state.valueInputSearch[channelId] = value;
+		},
+		setSearchedRequest: (state, action: PayloadAction<{ channelId: string; value: ApiSearchMessageRequest }>) => {
+			const { channelId, value } = action.payload;
+			state.searchedRequest[channelId] = value;
 		}
 	},
 
@@ -158,5 +164,13 @@ export const selectIsSearchMessage = createSelector(
 	(state, channelId) => state.isSearchMessage[channelId]
 );
 
-export const selectValueInputSearchMessage = (channelId: string) =>
-	createSelector(getSearchMessageState, (state) => state.valueInputSearch[channelId]);
+export const selectValueInputSearchMessage = createSelector([getSearchMessageState, (state, channelId) => channelId], (state, channelId: string) => {
+	return state.valueInputSearch[channelId];
+});
+
+export const selectSearchedRequestByChannelId = createSelector(
+	[getSearchMessageState, (state, channelId) => channelId],
+	(state, channelId: string) => {
+		return state.searchedRequest[channelId];
+	}
+);

@@ -5,6 +5,7 @@ import {
 	selectCurrentChannel,
 	selectDirectById,
 	selectFriendStatus,
+	selectIsShowCreateThread,
 	selectMemberClanByUserId,
 	selectUserIdCurrentDm,
 	useAppSelector
@@ -53,7 +54,7 @@ function ChatWelCome({ name, username, avatarDM, mode }: ChatWelComeProp) {
 								/>
 							) : (
 								<WelComeChannel
-									name={name}
+									name={currentChannel?.channel_label}
 									classNameSubtext={classNameSubtext}
 									showName={showName}
 									channelPrivate={Boolean(selectedChannel?.channel_private)}
@@ -121,6 +122,7 @@ type WelcomeChannelThreadProps = {
 
 const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 	const { name = '', classNameSubtext, username = '', currentThread } = props;
+  const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentThread?.id as string));
 	return (
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
@@ -128,7 +130,7 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 			</div>
 			<div>
 				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
-					{currentThread?.channel_label}
+					{ isShowCreateThread ? name : currentThread?.channel_label}
 				</p>
 			</div>
 			<p className={classNameSubtext}>

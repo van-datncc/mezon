@@ -31,7 +31,6 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { userId } = useAuth();
 
 	const membersOfParent = useAppSelector((state) =>
 		threadCurrentChannel?.parrent_id ? selectAllChannelMembers(state, threadCurrentChannel?.parrent_id as string) : null
@@ -117,7 +116,6 @@ const ThreadBox = () => {
 
 	return (
 		<div className="flex flex-col flex-1 justify-end border-l dark:border-borderDivider border-bgLightTertiary">
-			<div>
 				{threadCurrentChannel && (
 					<div
 						className={`overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBarMessageViewChatThread h-heightTitleBarMessageViewChatThread' : 'max-h-heightMessageViewChatThread h-heightMessageViewChatThread'}`}
@@ -134,7 +132,6 @@ const ThreadBox = () => {
 						/>
 					</div>
 				)}
-			</div>
 			<div
 				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[46px]' : 'pb-[26px]'} px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative`}
 			>

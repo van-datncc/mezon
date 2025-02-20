@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Dimensions, Platform } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
+import HomeScreen from '../../screens/home/HomeScreen';
+import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
-import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
-import HomeScreen from '../../screens/home/HomeScreen';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
@@ -33,7 +33,6 @@ export const Authentication = memo(() => {
 					headerShown: false,
 					gestureEnabled: Platform.OS === 'ios',
 					gestureDirection: 'horizontal',
-					...TransitionPresets.ModalFadeTransition,
 					animationEnabled: false
 				}}
 			>

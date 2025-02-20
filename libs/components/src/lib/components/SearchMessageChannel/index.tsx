@@ -9,6 +9,7 @@ import {
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
+	selectSearchedRequestByChannelId,
 	selectTheme,
 	selectValueInputSearchMessage,
 	threadsActions,
@@ -27,6 +28,7 @@ import darkMentionsInputStyle from './StyleSearchMessagesDark';
 import lightMentionsInputStyle from './StyleSearchMessagesLight';
 
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
+import { useDebouncedCallback } from 'use-debounce';
 import { UserMentionList } from '../UserMentionList';
 import SelectItemUser from './SelectItemUser';
 import { hasKeySearch, searchFieldName } from './constant';
@@ -64,8 +66,9 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? '')),
 		[mode, currentChannel, currentDmGroupId]
 	);
+	const searchedRequest = useSelector((state) => selectSearchedRequestByChannelId(state, channelId));
 
-	const valueInputSearch = useSelector(selectValueInputSearchMessage(channelId));
+	const valueInputSearch = useSelector((state) => selectValueInputSearchMessage(state, channelId));
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, channelId));
 
 	const userListData = UserMentionList({
@@ -86,7 +89,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
 	const [valueDisplay, setValueDisplay] = useState<string>('');
-	const [search, setSearch] = useState<any | undefined | ApiSearchMessageRequest>();
+	const [search, setSearch] = useState<any | undefined | ApiSearchMessageRequest>(searchedRequest || undefined);
 	const [isShowMemberListBefore, setIsShowMemberListBefore] = useState<boolean>(false);
 	const [isShowMemberListDMBefore, setIsShowMemberListDMBefore] = useState<boolean>(false);
 	const [isUseProfileDMBefore, setIsUseProfileDMBefore] = useState<boolean>(false);
@@ -149,6 +152,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					field_value: convertMention?.[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention?.[1]
 				});
 			}
+			const searchedRequest: ApiSearchMessageRequest = { ...search, filters: filter };
+			dispatch(searchMessagesActions.setSearchedRequest({ channelId: channelId, value: searchedRequest }));
 			setSearch({ ...search, filters: filter });
 		},
 		[channelId, currentClanId, search]
@@ -224,7 +229,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		[channelId, valueInputSearch]
 	);
 
-	useEffect(() => {
+	const debouncedFetchSearchMessages = useDebouncedCallback(async () => {
 		if (search) {
 			const requestFilter = [
 				...(search.filters || []),
@@ -234,7 +239,11 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const requestBody = { ...search, filters: requestFilter, from: currentPage, size: SIZE_PAGE_SEARCH };
 			fetchSearchMessages(requestBody);
 		}
-	}, [currentPage]);
+	}, 150);
+
+	useEffect(() => {
+		debouncedFetchSearchMessages();
+	}, [channelId, currentClanId, currentPage, debouncedFetchSearchMessages, fetchSearchMessages, search]);
 
 	useEffect(() => {
 		document.addEventListener('click', handleOutsideClick);

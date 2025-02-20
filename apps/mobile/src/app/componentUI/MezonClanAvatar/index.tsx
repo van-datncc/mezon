@@ -16,14 +16,7 @@ interface IMezonClanAvatarProps {
 	lightMode?: boolean;
 }
 
-export default function MezonClanAvatar({
-	image,
-	alt = 'anonymous',
-	defaultColor,
-	textStyle,
-	noDefaultText = false,
-	lightMode
-}: IMezonClanAvatarProps) {
+export default function MezonClanAvatar({ image, alt = '', defaultColor, textStyle, noDefaultText = false, lightMode }: IMezonClanAvatarProps) {
 	const { themeValue } = useTheme();
 	const [isLoadFailProxy, setIsLoadFailProxy] = React.useState<boolean>(false);
 	const isTabletLandscape = useTabletLandscape();
@@ -59,7 +52,10 @@ export default function MezonClanAvatar({
 	return (
 		<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>
 			{!noDefaultText ? (
-				<FastImage source={Images.ANONYMOUS_AVATAR} style={{ width: '100%', height: '100%', borderRadius: size.s_100 }} />
+				<FastImage
+					source={alt === 'Anonymous' ? Images.ANONYMOUS_MESSAGE_AVATAR : Images.ANONYMOUS_AVATAR}
+					style={{ width: '100%', height: '100%', borderRadius: size.s_100 }}
+				/>
 			) : null}
 		</View>
 	);

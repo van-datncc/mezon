@@ -28,7 +28,7 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
         url : '${sanitizeUrl(imageData.url)}',
           realUrl : '${sanitizeUrl(imageData.realUrl)}'
       };
-      ${App.imageScriptWindowLoaded === false && scriptThumnails(imageData.channelImagesData.images, activeIndex)}
+      ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
   `);
 
 	imageWindow.webContents.executeJavaScript(`
