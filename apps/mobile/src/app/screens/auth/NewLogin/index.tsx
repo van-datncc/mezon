@@ -1,28 +1,14 @@
 import { useAuth } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Buffer as BufferMobile } from 'buffer';
-import CryptoJS from 'crypto-js';
 import { useMemo, useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import WebView from 'react-native-webview';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
+import { generateCodeChallenge, generateCodeVerifier } from '../../../utils/helpers';
 import { style } from './styles';
-
-export const generateCodeVerifier = () => {
-	const array = new Uint8Array(64);
-	for (let i = 0; i < 64; i++) {
-		array[i] = Math.floor(Math.random() * 256);
-	}
-	return BufferMobile.from(array).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-};
-
-export const generateCodeChallenge = (verifier) => {
-	const sha256Hash = CryptoJS.SHA256(verifier);
-	return CryptoJS.enc.Base64.stringify(sha256Hash).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-};
 
 const NewLoginScreen = () => {
 	const { themeValue } = useTheme();
@@ -56,7 +42,7 @@ const NewLoginScreen = () => {
 	};
 
 	const handleNavigationStateChange = (newNavState) => {
-		if (newNavState.url.includes('code') && newNavState?.url?.includes('state')) {
+		if (newNavState?.url?.includes('code') && newNavState?.url?.includes('state')) {
 			setModalVisible(false);
 			setAuthUri(null);
 			const code = new URLSearchParams(newNavState?.url?.split('?')[1]).get('code');
