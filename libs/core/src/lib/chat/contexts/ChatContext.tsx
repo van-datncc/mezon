@@ -8,6 +8,7 @@ import {
 	attachmentActions,
 	AttachmentEntity,
 	audioCallActions,
+	channelAppSlice,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -104,6 +105,7 @@ import {
 	ClanUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
+	JoinChannelAppData,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
@@ -1451,6 +1453,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onJoinChannelAppEvent = useCallback(
+		async (joinChannelAppData: JoinChannelAppData) => {
+			if (!joinChannelAppData) return;
+			dispatch(channelAppSlice.actions.setUserInfo({ dataUpdate: joinChannelAppData }));
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1544,6 +1554,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
 			socket.onclanupdated = onclanupdated;
+
+			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1589,7 +1601,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			ontokensent,
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
-			onclanupdated
+			onclanupdated,
+			onJoinChannelAppEvent
 		]
 	);
 
