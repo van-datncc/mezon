@@ -31,7 +31,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center'
 		},
 		textMenuItem: {
-			fontSize: 16,
+			fontSize: size.s_16,
 			color: colors.white,
 			fontWeight: '500'
 		},
@@ -95,7 +95,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			width: '100%',
-			height: 250,
+			height: size.s_150 + size.s_100,
 			backgroundColor: colors.border,
 			gap: size.s_10,
 			borderRadius: size.s_10

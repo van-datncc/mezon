@@ -11,7 +11,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { createImgproxyUrl } from '@mezon/utils';
+import { ChannelStatusEnum, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,12 +20,14 @@ import { AvatarImage } from '../AvatarImage/AvatarImage';
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
+	readonly isPrivate?: Readonly<number>;
+
 	username?: string;
 
 	mode: number;
 };
 
-function ChatWelCome({ name, username, avatarDM, mode }: ChatWelComeProp) {
+function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeProp) {
 	const { directId } = useAppParams();
 	const directChannel = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -51,6 +53,7 @@ function ChatWelCome({ name, username, avatarDM, mode }: ChatWelComeProp) {
 									name={name}
 									classNameSubtext={classNameSubtext}
 									username={user?.user?.username}
+									isPrivate={isPrivate}
 								/>
 							) : (
 								<WelComeChannel
@@ -118,19 +121,20 @@ type WelcomeChannelThreadProps = {
 	classNameSubtext: string;
 	username?: string;
 	currentThread: ChannelsEntity | null;
+	isPrivate?: number;
 };
 
 const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
-	const { name = '', classNameSubtext, username = '', currentThread } = props;
-  const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentThread?.id as string));
+	const { name = '', classNameSubtext, username = '', currentThread , isPrivate} = props;
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentThread?.id as string));
 	return (
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-				<Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
+				{isPrivate === ChannelStatusEnum.isPrivate ? <Icons.ThreadIconLocker className='text-white w-10 h-10'/> : <Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />}
 			</div>
 			<div>
 				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
-					{ isShowCreateThread ? name : currentThread?.channel_label}
+					{isShowCreateThread ? name : currentThread?.channel_label}
 				</p>
 			</div>
 			<p className={classNameSubtext}>
