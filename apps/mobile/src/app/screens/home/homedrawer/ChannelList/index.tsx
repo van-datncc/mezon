@@ -1,11 +1,12 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsShowEmptyCategory, selectListChannelRenderByClanId } from '@mezon/store';
 import { channelsActions, selectCurrentClan, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -112,16 +113,13 @@ const ChannelList = () => {
 		<>
 			<View style={styles.mainList}>
 				<ChannelListScroll itemRefs={itemRefs} flashListRef={flashListRef} />
-				<FlatList
+				<FlashList
 					ref={flashListRef}
 					data={data}
 					renderItem={renderItem}
 					keyExtractor={keyExtractor}
 					removeClippedSubviews={true}
-					maxToRenderPerBatch={10}
-					updateCellsBatchingPeriod={50}
-					initialNumToRender={20}
-					windowSize={5}
+					estimatedItemSize={size.s_40}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 					stickyHeaderIndices={[1]}
 				/>

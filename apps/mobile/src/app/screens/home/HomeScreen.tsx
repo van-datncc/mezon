@@ -1,7 +1,6 @@
-import { ActionEmitEvent, save, STORAGE_IS_LAST_ACTIVE_TAB_DM } from '@mezon/mobile-components';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { DeviceEventEmitter, View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeDefault from './homedrawer/HomeDefault';
 import ServerAndChannelList from './homedrawer/ServerAndChannelList';
@@ -10,23 +9,6 @@ import { styles } from './styles';
 const HomeScreen = React.memo(() => {
 	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation<any>();
-	const [isDismissUI, setIsDismissUI] = useState<boolean>(false);
-
-	useEffect(() => {
-		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
-		const event = DeviceEventEmitter.addListener(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, (isDismiss: true) => {
-			setIsDismissUI(isDismiss);
-		});
-
-		return () => {
-			event.remove();
-		};
-	}, []);
-
-	if (isDismissUI) {
-		return null;
-	}
-
 	if (isTabletLandscape) {
 		return (
 			<View style={styles.container}>
