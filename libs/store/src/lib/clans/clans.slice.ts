@@ -529,5 +529,5 @@ export const selectInvitePeopleStatus = createSelector(getClansState, (state) =>
 export const selectInviteChannelId = createSelector(getClansState, (state) => state.inviteChannelId);
 export const selectInviteClanId = createSelector(getClansState, (state) => state.inviteClanId);
 export const selectWelcomeChannelByClanId = createSelector([getClansState, (state, clanId: string) => clanId], (state, clanId) => {
-	return selectById(state, clanId).welcome_channel_id || null;
+	return selectById(state, clanId)?.welcome_channel_id || null;
 });
