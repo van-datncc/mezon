@@ -78,7 +78,7 @@ export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconFriends(_props: React.HTMLAttributes<SVGElement>) {
+export function IconFriends(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g clipPath="url(#clip0_2719_1783)">
@@ -464,7 +464,7 @@ export function WifiIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function LookBlankIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="20" className="dark:text-[#AEAEAE] dark:hover:text-white text-colorTextLightMode hover:text-black">
 			<g clipPath="url(#__lottie_element_5917)">
@@ -518,7 +518,7 @@ export function LookBlankIcon(_props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function PhoneIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function PhoneIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			viewBox="0 0 24 24"
@@ -846,7 +846,7 @@ export const ShareIcon: React.FC<IconProps> = ({ defaultFill = '#FFFFFF', defaul
 	);
 };
 
-export function RocketIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function RocketIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
 			<defs>
@@ -938,7 +938,7 @@ export function RocketIcon(_props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function BellIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function BellIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
 			<defs>
@@ -1503,7 +1503,7 @@ export function Search(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function ArrowToThread(_props: React.HTMLAttributes<SVGElement>) {
+export function ArrowToThread(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg className="w-4 h-4 mt-0.5" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g id="Live area">
@@ -1517,7 +1517,7 @@ export function ArrowToThread(_props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function ThreadNotClick(_props: React.HTMLAttributes<SVGElement>) {
+export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg className="w-6 h-6 mt-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g id="live area" clipPath="url(#clip0_2190_1641)">
@@ -2789,7 +2789,7 @@ export function CreateCategoryIcon(_props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function CheckIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function CheckIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check2" viewBox="0 0 16 16">
 			<path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" />
@@ -2797,7 +2797,7 @@ export function CheckIcon(_props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function SpinArrowIcon(_props: React.HTMLAttributes<SVGAElement>) {
+export function SpinArrowIcon(props: React.HTMLAttributes<SVGAElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
@@ -2901,7 +2901,7 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AvatarUser(_props: React.HTMLAttributes<SVGElement>) {
+export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -6443,7 +6443,7 @@ export function MetaMaskIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function InfoIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function InfoIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			className="mx-auto  text-orange-400 w-20 h-20 dark:text-orange-400"
@@ -6597,7 +6597,7 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function History(_props: React.HTMLAttributes<SVGAElement>) {
+export function History(props: React.HTMLAttributes<SVGAElement>) {
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
