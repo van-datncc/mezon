@@ -2767,7 +2767,7 @@ export function UpDownIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function CreateCategoryIcon(_props: React.HTMLAttributes<SVGElement>) {
+export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			aria-hidden="true"
