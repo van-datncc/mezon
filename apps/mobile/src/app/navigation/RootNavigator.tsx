@@ -2,17 +2,14 @@
 import { MezonStoreProvider, initStore } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
-import React, { memo, useEffect, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
-import { Platform, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
-import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
-import VersionInfo from 'react-native-version-info';
-import MezonUpdateVersionModal from '../componentUI/MezonUpdateVersionModal';
 import NetInfoComp from '../components/NetworkInfo';
 import { WebRTCStreamProvider } from '../components/StreamContext/StreamContext';
 import { toastConfig } from '../configs/toastConfig';

@@ -11,8 +11,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		reactionSpace: {
-			marginBottom: size.s_6,
-			height: size.s_30
+			marginBottom: size.s_6
 		},
 		myReaction: {
 			borderWidth: 1,
@@ -28,7 +27,11 @@ export const style = (colors: Attributes) =>
 			gap: size.s_2,
 			padding: size.s_2,
 			borderRadius: 5,
-			height: '100%'
+			height: size.s_30
+		},
+		imageReactionTemp: {
+			height: size.s_30,
+			width: size.s_20 + size.s_2
 		},
 		reactCount: {
 			color: colors.text,
