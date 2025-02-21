@@ -59,13 +59,21 @@ export function ControlBar({
 	});
 
 	const microphoneOnChange = useCallback(
-		(enabled: boolean, isUserInitiated: boolean) => isUserInitiated ?? dispatch(voiceActions.setShowMicrophone(enabled)),
-		[dispatch]
+		(enabled: boolean) => {
+			if (enabled !== showMicrophone) {
+				dispatch(voiceActions.setShowMicrophone(enabled));
+			}
+		},
+		[dispatch, showMicrophone]
 	);
 
 	const cameraOnChange = useCallback(
-		(enabled: boolean, isUserInitiated: boolean) => isUserInitiated ?? dispatch(voiceActions.setShowCamera(enabled)),
-		[dispatch]
+		(enabled: boolean) => {
+			if (enabled !== showCamera) {
+				dispatch(voiceActions.setShowCamera(enabled));
+			}
+		},
+		[dispatch, showCamera]
 	);
 
 	return (
@@ -82,6 +90,7 @@ export function ControlBar({
 				{visibleControls.microphone && (
 					<div className="relative">
 						<Tooltip
+							key={+showMicrophone}
 							placement="top"
 							overlay={
 								<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">
@@ -90,8 +99,10 @@ export function ControlBar({
 							}
 							overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
 							getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+							destroyTooltipOnHide
 						>
 							<TrackToggle
+								initialState={showMicrophone}
 								className="w-14 h-14 rounded-full flex justify-center items-center"
 								source={Track.Source.Microphone}
 								onChange={microphoneOnChange}
@@ -107,14 +118,17 @@ export function ControlBar({
 				{visibleControls.camera && (
 					<div className="relative">
 						<Tooltip
+							key={+showCamera}
 							placement="top"
 							overlay={
 								<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">{showCamera ? 'Turn Off Camera' : 'Turn On Camera'}</span>
 							}
 							overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
 							getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+							destroyTooltipOnHide
 						>
 							<TrackToggle
+								initialState={showCamera}
 								className="w-14 h-14 rounded-full flex justify-center items-center"
 								source={Track.Source.Camera}
 								onChange={cameraOnChange}
@@ -129,14 +143,17 @@ export function ControlBar({
 				)}
 				{visibleControls.screenShare && browserSupportsScreenSharing && (
 					<Tooltip
+						key={+showScreen}
 						placement="top"
 						overlay={
 							<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">{showScreen ? 'Stop screen share' : 'Share Your Screen'}</span>
 						}
 						overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
 						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+						destroyTooltipOnHide
 					>
 						<TrackToggle
+							initialState={showScreen}
 							className="w-14 h-14 rounded-full flex justify-center items-center"
 							source={Track.Source.ScreenShare}
 							captureOptions={{ audio: true, selfBrowserSurface: 'include' }}

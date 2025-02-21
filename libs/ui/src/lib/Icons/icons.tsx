@@ -78,7 +78,7 @@ export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconFriends(props: React.HTMLAttributes<SVGElement>) {
+export function IconFriends(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g clipPath="url(#clip0_2719_1783)">
@@ -464,7 +464,7 @@ export function WifiIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
+export function LookBlankIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="20" className="dark:text-[#AEAEAE] dark:hover:text-white text-colorTextLightMode hover:text-black">
 			<g clipPath="url(#__lottie_element_5917)">
@@ -518,7 +518,7 @@ export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function PhoneIcon(props: React.HTMLAttributes<SVGElement>) {
+export function PhoneIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			viewBox="0 0 24 24"
@@ -846,7 +846,7 @@ export const ShareIcon: React.FC<IconProps> = ({ defaultFill = '#FFFFFF', defaul
 	);
 };
 
-export function RocketIcon(props: React.HTMLAttributes<SVGElement>) {
+export function RocketIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
 			<defs>
@@ -938,7 +938,7 @@ export function RocketIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function BellIcon(props: React.HTMLAttributes<SVGElement>) {
+export function BellIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg viewBox="0 0 24 24" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
 			<defs>
@@ -1503,7 +1503,7 @@ export function Search(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function ArrowToThread(props: React.HTMLAttributes<SVGElement>) {
+export function ArrowToThread(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg className="w-4 h-4 mt-0.5" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g id="Live area">
@@ -1517,7 +1517,7 @@ export function ArrowToThread(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
+export function ThreadNotClick(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg className="w-6 h-6 mt-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g id="live area" clipPath="url(#clip0_2190_1641)">
@@ -2767,7 +2767,7 @@ export function UpDownIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
+export function CreateCategoryIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -2789,7 +2789,7 @@ export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function CheckIcon(props: React.HTMLAttributes<SVGElement>) {
+export function CheckIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check2" viewBox="0 0 16 16">
 			<path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" />
@@ -2797,7 +2797,7 @@ export function CheckIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function SpinArrowIcon(props: React.HTMLAttributes<SVGAElement>) {
+export function SpinArrowIcon(_props: React.HTMLAttributes<SVGAElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
@@ -2901,7 +2901,7 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
+export function AvatarUser(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -6443,7 +6443,7 @@ export function MetaMaskIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function InfoIcon(props: React.HTMLAttributes<SVGElement>) {
+export function InfoIcon(_props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
 			className="mx-auto  text-orange-400 w-20 h-20 dark:text-orange-400"
@@ -6597,7 +6597,7 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function History(props: React.HTMLAttributes<SVGAElement>) {
+export function History(_props: React.HTMLAttributes<SVGAElement>) {
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -6884,73 +6884,106 @@ export function VoiceSoundControlIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const VoiceMicIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
-		<g transform="scale(1.3)">
-			<path
-				fillRule="evenodd"
-				d="M2.975 8.002a.5.5 0 0 1 .547.449 4.5 4.5 0 0 0 8.956 0 .5.5 0 1 1 .995.098A5.502 5.502 0 0 1 8.5 13.478V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .448-.547z"
-				clipRule="evenodd"
-			/>
-			<path d="M5 3a3 3 0 1 1 6 0v5a3 3 0 0 1-6 0z" />
-		</g>
-	</svg>
-);
+export function VoiceMicIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
+			<g transform="scale(1.3)">
+				<path
+					fillRule="evenodd"
+					d="M2.975 8.002a.5.5 0 0 1 .547.449 4.5 4.5 0 0 0 8.956 0 .5.5 0 1 1 .995.098A5.502 5.502 0 0 1 8.5 13.478V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .448-.547z"
+					clipRule="evenodd"
+				/>
+				<path d="M5 3a3 3 0 1 1 6 0v5a3 3 0 0 1-6 0z" />
+			</g>
+		</svg>
+	);
+}
 
-export const VoiceMicDisabledIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
-		<g transform="scale(1.3)">
-			<path d="M12.227 11.52a5.477 5.477 0 0 0 1.246-2.97.5.5 0 0 0-.995-.1 4.478 4.478 0 0 1-.962 2.359l-1.07-1.07C10.794 9.247 11 8.647 11 8V3a3 3 0 0 0-6 0v1.293L1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708zM8 12.5c.683 0 1.33-.152 1.911-.425l.743.743c-.649.359-1.378.59-2.154.66V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .995-.098A4.5 4.5 0 0 0 8 12.5z" />
-			<path d="M8.743 10.907 5 7.164V8a3 3 0 0 0 3.743 2.907z" />
-		</g>
-	</svg>
-);
+export function VoiceMicDisabledIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" {...props}>
+			<g transform="scale(1.3)">
+				<path d="M12.227 11.52a5.477 5.477 0 0 0 1.246-2.97.5.5 0 0 0-.995-.1 4.478 4.478 0 0 1-.962 2.359l-1.07-1.07C10.794 9.247 11 8.647 11 8V3a3 3 0 0 0-6 0v1.293L1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708zM8 12.5c.683 0 1.33-.152 1.911-.425l.743.743c-.649.359-1.378.59-2.154.66V15h2a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h2v-1.522a5.502 5.502 0 0 1-4.973-4.929.5.5 0 0 1 .995-.098A4.5 4.5 0 0 0 8 12.5z" />
+				<path d="M8.743 10.907 5 7.164V8a3 3 0 0 0 3.743 2.907z" />
+			</g>
+		</svg>
+	);
+}
 
-export const VoiceCameraIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
-		<g transform="scale(1.5)">
-			<path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h8A1.5 1.5 0 0 1 11 4.5v7A1.5 1.5 0 0 1 9.5 13h-8A1.5 1.5 0 0 1 0 11.5zM15.2 3.6l-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
-		</g>
-	</svg>
-);
+export function VoiceCameraIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
+			<g transform="scale(1.5)">
+				<path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h8A1.5 1.5 0 0 1 11 4.5v7A1.5 1.5 0 0 1 9.5 13h-8A1.5 1.5 0 0 1 0 11.5zM15.2 3.6l-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
+			</g>
+		</svg>
+	);
+}
 
-export const VoiceCameraDisabledIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
-		<g transform="scale(1.5)">
-			<path d="M1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708L11 10.293V4.5A1.5 1.5 0 0 0 9.5 3H3.707zM0 4.5a1.5 1.5 0 0 1 .943-1.393l9.532 9.533c-.262.224-.603.36-.975.36h-8A1.5 1.5 0 0 1 0 11.5z" />
-			<path d="m15.2 3.6-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
-		</g>
-	</svg>
-);
+export function VoiceCameraDisabledIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" {...props}>
+			<g transform="scale(1.5)">
+				<path d="M1.354.646a.5.5 0 1 0-.708.708l14 14a.5.5 0 0 0 .708-.708L11 10.293V4.5A1.5 1.5 0 0 0 9.5 3H3.707zM0 4.5a1.5 1.5 0 0 1 .943-1.393l9.532 9.533c-.262.224-.603.36-.975.36h-8A1.5 1.5 0 0 1 0 11.5z" />
+				<path d="m15.2 3.6-2.8 2.1a1 1 0 0 0-.4.8v3a1 1 0 0 0 .4.8l2.8 2.1a.5.5 0 0 0 .8-.4V4a.5.5 0 0 0-.8-.4z" />
+			</g>
+		</svg>
+	);
+}
 
-export const VoiceScreenShareStopIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
-		<g fill="currentColor" transform="scale(1.2)">
-			<path d="M7.28 4.22a.75.75 0 0 0-1.06 1.06L8.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L10 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L11.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L10 6.94z" />
-			<path
-				fillRule="evenodd"
-				d="M2.75 0A2.75 2.75 0 0 0 0 2.75v10.5A2.75 2.75 0 0 0 2.75 16h14.5A2.75 2.75 0 0 0 20 13.25V2.75A2.75 2.75 0 0 0 17.25 0zM1.5 2.75c0-.69.56-1.25 1.25-1.25h14.5c.69 0 1.25.56 1.25 1.25v10.5c0 .69-.56 1.25-1.25 1.25H2.75c-.69 0-1.25-.56-1.25-1.25z"
-				clipRule="evenodd"
-			/>
-		</g>
-	</svg>
-);
+export function VoiceScreenShareStopIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
+			<g fill="currentColor" transform="scale(1.2)">
+				<path d="M7.28 4.22a.75.75 0 0 0-1.06 1.06L8.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L10 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L11.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L10 6.94z" />
+				<path
+					fillRule="evenodd"
+					d="M2.75 0A2.75 2.75 0 0 0 0 2.75v10.5A2.75 2.75 0 0 0 2.75 16h14.5A2.75 2.75 0 0 0 20 13.25V2.75A2.75 2.75 0 0 0 17.25 0zM1.5 2.75c0-.69.56-1.25 1.25-1.25h14.5c.69 0 1.25.56 1.25 1.25v10.5c0 .69-.56 1.25-1.25 1.25H2.75c-.69 0-1.25-.56-1.25-1.25z"
+					clipRule="evenodd"
+				/>
+			</g>
+		</svg>
+	);
+}
 
-export const VoiceScreenShareIcon = (props: React.HTMLAttributes<SVGElement>) => (
-	<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
-		<g transform="scale(1.2)">
+export function VoiceScreenShareIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20" {...props}>
+			<g transform="scale(1.2)">
+				<path
+					fill="currentColor"
+					fillRule="evenodd"
+					d="M0 2.75A2.75 2.75 0 0 1 2.75 0h14.5A2.75 2.75 0 0 1 20 2.75v10.5A2.75 2.75 0 0 1 17.25 16H2.75A2.75 2.75 0 0 1 0 13.25V2.75ZM2.75 1.5c-.69 0-1.25.56-1.25 1.25v10.5c0 .69.56 1.25 1.25 1.25h14.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25H2.75Z"
+					clipRule="evenodd"
+				/>
+				<path
+					fill="currentColor"
+					fillRule="evenodd"
+					d="M9.47 4.22a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1-1.06 1.06l-.97-.97v4.69a.75.75 0 0 1-1.5 0V6.56l-.97.97a.75.75 0 0 1-1.06-1.06l2.25-2.25Z"
+					clipRule="evenodd"
+				/>
+			</g>
+		</svg>
+	);
+}
+
+export function VoiceArowUpIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
 				fill="currentColor"
-				fillRule="evenodd"
-				d="M0 2.75A2.75 2.75 0 0 1 2.75 0h14.5A2.75 2.75 0 0 1 20 2.75v10.5A2.75 2.75 0 0 1 17.25 16H2.75A2.75 2.75 0 0 1 0 13.25V2.75ZM2.75 1.5c-.69 0-1.25.56-1.25 1.25v10.5c0 .69.56 1.25 1.25 1.25h14.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25H2.75Z"
-				clipRule="evenodd"
-			/>
+				d="M18.7 14.7a1 1 0 0 1-1.4 0L12 9.41l-5.3 5.3a1 1 0 1 1-1.4-1.42l6-6a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.42Z"
+			></path>
+		</svg>
+	);
+}
+export function VoiceArowDownIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
 				fill="currentColor"
-				fillRule="evenodd"
-				d="M9.47 4.22a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1-1.06 1.06l-.97-.97v4.69a.75.75 0 0 1-1.5 0V6.56l-.97.97a.75.75 0 0 1-1.06-1.06l2.25-2.25Z"
-				clipRule="evenodd"
-			/>
-		</g>
-	</svg>
-);
+				d="M5.3 9.3a1 1 0 0 1 1.4 0l5.3 5.29 5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42Z"
+			></path>
+		</svg>
+	);
+}

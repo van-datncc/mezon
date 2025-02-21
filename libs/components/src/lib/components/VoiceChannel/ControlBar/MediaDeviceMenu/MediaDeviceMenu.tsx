@@ -1,7 +1,8 @@
-import { computeMenuPosition, log, wasClickOutside } from '@livekit/components-core';
+import { computeMenuPosition } from '@livekit/components-core';
 import { MediaDeviceSelect } from '@livekit/components-react';
+import { Icons } from '@mezon/ui';
 import type { LocalAudioTrack, LocalVideoTrack } from 'livekit-client';
-import { ButtonHTMLAttributes, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ButtonHTMLAttributes, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export interface MediaDeviceMenuProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	kind?: MediaDeviceKind;
@@ -25,7 +26,6 @@ export function MediaDeviceMenu({
 	const [needPermissions, setNeedPermissions] = useState(requestPermissions);
 
 	const handleActiveDeviceChange = (kind: MediaDeviceKind, deviceId: string) => {
-		log.debug('handle device change');
 		setIsOpen(false);
 		onActiveDeviceChange?.(kind, deviceId);
 	};
@@ -50,44 +50,42 @@ export function MediaDeviceMenu({
 		setUpdateRequired(false);
 	}, [button, tooltip, devices, updateRequired]);
 
-	const handleClickOutside = useCallback(
-		(event: MouseEvent) => {
-			if (!tooltip.current) {
-				return;
-			}
-			if (event.target === button.current) {
-				return;
-			}
-			if (isOpen && wasClickOutside(tooltip.current, event)) {
-				setIsOpen(false);
-			}
-		},
-		[isOpen, tooltip, button]
-	);
+	const handleClickOutside = (event: MouseEvent) => {
+		if (!tooltip.current || !button.current) return;
+		if (!button.current.contains(event.target as Node) && !tooltip.current.contains(event.target as Node)) {
+			setIsOpen(false);
+		}
+	};
 
 	useEffect(() => {
-		document.addEventListener<'click'>('click', handleClickOutside);
-		window.addEventListener<'resize'>('resize', () => setUpdateRequired(true));
+		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
-			document.removeEventListener<'click'>('click', handleClickOutside);
-			window.removeEventListener<'resize'>('resize', () => setUpdateRequired(true));
+			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [handleClickOutside, setUpdateRequired]);
+	}, []);
 
 	return (
 		<>
 			<button
-				className="lk-button lk-button-menu !w-5 !h-5 !p-2 !absolute !bottom-0 !left-[36px] !rounded-full !border-2 !border-solid !border-[#111]"
+				className="lk-button !w-5 !h-5 !p-2 !absolute !bottom-0 !left-[36px] !rounded-full !border-2 !border-solid !border-[#111]"
 				aria-pressed={isOpen}
 				{...props}
-				onClick={() => setIsOpen(!isOpen)}
 				ref={button}
+				onClick={(e) => {
+					e.stopPropagation();
+					setIsOpen(!isOpen);
+				}}
 			>
+				{isOpen ? (
+					<Icons.VoiceArowUpIcon className="w-4 h-4 bg-white text-black rounded-full" />
+				) : (
+					<Icons.VoiceArowDownIcon className="w-4 h-4" />
+				)}
 				{props.children}
 			</button>
 			{!props.disabled && (
 				<div className="lk-device-menu" ref={tooltip} style={{ visibility: isOpen ? 'visible' : 'hidden' }}>
-					{kind ? (
+					{kind && (
 						<MediaDeviceSelect
 							initialSelection={initialSelection}
 							onActiveDeviceChange={(deviceId) => handleActiveDeviceChange(kind, deviceId)}
@@ -96,25 +94,6 @@ export function MediaDeviceMenu({
 							track={tracks?.[kind]}
 							requestPermissions={needPermissions}
 						/>
-					) : (
-						<>
-							<div className="lk-device-menu-heading">Audio inputs</div>
-							<MediaDeviceSelect
-								kind="audioinput"
-								onActiveDeviceChange={(deviceId) => handleActiveDeviceChange('audioinput', deviceId)}
-								onDeviceListChange={setDevices}
-								track={tracks?.audioinput}
-								requestPermissions={needPermissions}
-							/>
-							<div className="lk-device-menu-heading">Video inputs</div>
-							<MediaDeviceSelect
-								kind="videoinput"
-								onActiveDeviceChange={(deviceId) => handleActiveDeviceChange('videoinput', deviceId)}
-								onDeviceListChange={setDevices}
-								track={tracks?.videoinput}
-								requestPermissions={needPermissions}
-							/>
-						</>
 					)}
 				</div>
 			)}
