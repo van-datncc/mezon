@@ -1,9 +1,10 @@
 import { useChatSending, useCurrentInbox, useDeleteMessage, useEditMessage, useEscapeKeyClose } from '@mezon/core';
-import { selectOpenEditMessageState } from '@mezon/store';
+import { selectCurrentTopicId, selectOpenEditMessageState, topicsActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
 
 type ModalDeleteMessProps = {
@@ -20,9 +21,11 @@ type ModalDeleteMessProps = {
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { mess, closeModal, mode, isRemoveAttachmentNoContent, attachmentData, isRemoveAttachmentAction = false, isTopic } = props;
+	const dispatch = useDispatch();
 	const current = useCurrentInbox() || undefined;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const isEditing = useSelector(selectOpenEditMessageState);
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isInitialRender, setIsInitialRender] = useState(isEditing);
 	const hasAttachment = !!mess?.attachments?.length;
 	const { deleteSendMessage } = useDeleteMessage({
@@ -31,9 +34,9 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		hasAttachment: hasAttachment,
 		isTopic: isTopic
 	});
-
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
 	const { editSendMessage } = useChatSending({ channelOrDirect: current, mode });
+	const [isLoading, setIsLoading] = useState(false);
 
 	const messagePreviewWithAttachmentRemove = {
 		...mess,
@@ -43,27 +46,41 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 	const removeLastFile = mess.content.t === '' && mess.attachments?.length === 1;
 
-	const handleAction = useCallback(() => {
+	const handleDeleteMessage = async () => {
+		if (!mess?.content?.tp) {
+			await deleteSendMessage(mess.id);
+			setIsLoading(false);
+			return;
+		}
+
+		if (mess.content.tp === currentTopicId) {
+			await deleteSendMessage(mess.id);
+			setIsLoading(false);
+			dispatch(topicsActions.setCurrentTopicId(''));
+			dispatch(topicsActions.setIsShowCreateTopic(false));
+		}
+	};
+
+	const handleAction = useCallback(async () => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
-			editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
-		} else if (removeLastFile) {
-			deleteSendMessage(mess.id);
+			await editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
 		} else {
-			deleteSendMessage(mess.id);
+			setIsLoading(true);
+			await handleDeleteMessage();
 		}
 		handleCancelEdit();
 		closeModal();
 	}, [isRemoveAttachmentNoContent, attachmentData, mess, removeLastFile, editSendMessage, deleteSendMessage, handleCancelEdit, closeModal]);
 
-	const handleEnter = (e: KeyboardEvent) => {
+	const handleEnter = async (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.stopPropagation();
 			if (isInitialRender) {
 				setIsInitialRender(false);
 			} else {
-				handleAction();
+				await handleAction();
 			}
 		}
 	};
@@ -105,11 +122,20 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 						/>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
-						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
+						<button
+							onClick={closeModal}
+							className="px-4 py-2 hover:underline rounded disabled:cursor-not-allowed disabled:hover:no-underline disabled:opacity-85"
+							disabled={isLoading}
+						>
 							Cancel
 						</button>
-						<button onClick={handleAction} className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white">
-							{isRemoveAttachmentNoContent ? 'Remove' : 'Delete'}
+						<button
+							onClick={handleAction}
+							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white disabled:cursor-not-allowed disabled:opacity-85 disabled:hover:opacity-85 flex"
+							disabled={isLoading}
+						>
+							{isRemoveAttachmentNoContent ? 'Remove ' : 'Delete '}
+							{isLoading && <Icons.IconLoadingTyping />}
 						</button>
 					</div>
 				</div>
