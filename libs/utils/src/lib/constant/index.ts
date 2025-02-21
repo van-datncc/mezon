@@ -80,6 +80,7 @@ export const EMOJI_GIVE_COFFEE = {
 export const HEIGHT_PANEL_PROFILE = 480;
 export const WIDTH_PANEL_PROFILE = 300;
 export const HEIGHT_PANEL_PROFILE_DM = 314;
+export const ACTIVITY_PANEL_HEIGHT = 73;
 export const WIDTH_CLAN_SIDE_BAR = 72;
 export const WIDTH_CHANNEL_LIST_BOX = 272;
 
