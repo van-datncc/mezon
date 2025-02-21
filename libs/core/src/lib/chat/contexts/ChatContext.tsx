@@ -1456,7 +1456,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onJoinChannelAppEvent = useCallback(
 		async (joinChannelAppData: JoinChannelAppData) => {
 			if (!joinChannelAppData) return;
-			dispatch(channelAppSlice.actions.setUserInfo({ dataUpdate: joinChannelAppData }));
+			dispatch(channelAppSlice.actions.setJoinChannelAppData({ dataUpdate: joinChannelAppData }));
 		},
 		[dispatch]
 	);
@@ -1702,6 +1702,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oneventwebhook = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onJoinChannelAppEvent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1747,7 +1749,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onroleevent,
 		onuserstatusevent,
 		oneventwebhook,
-		ontokensent
+		ontokensent,
+		onJoinChannelAppEvent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

@@ -31,7 +31,6 @@ import {
 	selectAppChannelById,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
-	selectChannelAppUserInfo,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -43,6 +42,7 @@ import {
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
+	selectJoinChannelAppData,
 	selectLastMessageByChannelId,
 	selectListChannelRenderByClanId,
 	selectMissionDone,
@@ -274,7 +274,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
 	const appearanceTheme = useSelector(selectTheme);
-	const channelAppUserInfo = useSelector(selectChannelAppUserInfo);
+	const channelAppUserData = useSelector(selectJoinChannelAppData);
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -297,7 +297,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	useEffect(() => {
 		if (currentChannelAppId && currentChannelAppClanId) {
-			dispatch(channelAppActions.setUserInfo({ dataUpdate: undefined }));
+			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
 			dispatch(
 				handleParticipantMeetState({
 					clan_id: currentChannelAppClanId,
@@ -330,7 +330,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				}
 			};
 			const handleMessage = async (event: MessageEvent) => {
-				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
+				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '') && channelAppUserData !== undefined) {
+					if (channelAppUserData !== undefined) {
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { channelAppUserData } }),
+							appChannel.url ?? ''
+						);
+					}
 					const eventData = safeJSONParse(event.data ?? '{}') || {};
 					// eslint-disable-next-line no-console
 					console.log('[MEZON] < ', eventData);
@@ -386,15 +392,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			window.addEventListener('message', handleMessage);
 			return () => window.removeEventListener('message', handleMessage);
 		}
-	}, [appChannel?.url]);
+	}, [appChannel?.url, channelAppUserData]);
 
-	useEffect(() => {
-		if (!channelAppUserInfo) return;
-		miniAppRef.current?.contentWindow?.postMessage(
-			JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { channelAppUserInfo } }),
-			appChannel.url ?? ''
-		);
-	}, [channelAppUserInfo]);
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(

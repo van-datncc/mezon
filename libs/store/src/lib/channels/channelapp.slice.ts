@@ -70,7 +70,7 @@ export const channelAppSlice = createSlice({
 		setRoomName: (state, action: PayloadAction<string>) => {
 			state.roomName = action.payload;
 		},
-		setUserInfo: (state, action: PayloadAction<{ dataUpdate: JoinChannelAppData | undefined }>) => {
+		setJoinChannelAppData: (state, action: PayloadAction<{ dataUpdate: JoinChannelAppData | undefined }>) => {
 			state.joinChannelAppData = action.payload.dataUpdate;
 		},
 		setRoomId: (state, action: PayloadAction<string | null>) => {
@@ -122,7 +122,7 @@ export const selectRoomName = createSelector(getChannelAppState, (state) => stat
 export const selectLiveToken = createSelector(getChannelAppState, (state) => state.roomToken);
 export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
 export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
-export const selectChannelAppUserInfo = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
+export const selectJoinChannelAppData = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
 
 export const channelAppReducer = channelAppSlice.reducer;
 
