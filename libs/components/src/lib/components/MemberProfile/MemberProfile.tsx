@@ -14,6 +14,7 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	ActivitiesType,
+	ACTIVITY_PANEL_HEIGHT,
 	createImgproxyUrl,
 	DEFAULT_ROLE_COLOR,
 	EUserStatus,
@@ -172,7 +173,8 @@ export function MemberProfile({
 
 		if (event.button === MouseButton.LEFT) {
 			// handle show profile item
-			const heightPanel = isDM ? HEIGHT_PANEL_PROFILE_DM : HEIGHT_PANEL_PROFILE;
+			const hasActivityPanel = !isFooter && status?.status && activityByUserId;
+			const heightPanel = isDM ? HEIGHT_PANEL_PROFILE_DM : HEIGHT_PANEL_PROFILE + (hasActivityPanel ? ACTIVITY_PANEL_HEIGHT : 0);
 			if (window.innerHeight - event.clientY > heightPanel) {
 				setPositionShortUser({
 					top: event.clientY,
