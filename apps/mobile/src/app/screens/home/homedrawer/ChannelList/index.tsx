@@ -82,30 +82,39 @@ const ChannelList = () => {
 		// 	empty
 	}, []);
 
-	const renderItem = useCallback(({ item, index }) => {
-		if (index === 0) {
-			return <ChannelListBackground />;
-		} else if (index === 1) {
-			return <ChannelListHeader />;
-		} else if (item.channels) {
-			return (
-				<ChannelListSection channelsPositionRef={channelsPositionRef} data={item} key={`${item?.category_id}_${index}_ItemChannelList}`} />
-			);
-		} else {
-			return (
-				<View
-					ref={(ref) => (itemRefs.current[item?.channel_id?.toString()] = ref)}
-					onLayout={() => handleLayout()}
-					key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
-				>
-					<ChannelListItem
+	const renderItem = useCallback(
+		({ item, index }) => {
+			if (index === 0) {
+				return <ChannelListBackground />;
+			} else if (index === 1) {
+				return <ChannelListHeader />;
+			} else if (item.channels) {
+				return (
+					<ChannelListSection
+						channelsPositionRef={channelsPositionRef}
 						data={item}
-						isFirstThread={item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD}
+						key={`${item?.category_id}_${index}_ItemChannelList}`}
 					/>
-				</View>
-			);
-		}
-	}, []);
+				);
+			} else {
+				return (
+					<View
+						ref={(ref) => (itemRefs.current[item?.channel_id?.toString()] = ref)}
+						onLayout={() => handleLayout()}
+						key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
+					>
+						<ChannelListItem
+							data={item}
+							isFirstThread={
+								item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD
+							}
+						/>
+					</View>
+				);
+			}
+		},
+		[data, handleLayout]
+	);
 
 	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
 
