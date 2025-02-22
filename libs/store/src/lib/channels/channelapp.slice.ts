@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { JoinChannelAppData } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 type CreateChannelAppMeetPayload = {
@@ -23,12 +24,14 @@ export interface ChannelAppState {
 	roomToken: string | undefined;
 	enableMic: boolean;
 	enableVideo: boolean;
+	joinChannelAppData: JoinChannelAppData | undefined;
 	enableCall: boolean;
 }
 
 export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
+	joinChannelAppData: undefined,
 	roomId: null,
 	clanId: null,
 	roomToken: undefined,
@@ -66,6 +69,9 @@ export const channelAppSlice = createSlice({
 	reducers: {
 		setRoomName: (state, action: PayloadAction<string>) => {
 			state.roomName = action.payload;
+		},
+		setJoinChannelAppData: (state, action: PayloadAction<{ dataUpdate: JoinChannelAppData | undefined }>) => {
+			state.joinChannelAppData = action.payload.dataUpdate;
 		},
 		setRoomId: (state, action: PayloadAction<string | null>) => {
 			state.roomId = action.payload;
@@ -116,6 +122,7 @@ export const selectRoomName = createSelector(getChannelAppState, (state) => stat
 export const selectLiveToken = createSelector(getChannelAppState, (state) => state.roomToken);
 export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
 export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
+export const selectJoinChannelAppData = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
 
 export const channelAppReducer = channelAppSlice.reducer;
 
