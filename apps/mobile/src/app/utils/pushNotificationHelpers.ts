@@ -244,9 +244,9 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 
 	await Promise.all(promises);
 
-	navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-		screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
-	});
+	if (navigation) {
+		navigation.navigate(APP_SCREEN.MESSAGES.TOPIC_DISCUSSION);
+	}
 };
 
 const processNotification = async ({ notification, navigation, time = 0 }) => {
@@ -255,13 +255,9 @@ const processNotification = async ({ notification, navigation, time = 0 }) => {
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
-		// DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, true);
 		setTimeout(() => {
 			navigateToNotification(store, notification, navigation, time);
 		}, time);
-		// setTimeout(() => {
-		// 	DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, false);
-		// }, 3000);
 	} else {
 		navigateToNotification(store, notification, navigation);
 	}

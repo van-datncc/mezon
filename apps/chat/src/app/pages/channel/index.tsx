@@ -42,6 +42,7 @@ import {
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
+	selectJoinChannelAppData,
 	selectLastMessageByChannelId,
 	selectListChannelRenderByClanId,
 	selectMissionDone,
@@ -185,7 +186,6 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const currentMission = useMemo(() => {
 		return onboardingClan.mission[missionDone];
 	}, [missionDone, channelId]);
-
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -274,6 +274,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
 	const appearanceTheme = useSelector(selectTheme);
+	const channelAppUserData = useSelector(selectJoinChannelAppData);
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -295,6 +296,29 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [isShowMemberList, setIsShowCreateThread]);
 
 	useEffect(() => {
+		if (currentChannelAppId && currentChannelAppClanId) {
+			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
+			dispatch(
+				handleParticipantMeetState({
+					clan_id: currentChannelAppClanId,
+					channel_id: currentChannelAppId,
+					user_id: userProfile?.user?.id,
+					display_name: userProfile?.user?.display_name,
+					state: ParticipantMeetState.LEAVE
+				})
+			);
+		}
+		dispatch(channelAppActions.setRoomId(null));
+		if (isChannelApp) {
+			dispatch(channelAppActions.setChannelId(channelId));
+			dispatch(channelAppActions.setClanId(currentChannel?.clan_id || null));
+		} else {
+			dispatch(channelAppActions.setChannelId(null));
+			dispatch(channelAppActions.setClanId(null));
+		}
+	}, [appChannel]);
+
+	useEffect(() => {
 		if (appChannel?.url) {
 			const compareHost = (url1: string, url2: string) => {
 				try {
@@ -306,7 +330,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				}
 			};
 			const handleMessage = async (event: MessageEvent) => {
-				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
+				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '') && channelAppUserData !== undefined) {
+					if (channelAppUserData !== undefined) {
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { channelAppUserData } }),
+							appChannel.url ?? ''
+						);
+					}
 					const eventData = safeJSONParse(event.data ?? '{}') || {};
 					// eslint-disable-next-line no-console
 					console.log('[MEZON] < ', eventData);
@@ -321,7 +351,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
 							appChannel.url ?? ''
 						);
-
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CURRENT_USER_INFO', eventData: currentUser?.userProfile }),
 							appChannel.url ?? ''
@@ -363,7 +392,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			window.addEventListener('message', handleMessage);
 			return () => window.removeEventListener('message', handleMessage);
 		}
-	}, [appChannel?.url]);
+	}, [appChannel?.url, channelAppUserData]);
 
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
@@ -397,27 +426,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-	useEffect(() => {
-		if (currentChannelAppId && currentChannelAppClanId) {
-			dispatch(
-				handleParticipantMeetState({
-					clan_id: currentChannelAppClanId,
-					channel_id: currentChannelAppId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
-					state: ParticipantMeetState.LEAVE
-				})
-			);
-		}
-		dispatch(channelAppActions.setRoomId(null));
-		if (isChannelApp) {
-			dispatch(channelAppActions.setChannelId(channelId));
-			dispatch(channelAppActions.setClanId(currentChannel?.clan_id || null));
-		} else {
-			dispatch(channelAppActions.setChannelId(null));
-			dispatch(channelAppActions.setClanId(null));
-		}
-	}, [appChannel]);
+
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
 			{isChannelApp ? (

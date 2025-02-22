@@ -69,6 +69,7 @@ type ChannelMessagesProps = {
 	isTopicBox?: boolean;
 	topicId?: string;
 	isDM?: boolean;
+  isPrivate?:number;
 };
 
 const MESSAGE_LIST_SLICE = 50;
@@ -88,7 +89,8 @@ function ChannelMessages({
 	isThreadBox = false,
 	isTopicBox,
 	isDM,
-	topicId
+	topicId,
+  isPrivate
 }: ChannelMessagesProps) {
 	const store = useStore();
 	const appearanceTheme = useSelector(selectTheme);
@@ -291,6 +293,7 @@ function ChannelMessages({
 				anchorIdRef={anchorIdRef}
 				anchorTopRef={anchorTopRef}
 				setAnchor={setAnchor}
+        isPrivate={isPrivate}
 			/>
 		</MessageContextMenuProvider>
 	);
@@ -323,7 +326,7 @@ type ChatMessageListProps = {
 	lastMessageUnreadId: string;
 	avatarDM?: string;
 	username?: string;
-
+  isPrivate?:number;
 	channelId: string;
 	mode: number;
 	channelLabel?: string;
@@ -354,7 +357,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		skipCalculateScroll,
 		anchorIdRef,
 		anchorTopRef,
-		setAnchor
+		setAnchor,
+    isPrivate
 	}) => {
 		const store = useStore();
 		const dispatch = useAppDispatch();
@@ -648,6 +652,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							isHighlight={messageId === idMessageNotified}
 							mode={mode}
 							channelLabel={channelLabel ?? ''}
+              isPrivate={isPrivate}
 							isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
 							checkMessageTargetToMoved={checkMessageTargetToMoved}
 							messageReplyHighlight={messageReplyHighlight}

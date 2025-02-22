@@ -1,6 +1,5 @@
 import { useAuth } from '@mezon/core';
 import { useGoogleLogin } from '@react-oauth/google';
-import isElectron from 'is-electron';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 

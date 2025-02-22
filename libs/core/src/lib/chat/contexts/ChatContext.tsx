@@ -8,6 +8,7 @@ import {
 	attachmentActions,
 	AttachmentEntity,
 	audioCallActions,
+	channelAppSlice,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -104,6 +105,7 @@ import {
 	ClanUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
+	JoinChannelAppData,
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
@@ -616,6 +618,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					}
+          if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD){
+            dispatch(
+              channelMetaActions.updateBulkChannelMetadata([
+                {
+                  id: channel.id,
+                  lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
+                  clanId: channel.clan_id ?? '',
+                  isMute: false,
+                  senderId: '',
+                  lastSeenTimestamp: Date.now() / 1000 - 1000,
+                }
+              ])
+            );
+          }
 
 					if (channel_desc.parrent_id) {
 						dispatch(
@@ -1453,6 +1469,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onJoinChannelAppEvent = useCallback(
+		async (joinChannelAppData: JoinChannelAppData) => {
+			if (!joinChannelAppData) return;
+			dispatch(channelAppSlice.actions.setJoinChannelAppData({ dataUpdate: joinChannelAppData }));
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1546,6 +1570,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onwebrtcsignalingfwd = onwebrtcsignalingfwd;
 
 			socket.onclanupdated = onclanupdated;
+
+			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1591,7 +1617,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			ontokensent,
 			onmessagebuttonclicked,
 			onwebrtcsignalingfwd,
-			onclanupdated
+			onclanupdated,
+			onJoinChannelAppEvent
 		]
 	);
 
@@ -1691,6 +1718,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oneventwebhook = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onJoinChannelAppEvent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1736,7 +1765,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onroleevent,
 		onuserstatusevent,
 		oneventwebhook,
-		ontokensent
+		ontokensent,
+		onJoinChannelAppEvent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

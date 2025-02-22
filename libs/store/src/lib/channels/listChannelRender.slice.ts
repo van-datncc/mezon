@@ -199,6 +199,9 @@ export const listChannelRenderSlice = createSlice({
 				if (indexInsert === -1) {
 					return;
 				}
+
+				const channel = state.listChannelRender[clanId]?.[indexInsert] as IChannel;
+				state.listChannelRender[clanId]?.splice(indexInsert, 1, { ...channel, threadIds: [...(channel.threadIds || []), channelData.id] });
 				state.listChannelRender[clanId]?.splice(indexInsert + 1, 0, channelData);
 				state.listChannelRender[clanId].join();
 			}
