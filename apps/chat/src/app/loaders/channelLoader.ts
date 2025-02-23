@@ -4,7 +4,6 @@ import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
 export const channelLoader: CustomLoaderFunction = async ({ params, request, dispatch }) => {
-	console.log(1);
 	const { channelId, clanId } = params;
 	const messageId = new URL(request.url).searchParams.get('messageId');
 	if (!channelId || !clanId) {
