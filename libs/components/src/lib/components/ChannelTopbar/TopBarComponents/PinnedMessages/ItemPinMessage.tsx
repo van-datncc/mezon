@@ -90,6 +90,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							isJumMessageEnabled={false}
 							isTokenClickAble={false}
 							messageId={message?.message_id}
+							isSearchMessage={true} // to correct size youtube emmbed
 						/>
 					</div>
 					{message?.attachments?.length ? <ListPinAttachment attachments={message?.attachments} /> : <></>}
