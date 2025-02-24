@@ -439,7 +439,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	);
 }
 
-function RedDot() {
+export function RedDot() {
 	return (
 		<div
 			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
