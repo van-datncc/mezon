@@ -36,6 +36,7 @@ const ChannelList = () => {
 	const [refreshing, setRefreshing] = useState(false);
 	const dispatch = useAppDispatch();
 	const itemRefs = useRef({});
+	// const [parentIdList, setParentIdList] = useState<Set<string>>(new Set());
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
@@ -70,6 +71,26 @@ const ChannelList = () => {
 		],
 		[listChannelRender, isShowEmptyCategory]
 	) as ICategoryChannel[];
+
+	// useEffect(() => {
+	// 	const newParentIds = new Set(
+	// 		data
+	// 			.filter(
+	// 				(item) =>
+	// 					(item as IChannel)?.type === ChannelType.CHANNEL_TYPE_THREAD &&
+	// 					(item as IChannel)?.last_sent_message.timestamp_seconds > (item as IChannel)?.last_seen_message.timestamp_seconds &&
+	// 					(item as IChannel)?.parrent_id
+	// 			)
+	// 			.map((item) => (item as IChannel).parrent_id)
+	// 	);
+
+	// 	setParentIdList((prev) => {
+	// 		if ([...prev].sort().toString() !== [...newParentIds].sort().toString()) {
+	// 			return newParentIds;
+	// 		}
+	// 		return prev;
+	// 	});
+	// }, [data]);
 
 	const styles = style(themeValue, isTabletLandscape);
 
@@ -107,6 +128,7 @@ const ChannelList = () => {
 							isFirstThread={
 								item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD
 							}
+							// parentIdList={parentIdList}
 						/>
 					</View>
 				);
@@ -129,6 +151,10 @@ const ChannelList = () => {
 					removeClippedSubviews={true}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 					stickyHeaderIndices={[1]}
+					maxToRenderPerBatch={10}
+					updateCellsBatchingPeriod={50}
+					initialNumToRender={20}
+					windowSize={5}
 				/>
 				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />
 				<View style={{ height: 80 }} />
