@@ -1,12 +1,11 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectIsShowEmptyCategory, selectListChannelRenderByClanId } from '@mezon/store';
 import { channelsActions, selectCurrentClan, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { FlashList } from '@shopify/flash-list';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -42,7 +41,7 @@ const ChannelList = () => {
 		setRefreshing(true);
 
 		const promise = [
-			dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true })),
+			dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true, isMobile: true })),
 			dispatch(
 				voiceActions.fetchVoiceChannelMembers({
 					clanId: currentClan?.clan_id ?? '',
@@ -121,14 +120,13 @@ const ChannelList = () => {
 	return (
 		<>
 			<View style={styles.mainList}>
-				<ChannelListScroll itemRefs={itemRefs} flashListRef={flashListRef} />
-				<FlashList
+				<ChannelListScroll data={data} flashListRef={flashListRef} />
+				<FlatList
 					ref={flashListRef}
 					data={data}
 					renderItem={renderItem}
 					keyExtractor={keyExtractor}
 					removeClippedSubviews={true}
-					estimatedItemSize={size.s_40}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 					stickyHeaderIndices={[1]}
 				/>
