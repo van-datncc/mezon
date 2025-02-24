@@ -132,7 +132,7 @@ const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
 		storage,
-		blacklist: ['isShowCreateThread', 'isThreadModalVisible']
+		blacklist: ['isShowCreateThread', 'isThreadModalVisible', 'isFocusThreadBox']
 	},
 	threadsReducer
 );
@@ -141,7 +141,7 @@ const persistedTopicReducer = persistReducer(
 	{
 		key: 'topicdiscussions',
 		storage,
-		blacklist: ['isShowCreateTopic']
+		blacklist: ['isShowCreateTopic', 'isFocusTopicBox']
 	},
 	topicsReducer
 );

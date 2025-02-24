@@ -3,6 +3,7 @@ import {
 	emojiSuggestionActions,
 	referencesActions,
 	selectCurrentChannel,
+	selectCurrentThread,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	selectTheme,
@@ -20,6 +21,8 @@ export type EmojiCustomPanelOptions = {
 	onClickAddButton?: () => void;
 	onClose: () => void;
 	isFocusTopicBox?: boolean;
+	isFocusThreadBox?: boolean;
+
 	currenTopicId?: string;
 	directId?: string;
 	isClanView: boolean;
@@ -33,6 +36,8 @@ const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentThread = useSelector(selectCurrentThread);
+
 	const {
 		categoryEmoji,
 		categoriesEmoji,
@@ -87,6 +92,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, [categoriesEmoji, categoryIcons]);
 
 	const channelID = props.isClanView ? currentChannel?.id : props.directId;
+
 	const messageEmoji = useAppSelector((state) =>
 		selectMessageByMessageId(state, props.isFocusTopicBox ? props.currenTopicId : channelID, props.messageEmojiId || '')
 	);
