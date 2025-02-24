@@ -150,6 +150,7 @@ type ChatContextProviderProps = {
 export type ChatContextValue = {
 	setCallbackEventFn: (socket: Socket) => void;
 	handleReconnect: (socketType: string) => void;
+	onchannelmessage: (message: ChannelMessage) => void;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -1773,7 +1774,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		() => ({
 			// add logic code
 			setCallbackEventFn,
-			handleReconnect
+			handleReconnect,
+			onchannelmessage
 		}),
 		[setCallbackEventFn]
 	);
