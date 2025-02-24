@@ -1117,12 +1117,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								})
 							);
 							dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
-							dispatch(
-								listChannelRenderAction.addChannelToListRender({
-									type: channel.type,
-									...channelUpdated
-								})
-							);
+							if (channel.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+								dispatch(
+									listChannelRenderAction.addThreadToListRender({
+										clanId: channel.clan_id,
+										channel: { id: channelUpdated.channel_id, ...channelUpdated }
+									})
+								);
+							} else {
+								dispatch(
+									listChannelRenderAction.addChannelToListRender({
+										type: channel.type,
+										...channelUpdated
+									})
+								);
+							}
+
 							if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 								if (channel.parrent_id) {
 									dispatch(
