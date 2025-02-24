@@ -27,7 +27,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -172,7 +172,7 @@ export const Sharing = ({ data, onClose }) => {
 			false,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || []
+				mk: dataSend.links || []
 			},
 			[],
 			getAttachmentUnique(attachmentUpload) || [],
@@ -228,7 +228,7 @@ export const Sharing = ({ data, onClose }) => {
 			isPublic,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || []
+				mk: dataSend.links || []
 			},
 			[], //mentions
 			getAttachmentUnique(attachmentUpload) || [], //attachments
@@ -255,6 +255,9 @@ export const Sharing = ({ data, onClose }) => {
 				}
 				const endIndex = i;
 				links.push({
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					type: EBacktickType.LINK,
 					s: startIndex,
 					e: endIndex
 				});

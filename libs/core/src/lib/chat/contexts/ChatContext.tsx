@@ -937,7 +937,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
+				dispatch(
+					listChannelsByUserActions.addOneChannel({ id: channelCreated.channel_id, type: channelCreated.channel_type, ...channelCreated })
+				);
 				dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
@@ -970,6 +972,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						])
 					);
 				}
+			} else if (channelCreated.creator_id === userId) {
+				dispatch(
+					listChannelsByUserActions.addOneChannel({
+						id: channelCreated.channel_id,
+						type: channelCreated.channel_type,
+						...channelCreated
+					})
+				);
 			}
 		},
 		[dispatch, allThreads]
@@ -1034,7 +1044,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				if (channelUpdated.channel_private !== undefined) {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string };
+					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string, clan_name: '' };
 
 					if (channelUpdated.creator_id === userId) {
 						dispatch(
