@@ -58,7 +58,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const { sendInviteMessage } = useSendInviteMessage();
 	const [successTime, setSuccessTime] = useState('');
 	const [fileShared, setFileShared] = useState<any>();
-	const [showSharingModal, setShowSharingModal] = useState(false);
 	const viewToSnapshotRef = useRef();
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return friends?.filter((user) => user.state === 0) || [];
@@ -270,8 +269,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			contentUri: dataUri,
 			filePath: dataUri
 		};
-		setShowConfirmModal(false);
-		setShowSharingModal(true);
 		setFileShared([shareData]);
 	};
 
@@ -285,7 +282,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 
 	const onCloseFileShare = useCallback(() => {
 		setFileShared(undefined);
-		setShowSharingModal(false);
 		navigation.goBack();
 	}, [navigation]);
 
@@ -340,66 +336,55 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				deviceHeight={Dimensions.get('screen').height}
 				style={{ margin: 0, justifyContent: 'center', alignItems: 'center' }}
 			>
-				<View ref={viewToSnapshotRef} style={styles.fullscreenModal}>
-					<View style={styles.modalHeader}>
-						<View>
-							<Icons.TickIcon width={100} height={100} />
-						</View>
-						<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
-						<Text style={styles.amountText}>
-							{tokenCount} {plainTokenCount === 1 ? `token` : `tokens`}
-						</Text>
-					</View>
-
-					<View style={styles.modalBody}>
-						<View style={styles.infoRow}>
-							<Text style={styles.label}>{t('receiver')}</Text>
-							<Text style={[styles.value, { fontSize: size.s_20 }]}>{selectedUser?.username || 'Unknown'}</Text>
-						</View>
-
-						<View style={styles.infoRow}>
-							<Text style={styles.label}>{t('note')}</Text>
-							<Text style={styles.value}>{note || ''}</Text>
-						</View>
-
-						<View style={styles.infoRow}>
-							<Text style={styles.label}>{t('date')}</Text>
-							<Text style={styles.value}>{successTime}</Text>
-						</View>
-					</View>
-					<View style={styles.action}>
-						<View style={styles.actionMore}>
-							<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
-								<Icons.ShareIcon width={24} height={24} />
-								<Text style={styles.textActionMore}>{t('share')}</Text>
-							</TouchableOpacity>
-							<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
-								<Icons.ArrowLeftRightIcon />
-								<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
-							</TouchableOpacity>
-						</View>
-
-						<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
-							<Text style={styles.confirmText}>{t('complete')}</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</Modal>
-
-			{!!fileShared && (
-				<Modal
-					isVisible={showSharingModal}
-					animationIn="fadeIn"
-					animationOut="fadeOut"
-					hasBackdrop={true}
-					coverScreen={true}
-					backdropColor="rgba(0,0,0, 0.9)"
-					deviceHeight={Dimensions.get('screen').height}
-					style={{ margin: 0, justifyContent: 'center', alignItems: 'center' }}
-				>
+				{fileShared ? (
 					<Sharing data={fileShared} onClose={onCloseFileShare} />
-				</Modal>
-			)}
+				) : (
+					<View ref={viewToSnapshotRef} style={styles.fullscreenModal}>
+						<View style={styles.modalHeader}>
+							<View>
+								<Icons.TickIcon width={100} height={100} />
+							</View>
+							<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
+							<Text style={styles.amountText}>
+								{tokenCount} {plainTokenCount === 1 ? `token` : `tokens`}
+							</Text>
+						</View>
+
+						<View style={styles.modalBody}>
+							<View style={styles.infoRow}>
+								<Text style={styles.label}>{t('receiver')}</Text>
+								<Text style={[styles.value, { fontSize: size.s_20 }]}>{selectedUser?.username || 'Unknown'}</Text>
+							</View>
+
+							<View style={styles.infoRow}>
+								<Text style={styles.label}>{t('note')}</Text>
+								<Text style={styles.value}>{note || ''}</Text>
+							</View>
+
+							<View style={styles.infoRow}>
+								<Text style={styles.label}>{t('date')}</Text>
+								<Text style={styles.value}>{successTime}</Text>
+							</View>
+						</View>
+						<View style={styles.action}>
+							<View style={styles.actionMore}>
+								<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
+									<Icons.ShareIcon width={24} height={24} />
+									<Text style={styles.textActionMore}>{t('share')}</Text>
+								</TouchableOpacity>
+								<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
+									<Icons.ArrowLeftRightIcon />
+									<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
+								</TouchableOpacity>
+							</View>
+
+							<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
+								<Text style={styles.confirmText}>{t('complete')}</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				)}
+			</Modal>
 			<BottomSheetModal
 				ref={BottomSheetRef}
 				snapPoints={snapPoints}

@@ -171,6 +171,7 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	if (
 		channelType !== ChannelType.CHANNEL_TYPE_CHANNEL &&
 		channelType !== ChannelType.CHANNEL_TYPE_DM &&
+		channelType !== ChannelType.CHANNEL_TYPE_APP &&
 		channelType !== ChannelType.CHANNEL_TYPE_GROUP &&
 		channelType !== ChannelType.CHANNEL_TYPE_THREAD
 	) {

@@ -80,6 +80,11 @@ export const MessageReactionWrapper = React.memo(
 
 		return (
 			<View style={[styles.reactionWrapper, styles.reactionSpace, isMessageSystem && { paddingTop: 0, marginLeft: size.s_40 }]}>
+				{!messageReactions?.length &&
+					!!message?.reactions?.length &&
+					message?.reactions?.map((i) => {
+						return <View style={[styles.imageReactionTemp]} />;
+					})}
 				{messageReactions?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const isMyReaction = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 
