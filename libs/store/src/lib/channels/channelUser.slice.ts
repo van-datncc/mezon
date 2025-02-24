@@ -125,6 +125,9 @@ export const listChannelsByUserSlice = createSlice({
 					}
 				}
 			}
+		},
+		addOneChannel: (state, action: PayloadAction<ChannelUsersEntity>) => {
+			listChannelsByUserAdapter.addOne(state, action.payload);
 		}
 	},
 	extraReducers: (builder) => {
