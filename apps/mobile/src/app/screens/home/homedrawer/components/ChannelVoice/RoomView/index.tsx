@@ -12,13 +12,14 @@ import {
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
-import { LocalParticipant, RemoteParticipant, Track } from 'livekit-client';
+import { Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Platform, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonAvatar } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
+import FocusedScreenPopup from '../FocusedScreenPopup';
+import ParticipantScreen from '../ParticipantScreen';
 import { style } from '../styles';
 
 const RoomView = ({
@@ -51,92 +52,6 @@ const RoomView = ({
 
 	const sortedParticipants = [...participants].sort((a, b) => (b.isScreenShareEnabled ? 1 : 0) - (a.isScreenShareEnabled ? 1 : 0));
 
-	const videoTrackCount = sortedParticipants.reduce((count, participant) => {
-		if (participant.isScreenShareEnabled) {
-			count += 1;
-		}
-		if (participant.isCameraEnabled || participant.isScreenShareEnabled) {
-			count += 1;
-		} else {
-			count += 1;
-		}
-		return count;
-	}, 0);
-
-	const isGridLayout = videoTrackCount >= 3;
-
-	const renderParticipant = (participant: LocalParticipant | RemoteParticipant) => {
-		const videoTrackRef = tracks.find(
-			(t) => t.participant.identity === participant.identity && t.source === Track.Source.Camera && t.participant.isCameraEnabled === true
-		);
-
-		const screenTrackRef = tracks.find((t) => t.participant.identity === participant.identity && t.source === Track.Source.ScreenShare);
-		const handleFocusScreen = (screenTrack: TrackReference) => {
-			setFocusedScreenShare(screenTrack);
-		};
-
-		const isFocusedScreen = focusedScreenShare === screenTrackRef;
-
-		return (
-			<>
-				{screenTrackRef && (
-					<View
-						style={[
-							styles.userView,
-							!isGridLayout ? { width: '100%', height: size.s_150 + size.s_100 } : { width: '48%', height: size.s_150 },
-							isTabletLandscape && { height: size.s_150 + size.s_100 }
-						]}
-					>
-						<VideoTrack trackRef={screenTrackRef} style={styles.participantView} />
-						<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
-							<Icons.ShareScreenIcon height={size.s_14} />
-							<Text
-								numberOfLines={1}
-								ellipsizeMode="tail"
-								style={[styles.subTitle, isFocusedScreen ? { width: '100%' } : { width: '48%' }]}
-							>
-								{participant.identity} {isFocusedScreen && `(Share Screen)`}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.focusIcon} onPress={() => handleFocusScreen(screenTrackRef)}>
-							<Icons.ArrowSaltIcon height={size.s_14} />
-						</TouchableOpacity>
-					</View>
-				)}
-
-				{videoTrackRef && (
-					<View style={[styles.userView, isGridLayout && { width: '48%', height: 150 }, isTabletLandscape && { height: 250 }]}>
-						<VideoTrack trackRef={videoTrackRef} style={styles.participantView} />
-						<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
-							{participant.isMicrophoneEnabled ? (
-								<Icons.MicrophoneIcon height={size.s_14} />
-							) : (
-								<Icons.MicrophoneSlashIcon height={size.s_14} />
-							)}
-							<Text style={styles.subTitle}>{participant.identity || 'Unknown'}</Text>
-						</View>
-					</View>
-				)}
-
-				{!videoTrackRef && (
-					<View style={[styles.userView, isGridLayout && { width: '48%', height: 150 }, isTabletLandscape && { height: 250 }]}>
-						<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-							<MezonAvatar width={size.s_50} height={size.s_50} username={participant.identity} avatarUrl={participant.metadata} />
-						</View>
-						<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
-							{participant.isMicrophoneEnabled ? (
-								<Icons.MicrophoneIcon height={size.s_14} />
-							) : (
-								<Icons.MicrophoneSlashIcon height={size.s_14} />
-							)}
-							<Text style={styles.subTitle}>{participant.identity || 'Unknown'}</Text>
-						</View>
-					</View>
-				)}
-			</>
-		);
-	};
-
 	const handleToggleCamera = useCallback(() => {
 		localParticipant.setCameraEnabled(!isCameraEnabled);
 	}, [isCameraEnabled, localParticipant]);
@@ -163,6 +78,16 @@ const RoomView = ({
 		joinChannel();
 		onPressMinimizeRoom();
 	};
+
+	useEffect(() => {
+		if (focusedScreenShare) {
+			const focusedParticipant = sortedParticipants.find((p) => p.identity === focusedScreenShare?.participant?.identity);
+
+			if (!focusedParticipant?.isScreenShareEnabled) {
+				setFocusedScreenShare(null);
+			}
+		}
+	}, [sortedParticipants, focusedScreenShare]);
 
 	const joinChannel = async () => {
 		const clanIdCache = load(STORAGE_CLAN_ID);
@@ -198,111 +123,17 @@ const RoomView = ({
 		);
 	}
 
-	const renderFocusedParticipant = () => {
-		if (isAnimationComplete) return null;
-		const otherParticipants = sortedParticipants.filter((p) => p.identity !== localParticipant.identity);
-		const selfParticipant = sortedParticipants.find((p) => p.identity === localParticipant.identity);
-
-		const screenShareOther = otherParticipants.find((p) => p.isScreenShareEnabled);
-		if (screenShareOther) {
-			const screenTrackRef = tracks.find((t) => t.participant.identity === screenShareOther.identity && t.source === Track.Source.ScreenShare);
-			if (screenTrackRef) {
-				return (
-					<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<View style={{ height: size.s_100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={screenTrackRef} style={{ height: size.s_100, width: '100%', alignSelf: 'center' }} />
-						</View>
-					</View>
-				);
-			}
-		}
-
-		if (selfParticipant?.isScreenShareEnabled) {
-			const selfScreenTrackRef = tracks.find(
-				(t) => t.participant.identity === selfParticipant.identity && t.source === Track.Source.ScreenShare
-			);
-			if (selfScreenTrackRef) {
-				return (
-					<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<View style={{ height: size.s_100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={selfScreenTrackRef} style={{ height: size.s_100, width: '100%', alignSelf: 'center' }} />
-						</View>
-					</View>
-				);
-			}
-		}
-
-		const cameraOther = otherParticipants.find((p) => p.isCameraEnabled);
-		if (cameraOther) {
-			const videoTrackRef = tracks.find((t) => t.participant.identity === cameraOther.identity && t.source === Track.Source.Camera);
-			if (videoTrackRef) {
-				return (
-					<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<View style={{ height: 100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={videoTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
-						</View>
-					</View>
-				);
-			}
-		}
-
-		if (selfParticipant?.isCameraEnabled) {
-			const videoTrackRef = tracks.find((t) => t.participant.identity === selfParticipant.identity && t.source === Track.Source.Camera);
-			if (videoTrackRef) {
-				return (
-					<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<View style={{ height: 100, width: '100%', alignSelf: 'center' }}>
-							<VideoTrack trackRef={videoTrackRef} style={{ height: 100, width: '100%', alignSelf: 'center' }} />
-						</View>
-					</View>
-				);
-			}
-		}
-
-		const randomParticipant = sortedParticipants[0];
-		if (randomParticipant) {
-			return (
-				<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-					<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-						<MezonAvatar
-							width={size.s_50}
-							height={size.s_50}
-							username={randomParticipant.identity}
-							avatarUrl={randomParticipant.metadata}
-						/>
-					</View>
-					<View style={[styles.userName, { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
-						{randomParticipant.isMicrophoneEnabled ? (
-							<Icons.MicrophoneIcon height={size.s_14} />
-						) : (
-							<Icons.MicrophoneSlashIcon height={size.s_14} />
-						)}
-						<Text style={styles.subTitle}>{randomParticipant.identity || 'Unknown'}</Text>
-					</View>
-				</View>
-			);
-		}
-
-		return null;
-	};
-
 	return (
 		<View style={styles.roomViewcontainer}>
 			{!isAnimationComplete ? (
-				renderFocusedParticipant()
+				<FocusedScreenPopup sortedParticipants={sortedParticipants} tracks={tracks} localParticipant={localParticipant} />
 			) : (
-				<View style={{ marginBottom: isTabletLandscape ? '5%' : '30%' }}>
-					<ScrollView
-						style={{ marginHorizontal: size.s_10 }}
-						contentContainerStyle={
-							isGridLayout
-								? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: size.s_10, alignItems: 'center' }
-								: { gap: size.s_10 }
-						}
-					>
-						{sortedParticipants.map((participant) => renderParticipant(participant))}
-					</ScrollView>
-				</View>
+				<ParticipantScreen
+					sortedParticipants={sortedParticipants}
+					tracks={tracks}
+					isFocusedScreen={focusedScreenShare}
+					setFocusedScreenShare={setFocusedScreenShare}
+				/>
 			)}
 			{isAnimationComplete && (
 				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_50 }]}>

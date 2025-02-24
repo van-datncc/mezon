@@ -22,7 +22,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
 import uuid from 'react-native-uuid';
 import { useSelector, useStore } from 'react-redux';
-import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import MessageItem from './MessageItem';
 import ChannelMessageList from './components/ChannelMessageList';
 import { ChannelMessageLoading } from './components/ChannelMessageLoading';
@@ -227,7 +226,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} />
+			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} isDisableLoadMore={isDisableLoadMore} />
 
 			{isReadyShowChannelMsg && !!messages?.length ? (
 				<ChannelMessageList
@@ -239,8 +238,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
 					isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
 				/>
-			) : !isDisableLoadMore ? (
-				<MessageItemSkeleton skeletonNumber={15} />
 			) : (
 				<View />
 			)}
