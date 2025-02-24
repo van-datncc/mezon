@@ -77,7 +77,7 @@ export function ControlBar({
 	);
 
 	return (
-		<div className="lk-control-bar justify-between">
+		<div className="lk-control-bar justify-between !border-none !bg-transparent">
 			<div className="flex justify-start gap-4">
 				<span>
 					<Icons.VoiceSoundControlIcon className="cursor-pointer dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />

@@ -12,10 +12,10 @@ const WIDTH_EMOJI_PANEL = 500;
 type ReactionEmojiPannelProps = {
 	closeMenu: boolean;
 	currentChannelId: string;
-	isFocusTopicBox?: boolean;
+	isFocusTopicOrThreadBox?: boolean;
 	openEmojiRightPanel?: boolean;
 	openEmojiBottomPanel?: boolean;
-	openEmojiPanelOnTopic?: boolean;
+	openEmojiPanelOnTopicOrThreadBox?: boolean;
 	isShowCreateTopic?: boolean;
 };
 
@@ -23,10 +23,10 @@ const ReactionEmojiPanel = memo(
 	({
 		closeMenu,
 		currentChannelId,
-		isFocusTopicBox,
+		isFocusTopicOrThreadBox,
 		openEmojiRightPanel,
 		openEmojiBottomPanel,
-		openEmojiPanelOnTopic,
+		openEmojiPanelOnTopicOrThreadBox,
 		isShowCreateTopic
 	}: ReactionEmojiPannelProps) => {
 		const reactionTopState = useSelector(selectReactionTopState);
@@ -34,8 +34,8 @@ const ReactionEmojiPanel = memo(
 		const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 		const { isShowMemberList } = useApp();
 
-		const openEmojiRightPanelOnChannelLayout = openEmojiRightPanel && !isFocusTopicBox;
-		const openEmojiBottomPanelOnChannelLayout = openEmojiBottomPanel && !isFocusTopicBox;
+		const openEmojiRightPanelOnChannelLayout = openEmojiRightPanel && !isFocusTopicOrThreadBox;
+		const openEmojiBottomPanelOnChannelLayout = openEmojiBottomPanel && !isFocusTopicOrThreadBox;
 
 		const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 		const distanceToRight = window.innerWidth - positionOfSmileButton.right;
@@ -70,7 +70,7 @@ const ReactionEmojiPanel = memo(
 						<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 					</div>
 				)}
-				{openEmojiPanelOnTopic && (
+				{openEmojiPanelOnTopicOrThreadBox && (
 					<div
 						style={{ top: topPositionEmojiPanel }}
 						onMouseDown={(e) => e.stopPropagation()}
