@@ -4,9 +4,9 @@ import { sleep } from '@mezon/utils';
 import notifee from '@notifee/react-native';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect } from 'react';
-import {Platform, StatusBar, View} from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
-import HomeDefault from './HomeDefault';
+import HomeScreen from './HomeScreen';
 import SwipeBackContainer from './SwipeBackContainer';
 
 const HomeDefaultWrapper = React.memo((props: any) => {
@@ -48,7 +48,7 @@ const HomeDefaultWrapper = React.memo((props: any) => {
 	return (
 		<SwipeBackContainer handleBack={handleBack}>
 			<StatusBarHeight />
-			<HomeDefault {...props} />
+			<HomeScreen {...props} />
 		</SwipeBackContainer>
 	);
 });

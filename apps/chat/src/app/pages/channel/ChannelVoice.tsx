@@ -160,7 +160,12 @@ const ChannelVoice = memo(
 							serverUrl={serverUrl}
 							data-lk-theme="default"
 						>
-							<MyVideoConference onLeaveRoom={handleLeaveRoom} onFullScreen={handleFullScreen} onScreenShare={handleScreenShare} />
+							<MyVideoConference
+								channel={currentChannel || undefined}
+								onLeaveRoom={handleLeaveRoom}
+								onFullScreen={handleFullScreen}
+								onScreenShare={handleScreenShare}
+							/>
 						</LiveKitRoom>
 					</>
 				)}

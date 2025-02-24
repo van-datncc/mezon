@@ -31,6 +31,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	openThreadMessageState: boolean;
 	currentThread?: ApiChannelDescription;
 	isThreadModalVisible?: boolean;
+	isFocusThreadBox?: boolean;
 }
 
 export const threadsAdapter = createEntityAdapter({
@@ -287,6 +288,9 @@ export const threadsSlice = createSlice({
 					}
 				});
 			}
+		},
+		setFocusThreadBox(state, action: PayloadAction<boolean>) {
+			state.isFocusThreadBox = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -295,7 +299,7 @@ export const threadsSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
-				threadsAdapter.setAll(state, action.payload);
+				threadsAdapter.upsertMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
@@ -458,3 +462,4 @@ export const selectShowEmptyStatus = () =>
 	createSelector(selectAllThreads, (threads) => {
 		return threads.length === 0;
 	});
+export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (state) => state.isFocusThreadBox);

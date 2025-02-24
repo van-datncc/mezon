@@ -224,7 +224,8 @@ export const reactionSlice = createSlice({
 					(reaction) =>
 						reaction.message_id === reactionDataSocket.message_id &&
 						reaction.emoji === reactionDataSocket.emoji &&
-						reaction.sender_id === reactionDataSocket.sender_id
+						reaction.sender_id === reactionDataSocket.sender_id &&
+						reaction?.channel_id === reactionDataSocket?.channel_id
 				);
 
 				if (reaction) {
