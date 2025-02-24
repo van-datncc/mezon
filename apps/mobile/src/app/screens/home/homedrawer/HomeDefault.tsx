@@ -1,4 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { STORAGE_IS_LAST_ACTIVE_TAB_DM, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -62,6 +63,7 @@ const HomeDefault = React.memo((props: any) => {
 	};
 
 	useEffect(() => {
+		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
 		return () => {
 			timeoutRef?.current && clearTimeout(timeoutRef.current);
 		};
