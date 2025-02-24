@@ -1312,14 +1312,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
-		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
 
-		const updateAmount = isReceiverGiveCoffee
-			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
-			: isSenderGiveCoffee
-				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
-				: 0;
-		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 		if (isReceiverGiveCoffee && isElectron()) {
 			const senderToken = coffeeEvent.sender_id;
 			const allMembersClan = selectAllUserClans(store.getState() as RootState);
