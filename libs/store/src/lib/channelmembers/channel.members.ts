@@ -103,7 +103,7 @@ export const fetchChannelMembers = createAsyncThunk(
 			const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
 
 			if (Date.now() - response.time > 100) {
-				return [];
+				return response.channel_users || [];
 			}
 
 			if (!response.channel_users) {
