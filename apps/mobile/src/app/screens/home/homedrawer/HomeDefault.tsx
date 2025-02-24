@@ -19,7 +19,7 @@ import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
-
+// HomeDefault check
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
