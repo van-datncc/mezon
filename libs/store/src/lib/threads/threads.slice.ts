@@ -299,7 +299,7 @@ export const threadsSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
-				threadsAdapter.setAll(state, action.payload);
+				threadsAdapter.upsertMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {

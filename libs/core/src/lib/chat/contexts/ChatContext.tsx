@@ -61,6 +61,7 @@ import {
 	selectUserCallId,
 	stickerSettingActions,
 	threadsActions,
+	ThreadsEntity,
 	toastActions,
 	topicsActions,
 	useAppDispatch,
@@ -313,15 +314,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const attachmentList: AttachmentEntity[] =
 					message.attachments && message.attachments.length > 0
 						? message.attachments.map((attachment) => {
-								const dateTime = new Date();
-								return {
-									...attachment,
-									id: attachment.url as string,
-									message_id: message?.message_id,
-									create_time: dateTime.toISOString(),
-									uploader: message?.sender_id
-								};
-							})
+							const dateTime = new Date();
+							return {
+								...attachment,
+								id: attachment.url as string,
+								message_id: message?.message_id,
+								create_time: dateTime.toISOString(),
+								uploader: message?.sender_id
+							};
+						})
 						: [];
 
 				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
@@ -631,6 +632,34 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							])
 						);
 					}
+					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+						dispatch(
+							channelMetaActions.updateBulkChannelMetadata([
+								{
+									id: channel.id,
+									lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
+									clanId: channel.clan_id ?? '',
+									isMute: false,
+									senderId: '',
+									lastSeenTimestamp: Date.now() / 1000 - 1000,
+								}
+							])
+						);
+
+						if (channel.parrent_id === channelId) {
+							const thread: ThreadsEntity = {
+								id: channel.id,
+								channel_id: channel_desc.channel_id,
+								active: 1,
+								channel_label: channel_desc.channel_label,
+								clan_id: channel_desc.clan_id || clanId,
+								parrent_id: channel_desc.parrent_id,
+								last_sent_message: channel_desc.last_sent_message,
+								type: channel_desc.type,
+							}
+							dispatch(threadsActions.add(thread))
+						}
+					}
 
 					if (channel_desc.parrent_id) {
 						dispatch(
@@ -937,9 +966,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(
-					listChannelsByUserActions.addOneChannel({ id: channelCreated.channel_id, type: channelCreated.channel_type, ...channelCreated })
-				);
+				dispatch(listChannelsByUserActions.addOneChannel({ id: channelCreated.channel_id, type: channelCreated.channel_type, ...channelCreated }));
 				dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
