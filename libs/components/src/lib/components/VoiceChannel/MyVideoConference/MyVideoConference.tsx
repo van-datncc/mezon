@@ -110,14 +110,28 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, onScreen
 
 	const toggleViewMode = () => {
 		if (isFocused) {
-			layoutContext.pin.dispatch?.({ msg: 'clear_pin' }); // Chuyển về Grid mode
+			layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
 		} else {
-			const firstTrack = tracks.find(isTrackReference) || tracks[0];
+			const firstTrack = screenShareTracks[0] || tracks.find(isTrackReference) || tracks[0];
 			if (firstTrack) {
-				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: firstTrack }); // Chuyển sang Focus mode
+				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: firstTrack });
 			}
 		}
 	};
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (!inboxRef.current) return;
+		if (!inboxRef.current.contains(event.target as Node)) {
+			setIsShowInbox(false);
+		}
+	};
+
+	useEffect(() => {
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
 
 	return (
 		<div className="lk-video-conference">
