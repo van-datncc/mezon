@@ -117,7 +117,7 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 									<AudioTrack trackRef={trackReference} onSubscriptionStatusChanged={handleSubscribe} />
 								)
 							)}
-							<div className="lk-participant-placeholder">
+							<div className="lk-participant-placeholder !bg-bgIconLight">
 								{member && (
 									<AvatarImage
 										alt={username || ''}

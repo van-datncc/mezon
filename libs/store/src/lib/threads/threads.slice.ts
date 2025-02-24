@@ -31,17 +31,18 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	openThreadMessageState: boolean;
 	currentThread?: ApiChannelDescription;
 	isThreadModalVisible?: boolean;
+	isFocusThreadBox?: boolean;
 }
 
-export const threadsAdapter = createEntityAdapter({ selectId: (thread: ThreadsEntity) => thread.id || '', 
-sortComparer: (a: ThreadsEntity, b: ThreadsEntity) => {
-    if (a.last_sent_message && b.last_sent_message) {
-      return (b.last_sent_message.timestamp_seconds || 0 ) - ( a.last_sent_message.timestamp_seconds || 0 )
-    }
-    return 0;
-  }
-
- });
+export const threadsAdapter = createEntityAdapter({
+	selectId: (thread: ThreadsEntity) => thread.id || '',
+	sortComparer: (a: ThreadsEntity, b: ThreadsEntity) => {
+		if (a.last_sent_message && b.last_sent_message) {
+			return (b.last_sent_message.timestamp_seconds || 0) - (a.last_sent_message.timestamp_seconds || 0);
+		}
+		return 0;
+	}
+});
 
 /**
  * Export an effect using createAsyncThunk from
@@ -273,21 +274,24 @@ export const threadsSlice = createSlice({
 				});
 			}
 		},
-    updateLastSentInThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; lastSentTime: number }>) => {
+		updateLastSentInThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; lastSentTime: number }>) => {
 			const { channelId, lastSentTime } = action.payload;
 			const entity = state.entities[channelId];
 			if (entity) {
 				threadsAdapter.updateOne(state, {
 					id: channelId,
 					changes: {
-						last_sent_message : {
-              ...entity.last_sent_message,
-              timestamp_seconds : lastSentTime
-            }
+						last_sent_message: {
+							...entity.last_sent_message,
+							timestamp_seconds: lastSentTime
+						}
 					}
 				});
 			}
 		},
+		setFocusThreadBox(state, action: PayloadAction<boolean>) {
+			state.isFocusThreadBox = action.payload;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -458,3 +462,4 @@ export const selectShowEmptyStatus = () =>
 	createSelector(selectAllThreads, (threads) => {
 		return threads.length === 0;
 	});
+export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (state) => state.isFocusThreadBox);
