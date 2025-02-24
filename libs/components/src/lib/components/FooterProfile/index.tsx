@@ -180,7 +180,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			setSelectedUserId(infoSendToken.receiver_id ?? '');
 			setNote(infoSendToken.note ?? 'send token');
 			setExtraAttribute(infoSendToken.extra_attribute ?? '');
-			setIsInputDisabled(true);
+			setIsInputDisabled(infoSendToken.amount !== 0);
 			const timer = setTimeout(() => {
 				handleClosePopup();
 			}, 10000);

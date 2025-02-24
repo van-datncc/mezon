@@ -129,6 +129,7 @@ const ThreadBox = () => {
 							channelLabel={threadCurrentChannel.channel_label}
 							type={ChannelType.CHANNEL_TYPE_THREAD}
 							mode={ChannelStreamMode.STREAM_MODE_THREAD}
+              isPrivate={threadCurrentChannel.channel_private}
 						/>
 					</div>
 				)}
