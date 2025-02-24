@@ -8,7 +8,6 @@ import {
 	messagesActions,
 	reactionActions,
 	referencesActions,
-	selectChannelById,
 	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -208,10 +207,10 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
-	const channel = useAppSelector((state) => selectChannelById(state, message.channel_id ?? '')) || {};
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const channel = useSelector(selectCurrentChannel);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	const sendNotificationMessage = useCallback(
 		async (userId: string) => {
@@ -259,7 +258,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
 		}
-	}, []);
+	}, [isFocusTopicBox, channel]);
 
 	return useMenuBuilderPlugin((builder) => {
 		builder.when(userId !== message.sender_id, (builder) => {

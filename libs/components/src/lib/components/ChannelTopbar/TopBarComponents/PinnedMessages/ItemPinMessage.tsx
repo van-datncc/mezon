@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { UnpinMessageObject } from '.';
 import { MemberProfile } from '../../../MemberProfile';
+import MessageAttachment from '../../../MessageWithUser/MessageAttachment';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 
 type ItemPinMessageProps = {
@@ -90,9 +91,10 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							isJumMessageEnabled={false}
 							isTokenClickAble={false}
 							messageId={message?.message_id}
+							isSearchMessage={true} // to correct size youtube emmbed
 						/>
 					</div>
-					{message?.attachments?.length ? <ListPinAttachment attachments={message?.attachments} /> : <></>}
+					{(message?.attachments?.length as number) > 0 && <MessageAttachment mode={mode as ChannelStreamMode} message={message} />}
 				</div>
 			</div>
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
