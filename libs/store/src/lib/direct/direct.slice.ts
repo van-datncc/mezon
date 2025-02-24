@@ -160,6 +160,7 @@ export const fetchDirectMessage = createAsyncThunk(
 				return -1;
 			});
 			const channels = sorted.map(mapDmGroupToEntity).filter((item) => item.active);
+			thunkAPI.dispatch(channelsActions.setChannelEntityListByClanId({ channels: channels, clanId: '0' }));
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
 			thunkAPI.dispatch(directActions.setAll(channels));
 			const users = mapChannelsToUsers(channels);

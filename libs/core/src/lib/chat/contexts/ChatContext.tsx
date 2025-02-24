@@ -28,6 +28,7 @@ import {
 	emojiSuggestionActions,
 	eventManagementActions,
 	friendsActions,
+	getChannelEntityById,
 	giveCoffeeActions,
 	listChannelRenderAction,
 	listChannelsByUserActions,
@@ -142,6 +143,7 @@ import { useSelector, useStore } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { useDirect } from '../hooks/useDirect';
 import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
 type ChatContextProviderProps = {
@@ -162,6 +164,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId, channelId, clanId } = useAppParams();
 	const dispatch = useAppDispatch();
+	const { createDirectMessageWithUser } = useDirect();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -333,7 +336,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					const senderIsMe = userId === mess.sender_id;
 					const newDm = await dispatch(directActions.addDirectByMessageWS(mess)).unwrap();
+					// eslint-disable-next-line no-extra-boolean-cast
+					if (!!newDm) {
+						if (senderIsMe) {
+							const dmItemInChannelState = await dispatch(getChannelEntityById({ channelId: mess.channel_id })).unwrap();
+							const partnerId = dmItemInChannelState?.user_id?.[0] || '';
+							await createDirectMessageWithUser(partnerId);
+						} else {
+							await createDirectMessageWithUser(mess.sender_id);
+						}
+					}
 					!newDm && dispatch(directMetaActions.updateDMSocket(message));
 
 					const path = isElectron() ? window.location.hash : window.location.pathname;
