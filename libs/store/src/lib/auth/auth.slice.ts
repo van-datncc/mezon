@@ -1,7 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Session } from 'mezon-js';
-import { toast } from 'react-toastify';
 import { ensureClientAsync, getMezonCtx, restoreLocalStorage } from '../helpers';
 export const AUTH_FEATURE_KEY = 'auth';
 
@@ -61,7 +60,7 @@ export const authenticateMezon = createAsyncThunk('auth/authenticateMezon', asyn
 	const mezon = getMezonCtx(thunkAPI);
 	const session = await mezon?.authenticateMezon(code).catch(function (err: any) {
 		err.json().then((data: any) => {
-			toast.error(data.message);
+			console.error(data.message);
 		});
 	});
 
@@ -224,7 +223,7 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateMezon.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'error';
-				state.error = action.error.message;
+				// state.error = action.error.message;
 			});
 	}
 });
