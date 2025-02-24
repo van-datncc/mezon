@@ -214,9 +214,9 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, onScreen
 								>
 									<span onClick={toggleViewMode} className="cursor-pointer">
 										{focusTrack ? (
-											<Icons.VoiceFocusIcon className="dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-										) : (
 											<Icons.VoiceGridIcon className="dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+										) : (
+											<Icons.VoiceFocusIcon className="dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
 										)}
 									</span>
 								</Tooltip>
