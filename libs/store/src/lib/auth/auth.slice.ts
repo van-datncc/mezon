@@ -223,7 +223,7 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateMezon.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'error';
-				// state.error = action.error.message;
+				state.error = action.error.message;
 			});
 	}
 });
