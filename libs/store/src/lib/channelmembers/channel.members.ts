@@ -294,7 +294,7 @@ export const channelMembers = createSlice({
 			const userIds = payload.user_ids;
 			const channelId = payload.channel_id;
 
-			if (!state.memberChannels[channelId]) {
+			if (!state?.memberChannels?.[channelId]) {
 				state.memberChannels[channelId] = {
 					...channelMembersAdapter.getInitialState(),
 					id: channelId
