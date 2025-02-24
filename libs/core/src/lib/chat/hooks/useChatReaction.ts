@@ -5,10 +5,12 @@ import {
 	reactionActions,
 	selectAllChannelMembers,
 	selectClanView,
+	selectClickedOnThreadBoxStatus,
+	selectClickedOnTopicStatus,
 	selectCurrentChannel,
-	selectCurrentTopicId,
 	selectDirectById,
 	selectDmGroupCurrentId,
+	selectThreadCurrentChannel,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -34,7 +36,9 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const directId = useSelector(selectDmGroupCurrentId);
 	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const channel = useSelector(selectCurrentChannel);
-	const currenTopicId = useSelector(selectCurrentTopicId);
+	const thread = useSelector(selectThreadCurrentChannel);
+	const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -49,7 +53,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			clanIdActive = '0';
 			modeActive = ChannelStreamMode.STREAM_MODE_DM;
 			channelIdActive = directId || '';
-		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && !isFocusThreadBox && !isFocusTopicBox) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
 			channelIdActive = channel?.id || '';
@@ -61,6 +65,14 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
 			channelIdActive = channel?.id || '';
+		} else if (isClanView && isFocusThreadBox) {
+			clanIdActive = thread?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_THREAD;
+			channelIdActive = thread?.channel_id || '';
+		} else if (isClanView && isFocusTopicBox) {
+			clanIdActive = channel?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
+			channelIdActive = channel?.channel_id || '';
 		}
 
 		return {
@@ -68,7 +80,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			modeActive,
 			channelIdActive
 		};
-	}, [isClanView, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id]);
+	}, [isClanView, direct?.type, directId, channel?.type, channel?.clan_id, channel?.id, thread?.channel_id, isFocusTopicBox, isFocusThreadBox]);
 	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
 	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
@@ -146,7 +158,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				emoji_id,
 				emoji,
 				count,
-				messageSenderId: message_sender_id,
+				messageSenderId: userId as string,
 				actionDelete: action_delete,
 				isPublic: payload.is_public,
 				userId: userId as string,

@@ -61,6 +61,7 @@ import {
 	selectUserCallId,
 	stickerSettingActions,
 	threadsActions,
+	ThreadsEntity,
 	toastActions,
 	topicsActions,
 	useAppDispatch,
@@ -150,6 +151,7 @@ type ChatContextProviderProps = {
 export type ChatContextValue = {
 	setCallbackEventFn: (socket: Socket) => void;
 	handleReconnect: (socketType: string) => void;
+	onchannelmessage: (message: ChannelMessage) => void;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -563,8 +565,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: clanId as string }));
 					dispatch(listChannelsByUserActions.remove(userID));
 					dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: user.channel_id, clanId: user.clan_id }));
-          dispatch(directMetaActions.remove(user.channel_id))
-
+					dispatch(directMetaActions.remove(user.channel_id));
 				} else {
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(directActions.removeByUserId({ userId: userID, currentUserId: userId as string, channelId: user.channel_id }));
@@ -618,20 +619,48 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					}
-          if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD){
-            dispatch(
-              channelMetaActions.updateBulkChannelMetadata([
-                {
-                  id: channel.id,
-                  lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
-                  clanId: channel.clan_id ?? '',
-                  isMute: false,
-                  senderId: '',
-                  lastSeenTimestamp: Date.now() / 1000 - 1000,
-                }
-              ])
-            );
-          }
+					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+						dispatch(
+							channelMetaActions.updateBulkChannelMetadata([
+								{
+									id: channel.id,
+									lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
+									clanId: channel.clan_id ?? '',
+									isMute: false,
+									senderId: '',
+									lastSeenTimestamp: Date.now() / 1000 - 1000
+								}
+							])
+						);
+					}
+					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+						dispatch(
+							channelMetaActions.updateBulkChannelMetadata([
+								{
+									id: channel.id,
+									lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
+									clanId: channel.clan_id ?? '',
+									isMute: false,
+									senderId: '',
+									lastSeenTimestamp: Date.now() / 1000 - 1000
+								}
+							])
+						);
+
+						if (channel.parrent_id === channelId) {
+							const thread: ThreadsEntity = {
+								id: channel.id,
+								channel_id: channel_desc.channel_id,
+								active: 1,
+								channel_label: channel_desc.channel_label,
+								clan_id: channel_desc.clan_id || clanId,
+								parrent_id: channel_desc.parrent_id,
+								last_sent_message: channel_desc.last_sent_message,
+								type: channel_desc.type
+							};
+							dispatch(threadsActions.add(thread));
+						}
+					}
 
 					if (channel_desc.parrent_id) {
 						dispatch(
@@ -938,7 +967,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(listChannelsByUserActions.upsertOne({ id: channelCreated.channel_id, ...channelCreated }));
+				dispatch(
+					listChannelsByUserActions.addOneChannel({ id: channelCreated.channel_id, type: channelCreated.channel_type, ...channelCreated })
+				);
 				dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
@@ -971,6 +1002,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						])
 					);
 				}
+			} else if (channelCreated.creator_id === userId) {
+				dispatch(
+					listChannelsByUserActions.addOneChannel({
+						id: channelCreated.channel_id,
+						type: channelCreated.channel_type,
+						...channelCreated
+					})
+				);
 			}
 		},
 		[dispatch, allThreads]
@@ -1035,7 +1074,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				if (channelUpdated.channel_private !== undefined) {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string };
+					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string, clan_name: '' };
 
 					if (channelUpdated.creator_id === userId) {
 						dispatch(
@@ -1078,12 +1117,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								})
 							);
 							dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
-							dispatch(
-								listChannelRenderAction.addChannelToListRender({
-									type: channel.type,
-									...channelUpdated
-								})
-							);
+							if (channel.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+								dispatch(
+									listChannelRenderAction.addThreadToListRender({
+										clanId: channel.clan_id,
+										channel: { id: channelUpdated.channel_id, ...channelUpdated }
+									})
+								);
+							} else {
+								dispatch(
+									listChannelRenderAction.addChannelToListRender({
+										type: channel.type,
+										...channelUpdated
+									})
+								);
+							}
+
 							if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 								if (channel.parrent_id) {
 									dispatch(
@@ -1274,14 +1323,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		const isReceiverGiveCoffee = coffeeEvent.receiver_id === userId;
-		const isSenderGiveCoffee = coffeeEvent.sender_id === userId;
 
-		const updateAmount = isReceiverGiveCoffee
-			? AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
-			: isSenderGiveCoffee
-				? -AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND
-				: 0;
-		dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
 		if (isReceiverGiveCoffee && isElectron()) {
 			const senderToken = coffeeEvent.sender_id;
 			const allMembersClan = selectAllUserClans(store.getState() as RootState);
@@ -1773,7 +1815,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		() => ({
 			// add logic code
 			setCallbackEventFn,
-			handleReconnect
+			handleReconnect,
+			onchannelmessage
 		}),
 		[setCallbackEventFn]
 	);

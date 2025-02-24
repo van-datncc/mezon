@@ -242,7 +242,7 @@ export const topicsSlice = createSlice({
 			state.firstMessageOfCurrentTopic.message.content = stringifiedContent;
 			state.firstMessageOfCurrentTopic.message.mentions = stringifiedMentions;
 		},
-		setFocusTopicBox(state, action) {
+		setFocusTopicBox(state, action: PayloadAction<boolean>) {
 			state.isFocusTopicBox = action.payload;
 		}
 	},
