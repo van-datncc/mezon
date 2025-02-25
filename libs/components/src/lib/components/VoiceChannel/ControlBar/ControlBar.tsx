@@ -59,21 +59,13 @@ export function ControlBar({
 	});
 
 	const microphoneOnChange = useCallback(
-		(enabled: boolean) => {
-			if (enabled !== showMicrophone) {
-				dispatch(voiceActions.setShowMicrophone(enabled));
-			}
-		},
-		[dispatch, showMicrophone]
+		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? dispatch(voiceActions.setShowMicrophone(enabled)) : null),
+		[dispatch]
 	);
 
 	const cameraOnChange = useCallback(
-		(enabled: boolean) => {
-			if (enabled !== showCamera) {
-				dispatch(voiceActions.setShowCamera(enabled));
-			}
-		},
-		[dispatch, showCamera]
+		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? dispatch(voiceActions.setShowCamera(enabled)) : null),
+		[dispatch]
 	);
 
 	return (
@@ -102,6 +94,7 @@ export function ControlBar({
 							destroyTooltipOnHide
 						>
 							<TrackToggle
+								key={+showMicrophone}
 								initialState={showMicrophone}
 								className="w-14 h-14 rounded-full flex justify-center items-center"
 								source={Track.Source.Microphone}
@@ -128,6 +121,7 @@ export function ControlBar({
 							destroyTooltipOnHide
 						>
 							<TrackToggle
+								key={+showCamera}
 								initialState={showCamera}
 								className="w-14 h-14 rounded-full flex justify-center items-center"
 								source={Track.Source.Camera}
@@ -153,6 +147,7 @@ export function ControlBar({
 						destroyTooltipOnHide
 					>
 						<TrackToggle
+							key={+showScreen}
 							initialState={showScreen}
 							className="w-14 h-14 rounded-full flex justify-center items-center"
 							source={Track.Source.ScreenShare}
