@@ -17,7 +17,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { Direction_Mode, LIMIT_MESSAGE, sleep } from '@mezon/utils';
+import { Direction_Mode, LIMIT_MESSAGE } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
@@ -57,7 +57,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(true);
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean | string>(false);
@@ -85,19 +84,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 			event.remove();
 		};
 	}, [isViewingOldMessage]);
-
-	useEffect(() => {
-		const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
-			if (time) {
-				setIsReadyShowChannelMsg(false);
-				await sleep(time);
-				setIsReadyShowChannelMsg(true);
-			}
-		});
-		return () => {
-			onSwitchChannel.remove();
-		};
-	}, []);
 
 	useEffect(() => {
 		if (flatListRef?.current && channelId) {
@@ -195,7 +181,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				<MessageItem userId={userId} message={item} previousMessage={previousMessage} messageId={item.id} mode={mode} channelId={channelId} />
 			);
 		},
-		[messages, mode, channelId]
+		[messages, userId, mode, channelId]
 	);
 
 	const handleJumpToPresent = useCallback(async () => {
@@ -234,7 +220,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		<View style={styles.wrapperChannelMessage}>
 			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} isDisableLoadMore={isDisableLoadMore} />
 
-			{isReadyShowChannelMsg && !!messages?.length ? (
+			{messages?.length ? (
 				<ChannelMessageList
 					flatListRef={flatListRef}
 					messages={messages}

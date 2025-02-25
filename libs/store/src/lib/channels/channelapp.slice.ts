@@ -9,6 +9,10 @@ type CreateChannelAppMeetPayload = {
 	roomName: string;
 };
 
+type GenerateAppUserHashPayload = {
+	appId: string;
+};
+
 export const CHANNEL_APP = 'channelApp';
 
 export interface ChannelAppEntity {
@@ -62,6 +66,22 @@ export const createChannelAppMeet = createAsyncThunk(
 		}
 	}
 );
+
+export const generateAppUserHash = createAsyncThunk(`${CHANNEL_APP}/generateAppUserHash`, async ({ appId }: GenerateAppUserHashPayload, thunkAPI) => {
+	if (appId.trim() === '') return thunkAPI.rejectWithValue('Invalid input');
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.generateHashChannelApps(mezon.session, appId);
+
+		if (!response) {
+			return thunkAPI.rejectWithValue('Failed to create room');
+		}
+		return response;
+	} catch (error) {
+		captureSentryError(error, `${CHANNEL_APP}/generateAppUserHash`);
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 
 export const channelAppSlice = createSlice({
 	name: CHANNEL_APP,
@@ -129,5 +149,6 @@ export const channelAppReducer = channelAppSlice.reducer;
 // Export actions & reducer
 export const channelAppActions = {
 	...channelAppSlice.actions,
-	createChannelAppMeet
+	createChannelAppMeet,
+	generateAppUserHash
 };
