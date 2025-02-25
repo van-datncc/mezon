@@ -1,6 +1,8 @@
+import { FailLoginModal } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { useEffect } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSearchParams } from 'react-router-dom';
 
 const LoginCallback = () => {
@@ -8,13 +10,15 @@ const LoginCallback = () => {
 	const code = searchParams.get('code');
 	const dispatch = useAppDispatch();
 	const { navigate } = useAppNavigation();
+	const [openUnknown] = useModal(() => {
+		return <FailLoginModal />;
+	}, []);
 	useEffect(() => {
 		const handleLogin = async () => {
 			if (!code) {
 				navigate('/login');
 				return;
 			}
-
 			try {
 				const action = await dispatch(authActions.authenticateMezon(code));
 
@@ -25,8 +29,7 @@ const LoginCallback = () => {
 					throw new Error(errorMessage);
 				}
 			} catch (error) {
-				alert(error instanceof Error ? error.message : 'An unknown error occurred.');
-				navigate('/login');
+				openUnknown();
 			}
 		};
 

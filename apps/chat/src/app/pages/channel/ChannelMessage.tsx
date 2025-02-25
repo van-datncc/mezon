@@ -147,7 +147,7 @@ export const MemorizedChannelMessage = memo(
 		prev.channelId === curr.channelId &&
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
-		prev.message.content === curr.message.content &&
+		// prev.message.content === curr.message.content &&
 		prev.previousMessage === curr.previousMessage
 );
 

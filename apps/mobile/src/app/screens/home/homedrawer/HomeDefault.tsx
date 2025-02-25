@@ -1,4 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { STORAGE_IS_LAST_ACTIVE_TAB_DM, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -18,7 +19,7 @@ import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
-
+// HomeDefault check
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -62,6 +63,7 @@ const HomeDefault = React.memo((props: any) => {
 	};
 
 	useEffect(() => {
+		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
 		return () => {
 			timeoutRef?.current && clearTimeout(timeoutRef.current);
 		};
