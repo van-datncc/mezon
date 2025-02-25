@@ -52,23 +52,23 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 					Profiles
 				</button>
 				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Privacy & Safety
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Authorized Apps
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Devices
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Connections
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Friend Requests
 				</button>
 				<hr className="border-t border-solid border-borderDefault mt-4" />
@@ -83,36 +83,36 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				>
 					Appearance
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Accessibility
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Voice & Video
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Text & Image
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Notifications
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Keybinds
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Language
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Streamer Mode
 				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+				<br className="hidden" />
+				<button className="hidden p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Advanced
 				</button>
 				<hr className="border-t border-solid border-borderDefault mt-4" />
