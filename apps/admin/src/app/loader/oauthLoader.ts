@@ -11,7 +11,7 @@ export const oAuth2Loader: CustomLoaderFunction = async ({ params, dispatch }) =
 		throw new Error('Application ID null');
 	}
 
-	await dispatch(fetchMezonOauthClient());
+	await dispatch(fetchMezonOauthClient({ appId: applicationId as string }));
 
 	return {
 		applicationId
