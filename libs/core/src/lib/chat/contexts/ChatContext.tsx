@@ -660,6 +660,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								type: channel_desc.type
 							};
 							dispatch(threadsActions.add(thread));
+							const defaultThreadList: ApiChannelDescription[] = [thread as ApiChannelDescription, ...((allThreads || []) as ApiChannelDescription[])];
+							dispatch(
+								threadsActions.updateCacheOnThreadCreation({
+									clanId: channel.clan_id || '',
+									channelId: channel.parrent_id || '',
+									defaultThreadList: defaultThreadList.length > LIMIT ? defaultThreadList.slice(0, -1) : defaultThreadList
+								})
+							);
 						}
 					}
 
@@ -723,7 +731,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(userChannelsActions.addUserChannel({ channelId: channel_desc.channel_id as string, userAdds: userIds }));
 			}
 		},
-		[userId, clanIdActive, dispatch]
+		[userId, clanIdActive, dispatch,allThreads]
 	);
 
 	const onuserclanadded = useCallback(
