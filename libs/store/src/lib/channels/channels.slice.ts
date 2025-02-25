@@ -1126,6 +1126,12 @@ export const channelsSlice = createSlice({
 			}
 			if (!state.byClans[clanId].entities.entities?.[channelId]) return;
 			state.byClans[clanId].entities.entities[channelId].showPinBadge = isShow;
+		},
+
+		setChannelEntityListByClanId: (state, action: PayloadAction<{ channels: ChannelsEntity[]; clanId: string }>) => {
+			const { channels, clanId } = action.payload;
+			if (!state.byClans[clanId]) return;
+			channelsAdapter.setAll(state.byClans[clanId]?.entities, channels);
 		}
 	},
 	extraReducers: (builder) => {
