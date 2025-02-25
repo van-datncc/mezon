@@ -53,10 +53,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 				<ChannelStatusIcon channel={data} isUnRead={isUnRead || Number(numberNotification || 0) > 0} />
 				<EventBadge clanId={data?.clan_id} channelId={data?.channel_id} />
-				<Text
-					style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}
-					numberOfLines={1}
-				>
+				<Text style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}>
 					{data?.channel_label}
 				</Text>
 			</View>

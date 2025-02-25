@@ -1,6 +1,11 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
+import { sleep } from '@mezon/utils';
+import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect } from 'react';
+import { DeviceEventEmitter, View } from 'react-native';
+import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import ChannelMessageActionListener from './ChannelMessageActionListener';
 import ChannelMessageListener from './ChannelMessageListener';
 import ChannelMessageReactionListener from './ChannelMessageReactionListener';
@@ -20,6 +25,39 @@ type ChannelMessagesProps = {
 
 const ChannelMessagesWrapper = React.memo(
 	({ channelId, topicId, clanId, mode, isPublic, isDM, isDisableLoadMore, isDisableActionListener = false }: ChannelMessagesProps) => {
+		const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(false);
+		const { themeValue } = useTheme();
+
+		useFocusEffect(() => {
+			if (!isReadyShowChannelMsg) {
+				setTimeout(() => {
+					setIsReadyShowChannelMsg(() => true);
+				}, 300);
+			}
+		});
+
+		useEffect(() => {
+			const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
+				if (time) {
+					setIsReadyShowChannelMsg(() => false);
+					await sleep(time);
+					setIsReadyShowChannelMsg(() => true);
+				} else {
+					setIsReadyShowChannelMsg(() => true);
+				}
+			});
+			return () => {
+				onSwitchChannel.remove();
+			};
+		}, []);
+
+		if (!isReadyShowChannelMsg)
+			return (
+				<View style={{ flex: 1, backgroundColor: themeValue.primary }}>
+					<MessageItemSkeleton skeletonNumber={8} />
+				</View>
+			);
+
 		return (
 			<View style={{ flex: 1 }}>
 				<ChannelMessages

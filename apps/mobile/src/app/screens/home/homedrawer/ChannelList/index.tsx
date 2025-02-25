@@ -13,7 +13,6 @@ import ChannelListBackground from '../components/ChannelList/ChannelListBackgrou
 import ChannelListBottomSheet from '../components/ChannelList/ChannelListBottomSheet';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import { ChannelListItem } from '../components/ChannelList/ChannelListItem';
-import ChannelListLoading from '../components/ChannelList/ChannelListLoading';
 import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ButtonNewUnread from './ButtonNewUnread';
@@ -156,7 +155,6 @@ const ChannelList = () => {
 					initialNumToRender={20}
 					windowSize={5}
 				/>
-				<ChannelListLoading isNonChannel={!!listChannelRender?.length} />
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />
 			</View>
