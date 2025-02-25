@@ -115,7 +115,8 @@ export const directMetaSlice = createSlice({
 						id: payload.id,
 						sender_id: payload.sender_id,
 						timestamp_seconds: timestamp
-					}
+					},
+          count_mess_unread : 0
 				}
 			});
 		},
