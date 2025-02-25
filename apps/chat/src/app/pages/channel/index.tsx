@@ -318,6 +318,20 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel]);
 
+	const getUserHashInfo = useCallback(
+		async (appId: string) => {
+			try {
+				const response = await dispatch(channelAppActions.generateAppUserHash({ appId: appId })).unwrap();
+
+				return response;
+			} catch (error) {
+				console.error('Error:', error);
+				return null;
+			}
+		},
+		[dispatch, appChannel?.url]
+	);
+
 	useEffect(() => {
 		if (appChannel?.url) {
 			const compareHost = (url1: string, url2: string) => {
@@ -346,7 +360,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					if (!eventType) return;
 
 					if (eventType === 'PING') {
-						// send event to mini app
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
 							appChannel.url ?? ''
@@ -368,6 +381,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
 						dispatch(giveCoffeeActions.setShowModalSendToken(true));
 					} else if (eventType === 'GET_CLAN_ROLES') {
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
+							appChannel.url ?? ''
+						);
+					} else if (eventType === 'SEND_APP_ID') {
+						const { appId } = (eventData.eventData || {}) as any;
+
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
 							appChannel.url ?? ''
