@@ -9,7 +9,7 @@ const toastsAdapter = createEntityAdapter<Toast>();
 
 const initialState = {
 	...toastsAdapter.getInitialState(),
-	toastErrorStatus: false
+	toastError: { status: false, errors: [] as { message: string }[] }
 };
 const addToast = createAsyncThunk(
 	'toasts/addToast',
@@ -62,19 +62,24 @@ export const toastsSlice = createSlice({
 		clearToasts: (state) => {
 			toastsAdapter.removeAll(state);
 		},
-		setErrorToastStatus: (state, action: PayloadAction<boolean>) => {
-			state.toastErrorStatus = action.payload;
+		setToastError: (state, action: PayloadAction<{ status: boolean; message: string }>) => {
+			state.toastError.status = action.payload.status;
+			if (action.payload.status) {
+				state.toastError.errors.push({ message: action.payload.message });
+			} else {
+				state.toastError.errors = [];
+			}
 		}
 	}
 });
 
-export const { addOneToast, removeToast, clearToasts, setErrorToastStatus } = toastsSlice.actions;
+export const { addOneToast, removeToast, clearToasts, setToastError } = toastsSlice.actions;
 
 export const toastActions = {
 	addToast,
 	removeToast,
 	clearToasts,
-	setErrorToastStatus
+	setToastError
 };
 
 // Create selectors using the adapter's getSelectors method
@@ -83,6 +88,6 @@ export const { selectAll: selectToasts, selectById: selectToastById } = toastsAd
 );
 export const selectToastErrorStatus = createSelector(
 	[(state: { toasts: typeof initialState }) => state.toasts],
-	(toastsState) => toastsState.toastErrorStatus
+	(toastsState) => toastsState.toastError
 );
 export const toastsReducer = toastsSlice.reducer;

@@ -1,5 +1,5 @@
 import { FRIEND_PAGE_LINK, toChannelPage, toMembersPage } from '@mezon/core';
-import { RootState, getStoreAsync, selectCurrentClanId, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
+import { RootState, getStoreAsync, selectCurrentClanId, selectWelcomeChannelByClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -7,19 +7,20 @@ import { useNavigate } from 'react-router-dom';
 type ModalUnknowChannelProps = {
 	onClose: () => void;
 	isError?: boolean;
+	errMessage?: string;
 };
 
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const dispatch = useDispatch();
-	const { onClose, isError = false } = props;
+	const { onClose, isError = false, errMessage } = props;
 	const navigate = useNavigate();
 
-	const resetErrorToastStatus = () => {
-		dispatch(toastActions.setErrorToastStatus(false));
-	};
+	// const resetErrorToastStatus = () => {
+	// 	dispatch(toastActions.setToastError({ isActive: false, message: '' }));
+	// };
 
 	const directToWelcomeChannel = async () => {
-		resetErrorToastStatus();
+		// resetErrorToastStatus();
 
 		const store = await getStoreAsync();
 		const currentClanId = selectCurrentClanId(store.getState() as RootState);
@@ -40,7 +41,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const onCloseAndReset = () => {
 		onClose();
 		if (isError) {
-			resetErrorToastStatus();
+			// resetErrorToastStatus();
 		}
 	};
 
@@ -52,7 +53,9 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 						<div className="flex flex-col items-center gap-y-3 ">
 							<Icons.IconClockChannel />
 							{isError ? (
-								<h3 className="font-bold text-2xl dark:text-white text-black">Oops! Something Went Wrong</h3>
+								<h3 className="font-bold text-2xl dark:text-white text-black">
+									{errMessage ? errMessage : 'Oops! Something Went Wrong'}
+								</h3>
 							) : (
 								<>
 									<h3 className="font-bold text-2xl dark:text-white text-black">You don't have access to this link.</h3>

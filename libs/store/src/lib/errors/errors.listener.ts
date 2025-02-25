@@ -123,8 +123,14 @@ errorListenerMiddleware.startListening({
 		if (!toast) {
 			return;
 		}
+		console.log('toast: ', toast);
 		if (toast.type === 'error') {
-			listenerApi.dispatch(toastActions.setErrorToastStatus(true));
+			listenerApi.dispatch(
+				toastActions.setToastError({
+					status: true,
+					message: toast.message as string
+				})
+			);
 		}
 	}
 });
