@@ -343,14 +343,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					return false;
 				}
 			};
+
 			const handleMessage = async (event: MessageEvent) => {
-				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '') && channelAppUserData !== undefined) {
-					if (channelAppUserData !== undefined) {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { channelAppUserData } }),
-							appChannel.url ?? ''
-						);
-					}
+				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
 					const eventData = safeJSONParse(event.data ?? '{}') || {};
 					// eslint-disable-next-line no-console
 					console.log('[MEZON] < ', eventData);
@@ -385,11 +380,11 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
 							appChannel.url ?? ''
 						);
-					} else if (eventType === 'SEND_APP_ID') {
+					} else if (eventType === 'SEND_BOT_ID') {
 						const { appId } = (eventData.eventData || {}) as any;
-
+						const hashData = await getUserHashInfo(appId);
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
+							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { message: hashData } }),
 							appChannel.url ?? ''
 						);
 					} else if (eventType === 'GET_CLAN_USERS') {
