@@ -673,6 +673,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								type: channel_desc.type
 							};
 							dispatch(threadsActions.add(thread));
+							const store = await getStoreAsync();
+							const allThreads = selectAllThreads(store.getState());
+							const defaultThreadList: ApiChannelDescription[] = [thread as ApiChannelDescription, ...((allThreads || []) as ApiChannelDescription[])];
+							dispatch(
+								threadsActions.updateCacheOnThreadCreation({
+									clanId: channel.clan_id || '',
+									channelId: channel.parrent_id || '',
+									defaultThreadList: defaultThreadList.length > LIMIT ? defaultThreadList.slice(0, -1) : defaultThreadList
+								})
+							);
 						}
 					}
 
