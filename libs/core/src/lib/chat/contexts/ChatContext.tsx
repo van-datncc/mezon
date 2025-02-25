@@ -660,6 +660,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								type: channel_desc.type
 							};
 							dispatch(threadsActions.add(thread));
+							const store = await getStoreAsync();
+							const allThreads = selectAllThreads(store.getState());
 							const defaultThreadList: ApiChannelDescription[] = [thread as ApiChannelDescription, ...((allThreads || []) as ApiChannelDescription[])];
 							dispatch(
 								threadsActions.updateCacheOnThreadCreation({
@@ -731,7 +733,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(userChannelsActions.addUserChannel({ channelId: channel_desc.channel_id as string, userAdds: userIds }));
 			}
 		},
-		[userId, clanIdActive, dispatch,allThreads]
+		[userId, clanIdActive, dispatch]
 	);
 
 	const onuserclanadded = useCallback(
