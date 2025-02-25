@@ -8,7 +8,6 @@ import Toast from 'react-native-toast-message';
 import WebView from 'react-native-webview';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
-import { generateCodeChallenge, generateCodeVerifier } from '../../../utils/helpers';
 import { style } from './styles';
 
 const NewLoginScreen = () => {
@@ -20,7 +19,6 @@ const NewLoginScreen = () => {
 	const REDIRECT_URI = encodeURIComponent(process.env.NX_CHAT_APP_OAUTH2_REDIRECT_URI as string);
 	const RESPONSE_TYPE = process.env.NX_CHAT_APP_OAUTH2_RESPONSE_TYPE;
 	const SCOPE = process.env.NX_CHAT_APP_OAUTH2_SCOPE;
-	const CODE_CHALLENGE_METHOD = process.env.NX_CHAT_APP_OAUTH2_CODE_CHALLENGE_METHOD;
 	const STATE = useMemo(() => {
 		const randomState = Math.random().toString(36).substring(2, 15);
 		AsyncStorage.setItem('oauth_state', randomState);
@@ -31,11 +29,7 @@ const NewLoginScreen = () => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		const codeVerifier = generateCodeVerifier();
-		const codeChallenge = generateCodeChallenge(codeVerifier);
-		AsyncStorage.setItem('code_verifier', codeVerifier);
-
-		const authUrl = `${OAUTH2_AUTHORIZE_URL}?client_id=${CLIENT_ID}&prompt=consent&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${REDIRECT_URI}&code_challenge=${codeChallenge}&code_challenge_method=${CODE_CHALLENGE_METHOD}&state=${STATE}`;
+		const authUrl = `${OAUTH2_AUTHORIZE_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&state=${STATE}`;
 		setAuthUri(authUrl);
 	}, []);
 
