@@ -1,26 +1,6 @@
 import { load, save, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
-import { Buffer as BufferMobile } from 'buffer';
-import CryptoJS from 'crypto-js';
 import { safeJSONParse } from 'mezon-js';
 import { Platform } from 'react-native';
-
-type Size =
-	| '64w'
-	| '128w'
-	| '320w'
-	| '480w'
-	| '640w'
-	| '720w'
-	| '960w'
-	| '1280w'
-	| '64h'
-	| '128h'
-	| '320h'
-	| '480h'
-	| '640h'
-	| '720h'
-	| '960h'
-	| '1280h'; // largest web image
 
 export const sleep = (milliseconds: number) => {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -90,17 +70,4 @@ export const resetCachedMessageActionNeedToResolve = (channelId: string) => {
 
 export const getUserStatusByMetadata = (metadata: string | { status: string; user_status: string }) => {
 	return typeof metadata === 'string' ? safeJSONParse(metadata)?.user_status : metadata?.user_status;
-};
-
-export const generateCodeVerifier = () => {
-	const array = new Uint8Array(64);
-	for (let i = 0; i < 64; i++) {
-		array[i] = Math.floor(Math.random() * 256);
-	}
-	return BufferMobile.from(array).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-};
-
-export const generateCodeChallenge = (verifier) => {
-	const sha256Hash = CryptoJS.SHA256(verifier);
-	return CryptoJS.enc.Base64.stringify(sha256Hash).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 };

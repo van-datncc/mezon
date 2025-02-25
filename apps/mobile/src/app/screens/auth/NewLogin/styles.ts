@@ -51,7 +51,7 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			alignItems: 'center'
 		},
 		webView: {
-			height: '60%',
-			width: '90%'
+			height: '100%',
+			width: '100%'
 		}
 	});
