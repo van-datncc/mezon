@@ -30,7 +30,7 @@ import {
 	emojiSuggestionActions,
 	eventManagementActions,
 	friendsActions,
-	getChannelEntityById,
+	getDmEntityByChannelId,
 	getStoreAsync,
 	giveCoffeeActions,
 	listChannelRenderAction,
@@ -326,10 +326,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 					const senderIsMe = userId === mess.sender_id;
 					const newDm = await dispatch(directActions.addDirectByMessageWS(mess)).unwrap();
-					// eslint-disable-next-line no-extra-boolean-cast
-					if (!!newDm) {
+					const dmItemInChannelState = await dispatch(getDmEntityByChannelId({ channelId: mess.channel_id })).unwrap();
+					if (!dmItemInChannelState.active) {
 						if (senderIsMe) {
-							const dmItemInChannelState = await dispatch(getChannelEntityById({ channelId: mess.channel_id })).unwrap();
 							const partnerId = dmItemInChannelState?.user_id?.[0] || '';
 							await createDirectMessageWithUser(partnerId);
 						} else {

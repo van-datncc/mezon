@@ -76,7 +76,7 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.closeDirectMess(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.remove(body.channel_id as string));
+			thunkAPI.dispatch(directActions.setDmActiveStatus({ dmId: body.channel_id as string, isActive: false }));
 			return response;
 		} else {
 			captureSentryError('no reponse', 'direct/createNewDirectMessage');
@@ -159,8 +159,7 @@ export const fetchDirectMessage = createAsyncThunk(
 
 				return -1;
 			});
-			const channels = sorted.map(mapDmGroupToEntity).filter((item) => item.active);
-			thunkAPI.dispatch(channelsActions.setChannelEntityListByClanId({ channels: channels, clanId: '0' }));
+			const channels = sorted.map(mapDmGroupToEntity);
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
 			thunkAPI.dispatch(directActions.setAll(channels));
 			const users = mapChannelsToUsers(channels);
@@ -172,6 +171,17 @@ export const fetchDirectMessage = createAsyncThunk(
 		}
 	}
 );
+
+export const getDmEntityByChannelId = createAsyncThunk('channels/getChannelEntityById', async ({ channelId }: { channelId: string }, thunkAPI) => {
+	try {
+		const state = thunkAPI.getState() as RootState;
+		const channelEntity = state?.direct?.entities?.[channelId];
+		return channelEntity ?? null;
+	} catch (error) {
+		captureSentryError(error, 'channels/getChannelEntityById');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 
 function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 	return channels.reduce<IUserItemActivity[]>((acc, dm) => {
@@ -544,6 +554,12 @@ export const directSlice = createSlice({
 				dmGroup.usernames = [...(dmGroup.usernames ?? []), ...(action.payload.usernames ?? [])];
 				dmGroup.channel_avatar = [...(dmGroup.channel_avatar ?? []), ...(action.payload.channel_avatar ?? [])];
 			}
+		},
+		setDmActiveStatus: (state, action: PayloadAction<{ dmId: string; isActive: boolean }>) => {
+			const { dmId, isActive } = action.payload;
+			const dmGroup = state.entities?.[dmId];
+			if (!dmGroup) return;
+			state.entities[dmId].active = isActive ? 1 : 0;
 		}
 	},
 	extraReducers: (builder) => {

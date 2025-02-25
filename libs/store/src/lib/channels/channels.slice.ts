@@ -789,17 +789,6 @@ export const updateChannelBadgeCountAsync = createAsyncThunk(
 	}
 );
 
-export const getChannelEntityById = createAsyncThunk('channels/getChannelEntityById', async ({ channelId }: { channelId: string }, thunkAPI) => {
-	try {
-		const state = thunkAPI.getState() as RootState;
-		const channelEntity = state.channels.byClans['0'].entities.entities[channelId];
-		return channelEntity ?? null;
-	} catch (error) {
-		captureSentryError(error, 'channels/getChannelEntityById');
-		return thunkAPI.rejectWithValue(error);
-	}
-});
-
 export const initialChannelsState: ChannelsState = {
 	byClans: {},
 	loadingStatus: 'not loaded',
