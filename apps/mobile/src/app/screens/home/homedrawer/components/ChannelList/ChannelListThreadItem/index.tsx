@@ -73,7 +73,6 @@ const ChannelListThreadItem = ({ onPress, onLongPress, thread, isActive, isFirst
 								backgroundColor: themeBasic === ThemeModeBase.DARK ? themeValue.secondaryLight : themeValue.secondaryWeight
 							}
 						]}
-						numberOfLines={1}
 					>
 						{thread?.channel_label}
 					</Text>
