@@ -63,6 +63,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (channelData?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
+				return;
 			}
 
 			const clanId = channelData?.clan_id;
