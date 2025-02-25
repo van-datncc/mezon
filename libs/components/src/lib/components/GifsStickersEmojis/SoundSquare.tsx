@@ -44,9 +44,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '1',
-		filename: 'giong_nghe_di_deo_chiu_dc.mp3',
+		filename: 'fail-sound-effect.mp3',
 		size: 64503,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1840651419422560256/1775730015049093000/1738915806076_0giong_nghe_di_deo_chiu_dc.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/fail-sound-effect.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -54,9 +54,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '2',
-		filename: 'yeah_boiii_i_i_i.mp3',
+		filename: 'huh_.mp3',
 		size: 130430,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1840651419422560256/1775730015049093000/1738915806076_1yeah_boiii_i_i_i.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/huh_.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -64,9 +64,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '3',
-		filename: 'Danger_Alarm_Meme_Sound_Effect.mp3',
+		filename: 'dun-dun-dun-sound-effect-brass_8nFBc.mp3',
 		size: 101189,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1840651419422560256/1775730015049093000/1738915806076_2Danger_Alarm_Meme_Sound_Effect.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/dun-dun-dun-sound-effect-brass_8nFBccR.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -74,9 +74,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '4',
-		filename: 'galaxy_meme.mp3',
+		filename: 'oh-my-god-meme.mp3',
 		size: 303744,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1840651419422560256/1775730015049093000/1738915806076_3galaxy_meme.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/oh-my-god-meme.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -84,9 +84,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '5',
-		filename: 'oh_hello_there.mp3',
+		filename: 'nani-meme-sound-effect.mp3',
 		size: 49780,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1840651419422560256/1775730015049093000/1738915806076_4oh_hello_there.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/nani-meme-sound-effect.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -94,9 +94,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '6',
-		filename: 'thoi_toang_mimosa_chu_sound_effect-www_tiengdong_com.mp3',
+		filename: 'bruh.mp3',
 		size: 284194,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739012077086_0thoi_toang_mimosa_chu_sound_effect_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/bruh.mp3',
 		filetype: 'audio/mpeg'
 	},
 	// SYSTEM SOUNDS
@@ -106,9 +106,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '7',
-		filename: 'hieu_ung_am_thanh_na_ni-www_tiengdong_com.mp3',
+		filename: 'shocked-sound-effect.mp3',
 		size: 343658,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550763_0hieu_ung_am_thanh_na_ni_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/shocked-sound-effect.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -116,9 +116,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '8',
-		filename: 'nhon_hahaha_meme_sound_effect-www_tiengdong_com.mp3',
+		filename: 'anime-wow-sound-effect-mp3cut.mp3',
 		size: 326558,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_1nhon_hahaha_meme_sound_effect_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/anime-wow-sound-effect-mp3cut.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -126,9 +126,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '9',
-		filename: 'day_gay_di_sao_lai_khong_gay_mp3-www_tiengdong_com.mp3',
+		filename: 'directed-by-robert-b.mp3',
 		size: 107519,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_2day_gay_di_sao_lai_khong_gay_mp3_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/directed-by-robert-b.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -136,9 +136,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '10',
-		filename: 'Do_ngu_Do_an_hai-www_tiengdong_com.mp3',
+		filename: 'punch-gaming-sound.mp3',
 		size: 107519,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_3Do_ngu_Do_an_hai_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/punch-gaming-sound.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -146,9 +146,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '11',
-		filename: 'toi_nam_nay_hon_70_tuoi_tiktok-www_tiengdong_com.mp3',
+		filename: 'vine-boom-sound.mp3',
 		size: 340902,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_4toi_nam_nay_hon_70_tuoi_tiktok_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/vine-boom-sound.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -156,9 +156,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '12',
-		filename: 'may_la_ai_ban_goc-www_tiengdong_com.mp3',
+		filename: 'run.mp3',
 		size: 93308,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_5may_la_ai_ban_goc_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/run.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -166,9 +166,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '13',
-		filename: 'khoai_khoai_chay_nuoc_mieng_tiktok-www_tiengdong_com.mp3',
+		filename: 'among-us-role-reveal-sound.mp3',
 		size: 112695,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_6khoai_khoai_chay_nuoc_mieng_tiktok_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/among-us-role-reveal-sound.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -176,9 +176,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '14',
-		filename: 'meme_A_du_be_gai_giat_minh_ha_mp3-www_tiengdong_com.mp3',
+		filename: 'meme_fail.mp3',
 		size: 151822,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028550764_7meme_A_du_be_gai_giat_minh_ha_mp3_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/meme_fail.mp3',
 		filetype: 'audio/mpeg'
 	},
 
@@ -188,9 +188,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '15',
-		filename: 'tao_lay_may_pewpew-www_tiengdong_com.mp3',
+		filename: 'error_sound.mp3',
 		size: 304211,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843431_0tao_lay_may_pewpew_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/error_sound.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -198,9 +198,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '16',
-		filename: 'may_coi_do_may_ra_mp3_ban_goc-www_tiengdong_com.mp3',
+		filename: 'emotional_damage_meme.mp3',
 		size: 151822,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843431_1may_coi_do_may_ra_mp3_ban_goc_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/emotional_damage_meme.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -208,9 +208,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '17',
-		filename: 'thoi_thoi_may_dung_co_boc_phet_kha_banh-www_tiengdong_com.mp3',
+		filename: 'are_you_crazy.mp3',
 		size: 132363,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843431_2thoi_thoi_may_dung_co_boc_phet_kha_banh_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/are_you_crazy.mp3',
 		filetype: 'audio/mpeg'
 	},
 	{
@@ -218,80 +218,9 @@ const sounds = [
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
 		clan_id: '1775731152322039809',
 		id: '18',
-		filename: 'Am_thanh_meme_ban_noi_that_la_nuc_cuoi-www_tiengdong_com.mp3',
+		filename: 'sad_violin.mp3',
 		size: 361889,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843432_3Am_thanh_meme_ban_noi_that_la_nuc_cuoi_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '19',
-		filename: 'Am_thanh_meme_nhin_ne_nhin_di_nhin_ky_di-www_tiengdong_com.mp3',
-		size: 317167,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843432_4Am_thanh_meme_nhin_ne_nhin_di_nhin_ky_di_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '20',
-		filename: 'anh_la_dai_bang_me_la_phuong_hoang_Duoc_cai_me_thuong-www_tiengdong_com.mp3',
-		size: 296374,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028843432_5anh_la_dai_bang_me_la_phuong_hoang_Duoc_cai_me_thuong_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '21',
-		filename: 'ai_chui_minh_cung_bo_ngoai_tai_het_ma_danh_thi_minh_chay-www_tiengdong_com.mp3',
-		size: 288589,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028876567_0ai_chui_minh_cung_bo_ngoai_tai_het_ma_danh_thi_minh_chay_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '22',
-		filename: 'tieng_rao_ai_danh_tao_di_ai_danh_tao_nao_ban_goc-www_tiengdong_com.mp3',
-		size: 187663,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028876568_1tieng_rao_ai_danh_tao_di_ai_danh_tao_nao_ban_goc_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '23',
-		filename: 'troi_oi_bao_tap_mua_sa_tiktok_mp3-www_tiengdong_com.mp3',
-		size: 951995,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028876568_2troi_oi_bao_tap_mua_sa_tiktok_mp3_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '24',
-		filename: 'ok_ok_tuan_tien_ti_sound_effect-www_tiengdong_com.mp3',
-		size: 137194,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028876568_3ok_ok_tuan_tien_ti_sound_effect_www_tiengdong_com.mp3',
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '25',
-		filename: 'Am_thanh_meme_khongDungdung-www_tiengdong_com.mp3',
-		size: 296437,
-		url: 'https://cdn.mezon.vn/1775732550744936448/1838798547944738816/1775730015049093000/1739028876568_4Am_thanh_meme_khongDungdung_www_tiengdong_com.mp3',
+		url: 'https://cdn.mezon.vn/soundboard/meme/sad_violin.mp3',
 		filetype: 'audio/mpeg'
 	}
 ];
