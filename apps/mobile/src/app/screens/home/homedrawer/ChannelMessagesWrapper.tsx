@@ -70,7 +70,7 @@ const ChannelMessagesWrapper = React.memo(
 					isDisableLoadMore={isDisableLoadMore}
 				/>
 				<ChannelMessageListener />
-				<ChannelMessageReactionListener />
+				{!isDisableActionListener && <ChannelMessageReactionListener />}
 				{!isDisableActionListener && <ChannelMessageActionListener mode={mode} isPublic={isPublic} clanId={clanId} channelId={channelId} />}
 			</View>
 		);
