@@ -10,14 +10,25 @@ interface IProps {
 	height: number;
 	children: React.ReactNode;
 	isStickyHeader: boolean;
+	isAlbumHeader?: boolean;
+	changeBottomSheet?: (isShow: boolean) => void;
 }
 
 const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
-	{ height = 1, children, isStickyHeader = false }: IProps,
+	{ height = 1, children, isStickyHeader = false, isAlbumHeader = false, changeBottomSheet }: IProps,
 	ref: Ref<BottomSheetMethods>
 ) {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
+
+	const handleBottomSheet = (index) => {
+		if (index === 1 && isAlbumHeader) {
+			changeBottomSheet(true);
+		} else {
+			changeBottomSheet(false);
+		}
+	};
+
 	return (
 		<BottomSheet
 			ref={ref}
@@ -26,6 +37,7 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 			backgroundStyle={{
 				backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary
 			}}
+			onChange={handleBottomSheet}
 		>
 			<BottomSheetScrollView stickyHeaderIndices={isStickyHeader ? [0] : []} style={styles.contentContainer}>
 				{children}
