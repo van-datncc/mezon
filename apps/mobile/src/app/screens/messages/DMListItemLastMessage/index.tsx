@@ -85,7 +85,7 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 
 			if (endIndex !== -1) {
 				const emojiUrl = formatEmojiInText.slice(startIndex, endIndex);
-				parts.push(<FastImage style={styles.emoji} source={{ uri: emojiUrl }} />);
+				parts.push(<FastImage style={styles.emoji} source={{ uri: emojiUrl }} resizeMode="contain" />);
 				startIndex = endIndex + EMOJI_KEY.length;
 				endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
 			}
