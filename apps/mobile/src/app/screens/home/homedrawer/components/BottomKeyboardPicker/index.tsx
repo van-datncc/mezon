@@ -18,7 +18,7 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 	{ height = 1, children, isStickyHeader = false, isAlbumHeader = false, changeBottomSheet }: IProps,
 	ref: Ref<BottomSheetMethods>
 ) {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 
 	const handleBottomSheet = (index) => {
@@ -35,7 +35,7 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 			snapPoints={[height === 0 ? 1 : height, '100%']}
 			animateOnMount
 			backgroundStyle={{
-				backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.primary
+				backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary
 			}}
 			onChange={handleBottomSheet}
 		>
