@@ -39,10 +39,12 @@ export const style = (colors: Attributes) =>
 		titleThread: {
 			flex: 1,
 			fontSize: size.s_15,
+			maxHeight: size.s_20,
 			fontWeight: '600',
 			color: colors.channelNormal,
 			top: verticalScale(3),
-			paddingBottom: size.s_2
+			paddingBottom: size.s_2,
+			overflow: 'hidden'
 		},
 
 		channelListItemTitleActive: {

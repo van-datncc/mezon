@@ -119,6 +119,7 @@ export interface MessagesState {
 	channelViewPortMessageIds: Record<string, string[]>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	directMessageUnread: Record<string, ChannelMessage[]>;
+	isLoadingJumpMessage?: boolean;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -526,22 +527,25 @@ export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
 	async ({ clanId, messageId, channelId, noCache = true, isFetchingLatestMessages = false, navigate, mode }: JumpToMessageArgs, thunkAPI) => {
 		try {
+			thunkAPI.dispatch(messagesActions.setLoadingJumpMessage(true));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
 			if (indexMessage < 10) {
-				await thunkAPI.dispatch(
-					fetchMessages({
-						clanId: clanId,
-						channelId: channelId,
-						noCache: noCache,
-						messageId: messageId,
-						direction: Direction_Mode.AROUND_TIMESTAMP,
-						isFetchingLatestMessages,
-						isClearMessage: true,
-						viewingOlder: true
-					})
-				);
+				await thunkAPI
+					.dispatch(
+						fetchMessages({
+							clanId: clanId,
+							channelId: channelId,
+							noCache: noCache,
+							messageId: messageId,
+							direction: Direction_Mode.AROUND_TIMESTAMP,
+							isFetchingLatestMessages,
+							isClearMessage: true,
+							viewingOlder: true
+						})
+					)
+					.unwrap();
 			}
 
 			const state = thunkAPI.getState() as RootState;
@@ -558,6 +562,8 @@ export const jumpToMessage = createAsyncThunk(
 		} catch (e) {
 			captureSentryError(e, 'messages/jumpToMessage');
 			return thunkAPI.rejectWithValue(e);
+		} finally {
+			thunkAPI.dispatch(messagesActions.setLoadingJumpMessage(false));
 		}
 	}
 );
@@ -855,7 +861,8 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: null,
 	directMessageUnread: {},
-	channelViewPortMessageIds: {}
+	channelViewPortMessageIds: {},
+	isLoadingJumpMessage: false
 };
 
 export type SetCursorChannelArgs = {
@@ -1177,6 +1184,9 @@ export const messagesSlice = createSlice({
 					};
 				}
 			}
+		},
+		setLoadingJumpMessage: (state, action) => {
+			state.isLoadingJumpMessage = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -1506,6 +1516,8 @@ export const selectIsJumpingToPresent = createSelector(
 );
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
+
+export const selectIsLoadingJumpMessage = (state: MessagesState) => state.isLoadingJumpMessage;
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	if (!channelId) return state;

@@ -39,7 +39,7 @@ export const ChannelMessageLoading = React.memo(({ channelId, isEmptyMsg, isDisa
 	}, []);
 
 	if (isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && isEmptyMsg && !isDisableLoadMore) {
-		return <MessageItemSkeleton skeletonNumber={15} />;
+		return <MessageItemSkeleton skeletonNumber={8} />;
 	}
 
 	return null;

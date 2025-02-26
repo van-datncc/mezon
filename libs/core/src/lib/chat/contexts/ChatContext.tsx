@@ -30,6 +30,7 @@ import {
 	emojiSuggestionActions,
 	eventManagementActions,
 	friendsActions,
+	getDmEntityByChannelId,
 	getStoreAsync,
 	giveCoffeeActions,
 	listChannelRenderAction,
@@ -141,6 +142,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { useDirect } from '../hooks/useDirect';
 import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
 type ChatContextProviderProps = {
@@ -159,6 +161,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { socketRef, reconnectWithTimeout } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
+	const { createDirectMessageWithUser } = useDirect();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const navigate = useNavigate();
 	// update later
@@ -321,7 +324,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					const senderIsMe = userId === mess.sender_id;
 					const newDm = await dispatch(directActions.addDirectByMessageWS(mess)).unwrap();
+					const dmItemInChannelState = await dispatch(getDmEntityByChannelId({ channelId: mess.channel_id })).unwrap();
+					if (!dmItemInChannelState.active) {
+						if (senderIsMe) {
+							const partnerId = dmItemInChannelState?.user_id?.[0] || '';
+							await createDirectMessageWithUser(partnerId);
+						} else {
+							await createDirectMessageWithUser(mess.sender_id);
+						}
+					}
 					!newDm && dispatch(directMetaActions.updateDMSocket(message));
 					const isClanView = selectClanView(store.getState());
 
@@ -662,7 +675,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							dispatch(threadsActions.add(thread));
 							const store = await getStoreAsync();
 							const allThreads = selectAllThreads(store.getState());
-							const defaultThreadList: ApiChannelDescription[] = [thread as ApiChannelDescription, ...((allThreads || []) as ApiChannelDescription[])];
+							const defaultThreadList: ApiChannelDescription[] = [
+								thread as ApiChannelDescription,
+								...((allThreads || []) as ApiChannelDescription[])
+							];
 							dispatch(
 								threadsActions.updateCacheOnThreadCreation({
 									clanId: channel.clan_id || '',

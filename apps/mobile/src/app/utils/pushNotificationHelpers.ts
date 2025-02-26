@@ -162,6 +162,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				if (clanIdCache !== clanId || time) {
 					const joinAndChangeClan = async (store: any, clanId: string) => {

@@ -171,7 +171,6 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	if (
 		channelType !== ChannelType.CHANNEL_TYPE_CHANNEL &&
 		channelType !== ChannelType.CHANNEL_TYPE_DM &&
-		channelType !== ChannelType.CHANNEL_TYPE_APP &&
 		channelType !== ChannelType.CHANNEL_TYPE_GROUP &&
 		channelType !== ChannelType.CHANNEL_TYPE_THREAD
 	) {
@@ -1126,6 +1125,12 @@ export const channelsSlice = createSlice({
 			}
 			if (!state.byClans[clanId].entities.entities?.[channelId]) return;
 			state.byClans[clanId].entities.entities[channelId].showPinBadge = isShow;
+		},
+
+		setChannelEntityListByClanId: (state, action: PayloadAction<{ channels: ChannelsEntity[]; clanId: string }>) => {
+			const { channels, clanId } = action.payload;
+			if (!state.byClans[clanId]) return;
+			channelsAdapter.setAll(state.byClans[clanId]?.entities, channels);
 		}
 	},
 	extraReducers: (builder) => {

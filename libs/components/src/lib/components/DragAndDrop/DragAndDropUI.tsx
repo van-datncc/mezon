@@ -53,7 +53,7 @@ function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
 				<div className="border-2 border-white w-[90%] h-[86%] rounded-lg border-dashed">
 					<div className="flex flex-col justify-center mt-14">
 						<div className=" w-full flex flex-row justify-center">
-							<h1 className=" font-bold text-2xl mt-[1rem] text-center">Upload To #{currentChannel?.channel_label}</h1>
+							<h1 className=" font-bold text-2xl mt-[1rem] text-center truncate">Upload To #{currentChannel?.channel_label}</h1>
 						</div>
 						<div className=" w-full flex flex-row justify-center text-center mt-[1rem]">
 							<p className="w-[85%]">You can add comments before uploading. Hold shift to upload directly.</p>
