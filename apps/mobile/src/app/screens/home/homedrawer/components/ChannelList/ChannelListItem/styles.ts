@@ -37,10 +37,12 @@ export const style = (colors: Attributes) =>
 
 		channelListItemTitle: {
 			fontSize: size.s_15,
+			maxHeight: size.s_20,
 			fontWeight: '600',
 			marginLeft: size.s_10,
 			color: colors.channelNormal,
-			maxWidth: '80%'
+			maxWidth: '80%',
+			overflow: 'hidden'
 		},
 
 		channelListItemTitleActive: {

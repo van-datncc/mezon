@@ -111,6 +111,13 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			textDecorationLine: 'none',
 			lineHeight: size.s_20
 		},
+		hashtag: {
+			fontSize: size.medium,
+			fontWeight: '600',
+			color: colors.textLink,
+			backgroundColor: colors.midnightBlue,
+			lineHeight: size.s_20
+		},
 		iconEmojiInMessage: {
 			width: size.s_20,
 			height: size.s_20
@@ -499,7 +506,7 @@ export const RenderTextMarkdownContent = ({
 	if (!hasMarkdown) {
 		const elements = [
 			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
-			...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
+			...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
 			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS }))
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
@@ -600,7 +607,7 @@ export const RenderTextMarkdownContent = ({
 						textParts.push(
 							<Text
 								key={`hashtag-${index}`}
-								style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).link : {}]}
+								style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
 								onPress={() => {
 									const urlFormat = link.replace(/##voice%22|#%22|%22|"|#/g, '');
 									const dataChannel = urlFormat.split('_');
