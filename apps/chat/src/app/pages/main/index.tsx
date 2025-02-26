@@ -52,7 +52,7 @@ import {
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectTheme,
-	selectToastErrorStatus,
+	selectToastErrors,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -276,56 +276,52 @@ function MyApp() {
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
-	// show toast error
-	const toastErrorStatus = useSelector(selectToastErrorStatus);
-	const [openUnknown, closeUnknown] = useModal(() => {
-		return <ModalUnknowChannel isError={true} onClose={closeUnknown} />;
-	}, []);
-	useEffect(() => {
-		if (toastErrorStatus) {
-			openUnknown();
-		} else {
-			closeUnknown();
-		}
-	}, [toastErrorStatus]);
+
+	const toastError = useSelector(selectToastErrors);
+
 	return (
-		<div
-			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
-			onClick={handleClick}
-		>
-			{previewMode && <PreviewOnboardingMode />}
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
-			<SidebarMenu openCreateClanModal={openCreateClanModal} />
-			<MainContent />
+		<>
+			{toastError.map((error) => (
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
+			))}
 			<div
-				className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
-				style={streamStyle}
+				className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
+				onClick={handleClick}
 			>
-				<ChannelStream
-					key={currentStreamInfo?.streamId}
-					currentChannel={currentChannel}
-					currentStreamInfo={currentStreamInfo}
-					handleChannelClick={handleChannelClick}
-					streamVideoRef={streamVideoRef}
-					disconnect={disconnect}
-					isStream={isStream}
-				/>
+				{previewMode && <PreviewOnboardingMode />}
+				{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
+				<SidebarMenu openCreateClanModal={openCreateClanModal} />
+				<MainContent />
+				<div
+					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+					style={streamStyle}
+				>
+					<ChannelStream
+						key={currentStreamInfo?.streamId}
+						currentChannel={currentChannel}
+						currentStreamInfo={currentStreamInfo}
+						handleChannelClick={handleChannelClick}
+						streamVideoRef={streamVideoRef}
+						disconnect={disconnect}
+						isStream={isStream}
+					/>
+				</div>
+
+				{isPlayRingTone &&
+					!!dataCall &&
+					!isInCall &&
+					directId !== dataCall?.channel_id &&
+					dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
+						<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
+					)}
+
+				<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
+				{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
+				{openModalAttachment && <MessageModalImageWrapper />}
+				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
+				{isShowPopupQuickMess && <PopupQuickMess />}
 			</div>
-
-			{isPlayRingTone &&
-				!!dataCall &&
-				!isInCall &&
-				directId !== dataCall?.channel_id &&
-				dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
-					<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
-				)}
-
-			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
-			{openModalAttachment && <MessageModalImageWrapper />}
-			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
-			{isShowPopupQuickMess && <PopupQuickMess />}
-		</div>
+		</>
 	);
 }
 
