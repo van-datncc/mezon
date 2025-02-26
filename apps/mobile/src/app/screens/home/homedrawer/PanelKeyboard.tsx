@@ -15,7 +15,7 @@ interface IProps {
 	currentClanId: string;
 }
 const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -99,7 +99,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			<Animated.View
 				style={{
 					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? animatedHeight : 0,
-					backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.primary
+					backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary
 				}}
 			/>
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

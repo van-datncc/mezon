@@ -340,7 +340,8 @@ export const style = (colors: Attributes) =>
 		},
 		messageWrapper: {
 			flexDirection: 'column',
-			marginTop: size.s_10
+			marginTop: size.s_10,
+			marginBottom: size.s_4
 		},
 		highlightMessageMention: {
 			backgroundColor: colors.reactionBg
