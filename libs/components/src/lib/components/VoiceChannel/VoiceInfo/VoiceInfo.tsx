@@ -111,7 +111,7 @@ const VoiceInfo = React.memo(() => {
 				>
 					<button
 						className="flex justify-center items-center bg-buttonSecondary hover:bg-buttonSecondaryHover p-[6px] rounded-md"
-						// onClick={() => dispatch(voiceActions.setShowScreen(!showScreen))}
+						onClick={() => dispatch(voiceActions.setShowScreen(!showScreen))}
 					>
 						{showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5" /> : <Icons.VoiceScreenShareIcon className="w-5 h-5" />}
 					</button>

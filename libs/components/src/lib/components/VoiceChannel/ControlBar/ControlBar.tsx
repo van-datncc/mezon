@@ -1,5 +1,13 @@
 import { ControlBarControls, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
-import { selectShowCamera, selectShowMicrophone, selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	selectShowCamera,
+	selectShowMicrophone,
+	selectShowScreen,
+	selectVoiceFullScreen,
+	selectVoiceJoined,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
@@ -14,18 +22,9 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
-	onScreenShare: (enabled: boolean) => void;
 }
 
-export function ControlBar({
-	variation,
-	controls,
-	saveUserChoices = true,
-	onDeviceError,
-	onLeaveRoom,
-	onFullScreen,
-	onScreenShare
-}: ControlBarProps) {
+export function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 
@@ -37,6 +36,7 @@ export function ControlBar({
 	const showScreen = useSelector(selectShowScreen);
 	const showCamera = useSelector(selectShowCamera);
 	const showMicrophone = useSelector(selectShowMicrophone);
+	const isJoined = useSelector(selectVoiceJoined);
 
 	const isFullScreen = useSelector(selectVoiceFullScreen);
 
@@ -65,6 +65,19 @@ export function ControlBar({
 
 	const cameraOnChange = useCallback(
 		(enabled: boolean, isUserInitiated: boolean) => (isUserInitiated ? dispatch(voiceActions.setShowCamera(enabled)) : null),
+		[dispatch]
+	);
+
+	const onScreenShare = useCallback(
+		(enabled: boolean, isUserInitiated: boolean) => {
+			if (enabled) {
+				dispatch(voiceActions.setFullScreen(false));
+			}
+
+			if (isUserInitiated) {
+				dispatch(voiceActions.setShowScreen(enabled));
+			}
+		},
 		[dispatch]
 	);
 
