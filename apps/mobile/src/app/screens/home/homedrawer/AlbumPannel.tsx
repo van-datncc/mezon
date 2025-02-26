@@ -84,7 +84,7 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 
 	const handleSelectAlbum = (album: AlbumWithCover) => {
 		onAlbumChange(album?.title);
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_SELECT_ALBUM, album.title);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_SELECT_ALBUM, album?.title || '');
 		setIsShowAlbumList(false);
 	};
 
@@ -192,8 +192,8 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 				const allAlbum = {
 					id: '0',
 					title: 'All',
-					count: albumsWithCovers.reduce((acc, album) => acc + album.count, 0),
-					coverPhoto: allPhotos?.edges?.[0]?.node?.image?.uri
+					count: albumsWithCovers?.reduce((acc, album) => acc + album?.count, 0) || 0,
+					coverPhoto: allPhotos?.edges?.[0]?.node?.image?.uri || ''
 				} as AlbumWithCover;
 				setAlbums([allAlbum, ...(albumsWithCovers || [])]);
 			})
