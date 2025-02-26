@@ -123,11 +123,9 @@ errorListenerMiddleware.startListening({
 		if (!toast) {
 			return;
 		}
-		console.log('toast: ', toast);
 		if (toast.type === 'error') {
 			listenerApi.dispatch(
-				toastActions.setToastError({
-					status: true,
+				toastActions.addToastError({
 					message: toast.message as string
 				})
 			);

@@ -9,7 +9,7 @@ const toastsAdapter = createEntityAdapter<Toast>();
 
 const initialState = {
 	...toastsAdapter.getInitialState(),
-	toastError: { status: false, errors: [] as { message: string }[] }
+	toastErrors: [] as { id: string; message: string }[]
 };
 const addToast = createAsyncThunk(
 	'toasts/addToast',
@@ -62,32 +62,38 @@ export const toastsSlice = createSlice({
 		clearToasts: (state) => {
 			toastsAdapter.removeAll(state);
 		},
-		setToastError: (state, action: PayloadAction<{ status: boolean; message: string }>) => {
-			state.toastError.status = action.payload.status;
-			if (action.payload.status) {
-				state.toastError.errors.push({ message: action.payload.message });
-			} else {
-				state.toastError.errors = [];
+		addToastError: (state, action: PayloadAction<{ message?: string }>) => {
+			const message = action.payload.message;
+			if (!message || state.toastErrors.find((error) => error.message === message)) {
+				return;
 			}
+			const id = Date.now().toString();
+			state.toastErrors.push({ id, message });
+		},
+		removeToastError: (state, action: PayloadAction<string>) => {
+			state.toastErrors = state.toastErrors.filter((error) => error.id !== action.payload);
+		},
+		clearAllToastErrors: (state) => {
+			state.toastErrors = [];
 		}
 	}
 });
 
-export const { addOneToast, removeToast, clearToasts, setToastError } = toastsSlice.actions;
+export const { addOneToast, removeToast, clearToasts, addToastError, removeToastError, clearAllToastErrors } = toastsSlice.actions;
 
 export const toastActions = {
 	addToast,
 	removeToast,
 	clearToasts,
-	setToastError
+	addToastError,
+	removeToastError,
+	clearAllToastErrors
 };
 
 // Create selectors using the adapter's getSelectors method
 export const { selectAll: selectToasts, selectById: selectToastById } = toastsAdapter.getSelectors(
 	(state: { toasts: typeof initialState }) => state.toasts
 );
-export const selectToastErrorStatus = createSelector(
-	[(state: { toasts: typeof initialState }) => state.toasts],
-	(toastsState) => toastsState.toastError
-);
+export const selectToastErrors = createSelector([(state: { toasts: typeof initialState }) => state.toasts], (toastsState) => toastsState.toastErrors);
+
 export const toastsReducer = toastsSlice.reducer;

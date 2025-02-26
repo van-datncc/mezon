@@ -290,7 +290,6 @@ interface JoinClanPayload {
 	clanId: string;
 }
 export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
-	console.log('joinClan', clanId);
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.socketRef.current?.joinClanChat(clanId);

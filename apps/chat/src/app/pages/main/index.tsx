@@ -52,7 +52,7 @@ import {
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	selectTheme,
-	selectToastErrorStatus,
+	selectToastErrors,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -276,35 +276,13 @@ function MyApp() {
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
-	// show toast error
-	// Lấy danh sách lỗi từ Redux
-	const toastError = useSelector(selectToastErrorStatus);
 
-	// State quản lý danh sách modal lỗi đang mở
-	const [openErrors, setOpenErrors] = useState<{ id: number; message: string }[]>([]);
-
-	// Khi có lỗi mới, thêm vào danh sách openErrors
-	useEffect(() => {
-		if (toastError.errors.length > 0) {
-			setOpenErrors((prev) => [
-				...prev,
-				...toastError.errors.map((err, index) => ({
-					id: Date.now() + index,
-					message: err.message
-				}))
-			]);
-		}
-	}, [toastError.errors]);
-
-	// Hàm đóng modal theo ID
-	const closeError = (id: number) => {
-		setOpenErrors((prev) => prev.filter((err) => err.id !== id));
-	};
+	const toastError = useSelector(selectToastErrors);
 
 	return (
 		<>
-			{openErrors.map((error) => (
-				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} onClose={() => closeError(error.id)} />
+			{toastError.map((error) => (
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
 			))}
 			<div
 				className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
