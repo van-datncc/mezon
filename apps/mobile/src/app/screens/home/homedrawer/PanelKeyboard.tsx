@@ -24,7 +24,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const timer = useRef<NodeJS.Timeout | null>(null);
 	const animatedHeight = useRef(new Animated.Value(0)).current;
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
-	const [isShowAlbum, SetIsShowAlbum] = useState<boolean>(false);
+	const [isShowAlbum, setIsShowAlbum] = useState<boolean>(false);
 	const [currentAlbum, setCurrentAlbum] = useState<string>('All');
 
 	const onShowKeyboardBottomSheet = useCallback(
@@ -98,7 +98,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	}, []);
 
 	const handleShow = (value) => {
-		SetIsShowAlbum(value);
+		setIsShowAlbum(value);
 	};
 
 	const handleChangeAlbum = (value) => {
@@ -119,6 +119,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 					height={heightKeyboardShow}
 					ref={bottomPickerRef}
 					isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+					isAlbumHeader={typeKeyboardBottomSheet === 'attachment'}
 					changeBottomSheet={handleShow}
 				>
 					{typeKeyboardBottomSheet === 'emoji' ? (
