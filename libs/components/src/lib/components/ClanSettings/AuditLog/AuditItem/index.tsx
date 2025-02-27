@@ -97,18 +97,17 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 				<div className="">
 					{logItem?.channel_id !== '0' ? (
 						<span>
-							<span>{username}</span>
-							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
-							<strong className="dark:text-white text-black font-medium"> {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
+							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span> :{' '}
+							<strong className="dark:text-white text-black font-medium"> {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>{' '}
+							in {channel?.parrent_id !== '0' ? 'thread' : 'channel'}
 							<strong className="dark:text-white text-black font-medium">
-								in {channel.parrent_id != '0' ? 'thread' : 'channel'}
 								{` ${logItem?.channel_label} (${logItem?.channel_id})`}
 							</strong>
 						</span>
 					) : (
 						<span>
-							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
-							<strong className="dark:text-white text-black font-medium"> : {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
+							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span> :{' '}
+							<strong className="dark:text-white text-black font-medium">{`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
 						</span>
 					)}
 				</div>
