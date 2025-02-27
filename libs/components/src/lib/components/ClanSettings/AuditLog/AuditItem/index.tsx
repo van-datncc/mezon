@@ -2,6 +2,7 @@ import {
 	auditLogList,
 	selectActionAuditLog,
 	selectAllAuditLogData,
+	selectChannelById,
 	selectCurrentClan,
 	selectMemberClanByUserId,
 	selectTotalCountAuditLog,
@@ -10,7 +11,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ActionLog, convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { convertTimeString, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { ApiAuditLog } from 'mezon-js/api.gen';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -73,6 +74,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem?.user_id ?? ''));
 	const username = userAuditLogItem?.user?.username;
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
+	const channel = useAppSelector((state) => selectChannelById(state, logItem?.channel_id || ''));
 
 	return (
 		<div className="dark:text-[#b5bac1] text-textLightTheme p-[10px] flex gap-3 items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary mb-4">
@@ -99,20 +101,7 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
 							<strong className="dark:text-white text-black font-medium"> {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
 							<strong className="dark:text-white text-black font-medium">
-								in{' '}
-								{(
-									[
-										ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT,
-										ActionLog.CREATE_THREAD_ACTION_AUDIT,
-										ActionLog.UPDATE_THREAD_ACTION_AUDIT,
-										ActionLog.DELETE_THREAD_ACTION_AUDIT,
-										ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT,
-										ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT,
-										ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT
-									] as ActionLog[]
-								).includes(logItem.action_log as ActionLog)
-									? 'thread'
-									: 'channel'}
+								in {channel.parrent_id != '0' ? 'thread' : 'channel'}
 								{` ${logItem?.channel_label} (${logItem?.channel_id})`}
 							</strong>
 						</span>
