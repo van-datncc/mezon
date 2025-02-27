@@ -4,4 +4,6 @@
     <string moduleConfig="true" name="CodePushDeploymentKey">JT3Y22ATCAz3K-IadwV5RGntE6PT5hO0FuaudV</string>
     <string name="accept">Answer</string>
     <string name="decline">Decline</string>
+    <string name="call_notification_answer_action">Answer</string>
+    <string name="call_notification_decline_action">Decline</string>
 </resources>

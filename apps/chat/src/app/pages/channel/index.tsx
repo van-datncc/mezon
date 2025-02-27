@@ -42,6 +42,7 @@ import {
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
+	selectJoinChannelAppData,
 	selectLastMessageByChannelId,
 	selectListChannelRenderByClanId,
 	selectMissionDone,
@@ -78,7 +79,6 @@ import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
-import ChannelVoice from './ChannelVoice';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -186,7 +186,6 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const currentMission = useMemo(() => {
 		return onboardingClan.mission[missionDone];
 	}, [missionDone, channelId]);
-
 	const selectUserProcessing = useSelector(selectProcessingByClan(currentClan?.clan_id as string));
 
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -275,6 +274,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
 	const appearanceTheme = useSelector(selectTheme);
+	const channelAppUserData = useSelector(selectJoinChannelAppData);
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -296,6 +296,43 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [isShowMemberList, setIsShowCreateThread]);
 
 	useEffect(() => {
+		if (currentChannelAppId && currentChannelAppClanId) {
+			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
+			dispatch(
+				handleParticipantMeetState({
+					clan_id: currentChannelAppClanId,
+					channel_id: currentChannelAppId,
+					user_id: userProfile?.user?.id,
+					display_name: userProfile?.user?.display_name,
+					state: ParticipantMeetState.LEAVE
+				})
+			);
+		}
+		dispatch(channelAppActions.setRoomId(null));
+		if (isChannelApp) {
+			dispatch(channelAppActions.setChannelId(channelId));
+			dispatch(channelAppActions.setClanId(currentChannel?.clan_id || null));
+		} else {
+			dispatch(channelAppActions.setChannelId(null));
+			dispatch(channelAppActions.setClanId(null));
+		}
+	}, [appChannel]);
+
+	const getUserHashInfo = useCallback(
+		async (appId: string) => {
+			try {
+				const response = await dispatch(channelAppActions.generateAppUserHash({ appId: appId })).unwrap();
+
+				return response;
+			} catch (error) {
+				console.error('Error:', error);
+				return null;
+			}
+		},
+		[dispatch, appChannel?.url]
+	);
+
+	useEffect(() => {
 		if (appChannel?.url) {
 			const compareHost = (url1: string, url2: string) => {
 				try {
@@ -306,6 +343,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					return false;
 				}
 			};
+
 			const handleMessage = async (event: MessageEvent) => {
 				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
 					const eventData = safeJSONParse(event.data ?? '{}') || {};
@@ -317,12 +355,10 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					if (!eventType) return;
 
 					if (eventType === 'PING') {
-						// send event to mini app
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
 							appChannel.url ?? ''
 						);
-
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CURRENT_USER_INFO', eventData: currentUser?.userProfile }),
 							appChannel.url ?? ''
@@ -342,6 +378,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					} else if (eventType === 'GET_CLAN_ROLES') {
 						miniAppRef.current?.contentWindow?.postMessage(
 							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
+							appChannel.url ?? ''
+						);
+					} else if (eventType === 'SEND_BOT_ID') {
+						const { appId } = (eventData.eventData || {}) as any;
+						const hashData = await getUserHashInfo(appId);
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { message: hashData } }),
 							appChannel.url ?? ''
 						);
 					} else if (eventType === 'GET_CLAN_USERS') {
@@ -364,7 +407,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			window.addEventListener('message', handleMessage);
 			return () => window.removeEventListener('message', handleMessage);
 		}
-	}, [appChannel?.url]);
+	}, [appChannel?.url, channelAppUserData]);
 
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
@@ -398,95 +441,70 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-	useEffect(() => {
-		if (currentChannelAppId && currentChannelAppClanId) {
-			dispatch(
-				handleParticipantMeetState({
-					clan_id: currentChannelAppClanId,
-					channel_id: currentChannelAppId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
-					state: ParticipantMeetState.LEAVE
-				})
-			);
-		}
-		dispatch(channelAppActions.setRoomId(null));
-		if (isChannelApp) {
-			dispatch(channelAppActions.setChannelId(channelId));
-			dispatch(channelAppActions.setClanId(currentChannel?.clan_id || null));
-		} else {
-			dispatch(channelAppActions.setChannelId(null));
-			dispatch(channelAppActions.setClanId(null));
-		}
-	}, [appChannel]);
+
 	return (
-		<>
-			<div className={`w-full ${!isChannelMezonVoice ? 'hidden' : ''}`}>
-				<ChannelVoice channel={currentChannel} roomName={currentChannel.meeting_code || ''} />
-			</div>
-			<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-				{isChannelApp ? (
-					<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
-				) : (
-					<>
-						{!isShowCanvas && !isShowAgeRestricted && draggingState && !isChannelMezonVoice && (
-							<FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />
-						)}
-						{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
+		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
+			{isChannelApp ? (
+				<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
+			) : (
+				<>
+					{!isShowCanvas && !isShowAgeRestricted && draggingState && !isChannelMezonVoice && (
+						<FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />
+					)}
+					{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
+					<div
+						className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
+						id="mainChat"
+						// eslint-disable-next-line @typescript-eslint/no-empty-function
+						onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+					>
 						<div
-							className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
-							id="mainChat"
-							// eslint-disable-next-line @typescript-eslint/no-empty-function
-							onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+							className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
 						>
-							<div
-								className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
-							>
-								{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
+							{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
+								<div
+									className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
+								>
 									<div
-										className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
+										className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
+										ref={messagesContainerRef}
 									>
-										<div
-											className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
-											ref={messagesContainerRef}
-										>
-											<ChannelMedia currentChannel={currentChannel} />
-										</div>
-										<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
+										<ChannelMedia currentChannel={currentChannel} />
 									</div>
-								)}
-								{isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
-									<div
-										className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-									>
-										<Canvas />
-									</div>
-								)}
+									<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
+								</div>
+							)}
+							{isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
+								<div
+									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+								>
+									<Canvas />
+								</div>
+							)}
 
-								{!isShowCanvas && isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
-									<div
-										className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-									>
-										<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
-									</div>
-								)}
-								{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
-									<div
-										onContextMenu={(event) => event.preventDefault()}
-										className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-										id="memberList"
-									>
-										<MemberList />
-									</div>
-								)}
+							{!isShowCanvas && isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
+								<div
+									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+								>
+									<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
+								</div>
+							)}
+							{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
+								<div
+									onContextMenu={(event) => event.preventDefault()}
+									className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+									id="memberList"
+								>
+									<MemberList />
+								</div>
+							)}
 
-								{isSearchMessage && !isChannelMezonVoice && !isChannelStream && <SearchMessageChannel />}
-							</div>
+							{isSearchMessage && !isChannelMezonVoice && !isChannelStream && <SearchMessageChannel />}
 						</div>
-					</>
-				)}
-			</div>
-		</>
+					</div>
+				</>
+			)}
+		</div>
 	);
 };
 

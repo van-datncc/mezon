@@ -8,14 +8,15 @@ import {
 	selectChannelsEntities,
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
-import { EBacktickType, ETokenMessage, IExtendedMessage } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
-import React, { useMemo } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
+import WebView from 'react-native-webview';
 import { useStore } from 'react-redux';
 import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -110,6 +111,13 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			textDecorationLine: 'none',
 			lineHeight: size.s_20
 		},
+		hashtag: {
+			fontSize: size.medium,
+			fontWeight: '600',
+			color: colors.textLink,
+			backgroundColor: colors.midnightBlue,
+			lineHeight: size.s_20
+		},
 		iconEmojiInMessage: {
 			width: size.s_20,
 			height: size.s_20
@@ -165,6 +173,21 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		privateChannel: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight
+		},
+		viewYoutube: {
+			flex: 1,
+			padding: size.s_10,
+			backgroundColor: colors.border,
+			width: '90%',
+			maxWidth: size.s_400,
+			borderRadius: size.s_4,
+			height: size.s_220
+		},
+		borderLeftView: {
+			borderLeftWidth: size.s_4,
+			borderLeftColor: 'red',
+			borderRadius: size.s_4,
+			height: size.s_220
 		}
 	});
 };
@@ -207,6 +230,16 @@ export type IMarkdownProps = {
 	onLongPress?: () => void;
 };
 
+function parseMarkdownLink(text: string) {
+	const bracketMatch = text.match(/\[(.*?)\]/);
+	const parenthesesMatch = text.match(/\((.*?)\)/);
+
+	return {
+		text: bracketMatch?.[1] || '',
+		link: parenthesesMatch?.[1] || ''
+	};
+}
+
 export function extractIds(url: string): { clanId: string | null; channelId: string | null; canvasId: string | null } {
 	const clanIdMatch = url.match(/\/clans\/(\d+)\//);
 	const channelIdMatch = url.match(/\/channels\/(\d+)\//);
@@ -239,11 +272,35 @@ export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 	link: (node, children, parent, styles, onLinkPress) => {
 		const payload = node?.attributes?.href;
 		const content = node?.children[0]?.content;
+		const widthScreen = Dimensions.get('screen').width;
+
 		if (payload === EDITED_FLAG) {
 			return (
 				<Text key={node.key} style={[styles.editedText]}>
 					{content}
 				</Text>
+			);
+		}
+
+		if (isYouTubeLink(payload)) {
+			const videoUrl = getYouTubeEmbedUrl(payload);
+			return (
+				<View style={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}>
+					<Text
+						key={node.key}
+						style={[styles.link]}
+						onPress={() => openUrl(node.attributes.href, onLinkPress)}
+						onLongPress={onLongPress && onLongPress}
+					>
+						{children}
+					</Text>
+					<View style={{ display: 'flex', flexDirection: 'row' }}>
+						<View style={styles.borderLeftView} />
+						<View style={styles.viewYoutube}>
+							<WebView source={{ uri: videoUrl }} allowsFullscreenVideo={true} javaScriptEnabled={true} domStorageEnabled={true} />
+						</View>
+					</View>
+				</View>
 			);
 		}
 
@@ -418,82 +475,80 @@ export const formatBlockCode = (text: string, isMessageReply: boolean) => {
 	return text?.replace?.(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 };
 
-export const RenderTextMarkdownContent = React.memo(
-	({
-		content,
-		isEdited,
-		translate,
-		onMention,
-		onChannelMention,
-		isNumberOfLine,
-		isMessageReply,
-		mode,
-		isHiddenHashtag,
-		currentChannelId,
-		isOpenLink = true,
-		isOnlyContainEmoji,
-		isUnReadChannel = false,
-		isLastMessage = false,
-		isBuzzMessage = false,
-		onLongPress
-	}: IMarkdownProps) => {
-		let customStyle = {};
-		const { themeValue } = useTheme();
-		const store = useStore();
+export const RenderTextMarkdownContent = ({
+	content,
+	isEdited,
+	translate,
+	onMention,
+	onChannelMention,
+	isNumberOfLine,
+	isMessageReply,
+	mode,
+	isHiddenHashtag,
+	currentChannelId,
+	isOpenLink = true,
+	isOnlyContainEmoji,
+	isUnReadChannel = false,
+	isLastMessage = false,
+	isBuzzMessage = false,
+	onLongPress
+}: IMarkdownProps) => {
+	let customStyle = {};
+	const { themeValue } = useTheme();
+	const store = useStore();
 
-		if (isMessageReply) {
-			customStyle = { ...styleMessageReply(themeValue) };
-		}
-		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = content || {};
-		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
-		const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
-		const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
-		const lkm = Array.isArray(lk) ? lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })) : [];
-		const vkm = Array.isArray(vk) ? vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })) : [];
-		const elements: ElementToken[] = [
+	if (isMessageReply) {
+		customStyle = { ...styleMessageReply(themeValue) };
+	}
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = content || {};
+
+	const hasMarkdown = mk.length > 0 || isEdited;
+	if (!hasMarkdown) {
+		const elements = [
+			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
 			...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
-			...hgm,
-			...ejm,
-			...mkm,
-			...lkm,
-			...vkm
-		]?.sort?.((a, b) => (a.s ?? 0) - (b.s ?? 0));
+			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS }))
+		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		let lastIndex = 0;
+		const textParts: React.ReactNode[] = [];
 
-		const contentRender = useMemo(() => {
-			let formattedContent = '';
+		elements.forEach((element, index) => {
+			const s = element.s ?? 0;
+			const e = element.e ?? 0;
 
-			elements.forEach((element) => {
-				const s = element.s ?? 0;
-				const e = element.e ?? 0;
+			if (lastIndex < s) {
+				textParts.push(
+					<Text
+						key={`text-${index}`}
+						style={themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}}
+					>
+						{t?.slice(lastIndex, s)}
+					</Text>
+				);
+			}
 
-				const contentInElement = t?.substring?.(s, e);
-
-				if (lastIndex < s) {
-					formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
+			switch (element?.kindOf) {
+				case ETokenMessage.EMOJIS: {
+					const srcEmoji = getSrcEmoji(element.emojiid);
+					textParts.push(
+						<FastImage
+							key={`emoji-${index}`}
+							source={{ uri: srcEmoji }}
+							style={
+								isOnlyContainEmoji ? markdownStyles(themeValue).onlyIconEmojiInMessage : markdownStyles(themeValue).iconEmojiInMessage
+							}
+							resizeMode={'contain'}
+						/>
+					);
+					break;
 				}
-				if (element.kindOf === ETokenMessage.HASHTAGS) {
-					if (isHiddenHashtag) {
-						formattedContent = contentInElement;
-					} else {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-expect-error
-						const channelsEntities = selectChannelsEntities(store.getState() as RootState);
-						const hashtagDmEntities = selectHashtagDmEntities(store.getState() as RootState);
-						formattedContent += ChannelHashtag({
-							channelHashtagId: element.channelid,
-							mode,
-							currentChannelId,
-							channelsEntities,
-							hashtagDmEntities
-						});
-					}
-				}
-				if (element.kindOf === ETokenMessage.MENTIONS) {
+				case ETokenMessage.MENTIONS: {
 					const usersClan = selectAllUserClans(store.getState() as RootState);
 					const usersInChannel = selectAllChannelMembers(store.getState() as RootState, currentChannelId as string);
-					formattedContent += MentionUser({
+					const contentInElement = t?.substring(s, e);
+
+					const mention = MentionUser({
 						tagName: contentInElement,
 						roleId: element.role_id || '',
 						tagUserId: element.user_id,
@@ -501,142 +556,288 @@ export const RenderTextMarkdownContent = React.memo(
 						usersClan,
 						usersInChannel
 					});
-				}
-				if (element.kindOf === ETokenMessage.EMOJIS) {
-					formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
-				}
 
-				if (element.kindOf === ETokenMessage.MARKDOWNS) {
-					if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
-						formattedContent += formatUrls(contentInElement);
-					} else if (element.type === EBacktickType.BOLD) {
-						formattedContent += `**${contentInElement}**` ?? '';
-					} else if (element.type === EBacktickType.VOICE_LINK) {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-expect-error
-						const channelsEntities = selectChannelsEntities(store.getState() as RootState);
-						const meetingCode = contentInElement?.split('/').pop();
-						const allChannelVoice = Object.values(channelsEntities).flat();
-						const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-						if (!voiceChannelFound) {
-							formattedContent += formatUrls(contentInElement);
-						} else {
-							formattedContent += ChannelHashtag({
-								channelHashtagId: voiceChannelFound?.channel_id,
-								channelsEntities
-							});
-						}
+					const { text, link } = parseMarkdownLink(mention);
+
+					if (link.startsWith(TYPE_MENTION.userRoleMention)) {
+						textParts.push(
+							<Text
+								key={`mention-${index}`}
+								style={[
+									themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).mention : {},
+									{
+										color: themeValue.textRoleLink,
+										backgroundColor: themeValue.darkMossGreen
+									}
+								]}
+								onPress={() => onMention?.(link.replace('@role', '@'))}
+							>
+								{text}
+							</Text>
+						);
 					} else {
-						let content = contentInElement ?? '';
-						if (element.type === EBacktickType.PRE) {
-							content = '```' + content + '```';
-						}
-						if (element.type === EBacktickType.CODE) {
-							content = '`' + content + '`';
-						}
-						formattedContent += formatBlockCode(content, isMessageReply);
+						textParts.push(
+							<Text
+								key={`mention-${index}`}
+								style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).mention : {}]}
+								onPress={() => onMention?.(link)}
+							>
+								{text}
+							</Text>
+						);
 					}
+					break;
 				}
+				case ETokenMessage.HASHTAGS: {
+					const contentInElement = t?.substring(s, e);
+					if (!isHiddenHashtag) {
+						const channelsEntities = selectChannelsEntities(store.getState() as any);
+						const hashtagDmEntities = selectHashtagDmEntities(store.getState() as any);
 
-				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
+						const mention = ChannelHashtag({
+							channelHashtagId: element.channelid,
+							mode,
+							currentChannelId,
+							channelsEntities,
+							hashtagDmEntities
+						});
+
+						const { text, link } = parseMarkdownLink(mention);
+
+						textParts.push(
+							<Text
+								key={`hashtag-${index}`}
+								style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
+								onPress={() => {
+									const urlFormat = link.replace(/##voice%22|#%22|%22|"|#/g, '');
+									const dataChannel = urlFormat.split('_');
+									const payloadChannel = {
+										type: Number(dataChannel?.[0] || 1),
+										id: dataChannel?.[1],
+										channel_id: dataChannel?.[1],
+										clan_id: dataChannel?.[2],
+										status: Number(dataChannel?.[3] || 1),
+										meeting_code: dataChannel?.[4] || '',
+										category_id: dataChannel?.[5]
+									};
+									onChannelMention?.(payloadChannel);
+								}}
+							>
+								{text}
+							</Text>
+						);
+					} else {
+						textParts.push(<Text key={`hashtag-${index}`}>{contentInElement}</Text>);
+					}
+					break;
+				}
+			}
+
+			lastIndex = e;
+		});
+
+		if (lastIndex < (t?.length ?? 0)) {
+			textParts.push(
+				<Text key="text-end" style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}>
+					{t?.slice(lastIndex)}
+				</Text>
+			);
+		}
+
+		return <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' }}>{textParts}</View>;
+	}
+
+	const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
+	const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
+	const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
+	const lkm = Array.isArray(lk) ? lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })) : [];
+	const vkm = Array.isArray(vk) ? vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })) : [];
+	const elements: ElementToken[] = [
+		...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
+		...hgm,
+		...ejm,
+		...mkm,
+		...lkm,
+		...vkm
+	].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+
+	let lastIndex = 0;
+
+	const contentRender = (() => {
+		let formattedContent = '';
+
+		elements.forEach((element) => {
+			const s = element.s ?? 0;
+			const e = element.e ?? 0;
+
+			const contentInElement = t?.substring?.(s, e);
+
+			if (lastIndex < s) {
+				formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
+			}
+			if (element.kindOf === ETokenMessage.HASHTAGS) {
+				if (isHiddenHashtag) {
+					formattedContent = contentInElement;
+				} else {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-expect-error
 					const channelsEntities = selectChannelsEntities(store.getState() as RootState);
 					const hashtagDmEntities = selectHashtagDmEntities(store.getState() as RootState);
+					formattedContent += ChannelHashtag({
+						channelHashtagId: element.channelid,
+						mode,
+						currentChannelId,
+						channelsEntities,
+						hashtagDmEntities
+					});
+				}
+			}
+			if (element.kindOf === ETokenMessage.MENTIONS) {
+				const usersClan = selectAllUserClans(store.getState() as RootState);
+				const usersInChannel = selectAllChannelMembers(store.getState() as RootState, currentChannelId as string);
+				formattedContent += MentionUser({
+					tagName: contentInElement,
+					roleId: element.role_id || '',
+					tagUserId: element.user_id,
+					mode,
+					usersClan,
+					usersInChannel
+				});
+			}
+			if (element.kindOf === ETokenMessage.EMOJIS) {
+				formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
+			}
+
+			if (element.kindOf === ETokenMessage.MARKDOWNS) {
+				if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
+					formattedContent += formatUrls(contentInElement);
+				} else if (element.type === EBacktickType.BOLD) {
+					formattedContent += `**${contentInElement}**` ?? '';
+				} else if (element.type === EBacktickType.VOICE_LINK) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					const channelsEntities = selectChannelsEntities(store.getState() as RootState);
 					const meetingCode = contentInElement?.split('/').pop();
 					const allChannelVoice = Object.values(channelsEntities).flat();
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-
 					if (!voiceChannelFound) {
 						formattedContent += formatUrls(contentInElement);
 					} else {
-						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
+						formattedContent += ChannelHashtag({
+							channelHashtagId: voiceChannelFound?.channel_id,
+							channelsEntities
+						});
 					}
+				} else {
+					let content = contentInElement ?? '';
+					if (element.type === EBacktickType.PRE) {
+						content = '```' + content + '```';
+					}
+					if (element.type === EBacktickType.CODE) {
+						content = '`' + content + '`';
+					}
+					formattedContent += formatBlockCode(content, isMessageReply);
 				}
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				lastIndex = e;
-			});
-
-			if (lastIndex < t?.length) {
-				formattedContent += t?.slice?.(lastIndex)?.toString();
 			}
 
-			if (isEdited) {
-				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
+			if (element.kindOf === ETokenMessage.VOICE_LINKS) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				const channelsEntities = selectChannelsEntities(store.getState() as RootState);
+				const hashtagDmEntities = selectHashtagDmEntities(store.getState() as RootState);
+				const meetingCode = contentInElement?.split('/').pop();
+				const allChannelVoice = Object.values(channelsEntities).flat();
+				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+
+				if (!voiceChannelFound) {
+					formattedContent += formatUrls(contentInElement);
+				} else {
+					formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
+				}
 			}
-			return formattedContent;
-		}, [elements, t, mode]);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			lastIndex = e;
+		});
 
-		const escapeDashes = (text: string): string => {
-			return text.replace(/-{1,10}/g, (match) => `\\${match}`);
-		};
+		if (lastIndex < t?.length) {
+			formattedContent += t?.slice?.(lastIndex)?.toString();
+		}
 
-		const renderMarkdown = () => (
-			<Markdown
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{
-					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage) as StyleSheet.NamedStyles<any>) : {}),
-					...customStyle
-				}}
-				rules={renderRulesCustom(isOnlyContainEmoji, onLongPress)}
-				onLinkPress={(url) => {
-					if (isOpenLink) {
-						if (url.startsWith(TYPE_MENTION.userRoleMention)) {
-							onMention && onMention(url.replace('@role', '@'));
-							return false;
-						}
-						if (url.startsWith(TYPE_MENTION.userMention)) {
-							onMention && onMention(url);
-							return false;
-						}
-						if (url.startsWith(TYPE_MENTION.hashtag)) {
-							const urlFormat = url.replace(/##voice%22|#%22|%22/g, '');
-							const dataChannel = urlFormat.split('_');
-							const payloadChannel = {
-								type: Number(dataChannel?.[0] || 1),
-								id: dataChannel?.[1],
-								channel_id: dataChannel?.[1],
-								clan_id: dataChannel?.[2],
-								status: Number(dataChannel?.[3] || 1),
-								meeting_code: dataChannel?.[4] || '',
-								category_id: dataChannel?.[5]
-							};
-							onChannelMention && onChannelMention(payloadChannel);
-							return false;
-						}
-						// Note: return false to prevent default
-						return true;
+		if (isEdited) {
+			formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
+		}
+		return formattedContent;
+	})();
+
+	const escapeDashes = (text: string): string => {
+		return text.replace(/-{1,10}/g, (match) => `\\${match}`);
+	};
+
+	const renderMarkdown = () => (
+		<Markdown
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			style={{
+				...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage) as StyleSheet.NamedStyles<any>) : {}),
+				...customStyle
+			}}
+			rules={renderRulesCustom(isOnlyContainEmoji, onLongPress)}
+			onLinkPress={(url) => {
+				if (isOpenLink) {
+					if (url.startsWith(TYPE_MENTION.userRoleMention)) {
+						onMention && onMention(url.replace('@role', '@'));
+						return false;
 					}
-				}}
-			>
-				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
-			</Markdown>
-		);
+					if (url.startsWith(TYPE_MENTION.userMention)) {
+						onMention && onMention(url);
+						return false;
+					}
+					if (url.startsWith(TYPE_MENTION.hashtag)) {
+						const urlFormat = url.replace(/##voice%22|#%22|%22/g, '');
+						const dataChannel = urlFormat.split('_');
+						const payloadChannel = {
+							type: Number(dataChannel?.[0] || 1),
+							id: dataChannel?.[1],
+							channel_id: dataChannel?.[1],
+							clan_id: dataChannel?.[2],
+							status: Number(dataChannel?.[3] || 1),
+							meeting_code: dataChannel?.[4] || '',
+							category_id: dataChannel?.[5]
+						};
+						onChannelMention && onChannelMention(payloadChannel);
+						return false;
+					}
+					// Note: return false to prevent default
+					return true;
+				}
+			}}
+		>
+			{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
+		</Markdown>
+	);
 
-		return isNumberOfLine ? (
-			<View
-				style={{
-					flex: 1,
-					maxHeight: isMessageReply ? size.s_17 : size.s_20 * 10 - size.s_10,
-					overflow: 'hidden'
-				}}
-			>
-				{isMessageReply && (
-					<View
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							right: 0,
-							bottom: 0,
-							zIndex: 1
-						}}
-					/>
-				)}
-				{renderMarkdown()}
-			</View>
-		) : (
-			renderMarkdown()
-		);
-	}
-);
+	return isNumberOfLine ? (
+		<View
+			style={{
+				flex: 1,
+				maxHeight: isMessageReply ? size.s_17 : size.s_20 * 10 - size.s_10,
+				overflow: 'hidden'
+			}}
+		>
+			{isMessageReply && (
+				<View
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						zIndex: 1
+					}}
+				/>
+			)}
+			{renderMarkdown()}
+		</View>
+	) : (
+		renderMarkdown()
+	);
+};

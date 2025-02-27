@@ -9,6 +9,7 @@ import { SideBarMezon } from './sidebar';
 
 function MezonPage() {
 	const platform = getPlatform();
+	const isWindow = platform === Platform.WINDOWS;
 	const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
 	const [backgroundImage, setBackgroundImage] = useState('');
 
@@ -34,6 +35,7 @@ function MezonPage() {
 
 	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-x64.dmg`;
 	const portableUrl = `https://cdn.mezon.vn/release/mezon-${version}-win-x64-portable.exe`;
+	const microsoftStoreUrl = `https://apps.microsoft.com/detail/9pf25lf1fj17?hl=en-US&gl=VN`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -132,7 +134,7 @@ function MezonPage() {
 							) : (
 								<DropdownButton
 									icon={
-										<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+										<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
 											<Icons.MicrosoftDropdown className="max-w-full max-md:h-[32px] max-md:w-full" />
 										</a>
 									}
@@ -144,6 +146,7 @@ function MezonPage() {
 									]}
 									dropdownRef={dropdownRef}
 									downloadUrl={downloadUrl}
+									isWindow={isWindow}
 								/>
 							)}
 						</div>
@@ -176,9 +179,10 @@ interface DropdownButtonProps {
 	dropdownRef: React.RefObject<HTMLDivElement>;
 	downloadUrl?: string;
 	platform?: Platform;
+	isWindow?: boolean;
 }
 
-export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, downloadLinks, dropdownRef, downloadUrl }) => {
+export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, downloadLinks, dropdownRef, downloadUrl, isWindow }) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const toggleDropdown = () => {
@@ -189,6 +193,10 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 
 	const toggleDropdownWindow = () => {
 		setIsOpen((prev) => !prev);
+	};
+
+	const handleOpenCdnUrl = () => {
+		window.open(downloadUrl, '_blank', 'noreferrer');
 	};
 
 	useEffect(() => {
@@ -204,13 +212,39 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 	return (
 		<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
 			<button className="relative" onClick={toggleDropdown}>
-				{icon}
+				{isWindow ? (
+					<div className="cursor-pointer" onClick={handleOpenCdnUrl}>
+						<div className="bg-black py-1 max-md:py-[2px] px-[10px] max-md:px-2 w-[180px] max-md:w-[125px] flex items-center gap-[10px] rounded-md border-[1.5px] border-white">
+							<Icons.Microsoft className="w-[34px] h-[34px] max-md:w-[22px] max-md:h-[22px]" />
+							<div>
+								<div className="text-xs max-md:text-[9px]">Get it from</div>
+								<div className="font-semibold max-md:text-[12px] leading-[20px] max-md:leading-[13px]">CDN Url</div>
+							</div>
+						</div>
+					</div>
+				) : (
+					icon
+				)}
 				<div className="absolute top-2.5 right-2.5 max-md:top-0 max-md:right-0">
-					<Icons.ChevronDownIcon onClick={toggleDropdownWindow} style={{ width: 26, height: 26, color: 'transparent' }} />
+					<Icons.ChevronDownIcon
+						className={isWindow ? 'text-textDarkTheme' : 'text-transparent'}
+						onClick={toggleDropdownWindow}
+						style={{ width: 26, height: 26 }}
+					/>
 				</div>
 			</button>
 			{isOpen && (
-				<div className="absolute mt-[8px] z-50 flex flex-col gap-1">
+				<div className="absolute z-50 flex flex-col gap-1 mt-1 left-[2px]">
+					{/* The below component will be used in the future - TungNQS */}
+					<div className="cursor-pointer hidden" onClick={handleOpenCdnUrl}>
+						<div className="bg-black py-1 max-md:py-[2px] px-[10px] max-md:px-2 w-[180px] max-md:w-[125px] flex items-center gap-[10px] rounded-md border-[1.5px] border-white">
+							<Icons.CDNIcon className="w-[29px] h-[29px] max-md:w-[20px] max-md:h-[20px]" />
+							<div>
+								<div className="text-xs max-md:text-[9px]">Get it from</div>
+								<div className="font-semibold max-md:text-[12px] leading-[20px] max-md:leading-[13px]">CDN Url</div>
+							</div>
+						</div>
+					</div>
 					{downloadLinks.map((link, index) => (
 						<a key={index} className="cursor-pointer block" href={link.url} target="_blank" rel="noreferrer">
 							{link.icon}

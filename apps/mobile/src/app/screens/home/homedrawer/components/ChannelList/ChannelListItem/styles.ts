@@ -22,7 +22,8 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			paddingVertical: size.s_8,
 			borderRadius: 5,
-			flex: 1
+			flex: 1,
+			paddingLeft: 20
 		},
 
 		dotIsNew: {
@@ -36,10 +37,12 @@ export const style = (colors: Attributes) =>
 
 		channelListItemTitle: {
 			fontSize: size.s_15,
+			maxHeight: size.s_20,
 			fontWeight: '600',
 			marginLeft: size.s_10,
 			color: colors.channelNormal,
-			maxWidth: '80%'
+			maxWidth: '80%',
+			overflow: 'hidden'
 		},
 
 		channelListItemTitleActive: {

@@ -1,7 +1,15 @@
-import { useIdleRender } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, topicsActions } from '@mezon/store';
+import { useGifsStickersEmoji, useIdleRender } from '@mezon/core';
+import {
+	selectClickedOnThreadBoxStatus,
+	selectClickedOnTopicStatus,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectIsShowCreateTopic,
+	threadsActions,
+	topicsActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,15 +22,31 @@ const ChannelLayout = () => {
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const closeMenu = useSelector(selectCloseMenu);
 
+	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
+
+	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
+	const openEmojiRightPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT;
+	const openEmojiBottomPanel = subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
+	const openEmojiPanelOnTopic = (openEmojiRightPanel || openEmojiBottomPanel) && isFocusTopicBox;
+	const openEmojiPanelOnThreadBox = (openEmojiRightPanel || openEmojiBottomPanel) && isFocusThreadBox;
+
+	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
+
 	const dispatch = useDispatch();
 
 	const onMouseDown = () => {
+		setSubPanelActive(SubPanelName.NONE);
 		dispatch(topicsActions.setFocusTopicBox(false));
+		dispatch(threadsActions.setFocusThreadBox(false));
 	};
 	const shouldRender = useIdleRender();
 
 	return (
-		<div onMouseDown={onMouseDown} className="flex flex-col z-20 flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible  relative">
+		<div
+			onMouseDown={onMouseDown}
+			className={`flex flex-col ${openEmojiPanelOnTopic || subPanelActive !== SubPanelName.NONE || isFocusThreadBox ? 'z-20 relative' : 'z-0'} flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible  relative`}
+		>
 			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (
@@ -32,7 +56,17 @@ const ChannelLayout = () => {
 					>
 						<Outlet />
 					</div>
-					{shouldRender && <ReactionEmojiPanel closeMenu={closeMenu} currentChannelId={currentChannel?.channel_id ?? ''} />}
+					{shouldRender && (
+						<ReactionEmojiPanel
+							isFocusTopicOrThreadBox={isFocusTopicBox || isFocusThreadBox}
+							openEmojiRightPanel={openEmojiRightPanel}
+							openEmojiBottomPanel={openEmojiBottomPanel}
+							openEmojiPanelOnTopicOrThreadBox={openEmojiPanelOnTopic || openEmojiPanelOnThreadBox}
+							closeMenu={closeMenu}
+							currentChannelId={currentChannel?.channel_id ?? ''}
+							isShowCreateTopic={isShowCreateTopic}
+						/>
+					)}
 				</>
 			)}
 		</div>

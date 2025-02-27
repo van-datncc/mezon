@@ -125,7 +125,7 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 		});
 
 		return formattedContent;
-	}, [elements, t, mode]);
+	}, [elements, t, mode, allUserIdsInChannel]);
 
 	const { threadLabel, threadId, threadContent } = useMemo(() => {
 		if (message.code === TypeMessage.CreateThread && message.content?.t) {

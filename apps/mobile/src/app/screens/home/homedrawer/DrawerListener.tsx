@@ -3,11 +3,12 @@ import {
 	channelMembersActions,
 	channelMetaActions,
 	channelsActions,
-	ChannelsEntity,
 	clansActions,
+	listChannelRenderAction,
 	listChannelsByUserActions,
 	selectAnyUnreadChannels,
 	selectChannelById,
+	selectCurrentChannel,
 	selectFetchChannelStatus,
 	selectLastMessageByChannelId,
 	useAppDispatch,
@@ -41,6 +42,12 @@ function useChannelSeen(channelId: string) {
 		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(
+				listChannelRenderAction.removeBadgeFromChannel({
+					clanId: currentChannel.clan_id as string,
+					channelId: currentChannel.channel_id as string
+				})
+			);
+			dispatch(
 				channelsActions.updateChannelBadgeCount({ clanId: currentChannel?.clan_id ?? '', channelId: channelId, count: 0, isReset: true })
 			);
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
@@ -54,7 +61,8 @@ function useChannelSeen(channelId: string) {
 	}, [currentChannel?.id, statusFetchChannel, channelId, currentChannel, dispatch, resetBadgeCount]);
 }
 
-function DrawerListener({ currentChannel }: { currentChannel: ChannelsEntity }) {
+function DrawerListener() {
+	const currentChannel = useSelector(selectCurrentChannel);
 	const prevChannelIdRef = useRef<string>();
 	const dispatch = useAppDispatch();
 	useChannelSeen(currentChannel?.channel_id || '');

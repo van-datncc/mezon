@@ -88,6 +88,7 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 	if (!response.categorydesc) {
 		return { categories: [], clanId: clanId };
 	}
+
 	const payload: FetchCategoriesPayload = {
 		categories: response.categorydesc.map(mapCategoryToEntity),
 		clanId: clanId

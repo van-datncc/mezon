@@ -25,10 +25,10 @@ export const size = {
 	h9: verticalScale(9),
 	input: verticalScale(18),
 	regular: verticalScale(17),
-	medium: verticalScale(14.5),
+	medium: verticalScale(15.5),
 	small: verticalScale(12),
 	tiny: verticalScale(9),
-	label: verticalScale(16),
+	label: verticalScale(17),
 
 	s_2: verticalScale(2),
 	s_8: verticalScale(8),
@@ -58,7 +58,9 @@ export const size = {
 	s_70: verticalScale(70),
 	s_80: verticalScale(80),
 	s_100: verticalScale(100),
-	s_150: verticalScale(150)
+	s_150: verticalScale(150),
+	s_220: verticalScale(220),
+	s_400: verticalScale(400)
 };
 
 const style = {

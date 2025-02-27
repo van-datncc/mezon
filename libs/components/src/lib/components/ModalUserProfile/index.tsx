@@ -50,6 +50,8 @@ type ModalUserProfileProps = {
 	onClose: () => void;
 	rootRef?: RefObject<HTMLElement>;
 	activityByUserId?: ApiUserActivity;
+	isUserRemoved?: boolean;
+	checkAnonymous?: boolean;
 };
 
 export type OpenModalProps = {
@@ -78,7 +80,9 @@ const ModalUserProfile = ({
 	isDM,
 	onClose,
 	rootRef,
-	activityByUserId
+	activityByUserId,
+	isUserRemoved,
+	checkAnonymous
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { userId } = useAuth();
@@ -91,7 +95,7 @@ const ModalUserProfile = ({
 	const statusOnline = useMemo(() => {
 		if (userProfile?.user?.metadata && userId === userID) {
 			const metadata = safeJSONParse(userProfile?.user?.metadata);
-			return metadata;
+			return metadata?.user_status;
 		}
 		if (userMetaById) {
 			return userMetaById as any;
@@ -151,7 +155,6 @@ const ModalUserProfile = ({
 	}, [userProfile?.user?.avatar_url, isFooterProfile, userID, message?.avatar, userById?.user?.avatar_url]);
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
@@ -236,9 +239,13 @@ const ModalUserProfile = ({
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{checkAnonymous ? 'Anonymous' : userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
+							{isUserRemoved
+								? 'Unknown User'
+								: checkAnonymous
+									? 'Anonymous'
+									: userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
-						<p className="font-medium tracking-wide text-sm my-0">{usernameShow}</p>
+						<p className="font-medium tracking-wide text-sm my-0">{isUserRemoved ? 'Unknown User' : usernameShow}</p>
 					</div>
 
 					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}
@@ -270,11 +277,11 @@ const ModalUserProfile = ({
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}
 
-					{!checkOwner(userID ?? '') && !hiddenRole && !checkAnonymous ? (
+					{!checkOwner(userID ?? '') && !hiddenRole && !checkAnonymous && !isUserRemoved ? (
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
-								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
+								className={`w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] `}
 								placeholder={`Message @${placeholderUserName}`}
 								value={content}
 								onKeyPress={(e) => {

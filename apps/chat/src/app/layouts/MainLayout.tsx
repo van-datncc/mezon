@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, useFriends } from '@mezon/core';
+import { ChatContext, ChatContextProvider, useFriends, useIdleRender } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -18,6 +18,7 @@ import debounce from 'lodash.debounce';
 import { memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
+import ChannelVoice from '../pages/channel/ChannelVoice';
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
@@ -113,6 +114,8 @@ const MainLayout = memo(
 		const handleClickingOutside = () => {
 			dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		};
+		const shouldRender = useIdleRender();
+
 		return (
 			<div
 				id="main-layout"
@@ -122,6 +125,7 @@ const MainLayout = memo(
 					event.preventDefault();
 				}}
 			>
+				{shouldRender && <ChannelVoice />}
 				<Outlet />
 				<GlobalEventListener />
 			</div>

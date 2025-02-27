@@ -19,8 +19,7 @@ const RootStack = (props) => {
 		<Root.Navigator
 			screenOptions={{
 				headerShown: false,
-				cardStyle: { backgroundColor: themeValue.primary },
-				gestureDirection: 'horizontal'
+				cardStyle: { backgroundColor: themeValue.primary }
 			}}
 		>
 			{isLoggedIn ? (

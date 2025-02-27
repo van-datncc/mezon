@@ -1,11 +1,16 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { JoinChannelAppData } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 type CreateChannelAppMeetPayload = {
 	channelId: string;
 	roomName: string;
+};
+
+type GenerateAppUserHashPayload = {
+	appId: string;
 };
 
 export const CHANNEL_APP = 'channelApp';
@@ -23,12 +28,14 @@ export interface ChannelAppState {
 	roomToken: string | undefined;
 	enableMic: boolean;
 	enableVideo: boolean;
+	joinChannelAppData: JoinChannelAppData | undefined;
 	enableCall: boolean;
 }
 
 export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
+	joinChannelAppData: undefined,
 	roomId: null,
 	clanId: null,
 	roomToken: undefined,
@@ -60,12 +67,31 @@ export const createChannelAppMeet = createAsyncThunk(
 	}
 );
 
+export const generateAppUserHash = createAsyncThunk(`${CHANNEL_APP}/generateAppUserHash`, async ({ appId }: GenerateAppUserHashPayload, thunkAPI) => {
+	if (appId.trim() === '') return thunkAPI.rejectWithValue('Invalid input');
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.generateHashChannelApps(mezon.session, appId);
+
+		if (!response) {
+			return thunkAPI.rejectWithValue('Failed to create room');
+		}
+		return response;
+	} catch (error) {
+		captureSentryError(error, `${CHANNEL_APP}/generateAppUserHash`);
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const channelAppSlice = createSlice({
 	name: CHANNEL_APP,
 	initialState: initialChannelAppState,
 	reducers: {
 		setRoomName: (state, action: PayloadAction<string>) => {
 			state.roomName = action.payload;
+		},
+		setJoinChannelAppData: (state, action: PayloadAction<{ dataUpdate: JoinChannelAppData | undefined }>) => {
+			state.joinChannelAppData = action.payload.dataUpdate;
 		},
 		setRoomId: (state, action: PayloadAction<string | null>) => {
 			state.roomId = action.payload;
@@ -116,11 +142,13 @@ export const selectRoomName = createSelector(getChannelAppState, (state) => stat
 export const selectLiveToken = createSelector(getChannelAppState, (state) => state.roomToken);
 export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
 export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
+export const selectJoinChannelAppData = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
 
 export const channelAppReducer = channelAppSlice.reducer;
 
 // Export actions & reducer
 export const channelAppActions = {
 	...channelAppSlice.actions,
-	createChannelAppMeet
+	createChannelAppMeet,
+	generateAppUserHash
 };

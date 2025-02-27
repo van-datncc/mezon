@@ -27,7 +27,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { checkIsThread, createImgproxyUrl, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
+import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -38,7 +38,6 @@ import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { useDispatch, useSelector } from 'react-redux';
-import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { MezonAvatar } from '../../../componentUI';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
@@ -173,7 +172,7 @@ export const Sharing = ({ data, onClose }) => {
 			false,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || []
+				mk: dataSend.links || []
 			},
 			[],
 			getAttachmentUnique(attachmentUpload) || [],
@@ -229,7 +228,7 @@ export const Sharing = ({ data, onClose }) => {
 			isPublic,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || []
+				mk: dataSend.links || []
 			},
 			[], //mentions
 			getAttachmentUnique(attachmentUpload) || [], //attachments
@@ -256,6 +255,9 @@ export const Sharing = ({ data, onClose }) => {
 				}
 				const endIndex = i;
 				links.push({
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					type: EBacktickType.LINK,
 					s: startIndex,
 					e: endIndex
 				});
@@ -415,7 +417,6 @@ export const Sharing = ({ data, onClose }) => {
 
 	return (
 		<View style={styles.wrapper}>
-			<StatusBarHeight />
 			<View style={styles.header}>
 				<TouchableOpacity onPress={onClose}>
 					<CloseIcon width={size.s_28} height={size.s_28} />

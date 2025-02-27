@@ -1,5 +1,12 @@
 import { useAppParams, useGifsStickersEmoji } from '@mezon/core';
-import { selectClanView, selectClickedOnTopicStatus, selectCurrentChannel, selectCurrentTopicId, selectIdMessageRefReaction } from '@mezon/store';
+import {
+	selectClanView,
+	selectClickedOnThreadBoxStatus,
+	selectClickedOnTopicStatus,
+	selectCurrentChannel,
+	selectCurrentTopicId,
+	selectIdMessageRefReaction
+} from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
@@ -152,6 +159,8 @@ const ContentPanel = React.memo(
 		idMessageRefReaction?: string;
 	}) => {
 		const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+		const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
+
 		const currenTopicId = useSelector(selectCurrentTopicId);
 		const { directId } = useAppParams();
 		const isClanView = useSelector(selectClanView);
@@ -187,6 +196,7 @@ const ContentPanel = React.memo(
 						mode={mode}
 						messageEmojiId={idMessageRefReaction}
 						onClose={onClose}
+						isFocusThreadBox={isFocusThreadBox}
 					/>
 				</div>
 			);

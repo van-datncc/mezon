@@ -1,7 +1,7 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import BuzzBadge from '../../../../../../components/BuzzBadge/BuzzBadge';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
@@ -21,11 +21,9 @@ interface IChannelItemProps {
 }
 
 function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstThread }: IChannelItemProps) {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
-	const numberNotification = useMemo(() => {
-		return data?.count_mess_unread ? data?.count_mess_unread : 0;
-	}, [data?.count_mess_unread]);
+	const numberNotification = data?.count_mess_unread ? data?.count_mess_unread : 0;
 
 	if (data.type === ChannelType.CHANNEL_TYPE_THREAD) {
 		return <ChannelListThreadItem thread={data} isActive={isActive} onPress={onPress} onLongPress={onLongPress} isFirstThread={isFirstThread} />;
@@ -33,13 +31,21 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 	return (
 		<TouchableOpacity
-			activeOpacity={1}
+			activeOpacity={0.7}
 			onPress={() => onPress()}
 			onLongPress={onLongPress}
 			style={[
 				styles.channelListLink,
 				isActive && styles.channelListItemActive,
-				isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
+				isActive && {
+					backgroundColor: themeBasic === ThemeModeBase.LIGHT ? themeValue.secondaryWeight : themeValue.secondaryLight,
+					opacity: 0.9,
+					shadowColor: themeValue.primary,
+					shadowOffset: { width: 0, height: 2 },
+					shadowOpacity: 0.25,
+					shadowRadius: 3.84,
+					elevation: 5
+				}
 			]}
 		>
 			<View style={[styles.channelListItem]}>
@@ -47,10 +53,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 				<ChannelStatusIcon channel={data} isUnRead={isUnRead || Number(numberNotification || 0) > 0} />
 				<EventBadge clanId={data?.clan_id} channelId={data?.channel_id} />
-				<Text
-					style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}
-					numberOfLines={1}
-				>
+				<Text style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}>
 					{data?.channel_label}
 				</Text>
 			</View>

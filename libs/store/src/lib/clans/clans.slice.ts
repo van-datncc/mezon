@@ -1,8 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
-import { ApiClanDesc, ApiUpdateAccountRequest } from 'mezon-js/api.gen';
+import { ChannelType, ClanUpdatedEvent } from 'mezon-js';
+import { ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
@@ -189,17 +189,9 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 
 export const updateClan = createAsyncThunk(
 	'clans/updateClans',
-	async ({ clan_id, banner, clan_name, creator_id, logo }: ApiUpdateClanDescRequest, thunkAPI) => {
+	async ({ clan_id, request }: { clan_id: string; request: MezonUpdateClanDescBody }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-			const request: ApiUpdateClanDescRequest = {
-				clan_id,
-				creator_id,
-				clan_name,
-				logo,
-				banner
-			};
 
 			const response = await mezon.client.updateClanDesc(mezon.session, clan_id, request);
 
@@ -393,6 +385,20 @@ export const clansSlice = createSlice({
 					is_onboarding: onboarding
 				}
 			});
+		},
+		update: (state, action: PayloadAction<{ dataUpdate: ClanUpdatedEvent }>) => {
+			const { dataUpdate } = action.payload;
+			clansAdapter.updateOne(state, {
+				id: dataUpdate.clan_id as string,
+				changes: {
+					clan_id: dataUpdate.clan_id,
+					clan_name: dataUpdate.clan_name,
+					logo: dataUpdate.logo,
+					banner: dataUpdate.banner,
+					is_onboarding: dataUpdate.is_onboarding,
+					welcome_channel_id: dataUpdate.welcome_channel_id
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {
@@ -484,10 +490,11 @@ export const clansActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = clansAdapter.getSelectors();
+const { selectAll, selectEntities, selectById } = clansAdapter.getSelectors();
 
 export const getClansState = (rootState: { [CLANS_FEATURE_KEY]: ClansState }): ClansState => rootState[CLANS_FEATURE_KEY];
 export const selectAllClans = createSelector(getClansState, selectAll);
+export const selectClanNumber = createSelector(getClansState, (state) => state?.ids?.length || 0);
 export const selectCurrentClanId = createSelector(getClansState, (state) => state.currentClanId);
 
 export const selectClanView = createSelector(selectCurrentClanId, (currentClanId) => !!(currentClanId && currentClanId !== '0'));
@@ -521,3 +528,6 @@ export const selectBadgeCountByClanId = (clanId: string) =>
 export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
 export const selectInviteChannelId = createSelector(getClansState, (state) => state.inviteChannelId);
 export const selectInviteClanId = createSelector(getClansState, (state) => state.inviteClanId);
+export const selectWelcomeChannelByClanId = createSelector([getClansState, (state, clanId: string) => clanId], (state, clanId) => {
+	return selectById(state, clanId)?.welcome_channel_id || null;
+});

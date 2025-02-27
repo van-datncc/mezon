@@ -8,9 +8,10 @@ import MessageItemSkeleton from '../../../../../components/Skeletons/MessageItem
 interface IProps {
 	channelId: string;
 	isEmptyMsg: boolean;
+	isDisableLoadMore: boolean;
 }
 
-export const ChannelMessageLoading = React.memo(({ channelId, isEmptyMsg }: IProps) => {
+export const ChannelMessageLoading = React.memo(({ channelId, isEmptyMsg, isDisableLoadMore }: IProps) => {
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 
@@ -37,8 +38,8 @@ export const ChannelMessageLoading = React.memo(({ channelId, isEmptyMsg }: IPro
 		};
 	}, []);
 
-	if (isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && isEmptyMsg) {
-		return <MessageItemSkeleton skeletonNumber={15} />;
+	if (isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && isEmptyMsg && !isDisableLoadMore) {
+		return <MessageItemSkeleton skeletonNumber={8} />;
 	}
 
 	return null;

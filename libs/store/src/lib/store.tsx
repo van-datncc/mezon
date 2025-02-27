@@ -68,7 +68,7 @@ import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessa
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
-import { systemMessageReducer } from './systemMessages/systemMessage.slide';
+import { systemMessageReducer } from './systemMessages/systemMessage.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
@@ -132,7 +132,7 @@ const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
 		storage,
-		blacklist: ['isShowCreateThread', 'isThreadModalVisible']
+		blacklist: ['isShowCreateThread', 'isThreadModalVisible', 'isFocusThreadBox']
 	},
 	threadsReducer
 );
@@ -141,7 +141,7 @@ const persistedTopicReducer = persistReducer(
 	{
 		key: 'topicdiscussions',
 		storage,
-		blacklist: ['isShowCreateTopic']
+		blacklist: ['isShowCreateTopic', 'isFocusTopicBox']
 	},
 	topicsReducer
 );
@@ -293,7 +293,7 @@ const persistedVoiceReducer = persistReducer(
 	{
 		key: VOICE_FEATURE_KEY,
 		storage,
-		whitelist: ['voiceConnectionState', 'channelId']
+		whitelist: ['voiceInfo']
 	},
 	voiceReducer
 );

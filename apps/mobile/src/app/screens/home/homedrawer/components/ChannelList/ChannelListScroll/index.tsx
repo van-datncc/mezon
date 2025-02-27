@@ -1,71 +1,38 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { size } from '@mezon/mobile-ui';
-import { selectCategoryChannelOffsets, selectCurrentChannel } from '@mezon/store-mobile';
-import React, { memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
-import { useSelector } from 'react-redux';
-import { ChannelsPositionRef } from '../../../ChannelList';
 
 interface IProps {
-	channelsPositionRef: ChannelsPositionRef;
 	flashListRef: any;
+	data: any;
 }
 
-const ChannelListScroll = ({ channelsPositionRef, flashListRef }: IProps) => {
-	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const isFirstOpen = useRef(false);
-
-	useEffect(() => {
-		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
-		if (currentChannel?.channel_id) {
-			timerToScrollChannelActive = setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, currentChannel?.channel_id);
-			}, 1500);
-		}
-		return () => {
-			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
-		};
-	}, [currentChannel?.channel_id]);
-
-	useEffect(() => {
-		let timerToScrollChannelActive: string | number | NodeJS.Timeout;
-		if (currentChannel?.channel_id && isFirstOpen?.current) {
-			timerToScrollChannelActive = setTimeout(() => {
-				DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
-			}, 10);
-		} else {
-			isFirstOpen.current = true;
-		}
-		return () => {
-			timerToScrollChannelActive && clearTimeout(timerToScrollChannelActive);
-		};
-	}, [currentChannel?.channel_id]);
-
+const ChannelListScroll = ({ flashListRef, data }: IProps) => {
 	const handleScrollToChannel = useCallback(
-		(currentChannelId: string) => {
-			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
-			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || ''];
-			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
+		(channelId) => {
+			if (!flashListRef.current || !data) return;
 
-			if (position) {
-				flashListRef?.current?.scrollTo({
-					x: 0,
-					y: position - size.s_100 * 2,
-					animated: true
+			const targetIndex = data.findIndex((item) => item.id === channelId);
+			if (targetIndex !== -1) {
+				flashListRef.current.scrollToIndex({
+					index: targetIndex,
+					animated: true,
+					viewPosition: 0.5
 				});
+			} else {
+				console.warn('Channel ID not found in list:', channelId);
 			}
 		},
-		[channelsPositionRef, flashListRef, selectCategoryOffsets]
+		[flashListRef, data]
 	);
 	useEffect(() => {
 		const scrollChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (channelId?: string) => {
-			handleScrollToChannel(channelId || currentChannel?.channel_id);
+			handleScrollToChannel(channelId);
 		});
 		return () => {
 			scrollChannel.remove();
 		};
-	}, [handleScrollToChannel, currentChannel?.channel_id]);
+	}, [handleScrollToChannel]);
 
 	return <View />;
 };

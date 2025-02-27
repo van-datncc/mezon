@@ -27,6 +27,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" android:required="false" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" android:required="false" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" android:required="false" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" android:required="false" />
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" android:required="false" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" android:required="false" />
@@ -96,7 +97,7 @@
         </service>
         <service android:name="io.wazo.callkeep.RNCallKeepBackgroundMessagingService" android:exported="true"/>
         <service
-            android:name=".CustomFirebaseMessagingReceiver"
+            android:name=".CustomFirebaseMessagingService"
             android:enabled="true"
             android:exported="true"
         >
@@ -104,6 +105,16 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <receiver
+            android:name=".CustomFirebaseMessagingReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND"
+        >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

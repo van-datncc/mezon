@@ -119,6 +119,7 @@ export interface MessagesState {
 	channelViewPortMessageIds: Record<string, string[]>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	directMessageUnread: Record<string, ChannelMessage[]>;
+	isLoadingJumpMessage?: boolean;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -301,15 +302,17 @@ export const fetchMessages = createAsyncThunk(
 	) => {
 		try {
 			const state = thunkAPI.getState() as RootState;
-			if (isFetchingLatestMessages) {
-				thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
-				thunkAPI.dispatch(messagesActions.setIsViewingOlderMessages({ channelId, isViewing: false }));
-			}
 
 			let chlId = channelId;
 			if (topicId) {
 				chlId = topicId || '';
 			}
+
+			if (isFetchingLatestMessages) {
+				thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
+				thunkAPI.dispatch(messagesActions.setIsViewingOlderMessages({ channelId: chlId, isViewing: false }));
+			}
+
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			let currentUser = selectAllAccount(state);
@@ -335,7 +338,7 @@ export const fetchMessages = createAsyncThunk(
 				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: firstMessage.id }));
 			}
 
-			let lastSentMessage = (state.messages.lastMessageByChannel[channelId] as ApiChannelMessageHeader) || response.last_sent_message;
+			let lastSentMessage = (state.messages.lastMessageByChannel[chlId] as ApiChannelMessageHeader) || response.last_sent_message;
 
 			if (!fromCache) {
 				lastSentMessage = response.last_sent_message as ApiChannelMessageHeader;
@@ -347,7 +350,8 @@ export const fetchMessages = createAsyncThunk(
 				lastSentMessage = response.messages[response.messages.length - 1];
 			}
 
-			if (lastSentMessage && lastSentMessage.id && noCache) {
+			const lastSentState = selectLatestMessageId(state, chlId);
+			if (!lastSentState || (lastSentMessage && lastSentMessage.id && noCache)) {
 				thunkAPI.dispatch(
 					messagesActions.setLastMessage({
 						...lastSentMessage,
@@ -356,9 +360,7 @@ export const fetchMessages = createAsyncThunk(
 				);
 			}
 
-			const oldMessages = channelMessagesAdapter
-				.getSelectors()
-				.selectAll(state.messages.channelMessages[channelId] || { ids: [], entities: {} });
+			const oldMessages = channelMessagesAdapter.getSelectors().selectAll(state.messages.channelMessages[chlId] || { ids: [], entities: {} });
 
 			const lastLoadMessage = !fromCache ? response.messages.at(-1) : oldMessages[0];
 			const hasMore = lastLoadMessage?.code !== EMessageCode.FIRST_MESSAGE;
@@ -421,6 +423,11 @@ export const loadMoreMessage = createAsyncThunk(
 	'messages/loadMoreMessage',
 	async ({ clanId, channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false, topicId }: LoadMoreMessArgs, thunkAPI) => {
 		try {
+			let chlId = channelId;
+			if (topicId) {
+				chlId = topicId || '';
+			}
+
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
 			// ignore when:
 			// - jumping to present
@@ -432,22 +439,24 @@ export const loadMoreMessage = createAsyncThunk(
 			}
 
 			if (direction === Direction_Mode.BEFORE_TIMESTAMP) {
+				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(chlId)(getMessagesRootState(thunkAPI));
+				const firstChannelMessageId = selectFirstMessageIdByChannelId(chlId)(getMessagesRootState(thunkAPI));
+
+				if (!lastScrollMessageId || lastScrollMessageId === firstChannelMessageId) {
+					return;
+				}
+
 				if (topicId) {
 					return await thunkAPI.dispatch(
 						fetchMessages({
 							clanId: clanId,
 							channelId: channelId,
 							direction: direction,
-							topicId: topicId
+							topicId: topicId,
+							messageId: lastScrollMessageId,
+							noCache: true
 						})
 					);
-				}
-				// scroll up
-				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
-				const firstChannelMessageId = selectFirstMessageIdByChannelId(channelId)(getMessagesRootState(thunkAPI));
-
-				if (!lastScrollMessageId || lastScrollMessageId === firstChannelMessageId) {
-					return;
 				}
 
 				return await thunkAPI.dispatch(
@@ -460,21 +469,23 @@ export const loadMoreMessage = createAsyncThunk(
 					})
 				);
 			} else {
+				const lastChannelMessageId = selectLatestMessageId(getMessagesRootState(thunkAPI), chlId);
+				const firstScrollMessageId = selectLastLoadedMessageIdByChannelId(chlId)(getMessagesRootState(thunkAPI));
+				if (!lastChannelMessageId || !firstScrollMessageId || lastChannelMessageId === firstScrollMessageId) {
+					return;
+				}
+
 				if (topicId) {
 					return await thunkAPI.dispatch(
 						fetchMessages({
 							clanId: clanId,
 							channelId: channelId,
 							direction: direction,
-							topicId: topicId
+							messageId: firstScrollMessageId,
+							topicId: topicId,
+							noCache: true
 						})
 					);
-				}
-				// scroll down
-				const lastChannelMessageId = selectLatestMessageId(getMessagesRootState(thunkAPI), channelId);
-				const firstScrollMessageId = selectLastLoadedMessageIdByChannelId(channelId)(getMessagesRootState(thunkAPI));
-				if (!lastChannelMessageId || !firstScrollMessageId || lastChannelMessageId === firstScrollMessageId) {
-					return;
 				}
 
 				return await thunkAPI.dispatch(
@@ -516,22 +527,25 @@ export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
 	async ({ clanId, messageId, channelId, noCache = true, isFetchingLatestMessages = false, navigate, mode }: JumpToMessageArgs, thunkAPI) => {
 		try {
+			thunkAPI.dispatch(messagesActions.setLoadingJumpMessage(true));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
 			if (indexMessage < 10) {
-				await thunkAPI.dispatch(
-					fetchMessages({
-						clanId: clanId,
-						channelId: channelId,
-						noCache: noCache,
-						messageId: messageId,
-						direction: Direction_Mode.AROUND_TIMESTAMP,
-						isFetchingLatestMessages,
-						isClearMessage: true,
-						viewingOlder: true
-					})
-				);
+				await thunkAPI
+					.dispatch(
+						fetchMessages({
+							clanId: clanId,
+							channelId: channelId,
+							noCache: noCache,
+							messageId: messageId,
+							direction: Direction_Mode.AROUND_TIMESTAMP,
+							isFetchingLatestMessages,
+							isClearMessage: true,
+							viewingOlder: true
+						})
+					)
+					.unwrap();
 			}
 
 			const state = thunkAPI.getState() as RootState;
@@ -548,6 +562,8 @@ export const jumpToMessage = createAsyncThunk(
 		} catch (e) {
 			captureSentryError(e, 'messages/jumpToMessage');
 			return thunkAPI.rejectWithValue(e);
+		} finally {
+			thunkAPI.dispatch(messagesActions.setLoadingJumpMessage(false));
 		}
 	}
 );
@@ -845,7 +861,8 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: null,
 	directMessageUnread: {},
-	channelViewPortMessageIds: {}
+	channelViewPortMessageIds: {},
+	isLoadingJumpMessage: false
 };
 
 export type SetCursorChannelArgs = {
@@ -1167,6 +1184,9 @@ export const messagesSlice = createSlice({
 					};
 				}
 			}
+		},
+		setLoadingJumpMessage: (state, action) => {
+			state.isLoadingJumpMessage = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -1496,6 +1516,8 @@ export const selectIsJumpingToPresent = createSelector(
 );
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
+
+export const selectIsLoadingJumpMessage = (state: MessagesState) => state.isLoadingJumpMessage;
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	if (!channelId) return state;

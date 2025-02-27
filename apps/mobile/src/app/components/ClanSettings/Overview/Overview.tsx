@@ -1,6 +1,6 @@
 import { useClans, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -81,11 +81,15 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		}
 
 		await updateClan({
-			banner: banner,
-			clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
 			clan_id: currentClan?.clan_id ?? '',
-			creator_id: currentClan?.creator_id ?? '',
-			logo: currentClan?.logo ?? ''
+			request: {
+				banner: banner,
+				clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
+				creator_id: currentClan?.creator_id ?? '',
+				is_onboarding: currentClan?.is_onboarding,
+				logo: currentClan?.logo ?? '',
+				welcome_channel_id: currentClan?.welcome_channel_id ?? ''
+			}
 		});
 
 		setLoading(false);
@@ -199,7 +203,12 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	];
 
 	return (
-		<Block flex={1} backgroundColor={themeValue.secondary}>
+		<View
+			style={{
+				flex: 1,
+				backgroundColor: themeValue.secondary
+			}}
+		>
 			<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<MezonImagePicker
 					disabled={disabled}
@@ -243,6 +252,6 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 					}}
 				></DeleteClanModal>
 			)}
-		</Block>
+		</View>
 	);
 }

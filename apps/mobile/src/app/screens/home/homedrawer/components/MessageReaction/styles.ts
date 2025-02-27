@@ -26,7 +26,12 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			gap: size.s_2,
 			padding: size.s_2,
-			borderRadius: 5
+			borderRadius: 5,
+			height: size.s_30
+		},
+		imageReactionTemp: {
+			height: size.s_30,
+			width: size.s_20 + size.s_2
 		},
 		reactCount: {
 			color: colors.text,
@@ -116,7 +121,7 @@ export const style = (colors: Attributes) =>
 		},
 		iconEmojiReaction: {
 			width: size.s_18,
-			height: size.s_18,
+			height: '100%',
 			marginRight: size.s_2
 		},
 		iconEmojiReactionDetail: {

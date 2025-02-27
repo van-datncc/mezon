@@ -52,6 +52,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 										content={safeJSONParse(pinMessage.content || '{}')}
 										isInPinMsg={true}
 										messageId={pinMessage.message_id}
+										isSearchMessage={true} // resize youtube link emmbed
 									/>
 								</span>
 								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}

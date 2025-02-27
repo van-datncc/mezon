@@ -1,5 +1,5 @@
 import { ActionEmitEvent, Icons, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
-import { Block, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	DMCallActions,
@@ -23,7 +23,7 @@ import { style } from './styles';
 const { SharedPreferences } = NativeModules;
 
 const CallingModal = () => {
-	const { themeValue, theme } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -219,28 +219,33 @@ const CallingModal = () => {
 
 	return (
 		<View style={styles.centeredView}>
-			<Block flex={1} paddingRight={size.s_10}>
-				<Block alignItems={'center'} flexDirection={'row'}>
+			<View style={{ flex: 1, paddingRight: size.s_10 }}>
+				<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 					<Text numberOfLines={1} style={styles.headerTitle}>
 						Mezon audio
 					</Text>
-					<LottieView source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE} autoPlay loop style={styles.threeDot} />
-				</Block>
+					<LottieView
+						source={themeBasic === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+						autoPlay
+						loop
+						style={styles.threeDot}
+					/>
+				</View>
 
 				<Text numberOfLines={1} style={styles.username}>
 					{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
 					{/* @ts-expect-error */}
 					{callerInfo?.user?.username || ''}
 				</Text>
-			</Block>
-			<Block gap={size.s_10} flexDirection={'row'}>
+			</View>
+			<View style={{ gap: size.s_10, flexDirection: 'row' }}>
 				<TouchableOpacity onPress={onDeniedCall} style={[styles.btnControl, styles.btnDenied]}>
 					<Icons.CloseLargeIcon width={size.s_20} height={size.s_20} />
 				</TouchableOpacity>
 				<TouchableOpacity onPress={onJoinCall} style={[styles.btnControl, styles.btnAccept]}>
 					<Icons.CheckmarkLargeIcon width={size.s_20} height={size.s_20} />
 				</TouchableOpacity>
-			</Block>
+			</View>
 		</View>
 	);
 };

@@ -24,7 +24,7 @@ export const updateClanBadgeRender = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 			const listChannelRender = state.CHANNEL_LIST_RENDER.listChannelRender[clanId];
 			const channelDelete = listChannelRender.filter((channel) => channelId === channel.id);
-			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel).count_mess_unread || 0) * -1 }));
+			thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: ((channelDelete[0] as IChannel)?.count_mess_unread || 0) * -1 }));
 		} catch (error) {
 			captureSentryError(error, 'listRender/updateClanBadge');
 			return thunkAPI.rejectWithValue(error);
@@ -37,6 +37,7 @@ export interface DataChannelAndCate {
 	listCategory: CategoriesEntity[];
 	clanId: string;
 	listChannelFavor: string[];
+	isMobile?: boolean;
 }
 
 export const FAVORITE_CATEGORY_ID = 'favorCate';
@@ -46,10 +47,10 @@ export const listChannelRenderSlice = createSlice({
 	initialState: initialListChannelRenderState,
 	reducers: {
 		mapListChannelRender: (state, action: PayloadAction<DataChannelAndCate>) => {
-			const { listChannel, listCategory, clanId, listChannelFavor } = action.payload;
+			const { listChannel, listCategory, clanId, listChannelFavor, isMobile } = action.payload;
 			// Prioritize moving channel forward thread
 			const listChannelPriority = prioritizeChannel(listChannel);
-			if (!state.listChannelRender[clanId]) {
+			if (!state.listChannelRender[clanId] || isMobile) {
 				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 				const listFavorChannel: IChannel[] = [];
 				listCategory.map((category) => {
@@ -92,7 +93,13 @@ export const listChannelRenderSlice = createSlice({
 				id: action.payload.channel_id || ''
 			};
 			const clanId = channelData.clan_id;
+
 			if (clanId && state.listChannelRender[clanId]) {
+				const isExistChannel = state.listChannelRender[clanId]?.findIndex((channel) => (channel as IChannel)?.channel_id === channelData.id);
+				if (isExistChannel !== -1) {
+					return;
+				}
+
 				const indexInsert = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelData.category_id);
 				if (indexInsert === -1) {
 					return;
@@ -193,6 +200,9 @@ export const listChannelRenderSlice = createSlice({
 				if (indexInsert === -1) {
 					return;
 				}
+
+				const channel = state.listChannelRender[clanId]?.[indexInsert] as IChannel;
+				state.listChannelRender[clanId]?.splice(indexInsert, 1, { ...channel, threadIds: [...(channel.threadIds || []), channelData.id] });
 				state.listChannelRender[clanId]?.splice(indexInsert + 1, 0, channelData);
 				state.listChannelRender[clanId].join();
 			}
@@ -348,15 +358,12 @@ export const listChannelRenderReducer = listChannelRenderSlice.reducer;
 export const getListChannelRenderState = (rootState: { [CHANNEL_LIST_RENDER]: ChannelListRenderState }): ChannelListRenderState =>
 	rootState[CHANNEL_LIST_RENDER];
 
-export const selectListChannelRenderByClanId = createSelector(
-	[getListChannelRenderState, (state: RootState, clanId?: string) => clanId],
-	(state, clanId) => {
-		if (!clanId || !state.listChannelRender[clanId]) {
-			return undefined;
-		}
-		return state.listChannelRender[clanId];
+export const selectListChannelRenderByClanId = createSelector([getListChannelRenderState, (state, clanId?: string) => clanId], (state, clanId) => {
+	if (!clanId || !state.listChannelRender[clanId]) {
+		return undefined;
 	}
-);
+	return state.listChannelRender[clanId];
+});
 
 function prioritizeChannel(channels: IChannel[]): IChannel[] {
 	return channels.sort((a, b) => {

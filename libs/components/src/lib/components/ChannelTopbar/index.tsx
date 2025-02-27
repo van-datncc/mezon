@@ -1,4 +1,4 @@
-import { useAppNavigation, useIdleRender, usePathMatch } from '@mezon/core';
+import { useAppNavigation, useGifsStickersEmoji, useIdleRender, usePathMatch } from '@mezon/core';
 import {
 	AppDispatch,
 	RootState,
@@ -9,6 +9,7 @@ import {
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
+	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -37,7 +38,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, isMacDesktop } from '@mezon/utils';
+import { IChannel, SubPanelName, isMacDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -70,10 +71,18 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
 
 	const shouldRender = useIdleRender();
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
+	const dispatch = useDispatch();
+	const onMouseDownTopbar = () => {
+		setSubPanelActive(SubPanelName.NONE);
+		dispatch(topicsActions.setFocusTopicBox(false));
+		dispatch(threadsActions.setFocusThreadBox(false));
+	};
 	return (
 		<div
-			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			onMouseDown={onMouseDownTopbar}
+			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center border border-red-400 flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			{shouldRender &&
 				(isChannelApps ? (
@@ -94,7 +103,7 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	);
 	return (
 		<>
-			<div className="justify-start items-center gap-1 flex">
+			<div className="justify-start items-center gap-1 flex ">
 				<ChannelLabel channel={channel} />
 			</div>
 			<div className="items-center h-full ml-auto flex">
@@ -120,6 +129,7 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 	const roomId = useSelector(selectGetRoomId);
 	const joinCall = useSelector(selectEnableCall);
 	const [loading, setLoading] = useState(false);
+	const appChannel = useSelector(selectAppChannelById(channel?.channel_id || ''));
 
 	useEffect(() => {
 		dispatch(channelAppActions.setRoomId(null));
@@ -127,15 +137,15 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			if (!roomId || !joinCall || !channel) {
+			if (!roomId || !joinCall || !appChannel || !appChannel.url) {
 				dispatch(channelAppActions.setRoomToken(undefined));
 				return;
 			}
 			setLoading(true);
 
 			try {
-				const channelId = String(channel.channel_id ?? '');
-				const roomName = `${channelId}-${roomId}`;
+				const channelId = String(appChannel.channel_id ?? '');
+				const roomName = `${appChannel?.url}-${roomId}`;
 
 				const result = await dispatch(generateMeetToken({ channelId, roomName })).unwrap();
 
@@ -148,7 +158,7 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 		};
 
 		fetchData();
-	}, [channel, dispatch, roomId, joinCall]);
+	}, [channel, dispatch, roomId, joinCall, appChannel]);
 
 	return (
 		roomId && (
@@ -437,7 +447,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	);
 }
 
-function RedDot() {
+export function RedDot() {
 	return (
 		<div
 			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]

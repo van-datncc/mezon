@@ -7,8 +7,7 @@ import {
 	load,
 	save
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, messagesActions, topicsActions } from '@mezon/store-mobile';
-import { sleep } from '@mezon/utils';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -158,14 +157,12 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
-			store.dispatch(
-				messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage: true, noCache: true })
-			);
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
 			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				if (clanIdCache !== clanId || time) {
 					const joinAndChangeClan = async (store: any, clanId: string) => {
@@ -203,15 +200,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-				store.dispatch(
-					messagesActions.fetchMessages({
-						clanId: '0',
-						channelId: messageId,
-						noCache: true,
-						isFetchingLatestMessages: true,
-						isClearMessage: true
-					})
-				);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: messageId });
 				}
@@ -245,9 +233,9 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 
 	await Promise.all(promises);
 
-	navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-		screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
-	});
+	if (navigation) {
+		navigation.navigate(APP_SCREEN.MESSAGES.TOPIC_DISCUSSION);
+	}
 };
 
 const processNotification = async ({ notification, navigation, time = 0 }) => {
@@ -256,13 +244,9 @@ const processNotification = async ({ notification, navigation, time = 0 }) => {
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
-		// DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, true);
 		setTimeout(() => {
 			navigateToNotification(store, notification, navigation, time);
 		}, time);
-		// setTimeout(() => {
-		// 	DeviceEventEmitter.emit(ActionEmitEvent.ON_DISMISS_UI_FROM_FCM, false);
-		// }, 3000);
 	} else {
 		navigateToNotification(store, notification, navigation);
 	}

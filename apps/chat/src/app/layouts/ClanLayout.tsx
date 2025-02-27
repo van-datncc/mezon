@@ -1,5 +1,5 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton } from '@mezon/components';
-import { useApp } from '@mezon/core';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo, UpdateButton, VoiceInfo } from '@mezon/components';
+import { useApp, useGifsStickersEmoji } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -17,11 +17,13 @@ import {
 	selectIsShowCreateTopic,
 	selectStatusMenu,
 	selectVoiceFullScreen,
+	selectVoiceJoined,
+	threadsActions,
 	topicsActions,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import { ESummaryInfo, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { ESummaryInfo, SubPanelName, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
@@ -96,10 +98,19 @@ const ClanLayout = () => {
 	const isInCall = useSelector(selectIsInCall);
 	const isJoin = useSelector(selectIsJoin);
 	const dispatch = useDispatch();
-	const onMouseDown = () => {
+	const { setSubPanelActive } = useGifsStickersEmoji();
+	const onMouseDownTopicBox = () => {
+		setSubPanelActive(SubPanelName.NONE);
 		dispatch(topicsActions.setFocusTopicBox(true));
+		dispatch(threadsActions.setFocusThreadBox(false));
+	};
+	const onMouseDownThreadBox = () => {
+		setSubPanelActive(SubPanelName.NONE);
+		dispatch(topicsActions.setFocusTopicBox(false));
+		dispatch(threadsActions.setFocusThreadBox(true));
 	};
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
+	const isVoiceJoined = useSelector(selectVoiceJoined);
 
 	return (
 		<>
@@ -111,6 +122,7 @@ const ClanLayout = () => {
 				<div id="clan-footer">
 					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 					{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
+					{isVoiceJoined && <VoiceInfo />}
 					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 					<div style={{ height: 56, width: '100%' }}>
 						<FooterProfile
@@ -140,13 +152,13 @@ const ClanLayout = () => {
 				)}
 			</div>
 			{isShowCreateThread && !isShowCreateTopic && (
-				<div className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 					<ThreadsMain />
 				</div>
 			)}
 
 			{isShowCreateTopic && !isShowCreateThread && (
-				<div onMouseDown={onMouseDown} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 					<TopicDiscussionMain />
 				</div>
 			)}

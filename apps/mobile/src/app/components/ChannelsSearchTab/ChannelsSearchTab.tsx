@@ -1,5 +1,5 @@
 import { ActionEmitEvent, ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -63,6 +63,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (channelData?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
+				return;
 			}
 
 			const clanId = channelData?.clan_id;
@@ -111,7 +112,11 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<Block paddingBottom={size.s_100}>
+				<View
+					style={{
+						paddingBottom: size.s_100
+					}}
+				>
 					<FlatList
 						data={combinedListChannel}
 						renderItem={renderItem}
@@ -122,7 +127,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 						showsVerticalScrollIndicator={false}
 						removeClippedSubviews={true}
 					/>
-				</Block>
+				</View>
 			) : (
 				<EmptySearchPage />
 			)}

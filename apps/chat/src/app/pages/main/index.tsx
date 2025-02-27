@@ -11,8 +11,7 @@ import {
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
-	SidebarLogoItem,
-	SidebarTooltip
+	SidebarLogoItem
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
@@ -32,6 +31,7 @@ import {
 	selectAudioEndTone,
 	selectAudioRingTone,
 	selectChatStreamWidth,
+	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -51,9 +51,8 @@ import {
 	selectOpenModalE2ee,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
-	selectStreamMembersByChannelId,
 	selectTheme,
-	selectToastErrorStatus,
+	selectToastErrors,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -83,7 +82,8 @@ function MyApp() {
 	const { userProfile } = useAuth();
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
-	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+	const numberOfCLanJoined = useSelector(selectClanNumber);
+	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy && numberOfCLanJoined === 0);
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
@@ -251,7 +251,6 @@ function MyApp() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentChannel?.channel_id || ''));
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
 	const openModalE2ee = useSelector(selectOpenModalE2ee);
@@ -277,57 +276,52 @@ function MyApp() {
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
-	// show toast error
-	const toastErrorStatus = useSelector(selectToastErrorStatus);
-	const [openUnknown, closeUnknown] = useModal(() => {
-		return <ModalUnknowChannel isError={true} onClose={closeUnknown} />;
-	}, []);
-	useEffect(() => {
-		if (toastErrorStatus) {
-			openUnknown();
-		} else {
-			closeUnknown();
-		}
-	}, [toastErrorStatus]);
+
+	const toastError = useSelector(selectToastErrors);
+
 	return (
-		<div
-			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
-			onClick={handleClick}
-		>
-			{previewMode && <PreviewOnboardingMode />}
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
-			<SidebarMenu openCreateClanModal={openCreateClanModal} />
-			<MainContent />
+		<>
+			{toastError.map((error) => (
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
+			))}
 			<div
-				className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
-				style={streamStyle}
+				className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
+				onClick={handleClick}
 			>
-				<ChannelStream
-					key={currentStreamInfo?.streamId}
-					memberJoin={streamChannelMember}
-					currentChannel={currentChannel}
-					currentStreamInfo={currentStreamInfo}
-					handleChannelClick={handleChannelClick}
-					streamVideoRef={streamVideoRef}
-					disconnect={disconnect}
-					isStream={isStream}
-				/>
+				{previewMode && <PreviewOnboardingMode />}
+				{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
+				<SidebarMenu openCreateClanModal={openCreateClanModal} />
+				<MainContent />
+				<div
+					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+					style={streamStyle}
+				>
+					<ChannelStream
+						key={currentStreamInfo?.streamId}
+						currentChannel={currentChannel}
+						currentStreamInfo={currentStreamInfo}
+						handleChannelClick={handleChannelClick}
+						streamVideoRef={streamVideoRef}
+						disconnect={disconnect}
+						isStream={isStream}
+					/>
+				</div>
+
+				{isPlayRingTone &&
+					!!dataCall &&
+					!isInCall &&
+					directId !== dataCall?.channel_id &&
+					dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
+						<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
+					)}
+
+				<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
+				{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
+				{openModalAttachment && <MessageModalImageWrapper />}
+				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
+				{isShowPopupQuickMess && <PopupQuickMess />}
 			</div>
-
-			{isPlayRingTone &&
-				!!dataCall &&
-				!isInCall &&
-				directId !== dataCall?.channel_id &&
-				dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
-					<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
-				)}
-
-			<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
-			{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
-			{openModalAttachment && <MessageModalImageWrapper />}
-			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
-			{isShowPopupQuickMess && <PopupQuickMess />}
-		</div>
+		</>
 	);
 }
 
@@ -352,6 +346,8 @@ const SidebarMenu = memo(
 			return 0;
 		});
 		const listUnreadDM = useSelector(selectDirectsUnreadlist);
+		const [listDmRender, setListDmRender] = useState(listUnreadDM);
+		const countUnreadRender = useRef(listDmRender.map((channel) => channel.id));
 		const isClanView = useSelector(selectClanView);
 		const currentClanId = useSelector(selectCurrentClanId);
 		const closeMenu = useSelector(selectCloseMenu);
@@ -406,8 +402,23 @@ const SidebarMenu = memo(
 			}
 		};
 
+		const timerRef = useRef<NodeJS.Timeout | null>(null);
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
-
+		useEffect(() => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+				timerRef.current = null;
+			}
+			if (listUnreadDM.length > countUnreadRender.current.length) {
+				setListDmRender(listUnreadDM);
+				countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
+			} else {
+				countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
+				timerRef.current = setTimeout(() => {
+					setListDmRender(listUnreadDM);
+				}, 1000);
+			}
+		}, [listUnreadDM]);
 		return (
 			<div
 				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
@@ -417,44 +428,37 @@ const SidebarMenu = memo(
 				<div
 					className={`top-0 left-0 right-0 flex flex-col items-center py-4 px-3 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-screen'} `}
 				>
-					<div className="flex flex-col gap-3 ">
-						<SidebarTooltip titleTooltip="Direct Message">
-							<SidebarLogoItem />
-						</SidebarTooltip>
-						{!!listUnreadDM?.length &&
-							listUnreadDM.map((dmGroupChatUnread) => (
-								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-									<DirectUnread directMessage={dmGroupChatUnread} />
-								</SidebarTooltip>
+					<div className="flex flex-col ">
+						<SidebarLogoItem />
+						{!!listDmRender?.length &&
+							listDmRender.map((dmGroupChatUnread) => (
+								<DirectUnread key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} checkMoveOut={countUnreadRender.current} />
 							))}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
 					<div className="flex flex-col gap-3 ">
 						{clans.map((clan: IClan) => {
 							return (
-								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name} clan={clan}>
-									<SidebarClanItem
-										linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
-										option={clan}
-										active={isClanView && currentClanId === clan.clan_id}
-									/>
-								</SidebarTooltip>
+								<SidebarClanItem
+									key={clan.id}
+									linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
+									option={clan}
+									active={isClanView && currentClanId === clan.clan_id}
+								/>
 							);
 						})}
 					</div>
 					<div className="mt-3">
-						<SidebarTooltip titleTooltip="Add Clan">
-							<NavLinkComponent>
-								<div
-									className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
-									onClick={openCreateClanModal}
-								>
-									<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-										<p className="text-2xl font-bold text-[#155EEF]">+</p>
-									</div>
+						<NavLinkComponent>
+							<div
+								className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
+								onClick={openCreateClanModal}
+							>
+								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+									<p className="text-2xl font-bold text-[#155EEF]">+</p>
 								</div>
-							</NavLinkComponent>
-						</SidebarTooltip>
+							</div>
+						</NavLinkComponent>
 					</div>
 				</div>
 			</div>
