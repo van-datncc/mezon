@@ -6,9 +6,11 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	messagesActions,
+	selectAllAccount,
 	selectHasMoreBottomByChannelId2,
 	selectHasMoreMessageByChannelId2,
 	selectIdMessageToJump,
+	selectIsLoadingJumpMessage,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
 	selectMessageIsLoading,
@@ -16,7 +18,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { Direction_Mode, LIMIT_MESSAGE, sleep } from '@mezon/utils';
+import { Direction_Mode, LIMIT_MESSAGE } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
@@ -56,17 +58,20 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const [isReadyShowChannelMsg, setIsReadyShowChannelMsg] = React.useState<boolean>(true);
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean | string>(false);
+	// check later
 	const isFetching = useSelector(selectMessageIsLoading);
 	const isViewingOldMessage = useAppSelector((state) => selectIsViewingOlderMessagesByChannelId(state, channelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isMessageExist = useAppSelector((state) => selectIsMessageIdExist(state, channelId, idMessageToJump?.id));
+	const isLoadingJumpMessage = useSelector(selectIsLoadingJumpMessage);
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const timeOutRef2 = useRef(null);
+
+	const userId = useSelector(selectAllAccount)?.user?.id;
 
 	useEffect(() => {
 		const event = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT, () => {
@@ -83,26 +88,13 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	}, [isViewingOldMessage]);
 
 	useEffect(() => {
-		const onSwitchChannel = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SWITCH_CHANEL, async (time: number) => {
-			if (time) {
-				setIsReadyShowChannelMsg(false);
-				await sleep(time);
-				setIsReadyShowChannelMsg(true);
-			}
-		});
-		return () => {
-			onSwitchChannel.remove();
-		};
-	}, []);
-
-	useEffect(() => {
 		if (flatListRef?.current && channelId) {
 			flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
 		}
 	}, [channelId]);
 
 	useEffect(() => {
-		if (idMessageToJump?.id && isMessageExist) {
+		if (idMessageToJump?.id && isMessageExist && !isLoadingJumpMessage) {
 			const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump?.id);
 			if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
 				flatListRef?.current?.scrollToIndex?.({
@@ -116,12 +108,12 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 						animated: true,
 						index: indexToJump
 					});
-				}, 1);
+				}, 100);
 
 				DeviceEventEmitter.emit(ActionEmitEvent.MESSAGE_ID_TO_JUMP, idMessageToJump?.id);
 			}
 		}
-	}, [dispatch, idMessageToJump?.id, isMessageExist, messages]);
+	}, [dispatch, idMessageToJump?.id, isLoadingJumpMessage, isMessageExist, messages]);
 
 	const scrollChannelMessageToIndex = useCallback(
 		(index: number) => {
@@ -187,9 +179,11 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const renderItem = useCallback(
 		({ item, index }) => {
 			const previousMessage = messages?.[index + 1];
-			return <MessageItem message={item} previousMessage={previousMessage} messageId={item.id} mode={mode} channelId={channelId} />;
+			return (
+				<MessageItem userId={userId} message={item} previousMessage={previousMessage} messageId={item.id} mode={mode} channelId={channelId} />
+			);
 		},
-		[messages, mode, channelId]
+		[messages, userId, mode, channelId]
 	);
 
 	const handleJumpToPresent = useCallback(async () => {
@@ -228,7 +222,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		<View style={styles.wrapperChannelMessage}>
 			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} isDisableLoadMore={isDisableLoadMore} />
 
-			{isReadyShowChannelMsg && !!messages?.length ? (
+			{messages?.length ? (
 				<ChannelMessageList
 					flatListRef={flatListRef}
 					messages={messages}

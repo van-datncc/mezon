@@ -1,5 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save
+} from '@mezon/mobile-components';
 import {
 	channelsActions,
 	directActions,
@@ -25,6 +32,7 @@ import UserListVoiceChannel from '../ChannelListUserVoice';
 interface IChannelListItemProps {
 	data: any;
 	isFirstThread?: boolean;
+	// parentIdList?: Set<string>;
 }
 
 export enum StatusVoiceChannel {
@@ -81,16 +89,18 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					await Linking.openURL(urlVoice);
 				}
 			} else {
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, 200);
 				if (!isTabletLandscape) navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 				const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-				// const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-				// const isCached = channelsCache?.includes(channelId);
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				const isCached = channelsCache?.includes(channelId);
 				const store = await getStoreAsync();
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				timeoutRef.current = setTimeout(async () => {
+					if (isCached) {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_SWITCH_CHANEL, 0);
+					}
 					DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
 					store.dispatch(
 						channelsActions.joinChannel({
@@ -101,7 +111,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 							noCache: true
 						})
 					);
-				}, 50);
+				}, 0);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
@@ -124,8 +134,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_LONG_PRESS_CHANNEL, { channel: props?.data });
 		}
 	}, [props?.data]);
+	const shouldDisplay = isCategoryExpanded || isUnRead || isChannelVoice || isActive;
+	// || props.parentIdList?.has(props.data.id);
 
-	if (!isCategoryExpanded && !isUnRead && !isChannelVoice && !isActive) return;
+	if (!shouldDisplay) return null;
 	return (
 		<>
 			{!isChannelVoice && (

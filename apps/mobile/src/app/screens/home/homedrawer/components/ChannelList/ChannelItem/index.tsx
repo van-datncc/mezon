@@ -31,13 +31,21 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 	return (
 		<TouchableOpacity
-			activeOpacity={0.8}
+			activeOpacity={0.7}
 			onPress={() => onPress()}
 			onLongPress={onLongPress}
 			style={[
 				styles.channelListLink,
 				isActive && styles.channelListItemActive,
-				isActive && { backgroundColor: themeBasic === ThemeModeBase.LIGHT ? themeValue.secondaryWeight : themeValue.secondaryLight }
+				isActive && {
+					backgroundColor: themeBasic === ThemeModeBase.LIGHT ? themeValue.secondaryWeight : themeValue.secondaryLight,
+					opacity: 0.9,
+					shadowColor: themeValue.primary,
+					shadowOffset: { width: 0, height: 2 },
+					shadowOpacity: 0.25,
+					shadowRadius: 3.84,
+					elevation: 5
+				}
 			]}
 		>
 			<View style={[styles.channelListItem]}>
@@ -45,10 +53,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive, isFirstTh
 
 				<ChannelStatusIcon channel={data} isUnRead={isUnRead || Number(numberNotification || 0) > 0} />
 				<EventBadge clanId={data?.clan_id} channelId={data?.channel_id} />
-				<Text
-					style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}
-					numberOfLines={1}
-				>
+				<Text style={[styles.channelListItemTitle, (isUnRead || Number(numberNotification || 0) > 0) && styles.channelListItemTitleActive]}>
 					{data?.channel_label}
 				</Text>
 			</View>

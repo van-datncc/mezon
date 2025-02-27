@@ -123,11 +123,12 @@ errorListenerMiddleware.startListening({
 		if (!toast) {
 			return;
 		}
-		const clanId = action.meta.arg.clanId;
-		if (toast.type === 'error' && clanId) {
-			listenerApi.dispatch(toastActions.setErrorToastStatus(true));
+		if (toast.type === 'error') {
+			listenerApi.dispatch(
+				toastActions.addToastError({
+					message: toast.message as string
+				})
+			);
 		}
-
-		listenerApi.dispatch(toastActions.addToast(toast));
 	}
 });

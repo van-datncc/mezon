@@ -171,7 +171,6 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	if (
 		channelType !== ChannelType.CHANNEL_TYPE_CHANNEL &&
 		channelType !== ChannelType.CHANNEL_TYPE_DM &&
-		channelType !== ChannelType.CHANNEL_TYPE_APP &&
 		channelType !== ChannelType.CHANNEL_TYPE_GROUP &&
 		channelType !== ChannelType.CHANNEL_TYPE_THREAD
 	) {
@@ -509,6 +508,7 @@ type fetchChannelsArgs = {
 	forward?: number;
 	channelType?: number;
 	noCache?: boolean;
+	isMobile?: boolean;
 };
 
 export const fetchChannelsCached = memoizeAndTrack(
@@ -596,7 +596,7 @@ export const addThreadSocket = createAsyncThunk(
 
 export const fetchChannels = createAsyncThunk(
 	'channels/fetchChannels',
-	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_CHANNEL, noCache }: fetchChannelsArgs, thunkAPI) => {
+	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_CHANNEL, noCache, isMobile = false }: fetchChannelsArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
@@ -652,8 +652,8 @@ export const fetchChannels = createAsyncThunk(
 			}));
 
 			const [favorChannels, listCategory] = await Promise.all([
-				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId })),
-				thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }))
+				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId, noCache: Boolean(noCache) })),
+				thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId, noCache: Boolean(noCache) }))
 			]);
 
 			thunkAPI.dispatch(
@@ -661,7 +661,8 @@ export const fetchChannels = createAsyncThunk(
 					clanId,
 					listChannelFavor: favorChannels.payload.channel_ids || [],
 					listCategory: (listCategory.payload as FetchCategoriesPayload)?.categories || [],
-					listChannel: channels
+					listChannel: channels,
+					isMobile
 				})
 			);
 
@@ -1124,6 +1125,12 @@ export const channelsSlice = createSlice({
 			}
 			if (!state.byClans[clanId].entities.entities?.[channelId]) return;
 			state.byClans[clanId].entities.entities[channelId].showPinBadge = isShow;
+		},
+
+		setChannelEntityListByClanId: (state, action: PayloadAction<{ channels: ChannelsEntity[]; clanId: string }>) => {
+			const { channels, clanId } = action.payload;
+			if (!state.byClans[clanId]) return;
+			channelsAdapter.setAll(state.byClans[clanId]?.entities, channels);
 		}
 	},
 	extraReducers: (builder) => {

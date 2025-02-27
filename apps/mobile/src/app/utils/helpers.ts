@@ -2,24 +2,6 @@ import { load, save, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobil
 import { safeJSONParse } from 'mezon-js';
 import { Platform } from 'react-native';
 
-type Size =
-	| '64w'
-	| '128w'
-	| '320w'
-	| '480w'
-	| '640w'
-	| '720w'
-	| '960w'
-	| '1280w'
-	| '64h'
-	| '128h'
-	| '320h'
-	| '480h'
-	| '640h'
-	| '720h'
-	| '960h'
-	| '1280h'; // largest web image
-
 export const sleep = (milliseconds: number) => {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds));
 };
