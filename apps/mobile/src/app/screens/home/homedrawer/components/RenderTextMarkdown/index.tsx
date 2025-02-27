@@ -502,7 +502,7 @@ export const RenderTextMarkdownContent = ({
 	}
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = content || {};
 
-	const hasMarkdown = mk.length > 0 || isEdited;
+	const hasMarkdown = mk?.length > 0 || lk?.length > 0 || isEdited;
 	if (!hasMarkdown) {
 		const elements = [
 			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
@@ -708,7 +708,7 @@ export const RenderTextMarkdownContent = ({
 				formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
 			}
 
-			if (element.kindOf === ETokenMessage.MARKDOWNS) {
+			if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
 				if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
 					formattedContent += formatUrls(contentInElement);
 				} else if (element.type === EBacktickType.BOLD) {
