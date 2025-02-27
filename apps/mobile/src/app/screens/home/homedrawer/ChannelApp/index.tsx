@@ -41,6 +41,18 @@ const ChannelAppScreen = memo(({ channelId }: { channelId: string }) => {
 	true;
   `;
 
+	const injectedCSS = `
+    (function() {
+      var style = document.createElement('style');
+      style.innerHTML = \`
+        .h-heightTopBar {
+          display: none !important;
+        }
+      \`;
+      document.head.appendChild(style);
+    })();
+  `;
+
 	return (
 		<View style={styles.container}>
 			{loading && (
@@ -52,7 +64,7 @@ const ChannelAppScreen = memo(({ channelId }: { channelId: string }) => {
 						height: '100%',
 						zIndex: 1,
 						width: '100%',
-						backgroundColor: themeValue.charcoal,
+						backgroundColor: themeValue.primary,
 						flex: 1
 					}}
 				>
@@ -72,6 +84,7 @@ const ChannelAppScreen = memo(({ channelId }: { channelId: string }) => {
 					await sleep(500);
 					setLoading(false);
 				}}
+				injectedJavaScript={injectedCSS}
 			/>
 		</View>
 	);
