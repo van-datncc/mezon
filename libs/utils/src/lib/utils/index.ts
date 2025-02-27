@@ -998,6 +998,42 @@ export const generateMentionItems = (
 		.filter((item): item is MentionItem => item !== null);
 };
 
+// Calculates the updated insert index when converting from plain text to markup text
+export const getMarkupInsertIndex = (
+	plainInsertIndex: number,
+	mentions: IMentionOnMessage[],
+	usersEntities: Record<string, ChannelMembersEntity> | Record<string, UsersClanEntity>,
+	clanRoles: Record<string, IRolesClan>
+) => {
+	const mentionsBeforeInsert = mentions.filter((mention) => mention?.e && mention?.e <= plainInsertIndex);
+	let totalInsertedLength = 0;
+
+	mentionsBeforeInsert.forEach((mention) => {
+		const { user_id, role_id } = mention;
+
+		if (role_id) {
+			const role = clanRoles?.[role_id as string];
+			if (role) {
+				// Plain text: @name
+				// Mention markup format: @[name](id)
+				// => Adding 4 extra characters: `[`, `]`, `(`, `)`
+				totalInsertedLength += 4 + (role?.id?.length || 0);
+			}
+			return;
+		}
+
+		const user = usersEntities?.[mention.user_id as string];
+		if (user) {
+			// Plain text: @name
+			// Mention markup format: @[name](id)
+			// => Adding 4 extra characters: `[`, `]`, `(`, `)`
+			totalInsertedLength += 4 + (user_id?.length || 0);
+		}
+	});
+
+	return plainInsertIndex + totalInsertedLength;
+};
+
 export const parseThreadInfo = (messageContent: string) => {
 	const match = messageContent.match(/\(([^,]+),\s*([^)]+)\)/);
 	if (match) {
