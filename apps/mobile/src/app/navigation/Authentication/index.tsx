@@ -6,6 +6,7 @@ import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove
 import notifee from '@notifee/react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
+import moment from 'moment';
 import { Dimensions, NativeModules, Platform } from 'react-native';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -57,7 +58,21 @@ export const Authentication = memo(() => {
 						if (extraMessage) {
 							const message = safeJSONParse(extraMessage);
 							if (message?.channel_id) {
-								onchannelmessage(message as ChannelMessage);
+								const createTime = moment.unix(message?.create_time_seconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+								const updateTime = moment.unix(message?.update_time_seconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+								const messageData = {
+									...message,
+									code: message?.code?.value || 0,
+									id: message.message_id,
+									content: safeJSONParse(message.content),
+									attachments: safeJSONParse(message.attachments),
+									mentions: safeJSONParse(message.mentions),
+									references: safeJSONParse(message.references),
+									reactions: safeJSONParse(message.reactions),
+									create_time: createTime,
+									update_time: updateTime
+								};
+								onchannelmessage(messageData as ChannelMessage);
 							}
 						}
 					}
