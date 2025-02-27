@@ -2,10 +2,8 @@ import {
 	auditLogList,
 	selectActionAuditLog,
 	selectAllAuditLogData,
-	selectChannelById,
 	selectCurrentClan,
 	selectMemberClanByUserId,
-	selectRoleByRoleId,
 	selectTotalCountAuditLog,
 	selectUserAuditLog,
 	useAppDispatch,
@@ -74,10 +72,6 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 	const auditLogTime = convertTimeString(logItem?.time_log as string);
 	const userAuditLogItem = useAppSelector(selectMemberClanByUserId(logItem?.user_id ?? ''));
 	const username = userAuditLogItem?.user?.username;
-	const userMention = useAppSelector(selectMemberClanByUserId(logItem?.entity_id ?? ''));
-	const clanRole = useSelector(selectRoleByRoleId(logItem?.entity_id ?? ''));
-	const usernameMention = userMention?.user?.username;
-	const channel = useAppSelector((state) => selectChannelById(state, logItem?.channel_id || ''));
 	const avatar = getAvatarForPrioritize(userAuditLogItem?.clan_avatar, userAuditLogItem?.user?.avatar_url);
 
 	return (
@@ -99,44 +93,33 @@ const AuditLogItem = ({ logItem }: AuditLogItemProps) => {
 			</div>
 			<div>
 				<div className="">
-					{(logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.REMOVE_ROLE_CHANNEL_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT ||
-						logItem?.action_log === ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT) &&
-					logItem?.channel_id !== '0' ? (
+					{logItem?.channel_id !== '0' ? (
 						<span>
-							<span>{username}</span>{' '}
-							<span className="lowercase">
-								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.ADD_ROLE_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT
-									? 'add'
-									: 'remove'}{' '}
-								{logItem?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT ||
-								logItem?.action_log === ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT
-									? usernameMention
-									: clanRole?.title}{' '}
-								({logItem?.entity_id}) to channel
-							</span>
+							<span>{username}</span>
+							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
+							<strong className="dark:text-white text-black font-medium"> {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
 							<strong className="dark:text-white text-black font-medium">
-								{' '}
-								#{channel?.channel_label || logItem.channel_label} ({channel?.channel_id || logItem.channel_id})
+								in{' '}
+								{(
+									[
+										ActionLog.ADD_MEMBER_THREAD_ACTION_AUDIT,
+										ActionLog.CREATE_THREAD_ACTION_AUDIT,
+										ActionLog.UPDATE_THREAD_ACTION_AUDIT,
+										ActionLog.DELETE_THREAD_ACTION_AUDIT,
+										ActionLog.REMOVE_MEMBER_THREAD_ACTION_AUDIT,
+										ActionLog.ADD_ROLE_THREAD_ACTION_AUDIT,
+										ActionLog.REMOVE_ROLE_THREAD_ACTION_AUDIT
+									] as ActionLog[]
+								).includes(logItem.action_log as ActionLog)
+									? 'thread'
+									: 'channel'}
+								{` ${logItem?.channel_label} (${logItem?.channel_id})`}
 							</strong>
 						</span>
 					) : (
 						<span>
 							<span>{username}</span> <span className="lowercase">{logItem?.action_log}</span>
-							<strong className="dark:text-white text-black font-medium">
-								{' '}
-								#{logItem?.entity_name || logItem?.entity_id} {logItem?.entity_name && `(${logItem?.entity_id})`}
-							</strong>
+							<strong className="dark:text-white text-black font-medium"> : {`${logItem?.entity_name} (${logItem?.entity_id})`}</strong>
 						</span>
 					)}
 				</div>
