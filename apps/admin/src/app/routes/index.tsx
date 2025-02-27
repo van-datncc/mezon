@@ -12,7 +12,6 @@ import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
 import { applicationLoader } from '../loader/applicationLoader';
-import { oAuth2Loader } from '../loader/oauthLoader';
 import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
@@ -100,7 +99,6 @@ export const Routes = () => {
 										},
 										{
 											path: 'oauth2',
-											loader: loaderWithStore(oAuth2Loader),
 											element: <OAuth2 />
 										},
 										{

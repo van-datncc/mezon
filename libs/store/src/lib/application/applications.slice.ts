@@ -1,15 +1,16 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiAddAppRequest, ApiApp, ApiAppList, ApiMezonOauthClientList, MezonUpdateAppBody } from 'mezon-js/api.gen';
+import { ApiAddAppRequest, ApiApp, ApiAppList, ApiMezonOauthClient, MezonUpdateAppBody } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 
 export const ADMIN_APPLICATIONS = 'adminApplication';
 
 export interface IApplicationEntity extends ApiApp {
 	id: string;
-	OAuth2: ApiMezonOauthClientList;
+	oAuthClient: ApiMezonOauthClient;
+	draftRedirectUris: string[];
 }
 
 export interface IApplicationState extends EntityState<IApplicationEntity, string> {
@@ -152,6 +153,20 @@ export const fetchMezonOauthClient = createAsyncThunk('adminApplication/fetchMez
 	}
 });
 
+export const editMezonOauthClient = createAsyncThunk(
+	'adminApplication/editMezonOauthClient',
+	async ({ body }: { body: ApiMezonOauthClient }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateMezonOauthClient(mezon.session, body);
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'adminApplication/editMezonOauthClient');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
 export const adminApplicationSlice = createSlice({
 	name: ADMIN_APPLICATIONS,
 	initialState: applicationInitialState,
@@ -164,6 +179,16 @@ export const adminApplicationSlice = createSlice({
 		},
 		setIsElectronDownloading: (state, action) => {
 			state.isElectronDownLoading = action.payload;
+		},
+		addRedirectUri: (state, action: PayloadAction<{ uri: string; appId: string }>) => {
+			const { uri, appId } = action.payload;
+			if (!state.entities[appId]) return;
+
+			if (!state.entities[appId].draftRedirectUris) {
+				state.entities[appId].draftRedirectUris = [uri];
+			} else {
+				state.entities[appId].draftRedirectUris.push(uri);
+			}
 		}
 	},
 	extraReducers(builder) {
@@ -187,6 +212,11 @@ export const adminApplicationSlice = createSlice({
 				...action.payload
 			};
 		});
+		builder.addCase(fetchMezonOauthClient.fulfilled, (state, action: PayloadAction<ApiMezonOauthClient>) => {
+			const clientId = action.payload.client_id ?? '';
+			if (!state.entities[clientId]) return;
+			state.entities[clientId].oAuthClient = action.payload;
+		});
 	}
 });
 
@@ -197,6 +227,16 @@ export const selectCurrentAppId = createSelector(getApplicationState, (state) =>
 export const selectIsElectronUpdateAvailable = createSelector(getApplicationState, (state) => state.isElectronUpdateAvailable);
 export const selectIsElectronDownloading = createSelector(getApplicationState, (state) => state.isElectronDownLoading);
 
+export const selectApplicationById = createSelector(
+	[getApplicationState, (state, appId: string) => appId],
+	(state, appId) => state.entities[appId] ?? {}
+);
+
+export const selectDraftRedirectUriByAppId = createSelector(
+	[getApplicationState, (state, appId: string) => appId],
+	(state, appId) => state.entities[appId].draftRedirectUris ?? []
+);
+
 export const selectAppById = (appId: string) => createSelector(selectAllApps, (allApp) => allApp.apps?.find((app) => app.id === appId) || null);
 export const adminApplicationReducer = adminApplicationSlice.reducer;
-export const { setCurrentAppId, setIsElectronUpdateAvailable, setIsElectronDownloading } = adminApplicationSlice.actions;
+export const { setCurrentAppId, setIsElectronUpdateAvailable, setIsElectronDownloading, addRedirectUri } = adminApplicationSlice.actions;

@@ -1,4 +1,14 @@
-const ClientInformation = () => {
+import { IApplicationEntity } from '@mezon/store';
+
+interface IClientInformationProps {
+	currentApp: IApplicationEntity;
+}
+
+const ClientInformation = ({ currentApp }: IClientInformationProps) => {
+	const handleCopyUrl = (url: string) => {
+		navigator.clipboard.writeText(url);
+	};
+
 	return (
 		<div className="rounded-md dark:bg-bgSecondary bg-bgLightSecondary p-5 dark:text-textPrimary text-colorTextLightMode flex flex-col gap-2">
 			<div className="text-black dark:text-white font-medium text-xl">Client information</div>
@@ -6,8 +16,11 @@ const ClientInformation = () => {
 				<div className="flex gap-5 max-md:flex-col">
 					<div className="flex flex-col gap-2 xl:w-1/3 max-xl:w-1/2">
 						<div className="uppercase text-black dark:text-white font-bold text-xs">Client ID</div>
-						<div className="text-black dark:text-white font-bold text-xs">1273168487367577641</div>
-						<div className="py-[7px] px-4 cursor-pointer bg-blue-600 hover:bg-blue-800 transition-colors rounded-sm w-fit select-none font-medium text-white">
+						<div className="text-black dark:text-white font-bold text-xs">{currentApp?.oAuthClient?.client_id}</div>
+						<div
+							onClick={() => handleCopyUrl(currentApp?.oAuthClient?.client_id as string)}
+							className="py-[7px] px-4 cursor-pointer bg-blue-600 hover:bg-blue-800 transition-colors rounded-sm w-fit select-none font-medium text-white"
+						>
 							Copy
 						</div>
 					</div>
