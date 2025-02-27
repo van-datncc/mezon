@@ -53,7 +53,7 @@ const ChannelListMessage = React.memo(
 				contentContainerStyle={styles.listChannels}
 				initialNumToRender={20}
 				maxToRenderPerBatch={10}
-				windowSize={5}
+				windowSize={10}
 				onEndReachedThreshold={0.5}
 				maintainVisibleContentPosition={{
 					minIndexForVisible: 0,
@@ -64,7 +64,7 @@ const ChannelListMessage = React.memo(
 				// overrideProps={{ isInvertedVirtualizedList: true }}
 				// showsVerticalScrollIndicator={false}
 				// data={messages || []}
-				onScroll={handleScroll}
+				onMomentumScrollEnd={handleScroll}
 				keyboardShouldPersistTaps={'handled'}
 				// contentContainerStyle={styles.listChannels}
 				// renderItem={renderItem}
@@ -94,6 +94,7 @@ const ChannelListMessage = React.memo(
 						flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
 					});
 				}}
+				disableVirtualization
 			/>
 		);
 	},
