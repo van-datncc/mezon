@@ -169,7 +169,8 @@ function parseMarkdown(html: string) {
 	return parsedHtml;
 }
 
-const LINK_TEMPLATE = /((ftp|http|https?):\/\/)?((www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z][-a-zA-Z0-9]{1,62})\b([-a-zA-Z0-9()@:%_+.,~#?&/=]*)/gi;
+const LINK_TEMPLATE =
+	/(ftp|http|https):\/\/(((www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z][-a-zA-Z0-9]{1,62})|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?([-a-zA-Z0-9()@:%_+.,~#?&\/=]*)/gi;
 
 function parseMarkdownLinks(html: string) {
 	const parts = html.split(/(`{1,3})/);
