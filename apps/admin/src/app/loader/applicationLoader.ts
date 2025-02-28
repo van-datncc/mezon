@@ -5,7 +5,7 @@ interface IBotLoaderData {
 	applicationId: string;
 }
 
-export const ApplicationLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
+export const applicationLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
 	const { applicationId } = params;
 	if (!applicationId) {
 		throw new Error('Application ID null');

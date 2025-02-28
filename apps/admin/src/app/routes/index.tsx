@@ -11,7 +11,7 @@ import RootLayout from '../layouts/RootLayout';
 import { appLoader, CustomLoaderFunction, shouldRevalidateApp } from '../loader/appLoader';
 import { authLoader, shouldRevalidateAuth } from '../loader/authLoader';
 // Pages
-import { ApplicationLoader, shouldRevalidateApplication } from '../loader/applicationLoader';
+import { applicationLoader, shouldRevalidateApplication } from '../loader/applicationLoader';
 import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
@@ -81,7 +81,7 @@ export const Routes = () => {
 											<Outlet />
 										</div>
 									),
-									loader: loaderWithStore(ApplicationLoader),
+									loader: loaderWithStore(applicationLoader),
 									shouldRevalidate: shouldRevalidateApplication,
 									children: [
 										{
