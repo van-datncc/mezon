@@ -52,7 +52,7 @@ const ChannelAppScreen = memo(({ channelId }: { channelId: string }) => {
 						height: '100%',
 						zIndex: 1,
 						width: '100%',
-						backgroundColor: themeValue.charcoal,
+						backgroundColor: themeValue.primary,
 						flex: 1
 					}}
 				>
