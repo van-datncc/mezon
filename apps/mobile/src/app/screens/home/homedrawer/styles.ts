@@ -342,6 +342,8 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'column',
 			marginTop: size.s_10,
 			marginBottom: size.s_4
+			// paddingTop: 50,
+			// paddingBottom: 50
 		},
 		highlightMessageMention: {
 			backgroundColor: colors.reactionBg

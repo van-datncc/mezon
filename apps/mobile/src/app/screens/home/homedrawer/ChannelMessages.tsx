@@ -4,7 +4,7 @@ import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
-	RootState,
+	getStore,
 	messagesActions,
 	selectAllAccount,
 	selectHasMoreBottomByChannelId2,
@@ -23,7 +23,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
 import uuid from 'react-native-uuid';
-import { useSelector, useStore } from 'react-redux';
+import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import ChannelMessageList from './components/ChannelMessageList';
 import { ChannelMessageLoading } from './components/ChannelMessageLoading';
@@ -54,7 +54,6 @@ if (Platform.OS === 'android') {
 const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, isPublic, isDisableLoadMore }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
-	const store = useStore();
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
@@ -62,7 +61,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean | string>(false);
 	// check later
-	const isFetching = useSelector(selectMessageIsLoading);
 	const isViewingOldMessage = useAppSelector((state) => selectIsViewingOlderMessagesByChannelId(state, channelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isMessageExist = useAppSelector((state) => selectIsMessageIdExist(state, channelId, idMessageToJump?.id));
@@ -130,14 +128,16 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
+			const store = getStore();
+			const isFetching = selectMessageIsLoading(store.getState());
 			if (isDisableLoadMore) return;
 			if (isLoadMore?.current?.[direction] || isFetching) return;
 			if (direction === ELoadMoreDirection.bottom) {
-				const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState() as RootState, channelId);
+				const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState(), channelId);
 				if (!hasMoreBottom) return;
 			}
 			if (direction === ELoadMoreDirection.top) {
-				const hasMoreTop = selectHasMoreMessageByChannelId2(store.getState() as RootState, channelId);
+				const hasMoreTop = selectHasMoreMessageByChannelId2(store.getState(), channelId);
 				if (!hasMoreTop) return;
 			}
 			isLoadMore.current[direction] = true;
@@ -173,7 +173,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 			return true;
 		},
-		[isDisableLoadMore, isFetching, dispatch, clanId, channelId, topicId, store]
+		[isDisableLoadMore, clanId, channelId, topicId]
 	);
 
 	const renderItem = useCallback(

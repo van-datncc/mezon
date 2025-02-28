@@ -13,7 +13,6 @@ import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmM
 import ChannelApp from './ChannelApp';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
-import DrawerListener from './DrawerListener';
 import HomeDefaultHeader from './HomeDefaultHeader';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
@@ -32,9 +31,7 @@ const HomeDefault = React.memo((props: any) => {
 	const navigation = useNavigation<any>();
 	const panelKeyboardRef = useRef(null);
 
-	const isChannelApp = useMemo(() => {
-		return channelType === ChannelType.CHANNEL_TYPE_APP;
-	}, [channelType]);
+	const isChannelApp = channelType === ChannelType.CHANNEL_TYPE_APP;
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
@@ -54,13 +51,13 @@ const HomeDefault = React.memo((props: any) => {
 	const snapPoints = useMemo(() => ['50%'], []);
 	const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
-	const openBottomSheet = () => {
+	const openBottomSheet = useCallback(() => {
 		Keyboard.dismiss();
 		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
 		timeoutRef.current = setTimeout(() => {
 			bottomSheetRef.current?.present();
 		}, 200);
-	};
+	}, []);
 
 	useEffect(() => {
 		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
@@ -73,7 +70,6 @@ const HomeDefault = React.memo((props: any) => {
 		<View style={[styles.homeDefault]}>
 			{Platform.OS === 'ios' && <LicenseAgreement />}
 
-			<DrawerListener />
 			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
 			{isChannelApp ? (
 				<ChannelApp channelId={channelId} />
@@ -108,5 +104,7 @@ const HomeDefault = React.memo((props: any) => {
 		</View>
 	);
 });
+
+HomeDefault.displayName = 'HomeDefault';
 
 export default HomeDefault;

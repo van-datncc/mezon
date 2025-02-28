@@ -32,7 +32,7 @@ const ChannelMessagesWrapper = React.memo(
 			if (!isReadyShowChannelMsg) {
 				setTimeout(() => {
 					setIsReadyShowChannelMsg(() => true);
-				}, 300);
+				}, 50);
 			}
 		});
 
