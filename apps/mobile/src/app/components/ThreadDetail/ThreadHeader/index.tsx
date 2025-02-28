@@ -46,8 +46,8 @@ export const ThreadHeader = memo(() => {
 	}, [currentDmGroup?.channel_label, currentChannel?.channel_label, currentChannel?.usernames]);
 
 	const isChannel = useMemo(() => {
-		return !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
-	}, [currentChannel?.channel_label, currentChannel?.parrent_id]);
+		return !!currentChannel?.channel_label && !Number(currentChannel?.parent_id);
+	}, [currentChannel?.channel_label, currentChannel?.parent_id]);
 
 	const handlebackMessageDetail = () => {
 		if (isDMThread && !isTabletLandscape) {

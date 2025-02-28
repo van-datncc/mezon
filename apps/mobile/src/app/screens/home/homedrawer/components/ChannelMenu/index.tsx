@@ -356,7 +356,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 		await dispatch(
 			threadsActions.leaveThread({
 				clanId: currentClan?.id || '',
-				channelId: channel?.parrent_id || '',
+				channelId: channel?.parent_id || '',
 				threadId: channel?.id || '',
 				isPrivate: channel.channel_private || 0
 			})
@@ -366,7 +366,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 	}, []);
 
 	const handleJoinChannel = async () => {
-		const channelId = channel?.parrent_id || '';
+		const channelId = channel?.parent_id || '';
 		const clanId = channel?.clan_id || '';
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		const store = await getStoreAsync();
