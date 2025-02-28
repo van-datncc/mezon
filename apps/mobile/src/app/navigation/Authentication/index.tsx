@@ -103,7 +103,7 @@ export const Authentication = memo(() => {
 					options={{
 						animationEnabled: false,
 						headerShown: false,
-						gestureEnabled: Platform.OS === 'ios',
+						gestureEnabled: true,
 						gestureDirection: 'horizontal',
 						gestureResponseDistance: Dimensions.get('window').width
 					}}
@@ -115,7 +115,7 @@ export const Authentication = memo(() => {
 						animationEnabled: false,
 						headerShown: false,
 						headerShadowVisible: false,
-						gestureEnabled: Platform.OS === 'ios',
+						gestureEnabled: true,
 						gestureDirection: 'horizontal',
 						gestureResponseDistance: Dimensions.get('window').width
 					}}
