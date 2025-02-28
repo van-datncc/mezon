@@ -37,7 +37,7 @@ type ChannelMessagesProps = {
 	mode: ChannelStreamMode;
 	isDM?: boolean;
 	isPublic?: boolean;
-	isDisableLoadMore?: boolean;
+	topicChannelId?: string;
 };
 
 const getEntitiesArray = (state: any) => {
@@ -51,7 +51,7 @@ if (Platform.OS === 'android') {
 	}
 }
 
-const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, isPublic, isDisableLoadMore }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, isPublic, topicChannelId }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const store = useStore();
@@ -99,18 +99,21 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 			if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
 				flatListRef?.current?.scrollToIndex?.({
 					animated: true,
-					index: indexToJump - 2 >= 0 ? indexToJump - 2 : indexToJump
+					index: indexToJump,
+					viewPosition: 0.5
 				});
 
 				setTimeout(() => {
 					dispatch(messagesActions.setIdMessageToJump(null));
 					flatListRef?.current?.scrollToIndex?.({
 						animated: true,
-						index: indexToJump
+						index: indexToJump,
+						viewPosition: 0.5
 					});
 				}, 100);
 
 				DeviceEventEmitter.emit(ActionEmitEvent.MESSAGE_ID_TO_JUMP, idMessageToJump?.id);
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 			}
 		}
 	}, [dispatch, idMessageToJump?.id, isLoadingJumpMessage, isMessageExist, messages]);
@@ -130,7 +133,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
-			if (isDisableLoadMore) return;
 			if (isLoadMore?.current?.[direction] || isFetching) return;
 			if (direction === ELoadMoreDirection.bottom) {
 				const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState() as RootState, channelId);
@@ -145,7 +147,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				await dispatch(
 					messagesActions.loadMoreMessage({
 						clanId,
-						channelId,
+						channelId: topicChannelId ? topicChannelId : channelId,
 						direction: Direction_Mode.AFTER_TIMESTAMP,
 						fromMobile: true,
 						topicId: topicId || ''
@@ -159,7 +161,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 			await dispatch(
 				messagesActions.loadMoreMessage({
 					clanId,
-					channelId,
+					channelId: topicChannelId ? topicChannelId : channelId,
 					direction: Direction_Mode.BEFORE_TIMESTAMP,
 					fromMobile: true,
 					topicId: topicId || ''
@@ -173,7 +175,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 			return true;
 		},
-		[isDisableLoadMore, isFetching, dispatch, clanId, channelId, topicId, store]
+		[isFetching, dispatch, clanId, topicChannelId, channelId, topicId, store]
 	);
 
 	const renderItem = useCallback(
@@ -220,7 +222,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} isDisableLoadMore={isDisableLoadMore} />
+			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} />
 
 			{messages?.length ? (
 				<ChannelMessageList
