@@ -25,6 +25,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import BottomSheetRootListener from '../../components/BottomSheetRootListener';
 const RootStack = createStackNavigator();
 const { SharedPreferences } = NativeModules;
 
@@ -102,7 +103,7 @@ export const Authentication = memo(() => {
 					options={{
 						animationEnabled: false,
 						headerShown: false,
-						gestureEnabled: Platform.OS === 'ios',
+						gestureEnabled: true,
 						gestureDirection: 'horizontal',
 						gestureResponseDistance: Dimensions.get('window').width
 					}}
@@ -114,7 +115,7 @@ export const Authentication = memo(() => {
 						animationEnabled: false,
 						headerShown: false,
 						headerShadowVisible: false,
-						gestureEnabled: Platform.OS === 'ios',
+						gestureEnabled: true,
 						gestureDirection: 'horizontal',
 						gestureResponseDistance: Dimensions.get('window').width
 					}}
@@ -135,6 +136,7 @@ export const Authentication = memo(() => {
 			<CallingModalWrapper />
 			<StreamingWrapper />
 			<ChannelVoicePopup />
+			<BottomSheetRootListener />
 		</BottomSheetModalProvider>
 	);
 });

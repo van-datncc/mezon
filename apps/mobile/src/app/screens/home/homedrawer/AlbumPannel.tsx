@@ -174,6 +174,7 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 						const albumPhotos = await CameraRoll.getPhotos({
 							first: 1,
 							assetType: 'All',
+							groupTypes: 'Album',
 							groupName: album?.title
 						});
 
