@@ -25,6 +25,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import BottomSheetRootListener from '../../components/BottomSheetRootListener';
 const RootStack = createStackNavigator();
 const { SharedPreferences } = NativeModules;
 
@@ -135,6 +136,7 @@ export const Authentication = memo(() => {
 			<CallingModalWrapper />
 			<StreamingWrapper />
 			<ChannelVoicePopup />
+			<BottomSheetRootListener />
 		</BottomSheetModalProvider>
 	);
 });

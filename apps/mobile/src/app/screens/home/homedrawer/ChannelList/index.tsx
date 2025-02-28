@@ -154,6 +154,12 @@ const ChannelList = () => {
 					updateCellsBatchingPeriod={50}
 					initialNumToRender={20}
 					windowSize={5}
+					onScrollToIndexFailed={(info) => {
+						const wait = new Promise((resolve) => setTimeout(resolve, 500));
+						wait.then(() => {
+							flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
+						});
+					}}
 				/>
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />
