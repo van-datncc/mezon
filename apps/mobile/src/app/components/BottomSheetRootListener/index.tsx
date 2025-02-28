@@ -87,7 +87,6 @@ const BottomSheetRootListener = () => {
 			if (isDismiss) {
 				onCloseBottomSheet();
 			} else {
-				console.log('log  => data', data);
 				onTriggerBottomSheet(data);
 			}
 		});
@@ -120,7 +119,7 @@ const BottomSheetRootListener = () => {
 			index={0}
 			animateOnMount
 			backgroundStyle={styles.backgroundStyle}
-			backdropComponent={(prop) => <Backdrop {...prop} onBackdropPress={() => onCloseBottomSheet()} />}
+			backdropComponent={(prop) => <Backdrop {...prop} />}
 			enableDynamicSizing={heightFitContent}
 			handleIndicatorStyle={styles.handleIndicator}
 			style={styles.container}
