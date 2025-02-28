@@ -57,7 +57,7 @@ export const Routes = () => {
 							element: <InitialRoutes />
 						},
 						{
-							path: 'developers/login',
+							path: 'login',
 							element: <Login />
 						},
 						{
