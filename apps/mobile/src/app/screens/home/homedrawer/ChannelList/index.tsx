@@ -84,11 +84,18 @@ const ChannelList = () => {
 					data={data}
 					renderItem={renderItem}
 					keyExtractor={keyExtractor}
-					removeClippedSubviews={true}
 					maxToRenderPerBatch={10}
 					updateCellsBatchingPeriod={50}
+					decelerationRate={'fast'}
+					disableVirtualization={true}
 					initialNumToRender={20}
-					windowSize={5}
+					windowSize={10}
+					onScrollToIndexFailed={(info) => {
+						const wait = new Promise((resolve) => setTimeout(resolve, 500));
+						wait.then(() => {
+							flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
+						});
+					}}
 				/>
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />

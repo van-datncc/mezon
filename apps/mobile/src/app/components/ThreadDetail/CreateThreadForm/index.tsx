@@ -56,7 +56,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
 	const { valueThread } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
-		channelId: threadCurrentChannel?.id as string,
+		channelId: '',
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
 	const panelKeyboardRef = useRef(null);
@@ -137,7 +137,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				console.error('Session is not available');
 			}
 		},
-		[createThread, sendMessageThread, sessionUser, currentClanId, dispatch]
+		[sessionUser, createThread, dispatch, currentClanId, sendMessageThread, threadCurrentChannel]
 	);
 
 	useEffect(() => {

@@ -97,7 +97,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<Icons.ThreadIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
-					<SearchThread setKeywordSearch={setKeywordSearch} />
+					<SearchThread />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button
@@ -114,7 +114,6 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					)}
 				</div>
 				<ThreadPagination
-					keywordSearch={keywordSearch}
 					channel={currentChannel as ChannelsEntity}
 					onClose={onClose}
 					preventClosePannel={preventClosePannel}

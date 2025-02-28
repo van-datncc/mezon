@@ -1,12 +1,10 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { STORAGE_IS_LAST_ACTIVE_TAB_DM, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, STORAGE_IS_LAST_ACTIVE_TAB_DM, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
-import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { DeviceEventEmitter, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ShareLocationConfirmModal from '../../../components/ShareLocationConfirmModal';
@@ -47,15 +45,17 @@ const HomeDefault = React.memo((props: any) => {
 		});
 	}, [navigation, onShowKeyboardBottomSheet]);
 
-	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ['50%'], []);
 	const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
 	const openBottomSheet = useCallback(() => {
 		Keyboard.dismiss();
 		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
 		timeoutRef.current = setTimeout(() => {
-			bottomSheetRef.current?.present();
+			const data = {
+				heightFitContent: true,
+				children: <NotificationSetting />
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		}, 200);
 	}, []);
 
@@ -98,9 +98,6 @@ const HomeDefault = React.memo((props: any) => {
 				</KeyboardAvoidingView>
 			)}
 			<AgeRestrictedModal />
-			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
-				<NotificationSetting />
-			</MezonBottomSheet>
 		</View>
 	);
 });

@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import { Dimensions, NativeModules, Platform } from 'react-native';
+import BottomSheetRootListener from '../../components/BottomSheetRootListener';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
@@ -104,7 +105,7 @@ export const Authentication = memo(() => {
 						options={{
 							animationEnabled: false,
 							headerShown: false,
-							gestureEnabled: Platform.OS === 'ios',
+							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width
 						}}
@@ -116,7 +117,7 @@ export const Authentication = memo(() => {
 							animationEnabled: false,
 							headerShown: false,
 							headerShadowVisible: false,
-							gestureEnabled: Platform.OS === 'ios',
+							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width
 						}}
@@ -134,10 +135,10 @@ export const Authentication = memo(() => {
 
 					<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
 				</RootStack.Navigator>
-
 				<CallingModalWrapper />
 				<StreamingWrapper />
 				<ChannelVoicePopup />
+				<BottomSheetRootListener />
 			</ColorRoleProvider>
 		</BottomSheetModalProvider>
 	);
