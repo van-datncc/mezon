@@ -181,7 +181,8 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				assetType: 'All',
 				...(!!pageInfo && !!after && { after: after }),
 				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
-				groupName: currentAlbums === 'All' ? null : currentAlbums
+				groupTypes: album === 'All' ? 'All' : 'Album',
+				groupName: album === 'All' ? null : album
 			});
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
