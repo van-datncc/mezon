@@ -53,7 +53,7 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 			}
 			setCurrentPage(page);
 			const body = {
-				channelId: isThread ? (channel?.parrent_id ?? '') : (channel?.channel_id ?? ''),
+				channelId: isThread ? (channel?.parent_id ?? '') : (channel?.channel_id ?? ''),
 				clanId: channel?.clan_id ?? '',
 				page: page,
 				noCache: true

@@ -89,7 +89,7 @@ export const fetchChannelMembers = createAsyncThunk(
 
 			const state = thunkAPI.getState() as RootState;
 			const currentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[channelId] || {};
-			const parentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
+			const parentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[currentChannel.parent_id || ''] as ChannelsEntity;
 
 			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
 				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
@@ -532,7 +532,7 @@ export const selectAllChannelMembers = createSelector(
 			const currentClanId = state.clans?.currentClanId;
 			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
-			const parentId = channel?.parrent_id;
+			const parentId = channel?.parent_id;
 			const isDm = state.direct?.currentDirectMessageId === channelId || '';
 			return `${channelId},${isPrivate},${isDm},${parentId}`;
 		}
@@ -568,7 +568,7 @@ export const selectMemberByUsername = createSelector(
 			const currentClanId = state.clans?.currentClanId;
 			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
-			const parentId = channel?.parrent_id;
+			const parentId = channel?.parent_id;
 			return `${channelId},${isPrivate},${parentId},${username}`;
 		}
 	],
@@ -602,7 +602,7 @@ export const selectAllChannelMemberIds = createSelector(
 			const currentClanId = state.clans?.currentClanId;
 			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
-			const parentId = channel?.parrent_id;
+			const parentId = channel?.parent_id;
 			return `${channelId},${isPrivate},${isDm ? 1 : ''},${parentId}`;
 		}
 	],

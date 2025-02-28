@@ -1,15 +1,15 @@
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
-	differenceInDays,
-	differenceInHours,
-	differenceInMonths,
-	differenceInSeconds,
-	format,
-	formatDistanceToNowStrict,
-	fromUnixTime,
-	isSameDay,
-	startOfDay,
-	subDays
+    differenceInDays,
+    differenceInHours,
+    differenceInMonths,
+    differenceInSeconds,
+    format,
+    formatDistanceToNowStrict,
+    fromUnixTime,
+    isSameDay,
+    startOfDay,
+    subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
@@ -23,29 +23,29 @@ import { REQUEST_PERMISSION_CAMERA, REQUEST_PERMISSION_MICROPHONE } from '../bri
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import { Platform, getPlatform } from '../hooks/platform';
 import {
-	ChannelMembersEntity,
-	EBacktickType,
-	EMimeTypes,
-	ETokenMessage,
-	EmojiDataOptionals,
-	IAttachmentEntity,
-	IChannel,
-	IEmojiOnMessage,
-	IExtendedMessage,
-	IHashtagOnMessage,
-	ILinkOnMessage,
-	ILinkVoiceRoomOnMessage,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
-	IMessageSendPayload,
-	IMessageWithUser,
-	IPermissonMedia,
-	IRolesClan,
-	MentionDataProps,
-	NotificationEntity,
-	SearchItemProps,
-	SenderInfoOptionals,
-	UsersClanEntity
+    ChannelMembersEntity,
+    EBacktickType,
+    EMimeTypes,
+    ETokenMessage,
+    EmojiDataOptionals,
+    IAttachmentEntity,
+    IChannel,
+    IEmojiOnMessage,
+    IExtendedMessage,
+    IHashtagOnMessage,
+    ILinkOnMessage,
+    ILinkVoiceRoomOnMessage,
+    IMarkdownOnMessage,
+    IMentionOnMessage,
+    IMessageSendPayload,
+    IMessageWithUser,
+    IPermissonMedia,
+    IRolesClan,
+    MentionDataProps,
+    NotificationEntity,
+    SearchItemProps,
+    SenderInfoOptionals,
+    UsersClanEntity
 } from '../types';
 export * from './animateScroll';
 export * from './audio';
@@ -832,7 +832,7 @@ export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => 
 	});
 };
 export const checkIsThread = (channel?: IChannel) => {
-	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
+	return channel?.parent_id !== '0' && channel?.parent_id !== '';
 };
 
 export const isWindowsDesktop = getPlatform() === Platform.WINDOWS && isElectron();

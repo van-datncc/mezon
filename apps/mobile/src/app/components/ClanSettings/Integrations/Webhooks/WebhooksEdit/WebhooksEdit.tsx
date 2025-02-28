@@ -40,7 +40,7 @@ export function WebhooksEdit({ route, navigation }: { route: any; navigation: an
 	const [isCopied, setIsCopied] = useState(false);
 	const [isVisibleModal, setIsVisibleModal] = useState(false);
 	const { t } = useTranslation(['screenStack', 'clanIntegrationsSetting']);
-	const parentChannelsInClan = useMemo(() => allChannel?.filter((channel) => channel?.parrent_id === ChannelIsNotThread.TRUE), [allChannel]);
+	const parentChannelsInClan = useMemo(() => allChannel?.filter((channel) => channel?.parent_id === ChannelIsNotThread.TRUE), [allChannel]);
 	const dispatch = useAppDispatch();
 
 	const channel = useMemo(() => {

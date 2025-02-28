@@ -16,7 +16,7 @@ const HomeDefaultHeader = React.memo(
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 		const currentChannel = useSelector(selectCurrentChannel);
-		const parent = useAppSelector((state) => selectChannelById(state, currentChannel?.parrent_id || ''));
+		const parent = useAppSelector((state) => selectChannelById(state, currentChannel?.parent_id || ''));
 
 		const parentChannelLabel = parent?.channel_label || '';
 		const navigateMenuThreadDetail = () => {
@@ -43,11 +43,11 @@ const HomeDefaultHeader = React.memo(
 		};
 
 		const renderChannelIcon = () => {
-			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)) {
+			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parent_id)) {
 				return <Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
-			if (!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id)) {
+			if (!!currentChannel?.channel_label && !!Number(currentChannel?.parent_id)) {
 				return <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
@@ -112,7 +112,7 @@ const HomeDefaultHeader = React.memo(
 						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				)}
-				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
+				{!!currentChannel?.channel_label && !!Number(currentChannel?.parent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
 						<NotificationBell color={themeValue.textStrong} />
 					</TouchableOpacity>

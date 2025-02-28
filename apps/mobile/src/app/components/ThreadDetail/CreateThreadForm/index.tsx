@@ -77,7 +77,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
-				parrent_id: (channelThreads ? channelThreads?.id : currentChannelId) || '',
+				parent_id: (channelThreads ? channelThreads?.id : currentChannelId) || '',
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_THREAD
 			};
@@ -93,7 +93,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
 			}
 		},
-		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch]
+		[currentChannel, currentChannel?.parent_id, currentClanId, dispatch]
 	);
 
 	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
