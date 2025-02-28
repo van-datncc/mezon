@@ -17,12 +17,12 @@ const ClientInformation = ({ currentApp }: IClientInformationProps) => {
 					<div className="flex flex-col gap-2 xl:w-1/3 max-xl:w-1/2">
 						<div className="uppercase text-black dark:text-white font-bold text-xs">Client ID</div>
 						<div className="text-black dark:text-white font-bold text-xs">{currentApp?.oAuthClient?.client_id}</div>
-						<div
+						<button
 							onClick={() => handleCopyUrl(currentApp?.oAuthClient?.client_id as string)}
 							className="py-[7px] px-4 cursor-pointer bg-blue-600 hover:bg-blue-800 transition-colors rounded-sm w-fit select-none font-medium text-white"
 						>
 							Copy
-						</div>
+						</button>
 					</div>
 					<div className="flex flex-col gap-2 xl:w-1/3 max-xl:w-1/2">
 						<div className="uppercase text-black dark:text-white font-bold text-xs">Client Secret</div>

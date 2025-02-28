@@ -9,7 +9,7 @@ interface IRedirectsProps {
 
 const Redirects = ({ currentApp }: IRedirectsProps) => {
 	const dispatch = useAppDispatch();
-	const draftDirectURIes = useSelector((state) => selectDraftRedirectUriByAppId(state, currentApp.id));
+	const draftDirectURIes = useSelector((state) => selectDraftRedirectUriByAppId(state, currentApp.id)) ?? [];
 	const appURIes = currentApp?.oAuthClient?.redirect_uris ?? [];
 	const handleAddDirectUri = () => {
 		dispatch(addRedirectUri({ appId: currentApp.id, uri: '' }));

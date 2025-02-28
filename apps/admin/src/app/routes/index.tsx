@@ -8,10 +8,10 @@ import { createBrowserRouter, LoaderFunctionArgs, Navigate, Outlet, RouterProvid
 import AppLayout from '../layouts/AppLayout';
 import RootLayout from '../layouts/RootLayout';
 //loader
-import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
-import { authLoader } from '../loader/authLoader';
+import { appLoader, CustomLoaderFunction, shouldRevalidateApp } from '../loader/appLoader';
+import { authLoader, shouldRevalidateAuth } from '../loader/authLoader';
 // Pages
-import { applicationLoader } from '../loader/applicationLoader';
+import { ApplicationLoader, shouldRevalidateApplication } from '../loader/applicationLoader';
 import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
@@ -49,6 +49,7 @@ export const Routes = () => {
 				{
 					path: '',
 					loader: loaderWithStore(appLoader),
+					shouldRevalidate: shouldRevalidateApp,
 					element: <AppLayout />,
 					children: [
 						{
@@ -62,6 +63,7 @@ export const Routes = () => {
 						{
 							path: '',
 							loader: loaderWithStore(authLoader),
+							shouldRevalidate: shouldRevalidateAuth,
 							element: <RootLayout />,
 							children: [
 								{
@@ -79,7 +81,8 @@ export const Routes = () => {
 											<Outlet />
 										</div>
 									),
-									loader: loaderWithStore(applicationLoader),
+									loader: loaderWithStore(ApplicationLoader),
+									shouldRevalidate: shouldRevalidateApplication,
 									children: [
 										{
 											path: '*',

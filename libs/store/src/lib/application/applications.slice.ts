@@ -229,13 +229,14 @@ export const selectIsElectronDownloading = createSelector(getApplicationState, (
 
 export const selectApplicationById = createSelector(
 	[getApplicationState, (state, appId: string) => appId],
-	(state, appId) => state.entities[appId] ?? {}
+	(state, appId) => state?.entities?.[appId]
 );
 
 export const selectDraftRedirectUriByAppId = createSelector(
 	[getApplicationState, (state, appId: string) => appId],
-	(state, appId) => state.entities[appId].draftRedirectUris ?? []
+	(state, appId) => state?.entities?.[appId]?.draftRedirectUris
 );
+export const selectAppsFetchingLoading = createSelector(getApplicationState, (state) => state.loadingStatus);
 
 export const selectAppById = (appId: string) => createSelector(selectAllApps, (allApp) => allApp.apps?.find((app) => app.id === appId) || null);
 export const adminApplicationReducer = adminApplicationSlice.reducer;

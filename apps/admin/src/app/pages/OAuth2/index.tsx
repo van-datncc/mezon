@@ -6,7 +6,7 @@ import Redirects from './Redirects/Redirects';
 
 const OAuth2 = () => {
 	const currentAppId = useSelector(selectCurrentAppId);
-	const currentApp = useSelector((state) => selectApplicationById(state, currentAppId as string));
+	const currentApp = useSelector((state) => selectApplicationById(state, currentAppId as string)) ?? {};
 	return (
 		<div className="flex flex-col gap-10">
 			<div className="flex gap-5 flex-col">
