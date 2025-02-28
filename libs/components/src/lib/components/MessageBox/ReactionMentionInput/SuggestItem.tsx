@@ -97,6 +97,13 @@ const SuggestItem = ({
 			return <Icons.SpeakerLocked defaultSize="w-5 h-5" />;
 		}
 
+		if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+			if (!channel_private || channel_private === 0) {
+				return <Icons.Speaker defaultSize="w-5 5-5" />;
+			}
+			return <Icons.SpeakerLocked defaultSize="w-5 h-5" />;
+		}
+
 		if (type === ChannelType.CHANNEL_TYPE_STREAMING && (!channel_private || channel_private === 0)) {
 			return <Icons.Stream defaultSize="w-5 5-5" />;
 		}

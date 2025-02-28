@@ -72,6 +72,11 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 						defaultFill="#3297FF"
 					/>
+				) : channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
+					<Icons.Speaker
+						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
+						defaultFill="#3297FF"
+					/>
 				) : channel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 					<Icons.Stream
 						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
