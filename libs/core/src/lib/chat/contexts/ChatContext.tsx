@@ -12,6 +12,7 @@ import {
 	appActions,
 	attachmentActions,
 	audioCallActions,
+	canvasAPIActions,
 	channelAppSlice,
 	channelMembers,
 	channelMembersActions,
@@ -137,7 +138,7 @@ import {
 } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
-import { RemoveFriend } from 'mezon-js/socket';
+import { ChannelCanvas, RemoveFriend } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -439,6 +440,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch]
 	);
+
+	const oncanvasevent = useCallback(
+		(canvasEvent: ChannelCanvas) => {
+			if (canvasEvent.status === EEventAction.CREATED) {
+				dispatch(
+					canvasAPIActions.upsertOne({
+						channel_id: canvasEvent.channel_id || '',
+						canvas: { ...canvasEvent, creator_id: canvasEvent.editor_id }
+					})
+				);
+			} else {
+				dispatch(canvasAPIActions.removeOneCanvas({ channelId: canvasEvent.channel_id || '', canvasId: canvasEvent.id || '' }));
+			}
+		},
+		[dispatch]
+	);
+
 	const onnotification = useCallback(
 		async (notification: NotificationInfo) => {
 			const path = isElectron() ? window.location.hash : window.location.pathname;
@@ -1608,6 +1626,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onstatuspresence = onstatuspresence;
 
+			socket.oncanvasevent = oncanvasevent;
+
 			socket.onchannelcreated = onchannelcreated;
 
 			socket.onchanneldeleted = onchanneldeleted;
@@ -1675,6 +1695,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
+			oncanvasevent,
 			onvoiceended,
 			onvoicejoined,
 			onvoiceleaved,
@@ -1756,6 +1777,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oncanvasevent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserchannelremoved = () => {};
@@ -1815,6 +1838,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,
+		oncanvasevent,
 		socketRef,
 		onvoiceended,
 		onvoicejoined,
