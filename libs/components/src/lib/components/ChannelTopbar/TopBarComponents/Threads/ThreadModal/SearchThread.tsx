@@ -1,10 +1,13 @@
-import { threadsActions, useAppDispatch } from '@mezon/store';
+import { selectSearchedThreadLoadingStatus, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { Spinner } from 'flowbite-react';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 const SearchThread = () => {
 	const dispatch = useAppDispatch();
-
+	const statusSearching = useSelector(selectSearchedThreadLoadingStatus);
+	const isLoading = statusSearching === 'loading';
 	const handleTypingDebounced = useThrottledCallback((value: string) => {
 		dispatch(threadsActions.searchedThreads({ label: value }));
 	}, 300);
@@ -24,7 +27,7 @@ const SearchThread = () => {
 				/>
 			</div>
 			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
-				<Icons.Search />
+				{isLoading ? <Spinner className="w-4 h-4 mb-1" /> : <Icons.Search />}
 			</div>
 		</div>
 	);

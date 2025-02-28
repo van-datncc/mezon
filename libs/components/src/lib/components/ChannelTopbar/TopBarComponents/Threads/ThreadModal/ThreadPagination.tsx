@@ -42,7 +42,10 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 	const firstPageNotFull = isNotFullPage && currentPage === 1;
 
 	const threadsSearched = useSelector(selectSearchedThreadResult);
-	const actionSearching = threadsSearched && threadsSearched.length > 0;
+	const noResultSearched = threadsSearched?.length === 0;
+
+	const showEmpty = isEmpty || noResultSearched;
+
 	const onPageChange = useCallback(
 		async (page: number) => {
 			if (!channel?.channel_id || !currentClanId) {
@@ -64,7 +67,7 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 			<div
 				className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
-				{actionSearching && (
+				{threadsSearched && (
 					<GroupThreads title={threadsSearched?.length > 1 ? `${threadsSearched.length} results` : `${threadsSearched.length} result`}>
 						{threadsSearched.map((thread: ThreadsEntity, index: number) => (
 							<ThreadItem
@@ -78,7 +81,7 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 					</GroupThreads>
 				)}
 				{/* Joined threads */}
-				{!actionSearching && getJoinedThreadsWithinLast30Days.length > 0 && (
+				{!threadsSearched && getJoinedThreadsWithinLast30Days.length > 0 && (
 					<GroupThreads
 						title={
 							getJoinedThreadsWithinLast30Days.length > 1
@@ -97,7 +100,7 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 					</GroupThreads>
 				)}
 				{/* Active threads */}
-				{!actionSearching && getActiveThreads.length > 0 && (
+				{!threadsSearched && getActiveThreads.length > 0 && (
 					<GroupThreads
 						title={
 							getActiveThreads.length > 1
@@ -118,7 +121,7 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 					</GroupThreads>
 				)}
 				{/* Older threads */}
-				{!actionSearching && getThreadsOlderThan30Days.length > 0 && (
+				{!threadsSearched && getThreadsOlderThan30Days.length > 0 && (
 					<GroupThreads
 						title={
 							getThreadsOlderThan30Days.length > 1
@@ -138,9 +141,9 @@ const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, p
 					</GroupThreads>
 				)}
 
-				{isEmpty && <EmptyThread onClick={handleCreateThread} />}
+				{showEmpty && <EmptyThread onClick={handleCreateThread} />}
 			</div>
-			{firstPageNotFull ? null : (
+			{threadsSearched || firstPageNotFull ? null : (
 				<div className="py-2 dark:bg-[#2B2D31] bg-[#F2F3F5]">
 					<Pagination
 						layout="navigation"

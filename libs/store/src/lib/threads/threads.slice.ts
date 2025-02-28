@@ -34,7 +34,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	isThreadModalVisible?: boolean;
 	isFocusThreadBox?: boolean;
 	loadingStatusSearchedThread?: LoadingStatus;
-	threadSearchedResult?: ThreadsEntity[];
+	threadSearchedResult?: ThreadsEntity[] | null;
 }
 
 export const threadsAdapter = createEntityAdapter({
@@ -149,9 +149,12 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 export interface SearchThreadsArgs {
 	label: string;
 }
-
 export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label }: SearchThreadsArgs, thunkAPI) => {
 	try {
+		if (!label) {
+			return null;
+		}
+
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const state = thunkAPI.getState() as RootState;
 		const clanId = state?.clans?.currentClanId;
@@ -200,7 +203,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false,
 	isThreadModalVisible: false,
 	loadingStatusSearchedThread: 'not loaded',
-	threadSearchedResult: []
+	threadSearchedResult: null
 });
 
 export const checkDuplicateThread = createAsyncThunk(
