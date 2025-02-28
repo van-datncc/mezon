@@ -3,7 +3,7 @@ import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectCurrentChannel, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
@@ -18,11 +18,10 @@ const HomeDefaultHeader = React.memo(
 		const currentChannel = useSelector(selectCurrentChannel);
 		const parent = useAppSelector((state) => selectChannelById(state, currentChannel?.parrent_id || ''));
 
-		const parentChannelLabel = useMemo(() => parent?.channel_label || '', [parent?.channel_label]);
+		const parentChannelLabel = parent?.channel_label || '';
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
-		const { statusMute } = useStatusMuteChannel();
 		const isTabletLandscape = useTabletLandscape();
 
 		const navigateToSearchPage = () => {
@@ -35,9 +34,7 @@ const HomeDefaultHeader = React.memo(
 			});
 		};
 
-		const isAgeRestrictedChannel = useMemo(() => {
-			return currentChannel?.age_restricted === 1;
-		}, [currentChannel?.age_restricted]);
+		const isAgeRestrictedChannel = currentChannel?.age_restricted === 1;
 
 		const navigateToNotifications = () => {
 			navigation.navigate(APP_SCREEN.NOTIFICATION.STACK, {
@@ -117,11 +114,7 @@ const HomeDefaultHeader = React.memo(
 				)}
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
-						{statusMute === ENotificationActive.OFF ? (
-							<Icons.BellSlashIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-						) : (
-							<Icons.BellIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-						)}
+						<NotificationBell color={themeValue.textStrong} />
 					</TouchableOpacity>
 				) : currentChannel ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => navigateToSearchPage()}>
@@ -134,5 +127,21 @@ const HomeDefaultHeader = React.memo(
 		);
 	}
 );
+
+interface NotificationBellProps {
+	color: string;
+}
+
+const NotificationBell: React.FC<NotificationBellProps> = ({ color }) => {
+	const iconProps = {
+		width: size.s_20,
+		height: size.s_20,
+		color
+	};
+
+	const { statusMute } = useStatusMuteChannel();
+
+	return statusMute === ENotificationActive.OFF ? <Icons.BellSlashIcon {...iconProps} /> : <Icons.BellIcon {...iconProps} />;
+};
 
 export default HomeDefaultHeader;

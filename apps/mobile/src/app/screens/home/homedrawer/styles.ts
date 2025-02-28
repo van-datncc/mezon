@@ -341,6 +341,8 @@ export const style = (colors: Attributes) =>
 		messageWrapper: {
 			flexDirection: 'column',
 			marginTop: size.s_10,
+			// paddingTop: 50,
+			// paddingBottom: 50
 			marginBottom: size.s_6
 		},
 		highlightMessageMention: {
