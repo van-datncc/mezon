@@ -9,6 +9,7 @@ import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from 
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
+import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { RootState } from '../store';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 60;
@@ -179,6 +180,8 @@ export const removeMemberChannel = createAsyncThunk(
 					fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_CHANNEL })
 				);
 				return;
+			} else {
+				thunkAPI.dispatch(notificationSettingActions.removeNotiSetting(channelId));
 			}
 
 			return true;
