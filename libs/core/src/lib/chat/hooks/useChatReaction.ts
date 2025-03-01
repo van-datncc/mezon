@@ -1,18 +1,18 @@
 import {
-    channelMetaActions,
-    ChannelsEntity,
-    channelUsersActions,
-    reactionActions,
-    selectAllChannelMembers,
-    selectClanView,
-    selectClickedOnThreadBoxStatus,
-    selectClickedOnTopicStatus,
-    selectCurrentChannel,
-    selectDirectById,
-    selectDmGroupCurrentId,
-    selectThreadCurrentChannel,
-    useAppDispatch,
-    useAppSelector
+	channelMetaActions,
+	ChannelsEntity,
+	channelUsersActions,
+	reactionActions,
+	selectAllChannelMembers,
+	selectClanView,
+	selectClickedOnThreadBoxStatus,
+	selectClickedOnTopicStatus,
+	selectCurrentChannel,
+	selectDirectById,
+	selectDmGroupCurrentId,
+	selectThreadCurrentChannel,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -110,9 +110,9 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const addMemberToThread = useCallback(
 		async (userId: string) => {
 			if (channel?.parent_id === '0' || channel?.parent_id === '') return;
-			const existingUserIdOfParrent = membersOfParent?.some((member) => member.id === userId);
+			const existingUserIdOfParent = membersOfParent?.some((member) => member.id === userId);
 			const existingUserIdOfChild = membersOfChild?.some((member) => member.id === userId);
-			if (existingUserIdOfParrent && !existingUserIdOfChild) {
+			if (existingUserIdOfParent && !existingUserIdOfChild) {
 				await updateChannelUsers(channel, [userId], channel?.clan_id as string);
 			}
 		},
