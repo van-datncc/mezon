@@ -16,7 +16,6 @@ import { oAuth2Loader } from '../loader/oauthLoader';
 import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
-import InitialRoutes from './InititalRoutes';
 
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
@@ -48,18 +47,10 @@ export const Routes = () => {
 		() =>
 			createBrowserRouter([
 				{
-					path: '',
+					path: '/developers',
 					loader: loaderWithStore(appLoader),
 					element: <AppLayout />,
 					children: [
-						{
-							path: '',
-							element: <InitialRoutes />
-						},
-						{
-							path: 'login',
-							element: <Login />
-						},
 						{
 							path: '',
 							loader: loaderWithStore(authLoader),
@@ -67,7 +58,7 @@ export const Routes = () => {
 							children: [
 								{
 									path: '',
-									element: <InitialRoutes />
+									element: <ApplicationsPage />
 								},
 								{
 									path: 'applications',

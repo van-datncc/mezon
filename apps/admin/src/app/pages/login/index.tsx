@@ -1,15 +1,11 @@
 import { GoogleButtonLogin, TitleSection } from '@mezon/components';
-import { useAppNavigation } from '@mezon/core';
-import { authActions, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { authActions, useAppDispatch } from '@mezon/store';
 import isElectron from 'is-electron';
 import { safeJSONParse } from 'mezon-js';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 function Login() {
-	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
-	const isLogin = useSelector(selectIsLogin);
 	const deepLinkUrl = safeJSONParse(localStorage.getItem('deepLinkUrl') as string);
 
 	useEffect(() => {
@@ -20,11 +16,11 @@ function Login() {
 		}
 	}, [deepLinkUrl, dispatch]);
 
-	useEffect(() => {
-		if (isLogin) {
-			navigate('/applications');
-		}
-	}, [isLogin, navigate]);
+	// useEffect(() => {
+	// 	if (isLogin) {
+	// 		navigate('/applications');
+	// 	}
+	// }, [isLogin, navigate]);
 
 	return (
 		<div
