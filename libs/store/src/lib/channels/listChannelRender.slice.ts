@@ -367,21 +367,21 @@ export const selectListChannelRenderByClanId = createSelector([getListChannelRen
 
 function prioritizeChannel(channels: IChannel[]): IChannel[] {
 	return channels.sort((a, b) => {
-		const aParrentId = a.parent_id ?? '';
-		const bParrentId = b.parent_id ?? '';
+		const aParentId = a.parent_id ?? '';
+		const bParentId = b.parent_id ?? '';
 
-		if ((aParrentId === '0' || aParrentId === '') && bParrentId !== '0') {
+		if ((aParentId === '0' || aParentId === '') && bParentId !== '0') {
 			return -1;
 		}
-		if (aParrentId !== '0' && (bParrentId === '0' || bParrentId === '')) {
+		if (aParentId !== '0' && (bParentId === '0' || bParentId === '')) {
 			return 1;
 		}
-		if (aParrentId === '0' || aParrentId === '') {
+		if (aParentId === '0' || aParentId === '') {
 			const aChannelId = a.channel_id ?? '';
 			const bChannelId = b.channel_id ?? '';
 			return aChannelId < bChannelId ? -1 : aChannelId > bChannelId ? 1 : 0;
 		}
-		return aParrentId < bParrentId ? -1 : aParrentId > bParrentId ? 1 : 0;
+		return aParentId < bParentId ? -1 : aParentId > bParentId ? 1 : 0;
 	});
 }
 
@@ -395,8 +395,8 @@ function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 			break;
 		}
 
-	const numOfParrent = indexThread;
-	for (let i = 0; i < numOfParrent; i++) {
+	const numOfParent = indexThread;
+	for (let i = 0; i < numOfParent; i++) {
 		const channel = channels[i];
 		if (channel.category_id === categoryId) {
 			sortedChannels.push(channel);
