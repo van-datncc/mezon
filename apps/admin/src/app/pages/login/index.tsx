@@ -16,12 +16,6 @@ function Login() {
 		}
 	}, [deepLinkUrl, dispatch]);
 
-	// useEffect(() => {
-	// 	if (isLogin) {
-	// 		navigate('/applications');
-	// 	}
-	// }, [isLogin, navigate]);
-
 	return (
 		<div
 			className=" w-screen h-screen  overflow-x-hidden overflow-y-scroll  scrollbar-hide flex items-center"
