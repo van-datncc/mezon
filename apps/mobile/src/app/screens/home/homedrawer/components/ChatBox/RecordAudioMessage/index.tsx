@@ -1,3 +1,4 @@
+import { useIdleRender } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectDmGroupCurrent, useAppSelector } from '@mezon/store-mobile';
@@ -24,7 +25,7 @@ interface IRecordAudioMessageProps {
 	mode: ChannelStreamMode;
 }
 
-export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
+export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['recordChatMessage']);
@@ -240,8 +241,9 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 		setIsConfirmRecordModalVisible(true);
 	}, []);
 	if (!isDisplay) return null;
+
 	return (
-		<View>
+		<>
 			<ModalConfirmRecord visible={isConfirmRecordModalVisible} onBack={handleBackRecord} onConfirm={handleQuitRecord} />
 			{/*TODO: Refactor this component*/}
 			<MezonBottomSheet snapPoints={['50%']} ref={recordingBsRef} onBackdropPress={handleBackdropBS} enablePanDownToClose={false}>
@@ -284,6 +286,14 @@ export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessage
 					</View>
 				</View>
 			</MezonBottomSheet>
-		</View>
+		</>
 	);
+});
+
+export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
+	const shouldRender = useIdleRender();
+
+	if (!shouldRender) return null;
+
+	return <BaseRecordAudioMessage channelId={channelId} mode={mode} />;
 });
