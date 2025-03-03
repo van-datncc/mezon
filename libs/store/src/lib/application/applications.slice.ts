@@ -10,7 +10,6 @@ export const ADMIN_APPLICATIONS = 'adminApplication';
 export interface IApplicationEntity extends ApiApp {
 	id: string;
 	oAuthClient: ApiMezonOauthClient;
-	draftRedirectUris: string[];
 }
 
 export interface IApplicationState extends EntityState<IApplicationEntity, string> {
@@ -179,16 +178,6 @@ export const adminApplicationSlice = createSlice({
 		},
 		setIsElectronDownloading: (state, action) => {
 			state.isElectronDownLoading = action.payload;
-		},
-		addRedirectUri: (state, action: PayloadAction<{ uri: string; appId: string }>) => {
-			const { uri, appId } = action.payload;
-			if (!state.entities[appId]) return;
-
-			if (!state.entities[appId].draftRedirectUris) {
-				state.entities[appId].draftRedirectUris = [uri];
-			} else {
-				state.entities[appId].draftRedirectUris.push(uri);
-			}
 		}
 	},
 	extraReducers(builder) {
@@ -217,6 +206,11 @@ export const adminApplicationSlice = createSlice({
 			if (!state.entities[clientId]) return;
 			state.entities[clientId].oAuthClient = action.payload;
 		});
+		builder.addCase(editMezonOauthClient.fulfilled, (state, action: PayloadAction<ApiMezonOauthClient>) => {
+			const clientId = action.payload.client_id ?? '';
+			if (!state.entities[clientId]) return;
+			state.entities[clientId].oAuthClient = action.payload;
+		});
 	}
 });
 
@@ -232,12 +226,8 @@ export const selectApplicationById = createSelector(
 	(state, appId) => state?.entities?.[appId]
 );
 
-export const selectDraftRedirectUriByAppId = createSelector(
-	[getApplicationState, (state, appId: string) => appId],
-	(state, appId) => state?.entities?.[appId]?.draftRedirectUris
-);
 export const selectAppsFetchingLoading = createSelector(getApplicationState, (state) => state.loadingStatus);
 
 export const selectAppById = (appId: string) => createSelector(selectAllApps, (allApp) => allApp.apps?.find((app) => app.id === appId) || null);
 export const adminApplicationReducer = adminApplicationSlice.reducer;
-export const { setCurrentAppId, setIsElectronUpdateAvailable, setIsElectronDownloading, addRedirectUri } = adminApplicationSlice.actions;
+export const { setCurrentAppId, setIsElectronUpdateAvailable, setIsElectronDownloading } = adminApplicationSlice.actions;

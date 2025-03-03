@@ -1,18 +1,23 @@
-import { addRedirectUri, IApplicationEntity, selectDraftRedirectUriByAppId, useAppDispatch } from '@mezon/store';
+import { IApplicationEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface IRedirectsProps {
 	currentApp: IApplicationEntity;
+	uriInputValuesRef: React.MutableRefObject<string[]>;
+	inputArrLength: number;
+	setInputArrLength: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Redirects = ({ currentApp }: IRedirectsProps) => {
-	const dispatch = useAppDispatch();
-	const draftDirectURIes = useSelector((state) => selectDraftRedirectUriByAppId(state, currentApp.id)) ?? [];
-	const appURIes = currentApp?.oAuthClient?.redirect_uris ?? [];
+const Redirects = ({ currentApp, uriInputValuesRef, setInputArrLength, inputArrLength }: IRedirectsProps) => {
 	const handleAddDirectUri = () => {
-		dispatch(addRedirectUri({ appId: currentApp.id, uri: '' }));
+		if (uriInputValuesRef.current.includes('')) {
+			toast.warning('Please fill all inputs with valid URIs!');
+			return;
+		}
+		setInputArrLength((prev) => prev + 1);
+		uriInputValuesRef.current.push('');
 	};
 
 	return (
@@ -24,12 +29,16 @@ const Redirects = ({ currentApp }: IRedirectsProps) => {
 					the URIs you enter here.
 				</div>
 				<div className="flex flex-col gap-5">
-					{appURIes.map((uri, index) => (
-						<UriItem uri={uri} key={index} />
+					{[...Array(inputArrLength).keys()].map((_, index) => (
+						<UriItem
+							key={index}
+							index={index}
+							uriInputValuesRef={uriInputValuesRef}
+							inputArrLength={inputArrLength}
+							setInputArrLength={setInputArrLength}
+						/>
 					))}
-					{draftDirectURIes.map((uri, index) => (
-						<UriItem uri={uri} key={index} />
-					))}
+
 					<div
 						onClick={handleAddDirectUri}
 						className="py-[7px] px-4 cursor-pointer bg-blue-600 hover:bg-blue-800 transition-colors rounded-sm w-fit select-none font-medium text-white"
@@ -43,15 +52,35 @@ const Redirects = ({ currentApp }: IRedirectsProps) => {
 };
 
 interface IUriItemProps {
-	uri: string;
+	index: number;
+	uriInputValuesRef: React.MutableRefObject<string[]>;
+	inputArrLength: number;
+	setInputArrLength: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const UriItem = ({ uri }: IUriItemProps) => {
-	const [uriInput, setUriInput] = useState(uri ?? '');
+const UriItem = ({ index, uriInputValuesRef, setInputArrLength, inputArrLength }: IUriItemProps) => {
+	const [uriInput, setUriInput] = useState(uriInputValuesRef.current[index] ?? '');
+
+	useEffect(() => {
+		setUriInput(uriInputValuesRef.current[index] ?? '');
+	}, [index, uriInputValuesRef, inputArrLength]);
 
 	const handleInputOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUriInput(e.target.value);
+		uriInputValuesRef.current[index] = e.target.value;
 	};
+
+	const handleDeleteInput = () => {
+		setInputArrLength(inputArrLength - 1);
+
+		const newRefArr = [...uriInputValuesRef.current];
+		newRefArr.splice(index, 1);
+		uriInputValuesRef.current = newRefArr;
+	};
+
+	const isValid = useMemo(() => {
+		return uriInput.startsWith('http://') || uriInput.startsWith('https://');
+	}, [uriInput]);
 
 	return (
 		<div className="relative">
@@ -60,10 +89,13 @@ const UriItem = ({ uri }: IUriItemProps) => {
 					value={uriInput}
 					onChange={handleInputOnchange}
 					type="text"
-					className="bg-bgLightModeThird dark:bg-[#1e1f22] border w-full border-primary outline-none p-[10px] rounded-md"
+					className={`bg-bgLightModeThird dark:bg-[#1e1f22] border w-full ${isValid ? 'border-primary' : 'border-red-500'}  outline-none p-[10px] rounded-md`}
 				/>
 			</div>
-			<Icons.CloseButton className="absolute top-3 right-1 w-5 dark:text-gray-500 dark:hover:text-gray-400 text-gray-500 hover:text-gray-700 cursor-pointer" />
+			<Icons.CloseButton
+				onClick={handleDeleteInput}
+				className="absolute top-3 right-1 w-5 dark:text-gray-500 dark:hover:text-gray-400 text-gray-500 hover:text-gray-700 cursor-pointer"
+			/>
 		</div>
 	);
 };
