@@ -18,6 +18,7 @@ import com.mezon.mobile.SharedPreferencesPackage;
 import com.livekit.reactnative.LiveKitReactNative
 import com.livekit.reactnative.audio.AudioType
 import com.mezon.mobile.FullScreenNotificationIncomingCallPackage;
+import com.mezon.mobile.CustomImageViewPackage;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -32,6 +33,7 @@ class MainApplication : Application(), ReactApplication {
           val packages = PackageList(this).packages.toMutableList()
           packages.add(FullScreenNotificationIncomingCallPackage())
           packages.add(SharedPreferencesPackage())
+          packages.add(CustomImageViewPackage())
           return packages;
         }
 
