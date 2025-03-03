@@ -168,7 +168,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 
 	const goToAppDetailPage = async (id: string) => {
 		await dispatch(getApplicationDetail({ appId: id }));
-		navigate('applications/' + id);
+		navigate(id);
 	};
 
 	return (

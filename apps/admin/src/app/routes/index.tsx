@@ -15,6 +15,7 @@ import { applicationLoader, shouldRevalidateApplication } from '../loader/applic
 import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
+import InitialRoutes from './InititalRoutes';
 
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
@@ -59,7 +60,7 @@ export const Routes = () => {
 							children: [
 								{
 									path: '',
-									element: <ApplicationsPage />
+									element: <InitialRoutes />
 								},
 								{
 									path: 'applications',
