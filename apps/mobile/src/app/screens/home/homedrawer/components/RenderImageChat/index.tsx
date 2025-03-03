@@ -1,9 +1,10 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
+import ImageNativeAndroid from '../../../../../components/ImageNativeAndroid';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
@@ -78,6 +79,16 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 
 	const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 	const photoSize = useMemo(() => getPhotoSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
+	const imagePoxy = useMemo(() => {
+		if (!image.url) {
+			return '';
+		}
+		return createImgproxyUrl(image?.url ?? '', {
+			width: Math.round(image?.width * 0.4) || 500,
+			height: Math.round(image?.height * 0.4) || 500,
+			resizeType: 'fit'
+		}) as string;
+	}, [image?.height, image?.url, image?.width]);
 
 	if (!image.url) {
 		return null;
@@ -85,29 +96,42 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
-			<FastImage
-				fallback={true}
-				style={[
-					styles.imageMessageRender,
-					{
-						width: photoSize?.width / (isTablet ? 1.8 : 1),
-						height: photoSize?.height / (isTablet ? 1.8 : 1),
-						opacity: isUploading ? 0.5 : 1,
-						marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-					}
-				]}
-				children={isUploading ? <UploadingIndicator /> : null}
-				source={{
-					uri: isLoadFailProxy
-						? image?.url
-						: createImgproxyUrl(image?.url ?? '', { width: image?.width || 500, height: image?.height || 500, resizeType: 'fit' }),
-					priority: FastImage.priority.high
-				}}
-				resizeMode={!imageSize?.height && !isUploading ? 'cover' : isMultiple ? 'cover' : 'contain'}
-				onError={() => {
-					setIsLoadFailProxy(true);
-				}}
-			/>
+			{Platform.OS === 'android' ? (
+				<ImageNativeAndroid
+					url={imagePoxy}
+					resizeMode={isMultiple ? 'cover' : 'contain'}
+					style={[
+						{
+							width: photoSize?.width / (isTablet ? 1.8 : 1),
+							height: photoSize?.height / (isTablet ? 1.8 : 1),
+							opacity: isUploading ? 0.5 : 1,
+							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+						}
+					]}
+				/>
+			) : (
+				<FastImage
+					fallback={true}
+					style={[
+						styles.imageMessageRender,
+						{
+							width: photoSize?.width / (isTablet ? 1.8 : 1),
+							height: photoSize?.height / (isTablet ? 1.8 : 1),
+							opacity: isUploading ? 0.5 : 1,
+							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+						}
+					]}
+					children={isUploading ? <UploadingIndicator /> : null}
+					source={{
+						uri: isLoadFailProxy ? image?.url : imagePoxy,
+						priority: FastImage.priority.high
+					}}
+					resizeMode={!imageSize?.height && !isUploading ? 'cover' : isMultiple ? 'cover' : 'contain'}
+					onError={() => {
+						setIsLoadFailProxy(true);
+					}}
+				/>
+			)}
 			{!!remainingImagesCount && (
 				<RemainingImagesOverlay remainingImagesCount={remainingImagesCount} photoSize={photoSize} styles={styles} isTablet={isTablet} />
 			)}
@@ -148,6 +172,16 @@ const RenderImageHaveSize = React.memo(
 
 		const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
 		const photoSize = useMemo(() => getPhotoSizeWithSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
+		const imagePoxy = useMemo(() => {
+			if (!image.url) {
+				return '';
+			}
+			return createImgproxyUrl(image?.url ?? '', {
+				width: Math.round(image?.width * 0.4) || 500,
+				height: Math.round(image?.height * 0.4) || 500,
+				resizeType: 'fit'
+			}) as string;
+		}, [image?.height, image?.url, image?.width]);
 
 		if (!image.url) {
 			return null;
@@ -160,30 +194,45 @@ const RenderImageHaveSize = React.memo(
 				key={index}
 				onPress={() => onPress(image)}
 				onLongPress={onLongPress}
+				style={styles.imageMessageRender}
 			>
-				<FastImage
-					fallback={true}
-					style={[
-						styles.imageMessageRender,
-						{
-							width: photoSize?.width / (isTablet ? 1.8 : 1),
-							height: photoSize?.height / (isTablet ? 1.8 : 1),
-							opacity: isUploading ? 0.5 : 1,
-							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-						}
-					]}
-					children={isUploading ? <UploadingIndicator /> : null}
-					source={{
-						uri: isLoadFailProxy
-							? image?.url
-							: createImgproxyUrl(image?.url ?? '', { width: image?.width || 500, height: image?.height || 500, resizeType: 'fit' }),
-						priority: FastImage.priority.high
-					}}
-					resizeMode={isMultiple ? 'cover' : 'contain'}
-					onError={() => {
-						setIsLoadFailProxy(true);
-					}}
-				/>
+				{Platform.OS === 'android' ? (
+					<ImageNativeAndroid
+						url={imagePoxy}
+						resizeMode={isMultiple ? 'cover' : 'contain'}
+						style={[
+							{
+								width: photoSize?.width / (isTablet ? 1.8 : 1),
+								height: photoSize?.height / (isTablet ? 1.8 : 1),
+								opacity: isUploading ? 0.5 : 1,
+								marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+							}
+						]}
+					/>
+				) : (
+					<FastImage
+						fallback={true}
+						style={[
+							styles.imageMessageRender,
+							{
+								width: photoSize?.width / (isTablet ? 1.8 : 1),
+								height: photoSize?.height / (isTablet ? 1.8 : 1),
+								opacity: isUploading ? 0.5 : 1,
+								marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+							}
+						]}
+						children={isUploading ? <UploadingIndicator /> : null}
+						source={{
+							uri: isLoadFailProxy ? image?.url : imagePoxy,
+							priority: FastImage.priority.high
+						}}
+						resizeMode={isMultiple ? 'cover' : 'contain'}
+						onError={() => {
+							setIsLoadFailProxy(true);
+						}}
+					/>
+				)}
+
 				{!!remainingImagesCount && (
 					<RemainingImagesOverlay remainingImagesCount={remainingImagesCount} photoSize={photoSize} styles={styles} isTablet={isTablet} />
 				)}
