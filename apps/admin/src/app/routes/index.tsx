@@ -30,7 +30,6 @@ const OAuth2 = loadable(() => import('../pages/OAuth2'));
 export const Routes = () => {
 	const dispatch = useAppDispatch();
 	const initialPath = useSelector(selectInitialPath);
-
 	const loaderWithStore = useCallback(
 		(loaderFunction: CustomLoaderFunction) => {
 			return async (props: LoaderFunctionArgs) =>
@@ -47,6 +46,10 @@ export const Routes = () => {
 		() =>
 			createBrowserRouter([
 				{
+					path: '',
+					element: <Navigate to="/developers" />
+				},
+				{
 					path: '/developers',
 					loader: loaderWithStore(appLoader),
 					shouldRevalidate: shouldRevalidateApp,
@@ -58,6 +61,10 @@ export const Routes = () => {
 							shouldRevalidate: shouldRevalidateAuth,
 							element: <RootLayout />,
 							children: [
+								{
+									path: '*',
+									element: <Navigate to="/developers/applications" />
+								},
 								{
 									path: '',
 									element: <InitialRoutes />
@@ -78,7 +85,7 @@ export const Routes = () => {
 									children: [
 										{
 											path: '*',
-											element: <Navigate to="information" />
+											element: <Navigate to="/developers/applications" />
 										},
 										{
 											path: '',
