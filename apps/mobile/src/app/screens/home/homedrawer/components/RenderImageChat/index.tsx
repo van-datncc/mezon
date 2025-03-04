@@ -1,10 +1,9 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
-import ImageNativeAndroid from '../../../../../components/ImageNativeAndroid';
+import ImageNative from '../../../../../components/ImageNative';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
@@ -70,7 +69,6 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { resolution } = useImageResolution({ uri: image.url });
-	const [isLoadFailProxy, setIsLoadFailProxy] = React.useState<boolean>(false);
 
 	const imageSize = getAspectRatioSize({
 		aspectRatio: (resolution?.width || 1) / (resolution?.height || 1),
@@ -96,42 +94,18 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
-			{Platform.OS === 'android' ? (
-				<ImageNativeAndroid
-					url={imagePoxy}
-					resizeMode={isMultiple ? 'cover' : 'contain'}
-					style={[
-						{
-							width: photoSize?.width / (isTablet ? 1.8 : 1),
-							height: photoSize?.height / (isTablet ? 1.8 : 1),
-							opacity: isUploading ? 0.5 : 1,
-							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-						}
-					]}
-				/>
-			) : (
-				<FastImage
-					fallback={true}
-					style={[
-						styles.imageMessageRender,
-						{
-							width: photoSize?.width / (isTablet ? 1.8 : 1),
-							height: photoSize?.height / (isTablet ? 1.8 : 1),
-							opacity: isUploading ? 0.5 : 1,
-							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-						}
-					]}
-					children={isUploading ? <UploadingIndicator /> : null}
-					source={{
-						uri: isLoadFailProxy ? image?.url : imagePoxy,
-						priority: FastImage.priority.high
-					}}
-					resizeMode={!imageSize?.height && !isUploading ? 'cover' : isMultiple ? 'cover' : 'contain'}
-					onError={() => {
-						setIsLoadFailProxy(true);
-					}}
-				/>
-			)}
+			<ImageNative
+				url={imagePoxy}
+				resizeMode={isMultiple ? 'cover' : 'contain'}
+				style={[
+					{
+						width: photoSize?.width / (isTablet ? 1.8 : 1),
+						height: photoSize?.height / (isTablet ? 1.8 : 1),
+						opacity: isUploading ? 0.5 : 1,
+						marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+					}
+				]}
+			/>
 			{!!remainingImagesCount && (
 				<RemainingImagesOverlay remainingImagesCount={remainingImagesCount} photoSize={photoSize} styles={styles} isTablet={isTablet} />
 			)}
@@ -167,7 +141,6 @@ const RemainingImagesOverlay = ({ remainingImagesCount, photoSize, styles, isTab
 const RenderImageHaveSize = React.memo(
 	({ image, imageSize, index, disable, onPress, onLongPress, isMultiple = false, remainingImagesCount, isTablet = false }: any) => {
 		const { themeValue } = useTheme();
-		const [isLoadFailProxy, setIsLoadFailProxy] = React.useState<boolean>(false);
 		const styles = style(themeValue);
 
 		const isUploading = !image?.url?.includes('http') && !image?.url?.includes('data:image/png;base64');
@@ -196,43 +169,18 @@ const RenderImageHaveSize = React.memo(
 				onLongPress={onLongPress}
 				style={styles.imageMessageRender}
 			>
-				{Platform.OS === 'android' ? (
-					<ImageNativeAndroid
-						url={imagePoxy}
-						resizeMode={isMultiple ? 'cover' : 'contain'}
-						style={[
-							{
-								width: photoSize?.width / (isTablet ? 1.8 : 1),
-								height: photoSize?.height / (isTablet ? 1.8 : 1),
-								opacity: isUploading ? 0.5 : 1,
-								marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-							}
-						]}
-					/>
-				) : (
-					<FastImage
-						fallback={true}
-						style={[
-							styles.imageMessageRender,
-							{
-								width: photoSize?.width / (isTablet ? 1.8 : 1),
-								height: photoSize?.height / (isTablet ? 1.8 : 1),
-								opacity: isUploading ? 0.5 : 1,
-								marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
-							}
-						]}
-						children={isUploading ? <UploadingIndicator /> : null}
-						source={{
-							uri: isLoadFailProxy ? image?.url : imagePoxy,
-							priority: FastImage.priority.high
-						}}
-						resizeMode={isMultiple ? 'cover' : 'contain'}
-						onError={() => {
-							setIsLoadFailProxy(true);
-						}}
-					/>
-				)}
-
+				<ImageNative
+					url={imagePoxy}
+					resizeMode={isMultiple ? 'cover' : 'contain'}
+					style={[
+						{
+							width: photoSize?.width / (isTablet ? 1.8 : 1),
+							height: photoSize?.height / (isTablet ? 1.8 : 1),
+							opacity: isUploading ? 0.5 : 1,
+							marginVertical: !remainingImagesCount && !isMultiple ? size.s_6 : 0
+						}
+					]}
+				/>
 				{!!remainingImagesCount && (
 					<RemainingImagesOverlay remainingImagesCount={remainingImagesCount} photoSize={photoSize} styles={styles} isTablet={isTablet} />
 				)}
