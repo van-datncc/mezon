@@ -82,12 +82,12 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		code_block: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			paddingVertical: 1,
+			paddingVertical: size.s_8,
 			borderColor: colors.secondary,
 			borderRadius: 5,
 			lineHeight: size.s_20,
 			width: codeBlockMaxWidth,
-			paddingHorizontal: size.s_10
+			paddingHorizontal: size.s_16
 		},
 		code_inline: {
 			color: colors.text,
@@ -400,10 +400,14 @@ export const RenderTextMarkdownContent = ({
 						);
 						break;
 
-					case EBacktickType.PRE:
+					case (EBacktickType.PRE, EBacktickType.TRIPLE):
 						textParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
+								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
+										? contentInElement?.slice(3, -3)
+										: contentInElement}
+								</Text>
 							</View>
 						);
 						break;
