@@ -97,7 +97,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<Icons.ThreadIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
-					<SearchThread />
+					<SearchThread setKeywordSearch={setKeywordSearch} />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button

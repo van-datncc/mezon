@@ -132,7 +132,7 @@ const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
 		storage,
-		blacklist: ['isShowCreateThread', 'isThreadModalVisible', 'isFocusThreadBox']
+		blacklist: ['isShowCreateThread', 'isThreadModalVisible', 'isFocusThreadBox', 'threadSearchedResult']
 	},
 	threadsReducer
 );

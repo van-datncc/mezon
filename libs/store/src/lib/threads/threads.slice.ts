@@ -35,6 +35,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	isFocusThreadBox?: boolean;
 	loadingStatusSearchedThread?: LoadingStatus;
 	threadSearchedResult?: ThreadsEntity[] | null;
+	inputSearchThread?: Record<string, string>;
 }
 
 export const threadsAdapter = createEntityAdapter({
@@ -203,7 +204,8 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false,
 	isThreadModalVisible: false,
 	loadingStatusSearchedThread: 'not loaded',
-	threadSearchedResult: null
+	threadSearchedResult: null,
+	inputSearchThread: {}
 });
 
 export const checkDuplicateThread = createAsyncThunk(
@@ -324,6 +326,18 @@ export const threadsSlice = createSlice({
 		},
 		setFocusThreadBox(state, action: PayloadAction<boolean>) {
 			state.isFocusThreadBox = action.payload;
+		},
+
+		// state.byClans[clanId].request[channelId] = request;
+
+		// setThreadInputSearch()
+
+		setThreadInputSearch(state, action) {
+			const { channelId, value } = action.payload;
+			if (!state.inputSearchThread) {
+				state.inputSearchThread = {};
+			}
+			state.inputSearchThread[channelId] = value;
 		}
 	},
 	extraReducers: (builder) => {
@@ -506,3 +520,8 @@ export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (s
 export const selectSearchedThreadLoadingStatus = createSelector(getThreadsState, (state) => state.loadingStatusSearchedThread);
 
 export const selectSearchedThreadResult = createSelector(getThreadsState, (state) => state.threadSearchedResult);
+
+export const selectThreadInputSearchByChannelId = createSelector(
+	[(state: { threads: ThreadsState }) => state.threads.inputSearchThread, (_: any, channelId: string) => channelId],
+	(inputSearchThread, channelId) => inputSearchThread?.[channelId] || ''
+);
