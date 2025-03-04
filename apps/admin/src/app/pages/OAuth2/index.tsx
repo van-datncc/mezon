@@ -1,10 +1,10 @@
 import { ModalSaveChanges } from '@mezon/components';
 import { editMezonOauthClient, selectApplicationById, selectCurrentAppId, useAppDispatch } from '@mezon/store';
 import { ApiMezonOauthClient } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import ClientInformation from './ClientInformation/ClientInfomation';
+import ClientInformation from './ClientInformation/ClientInformation';
 import Generator from './Generator/Generator';
 import Redirects from './Redirects/Redirects';
 
@@ -19,17 +19,8 @@ const OAuth2 = () => {
 	const uriInputValuesRef = useRef<string[]>([...appURIes]);
 	const [inputArrLength, setInputArrLength] = useState<number>(appURIes.length);
 
-	useEffect(() => {
-		const isSameURIArray =
-			appURIes.length === uriInputValuesRef.current.length && JSON.stringify(appURIes) === JSON.stringify(uriInputValuesRef.current);
-		if (!isSameURIArray || inputArrLength !== appURIes.length) {
-			setHasChange(true);
-			return;
-		}
-		setHasChange(false);
-	}, [appURIes, inputArrLength, uriInputValuesRef.current]);
-
 	const handleSaveChanges = async () => {
+		let includeInvalidURI = false;
 		if (!uriInputValuesRef.current || uriInputValuesRef.current.includes('')) {
 			toast.warning('There is empty input!');
 			return;
@@ -39,8 +30,13 @@ const OAuth2 = () => {
 			const item = uriInputValuesRef.current[index];
 			if (!item.startsWith('http://') && !item.startsWith('https://')) {
 				toast.warning('URIs must be valid!');
+				includeInvalidURI = true;
 				break;
 			}
+		}
+
+		if (includeInvalidURI) {
+			return;
 		}
 
 		const request: ApiMezonOauthClient = {
@@ -74,6 +70,7 @@ const OAuth2 = () => {
 				uriInputValuesRef={uriInputValuesRef}
 				setInputArrLength={setInputArrLength}
 				currentApp={currentApp}
+				setHasChange={setHasChange}
 			/>
 			<Generator />
 			{hasChange && <ModalSaveChanges onReset={handleResetChanges} onSave={handleSaveChanges} />}
