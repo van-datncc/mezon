@@ -7,10 +7,11 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Spinner } from 'flowbite-react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
-const SearchThread = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<React.SetStateAction<string>> }) => {
+const SearchThread = () => {
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const statusSearching = useSelector(selectSearchedThreadLoadingStatus);
@@ -22,10 +23,14 @@ const SearchThread = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<R
 	}, 500);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value.trim();
-		dispatch(threadsActions.setThreadInputSearch({ channelId: currentChannelId, value }));
+		const value = event.target.value;
+		dispatch(threadsActions.setThreadInputSearch({ channelId: currentChannelId, value: value }));
 		handleTypingDebounced(value);
 	};
+
+	useEffect(() => {
+		dispatch(threadsActions.searchedThreads({ label: inputSearchValue }));
+	}, [currentChannelId]);
 
 	return (
 		<div className="relative">

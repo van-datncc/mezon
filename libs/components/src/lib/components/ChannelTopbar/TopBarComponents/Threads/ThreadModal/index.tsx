@@ -11,7 +11,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission, checkIsThread } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SearchThread from './SearchThread';
@@ -40,7 +40,6 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const { setOpenThreadMessageState } = useReference();
 	const hasChildModal = useSelector(hasGrandchildModal);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
-	const [keywordSearch, setKeywordSearch] = useState('');
 
 	useEffect(() => {
 		const fetchThreads = async () => {
@@ -97,7 +96,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<Icons.ThreadIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
-					<SearchThread setKeywordSearch={setKeywordSearch} />
+					<SearchThread />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button

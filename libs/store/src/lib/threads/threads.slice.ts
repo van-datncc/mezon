@@ -152,7 +152,7 @@ export interface SearchThreadsArgs {
 }
 export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label }: SearchThreadsArgs, thunkAPI) => {
 	try {
-		if (!label || label.length < 3) {
+		if (!label || label.trim().length < 3) {
 			return null;
 		}
 
@@ -162,7 +162,7 @@ export const searchedThreads = createAsyncThunk('threads/searchThreads', async (
 		const channelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
 
 		if (clanId && clanId !== '0' && channelId) {
-			const response = await mezon.client.searchThread(mezon.session, clanId, channelId, label);
+			const response = await mezon.client.searchThread(mezon.session, clanId, channelId, label?.trim());
 			if (!response.channeldesc) {
 				return [];
 			}
