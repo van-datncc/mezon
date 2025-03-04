@@ -328,10 +328,6 @@ export const threadsSlice = createSlice({
 			state.isFocusThreadBox = action.payload;
 		},
 
-		// state.byClans[clanId].request[channelId] = request;
-
-		// setThreadInputSearch()
-
 		setThreadInputSearch(state, action) {
 			const { channelId, value } = action.payload;
 			if (!state.inputSearchThread) {
