@@ -32,6 +32,7 @@ import {
 	eventManagementActions,
 	friendsActions,
 	getDmEntityByChannelId,
+	getStore,
 	getStoreAsync,
 	giveCoffeeActions,
 	listChannelRenderAction,
@@ -139,10 +140,9 @@ import {
 import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { ChannelCanvas, RemoveFriend } from 'mezon-js/socket';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { useDirect } from '../hooks/useDirect';
 import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
@@ -163,18 +163,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
 	const { createDirectMessageWithUser } = useDirect();
-	const currentClanId = useSelector(selectCurrentClanId);
-	const navigate = useNavigate();
+
+	const navigate = useCustomNavigate();
 	// update later
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
-	const clanIdActive = useMemo(() => {
-		if (currentClanId) {
-			return currentClanId;
-		} else {
-			return '0';
-		}
-	}, [currentClanId]);
-
 	const onvoiceended = useCallback(
 		(voice: VoiceEndedEvent) => {
 			if (voice) {
@@ -234,34 +226,33 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const handleBuzz = useCallback(
-		(channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
-			const audio = new Audio('assets/audio/buzz.mp3');
-			audio.play().catch((error) => {
-				console.error('Failed to play buzz sound:', error);
-			});
+	const handleBuzz = useCallback((channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
+		const audio = new Audio('assets/audio/buzz.mp3');
+		audio.play().catch((error) => {
+			console.error('Failed to play buzz sound:', error);
+		});
 
-			const timestamp = Math.round(Date.now() / 1000);
+		const timestamp = Math.round(Date.now() / 1000);
 
-			if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				dispatch(
-					channelsActions.setBuzzState({
-						clanId: currentClanId as string,
-						channelId: channelId,
-						buzzState: { isReset: true, senderId, timestamp }
-					})
-				);
-			} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-				dispatch(
-					directActions.setBuzzStateDirect({
-						channelId: channelId,
-						buzzState: { isReset: true, senderId, timestamp }
-					})
-				);
-			}
-		},
-		[currentClanId]
-	);
+		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			const store = getStore();
+			const currentClanId = selectCurrentClanId(store.getState());
+			dispatch(
+				channelsActions.setBuzzState({
+					clanId: currentClanId as string,
+					channelId: channelId,
+					buzzState: { isReset: true, senderId, timestamp }
+				})
+			);
+		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			dispatch(
+				directActions.setBuzzStateDirect({
+					channelId: channelId,
+					buzzState: { isReset: true, senderId, timestamp }
+				})
+			);
+		}
+	}, []);
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
@@ -393,7 +384,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				captureSentryError(message, 'onchannelmessage');
 			}
 		},
-		[userId, currentClanId, isFocusDesktop, isTabVisible]
+		[userId, isFocusDesktop, isTabVisible]
 	);
 
 	const onchannelpresence = useCallback(
@@ -530,7 +521,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[userId, currentClanId, isFocusDesktop, isTabVisible]
+		[userId, isFocusDesktop, isTabVisible]
 	);
 
 	const onpinmessage = useCallback((pin: LastPinMessageEvent) => {
@@ -639,6 +630,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const store = await getStoreAsync();
 			const clanId = selectCurrentClanId(store.getState());
 			const channelId = selectCurrentChannelId(store.getState() as unknown as RootState);
+			const currentClanId = selectCurrentClanId(store.getState());
 
 			const userIds = users.map((u) => u.user_id);
 			const user = users?.find((user) => user.user_id === userId);
@@ -737,7 +729,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				);
 			}
 
-			if (clanIdActive === clan_id) {
+			if (currentClanId === clan_id) {
 				const members = users
 					.filter((user) => user?.user_id)
 					.map((user) => ({
@@ -767,40 +759,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(userChannelsActions.addUserChannel({ channelId: channel_desc.channel_id as string, userAdds: userIds }));
 			}
 		},
-		[userId, clanIdActive, dispatch]
+		[userId, dispatch]
 	);
 
-	const onuserclanadded = useCallback(
-		async (userJoinClan: AddClanUserEvent) => {
-			const store = await getStoreAsync();
-			const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
-			const modeResponsive = selectModeResponsive(store.getState() as unknown as RootState);
+	const onuserclanadded = useCallback(async (userJoinClan: AddClanUserEvent) => {
+		const store = await getStoreAsync();
+		const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
+		const modeResponsive = selectModeResponsive(store.getState() as unknown as RootState);
 
-			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
-				return;
-			}
-			if (userJoinClan?.user && clanIdActive === userJoinClan.clan_id) {
-				const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
-				dispatch(
-					usersClanActions.add({
-						...userJoinClan,
+		if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
+			return;
+		}
+
+		const currentClanId = selectCurrentClanId(store.getState());
+		if (userJoinClan?.user && currentClanId === userJoinClan.clan_id) {
+			const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
+			dispatch(
+				usersClanActions.add({
+					...userJoinClan,
+					id: userJoinClan.user.user_id,
+					user: {
+						...userJoinClan.user,
+						avatar_url: userJoinClan.user.avatar,
 						id: userJoinClan.user.user_id,
-						user: {
-							...userJoinClan.user,
-							avatar_url: userJoinClan.user.avatar,
-							id: userJoinClan.user.user_id,
-							about_me: userJoinClan.user.about_me,
-							display_name: userJoinClan.user.display_name,
-							metadata: userJoinClan.user.custom_status,
-							username: userJoinClan.user.username,
-							create_time: createTime
-						}
-					})
-				);
-			}
-		},
-		[clanIdActive]
-	);
+						about_me: userJoinClan.user.about_me,
+						display_name: userJoinClan.user.display_name,
+						metadata: userJoinClan.user.custom_status,
+						username: userJoinClan.user.username,
+						create_time: createTime
+					}
+				})
+			);
+		}
+	}, []);
 
 	const onremovefriend = useCallback(
 		(removeFriend: RemoveFriend) => {
@@ -1066,6 +1057,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
 			if (!clanDelete?.clan_id) return;
+			const store = getStore();
+			const currentClanId = selectCurrentClanId(store.getState());
 			dispatch(listChannelsByUserActions.removeByClanId({ clanId: clanDelete.clan_id }));
 			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
@@ -1073,7 +1066,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 			}
 		},
-		[currentClanId, dispatch, userId]
+		[userId]
 	);
 
 	const onchanneldeleted = useCallback(
@@ -1726,6 +1719,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const id = Date.now().toString();
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
+					const store = getStore();
+					const clanIdActive = selectCurrentClanId(store.getState());
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
 
 					if (socket === 'RECONNECTING') return;
@@ -1743,7 +1738,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			}, 5000);
 		},
-		[clanIdActive, reconnectWithTimeout, setCallbackEventFn]
+		[reconnectWithTimeout, setCallbackEventFn]
 	);
 
 	const ondisconnect = useCallback(() => {
