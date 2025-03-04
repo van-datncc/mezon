@@ -10,9 +10,11 @@ import {
 } from '@mezon/store-mobile';
 import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
+import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Dimensions, Image, Linking, StyleSheet, Text, View } from 'react-native';
 import WebView from 'react-native-webview';
+import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
@@ -362,25 +364,35 @@ export const RenderTextMarkdownContent = ({
 					});
 
 					const { text, link } = parseMarkdownLink(mention);
+
+					const urlFormat = link.replace(/##voice|#thread|#stream|#%22|%22|"|#/g, '');
+					const dataChannel = urlFormat.split('_');
+					const payloadChannel = {
+						type: Number(dataChannel?.[0] || 1),
+						id: dataChannel?.[1],
+						channel_id: dataChannel?.[1],
+						clan_id: dataChannel?.[2],
+						status: Number(dataChannel?.[3] || 1),
+						meeting_code: dataChannel?.[4] || '',
+						category_id: dataChannel?.[5]
+					};
+
 					textParts.push(
 						<Text
 							key={`hashtag-${index}`}
 							style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
 							onPress={() => {
-								const urlFormat = link.replace(/##voice%22|#%22|%22|"|#/g, '');
-								const dataChannel = urlFormat.split('_');
-								const payloadChannel = {
-									type: Number(dataChannel?.[0] || 1),
-									id: dataChannel?.[1],
-									channel_id: dataChannel?.[1],
-									clan_id: dataChannel?.[2],
-									status: Number(dataChannel?.[3] || 1),
-									meeting_code: dataChannel?.[4] || '',
-									category_id: dataChannel?.[5]
-								};
 								onChannelMention?.(payloadChannel);
 							}}
 						>
+							{payloadChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
+							payloadChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
+								<CustomIcon name="volume-up" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
+								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : null}
 							{text}
 						</Text>
 					);
@@ -400,7 +412,15 @@ export const RenderTextMarkdownContent = ({
 						);
 						break;
 
-					case (EBacktickType.PRE, EBacktickType.TRIPLE):
+					case EBacktickType.PRE:
+						textParts.push(
+							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
+							</View>
+						);
+						break;
+
+					case EBacktickType.TRIPLE:
 						textParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
