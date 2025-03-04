@@ -15,6 +15,7 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
+import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { APP_SCREEN } from '../ScreenTypes';
@@ -134,6 +135,16 @@ export const Authentication = memo(() => {
 					<RootStack.Screen name={APP_SCREEN.SETTINGS.STACK} children={(props) => <SettingStacks {...props} />} />
 
 					<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
+
+					<RootStack.Screen
+						name={APP_SCREEN.VIDEO_DETAIL}
+						component={RenderVideoDetail}
+						options={{
+							animationEnabled: true,
+							headerShown: false,
+							headerShadowVisible: false
+						}}
+					/>
 				</RootStack.Navigator>
 				<CallingModalWrapper />
 				<StreamingWrapper />
