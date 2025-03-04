@@ -55,6 +55,9 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
+const screenWidth = Dimensions.get('screen').width;
+const codeBlockMaxWidth = screenWidth - size.s_70;
+
 export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean, isBuzzMessage?: boolean) => {
 	const commonHeadingStyle = {
 		color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
@@ -82,7 +85,9 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			paddingVertical: 1,
 			borderColor: colors.secondary,
 			borderRadius: 5,
-			lineHeight: size.s_20
+			lineHeight: size.s_20,
+			width: codeBlockMaxWidth,
+			paddingHorizontal: size.s_10
 		},
 		code_inline: {
 			color: colors.text,
@@ -181,6 +186,12 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			borderLeftColor: 'red',
 			borderRadius: size.s_4,
 			height: size.s_220
+		},
+		boldText: {
+			fontSize: size.medium,
+			fontWeight: 'bold',
+			lineHeight: size.s_20,
+			color: colors.white
 		}
 	});
 };
@@ -399,7 +410,7 @@ export const RenderTextMarkdownContent = ({
 
 					case EBacktickType.BOLD:
 						textParts.push(
-							<Text key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
+							<Text key={`bold-${index}`} style={themeValue ? markdownStyles(themeValue).boldText : {}}>
 								{contentInElement}
 							</Text>
 						);
@@ -522,7 +533,7 @@ export const RenderTextMarkdownContent = ({
 					}}
 				/>
 			)}
-			{textParts}
+			<Text>{textParts}</Text>
 		</View>
 	);
 };
