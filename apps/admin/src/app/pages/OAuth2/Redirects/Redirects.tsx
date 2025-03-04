@@ -8,9 +8,10 @@ interface IRedirectsProps {
 	uriInputValuesRef: React.MutableRefObject<string[]>;
 	inputArrLength: number;
 	setInputArrLength: React.Dispatch<React.SetStateAction<number>>;
+	setHasChange: (value: boolean) => void;
 }
 
-const Redirects = ({ currentApp, uriInputValuesRef, setInputArrLength, inputArrLength }: IRedirectsProps) => {
+const Redirects = ({ currentApp, uriInputValuesRef, setInputArrLength, inputArrLength, setHasChange }: IRedirectsProps) => {
 	const handleAddDirectUri = () => {
 		if (uriInputValuesRef.current.includes('')) {
 			toast.warning('Please fill all inputs with valid URIs!');
@@ -36,6 +37,8 @@ const Redirects = ({ currentApp, uriInputValuesRef, setInputArrLength, inputArrL
 							uriInputValuesRef={uriInputValuesRef}
 							inputArrLength={inputArrLength}
 							setInputArrLength={setInputArrLength}
+							currentApp={currentApp}
+							setHasChange={setHasChange}
 						/>
 					))}
 
@@ -56,14 +59,27 @@ interface IUriItemProps {
 	uriInputValuesRef: React.MutableRefObject<string[]>;
 	inputArrLength: number;
 	setInputArrLength: React.Dispatch<React.SetStateAction<number>>;
+	currentApp: IApplicationEntity;
+	setHasChange: (value: boolean) => void;
 }
 
-const UriItem = ({ index, uriInputValuesRef, setInputArrLength, inputArrLength }: IUriItemProps) => {
+const UriItem = ({ index, uriInputValuesRef, setInputArrLength, inputArrLength, currentApp, setHasChange }: IUriItemProps) => {
 	const [uriInput, setUriInput] = useState(uriInputValuesRef.current[index] ?? '');
+	const appURIes = currentApp?.oAuthClient?.redirect_uris ?? [];
+
+	useEffect(() => {
+		const isSameURIArray =
+			appURIes.length === uriInputValuesRef.current.length && JSON.stringify(appURIes) === JSON.stringify(uriInputValuesRef.current);
+		if (!isSameURIArray || inputArrLength !== appURIes.length) {
+			setHasChange(true);
+			return;
+		}
+		setHasChange(false);
+	}, [appURIes, inputArrLength, uriInputValuesRef, uriInput]);
 
 	useEffect(() => {
 		setUriInput(uriInputValuesRef.current[index] ?? '');
-	}, [index, uriInputValuesRef, inputArrLength]);
+	}, [index, uriInputValuesRef.current[index], inputArrLength]);
 
 	const handleInputOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUriInput(e.target.value);
