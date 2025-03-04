@@ -17,9 +17,9 @@ const CustomImageView = requireNativeComponent<CustomImageProps>('CustomImageVie
 const CustomImageViewIOS = requireNativeComponent<CustomImageIOSProps>('CustomImageViewIOS');
 const ImageNative = ({ url, style, resizeMode }: CustomImageProps) => {
 	return Platform.OS === 'android' ? (
-		<CustomImageView url={url} resizeMode={resizeMode} style={style} />
+		<CustomImageView url={url?.toString()} resizeMode={resizeMode} style={style} />
 	) : (
-		<CustomImageViewIOS source={{ uri: url }} resizeMode={'cover'} style={style} />
+		<CustomImageViewIOS source={{ uri: url?.toString() }} resizeMode={'cover'} style={style} />
 	);
 };
 
