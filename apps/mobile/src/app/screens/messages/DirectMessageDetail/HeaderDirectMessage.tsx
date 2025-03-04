@@ -16,14 +16,13 @@ import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import ImageNative from '../../../components/ImageNative';
 import { UserStatus } from '../../../components/UserStatus';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { getUserStatusByMetadata } from '../../../utils/helpers';
-import ImageNative from "../../../components/ImageNative";
 
 interface HeaderProps {
 	from?: string;
