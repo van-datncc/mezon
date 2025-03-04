@@ -64,6 +64,9 @@ class CustomImageViewIOS: UIView {
       let assetName = String(uri.dropFirst(8))
       if let image = UIImage(named: assetName) {
         imageView.image = image
+      } else {
+        print("Image not found: \(assetName)")
+        imageView.image = nil
       }
     } else if let url = URL(string: uri) {
       // Use SDWebImage for caching and loading remote images
