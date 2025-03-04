@@ -30,8 +30,6 @@
 		"@shopify/flash-list": "1.7.0",
 		"@testing-library/jest-native": "*",
 		"@testing-library/react-native": "*",
-		"expo": "50.0.0",
-		"expo-av": "~13.10.6",
 		"formik": "2.4.5",
 		"lottie-react-native": "6.7.2",
 		"metro-config": "0.80.9",
