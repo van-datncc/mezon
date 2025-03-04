@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '../../chat/hooks/useCustomNavigate';
 
 export type ToClanPageArgs = {
 	clanId: string;
 };
 
 export function useAppNavigation() {
-	const navigate = useNavigate();
+	const navigate = useCustomNavigate();
 
 	const toLoginPage = useCallback(() => {
 		return `/guest/login`;

@@ -15,8 +15,8 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
-import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
+import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
@@ -142,7 +142,7 @@ export const Authentication = memo(() => {
 						options={{
 							animationEnabled: true,
 							headerShown: false,
-							headerShadowVisible: false,
+							headerShadowVisible: false
 						}}
 					/>
 				</RootStack.Navigator>

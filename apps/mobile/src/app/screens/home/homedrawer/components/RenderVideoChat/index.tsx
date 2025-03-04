@@ -10,7 +10,7 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 const widthMedia = Metrics.screenWidth - 150;
 
 export const RenderVideoChat = React.memo(
-	({ videoURL, onLongPress }: { videoURL: string, onLongPress: () => void }) => {
+	({ videoURL, onLongPress }: { videoURL: string; onLongPress: () => void }) => {
 		const [thumbnail, setThumbnail] = useState<string | null>(null);
 		const [loading, setLoading] = useState(true);
 		const navigation = useNavigation<any>();

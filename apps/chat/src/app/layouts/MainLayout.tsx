@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, useFriends, useIdleRender } from '@mezon/core';
+import { ChatContext, ChatContextProvider, useCustomNavigate, useFriends, useIdleRender } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -17,12 +17,12 @@ import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import { memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import ChannelVoice from '../pages/channel/ChannelVoice';
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
-	const navigate = useNavigate();
+	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
 
 	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);

@@ -4,15 +4,15 @@ import { size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectDmGroupCurrent, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { getMobileUploadedAttachments } from '@mezon/utils';
-import { Audio } from 'expo-av';
-import { AndroidAudioEncoder, AndroidOutputFormat, IOSAudioQuality, IOSOutputFormat } from 'expo-av/build/Audio/RecordingConstants';
-import * as FileSystem from 'expo-file-system';
 import LottieView from 'lottie-react-native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
 import { SOUND_WAVES_CIRCLE } from '../../../../../../../assets/lottie';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import RenderAudioChat from '../../RenderAudioChat/RenderAudioChat';
@@ -25,13 +25,13 @@ interface IRecordAudioMessageProps {
 	mode: ChannelStreamMode;
 }
 
+const audioRecorderPlayer = new AudioRecorderPlayer();
+
 export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['recordChatMessage']);
-	const [recording, setRecording] = useState(null);
 	const [isDisplay, setIsDisplay] = useAnimatedState(false);
-
 	const recordingRef = useRef(null);
 	const recordingWaveRef = useRef(null);
 	const { sessionRef, clientRef, socketRef } = useMezon();
@@ -48,16 +48,25 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		[mode, currentChannel, currentDmGroup]
 	);
 
+	useEffect(() => {
+		const eventStartRecord = DeviceEventEmitter.addListener(ActionEmitEvent.ON_START_RECORD_MESSAGE, startRecording);
+		return () => {
+			eventStartRecord.remove();
+		};
+	}, []);
+
 	const getPermissions = async () => {
 		try {
-			const { status } = await Audio.requestPermissionsAsync();
-			if (status !== 'granted') {
+			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+
+			if (granted !== 'granted') {
 				Alert.alert('Permissions required', 'Please grant microphone permissions to use this feature.');
 				return false;
 			}
 			return true;
 		} catch (error) {
 			console.error('Error requesting permissions:', error);
+			return false;
 		}
 	};
 
@@ -66,82 +75,40 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 			Keyboard.dismiss();
 			const isPermissionGranted = await getPermissions();
 			if (!isPermissionGranted) return;
+			const dirs = RNFetchBlob.fs.dirs;
+			const path = Platform.select({
+				android: `${dirs.CacheDir}/sound.mp3`
+			});
+
 			setIsDisplay(true);
 			setIsPreviewRecord(false);
 			recordingBsRef.current?.present();
-			await Audio.setAudioModeAsync({
-				allowsRecordingIOS: true,
-				playsInSilentModeIOS: true
+			await new Promise((resolve) => setTimeout(resolve, 300));
+			const result = await audioRecorderPlayer.startRecorder(path);
+			setRecordUrl(result);
+			audioRecorderPlayer.addRecordBackListener((e) => {
+				setDurationRecord(e.currentPosition);
 			});
-
-			// Create and start recording
-			const { recording: newRecording } = await Audio.Recording.createAsync({
-				isMeteringEnabled: true,
-				android: {
-					extension: '.mp3',
-					outputFormat: AndroidOutputFormat.MPEG_4,
-					audioEncoder: AndroidAudioEncoder.AAC,
-					sampleRate: 44100,
-					numberOfChannels: 2,
-					bitRate: 128000
-				},
-				ios: {
-					extension: '.m4a',
-					outputFormat: IOSOutputFormat.MPEG4AAC,
-					audioQuality: IOSAudioQuality.MAX,
-					sampleRate: 44100,
-					numberOfChannels: 2,
-					bitRate: 128000,
-					linearPCMBitDepth: 16,
-					linearPCMIsBigEndian: false,
-					linearPCMIsFloat: false
-				},
-				web: {
-					mimeType: 'audio/webm',
-					bitsPerSecond: 128000
-				}
-			});
-
 			recordingRef.current?.play();
 			recordingWaveRef.current?.play(0, 45);
 			meterSoundRef.current?.play();
-
-			setRecording(newRecording);
 		} catch (error) {
 			console.error('Failed to start recording:', error);
 			setIsDisplay(false);
 		}
 	};
 
-	useEffect(() => {
-		if (!recording) return;
-		recording.setOnRecordingStatusUpdate(async (status) => {
-			setDurationRecord(status?.durationMillis);
-		});
-	}, [recording]);
-
 	const stopRecording = useCallback(async () => {
 		try {
-			if (!recording) return;
-			// Stop recording
-			await recording.stopAndUnloadAsync();
-
-			// Get recording URI
-			const uri = recording.getURI();
-
-			if (uri) {
-				setRecordUrl(uri);
-			}
-
-			recordingRef.current?.reset();
-			meterSoundRef.current?.reset();
-			setRecording(null);
-			return uri;
+			const result = await audioRecorderPlayer.stopRecorder();
+			audioRecorderPlayer.removeRecordBackListener();
+			setRecordUrl(result);
+			return result;
 		} catch (error) {
 			setIsDisplay(false);
 			console.error('Failed to stop recording:', error);
 		}
-	}, [recording, setIsDisplay]);
+	}, [setIsDisplay]);
 
 	const sendMessage = useCallback(async () => {
 		try {
@@ -169,7 +136,7 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 			});
 			await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '');
 			setIsDisplay(false);
-			recordingBsRef?.current?.dismiss();
+			recordingBsRef?.current?.close();
 		} catch (error) {
 			console.error('Failed to send message:', error);
 			setIsDisplay(false);
@@ -188,15 +155,20 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		stopRecording
 	]);
 
+	const normalizeFilePath = (path) => {
+		return path.replace(/^file:\/*/, 'file:///');
+	};
+
 	const getAudioFileInfo = async (uri) => {
 		try {
-			const fileInfo = await FileSystem.getInfoAsync(uri);
-			if (fileInfo?.exists) {
+			const fixedPath = normalizeFilePath(uri);
+			const fileInfo = await RNFS.stat(fixedPath);
+			if (fileInfo?.path) {
 				const fileData = {
 					filename: uri.split('/').pop(),
 					size: fileInfo.size,
 					filetype: 'audio/mp3',
-					url: fileInfo.uri
+					url: fileInfo.path
 				};
 
 				return [fileData];
@@ -208,14 +180,6 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		}
 	};
 
-	useEffect(() => {
-		const eventStartRecord = DeviceEventEmitter.addListener(ActionEmitEvent.ON_START_RECORD_MESSAGE, startRecording);
-
-		return () => {
-			eventStartRecord.remove();
-		};
-	}, []);
-
 	const handlePreviewRecord = async () => {
 		meterSoundRef.current?.pause();
 		await stopRecording();
@@ -224,22 +188,24 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 
 	const handleBackRecord = useCallback(() => {
 		setIsConfirmRecordModalVisible(false);
-	}, []);
+	}, [setIsConfirmRecordModalVisible]);
 
 	const handleQuitRecord = useCallback(() => {
-		recordingBsRef?.current?.dismiss();
+		recordingBsRef?.current?.close();
 		setIsConfirmRecordModalVisible(false);
 		stopRecording();
-	}, [recording]);
+	}, [setIsConfirmRecordModalVisible, stopRecording]);
 
 	const handleRemoveRecord = async () => {
 		await stopRecording();
 		setIsDisplay(false);
-		recordingBsRef?.current?.dismiss();
+		recordingBsRef?.current?.close();
 	};
+
 	const handleBackdropBS = useCallback(() => {
 		setIsConfirmRecordModalVisible(true);
-	}, []);
+	}, [setIsConfirmRecordModalVisible]);
+
 	if (!isDisplay) return null;
 
 	return (
