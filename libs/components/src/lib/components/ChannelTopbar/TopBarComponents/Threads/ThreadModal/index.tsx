@@ -144,16 +144,15 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 	// Gọi API khi `page` thay đổi
 	useEffect(() => {
+		console.log('page :', page);
 		fetchComments();
 	}, [page]);
 
 	// Load thêm dữ liệu khi scroll xuống
 	const loadMore = useCallback(() => {
-		if (!isLoading) {
-			setPage((prevPage) => prevPage + 1);
-		}
-	}, [isLoading]);
-
+		setPage((page) => page + 1);
+		setIsLoading(true);
+	}, []);
 	return (
 		// <div
 		// 	ref={modalRef}
@@ -196,7 +195,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 		// 	</div>
 		// </div>
-		<div className="absolute top-8 right-0 overflow-auto rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right bg-black">
+		<div className="absolute top-8 right-0 overflow-auto rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right bg-red-600 h-[300px]">
 			<CommentList hasMore={hasMore} isLoading={isLoading} loadMore={loadMore} comments={comments} />{' '}
 		</div>
 	);
