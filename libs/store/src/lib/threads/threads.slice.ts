@@ -34,7 +34,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	isThreadModalVisible?: boolean;
 	isFocusThreadBox?: boolean;
 	loadingStatusSearchedThread?: LoadingStatus;
-	threadSearchedResult?: ThreadsEntity[] | null;
+	threadSearchedResult?: Record<string, ThreadsEntity[] | null>;
 	inputSearchThread?: Record<string, string>;
 }
 
@@ -149,10 +149,11 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 
 export interface SearchThreadsArgs {
 	label: string;
+	channelId: string;
 }
-export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label }: SearchThreadsArgs, thunkAPI) => {
+export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label, channelId }: SearchThreadsArgs, thunkAPI) => {
 	try {
-		if (!label || label.trim().length < 3) {
+		if (!label?.trim() || label.trim().length < 3) {
 			return null;
 		}
 
@@ -204,7 +205,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false,
 	isThreadModalVisible: false,
 	loadingStatusSearchedThread: 'not loaded',
-	threadSearchedResult: null,
+	threadSearchedResult: {},
 	inputSearchThread: {}
 });
 
@@ -374,7 +375,13 @@ export const threadsSlice = createSlice({
 				state.loadingStatusSearchedThread = 'loading';
 			})
 			.addCase(searchedThreads.fulfilled, (state: ThreadsState, action) => {
-				state.threadSearchedResult = action.payload;
+				const { channelId } = action.meta.arg;
+				if (channelId) {
+					state.threadSearchedResult = {
+						...state.threadSearchedResult,
+						[channelId]: action.payload || null
+					};
+				}
 				state.loadingStatusSearchedThread = 'loaded';
 			})
 			.addCase(searchedThreads.rejected, (state: ThreadsState, action) => {
@@ -515,7 +522,10 @@ export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (s
 
 export const selectSearchedThreadLoadingStatus = createSelector(getThreadsState, (state) => state.loadingStatusSearchedThread);
 
-export const selectSearchedThreadResult = createSelector(getThreadsState, (state) => state.threadSearchedResult);
+export const selectSearchedThreadResult = createSelector(
+	[(state: { threads: ThreadsState }) => state.threads.threadSearchedResult, (_: any, channelId: string) => channelId],
+	(threadSearchedResult, channelId) => threadSearchedResult?.[channelId] || null
+);
 
 export const selectThreadInputSearchByChannelId = createSelector(
 	[(state: { threads: ThreadsState }) => state.threads.inputSearchThread, (_: any, channelId: string) => channelId],

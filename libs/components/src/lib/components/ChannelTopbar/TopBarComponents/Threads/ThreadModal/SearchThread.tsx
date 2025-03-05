@@ -1,36 +1,36 @@
-import {
-	selectCurrentChannelId,
-	selectSearchedThreadLoadingStatus,
-	selectThreadInputSearchByChannelId,
-	threadsActions,
-	useAppDispatch
-} from '@mezon/store';
+import { selectSearchedThreadLoadingStatus, selectThreadInputSearchByChannelId, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Spinner } from 'flowbite-react';
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
-const SearchThread = () => {
+type SearchThreadProps = {
+	channelId: string;
+};
+const SearchThread = ({ channelId }: SearchThreadProps) => {
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const statusSearching = useSelector(selectSearchedThreadLoadingStatus);
 	const isLoading = statusSearching === 'loading';
-	const inputSearchValue = useSelector((state) => selectThreadInputSearchByChannelId(state, currentChannelId ?? ''));
+	const inputSearchValue = useSelector((state) => selectThreadInputSearchByChannelId(state, channelId ?? ''));
 
-	const handleTypingDebounced = useThrottledCallback((value: string) => {
-		dispatch(threadsActions.searchedThreads({ label: value }));
-	}, 500);
-
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const value = event.target.value;
-		dispatch(threadsActions.setThreadInputSearch({ channelId: currentChannelId, value: value }));
-		handleTypingDebounced(value);
-	};
-
-	useEffect(() => {
-		dispatch(threadsActions.searchedThreads({ label: inputSearchValue }));
-	}, [currentChannelId]);
+	const handleTypingDebounced = useThrottledCallback(
+		useCallback(
+			(value: string) => {
+				dispatch(threadsActions.searchedThreads({ label: value, channelId: channelId ?? '' }));
+			},
+			[dispatch]
+		),
+		500
+	);
+	const handleChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value;
+			dispatch(threadsActions.setThreadInputSearch({ channelId: channelId, value }));
+			handleTypingDebounced(value);
+		},
+		[dispatch, channelId, handleTypingDebounced]
+	);
 
 	return (
 		<div className="relative">

@@ -28,6 +28,8 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const { toChannelPage } = useAppNavigation();
 
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+	const currentChannelId = isThread ? (currentChannel?.parent_id ?? '') : (currentChannel?.channel_id ?? '');
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
@@ -83,6 +85,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 		},
 		rootRef
 	);
+
 	///
 	return (
 		<div
@@ -96,7 +99,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<Icons.ThreadIcon />
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
-					<SearchThread />
+					<SearchThread channelId={currentChannelId} />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button
@@ -113,7 +116,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					)}
 				</div>
 				<ThreadPagination
-					channel={currentChannel as ChannelsEntity}
+					channelId={currentChannelId}
 					onClose={onClose}
 					preventClosePannel={preventClosePannel}
 					handleCreateThread={handleCreateThread}
