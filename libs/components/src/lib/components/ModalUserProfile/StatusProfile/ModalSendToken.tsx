@@ -153,7 +153,7 @@ const ModalSendToken = ({
 				<div className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label value={`Transfer to ?`} className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
+							<Label value={`Transfer to?`} className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
 						</div>
 						<div className="relative">
 							<input
