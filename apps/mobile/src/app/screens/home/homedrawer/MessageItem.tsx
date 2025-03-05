@@ -339,6 +339,7 @@ const MessageItem = React.memo(
 												/>
 											))}
 									</View>
+									{/* check  */}
 									{message?.attachments?.length > 0 && (
 										<MessageAttachment
 											attachments={message?.attachments}
@@ -352,6 +353,7 @@ const MessageItem = React.memo(
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 							{!preventAction && !!message?.reactions?.length ? (
 								<MessageAction
+									userId={userId}
 									message={message}
 									mode={mode}
 									preventAction={preventAction}
@@ -369,14 +371,6 @@ const MessageItem = React.memo(
 						</View>
 					</View>
 				</Pressable>
-
-				{/*<NewMessageRedLine*/}
-				{/*	channelId={props?.channelId}*/}
-				{/*	messageId={props?.messageId}*/}
-				{/*	isEdited={message?.hide_editted}*/}
-				{/*	isSending={message?.isSending}*/}
-				{/*	isMe={message.sender_id === userProfile?.user?.id}*/}
-				{/*/>*/}
 			</Animated.View>
 		);
 	},

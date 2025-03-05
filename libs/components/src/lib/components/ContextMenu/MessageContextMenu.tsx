@@ -38,6 +38,7 @@ import { Icons } from '@mezon/ui';
 import {
 	AMOUNT_TOKEN,
 	ContextMenuItem,
+	EEventAction,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	EPermission,
@@ -98,6 +99,7 @@ function MessageContextMenu({
 	openPinMessageModal,
 	openDeleteMessageModal
 }: MessageContextMenuProps) {
+	const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -174,7 +176,8 @@ function MessageContextMenu({
 			content,
 			is_default: true,
 			...(id && { id }),
-			title: defaultCanvas?.title || 'Note'
+			title: defaultCanvas?.title || 'Note',
+			status: defaultCanvas ? 0 : EEventAction.CREATED
 		});
 
 		const insertImageToJson = (jsonObject: JsonObject, imageUrl?: string) => {
@@ -497,7 +500,7 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos, (builder) => {
+		builder.when(checkPos && message.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
 			builder.addMenuItem(
 				'giveAcoffee', // id
 				'Give A Coffee', // label
@@ -610,22 +613,22 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos, (builder) => {
-			builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
-		});
+		// builder.when(checkPos, (builder) => {
+		// 	builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
+		// });
 
-		builder.when(checkPos, (builder) => {
-			builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('markUnread'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
-		});
+		// builder.when(checkPos, (builder) => {
+		// 	builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('markUnread'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
+		// });
 
-		builder.when(checkPos, (builder) => {
-			builder.addMenuItem(
-				'copyMessageLink',
-				'Copy Message Link',
-				() => console.log('copyMessageLink'),
-				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
-			);
-		});
+		// builder.when(checkPos, (builder) => {
+		// 	builder.addMenuItem(
+		// 		'copyMessageLink',
+		// 		'Copy Message Link',
+		// 		() => console.log('copyMessageLink'),
+		// 		<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
+		// 	);
+		// });
 		message?.code !== TypeMessage.Topic &&
 			notAllowedType &&
 			!isTopic &&
@@ -648,36 +651,36 @@ function MessageContextMenu({
 				);
 			});
 
-		builder.when(enableRemoveOneReactionItem, (builder) => {
-			builder.addMenuItem(
-				'removeReactions',
-				'Remove Reactions',
-				() => {
-					console.log('remove reaction');
-				},
-				<Icons.RightArrowRightClick defaultSize="w-4 h-4" />
-			);
-		});
-		builder.when(enableRemoveAllReactionsItem, (builder) => {
-			builder.addMenuItem('removeAllReactions', 'Remove All Reactions', () => {
-				console.log('remove all reaction');
-			});
-		});
+		// builder.when(enableRemoveOneReactionItem, (builder) => {
+		// 	builder.addMenuItem(
+		// 		'removeReactions',
+		// 		'Remove Reactions',
+		// 		() => {
+		// 			console.log('remove reaction');
+		// 		},
+		// 		<Icons.RightArrowRightClick defaultSize="w-4 h-4" />
+		// 	);
+		// });
+		// builder.when(enableRemoveAllReactionsItem, (builder) => {
+		// 	builder.addMenuItem('removeAllReactions', 'Remove All Reactions', () => {
+		// 		console.log('remove all reaction');
+		// 	});
+		// });
 
 		builder.when(enableDelMessageItem, (builder) => {
 			builder.addMenuItem('deleteMessage', 'Delete Message', openDeleteMessageModal, <Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(enableReportMessageItem, (builder) => {
-			builder.addMenuItem(
-				'reportMessage',
-				'Report Message',
-				() => {
-					console.log('report message');
-				},
-				<Icons.ReportMessageRightClick defaultSize="w-4 h-4" />
-			);
-		});
+		// builder.when(enableReportMessageItem, (builder) => {
+		// 	builder.addMenuItem(
+		// 		'reportMessage',
+		// 		'Report Message',
+		// 		() => {
+		// 			console.log('report message');
+		// 		},
+		// 		<Icons.ReportMessageRightClick defaultSize="w-4 h-4" />
+		// 	);
+		// });
 
 		builder.when(enableCopyLinkItem, (builder) => {
 			builder.addMenuItem('copyLink', 'Copy Link', async () => {
