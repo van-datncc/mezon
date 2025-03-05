@@ -439,7 +439,7 @@ export const RenderTextMarkdownContent = ({
 							</Text>
 						);
 						break;
-
+					case EBacktickType.VOICE_LINK:
 					case EBacktickType.LINK: {
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
