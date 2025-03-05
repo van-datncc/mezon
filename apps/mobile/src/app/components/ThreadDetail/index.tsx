@@ -80,9 +80,9 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	}, [fetchThreads, page]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
-	const getActiveThreads = useSelector(selectActiveThreads(searchText));
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days(searchText));
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days(searchText));
+	const getActiveThreads = useSelector(selectActiveThreads());
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days());
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days());
 
 	const handleNavigateCreateForm = useCallback(() => {
 		dispatch(threadsActions.setOpenThreadMessageState(false));

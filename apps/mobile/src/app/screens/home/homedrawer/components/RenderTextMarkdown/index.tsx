@@ -84,27 +84,26 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			backgroundColor: colors.secondaryLight,
-			paddingVertical: size.s_8,
+			paddingVertical: size.s_10,
 			borderColor: colors.secondary,
-			borderRadius: 5,
-			lineHeight: size.s_20,
-			width: codeBlockMaxWidth,
-			paddingHorizontal: size.s_16
+			fontSize: size.medium,
+			lineHeight: size.s_22,
+			paddingHorizontal: size.s_10
 		},
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.small,
+			fontSize: size.medium,
 			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
-			paddingVertical: 5,
-			borderColor: colors.borderHighlight,
-			borderRadius: 5,
-			fontSize: size.small,
-			lineHeight: size.s_20
+			width: codeBlockMaxWidth,
+			backgroundColor: colors.secondaryLight,
+			marginTop: size.s_6,
+			borderColor: colors.black,
+			borderRadius: size.s_4,
+			overflow: 'hidden'
 		},
 		link: {
 			color: colors.textLink,
@@ -281,6 +280,7 @@ export const RenderTextMarkdownContent = ({
 	const { t, mentions = [], hg = [], ej = [], mk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
+	const markdownBlackParts: React.ReactNode[] = [];
 
 	const elements = [
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
@@ -416,20 +416,22 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.CODE:
 						textParts.push(
 							<Text key={`code-${index}`} style={themeValue ? markdownStyles(themeValue).code_inline : {}}>
-								{contentInElement}
+								{' '}
+								{contentInElement}{' '}
 							</Text>
 						);
 						break;
 
 					case EBacktickType.PRE:
-						textParts.push(
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
 							</View>
 						);
 						break;
-					case EBacktickType.TRIPLE: {
-						textParts.push(
+
+					case EBacktickType.TRIPLE:
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
 									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
@@ -439,7 +441,6 @@ export const RenderTextMarkdownContent = ({
 							</View>
 						);
 						break;
-					}
 
 					case EBacktickType.BOLD:
 						textParts.push(
@@ -567,6 +568,7 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 			<Text>{textParts}</Text>
+			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 		</View>
 	);
 };
