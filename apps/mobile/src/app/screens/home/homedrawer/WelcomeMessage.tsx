@@ -7,7 +7,7 @@ import {
 	EStateFriend,
 	friendsActions,
 	getStoreAsync,
-	selectChannelById,
+	selectChannelById2,
 	selectDmGroupCurrent,
 	selectFriendStatus,
 	selectMemberClanByUserId2,
@@ -26,7 +26,7 @@ interface IWelcomeMessage {
 }
 
 const useCurrentChannel = (channelId: string) => {
-	const channel = useAppSelector((state) => selectChannelById(state, channelId));
+	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const dmGroup = useAppSelector(selectDmGroupCurrent(channelId));
 	return channel || dmGroup;
 };
@@ -63,7 +63,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 					};
 				})
 			: [];
-	}, [isDMGroup, currenChannel?.user_id]);
+	}, [currenChannel?.category_name, currenChannel?.channel_avatar, isDMGroup]);
 
 	const creatorUser = useAppSelector((state) => selectMemberClanByUserId2(state, currenChannel?.creator_id));
 	const checkAddFriend = useAppSelector(selectFriendStatus(currenChannel?.user_id?.[0]));
