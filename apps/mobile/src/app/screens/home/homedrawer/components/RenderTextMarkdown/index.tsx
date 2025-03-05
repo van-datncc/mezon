@@ -13,6 +13,7 @@ import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Dimensions, Image, Linking, StyleSheet, Text, View } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -87,9 +88,10 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			paddingVertical: size.s_8,
 			borderColor: colors.secondary,
 			borderRadius: 5,
-			lineHeight: size.s_20,
 			width: codeBlockMaxWidth,
-			paddingHorizontal: size.s_16
+			lineHeight: size.s_22,
+			paddingHorizontal: size.s_16,
+			fontSize: size.medium
 		},
 		code_inline: {
 			color: colors.text,
@@ -99,12 +101,12 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		fence: {
 			color: colors.text,
-			backgroundColor: colors.secondaryLight,
 			paddingVertical: 5,
+			marginVertical: size.s_2,
 			borderColor: colors.borderHighlight,
 			borderRadius: 5,
 			fontSize: size.small,
-			lineHeight: size.s_20
+			lineHeight: size.s_24
 		},
 		link: {
 			color: colors.textLink,
@@ -380,8 +382,15 @@ export const RenderTextMarkdownContent = ({
 					textParts.push(
 						<Text
 							key={`hashtag-${index}`}
-							style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
+							style={[
+								themeValue && payloadChannel?.channel_id === 'undefined'
+									? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).privateChannel
+									: themeValue && !!payloadChannel?.channel_id
+										? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag
+										: {}
+							]}
 							onPress={() => {
+								if (!payloadChannel?.channel_id) return;
 								onChannelMention?.(payloadChannel);
 							}}
 						>
@@ -392,8 +401,10 @@ export const RenderTextMarkdownContent = ({
 								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.channel_id === 'undefined' ? (
+								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: 10 }} />
 							) : null}
-							{text}
+							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
 				} else {
@@ -413,24 +424,26 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.PRE:
+					case EBacktickType.TRIPLE: {
+						let block = contentInElement;
+						if (block.startsWith('```\n')) {
+							block = block.replace(/^```\n/, '```');
+						}
+						if (block.endsWith('\n```')) {
+							block = block.replace(/\n```$/, '```');
+						}
 						textParts.push(
-							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
-							</View>
+							<Text>
+								{'\n'}
+								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+										{block?.startsWith('```') && block?.endsWith('```') ? block?.slice(3, -3) : block}
+									</Text>
+								</View>
+							</Text>
 						);
 						break;
-
-					case EBacktickType.TRIPLE:
-						textParts.push(
-							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
-									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
-										? contentInElement?.slice(3, -3)
-										: contentInElement}
-								</Text>
-							</View>
-						);
-						break;
+					}
 
 					case EBacktickType.BOLD:
 						textParts.push(
