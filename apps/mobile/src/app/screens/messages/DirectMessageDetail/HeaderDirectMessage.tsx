@@ -150,6 +150,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 								<ImageNative
 									url={createImgproxyUrl(dmAvatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
 									style={{ width: '100%', height: '100%' }}
+									resizeMode={'cover'}
 								/>
 							</View>
 						) : (
