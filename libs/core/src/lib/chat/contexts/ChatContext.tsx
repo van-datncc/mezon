@@ -1387,7 +1387,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
 			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
 
-			const title = 'Token Received:';
+			const title = 'Balance notifications:';
 			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
 
 			electronBridge.pushNotification(title, {
