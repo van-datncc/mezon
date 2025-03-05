@@ -12,6 +12,7 @@ import {
 	appActions,
 	attachmentActions,
 	audioCallActions,
+	authActions,
 	canvasAPIActions,
 	channelAppSlice,
 	channelMembers,
@@ -643,6 +644,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					}
+
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						dispatch(
 							channelMetaActions.updateBulkChannelMetadata([
@@ -656,19 +658,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								}
 							])
 						);
-					}
-					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						dispatch(
-							channelMetaActions.updateBulkChannelMetadata([
-								{
-									id: channel.id,
-									lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
-									clanId: channel.clan_id ?? '',
-									isMute: false,
-									senderId: '',
-									lastSeenTimestamp: Date.now() / 1000 - 1000
-								}
-							])
+							listChannelRenderAction.setActiveThread({
+								channelId: channel_desc.channel_id as string,
+								clanId: channel_desc.clan_id as string
+							})
 						);
 
 						if (channel.parent_id === channelId) {
@@ -1387,7 +1381,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
 			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
 
-			const title = 'Token Received:';
+			const title = 'Balance notifications:';
 			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
 
 			electronBridge.pushNotification(title, {
@@ -1722,6 +1716,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const store = getStore();
 					const clanIdActive = selectCurrentClanId(store.getState());
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
+					if (socket && typeof socket === 'object' && 'token' in socket) {
+						dispatch(authActions.setSession(socket.token));
+					}
 
 					if (socket === 'RECONNECTING') return;
 

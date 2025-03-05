@@ -157,6 +157,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 							<ImageNative
 								url={createImgproxyUrl(directMessage?.channel_avatar?.[0] ?? '', { width: 50, height: 50, resizeType: 'fit' })}
 								style={{ width: '100%', height: '100%' }}
+								resizeMode={'cover'}
 							/>
 						</View>
 					) : (

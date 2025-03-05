@@ -119,7 +119,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		async (state: string) => {
 			if (state === 'active') {
 				try {
-					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 					handleReconnect('DM detail reconnect attempt');
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 					dispatch(
@@ -140,11 +139,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						})
 					);
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 				} catch (error) {
 					dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 				}
 			}
 		},

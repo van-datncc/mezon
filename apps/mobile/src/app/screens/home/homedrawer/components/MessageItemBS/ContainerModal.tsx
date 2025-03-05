@@ -142,7 +142,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			if (TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10 > tokenInWallet) {
 				Toast.show({
 					type: 'error',
-					text1: 'Token amount exceeds wallet balance'
+					text1: 'Your amount exceeds wallet balance'
 				});
 				return;
 			}

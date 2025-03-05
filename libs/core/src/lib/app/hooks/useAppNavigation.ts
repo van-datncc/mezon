@@ -52,11 +52,11 @@ export function useAppNavigation() {
 	}, []);
 
 	const toDmGroupPageFromFriendPage = useCallback((directId: string, type: number) => {
-		return `../message/${directId}/${type}`;
+		return `/chat/direct/message/${directId}/${type}`;
 	}, []);
 
 	const toDmGroupPageFromMainApp = useCallback((directId: string, type: number) => {
-		return `chat/direct/message/${directId}/${type}`;
+		return `/chat/direct/message/${directId}/${type}`;
 	}, []);
 
 	return useMemo(
