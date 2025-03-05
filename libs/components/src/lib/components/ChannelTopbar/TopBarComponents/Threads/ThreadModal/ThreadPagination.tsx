@@ -1,5 +1,4 @@
 import {
-	ChannelsEntity,
 	selectActiveThreads,
 	selectCurrentClanId,
 	selectJoinedThreadsWithinLast30Days,
@@ -12,7 +11,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { customTheme } from '@mezon/ui';
-import { checkIsThread, LIMIT } from '@mezon/utils';
+import { LIMIT } from '@mezon/utils';
 import { Pagination } from 'flowbite-react';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,46 +20,44 @@ import GroupThreads from './GroupThreads';
 import ThreadItem from './ThreadItem';
 
 interface ThreadPaginationProps {
-	channel: ChannelsEntity;
+	channelId: string;
 	onClose: () => void;
 	preventClosePannel: React.MutableRefObject<boolean>;
 	handleCreateThread: () => void;
 }
 
-const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channel, onClose, preventClosePannel, handleCreateThread }) => {
+const ThreadPagination: React.FC<ThreadPaginationProps> = ({ channelId, onClose, preventClosePannel, handleCreateThread }) => {
 	const dispatch = useAppDispatch();
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const currentClanId = useSelector(selectCurrentClanId);
 	const appearanceTheme = useSelector(selectTheme);
 	const [currentPage, setCurrentPage] = useState(1);
-	const isThread = checkIsThread(channel as ChannelsEntity);
 	const getActiveThreads = useSelector(selectActiveThreads()); // is thread public and last message within 30days
 	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days()); // is thread joined and last message within 30days
 	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days()); // is thread joined/public and last message over 30days
 	const totalCountThread = getActiveThreads.length + getJoinedThreadsWithinLast30Days.length + getThreadsOlderThan30Days.length;
 	const isNotFullPage = totalCountThread < LIMIT;
 	const firstPageNotFull = isNotFullPage && currentPage === 1;
-
-	const threadsSearched = useSelector(selectSearchedThreadResult);
+	const threadsSearched = useSelector((state) => selectSearchedThreadResult(state, channelId));
 	const noResultSearched = threadsSearched?.length === 0;
 
 	const showEmpty = isEmpty || noResultSearched;
 
 	const onPageChange = useCallback(
 		async (page: number) => {
-			if (!channel?.channel_id || !currentClanId) {
+			if (!channelId || !currentClanId) {
 				return;
 			}
 			setCurrentPage(page);
 			const body = {
-				channelId: isThread ? (channel?.parent_id ?? '') : (channel?.channel_id ?? ''),
-				clanId: channel?.clan_id ?? '',
+				channelId: channelId,
+				clanId: currentClanId ?? '',
 				page: page,
 				noCache: true
 			};
 			await dispatch(threadsActions.fetchThreads(body));
 		},
-		[dispatch, channel?.channel_id, currentClanId, totalCountThread, currentPage]
+		[dispatch, channelId, currentClanId, totalCountThread, currentPage]
 	);
 	return (
 		<>
