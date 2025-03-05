@@ -2,6 +2,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import React from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import Images from '../../../assets/Images';
 import ImageNative from '../../components/ImageNative';
 import { style } from './styles';
@@ -32,10 +33,9 @@ export default function MezonClanAvatar({ image, alt = '', defaultColor, textSty
 	return (
 		<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>
 			{!noDefaultText ? (
-				<ImageNative
-					url={alt === 'Anonymous' ? Images.ANONYMOUS_MESSAGE_AVATAR : Images.ANONYMOUS_AVATAR}
+				<FastImage
+					source={alt === 'Anonymous' ? Images.ANONYMOUS_MESSAGE_AVATAR : Images.ANONYMOUS_AVATAR}
 					style={{ width: '100%', height: '100%', borderRadius: size.s_100 }}
-					resizeMode={'cover'}
 				/>
 			) : null}
 		</View>

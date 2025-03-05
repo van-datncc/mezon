@@ -5,8 +5,8 @@ import { EmojiDataOptionals, SenderInfoOptionals, TypeMessage, calculateTotalCou
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Pressable, Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
+import ImageNative from '../../../../../components/ImageNative';
 import { IMessageReactionProps } from '../../types';
 import { MessageReactionBS } from './components/MessageReactionBS';
 import { style } from './styles';
@@ -113,11 +113,7 @@ export const MessageReactionWrapper = React.memo((props: IMessageReactionProps) 
 						key={index + emojiItemData.emojiId}
 						style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
 					>
-						<FastImage
-							source={{ uri: getSrcEmoji(emojiItemData.emojiId ?? '') }}
-							style={styles.iconEmojiReaction}
-							resizeMode={'contain'}
-						/>
+						<ImageNative url={getSrcEmoji(emojiItemData.emojiId ?? '')} style={styles.iconEmojiReaction} resizeMode={'contain'} />
 						<Text style={styles.reactCount}>{countReacts}</Text>
 					</Pressable>
 				);
