@@ -277,7 +277,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
-						return resolve(socket);
+						return resolve({ socket: socket, token: recsession });
 					} catch (error) {
 						failCount++;
 						const retryTime = isFromMobile
