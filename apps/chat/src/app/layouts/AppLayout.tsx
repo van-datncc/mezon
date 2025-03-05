@@ -1,6 +1,6 @@
 import { ToastController } from '@mezon/components';
 import { useCustomNavigate, useEscapeKey } from '@mezon/core';
-import { fcmActions, handleTopicNotification, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { fcmActions, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
@@ -109,9 +109,7 @@ const AppLayout = () => {
 		)
 			.then((response): void => {
 				const token = (response?.payload as { token: string })?.token;
-				notificationService.connect(token, (msg) => {
-					dispatch(handleTopicNotification({ msg }));
-				});
+				notificationService.connect(token);
 			})
 			.catch((error) => {
 				console.error(error);
