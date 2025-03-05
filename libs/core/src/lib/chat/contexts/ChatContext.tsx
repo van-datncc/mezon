@@ -644,6 +644,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					}
+
 					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						dispatch(
 							channelMetaActions.updateBulkChannelMetadata([
@@ -657,19 +658,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								}
 							])
 						);
-					}
-					if (channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
 						dispatch(
-							channelMetaActions.updateBulkChannelMetadata([
-								{
-									id: channel.id,
-									lastSentTimestamp: channel.last_sent_message?.timestamp_seconds || Date.now() / 1000,
-									clanId: channel.clan_id ?? '',
-									isMute: false,
-									senderId: '',
-									lastSeenTimestamp: Date.now() / 1000 - 1000
-								}
-							])
+							listChannelRenderAction.setActiveThread({
+								channelId: channel_desc.channel_id as string,
+								clanId: channel_desc.clan_id as string
+							})
 						);
 
 						if (channel.parent_id === channelId) {
