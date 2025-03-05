@@ -27,10 +27,12 @@ import { Icons } from '@mezon/ui';
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { IMessageTypeCallLog, createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
+import { Dropdown } from 'flowbite-react';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
+import DeviceSelector from './DeviceSelector';
 import LabelDm from './labelDm';
 
 type DmCallingProps = {
@@ -59,9 +61,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const [activeVideo, setActiveVideo] = useState<'local' | 'remote' | null>(null);
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const otherCall = useSelector(selectOtherCall);
-	const [isShowOutputDevice, setIsShowOutputDevice] = useState<boolean>(false);
-	const [isShowInputDevice, setIsShowInputDevice] = useState<boolean>(false);
-	const [isShowAudioSetting, setIsShowAudioSetting] = useState<boolean>(false);
 
 	const {
 		callState,
@@ -210,26 +209,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
-
-	const handleShowOutputOptions = async (e: React.MouseEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-
-		setIsShowOutputDevice(!isShowOutputDevice);
-		setIsShowInputDevice(false);
-	};
-
-	const handleShowInputOptions = async (e: React.MouseEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-
-		setIsShowInputDevice(!isShowInputDevice);
-		setIsShowOutputDevice(false);
-	};
-
-	const handleShowAudioSetting = () => {
-		setIsShowAudioSetting(!isShowAudioSetting);
-		setIsShowOutputDevice(false);
-		setIsShowInputDevice(false);
-	};
 
 	return (
 		<div
@@ -429,76 +408,34 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 									isShowLine={true}
 								/>
 							</div>
-							<div
-								className="h-[56px] w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary group"
-								onClick={handleShowAudioSetting}
-							>
-								<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
 
-								{isShowAudioSetting && (
-									<div
-										className="absolute flex top-[64px] h-[56px] right-0 rounded-3xl bg-bgModifierHover shadow-lg text-white p-2 w-[400px] min-w-max gap-2 rounded-full
-            pointer-events-auto z-10"
-									>
-										{/* Output */}
-										<div className="flex items-center border border-white h-full rounded-3xl cursor-pointer hover:bg-colorTextLightMode w-[200px]">
-											{audioOutputDevicesList.length && (
-												<div
-													className="w-full h-fit px-2 overflow-hidden whitespace-nowrap text-ellipsis truncate"
-													onClick={(e) => handleShowOutputOptions(e)}
-												>
-													{currentOutputDevice?.label || ''}
-												</div>
-											)}
-										</div>
-
-										{/* Input */}
-										<div className="flex items-center border border-white h-full rounded-3xl cursor-pointer dark:hover:bg-colorTextLightMode w-[200px]">
-											{audioInputDevicesList.length && (
-												<div
-													className="w-full h-fit px-2 overflow-hidden whitespace-nowrap text-ellipsis truncate"
-													onClick={(e) => handleShowInputOptions(e)}
-												>
-													{currentInputDevice?.label || ''}
-												</div>
-											)}
-										</div>
-
-										{/* Input Devices List */}
-										{isShowInputDevice && (
-											<div className="absolute top-[64px] left-0 rounded-3xl bg-bgModifierHover shadow-lg text-white p-2 w-auto min-w-max z-20">
-												{audioInputDevicesList.map((device) => (
-													<div
-														key={device.deviceId}
-														className={`p-2 rounded-3xl hover:bg-colorTextLightMode w-full flex justify-between items-center ${device.deviceId === currentInputDevice?.deviceId ? 'text-contentBrand' : ''} `}
-														onClick={() => changeAudioInputDevice(device.deviceId)}
-													>
-														{device.label}
-														{device.deviceId === currentInputDevice?.deviceId && <Icons.CheckIcon />}
-													</div>
-												))}
-											</div>
-										)}
-
-										{/* Output Devices List */}
-										{isShowOutputDevice && (
-											<div className="absolute top-[64px] left-0 rounded-3xl bg-bgModifierHover shadow-lg text-white p-2 w-auto min-w-max z-20">
-												{audioOutputDevicesList.map((device) => (
-													<div
-														key={device.deviceId}
-														className={`p-2 rounded-3xl hover:bg-colorTextLightMode w-full flex justify-between items-center ${device.deviceId === currentOutputDevice?.deviceId && 'text-contentBrand'} `}
-														onClick={() => changeAudioOutputDevice(device.deviceId)}
-													>
-														{device.label}
-														{device.deviceId === currentOutputDevice?.deviceId && <Icons.CheckIcon />}
-													</div>
-												))}
-											</div>
-										)}
+							<Dropdown
+								label={''}
+								renderTrigger={() => (
+									<div className="h-[56px] w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
+										<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
 									</div>
 								)}
-							</div>
+								className={'rounded-3xl'}
+							>
+								<div className="flex text-white px-1 w-[400px] min-w-max gap-2 h-full">
+									{/* Output */}
+									<DeviceSelector
+										deviceList={audioOutputDevicesList}
+										currentDevice={currentOutputDevice}
+										icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
+										onSelectDevice={changeAudioOutputDevice}
+									/>
 
+									{/* Input */}
+									<DeviceSelector
+										deviceList={audioInputDevicesList}
+										currentDevice={currentInputDevice}
+										icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
+										onSelectDevice={changeAudioInputDevice}
+									/>
+								</div>
+							</Dropdown>
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 								onClick={handleCloseCall}
