@@ -531,3 +531,8 @@ export const selectThreadInputSearchByChannelId = createSelector(
 	[(state: { threads: ThreadsState }) => state.threads.inputSearchThread, (_: any, channelId: string) => channelId],
 	(inputSearchThread, channelId) => inputSearchThread?.[channelId] || ''
 );
+
+export const selectThreadsByParentChannelId = createSelector(
+	[selectAllThreads, (_: any, parentChannelId: string) => parentChannelId],
+	(allThreads, parentChannelId) => allThreads.filter((thread) => thread.parent_id === parentChannelId)
+);
