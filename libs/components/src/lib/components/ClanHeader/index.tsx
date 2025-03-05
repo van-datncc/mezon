@@ -151,7 +151,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	return (
 		<>
 			{type === 'direct' ? (
-				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] dark:border-bgTertiary border-gray-200">
+				<div className="contain-strict px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] dark:border-bgTertiary border-gray-200">
 					<input
 						ref={inputRef}
 						placeholder="Find or start a conversation"

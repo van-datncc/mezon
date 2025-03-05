@@ -520,7 +520,7 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos && message.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
+		builder.when(checkPos && message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
 			builder.addMenuItem(
 				'giveAcoffee', // id
 				'Give A Coffee', // label
