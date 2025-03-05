@@ -13,6 +13,7 @@ import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Dimensions, Image, Linking, StyleSheet, Text, View } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -379,8 +380,15 @@ export const RenderTextMarkdownContent = ({
 					textParts.push(
 						<Text
 							key={`hashtag-${index}`}
-							style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
+							style={[
+								themeValue && payloadChannel?.channel_id === 'undefined'
+									? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).privateChannel
+									: themeValue && !!payloadChannel?.channel_id
+										? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag
+										: {}
+							]}
 							onPress={() => {
+								if (!payloadChannel?.channel_id) return;
 								onChannelMention?.(payloadChannel);
 							}}
 						>
@@ -391,8 +399,10 @@ export const RenderTextMarkdownContent = ({
 								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.channel_id === 'undefined' ? (
+								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: 10 }} />
 							) : null}
-							{text}
+							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
 				} else {
