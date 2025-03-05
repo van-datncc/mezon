@@ -82,8 +82,8 @@ const RenderImage = React.memo(({ image, index, disable, onPress, onLongPress, i
 			return '';
 		}
 		return createImgproxyUrl(image?.url ?? '', {
-			width: Math.round(image?.width * 0.4) || 500,
-			height: Math.round(image?.height * 0.4) || 500,
+			width: Math.round(image?.width * 0.6) || 500,
+			height: Math.round(image?.height * 0.6) || 500,
 			resizeType: 'fit'
 		}) as string;
 	}, [image?.height, image?.url, image?.width]);
@@ -150,8 +150,8 @@ const RenderImageHaveSize = React.memo(
 				return '';
 			}
 			return createImgproxyUrl(image?.url ?? '', {
-				width: Math.round(image?.width * 0.4) || 500,
-				height: Math.round(image?.height * 0.4) || 500,
+				width: Math.round(image?.width * 0.6) || 500,
+				height: Math.round(image?.height * 0.6) || 500,
 				resizeType: 'fit'
 			}) as string;
 		}, [image?.height, image?.url, image?.width]);
