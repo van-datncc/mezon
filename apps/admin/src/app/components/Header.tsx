@@ -25,7 +25,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 	const dispatch = useAppDispatch();
 
 	const handleLogout = () => {
-		dispatch(authActions.logOut());
+		dispatch(authActions.logOut({}));
 	};
 
 	const handleClickOutside = (event: MouseEvent) => {
