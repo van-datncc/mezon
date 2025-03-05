@@ -88,10 +88,9 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			paddingVertical: size.s_8,
 			borderColor: colors.secondary,
 			borderRadius: 5,
+			lineHeight: size.s_20,
 			width: codeBlockMaxWidth,
-			lineHeight: size.s_22,
-			paddingHorizontal: size.s_16,
-			fontSize: size.medium
+			paddingHorizontal: size.s_16
 		},
 		code_inline: {
 			color: colors.text,
@@ -102,11 +101,10 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		fence: {
 			color: colors.text,
 			paddingVertical: 5,
-			marginVertical: size.s_2,
 			borderColor: colors.borderHighlight,
 			borderRadius: 5,
 			fontSize: size.small,
-			lineHeight: size.s_24
+			lineHeight: size.s_20
 		},
 		link: {
 			color: colors.textLink,
@@ -424,23 +422,21 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.PRE:
-					case EBacktickType.TRIPLE: {
-						let block = contentInElement;
-						if (block.startsWith('```\n')) {
-							block = block.replace(/^```\n/, '```');
-						}
-						if (block.endsWith('\n```')) {
-							block = block.replace(/\n```$/, '```');
-						}
 						textParts.push(
-							<Text>
-								{'\n'}
-								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
-										{block?.startsWith('```') && block?.endsWith('```') ? block?.slice(3, -3) : block}
-									</Text>
-								</View>
-							</Text>
+							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
+							</View>
+						);
+						break;
+					case EBacktickType.TRIPLE: {
+						textParts.push(
+							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
+										? contentInElement?.slice(3, -3)
+										: contentInElement}
+								</Text>
+							</View>
 						);
 						break;
 					}
