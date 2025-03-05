@@ -119,10 +119,9 @@ const RootListener = () => {
 				)
 			];
 			await Promise.all(promise);
-			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {
-			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			/* empty */
 		}
 	}, [dispatch, handleReconnect]);
 
@@ -134,9 +133,8 @@ const RootListener = () => {
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
 			const isFromFcmMobile = selectIsFromFCMMobile(store.getState());
 			if (state === 'active' && !currentDirectId) {
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
-					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+					/* empty */
 				} else {
 					await messageLoaderBackground();
 				}

@@ -341,11 +341,17 @@ export const style = (colors: Attributes) =>
 		messageWrapper: {
 			flexDirection: 'column',
 			marginTop: size.s_10,
+			paddingTop: size.s_2,
+			borderLeftWidth: 2,
+			borderLeftColor: 'transparent',
 			// paddingTop: 50,
 			// paddingBottom: 50
 			marginBottom: size.s_6
 		},
 		highlightMessageMention: {
+			borderLeftColor: colors.textLink,
+			borderLeftWidth: 2,
+			paddingTop: size.s_2,
 			backgroundColor: colors.reactionBg
 		},
 		highlightMessageReply: {
