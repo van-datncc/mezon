@@ -1,4 +1,3 @@
-import { useIdleRender } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectDmGroupCurrent, useAppSelector } from '@mezon/store-mobile';
@@ -14,7 +13,6 @@ import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import RNFetchBlob from 'rn-fetch-blob';
 import { SOUND_WAVES_CIRCLE } from '../../../../../../../assets/lottie';
-import { MezonBottomSheet } from '../../../../../../componentUI';
 import RenderAudioChat from '../../RenderAudioChat/RenderAudioChat';
 import ModalConfirmRecord from '../ModalConfirmRecord/ModalConfirmRecord';
 import { RecordingAudioMessage } from '../RecordingAudioMessage/RecordingAudioMessage';
@@ -37,7 +35,6 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 	const { sessionRef, clientRef, socketRef } = useMezon();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId || ''));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
-	const recordingBsRef = useRef(null);
 	const [recordUrl, setRecordUrl] = useState<string>('');
 	const [durationRecord, setDurationRecord] = useState(0);
 	const [isPreviewRecord, setIsPreviewRecord] = useState<boolean>(false);
@@ -49,9 +46,11 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 	);
 
 	useEffect(() => {
-		const eventStartRecord = DeviceEventEmitter.addListener(ActionEmitEvent.ON_START_RECORD_MESSAGE, startRecording);
+		const timeout = setTimeout(() => {
+			startRecording();
+		}, 200);
 		return () => {
-			eventStartRecord.remove();
+			clearTimeout(timeout);
 		};
 	}, []);
 
@@ -74,7 +73,10 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		try {
 			Keyboard.dismiss();
 			const isPermissionGranted = await getPermissions();
-			if (!isPermissionGranted) return;
+			if (!isPermissionGranted) {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				return;
+			}
 			const dirs = RNFetchBlob.fs.dirs;
 			const path = Platform.select({
 				android: `${dirs.CacheDir}/sound.mp3`
@@ -82,7 +84,6 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 
 			setIsDisplay(true);
 			setIsPreviewRecord(false);
-			recordingBsRef.current?.present();
 			await new Promise((resolve) => setTimeout(resolve, 300));
 			const result = await audioRecorderPlayer.startRecorder(path);
 			setRecordUrl(result);
@@ -136,7 +137,7 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 			});
 			await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '');
 			setIsDisplay(false);
-			recordingBsRef?.current?.close();
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		} catch (error) {
 			console.error('Failed to send message:', error);
 			setIsDisplay(false);
@@ -191,7 +192,7 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 	}, [setIsConfirmRecordModalVisible]);
 
 	const handleQuitRecord = useCallback(() => {
-		recordingBsRef?.current?.close();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		setIsConfirmRecordModalVisible(false);
 		stopRecording();
 	}, [setIsConfirmRecordModalVisible, stopRecording]);
@@ -199,12 +200,8 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 	const handleRemoveRecord = async () => {
 		await stopRecording();
 		setIsDisplay(false);
-		recordingBsRef?.current?.close();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
-
-	const handleBackdropBS = useCallback(() => {
-		setIsConfirmRecordModalVisible(true);
-	}, [setIsConfirmRecordModalVisible]);
 
 	if (!isDisplay) return null;
 
@@ -212,54 +209,39 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		<>
 			<ModalConfirmRecord visible={isConfirmRecordModalVisible} onBack={handleBackRecord} onConfirm={handleQuitRecord} />
 			{/*TODO: Refactor this component*/}
-			<MezonBottomSheet snapPoints={['50%']} ref={recordingBsRef} onBackdropPress={handleBackdropBS} enablePanDownToClose={false}>
-				<View style={{ alignItems: 'center', justifyContent: 'center', paddingHorizontal: size.s_40, paddingVertical: size.s_20 }}>
-					{isPreviewRecord && recordUrl ? (
-						<RenderAudioChat audioURL={recordUrl} stylesContainerCustom={styles.containerAudioCustom} styleLottie={styles.customLottie} />
-					) : (
-						<RecordingAudioMessage durationRecord={durationRecord} ref={recordingWaveRef} />
-					)}
+			<View style={{ alignItems: 'center', justifyContent: 'center', paddingHorizontal: size.s_40, paddingVertical: size.s_20 }}>
+				{isPreviewRecord && recordUrl ? (
+					<RenderAudioChat audioURL={recordUrl} stylesContainerCustom={styles.containerAudioCustom} styleLottie={styles.customLottie} />
+				) : (
+					<RecordingAudioMessage durationRecord={durationRecord} ref={recordingWaveRef} />
+				)}
 
-					<View style={{ marginTop: size.s_20 }}>
-						<Text style={styles.title}>{t('handsFreeMode')}</Text>
-						<View
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								justifyContent: 'space-between',
-								marginVertical: size.s_20,
-								width: '80%'
-							}}
-						>
-							<TouchableOpacity onPress={handleRemoveRecord} style={styles.boxIcon}>
-								<Icons.TrashIcon color={themeValue.white} />
+				<View style={{ marginTop: size.s_20 }}>
+					<Text style={styles.title}>{t('handsFreeMode')}</Text>
+					<View
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'space-between',
+							marginVertical: size.s_20,
+							width: '80%'
+						}}
+					>
+						<TouchableOpacity onPress={handleRemoveRecord} style={styles.boxIcon}>
+							<Icons.TrashIcon color={themeValue.white} />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={sendMessage} style={styles.soundContainer}>
+							<Icons.SendMessageIcon style={styles.iconOverlay} color={themeValue.white} />
+							<LottieView ref={meterSoundRef} source={SOUND_WAVES_CIRCLE} resizeMode="cover" style={styles.soundLottie}></LottieView>
+						</TouchableOpacity>
+						{!isPreviewRecord && (
+							<TouchableOpacity onPress={handlePreviewRecord} style={styles.boxIcon}>
+								<Icons.RecordIcon color={themeValue.white} />
 							</TouchableOpacity>
-							<TouchableOpacity onPress={sendMessage} style={styles.soundContainer}>
-								<Icons.SendMessageIcon style={styles.iconOverlay} color={themeValue.white} />
-								<LottieView
-									ref={meterSoundRef}
-									source={SOUND_WAVES_CIRCLE}
-									resizeMode="cover"
-									style={styles.soundLottie}
-								></LottieView>
-							</TouchableOpacity>
-							{!isPreviewRecord && (
-								<TouchableOpacity onPress={handlePreviewRecord} style={styles.boxIcon}>
-									<Icons.RecordIcon color={themeValue.white} />
-								</TouchableOpacity>
-							)}
-						</View>
+						)}
 					</View>
 				</View>
-			</MezonBottomSheet>
+			</View>
 		</>
 	);
-});
-
-export const RecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
-	const shouldRender = useIdleRender();
-
-	if (!shouldRender) return null;
-
-	return <BaseRecordAudioMessage channelId={channelId} mode={mode} />;
 });
