@@ -69,13 +69,15 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const checkAddFriend = useAppSelector(selectFriendStatus(currenChannel?.user_id?.[0]));
 
 	const handleAddFriend = async () => {
-		const store = await getStoreAsync();
-		store.dispatch(
-			friendsActions.sendRequestAddFriend({
-				usernames: [],
-				ids: [currenChannel?.user_id[0]]
-			})
-		);
+		if (currenChannel?.user_id?.[0]) {
+			const store = await getStoreAsync();
+			store.dispatch(
+				friendsActions.sendRequestAddFriend({
+					usernames: [],
+					ids: [currenChannel?.user_id?.[0]]
+				})
+			);
+		}
 	};
 
 	const handleAcceptFriend = async () => {
