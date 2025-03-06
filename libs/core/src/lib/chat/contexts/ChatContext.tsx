@@ -12,7 +12,6 @@ import {
 	appActions,
 	attachmentActions,
 	audioCallActions,
-	authActions,
 	canvasAPIActions,
 	channelAppSlice,
 	channelMembers,
@@ -1745,9 +1744,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					const store = getStore();
 					const clanIdActive = selectCurrentClanId(store.getState());
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
-					if (socket && typeof socket === 'object' && 'token' in socket) {
-						dispatch(authActions.setSession(socket.token));
-					}
 
 					if (socket === 'RECONNECTING') return;
 
