@@ -524,6 +524,11 @@ function useOptionMenuBuilder(handleContextMenu: any) {
 	);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.addMenuItem('option', 'option', useHandleClickOption, <Icons.ThreeDot />);
+		builder.addMenuItem(
+			'option',
+			'option',
+			useHandleClickOption,
+			<Icons.ThreeDot defaultSize={'w-5 h-5 dark:hover:text-white hover:text-black'} />
+		);
 	});
 }
