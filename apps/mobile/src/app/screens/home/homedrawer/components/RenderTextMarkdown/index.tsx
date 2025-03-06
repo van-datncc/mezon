@@ -13,6 +13,7 @@ import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Dimensions, Image, Linking, StyleSheet, Text, View } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -83,28 +84,26 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			backgroundColor: colors.secondaryLight,
-			paddingVertical: size.s_8,
+			paddingVertical: size.s_10,
 			borderColor: colors.secondary,
-			borderRadius: 5,
-			lineHeight: size.s_20,
-			width: codeBlockMaxWidth,
-			paddingHorizontal: size.s_16
+			fontSize: size.medium,
+			lineHeight: size.s_22,
+			paddingHorizontal: size.s_10
 		},
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.small,
+			fontSize: size.medium,
 			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
+			width: codeBlockMaxWidth,
 			backgroundColor: colors.secondaryLight,
-			paddingVertical: 5,
-			borderColor: colors.borderHighlight,
-			borderRadius: 5,
-			fontSize: size.small,
-			lineHeight: size.s_20
+			marginTop: size.s_6,
+			borderColor: colors.black,
+			borderRadius: size.s_4,
+			overflow: 'hidden'
 		},
 		link: {
 			color: colors.textLink,
@@ -281,6 +280,7 @@ export const RenderTextMarkdownContent = ({
 	const { t, mentions = [], hg = [], ej = [], mk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
+	const markdownBlackParts: React.ReactNode[] = [];
 
 	const elements = [
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
@@ -380,8 +380,15 @@ export const RenderTextMarkdownContent = ({
 					textParts.push(
 						<Text
 							key={`hashtag-${index}`}
-							style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
+							style={[
+								themeValue && payloadChannel?.channel_id === 'undefined'
+									? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).privateChannel
+									: themeValue && !!payloadChannel?.channel_id
+										? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag
+										: {}
+							]}
 							onPress={() => {
+								if (!payloadChannel?.channel_id) return;
 								onChannelMention?.(payloadChannel);
 							}}
 						>
@@ -392,8 +399,10 @@ export const RenderTextMarkdownContent = ({
 								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.channel_id === 'undefined' ? (
+								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: 10 }} />
 							) : null}
-							{text}
+							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
 				} else {
@@ -404,16 +413,20 @@ export const RenderTextMarkdownContent = ({
 
 			case ETokenMessage.MARKDOWNS: {
 				switch (element.type) {
+					case EBacktickType.SINGLE:
 					case EBacktickType.CODE:
 						textParts.push(
 							<Text key={`code-${index}`} style={themeValue ? markdownStyles(themeValue).code_inline : {}}>
-								{contentInElement}
+								{' '}
+								{contentInElement?.startsWith('`') && contentInElement?.endsWith('`')
+									? contentInElement?.slice(1, -1)
+									: contentInElement}{' '}
 							</Text>
 						);
 						break;
 
 					case EBacktickType.PRE:
-						textParts.push(
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
 							</View>
@@ -421,7 +434,7 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.TRIPLE:
-						textParts.push(
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
 									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
@@ -558,6 +571,7 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 			<Text>{textParts}</Text>
+			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 		</View>
 	);
 };

@@ -54,7 +54,7 @@ const ChannelListMessage = React.memo(
 				initialNumToRender={10}
 				maxToRenderPerBatch={10}
 				windowSize={10}
-				onEndReachedThreshold={0.5}
+				onEndReachedThreshold={0.7}
 				maintainVisibleContentPosition={{
 					minIndexForVisible: 0,
 					autoscrollToTopThreshold: 10

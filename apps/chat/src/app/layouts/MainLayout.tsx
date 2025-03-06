@@ -2,6 +2,7 @@ import { ChatContext, ChatContextProvider, useCustomNavigate, useFriends, useIdl
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
+	handleTopicNotification,
 	selectAllAccount,
 	selectAnyUnreadChannel,
 	selectBadgeCountAllClan,
@@ -36,8 +37,9 @@ const GlobalEventListener = () => {
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
 
 	useEffect(() => {
-		const handleNavigateToPath = (_: unknown, path: string) => {
-			navigate(path);
+		const handleNavigateToPath = (_: unknown, notifi: any) => {
+			navigate(notifi.path);
+			dispatch(handleTopicNotification({ msg: notifi.msg }));
 		};
 		window.electron?.on('navigate-to-path', handleNavigateToPath);
 		return () => {
