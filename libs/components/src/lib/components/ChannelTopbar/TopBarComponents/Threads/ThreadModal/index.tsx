@@ -85,7 +85,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const fetchComments = async () => {
+	const fetchThreads = async () => {
 		setIsLoading(true);
 		try {
 			const body = {
@@ -99,12 +99,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 			const newThreads = Array.isArray(res?.payload) ? res.payload : [];
 			setHasMore(newThreads.length > 0);
 		} catch (error) {
-			console.error('Error fetching comments:', error);
+			console.error('Error fetching threads:', error);
 		}
 		setIsLoading(false);
 	};
 	useEffect(() => {
-		fetchComments();
+		fetchThreads();
 	}, [page, currentChannelId]);
 
 	const loadMore = useCallback(() => {
