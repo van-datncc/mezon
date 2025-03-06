@@ -1,10 +1,10 @@
-import { appActions, selectBadgeCountByClanId, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
+import { useCustomNavigate } from '@mezon/core';
+import { selectBadgeCountByClanId } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, createImgproxyUrl } from '@mezon/utils';
-import { useState } from 'react';
+import { createImgproxyUrl, IClan } from '@mezon/utils';
+import { memo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { NavLink, useLocation } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import NavLinkComponent from '../NavLink';
 import PanelClan from '../PanelClan';
@@ -17,16 +17,9 @@ export type SidebarClanItemProps = {
 
 const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => {
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
-	const location = useLocation();
-	const isShowDmProfile = useSelector(selectIsUseProfileDM);
-	const dispatch = useAppDispatch();
-	const handleClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-		if (location.pathname.includes(linkClan)) {
-			event.preventDefault();
-		}
-		if (isShowDmProfile) {
-			dispatch(appActions.setIsUseProfileDM(false));
-		}
+	const navigate = useCustomNavigate();
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		navigate(linkClan);
 	};
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
@@ -48,7 +41,7 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 
 	return (
 		<div onContextMenu={handleMouseClick} className="relative">
-			<NavLink to={linkClan} onClick={handleClick} draggable="false">
+			<button onClick={handleClick} draggable="false">
 				<NavLinkComponent active={active}>
 					{option.logo ? (
 						<Image
@@ -68,7 +61,7 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 						)
 					)}
 				</NavLinkComponent>
-			</NavLink>
+			</button>
 			{badgeCountClan > 0 ? (
 				<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
 					{badgeCountClan > 99 ? '99+' : badgeCountClan}
@@ -78,4 +71,4 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 	);
 };
 
-export default SidebarClanItem;
+export default memo(SidebarClanItem);
