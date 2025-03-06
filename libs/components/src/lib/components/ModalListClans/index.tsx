@@ -1,6 +1,6 @@
-import { selectBadgeCountByClanId } from '@mezon/store';
+import { appActions, selectBadgeCountByClanId, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { createImgproxyUrl, IClan } from '@mezon/utils';
+import { IClan, createImgproxyUrl } from '@mezon/utils';
 import { useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -18,9 +18,14 @@ export type SidebarClanItemProps = {
 const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => {
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const location = useLocation();
+	const isShowDmProfile = useSelector(selectIsUseProfileDM);
+	const dispatch = useAppDispatch();
 	const handleClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (location.pathname.includes(linkClan)) {
 			event.preventDefault();
+		}
+		if (isShowDmProfile) {
+			dispatch(appActions.setIsUseProfileDM(false));
 		}
 	};
 	const [coords, setCoords] = useState<Coords>({
