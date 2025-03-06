@@ -13,9 +13,7 @@ interface EmbedOptionRatioProps {
 }
 
 export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRatioProps) {
-	console.log('message_id: ', message_id);
 	const [checked, setChecked] = useState<number[]>([]);
-	console.log('checked: ', checked);
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
 			setChecked([index]);
@@ -38,7 +36,7 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 			return options[0].name === options[1].name;
 		}
 		return true;
-	}, [options, message_id]);
+	}, [options]);
 
 	const handleAddEmbedRadioValue = useCallback(
 		(index: number) => {
