@@ -279,7 +279,7 @@ export const RenderTextMarkdownContent = ({
 }: IMarkdownProps) => {
 	const { themeValue } = useTheme();
 
-	const { t, mentions = [], hg = [], ej = [], mk = [] } = content || {};
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
 	const markdownBlackParts: React.ReactNode[] = [];
@@ -288,7 +288,8 @@ export const RenderTextMarkdownContent = ({
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
 		...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
 		...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
-		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || [])
+		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || []),
+		...(lk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS, type: EBacktickType.LINK })) || [])
 	].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 	const store = elements?.length > 0 ? getStore() : null;
