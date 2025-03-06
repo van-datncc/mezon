@@ -424,7 +424,7 @@ input:-webkit-autofill:active {
 	align-items: center;
 	justify-content: flex-end;
 	height: 100%;
-	contain: strict;
+	contain: content;
 	content-visibility: auto;
 	contain-intrinsic-size: auto 500px;
 	.force-messages-scroll & {
