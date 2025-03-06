@@ -35,6 +35,7 @@ export interface TopicDiscussionsState extends EntityState<TopicDiscussionsEntit
 	currentTopicId?: string;
 	firstMessageOfCurrentTopic?: ApiSdTopic;
 	isFocusTopicBox: boolean;
+	channelTopics: Record<string, string>;
 }
 
 export const topicsAdapter = createEntityAdapter({ selectId: (topic: TopicDiscussionsEntity) => topic.id || '' });
@@ -102,7 +103,8 @@ export const initialTopicsState: TopicDiscussionsState = topicsAdapter.getInitia
 	isPrivate: 0,
 	currentTopicInitMessage: null,
 	openTopicMessageState: false,
-	isFocusTopicBox: false
+	isFocusTopicBox: false,
+	channelTopics: {}
 });
 
 export const createTopic = createAsyncThunk('topics/createTopic', async (body: ApiSdTopicRequest, thunkAPI) => {
@@ -219,6 +221,10 @@ export const topicsSlice = createSlice({
 		},
 		setFirstMessageOfCurrentTopic(state, action) {
 			state.firstMessageOfCurrentTopic = action.payload;
+		},
+		setChannelTopic: (state, action: PayloadAction<{ channelId: string; topicId: string }>) => {
+			const { channelId, topicId } = action.payload;
+			state.channelTopics[channelId] = topicId;
 		},
 		setTopicLastSent: (state, action: PayloadAction<{ topicId: string; lastSentMess: ApiChannelMessageHeader }>) => {
 			const topic = state.entities[action.payload.topicId];
@@ -339,5 +345,8 @@ export const selectTopicsSort = createSelector(selectAllTopics, (data) => {
 		return timestampB - timestampA;
 	});
 });
+
+export const selectTopicByChannelId = (channelId: string) =>
+	createSelector(getTopicsState, (state: TopicDiscussionsState) => state.channelTopics[channelId] ?? null);
 
 export const selectClickedOnTopicStatus = createSelector(getTopicsState, (state) => state.isFocusTopicBox);
