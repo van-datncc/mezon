@@ -12,7 +12,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EOverriddenPermission, checkIsThread } from '@mezon/utils';
+import { EOverriddenPermission, LIMIT, checkIsThread } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -97,7 +97,8 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 			const res = await dispatch(threadsActions.fetchThreads(body));
 			const newThreads = Array.isArray(res?.payload) ? res.payload : [];
-			setHasMore(newThreads.length > 0);
+			const endResult = newThreads.length < LIMIT;
+			setHasMore(!endResult);
 		} catch (error) {
 			console.error('Error fetching threads:', error);
 		}
