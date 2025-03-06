@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../components/StreamContext/StreamContext';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../utils/helpers';
-import { EMessageBSToShow } from './enums';
+import UserProfile from './components/UserProfile';
 
 const ChannelMessageListener = React.memo(() => {
 	const usersClan = useSelector(selectAllUserClans);
@@ -51,10 +51,11 @@ const ChannelMessageListener = React.memo(() => {
 				const clanUser = listUser?.find((userClan) => tagName === userClan?.user?.username);
 				const isRoleMention = rolesInClan?.some((role) => tagName === role?.id);
 				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_MESSAGE_ACTION_MESSAGE_ITEM, {
-					type: EMessageBSToShow.UserInformation,
-					user: clanUser?.user
-				});
+				const data = {
+					snapPoints: ['50%', '80%'],
+					children: <UserProfile userId={clanUser?.user?.id} user={clanUser?.user} />
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 			} catch (error) {
 				/* empty */
 			}

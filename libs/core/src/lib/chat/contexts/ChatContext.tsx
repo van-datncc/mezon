@@ -451,6 +451,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: NotificationInfo) => {
+			if (notification.topic_id !== '0') {
+				dispatch(topicsActions.setChannelTopic({ channelId: notification.channel_id || '', topicId: notification.topic_id || '' }));
+			}
 			const path = isElectron() ? window.location.hash : window.location.pathname;
 			const isFriendPageView = path.includes('/chat/direct/friends');
 			const isDirectViewPage = path.includes('/chat/direct/message/');

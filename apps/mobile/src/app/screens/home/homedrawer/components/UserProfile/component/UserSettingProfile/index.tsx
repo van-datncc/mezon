@@ -116,7 +116,6 @@ const UserSettingProfile = ({
 	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {
 			setVisibleKickUserModal(false);
-			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, { isHiddenBottomSheet: true });
 			const userIds = [user.user?.id ?? ''];
 			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
 		}
