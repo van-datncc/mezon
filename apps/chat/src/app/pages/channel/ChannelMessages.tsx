@@ -483,7 +483,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					const isAtBottom =
 						chatRef?.current &&
 						(Math.abs(chatRef.current.scrollHeight - chatRef.current.clientHeight - chatRef.current.scrollTop) <= BOTTOM_THRESHOLD ||
-							userId === lastMessage?.sender_id);
+							(userId === lastMessage?.sender_id &&
+								lastMessage?.create_time &&
+								new Date().getTime() - new Date(lastMessage.create_time).getTime() < 500));
 					// const isAlreadyFocusing = messageIds && memoFocusingIdRef.current === messageIds[messageIds.length - 1];
 					const isAlreadyFocusing = false;
 					// Animate incoming message, but if app is in background mode, scroll to the first unread
