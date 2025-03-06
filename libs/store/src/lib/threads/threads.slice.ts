@@ -257,6 +257,9 @@ export const threadsSlice = createSlice({
 		toggleThreadModal: (state: ThreadsState) => {
 			state.isThreadModalVisible = !state.isThreadModalVisible;
 		},
+		hideThreadModal: (state: ThreadsState) => {
+			state.isThreadModalVisible = false;
+		},
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
 				...state.isShowCreateThread,
@@ -343,7 +346,7 @@ export const threadsSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
-				threadsAdapter.setAll(state, action.payload);
+				threadsAdapter.addMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
@@ -534,5 +537,5 @@ export const selectThreadInputSearchByChannelId = createSelector(
 
 export const selectThreadsByParentChannelId = createSelector(
 	[selectAllThreads, (_: any, parentChannelId: string) => parentChannelId],
-	(allThreads, parentChannelId) => allThreads.filter((thread) => thread.parent_id === parentChannelId)
+	(allThreads, parentChannelId) => allThreads.filter((thread) => thread?.parent_id === parentChannelId)
 );
