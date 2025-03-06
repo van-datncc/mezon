@@ -159,7 +159,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
 				if (directMessageId) {
 					sendInviteMessage(
-						`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+						`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 						directMessageId,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -168,7 +168,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					const response = await createDirectMessageWithUser(message?.user?.id);
 					if (response?.channel_id) {
 						sendInviteMessage(
-							`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+							`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 							response?.channel_id,
 							ChannelStreamMode.STREAM_MODE_DM,
 							TypeMessage.SendToken
