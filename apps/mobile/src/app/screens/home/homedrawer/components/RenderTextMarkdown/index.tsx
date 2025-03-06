@@ -413,11 +413,14 @@ export const RenderTextMarkdownContent = ({
 
 			case ETokenMessage.MARKDOWNS: {
 				switch (element.type) {
+					case EBacktickType.SINGLE:
 					case EBacktickType.CODE:
 						textParts.push(
 							<Text key={`code-${index}`} style={themeValue ? markdownStyles(themeValue).code_inline : {}}>
 								{' '}
-								{contentInElement}{' '}
+								{contentInElement?.startsWith('`') && contentInElement?.endsWith('`')
+									? contentInElement?.slice(1, -1)
+									: contentInElement}{' '}
 							</Text>
 						);
 						break;
