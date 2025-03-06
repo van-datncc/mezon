@@ -106,15 +106,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	};
 
 	const handleShowServerSettings = () => {
-		setOpenServerSettings(true);
+		openServerSettingsModal();
 		setIsShowModalPanelClan(false);
 	};
 
 	const closeModalClan = useCallback(() => {
 		setIsShowModalPanelClan(false);
-		if (!hasChildModalRef.current) {
-			setOpenServerSettings(false);
-		}
 	}, []);
 
 	const handleLeaveClan = async () => {
@@ -132,7 +129,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	};
 
 	const closeAllModals = useCallback(() => {
-		setOpenServerSettings(false);
+		closeServerSettingsModal();
 		setOpenCreateCate(false);
 		closeNotiSettingModal();
 		dispatch(clansActions.toggleInvitePeople({ status: false }));
@@ -147,6 +144,21 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	useEffect(() => {
 		dispatch(settingClanStickerActions.closeModalInChild());
 	}, []);
+
+	const [openServerSettingsModal, closeServerSettingsModal] = useModal(
+		() => (
+			<ClanSetting
+				onClose={() => {
+					closeServerSettingsModal();
+					if (!hasChildModalRef.current) {
+						closeModalClan();
+					}
+				}}
+				initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.EMOJI}
+			/>
+		),
+		[canManageClan, hasChildModalRef, closeModalClan]
+	);
 
 	return (
 		<>
@@ -186,8 +198,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					buttonName="Leave Clan"
 				/>
 			)}
-
-			{openServerSettings && <ClanSetting onClose={closeModalClan} initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.EMOJI} />}
 
 			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />
 			<InviteClanModal />
