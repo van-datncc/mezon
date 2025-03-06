@@ -13,7 +13,9 @@ interface EmbedOptionRatioProps {
 }
 
 export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRatioProps) {
+	console.log('message_id: ', message_id);
 	const [checked, setChecked] = useState<number[]>([]);
+	console.log('checked: ', checked);
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
 			setChecked([index]);
@@ -36,7 +38,7 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 			return options[0].name === options[1].name;
 		}
 		return true;
-	}, [options]);
+	}, [options, message_id]);
 
 	const handleAddEmbedRadioValue = useCallback(
 		(index: number) => {
@@ -58,13 +60,13 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 		<>
 			{options &&
 				options.map((option, index) => (
-					<div className="flex justify-between" key={option.value}>
+					<div className="flex justify-between" key={option.value + message_id}>
 						<div className="flex flex-col">
 							<EmbedTitle title={option.label} />
 							<EmbedDescription description={option.description || ''} />
 						</div>
 						<MessageRatioButton
-							name={option.name ? option.name : 'ratio_button'}
+							name={option.name ? option.name + message_id : 'ratio_button' + message_id}
 							onCheckRatio={() => handleCheckedOption(index)}
 							checked={checked.includes(index)}
 							color={option.style}
