@@ -2,7 +2,7 @@
 import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
 import { Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, MessagesEntity, useAppDispatch } from '@mezon/store-mobile';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
@@ -240,7 +240,7 @@ const MessageItem = React.memo(
 						isHighlight && styles.highlightMessageMention
 					]}
 				>
-					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
+					{!isMessageSystem && <RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						{!isMessageSystem && (
 							<AvatarMessage
