@@ -1,23 +1,18 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
-	fetchListNotification,
 	notificationActions,
-	selectAllNotification,
-	selectAllNotificationClan,
-	selectAllNotificationExcludeMentionAndReply,
-	selectAllNotificationMentionAndReply,
-	selectAllTopics,
 	selectCurrentClan,
-	selectLastNotificationId,
+	selectNotificationClan,
+	selectNotificationForYou,
+	selectNotificationMentions,
 	selectTopicsSort,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, NotificationCode, sortNotificationsByDate } from '@mezon/utils';
 import { ApiSdTopic } from 'mezon-js/dist/api.gen';
-import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import AllNotification from './AllNotification';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -31,7 +26,6 @@ export type NotificationProps = {
 };
 
 const InboxType = {
-	ALL: 'all',
 	INDIVIDUAL: 'individual',
 	MESSAGES: 'messages',
 	MENTIONS: 'mentions',
@@ -39,7 +33,6 @@ const InboxType = {
 };
 
 const tabDataNotify = [
-	{ title: 'All', value: InboxType.ALL },
 	{ title: 'For you', value: InboxType.INDIVIDUAL },
 	{ title: 'Messages', value: InboxType.MESSAGES },
 	{ title: 'Mentions', value: InboxType.MENTIONS },
@@ -49,29 +42,28 @@ const tabDataNotify = [
 function NotificationList({ rootRef }: NotificationProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
-	const allNotificationClan = useSelector(selectAllNotificationClan);
 
-	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.ALL);
+	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.MENTIONS);
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const getNotificationExcludeMentionAndReplyUnread = useSelector(selectAllNotificationExcludeMentionAndReply);
-	const getAllNotificationMentionAndReply = useSelector(selectAllNotificationMentionAndReply);
+	const allNotificationForYou = useSelector(selectNotificationForYou);
+	const allNotificationMentions = useSelector(selectNotificationMentions);
+	const allNotificationClan = useSelector(selectNotificationClan);
 	const getAllTopic = useSelector(selectTopicsSort);
-	const allTopic = useSelector(selectAllTopics);
 
-	const getExcludeMentionAndReply = useMemo(() => {
-		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
-	}, [getNotificationExcludeMentionAndReplyUnread]);
+	const getAllNotificationForYou = useMemo(() => {
+		return sortNotificationsByDate([...allNotificationForYou.data]);
+	}, [allNotificationForYou]);
+
+	const getAllNotificationMentions = useMemo(() => {
+		return sortNotificationsByDate([...allNotificationMentions.data]);
+	}, [allNotificationMentions]);
 
 	const getAllNotificationClan = useMemo(() => {
-		return sortNotificationsByDate(allNotificationClan);
+		return sortNotificationsByDate([...allNotificationClan.data]);
 	}, [allNotificationClan]);
-
-	const getAllMentionAndReply = useMemo(() => {
-		return sortNotificationsByDate(getAllNotificationMentionAndReply);
-	}, [getAllNotificationMentionAndReply]);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleHideInbox = useCallback(() => {
@@ -81,26 +73,44 @@ function NotificationList({ rootRef }: NotificationProps) {
 	useEscapeKeyClose(modalRef, handleHideInbox);
 	useOnClickOutside(modalRef, handleHideInbox, rootRef);
 
+	useEffect(() => {
+		let code = -1;
+
+		if (currentTabNotify === InboxType.MESSAGES && allNotificationMentions?.data) {
+			code = NotificationCode.USER_MENTIONED;
+		}
+
+		if (currentTabNotify === InboxType.MESSAGES && allNotificationClan?.data) {
+			code = NotificationCode.NOTIFICATION_CLAN;
+		}
+
+		const fetchData = async () => {
+			try {
+				await dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '', code: code }));
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+		};
+
+		fetchData();
+	}, [currentTabNotify, dispatch, allNotificationMentions?.data, allNotificationClan?.data]);
+
 	const listRef = useRef<HTMLDivElement | null>(null);
-	const notifications = useSelector(selectAllNotification);
-	const getAllNotifications = useMemo(() => {
-		return sortNotificationsByDate(notifications);
-	}, [notifications]);
-	const lastNotificationId = useSelector(selectLastNotificationId);
-	const handleScroll = () => {
-		if (!listRef.current || !lastNotificationId) return;
+	// const handleScroll = () => {
+	// 	if (!listRef.current || !lastNotificationId) return;
 
-		const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+	// 	const { scrollTop, scrollHeight, clientHeight } = listRef.current;
 
-		if (scrollHeight - scrollTop !== clientHeight) return;
+	// 	if (scrollHeight - scrollTop !== clientHeight) return;
 
-		dispatch(
-			fetchListNotification({
-				clanId: currentClan?.id || '',
-				notificationId: lastNotificationId
-			})
-		);
-	};
+	// dispatch(
+	// 	fetchListNotification({
+	// 		clanId: currentClan?.id || '',
+	// 		code: ""
+	// 		notificationId: ""
+	// 	})
+	// );
+	// };
 
 	return (
 		<div
@@ -138,9 +148,9 @@ function NotificationList({ rootRef }: NotificationProps) {
 				<div
 					ref={listRef}
 					className="dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto"
-					onScroll={handleScroll}
+					// onScroll={handleScroll()}
 				>
-					{currentTabNotify === InboxType.ALL && (
+					{/* {currentTabNotify === InboxType.ALL && (
 						<div>
 							{getAllNotifications.length > 0 ? (
 								getAllNotifications.map((notification, index) => (
@@ -150,16 +160,33 @@ function NotificationList({ rootRef }: NotificationProps) {
 								<EmptyNotification isEmptyMessages />
 							)}
 						</div>
-					)}
+					)} */}
 
 					{currentTabNotify === InboxType.INDIVIDUAL && (
 						<div>
-							{getExcludeMentionAndReply.length > 0 ? (
-								getExcludeMentionAndReply.map((notify, index) => (
+							{getAllNotificationForYou.length > 0 ? (
+								getAllNotificationForYou.map((notify, index) => (
 									<NotificationItem notify={notify} key={`individual-${notify?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyForYou />
+							)}
+						</div>
+					)}
+
+					{currentTabNotify === InboxType.MENTIONS && (
+						<div>
+							{getAllNotificationMentions.length > 0 ? (
+								getAllNotificationMentions.map((notification: INotification, index: number) => (
+									<NotificationChannel
+										key={`mention-${notification?.id}-${index}`}
+										isUnreadTab={false}
+										unreadListConverted={[]}
+										notification={notification}
+									/>
+								))
+							) : (
+								<EmptyNotification isEmptyMentions />
 							)}
 						</div>
 					)}
@@ -176,23 +203,6 @@ function NotificationList({ rootRef }: NotificationProps) {
 								))
 							) : (
 								<EmptyNotification isEmptyMessages />
-							)}
-						</div>
-					)}
-
-					{currentTabNotify === InboxType.MENTIONS && (
-						<div>
-							{getAllMentionAndReply.length > 0 ? (
-								getAllMentionAndReply.map((notification: INotification, index: number) => (
-									<NotificationChannel
-										key={`mention-${notification?.id}-${index}`}
-										isUnreadTab={false}
-										unreadListConverted={[]}
-										notification={notification}
-									/>
-								))
-							) : (
-								<EmptyNotification isEmptyMentions />
 							)}
 						</div>
 					)}

@@ -1,58 +1,58 @@
 import {
-    ChannelDescription,
-    ChannelMessage,
-    ChannelStreamMode,
-    ChannelType,
-    HashtagDm,
-    Notification,
-    NotificationType,
-    SFUSignalingFwd,
-    WebrtcSignalingFwd
+	ChannelDescription,
+	ChannelMessage,
+	ChannelStreamMode,
+	ChannelType,
+	HashtagDm,
+	Notification,
+	NotificationType,
+	SFUSignalingFwd,
+	WebrtcSignalingFwd
 } from 'mezon-js';
 import {
-    ApiAccount,
-    ApiCategoryDesc,
-    ApiChannelAttachment,
-    ApiChannelDescription,
-    ApiChannelMessageHeader,
-    ApiClanDesc,
-    ApiClanProfile,
-    ApiEventManagement,
-    ApiInviteUserRes,
-    ApiMessageAttachment,
-    ApiMessageMention,
-    ApiMessageReaction,
-    ApiMessageRef,
-    ApiNotificationSetting,
-    ApiNotificationUserChannel,
-    ApiPermission,
-    ApiPinMessage,
-    ApiRole,
-    ApiSearchMessageDocument,
-    ApiSystemMessage,
-    ApiUser,
-    ClanUserListClanUser,
-    RoleUserListRoleUser
+	ApiAccount,
+	ApiCategoryDesc,
+	ApiChannelAttachment,
+	ApiChannelDescription,
+	ApiChannelMessageHeader,
+	ApiClanDesc,
+	ApiClanProfile,
+	ApiEventManagement,
+	ApiInviteUserRes,
+	ApiMessageAttachment,
+	ApiMessageMention,
+	ApiMessageReaction,
+	ApiMessageRef,
+	ApiNotificationSetting,
+	ApiNotificationUserChannel,
+	ApiPermission,
+	ApiPinMessage,
+	ApiRole,
+	ApiSearchMessageDocument,
+	ApiSystemMessage,
+	ApiUser,
+	ClanUserListClanUser,
+	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import {
-    ApiAllUsersAddChannelResponse,
-    ApiNotifiReactMessage,
-    ApiNotificationChannelCategorySetting,
-    ApiPermissionRoleChannel
+	ApiAllUsersAddChannelResponse,
+	ApiNotifiReactMessage,
+	ApiNotificationChannelCategorySetting,
+	ApiPermissionRoleChannel
 } from 'mezon-js/dist/api.gen';
 import { HTMLInputTypeAttribute } from 'react';
 import { MentionItem } from 'react-mentions';
 import { ILongPressType } from '../hooks';
 import { CanvasDataResponse } from './htmlCanvas';
 import {
-    IBoldMessage,
-    IEmojiOnMessage,
-    IHashtagOnMessage,
-    ILinkOnMessage,
-    ILinkVoiceRoomOnMessage,
-    ILinkYoutubeOnMessage,
-    IMarkdownOnMessage,
-    IPreMessage
+	IBoldMessage,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	ILinkYoutubeOnMessage,
+	IMarkdownOnMessage,
+	IPreMessage
 } from './messageLine';
 
 export * from './base';
@@ -846,6 +846,12 @@ export enum NotificationCode {
 	USER_REPLIED = -11,
 	NOTIFICATION_CLAN = -12,
 	NOTIFICATION_TOPIC = -13
+}
+
+export enum NotificationCategory {
+	FOR_YOU = 0,
+	MENTIONS = 1,
+	MESSAGES = 2
 }
 
 export enum ChannelIsNotThread {

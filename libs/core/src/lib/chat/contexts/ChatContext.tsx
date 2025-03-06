@@ -470,7 +470,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				(isElectron() && isFocusDesktop === false) ||
 				isTabVisible === false
 			) {
-				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				dispatch(notificationActions.add({ data: mapNotificationToEntity(notification), code: notification.code as NotificationCode }));
 				const isFriendPageView = path.includes('/chat/direct/friends');
 				const isNotCurrentDirect =
 					isFriendPageView ||
