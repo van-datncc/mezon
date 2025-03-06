@@ -1,5 +1,5 @@
 import { useFriends } from '@mezon/core';
-import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
+import { appActions, selectDirectsOpenlistOrder, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -72,19 +72,23 @@ const CreateMessageGroupModal = memo(
 const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean }) => {
 	const navigate = useNavigate();
 	const pathname = useLocation().pathname;
-
+	const dispatch = useAppDispatch();
 	useEffect(() => {
 		if (navigateToFriend) {
 			navigate('/chat/direct/friends');
 		}
 	}, [navigateToFriend, navigate]);
 
+	const handleOpenFriendList = async () => {
+		dispatch(appActions.setCloseMenu(true));
+		dispatch(appActions.setStatusMenu(false));
+		navigate('/chat/direct/friends');
+	};
+
 	return (
 		<button
 			className={`py-2 px-3 rounded-[4px] dark:text-white text-black w-full flex gap-4 items-center ${pathname.includes('friends') ? 'dark:bg-bgModifierHover bg-[#F7F7F7]' : ''}`}
-			onClick={() => {
-				navigate('/chat/direct/friends');
-			}}
+			onClick={handleOpenFriendList}
 		>
 			<Icons.IconFriends />
 			Friends

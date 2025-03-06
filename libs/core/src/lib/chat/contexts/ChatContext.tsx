@@ -451,6 +451,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: NotificationInfo) => {
+			if (notification.topic_id !== '0') {
+				dispatch(topicsActions.setChannelTopic({ channelId: notification.channel_id || '', topicId: notification.topic_id || '' }));
+			}
 			const path = isElectron() ? window.location.hash : window.location.pathname;
 			const isFriendPageView = path.includes('/chat/direct/friends');
 			const isDirectViewPage = path.includes('/chat/direct/message/');
@@ -673,10 +676,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								channel_label: channel_desc.channel_label,
 								clan_id: channel_desc.clan_id || (clanId as string),
 								parent_id: channel_desc.parent_id,
-								last_sent_message: channel_desc.last_sent_message,
+								last_sent_message: {
+									timestamp_seconds: userAdds.create_time_second
+								},
 								type: channel_desc.type
 							};
-							dispatch(threadsActions.add(thread));
+
 							const store = await getStoreAsync();
 							const allThreads = selectAllThreads(store.getState());
 							const defaultThreadList: ApiChannelDescription[] = [
@@ -1068,9 +1073,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const store = await getStoreAsync();
 			const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
 			const clanId = selectCurrentClanId(store.getState());
+			const allThreads = selectAllThreads(store.getState());
+
+			const newAllThreads = allThreads.filter((thread) => thread.id !== channelDeleted.channel_id);
 
 			if (channelDeleted?.deletor === userId) {
+				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
+				dispatch(listChannelRenderAction.updateClanBadgeRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
+				dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
+				dispatch(threadsActions.remove(channelDeleted.channel_id));
+
+				dispatch(
+					threadsActions.updateCacheOnThreadCreation({
+						clanId: channelDeleted.clan_id,
+						channelId: channelDeleted?.parent_id || '',
+						defaultThreadList: newAllThreads as ApiChannelDescription[]
+					})
+				);
+
 				return;
 			}
 			if (channelDeleted) {
@@ -1081,6 +1102,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
 				dispatch(listChannelRenderAction.updateClanBadgeRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
 				dispatch(listChannelRenderAction.deleteChannelInListRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
+
+				dispatch(
+					threadsActions.updateCacheOnThreadCreation({
+						clanId: channelDeleted.clan_id,
+						channelId: channelDeleted?.parent_id || '',
+						defaultThreadList: newAllThreads as ApiChannelDescription[]
+					})
+				);
 			}
 		},
 		[userId]
