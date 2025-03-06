@@ -272,7 +272,7 @@ const MessageItem = React.memo(
 						isHighlight && styles.highlightMessageMention
 					]}
 				>
-					<RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />
+					{!isMessageSystem && <RenderMessageItemRef message={message} preventAction={preventAction} isSearchTab={isSearchTab} />}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						{!isMessageSystem && (
 							<AvatarMessage
