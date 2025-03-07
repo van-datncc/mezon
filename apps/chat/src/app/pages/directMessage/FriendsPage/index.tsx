@@ -197,7 +197,7 @@ const FriendsPage = () => {
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className="pl-8 overflow-hidden flex flex-1 pb-16">
+							<div className="pl-8 overflow-hidden flex flex-1 pb-4">
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
