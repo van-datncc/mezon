@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Img, ImgProps } from 'react-image';
 
 export type ImageProps = ImgProps & {
@@ -10,6 +11,15 @@ export type ImageProps = ImgProps & {
 };
 
 function Image({ loading = 'lazy', ...rest }: ImageProps) {
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+		return () => setIsMounted(false);
+	}, []);
+
+	if (!isMounted) return null;
+
 	return <Img {...rest} loading={loading} />;
 }
 
