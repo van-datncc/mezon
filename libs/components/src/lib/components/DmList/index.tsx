@@ -1,7 +1,8 @@
 import { useFriends } from '@mezon/core';
 import { appActions, selectDirectsOpenlistOrder, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CreateMessageGroup from './CreateMessageGroup';
@@ -38,31 +39,35 @@ function DirectMessageList() {
 		</>
 	);
 }
-
 const CreateMessageGroupModal = memo(
 	() => {
-		const [isOpen, setIsOpen] = useState<boolean>(false);
 		const buttonPlusRef = useRef<HTMLDivElement | null>(null);
 		const appearanceTheme = useSelector(selectTheme);
 
-		const onClickOpenModal = () => {
-			setIsOpen(!isOpen);
-		};
-
-		const handleCloseModal = useCallback(() => {
-			setIsOpen(false);
-		}, []);
+		const [openCreateMessageGroup, closeCreateMessageGroup] = useModal(
+			() => (
+				<div className="fixed inset-0 flex items-center justify-center z-50">
+					<div className="absolute inset-0 bg-black bg-opacity-50" />
+					<CreateMessageGroup
+						onClose={closeCreateMessageGroup}
+						isOpen={true}
+						rootRef={buttonPlusRef}
+						classNames="relative" // Remove absolute positioning
+					/>
+				</div>
+			),
+			[]
+		);
 
 		return (
 			<div
 				ref={buttonPlusRef}
-				onClick={onClickOpenModal}
+				onClick={openCreateMessageGroup}
 				className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full whitespace-nowrap"
 			>
 				<span title="Create DM">
 					<Icons.Plus className="w-4 h-4" />
 				</span>
-				{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
 			</div>
 		);
 	},

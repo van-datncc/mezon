@@ -2,7 +2,6 @@ import { useAccount, useAppNavigation, useAuth } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { Modal } from 'flowbite-react';
 import { safeJSONParse } from 'mezon-js';
-import 'quill/dist/quill.snow.css';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSelector } from 'react-redux';
