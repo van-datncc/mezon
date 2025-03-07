@@ -6,7 +6,7 @@ import { ApiNotification } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 const LIST_NOTIFICATION_CACHED_TIME = 1000 * 60 * 60;
-const LIMIT_NOTIFICATION = 10;
+const LIMIT_NOTIFICATION = 50;
 
 export const mapNotificationToEntity = (notifyRes: ApiNotification): INotification => {
 	return { ...notifyRes, id: notifyRes.id || '', content: notifyRes.content };
