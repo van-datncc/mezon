@@ -370,7 +370,7 @@ export const threadsSlice = createSlice({
 			})
 			.addCase(updateCacheOnThreadCreation.fulfilled, (state, action) => {
 				if (!action.payload) return;
-				threadsAdapter.setAll(state, action.payload);
+				threadsAdapter.addMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			});
 		builder
