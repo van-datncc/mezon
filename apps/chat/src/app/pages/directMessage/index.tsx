@@ -46,8 +46,8 @@ const Direct = () => {
 					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 					{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 					{isVoiceJoined && <VoiceInfo />}
-					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 				</div>
+				{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 				<div style={{ height: 56, width: '100%' }}>
 					<FooterProfile
 						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
