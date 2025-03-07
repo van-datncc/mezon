@@ -1,5 +1,6 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
+	fetchListNotification,
 	notificationActions,
 	selectCurrentClan,
 	selectNotificationClan,
@@ -9,14 +10,12 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, NotificationCode, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, NotificationCategory, sortNotificationsByDate } from '@mezon/utils';
 import { ApiSdTopic } from 'mezon-js/dist/api.gen';
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import AllNotification from './AllNotification';
 import EmptyNotification from './EmptyNotification';
-import NotificationChannel from './NotificationChannel';
-import NotificationItem from './NotificationItem';
-import NotificationWebhookClan from './NotificationWebhookClan';
 import TopicNotification from './TopicNotification';
 
 export type MemberListProps = { className?: string };
@@ -74,43 +73,52 @@ function NotificationList({ rootRef }: NotificationProps) {
 	useOnClickOutside(modalRef, handleHideInbox, rootRef);
 
 	useEffect(() => {
-		let code = -1;
+		if (!currentClan?.clan_id) return;
 
-		if (currentTabNotify === InboxType.MESSAGES && allNotificationMentions?.data) {
-			code = NotificationCode.USER_MENTIONED;
+		let category = null;
+
+		if (currentTabNotify === InboxType.INDIVIDUAL) {
+			category = NotificationCategory.FOR_YOU;
+		} else if (currentTabNotify === InboxType.MESSAGES) {
+			category = NotificationCategory.MESSAGES;
+		} else if (currentTabNotify === InboxType.MENTIONS) {
+			category = NotificationCategory.MENTIONS;
 		}
 
-		if (currentTabNotify === InboxType.MESSAGES && allNotificationClan?.data) {
-			code = NotificationCode.NOTIFICATION_CLAN;
+		if (category) {
+			dispatch(notificationActions.fetchListNotification({ clanId: currentClan.clan_id, category }));
 		}
+	}, [
+		currentTabNotify,
+		currentClan?.clan_id,
+		allNotificationForYou.data.length,
+		allNotificationClan.data.length,
+		allNotificationMentions.data.length,
+		dispatch
+	]);
 
-		const fetchData = async () => {
-			try {
-				await dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '', code: code }));
-			} catch (error) {
-				console.error('Error fetching data:', error);
-			}
+	const listRefForYou = useRef<HTMLDivElement | null>(null);
+	const listRefMentions = useRef<HTMLDivElement | null>(null);
+	const listRefMessages = useRef<HTMLDivElement | null>(null);
+
+	const handleScroll = (category: NotificationCategory, lastId: string | null) => {
+		return (event: React.UIEvent<HTMLDivElement>) => {
+			const target = event.currentTarget;
+			if (!lastId) return;
+
+			const { scrollTop, scrollHeight, clientHeight } = target;
+
+			if (scrollHeight - scrollTop !== clientHeight) return;
+
+			dispatch(
+				fetchListNotification({
+					clanId: currentClan?.id || '',
+					category: category,
+					notificationId: lastId
+				})
+			);
 		};
-
-		fetchData();
-	}, [currentTabNotify, dispatch, allNotificationMentions?.data, allNotificationClan?.data]);
-
-	const listRef = useRef<HTMLDivElement | null>(null);
-	// const handleScroll = () => {
-	// 	if (!listRef.current || !lastNotificationId) return;
-
-	// 	const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-
-	// 	if (scrollHeight - scrollTop !== clientHeight) return;
-
-	// dispatch(
-	// 	fetchListNotification({
-	// 		clanId: currentClan?.id || '',
-	// 		code: ""
-	// 		notificationId: ""
-	// 	})
-	// );
-	// };
+	};
 
 	return (
 		<div
@@ -145,28 +153,16 @@ function NotificationList({ rootRef }: NotificationProps) {
 					</div>
 				</div>
 
-				<div
-					ref={listRef}
-					className="dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto"
-					// onScroll={handleScroll()}
-				>
-					{/* {currentTabNotify === InboxType.ALL && (
-						<div>
-							{getAllNotifications.length > 0 ? (
-								getAllNotifications.map((notification, index) => (
-									<AllNotification notification={notification} key={`all-${notification?.id}-${index}`} />
-								))
-							) : (
-								<EmptyNotification isEmptyMessages />
-							)}
-						</div>
-					)} */}
-
+				<div className="dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto">
 					{currentTabNotify === InboxType.INDIVIDUAL && (
-						<div>
+						<div
+							ref={listRefForYou}
+							className="max-w-[600px] max-h-heightInBox overflow-y-auto"
+							onScroll={handleScroll(NotificationCategory.FOR_YOU, allNotificationForYou?.lastId)}
+						>
 							{getAllNotificationForYou.length > 0 ? (
-								getAllNotificationForYou.map((notify, index) => (
-									<NotificationItem notify={notify} key={`individual-${notify?.id}-${index}`} />
+								getAllNotificationForYou.map((notification: INotification, index: number) => (
+									<AllNotification notification={notification} key={`individual-${notification?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyForYou />
@@ -175,15 +171,14 @@ function NotificationList({ rootRef }: NotificationProps) {
 					)}
 
 					{currentTabNotify === InboxType.MENTIONS && (
-						<div>
+						<div
+							ref={listRefMentions}
+							className="max-w-[600px] max-h-heightInBox overflow-y-auto"
+							onScroll={handleScroll(NotificationCategory.MENTIONS, allNotificationMentions?.lastId)}
+						>
 							{getAllNotificationMentions.length > 0 ? (
 								getAllNotificationMentions.map((notification: INotification, index: number) => (
-									<NotificationChannel
-										key={`mention-${notification?.id}-${index}`}
-										isUnreadTab={false}
-										unreadListConverted={[]}
-										notification={notification}
-									/>
+									<AllNotification notification={notification} key={`mention-${notification?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyMentions />
@@ -192,14 +187,14 @@ function NotificationList({ rootRef }: NotificationProps) {
 					)}
 
 					{currentTabNotify === InboxType.MESSAGES && (
-						<div>
+						<div
+							ref={listRefMessages}
+							className="max-w-[600px] max-h-heightInBox overflow-y-auto"
+							onScroll={handleScroll(NotificationCategory.MESSAGES, allNotificationClan?.lastId)}
+						>
 							{getAllNotificationClan.length > 0 ? (
 								getAllNotificationClan.map((notification: INotification, index: number) => (
-									<NotificationWebhookClan
-										key={`message-${notification?.id}-${index}`}
-										isUnreadTab={true}
-										notification={notification}
-									/>
+									<AllNotification notification={notification} key={`message-${notification?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyMessages />
@@ -211,7 +206,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 						<div>
 							{getAllTopic.length > 0 ? (
 								getAllTopic.map((topic: ApiSdTopic, index: number) => (
-									<TopicNotification topic={topic} key={`all-${topic?.id}-${index}`} />
+									<TopicNotification topic={topic} key={`topic-${topic?.id}-${index}`} />
 								))
 							) : (
 								<EmptyNotification isEmptyMentions />

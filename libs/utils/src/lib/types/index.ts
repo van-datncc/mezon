@@ -4,7 +4,6 @@ import {
 	ChannelStreamMode,
 	ChannelType,
 	HashtagDm,
-	Notification,
 	NotificationType,
 	SFUSignalingFwd,
 	WebrtcSignalingFwd
@@ -23,6 +22,7 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
+	ApiNotification,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
 	ApiPermission,
@@ -849,9 +849,9 @@ export enum NotificationCode {
 }
 
 export enum NotificationCategory {
-	FOR_YOU = 0,
 	MENTIONS = 1,
-	MESSAGES = 2
+	MESSAGES = 2,
+	FOR_YOU = 3
 }
 
 export enum ChannelIsNotThread {
@@ -881,7 +881,7 @@ export enum ThemeApp {
 	System = 'system'
 }
 
-export interface INotification extends Notification {
+export interface INotification extends ApiNotification {
 	id: string;
 	content?: any;
 }

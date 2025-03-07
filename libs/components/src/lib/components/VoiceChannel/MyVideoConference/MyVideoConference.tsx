@@ -8,9 +8,8 @@ import {
 	usePinnedTracks,
 	useTracks
 } from '@livekit/components-react';
-import { ChannelsEntity, notificationActions, selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
+import { ChannelsEntity, selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { NotificationCode } from '@mezon/utils';
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -95,7 +94,6 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 
 	useEffect(() => {
 		if (isShowInbox) {
-			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '', code: NotificationCode.USER_MENTIONED }));
 			dispatch(topicsActions.fetchTopics({ clanId: currentClan?.clan_id as string }));
 		}
 	}, [isShowInbox]);

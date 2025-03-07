@@ -38,7 +38,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, NotificationCode, SubPanelName, isMacDesktop } from '@mezon/utils';
+import { IChannel, SubPanelName, isMacDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -423,7 +423,6 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 
 	useEffect(() => {
 		if (isShowInbox) {
-			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '', code: NotificationCode.USER_MENTIONED }));
 			dispatch(topicsActions.fetchTopics({ clanId: currentClan?.clan_id as string }));
 		}
 	}, [isShowInbox]);
