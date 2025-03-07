@@ -360,8 +360,8 @@ const MessageItem = React.memo(
 									{message?.attachments?.length > 0 && (
 										<MessageAttachment
 											attachments={message?.attachments}
-											senderId={message?.sender_id}
-											createTime={message?.create_time}
+											clanId={message?.clan_id}
+											channelId={message?.channel_id}
 											onLongPressImage={onLongPressImage}
 										/>
 									)}
