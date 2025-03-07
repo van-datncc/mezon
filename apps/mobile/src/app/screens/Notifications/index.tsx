@@ -56,7 +56,13 @@ const Notifications = () => {
 	const timeoutRef = useRef(null);
 	const [isLoadMore, setIsLoadMore] = useState(true);
 	const [firstLoading, setFirstLoading] = useState(true);
-	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true, messages: true, topics: true });
+	const [selectedTabs, setSelectedTabs] = useState({
+		[EActionDataNotify.Individual]: true,
+		[EActionDataNotify.Mention]: true,
+		[EActionDataNotify.Messages]: true,
+		[EActionDataNotify.Topics]: true
+	});
+	const selectedTabsRef = useRef(selectedTabs);
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 	const lastNotificationId = useSelector(selectLastNotificationId);
 
@@ -97,7 +103,7 @@ const Notifications = () => {
 						case EActionDataNotify.Messages:
 							return notification?.code === NotificationCode.NOTIFICATION_CLAN;
 						case EActionDataNotify.Topics:
-							return !notification?.code;
+							return notification?.content?.topic_id && notification.content.topic_id !== '0';
 						default:
 							return false;
 					}
@@ -117,30 +123,21 @@ const Notifications = () => {
 	};
 
 	const handleTabChange = (value, isSelected) => {
-		setSelectedTabs((prevState) => ({
-			...prevState,
-			[value]: isSelected
-		}));
+		setSelectedTabs((prevState) => {
+			const newState = {
+				...prevState,
+				[value]: isSelected
+			};
+			selectedTabsRef.current = newState;
+			return newState;
+		});
 	};
 
 	useEffect(() => {
 		const selectedTabKeys = Object.entries(selectedTabs)
-			?.filter(([key, value]) => value)
-			?.map(([key]) => {
-				switch (key) {
-					case EActionDataNotify.Individual:
-						return EActionDataNotify.Individual;
-					case EActionDataNotify.Mention:
-						return EActionDataNotify.Mention;
-					case EActionDataNotify.Messages:
-						return EActionDataNotify.Messages;
-					case EActionDataNotify.Topics:
-						return EActionDataNotify.Topics;
-					default:
-						return null;
-				}
-			})
-			?.filter(Boolean);
+			.filter(([_, isSelected]) => isSelected)
+			.map(([key]) => key);
+
 		handleFilterNotify(selectedTabKeys);
 	}, [selectedTabs, handleFilterNotify]);
 
@@ -275,7 +272,7 @@ const Notifications = () => {
 			heightFitContent: true,
 			title: t('headerTitle'),
 			titleSize: 'md',
-			children: <NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabs} />
+			children: <NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabsRef.current} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	};
