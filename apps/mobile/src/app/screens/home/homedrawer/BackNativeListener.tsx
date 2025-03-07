@@ -12,7 +12,6 @@ function BackNativeListener() {
 	const drawerStatus = useDrawerStatus();
 	const isHiddenTab = useSelector(selectHiddenBottomTabMobile);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
-	const [isOpenBottomSheetClan, setIsOpenBottomSheetClan] = useState<boolean>(false);
 
 	const routesNavigation = useNavigationState((state) => state?.routes?.[state?.index]);
 
@@ -24,25 +23,11 @@ function BackNativeListener() {
 	}, [routesNavigation]);
 
 	useEffect(() => {
-		const eventOpenBottomSheet = DeviceEventEmitter.addListener(ActionEmitEvent.ON_STATUS_OPEN_BOTTOM_SHEET, ({ isOpen = false }) => {
-			setIsOpenBottomSheetClan(isOpen);
-		});
-
-		return () => {
-			eventOpenBottomSheet.remove();
-		};
-	}, []);
-
-	useEffect(() => {
 		const backAction = () => {
 			if (drawerStatus === 'closed') {
 				navigation.dispatch(DrawerActions.openDrawer());
 				return true;
 			} else if (isHomeActive && !isHiddenTab && !currentDirectId) {
-				if (isOpenBottomSheetClan) {
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_MENU_CLAN_CHANNEL, true);
-					return true;
-				}
 				Alert.alert(
 					'Exit App',
 					'Are you sure you want to close the app?',
@@ -69,7 +54,7 @@ function BackNativeListener() {
 		return () => {
 			backHandler.remove();
 		};
-	}, [isHomeActive, drawerStatus, navigation, isHiddenTab, isOpenBottomSheetClan, currentDirectId]);
+	}, [isHomeActive, drawerStatus, navigation, isHiddenTab, currentDirectId]);
 
 	return <View />;
 }

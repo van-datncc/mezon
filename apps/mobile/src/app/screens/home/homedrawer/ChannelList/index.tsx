@@ -111,7 +111,7 @@ const ChannelList = () => {
 					decelerationRate={'fast'}
 					disableVirtualization={true}
 					initialNumToRender={20}
-					windowSize={10}
+					windowSize={30}
 					onScrollToIndexFailed={(info) => {
 						const wait = new Promise((resolve) => setTimeout(resolve, 500));
 						wait.then(() => {
