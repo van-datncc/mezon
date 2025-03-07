@@ -28,6 +28,9 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import ChannelMessageListener from "../../screens/home/homedrawer/ChannelMessageListener";
+import ChannelMessageReactionListener from "../../screens/home/homedrawer/ChannelMessageReactionListener";
+import ModalRootListener from "../../components/ModalRootListener";
 const RootStack = createStackNavigator();
 const { SharedPreferences } = NativeModules;
 
@@ -150,6 +153,9 @@ export const Authentication = memo(() => {
 				<StreamingWrapper />
 				<ChannelVoicePopup />
 				<BottomSheetRootListener />
+				<ModalRootListener />
+				<ChannelMessageListener />
+				<ChannelMessageReactionListener />
 			</ColorRoleProvider>
 		</BottomSheetModalProvider>
 	);

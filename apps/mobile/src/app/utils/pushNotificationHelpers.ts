@@ -234,7 +234,9 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 	await Promise.all(promises);
 
 	if (navigation) {
-		navigation.navigate(APP_SCREEN.MESSAGES.TOPIC_DISCUSSION);
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
+		});
 	}
 };
 
