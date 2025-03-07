@@ -84,34 +84,40 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-
-	const fetchThreads = async () => {
+	const fetchThreads = async (pageNumber: number) => {
 		setIsLoading(true);
 		try {
 			const body = {
 				channelId: currentChannelId,
 				clanId: currentClanId ?? '',
-				page: page,
+				page: pageNumber,
 				noCache: true
 			};
 
 			const res = await dispatch(threadsActions.fetchThreads(body));
 			const newThreads = Array.isArray(res?.payload) ? res.payload : [];
-			const endResult = newThreads.length < LIMIT;
-			setHasMore(!endResult);
+			const isLastPage = newThreads.length < LIMIT;
+			setHasMore(!isLastPage);
 		} catch (error) {
 			console.error('Error fetching threads:', error);
 		}
 		setIsLoading(false);
 	};
+
 	useEffect(() => {
-		fetchThreads();
-	}, [page, currentChannelId]);
+		fetchThreads(1);
+	}, []);
 
 	const loadMore = useCallback(() => {
-		setPage((page) => page + 1);
-		setIsLoading(true);
-	}, []);
+		if (hasMore) {
+			setPage((prevPage) => {
+				const nextPage = prevPage + 1;
+				fetchThreads(nextPage);
+				return nextPage;
+			});
+		}
+	}, [hasMore]);
+
 	return (
 		<div
 			ref={modalRef}
@@ -146,14 +152,8 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					</ul>
 				)}
 				{showThreadList && (
-					<div className="h-[500px] overflow-y-auto">
-						<ThreadList
-							preventClosePannel={preventClosePannel}
-							hasMore={hasMore}
-							isLoading={isLoading}
-							loadMore={loadMore}
-							threads={threadFetched}
-						/>
+					<div className="h-[500px] ">
+						<ThreadList preventClosePannel={preventClosePannel} isLoading={isLoading} loadMore={loadMore} threads={threadFetched} />
 					</div>
 				)}
 				{showEmpty && <EmptyThread onClick={handleCreateThread} />}

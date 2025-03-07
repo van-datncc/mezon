@@ -40,7 +40,6 @@ export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
 export * from './lib/chat/hooks/useDragAndDrop';
-export * from './lib/chat/hooks/useDriver';
 export * from './lib/chat/hooks/useEditMessage';
 export * from './lib/chat/hooks/useEmojiSuggestion';
 export * from './lib/chat/hooks/useEscapeKey';
