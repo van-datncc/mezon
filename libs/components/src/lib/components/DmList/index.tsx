@@ -85,7 +85,6 @@ const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean })
 	}, [navigateToFriend, navigate]);
 
 	const handleOpenFriendList = async () => {
-		dispatch(appActions.setCloseMenu(true));
 		dispatch(appActions.setStatusMenu(false));
 		navigate('/chat/direct/friends');
 	};
