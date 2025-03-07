@@ -386,11 +386,6 @@ input:-webkit-autofill:active {
 }
 
 // css mainChat
-#mainChat:has(#memberList) {
-	[class='editorStyles_mentionSuggestions__-tu0h'] {
-		left: -50px !important;
-	}
-}
 
 .messages-container {
 	display: flex;
