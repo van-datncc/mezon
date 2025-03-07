@@ -12,9 +12,11 @@ import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTube
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
-import { Dimensions, Image, Linking, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
+import ImageNative from '../../../../../components/ImageNative';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
@@ -83,31 +85,30 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			backgroundColor: colors.secondaryLight,
-			paddingVertical: size.s_8,
+			paddingVertical: size.s_10,
 			borderColor: colors.secondary,
-			borderRadius: 5,
-			lineHeight: size.s_20,
-			width: codeBlockMaxWidth,
-			paddingHorizontal: size.s_16
+			fontSize: size.medium,
+			lineHeight: size.s_22,
+			paddingHorizontal: size.s_10
 		},
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.small,
+			fontSize: size.medium,
 			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
+			width: codeBlockMaxWidth,
 			backgroundColor: colors.secondaryLight,
-			paddingVertical: 5,
-			borderColor: colors.borderHighlight,
-			borderRadius: 5,
-			fontSize: size.small,
-			lineHeight: size.s_20
+			marginTop: size.s_6,
+			borderColor: colors.black,
+			borderRadius: size.s_4,
+			overflow: 'hidden'
 		},
 		link: {
 			color: colors.textLink,
+			fontSize: size.medium,
 			textDecorationLine: 'none',
 			lineHeight: size.s_20
 		},
@@ -193,7 +194,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			fontSize: size.medium,
 			fontWeight: 'bold',
 			lineHeight: size.s_20,
-			color: colors.white
+			color: colors.text
 		}
 	});
 };
@@ -278,15 +279,17 @@ export const RenderTextMarkdownContent = ({
 }: IMarkdownProps) => {
 	const { themeValue } = useTheme();
 
-	const { t, mentions = [], hg = [], ej = [], mk = [] } = content || {};
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
+	const markdownBlackParts: React.ReactNode[] = [];
 
 	const elements = [
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
 		...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
 		...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
-		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || [])
+		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || []),
+		...(lk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS, type: EBacktickType.LINK })) || [])
 	].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 	const store = elements?.length > 0 ? getStore() : null;
@@ -308,9 +311,9 @@ export const RenderTextMarkdownContent = ({
 			case ETokenMessage.EMOJIS: {
 				const srcEmoji = getSrcEmoji(element.emojiid);
 				textParts.push(
-					<Image
+					<ImageNative
 						key={`emoji-${index}`}
-						source={{ uri: srcEmoji }}
+						url={srcEmoji}
 						style={isOnlyContainEmoji ? markdownStyles(themeValue).onlyIconEmojiInMessage : markdownStyles(themeValue).iconEmojiInMessage}
 						resizeMode={'contain'}
 					/>
@@ -380,8 +383,15 @@ export const RenderTextMarkdownContent = ({
 					textParts.push(
 						<Text
 							key={`hashtag-${index}`}
-							style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag : {}]}
+							style={[
+								themeValue && payloadChannel?.channel_id === 'undefined'
+									? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).privateChannel
+									: themeValue && !!payloadChannel?.channel_id
+										? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag
+										: {}
+							]}
 							onPress={() => {
+								if (!payloadChannel?.channel_id) return;
 								onChannelMention?.(payloadChannel);
 							}}
 						>
@@ -392,8 +402,10 @@ export const RenderTextMarkdownContent = ({
 								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />
+							) : payloadChannel?.channel_id === 'undefined' ? (
+								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: 10 }} />
 							) : null}
-							{text}
+							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
 				} else {
@@ -404,16 +416,20 @@ export const RenderTextMarkdownContent = ({
 
 			case ETokenMessage.MARKDOWNS: {
 				switch (element.type) {
+					case EBacktickType.SINGLE:
 					case EBacktickType.CODE:
 						textParts.push(
 							<Text key={`code-${index}`} style={themeValue ? markdownStyles(themeValue).code_inline : {}}>
-								{contentInElement}
+								{' '}
+								{contentInElement?.startsWith('`') && contentInElement?.endsWith('`')
+									? contentInElement?.slice(1, -1)
+									: contentInElement}{' '}
 							</Text>
 						);
 						break;
 
 					case EBacktickType.PRE:
-						textParts.push(
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
 							</View>
@@ -421,7 +437,7 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.TRIPLE:
-						textParts.push(
+						markdownBlackParts.push(
 							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
 								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
 									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
@@ -470,7 +486,7 @@ export const RenderTextMarkdownContent = ({
 						if (isYouTubeLink(contentInElement)) {
 							const videoUrl = getYouTubeEmbedUrl(contentInElement);
 							const widthScreen = Dimensions.get('screen').width;
-							textParts.push(
+							markdownBlackParts.push(
 								<View key={`youtube-${index}`} style={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}>
 									<Text
 										style={[themeValue ? markdownStyles(themeValue).link : {}]}
@@ -483,6 +499,7 @@ export const RenderTextMarkdownContent = ({
 										<View style={themeValue ? markdownStyles(themeValue).borderLeftView : {}} />
 										<View style={themeValue ? markdownStyles(themeValue).viewYoutube : {}}>
 											<WebView
+												originWhitelist={['*']}
 												source={{ uri: videoUrl }}
 												allowsFullscreenVideo={true}
 												javaScriptEnabled={true}
@@ -558,6 +575,7 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 			<Text>{textParts}</Text>
+			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 		</View>
 	);
 };

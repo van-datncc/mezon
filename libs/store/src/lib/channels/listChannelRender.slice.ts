@@ -344,6 +344,22 @@ export const listChannelRenderSlice = createSlice({
 			});
 
 			state.listChannelRender[clanId] = [...listChannelFavor, ...listChannelRender];
+		},
+		setActiveThread: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { channelId, clanId } = action.payload;
+
+			if (state.listChannelRender[clanId]) {
+				const updateIndex = state.listChannelRender[clanId]?.findIndex((channel) => channel.id === channelId);
+				if (updateIndex === -1) {
+					return;
+				}
+				const activeThread: IChannel = {
+					...state.listChannelRender[clanId][updateIndex],
+					active: 1
+				};
+				state.listChannelRender[clanId]?.splice(updateIndex, 1, activeThread);
+				state.listChannelRender[clanId].join();
+			}
 		}
 	}
 });

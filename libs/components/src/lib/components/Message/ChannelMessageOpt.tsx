@@ -220,7 +220,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+					`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 					response.channel_id,
 					channelMode,
 					TypeMessage.SendToken
@@ -263,7 +263,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	}, [isFocusTopicBox, channel]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId !== message.sender_id && message.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
+		builder.when(userId !== message?.sender_id && message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
 			builder.addMenuItem('giveacoffee', 'Give a coffee', handleItemClick, <Icons.DollarIcon defaultSize="w-5 h-5" />);
 		});
 	});
@@ -524,6 +524,11 @@ function useOptionMenuBuilder(handleContextMenu: any) {
 	);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.addMenuItem('option', 'option', useHandleClickOption, <Icons.ThreeDot />);
+		builder.addMenuItem(
+			'option',
+			'option',
+			useHandleClickOption,
+			<Icons.ThreeDot defaultSize={'w-5 h-5 dark:hover:text-white hover:text-black'} />
+		);
 	});
 }

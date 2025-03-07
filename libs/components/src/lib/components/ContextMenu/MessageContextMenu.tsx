@@ -498,7 +498,7 @@ function MessageContextMenu({
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
-					`Tokens sent: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+					`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 					response.channel_id,
 					channelMode,
 					TypeMessage.SendToken
@@ -520,7 +520,7 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos && message.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
+		builder.when(checkPos && message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
 			builder.addMenuItem(
 				'giveAcoffee', // id
 				'Give A Coffee', // label

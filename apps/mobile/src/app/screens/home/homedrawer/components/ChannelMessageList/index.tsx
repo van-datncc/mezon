@@ -54,7 +54,7 @@ const ChannelListMessage = React.memo(
 				initialNumToRender={10}
 				maxToRenderPerBatch={10}
 				windowSize={10}
-				onEndReachedThreshold={0.5}
+				onEndReachedThreshold={0.7}
 				maintainVisibleContentPosition={{
 					minIndexForVisible: 0,
 					autoscrollToTopThreshold: 10
@@ -89,10 +89,13 @@ const ChannelListMessage = React.memo(
 				ListHeaderComponent={isLoadMoreBottom && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				ListFooterComponent={isLoadMoreTop && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				onScrollToIndexFailed={(info) => {
-					const wait = new Promise((resolve) => setTimeout(resolve, 300));
-					wait.then(() => {
-						flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
-					});
+					const wait = new Promise((resolve) => setTimeout(resolve, 200));
+					if (info.highestMeasuredFrameIndex < info.index) {
+						flatListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: true });
+						wait.then(() => {
+							flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+						});
+					}
 				}}
 				disableVirtualization
 			/>

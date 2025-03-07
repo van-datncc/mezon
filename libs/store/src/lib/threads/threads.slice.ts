@@ -34,7 +34,8 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	isThreadModalVisible?: boolean;
 	isFocusThreadBox?: boolean;
 	loadingStatusSearchedThread?: LoadingStatus;
-	threadSearchedResult?: ThreadsEntity[] | null;
+	threadSearchedResult?: Record<string, ThreadsEntity[] | null>;
+	inputSearchThread?: Record<string, string>;
 }
 
 export const threadsAdapter = createEntityAdapter({
@@ -148,10 +149,11 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 
 export interface SearchThreadsArgs {
 	label: string;
+	channelId: string;
 }
-export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label }: SearchThreadsArgs, thunkAPI) => {
+export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label, channelId }: SearchThreadsArgs, thunkAPI) => {
 	try {
-		if (!label || label.length < 3) {
+		if (!label?.trim() || label.trim().length < 3) {
 			return null;
 		}
 
@@ -161,7 +163,7 @@ export const searchedThreads = createAsyncThunk('threads/searchThreads', async (
 		const channelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
 
 		if (clanId && clanId !== '0' && channelId) {
-			const response = await mezon.client.searchThread(mezon.session, clanId, channelId, label);
+			const response = await mezon.client.searchThread(mezon.session, clanId, channelId, label?.trim());
 			if (!response.channeldesc) {
 				return [];
 			}
@@ -203,7 +205,8 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false,
 	isThreadModalVisible: false,
 	loadingStatusSearchedThread: 'not loaded',
-	threadSearchedResult: null
+	threadSearchedResult: {},
+	inputSearchThread: {}
 });
 
 export const checkDuplicateThread = createAsyncThunk(
@@ -253,6 +256,9 @@ export const threadsSlice = createSlice({
 		},
 		toggleThreadModal: (state: ThreadsState) => {
 			state.isThreadModalVisible = !state.isThreadModalVisible;
+		},
+		hideThreadModal: (state: ThreadsState) => {
+			state.isThreadModalVisible = false;
 		},
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
@@ -324,6 +330,14 @@ export const threadsSlice = createSlice({
 		},
 		setFocusThreadBox(state, action: PayloadAction<boolean>) {
 			state.isFocusThreadBox = action.payload;
+		},
+
+		setThreadInputSearch(state, action) {
+			const { channelId, value } = action.payload;
+			if (!state.inputSearchThread) {
+				state.inputSearchThread = {};
+			}
+			state.inputSearchThread[channelId] = value;
 		}
 	},
 	extraReducers: (builder) => {
@@ -332,7 +346,7 @@ export const threadsSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
-				threadsAdapter.setAll(state, action.payload);
+				threadsAdapter.addMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
@@ -364,7 +378,13 @@ export const threadsSlice = createSlice({
 				state.loadingStatusSearchedThread = 'loading';
 			})
 			.addCase(searchedThreads.fulfilled, (state: ThreadsState, action) => {
-				state.threadSearchedResult = action.payload;
+				const { channelId } = action.meta.arg;
+				if (channelId) {
+					state.threadSearchedResult = {
+						...state.threadSearchedResult,
+						[channelId]: action.payload || null
+					};
+				}
 				state.loadingStatusSearchedThread = 'loaded';
 			})
 			.addCase(searchedThreads.rejected, (state: ThreadsState, action) => {
@@ -505,4 +525,17 @@ export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (s
 
 export const selectSearchedThreadLoadingStatus = createSelector(getThreadsState, (state) => state.loadingStatusSearchedThread);
 
-export const selectSearchedThreadResult = createSelector(getThreadsState, (state) => state.threadSearchedResult);
+export const selectSearchedThreadResult = createSelector(
+	[(state: { threads: ThreadsState }) => state.threads.threadSearchedResult, (_: any, channelId: string) => channelId],
+	(threadSearchedResult, channelId) => threadSearchedResult?.[channelId] || null
+);
+
+export const selectThreadInputSearchByChannelId = createSelector(
+	[(state: { threads: ThreadsState }) => state.threads.inputSearchThread, (_: any, channelId: string) => channelId],
+	(inputSearchThread, channelId) => inputSearchThread?.[channelId] || ''
+);
+
+export const selectThreadsByParentChannelId = createSelector(
+	[selectAllThreads, (_: any, parentChannelId: string) => parentChannelId],
+	(allThreads, parentChannelId) => allThreads.filter((thread) => thread?.parent_id === parentChannelId)
+);

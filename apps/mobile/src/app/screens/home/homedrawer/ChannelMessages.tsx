@@ -65,7 +65,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		selectIsViewingOlderMessagesByChannelId(state, topicChannelId ? (topicChannelId ?? '') : (channelId ?? ''))
 	);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const isMessageExist = useAppSelector((state) => selectIsMessageIdExist(state, channelId, idMessageToJump?.id));
 	const isLoadingJumpMessage = useSelector(selectIsLoadingJumpMessage);
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
@@ -94,29 +93,40 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	}, [channelId]);
 
 	useEffect(() => {
-		if (idMessageToJump?.id && isMessageExist && !isLoadingJumpMessage) {
-			const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump?.id);
-			if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
-				flatListRef?.current?.scrollToIndex?.({
-					animated: true,
-					index: indexToJump,
-					viewPosition: 0.5
-				});
+		let timeout;
+		let retryCount = 0;
+		const maxRetries = 3;
 
-				setTimeout(() => {
-					dispatch(messagesActions.setIdMessageToJump(null));
+		const checkMessageExistence = () => {
+			const store = getStore();
+			const isMessageExist = selectIsMessageIdExist(store.getState() as any, channelId, idMessageToJump?.id);
+			if (isMessageExist) {
+				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump?.id);
+				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
 					flatListRef?.current?.scrollToIndex?.({
 						animated: true,
 						index: indexToJump,
 						viewPosition: 0.5
 					});
-				}, 100);
-
-				DeviceEventEmitter.emit(ActionEmitEvent.MESSAGE_ID_TO_JUMP, idMessageToJump?.id);
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
+					clearTimeout(timeout);
+					setTimeout(() => {
+						dispatch(messagesActions.setIdMessageToJump(null));
+					}, 3000);
+				}
+			} else if (retryCount < maxRetries) {
+				retryCount++;
+				timeout = setTimeout(checkMessageExistence, 1000);
 			}
+		};
+
+		if (idMessageToJump?.id && !isLoadingJumpMessage) {
+			timeout = setTimeout(checkMessageExistence, 0);
 		}
-	}, [dispatch, idMessageToJump?.id, isLoadingJumpMessage, isMessageExist, messages]);
+
+		return () => {
+			timeout && clearTimeout(timeout);
+		};
+	}, [channelId, dispatch, idMessageToJump?.id, isLoadingJumpMessage, messages]);
 
 	const scrollChannelMessageToIndex = useCallback(
 		(index: number) => {
@@ -184,10 +194,18 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		({ item, index }) => {
 			const previousMessage = messages?.[index + 1];
 			return (
-				<MessageItem userId={userId} message={item} previousMessage={previousMessage} messageId={item.id} mode={mode} channelId={channelId} />
+				<MessageItem
+					userId={userId}
+					message={item}
+					previousMessage={previousMessage}
+					messageId={item.id}
+					mode={mode}
+					channelId={channelId}
+					isHighlight={idMessageToJump?.id?.toString() === item?.id?.toString()}
+				/>
 			);
 		},
-		[messages, userId, mode, channelId]
+		[messages, userId, mode, channelId, idMessageToJump?.id]
 	);
 
 	const handleJumpToPresent = useCallback(async () => {

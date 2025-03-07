@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('../../../libs/assets/src/assets/font/nato-san-gg.css');
 @import 'tippy.js/dist/tippy.css';
+@import 'quill/dist/quill.snow.css';
 
 @font-face {
 	font-family: 'gg sans';
@@ -67,6 +67,26 @@
 	font-weight: normal;
 	src: url('./assets//fonts/Inter-Regular.woff2') format('woff2');
 	font-display: swap;
+}
+
+.contain-layout {
+	contain: layout;
+}
+
+.contain-paint {
+	contain: paint;
+}
+
+.contain-size {
+	contain: size;
+}
+
+.contain-content {
+	contain: content;
+}
+
+.contain-strict {
+	contain: strict;
 }
 
 /* You can add global styles to this file, and also import other style files */
@@ -361,34 +381,8 @@ input:-webkit-autofill:active {
 }
 
 #scrollLoading {
-	width: 100%;
 	overflow-y: scroll;
 	overflow-x: hidden;
-
-	scrollbar-width: thin;
-	scrollbar-color: transparent transparent;
-	transition: scrollbar-color 0.3s ease;
-
-	-webkit-overflow-scrolling: touch;
-	// Fix scroll lock on iOS
-	pointer-events: auto;
-
-	&::-webkit-scrollbar-thumb {
-		background-color: transparent;
-		border-radius: 0.375rem;
-		// `box-shadow` prevents repaint on macOS when hovering out of scrollable container
-		box-shadow: 0 0 1px rgba(255, 255, 255, 0.01);
-	}
-
-	&:hover,
-	&:focus,
-	&:focus-within {
-		scrollbar-color: var(--color-scrollbar) transparent;
-
-		&::-webkit-scrollbar-thumb {
-			background-color: var(--color-scrollbar);
-		}
-	}
 }
 
 // css mainChat
@@ -404,6 +398,9 @@ input:-webkit-autofill:active {
 	align-items: center;
 	justify-content: flex-end;
 	height: 100%;
+	contain: content;
+	content-visibility: auto;
+	contain-intrinsic-size: auto 500px;
 	.force-messages-scroll & {
 		margin-top: 100vh !important;
 	}
@@ -648,31 +645,6 @@ input:-webkit-autofill:active {
 .thread-scroll {
 	overflow-y: scroll;
 	overflow-x: hidden;
-
-	scrollbar-width: thin;
-	scrollbar-color: transparent transparent;
-	transition: scrollbar-color 0.3s ease;
-
-	-webkit-overflow-scrolling: touch;
-	// Fix scroll lock on iOS
-	pointer-events: auto;
-
-	&::-webkit-scrollbar-thumb {
-		background-color: transparent;
-		border-radius: 0.375rem;
-		// `box-shadow` prevents repaint on macOS when hovering out of scrollable container
-		box-shadow: 0 0 1px rgba(255, 255, 255, 0.01);
-	}
-
-	&:hover,
-	&:focus,
-	&:focus-within {
-		scrollbar-color: var(--color-scrollbar) transparent;
-
-		&::-webkit-scrollbar-thumb {
-			background-color: var(--color-scrollbar);
-		}
-	}
 }
 
 // editor-scroll
@@ -979,9 +951,9 @@ input:-webkit-autofill:active {
 	}
 }
 
-.custom-member-list {
-	-ms-overflow-style: none;
-}
+// .custom-member-list {
+// 	-ms-overflow-style: none;
+// }
 
 .error-boundary {
 	overflow: hidden;
@@ -1226,6 +1198,6 @@ input:-webkit-autofill:active {
 	padding: 0;
 }
 
-.rc-tooltip-placement-top{
+.rc-tooltip-placement-top {
 	padding-bottom: 4.5px;
 }
