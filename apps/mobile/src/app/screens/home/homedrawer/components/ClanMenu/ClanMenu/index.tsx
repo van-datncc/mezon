@@ -200,11 +200,11 @@ export default function ClanMenu() {
 				<ClanMenuInfo clan={currentClan} />
 
 				<ScrollView contentContainerStyle={styles.actionWrapper} horizontal>
-					<MezonButtonIcon
-						title={`18 ${t('actions.boot')}`}
-						icon={<Icons.BoostTier2Icon color={baseColor.purple} />}
-						onPress={() => reserve()}
-					/>
+					{/*<MezonButtonIcon*/}
+					{/*	title={`18 ${t('actions.boot')}`}*/}
+					{/*	icon={<Icons.BoostTier2Icon color={baseColor.purple} />}*/}
+					{/*	onPress={() => reserve()}*/}
+					{/*/>*/}
 					<MezonButtonIcon
 						title={t('actions.invite')}
 						icon={<Icons.GroupPlusIcon color={themeValue.textStrong} />}

@@ -121,7 +121,6 @@ export default function TopicDiscussion() {
 							clanId={currentClanId}
 							isPublic={isPublicChannel(currentChannel)}
 							mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-							isDisableActionListener={true}
 							topicChannelId={currentChannel?.channel_id}
 						/>
 					</View>
