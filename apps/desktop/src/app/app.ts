@@ -67,10 +67,10 @@ export default class App {
 		}
 
 		autoUpdater.checkForUpdates();
-		const sixHoursInMilliseconds = 6 * 60 * 60 * 1000;
+		const updateCheckTimeInMilliseconds = 60 * 60 * 1000;
 		setInterval(() => {
 			autoUpdater.checkForUpdates();
-		}, sixHoursInMilliseconds);
+		}, updateCheckTimeInMilliseconds);
 	}
 
 	private static onActivate() {
