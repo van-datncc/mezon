@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-export const useOnScreen = ({ root = null, rootMargin = '0px', threshold = 0 } = {}) => {
+export const useOnScreen = ({ root = null as HTMLElement | null, rootMargin = '0px', threshold = 0 } = {}) => {
 	const [observer, setObserver] = useState<IntersectionObserver | null>(null);
 	const [isIntersecting, setIntersecting] = useState(false);
 
