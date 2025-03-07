@@ -1,9 +1,8 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { selectDmGroupCurrentId, selectHiddenBottomTabMobile } from '@mezon/store';
 import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useNavigation, useNavigationState } from '@react-navigation/native';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, BackHandler, DeviceEventEmitter, View } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { Alert, BackHandler, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 
