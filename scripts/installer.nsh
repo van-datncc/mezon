@@ -68,9 +68,12 @@ Var pid
 !macroend
 
 !macro customInstall
-  SetDetailsPrint textonly
-  DetailPrint `Setting autostart in shell:startup...`
-  CreateShortCut "$SMSTARTUP\mezon.lnk" "$INSTDIR\mezon.exe"
-  Sleep 2000
-  SetDetailsPrint none
+  MessageBox MB_YESNO "Start Mezon on startup?" IDYES true
+  true:
+    SetDetailsPrint textonly
+    DetailPrint `Setting autostart in shell:startup...`
+    CreateShortCut "$SMSTARTUP\mezon.lnk" "$INSTDIR\mezon.exe"
+    Sleep 2000
+    SetDetailsPrint none
+
 !macroend
