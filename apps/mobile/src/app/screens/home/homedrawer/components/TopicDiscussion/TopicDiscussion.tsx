@@ -131,7 +131,7 @@ export default function TopicDiscussion() {
 					mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 					onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					hiddenIcon={{
-						threadIcon: currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD
+						threadIcon: currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD
 					}}
 					isPublic={isPublicChannel(currentChannel)}
 				/>
