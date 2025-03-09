@@ -80,7 +80,7 @@ const FriendsPage = () => {
 
 	const handleAddFriend = async () => {
 		const checkIsAlreadyFriend = (username: string) => {
-			return friends.some((user) => user.user?.username === username);
+			return friends.some((user) => user?.user?.username === username);
 		};
 		if (requestAddFriend?.usernames?.length && checkIsAlreadyFriend(requestAddFriend.usernames[0])) {
 			setIsAlreadyFriend(true);
