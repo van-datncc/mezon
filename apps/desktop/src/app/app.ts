@@ -200,7 +200,7 @@ export default class App {
 
 		App.application.on('before-quit', async () => {
 			try {
-        autoUpdater.checkForUpdates();
+				autoUpdater.checkForUpdates();
 			} catch (error) {
 				console.error('Update check failed:', error);
 			}
@@ -380,15 +380,15 @@ export default class App {
 					{ role: 'paste' },
 					...(isMac
 						? ([
-								{ role: 'pasteAndMatchStyle' },
-								{ role: 'delete' },
-								{ role: 'selectAll' },
-								{ type: 'separator' },
-								{
-									label: 'Speech',
-									submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
-								}
-							] as MenuItemConstructorOptions[])
+							{ role: 'pasteAndMatchStyle' },
+							{ role: 'delete' },
+							{ role: 'selectAll' },
+							{ type: 'separator' },
+							{
+								label: 'Speech',
+								submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+							}
+						] as MenuItemConstructorOptions[])
 						: ([{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }] as MenuItemConstructorOptions[]))
 				]
 			},
