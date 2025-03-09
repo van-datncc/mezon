@@ -5,6 +5,7 @@ import { join } from 'path';
 import { format } from 'url';
 import { rendererAppName, rendererAppPort } from './constants';
 
+import ua from 'universal-analytics';
 import tray from '../Tray';
 import { EActivityCoding, EActivityGaming, EActivityMusic } from './activities';
 import setupAutoUpdates from './autoUpdates';
@@ -71,6 +72,9 @@ export default class App {
 		setInterval(() => {
 			autoUpdater.checkForUpdates();
 		}, updateCheckTimeInMilliseconds);
+
+		const visitor = ua('G-9SD8R7Z8TJ');
+		visitor.screenview('Home Screen', 'Mezon Name').send();
 	}
 
 	private static onActivate() {
