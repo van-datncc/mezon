@@ -200,12 +200,7 @@ export default class App {
 
 		App.application.on('before-quit', async () => {
 			try {
-				const updateCheckResult = await autoUpdater.checkForUpdates();
-				//if (updateCheckResult?.downloadPromise) {
-				//	await updateCheckResult.downloadPromise;
-				//	forceQuit.enable();
-				//	return autoUpdater.quitAndInstall();
-				//}
+        autoUpdater.checkForUpdates();
 			} catch (error) {
 				console.error('Update check failed:', error);
 			}
