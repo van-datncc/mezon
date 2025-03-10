@@ -207,8 +207,12 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 								<Tooltip
 									key={+focusTrack}
 									placement="bottomRight"
-									overlay={<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">{focusTrack ? 'Grid' : 'Focus'}</span>}
-									overlayClassName="whitespace-nowrap z-50 !p-0 !pt-3"
+									align={{
+										offset: [11, 4]
+									}}
+									overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">{focusTrack ? 'Grid' : 'Focus'}</span>}
+									overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
+									overlayClassName="whitespace-nowrap z-50 !p-0"
 									getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
 								>
 									<span onClick={toggleViewMode} className="cursor-pointer">
