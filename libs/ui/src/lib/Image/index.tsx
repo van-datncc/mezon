@@ -1,26 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Img, ImgProps } from 'react-image';
-
-export type ImageProps = ImgProps & {
+export type ImageProps = {
 	src: string;
-	alt: string;
+	alt?: string;
 	width?: number;
 	height?: number;
 	placeholder?: string;
 	blurdataurl?: string;
+	loading?: 'lazy' | 'eager';
+	onClick?: () => void;
+	className?: string;
+	draggable?: 'true' | 'false';
 };
 
-function Image({ loading = 'lazy', ...rest }: ImageProps) {
-	const [isMounted, setIsMounted] = useState(false);
-
-	useEffect(() => {
-		setIsMounted(true);
-		return () => setIsMounted(false);
-	}, []);
-
-	if (!isMounted) return null;
-
-	return <Img {...rest} loading={loading} />;
+function Image({ loading = 'lazy', src, alt = src, className, draggable, ...rest }: ImageProps) {
+	return <img {...rest} src={src} alt={alt} loading={loading} className={className} draggable={draggable} />;
 }
 
 export default Image;
