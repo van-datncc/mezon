@@ -11,12 +11,13 @@ import {
 	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
-	selectLastMessageByChannelId,
+	selectLatestMessageId,
 	selectMemberClanByUserId2,
+	selectMessageByMessageId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { SubPanelName, createImgproxyUrl } from '@mezon/utils';
+import { IMessageWithUser, SubPanelName, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -30,7 +31,8 @@ import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const lastSentMessageId = useAppSelector((state) => selectLatestMessageId(state, channelId));
+	const lastMessage = useAppSelector((state) => selectMessageByMessageId(state, channelId, lastSentMessageId)) || ({} as IMessageWithUser);
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
@@ -102,13 +104,9 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 		return currentDmGroup?.channel_avatar?.[0];
 	}, [currentDmGroup?.channel_avatar?.[0]]);
 
-	const firstUserId = useMemo(() => {
-		return currentDmGroup?.user_id?.[0];
-	}, [currentDmGroup?.user_id?.[0]]);
+	const userStatus = useMemberStatus(isModeDM ? currentDmGroup?.user_id?.[0] : '');
 
-	const userStatus = useMemberStatus(isModeDM ? firstUserId : '');
-
-	const user = useSelector((state) => selectMemberClanByUserId2(state, firstUserId));
+	const user = useSelector((state) => selectMemberClanByUserId2(state, currentDmGroup?.user_id?.[0]));
 	const status = getUserStatusByMetadata(user?.user?.metadata);
 
 	const navigateToThreadDetail = () => {

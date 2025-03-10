@@ -53,7 +53,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
-	}, [currentAlbums]);
+	}, []);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
@@ -184,11 +184,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		try {
 			const res = await CameraRoll.getPhotos({
 				first: 30,
-				assetType: 'All',
+				assetType: album === 'All Videos' ? 'Videos' : 'All',
 				...(!!pageInfo && !!after && { after: after }),
 				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
 				groupTypes: album === 'All' ? 'All' : 'Album',
-				groupName: album === 'All' ? null : album
+				groupName: album === 'All' || album === 'All Videos' ? null : album
 			});
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
@@ -201,6 +201,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SELECT_ALBUM, (value) => {
+			loadPhotos(value);
 			setCurrentAlbums(value);
 		});
 		return () => {
