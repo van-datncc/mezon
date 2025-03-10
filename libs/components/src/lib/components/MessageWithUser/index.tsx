@@ -13,7 +13,7 @@ import {
 import classNames from 'classnames';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
-import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
@@ -153,15 +153,9 @@ function MessageWithUser({
 		[mode]
 	);
 
-	const isDM = useMemo(() => {
-		return mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
-	}, [mode]);
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 
-	const avatar = useMemo(() => {
-		if (shortUserId.current === message?.sender_id) {
-			return isDM ? message?.avatar : message?.clan_avatar || message?.avatar;
-		}
-	}, [isDM, shortUserId.current, message?.avatar, message?.clan_avatar, message?.sender_id]);
+	const avatar = isDM ? message?.avatar : message?.clan_avatar || message?.avatar;
 
 	const [isAnonymousOnModal, setIsAnonymousOnModal] = useState<boolean>(false);
 
@@ -234,7 +228,7 @@ function MessageWithUser({
 							/>
 						)}
 						<div
-							className={`pl-12 justify-start inline-flex flex-wrap w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
+							className={`pl-[60px] justify-start inline-flex flex-wrap w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 						>
 							{isMessageSystem ? (
 								<>
@@ -293,10 +287,13 @@ function MessageWithUser({
 								<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 							)}
 
-							{Array.isArray(message?.content?.embed) &&
-								message?.content?.embed?.map((embed, index) => (
-									<EmbedMessage key={index} embed={embed} senderId={message?.sender_id} message_id={message?.id} />
-								))}
+							{Array.isArray(message?.content?.embed) && (
+								<div className="w-full">
+									{message?.content?.embed?.map((embed, index) => (
+										<EmbedMessage key={index} embed={embed} senderId={message?.sender_id} message_id={message?.id} />
+									))}
+								</div>
+							)}
 
 							{!!message?.content?.callLog?.callLogType && (
 								<CallLogMessage
@@ -314,14 +311,13 @@ function MessageWithUser({
 
 							{message?.content?.components &&
 								message?.content.components.map((actionRow, index) => (
-									<div className={'flex flex-col'} key={index}>
+									<div className={'flex flex-col w-full'} key={index}>
 										<MessageActionsPanel actionRow={actionRow} messageId={message?.id} senderId={message?.sender_id} />
 									</div>
 								))}
 						</div>
 					</div>
-					{/* fix later */}
-					{(message.reactions?.length as any) > 0 && <MessageReaction message={message} mode={mode} />}
+					<MessageReaction message={message} mode={mode} />
 				</HoverStateWrapper>
 			)}
 		</>
@@ -370,7 +366,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	// className="message-list-item" id={'msg-' + messageId}
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
+			className={`mb-1 message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}

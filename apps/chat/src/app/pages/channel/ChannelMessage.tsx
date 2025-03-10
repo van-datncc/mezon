@@ -54,8 +54,6 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	isTopic = false,
 	canSendMessage
 }: Readonly<MessageProps>) => {
-	console.log('openEditMessageState');
-
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
@@ -145,7 +143,7 @@ export const MemorizedChannelMessage = memo(
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
 		// prev.message.content === curr.message.content &&
-		prev.previousMessage === curr.previousMessage
+		prev.previousMessage?.id === curr.previousMessage?.id
 );
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

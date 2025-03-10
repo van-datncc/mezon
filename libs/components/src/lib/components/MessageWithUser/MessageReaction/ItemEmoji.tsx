@@ -1,5 +1,5 @@
-import { useAuth, useChatReaction } from '@mezon/core';
-import { selectClickedOnTopicStatus, selectCurrentChannel } from '@mezon/store';
+import { useChatReaction } from '@mezon/core';
+import { selectAllAccount, selectClickedOnTopicStatus, selectCurrentChannel } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import Tooltip from 'rc-tooltip';
 import { memo } from 'react';
@@ -13,11 +13,11 @@ type EmojiItemProps = {
 };
 
 function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
-	const userId = useAuth();
+	const userId = useSelector(selectAllAccount)?.user?.id as string;
 	const { reactionMessageDispatch } = useChatReaction();
 	const getUrlItem = getSrcEmoji(emoji.emojiId || '');
 	const count = calculateTotalCount(emoji.senders);
-	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
+	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId)?.count;
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 
@@ -51,8 +51,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			<div
 				style={{ height: 24 }}
 				className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row noselect
-          cursor-pointer justify-center items-center relative
-          ${userSenderCount || 0 > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
+          cursor-pointer justify-center items-center relative pl-7 text-sm font-medium dark:text-white text-black
+          ${Number(userSenderCount) > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
 				onClick={() =>
 					reactOnExistEmoji(
 						emoji.emojiId ?? '',
@@ -61,12 +61,12 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 						emoji.emojiId ?? '',
 						emoji.emoji ?? '',
 						1,
-						userId.userId ?? '',
+						userId ?? '',
 						false
 					)
 				}
 			>
-				<img src={getUrlItem} className="absolute left-[5px] w-4 h-4 object-scale-down" alt="Item Icon" />
+				<img src={getUrlItem} className="absolute left-[5px] w-4 h-4 object-scale-down" alt="" />
 				{formatCount(count)}
 			</div>
 		</Tooltip>
@@ -74,13 +74,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 }
 
 export default memo(ItemEmoji);
-
-type ItemDetailProps = {
-	userSenderCount: number;
-	onClickReactExist: () => void;
-	getUrlItem: string;
-	totalCount: number;
-};
 
 const formatCount = (count: number) => {
 	if (count < 1000) {
