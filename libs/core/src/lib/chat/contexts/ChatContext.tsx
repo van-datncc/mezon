@@ -127,6 +127,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	UnmuteEvent,
+	UnpinMessageEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -538,6 +539,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		if (pin.operation === 1) {
 			dispatch(pinMessageActions.clearPinMessagesCacheThunk(pin.channel_id));
 		}
+	}, []);
+
+	const onUnpinMessageEvent = useCallback((unpin_message_event: UnpinMessageEvent) => {
+		if (!unpin_message_event?.channel_id) return;
+		dispatch(
+			pinMessageActions.deleteChannelPinMessage({
+				channel_id: unpin_message_event.channel_id || '',
+				message_id: unpin_message_event.message_id
+			})
+		);
+		dispatch(pinMessageActions.clearPinMessagesCacheThunk(unpin_message_event.channel_id));
 	}, []);
 
 	const oneventnotiuserchannel = useCallback(
@@ -1703,6 +1715,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
 
 			socket.onsdtopicevent = onsdtopicevent;
+
+			socket.onUnpinMessageEvent = onUnpinMessageEvent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1751,7 +1765,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onwebrtcsignalingfwd,
 			onclanupdated,
 			onJoinChannelAppEvent,
-			onsdtopicevent
+			onsdtopicevent,
+			onUnpinMessageEvent
 		]
 	);
 
@@ -1859,6 +1874,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onJoinChannelAppEvent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onsdtopicevent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onUnpinMessageEvent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1907,7 +1924,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oneventwebhook,
 		ontokensent,
 		onJoinChannelAppEvent,
-		onsdtopicevent
+		onsdtopicevent,
+		onUnpinMessageEvent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(
