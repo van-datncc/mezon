@@ -5,7 +5,7 @@ import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../componentUI';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../componentUI/MezonMenu';
 import useBackHardWare from '../../hooks/useBackHardWare';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { LogoClanSelector } from './LogoClanSelector';

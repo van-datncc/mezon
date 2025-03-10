@@ -17,7 +17,7 @@ import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MezonAvatar } from '../../../componentUI';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './styles';
 
 interface IWelcomeMessage {
