@@ -11,7 +11,8 @@ import { DeviceEventEmitter, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, reserve } from '../../../../../componentUI';
+import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
 import { style } from './styles';
 
 interface ICategoryMenuProps {

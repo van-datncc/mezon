@@ -109,7 +109,8 @@ const ChannelList = () => {
 					maxToRenderPerBatch={10}
 					updateCellsBatchingPeriod={50}
 					decelerationRate={'fast'}
-					disableVirtualization={true}
+					disableVirtualization={false}
+					onEndReachedThreshold={120}
 					initialNumToRender={20}
 					windowSize={10}
 					onScrollToIndexFailed={(info) => {

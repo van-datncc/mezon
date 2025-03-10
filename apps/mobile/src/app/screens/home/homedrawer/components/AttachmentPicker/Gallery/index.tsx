@@ -22,7 +22,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import { Camera } from 'react-native-vision-camera';
-import { IFile } from '../../../../../../componentUI';
+import { IFile } from '../../../../../../componentUI/MezonImagePicker';
 import { style } from './styles';
 export const { height } = Dimensions.get('window');
 interface IProps {

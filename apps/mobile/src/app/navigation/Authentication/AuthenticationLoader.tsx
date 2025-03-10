@@ -33,7 +33,7 @@ import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
-import { MezonConfirm } from '../../componentUI';
+import MezonConfirm from '../../componentUI/MezonConfirm';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';

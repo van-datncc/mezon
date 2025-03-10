@@ -4,9 +4,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
 import { AlbumPanel } from './AlbumPannel';
-import { IModeKeyboardPicker } from './components';
 import AttachmentPicker from './components/AttachmentPicker';
-import BottomKeyboardPicker from './components/BottomKeyboardPicker';
+import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { IMessageActionNeedToResolve } from './types';
 

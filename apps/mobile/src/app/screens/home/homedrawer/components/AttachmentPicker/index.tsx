@@ -9,9 +9,9 @@ import { Alert, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, V
 import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import { IFile } from '../../../../../componentUI';
 import Gallery from './Gallery';
 import { style } from './styles';
+import { IFile } from "../../../../../componentUI/MezonImagePicker";
 export type AttachmentPickerProps = {
 	mode?: number;
 	currentChannelId?: string;
