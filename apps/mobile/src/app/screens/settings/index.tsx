@@ -14,7 +14,8 @@ import { authActions, channelsActions, clansActions, getStoreAsync, messagesActi
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSearch, reserve } from '../../componentUI';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../componentUI/MezonMenu';
+import MezonSearch from '../../componentUI/MezonSearch';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { style } from './styles';
 

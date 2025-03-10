@@ -422,7 +422,7 @@ export const selectMemberCustomStatusById = createSelector(
 		const userClan = usersClanState.entities[userId];
 		const userGroup = directs?.[currentDirectMessageId];
 
-		if (userId === myId) {
+		if (statusList?.[userId]) {
 			return statusList?.[userId] || false;
 		}
 		if (userClan && (isDM === 'false' || 'undefined')) {

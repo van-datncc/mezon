@@ -13,6 +13,7 @@ import {
 	getStoreAsync,
 	selectCategoryExpandStateByCategoryId,
 	selectIsUnreadChannelById,
+	selectIsUnreadThreadInChannel,
 	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
@@ -32,7 +33,6 @@ import UserListVoiceChannel from '../ChannelListUserVoice';
 interface IChannelListItemProps {
 	data: any;
 	isFirstThread?: boolean;
-	// parentIdList?: Set<string>;
 }
 
 export enum StatusVoiceChannel {
@@ -56,6 +56,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			props?.data?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
 		);
 	}, [props?.data?.type]);
+	const hasUnread = useAppSelector((state) => selectIsUnreadThreadInChannel(state, props?.data?.threadIds || []));
 
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation<any>();
@@ -153,7 +154,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		isUnRead ||
 		isChannelVoice ||
 		channelIdActive === props?.data?.channel_id ||
-		props?.data?.threadIds?.includes(channelIdActive);
+		props?.data?.threadIds?.includes(channelIdActive) ||
+		hasUnread;
 
 	if (!shouldDisplay) return null;
 	return (

@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, getStoreAsync, MessagesEntity, selectCurrentChannel, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
-import { EmbedMessage, MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -17,13 +16,16 @@ import { useTranslation } from 'react-i18next';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
+import { EmbedMessage } from './components/EmbedMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageCallLog } from './components/MessageCallLog';
 import { ContainerMessageActionModal } from './components/MessageItemBS/ContainerMessageActionModal';
+import { MessageAction } from './components/MessageReaction';
 import MessageSendTokenLog from './components/MessageSendTokenLog';
 import MessageTopic from './components/MessageTopic/MessageTopic';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
+import { RenderTextMarkdownContent } from './components/RenderTextMarkdown';
 import UserProfile from './components/UserProfile';
 import { MessageLineSystem } from './MessageLineSystem';
 import RenderMessageBlock from './RenderMessageBlock';
@@ -255,7 +257,10 @@ const MessageItem = React.memo(
 		});
 
 		return (
-			<Animated.View {...panResponder?.panHandlers} style={[{ backgroundColor: bgColor }, { transform: [{ translateX }] }]}>
+			<Animated.View
+				{...panResponder?.panHandlers}
+				style={[{ backgroundColor: bgColor, paddingBottom: size.s_2 }, { transform: [{ translateX }] }]}
+			>
 				<Pressable
 					android_ripple={{
 						color: themeValue.secondaryLight

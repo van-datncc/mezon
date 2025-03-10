@@ -3,7 +3,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import React, { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSwitch, reserve } from '../../../componentUI';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../componentUI/MezonMenu';
+import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { EActionDataNotify } from '../types';
 import { style } from './NotificationOption.styles';
 interface INotificationOptionProps {
