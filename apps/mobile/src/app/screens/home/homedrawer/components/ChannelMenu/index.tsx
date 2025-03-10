@@ -32,7 +32,9 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
+import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
+import MezonConfirm from '../../../../../componentUI/MezonConfirm';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
 import NotificationSetting from '../../../../../components/NotificationSetting';
 import { style } from './styles';
 

@@ -163,46 +163,45 @@ const MessageText = memo(
 			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
 			attachmentOnMessage[0].url === contentToMessage?.trim();
 		const showEditted = !message.hide_editted && !isSearchMessage;
-		const messageTime = convertTimeString(message?.create_time as string);
 		return (
 			// eslint-disable-next-line react/jsx-no-useless-fragment
 			<>
 				{lines?.length > 0 ? (
-					<div className="flex w-full">
-						<div className="w-full flex gap-4 max-2xl:flex-col max-2xl:gap-0">
-							{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
-								<MessageLineSystem
-									message={message}
-									isHideLinkOneImage={checkOneLinkImage}
-									isTokenClickAble={true}
-									isSearchMessage={isSearchMessage}
-									isJumMessageEnabled={false}
-									content={content}
-									mode={mode}
-								/>
-							) : (
-								<MessageLine
-									isEditted={showEditted}
-									isHideLinkOneImage={checkOneLinkImage}
-									isTokenClickAble={true}
-									isSearchMessage={isSearchMessage}
-									isOnlyContainEmoji={isOnlyContainEmoji}
-									isJumMessageEnabled={false}
-									content={content}
-									mode={mode}
-									code={message.code}
-									onCopy={onCopy}
-									messageId={message.message_id}
-								/>
-							)}
-							{(message.code === TypeMessage.Welcome ||
-								message.code === TypeMessage.CreateThread ||
-								message.code === TypeMessage.AuditLog ||
-								message.code === TypeMessage.CreatePin) && (
-								<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
-							)}
-						</div>
-					</div>
+					<>
+						{message.code === TypeMessage.CreatePin || message.code === TypeMessage.CreateThread ? (
+							<MessageLineSystem
+								message={message}
+								isHideLinkOneImage={checkOneLinkImage}
+								isTokenClickAble={true}
+								isSearchMessage={isSearchMessage}
+								isJumMessageEnabled={false}
+								content={content}
+								mode={mode}
+							/>
+						) : (
+							<MessageLine
+								isEditted={showEditted}
+								isHideLinkOneImage={checkOneLinkImage}
+								isTokenClickAble={true}
+								isSearchMessage={isSearchMessage}
+								isOnlyContainEmoji={isOnlyContainEmoji}
+								isJumMessageEnabled={false}
+								content={content as any} // fix later
+								mode={mode}
+								code={message.code}
+								onCopy={onCopy}
+								messageId={message.message_id}
+							/>
+						)}
+						{(message.code === TypeMessage.Welcome ||
+							message.code === TypeMessage.CreateThread ||
+							message.code === TypeMessage.AuditLog ||
+							message.code === TypeMessage.CreatePin) && (
+							<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">
+								{convertTimeString(message?.create_time as string)}
+							</div>
+						)}
+					</>
 				) : null}
 			</>
 		);

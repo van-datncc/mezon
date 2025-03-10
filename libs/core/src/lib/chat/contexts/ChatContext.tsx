@@ -87,6 +87,7 @@ import {
 	IMessageTypeCallLog,
 	LIMIT,
 	ModeResponsive,
+	NotificationCategory,
 	NotificationCode,
 	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
@@ -115,7 +116,6 @@ import {
 	ListActivity,
 	MessageButtonClicked,
 	MessageTypingEvent,
-	NotificationInfo,
 	PermissionChangedEvent,
 	PermissionSet,
 	RoleEvent,
@@ -138,7 +138,7 @@ import {
 	VoiceLeavedEvent,
 	WebrtcSignalingFwd
 } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction, ApiNotification } from 'mezon-js/api.gen';
 import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
 import { ChannelCanvas, RemoveFriend, SdTopicEvent } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useRef } from 'react';
@@ -449,7 +449,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onnotification = useCallback(
-		async (notification: NotificationInfo) => {
+		async (notification: ApiNotification) => {
 			if (notification.topic_id !== '0') {
 				dispatch(topicsActions.setChannelTopic({ channelId: notification.channel_id || '', topicId: notification.topic_id || '' }));
 			}
@@ -469,7 +469,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				(isElectron() && isFocusDesktop === false) ||
 				isTabVisible === false
 			) {
-				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				dispatch(
+					notificationActions.add({ data: mapNotificationToEntity(notification), category: notification.category as NotificationCategory })
+				);
 				const isFriendPageView = path.includes('/chat/direct/friends');
 				const isNotCurrentDirect =
 					isFriendPageView ||
