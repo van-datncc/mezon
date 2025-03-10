@@ -1,6 +1,7 @@
 import { ControlBarControls, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
 import { selectShowCamera, selectShowMicrophone, selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { useMediaPermissions } from '@mezon/utils';
 import { Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useState } from 'react';
@@ -72,6 +73,8 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 		[dispatch]
 	);
 
+	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
+
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent">
 			<div className="flex justify-start gap-4">
@@ -83,7 +86,7 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 				</span>
 			</div>
 			<div className="flex justify-center gap-3">
-				{visibleControls.microphone && (
+				{visibleControls.microphone && hasMicrophoneAccess && (
 					<div className="relative rounded-full">
 						<Tooltip
 							key={+showMicrophone}
@@ -113,7 +116,7 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 						/>
 					</div>
 				)}
-				{visibleControls.camera && (
+				{visibleControls.camera && hasCameraAccess && (
 					<div className="relative rounded-full">
 						<Tooltip
 							key={+showCamera}
