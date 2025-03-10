@@ -26,7 +26,6 @@ export type EmojiCustomPanelOptions = {
 	currenTopicId?: string;
 	directId?: string;
 	isClanView: boolean;
-	popupOverHeightAppMinimized?: boolean;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -218,10 +217,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className={` outline-none flex max-h-full max-sm:h-32 max-sbm:h-full flex-row w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
+			className={`outline-none flex max-h-full max-sm:h-32 max-sbm:h-full flex-row w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
 		>
 			<div
-				className={`w-11 max-sm:gap-x-1 ${props.popupOverHeightAppMinimized ? 'h-[292px] overflow-y-visible' : ''}
+				className={`w-11 max-sm:gap-x-1
 				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
 				max-sm:w-full max-sbm:w-11 dark:bg-bgTertiary bg-bgLightModeSecond pt-1
 				px-1 md:items-start h-[25rem] pb-1 rounded max-sbm:flex-col

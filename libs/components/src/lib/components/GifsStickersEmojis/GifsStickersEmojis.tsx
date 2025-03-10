@@ -7,12 +7,12 @@ import {
 	selectCurrentTopicId,
 	selectIdMessageRefReaction
 } from '@mezon/store';
-import { EmojiPlaces, MIN_HEIGHT_MINIZED_APP, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import EmojiCustomPanel from '../EmojiPicker';
+import EmojiPickerComp from '../EmojiPicker';
 import SoundSquare from './SoundSquare';
 import StickerSquare from './StickerSquare';
 import TenorGifCategories from './gifs/TenorGifCategories';
@@ -29,8 +29,6 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
-
-	const popupOverHeightAppMinimized = window.innerHeight <= MIN_HEIGHT_MINIZED_APP;
 
 	const channelMode = useMemo(() => {
 		if (!channelOrDirect?.type) return null;
@@ -75,12 +73,15 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 		const isStreaming = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 		const baseClasses = 'w-[370px] max-sm:w-full max-sm:pt-0 max-sm:rounded-none max-sm:mt-[-0.5rem]';
 		const widthClasses = isStreaming ? 'sbm:w-[430px]' : 'sbm:w-[500px]';
-		const heightClasses = 'h-[300px]';
+		const heightClasses =
+			emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM
+				? 'min-h-[400px]'
+				: isShowEmojiPicker
+					? 'min-h-[350px]'
+					: 'min-h-[500px]';
 
-		return `${baseClasses} ${widthClasses} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30 ${heightClasses} `;
+		return `${baseClasses} ${widthClasses} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30 ${heightClasses}`;
 	}, [currentChannel?.type, emojiAction, isShowEmojiPicker]);
-
-	<div onClick={(e) => e.stopPropagation()} className={containerClassName} />;
 
 	const contentWidthClass = useMemo(() => {
 		const isStreaming = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
@@ -94,10 +95,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 				<InputSearch />
 			</div>
 
-			<div
-				className={`w-full ${popupOverHeightAppMinimized ? 'h-[300px]' : 'min-h-[400px]'}  text-center ${contentWidthClass}`}
-				ref={emojiRefParentDiv}
-			>
+			<div className={`w-full min-h-[400px] text-center ${contentWidthClass}`} ref={emojiRefParentDiv}>
 				<ContentPanel
 					subPanelActive={subPanelActive}
 					channelOrDirect={channelOrDirect}
@@ -107,7 +105,6 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 					onClose={closePannel}
 					isShowEmojiPicker={isShowEmojiPicker}
 					idMessageRefReaction={idMessageRefReaction}
-					popupOverHeightAppMinimized={popupOverHeightAppMinimized}
 				/>
 			</div>
 		</div>
@@ -140,6 +137,7 @@ const TabBar = React.memo(({ subPanelActive, onTabClick }: { subPanelActive: Sub
 		</div>
 	);
 });
+
 const ContentPanel = React.memo(
 	({
 		subPanelActive,
@@ -149,8 +147,7 @@ const ContentPanel = React.memo(
 		contentWidthClass,
 		onClose,
 		isShowEmojiPicker,
-		idMessageRefReaction,
-		popupOverHeightAppMinimized
+		idMessageRefReaction
 	}: {
 		subPanelActive: SubPanelName;
 		channelOrDirect?: ApiChannelDescription;
@@ -160,53 +157,58 @@ const ContentPanel = React.memo(
 		onClose: () => void;
 		isShowEmojiPicker: boolean;
 		idMessageRefReaction?: string;
-		popupOverHeightAppMinimized?: boolean;
 	}) => {
 		const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 		const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
+
 		const currenTopicId = useSelector(selectCurrentTopicId);
 		const { directId } = useAppParams();
 		const isClanView = useSelector(selectClanView);
+		if (subPanelActive === SubPanelName.GIFS) {
+			return (
+				<div className={`flex h-full pr-1 w-full ${contentWidthClass}`}>
+					<TenorGifCategories
+						activeTab={SubPanelName.EMOJI}
+						channelOrDirect={channelOrDirect}
+						mode={channelMode as number}
+						onClose={onClose}
+					/>
+				</div>
+			);
+		}
 
-		return (
-			<div className={`flex flex-col ${popupOverHeightAppMinimized ? 'h-[300px] ' : 'h-full '}`}>
-				{subPanelActive === SubPanelName.GIFS && (
-					<div className={`flex h-full pr-1 w-full ${contentWidthClass}`}>
-						<TenorGifCategories
-							activeTab={SubPanelName.EMOJI}
-							channelOrDirect={channelOrDirect}
-							mode={channelMode as number}
-							onClose={onClose}
-						/>
-					</div>
-				)}
-				{subPanelActive === SubPanelName.STICKERS && (
-					<div className={`flex h-full pr-2 w-full ${contentWidthClass}`}>
-						<StickerSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
-					</div>
-				)}
-				{(subPanelActive === SubPanelName.EMOJI || isShowEmojiPicker) && (
-					<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
-						<EmojiCustomPanel
-							isFocusTopicBox={isFocusTopicBox}
-							currenTopicId={currenTopicId ?? ''}
-							directId={directId}
-							isClanView={isClanView}
-							mode={mode}
-							messageEmojiId={idMessageRefReaction}
-							onClose={onClose}
-							isFocusThreadBox={isFocusThreadBox}
-							popupOverHeightAppMinimized={popupOverHeightAppMinimized}
-						/>
-					</div>
-				)}
-				{subPanelActive === SubPanelName.SOUNDS && (
-					<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
-						<SoundSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
-					</div>
-				)}
-			</div>
-		);
+		if (subPanelActive === SubPanelName.STICKERS) {
+			return (
+				<div className={`flex h-full pr-2 w-full ${contentWidthClass}`}>
+					<StickerSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
+				</div>
+			);
+		}
+
+		if (subPanelActive === SubPanelName.EMOJI || isShowEmojiPicker) {
+			return (
+				<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
+					<EmojiPickerComp
+						isFocusTopicBox={isFocusTopicBox}
+						currenTopicId={currenTopicId ?? ''}
+						directId={directId}
+						isClanView={isClanView}
+						mode={mode}
+						messageEmojiId={idMessageRefReaction}
+						onClose={onClose}
+						isFocusThreadBox={isFocusThreadBox}
+					/>
+				</div>
+			);
+		}
+		if (subPanelActive === SubPanelName.SOUNDS) {
+			return (
+				<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
+					<SoundSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
+				</div>
+			);
+		}
+		return null;
 	}
 );
 
