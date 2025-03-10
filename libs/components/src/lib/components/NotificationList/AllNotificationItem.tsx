@@ -22,13 +22,38 @@ export type NotifyMentionProps = {
 	readonly notify: INotification;
 };
 
+function convertContentToObject(notify: any) {
+	if (notify && notify.content && typeof notify.content === 'object') {
+		try {
+			const parsedContent = {
+				...notify.content,
+				content: notify.content.content ? safeJSONParse(notify.content.content) : null,
+				mentions: notify.content.mentions ? safeJSONParse(notify.content.mentions) : null,
+				reactions: notify.content.reactions ? safeJSONParse(notify.content.reactions) : null,
+				references: notify.content.references ? safeJSONParse(notify.content.references) : null,
+				attachments: notify.content.attachments ? safeJSONParse(notify.content.attachments) : null,
+				create_time: notify.create_time
+			};
+
+			return {
+				...notify,
+				content: parsedContent
+			};
+		} catch (error) {
+			return notify;
+		}
+	}
+	return notify;
+}
+
 function AllNotificationItem({ notify }: NotifyMentionProps) {
 	const navigate = useNavigate();
+	const parseNotify = useMemo(() => convertContentToObject(notify), [notify]);
 	const dispatch = useAppDispatch();
-	const messageId = notify.content.message_id;
-	const channelId = notify.content.channel_id;
-	const clanId = notify.content.clan_id;
-	const mode = notify?.content?.mode - 1;
+	const messageId = parseNotify.content.message_id;
+	const channelId = parseNotify.content.channel_id;
+	const clanId = parseNotify.content.clan_id;
+	const mode = parseNotify?.content?.mode - 1;
 
 	const handleClickJump = useCallback(() => {
 		dispatch(
@@ -53,30 +78,21 @@ function AllNotificationItem({ notify }: NotifyMentionProps) {
 	};
 
 	const allTabProps = {
-		message: {
-			...notify.content,
-			content: notify.content.content ? safeJSONParse(notify.content.content) : null,
-			mentions: notify.content.mentions ? safeJSONParse(notify.content.mentions) : null,
-			reactions: notify.content.reactions ? safeJSONParse(notify.content.reactions) : null,
-			references: notify.content.references ? safeJSONParse(notify.content.references) : null,
-			attachments: notify.content.attachments ? safeJSONParse(notify.content.attachments) : null,
-			create_time: notify.create_time
-		},
-		subject: notify.subject,
-		category: notify.category,
-		senderId: notify.sender_id,
-		createTime: notify.create_time
+		message: parseNotify.content,
+		subject: parseNotify.subject,
+		category: parseNotify.category,
+		senderId: parseNotify.sender_id
 	};
 
 	return (
 		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
 			<button
 				className="absolute dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode top-[10px] z-50 right-3 rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-				onClick={(event) => handleDeleteNotification(event, notify.id, notify.category as NotificationCategory)}
+				onClick={(event) => handleDeleteNotification(event, parseNotify.id, parseNotify.category as NotificationCategory)}
 			>
 				✕
 			</button>
-			{notify.category === NotificationCategory.MENTIONS && (
+			{parseNotify.category === NotificationCategory.MENTIONS && (
 				<button
 					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightTertiary bottom-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={handleClickJump}
