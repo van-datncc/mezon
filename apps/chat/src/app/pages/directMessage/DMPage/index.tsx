@@ -45,7 +45,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, TypeMessage, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, MIN_HEIGHT_MINIZED_APP, SubPanelName, TypeMessage, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -160,6 +160,8 @@ const DirectMessage = () => {
 		);
 	}, [currentDmGroup?.channel_id]);
 
+	const popupOverHeightAppMinimized = window.innerHeight <= MIN_HEIGHT_MINIZED_APP;
+
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
 		topPositionEmojiPanel = 'auto';
 	} else if (positionOfSmileButton.top < 100) {
@@ -240,7 +242,7 @@ const DirectMessage = () => {
 						{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
 							<div
 								id="emojiPicker"
-								className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+								className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${popupOverHeightAppMinimized ? 'top-[10px] ' : reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 								style={{
 									right: setMarginleft
 								}}
@@ -261,7 +263,7 @@ const DirectMessage = () => {
 							<div
 								className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in`}
 								style={{
-									top: topPositionEmojiPanel,
+									top: popupOverHeightAppMinimized ? '10px' : topPositionEmojiPanel,
 									bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
 									left:
 										distanceToRight < WIDTH_EMOJI_PANEL

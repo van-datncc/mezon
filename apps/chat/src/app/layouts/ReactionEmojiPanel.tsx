@@ -1,13 +1,10 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp } from '@mezon/core';
 import { selectIsShowCreateThread, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
-import { EmojiPlaces } from '@mezon/utils';
+import { EmojiPlaces, HEIGHT_EMOJI_PANEL, MIN_HEIGHT_MINIZED_APP, WIDTH_EMOJI_PANEL } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
-
-const HEIGHT_EMOJI_PANEL = 457;
-const WIDTH_EMOJI_PANEL = 500;
 
 type ReactionEmojiPannelProps = {
 	closeMenu: boolean;
@@ -36,10 +33,15 @@ const ReactionEmojiPanel = memo(
 
 		const openEmojiRightPanelOnChannelLayout = openEmojiRightPanel && !isFocusTopicOrThreadBox;
 		const openEmojiBottomPanelOnChannelLayout = openEmojiBottomPanel && !isFocusTopicOrThreadBox;
+		const popupOverHeightAppMinimized = window.innerHeight <= MIN_HEIGHT_MINIZED_APP;
 
 		const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 		const distanceToRight = window.innerWidth - positionOfSmileButton.right;
-		const topPositionEmojiPanel = distanceToBottom < HEIGHT_EMOJI_PANEL ? 'auto' : `${positionOfSmileButton.top - 100}px`;
+		const topPositionEmojiPanel = popupOverHeightAppMinimized
+			? '10px'
+			: distanceToBottom < HEIGHT_EMOJI_PANEL
+				? 'auto'
+				: `${positionOfSmileButton.top - 100}px`;
 
 		const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId));
 
@@ -49,7 +51,7 @@ const ReactionEmojiPanel = memo(
 					<div
 						onMouseDown={(e) => e.stopPropagation()}
 						id="emojiPicker"
-						className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${(isShowCreateThread || isShowCreateTopic) && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && !isShowCreateTopic && 'ssm:right-44'}`}
+						className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${popupOverHeightAppMinimized ? 'top-[10px] ' : reactionTopState ? 'top-20' : 'bottom-20'} ${(isShowCreateThread || isShowCreateTopic) && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && !isShowCreateTopic && 'ssm:right-44'}`}
 					>
 						<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 					</div>
