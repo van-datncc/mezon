@@ -5,7 +5,8 @@ import { ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { Platform, RefreshControl, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -53,7 +54,6 @@ const ChannelList = () => {
 
 	const data = useMemo(
 		() => [
-			{ id: 'bannerAndEvents' },
 			{ id: 'listHeader' },
 			...(listChannelRender
 				? isShowEmptyCategory
@@ -76,8 +76,6 @@ const ChannelList = () => {
 
 	const renderItem = useCallback(({ item, index }) => {
 		if (index === 0) {
-			return <ChannelListBackground />;
-		} else if (index === 1) {
 			return <ChannelListHeader />;
 		} else if (item.channels) {
 			return <ChannelListSection channelsPositionRef={channelsPositionRef} data={item} />;
@@ -94,7 +92,6 @@ const ChannelList = () => {
 	}, []);
 
 	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
-
 	return (
 		<>
 			<View style={styles.mainList}>
@@ -106,13 +103,16 @@ const ChannelList = () => {
 					keyExtractor={keyExtractor}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 					stickyHeaderIndices={[1]}
+					showsVerticalScrollIndicator={true}
+					initialNumToRender={10}
 					maxToRenderPerBatch={10}
-					updateCellsBatchingPeriod={50}
-					decelerationRate={'fast'}
-					disableVirtualization={false}
-					onEndReachedThreshold={120}
-					initialNumToRender={20}
 					windowSize={10}
+					onEndReachedThreshold={0.7}
+					removeClippedSubviews={Platform.OS === 'android'}
+					keyboardShouldPersistTaps={'handled'}
+					ListHeaderComponent={() => {
+						return <ChannelListBackground />;
+					}}
 					onScrollToIndexFailed={(info) => {
 						const wait = new Promise((resolve) => setTimeout(resolve, 200));
 						if (info.highestMeasuredFrameIndex < info.index) {
@@ -122,6 +122,7 @@ const ChannelList = () => {
 							});
 						}
 					}}
+					disableVirtualization
 				/>
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, getStoreAsync, MessagesEntity, selectCurrentChannel, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
@@ -257,7 +257,10 @@ const MessageItem = React.memo(
 		});
 
 		return (
-			<Animated.View {...panResponder?.panHandlers} style={[{ backgroundColor: bgColor }, { transform: [{ translateX }] }]}>
+			<Animated.View
+				{...panResponder?.panHandlers}
+				style={[{ backgroundColor: bgColor, paddingBottom: size.s_2 }, { transform: [{ translateX }] }]}
+			>
 				<Pressable
 					android_ripple={{
 						color: themeValue.secondaryLight
