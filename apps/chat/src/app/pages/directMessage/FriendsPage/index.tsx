@@ -80,7 +80,7 @@ const FriendsPage = () => {
 
 	const handleAddFriend = async () => {
 		const checkIsAlreadyFriend = (username: string) => {
-			return friends.some((user) => user.user?.username === username);
+			return friends.some((user) => user?.user?.username === username);
 		};
 		if (requestAddFriend?.usernames?.length && checkIsAlreadyFriend(requestAddFriend.usernames[0])) {
 			setIsAlreadyFriend(true);
@@ -196,7 +196,7 @@ const FriendsPage = () => {
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className="pl-8 overflow-hidden flex flex-1 pb-2">
+							<div className="pl-8 overflow-hidden flex flex-1 pb-4">
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
