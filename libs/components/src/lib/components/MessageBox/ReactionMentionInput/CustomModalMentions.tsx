@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useWindowSize } from '@mezon/core';
 
 type CustomModalMentionsProps = {
 	children: React.ReactNode;
@@ -7,13 +7,8 @@ type CustomModalMentionsProps = {
 };
 
 const CustomModalMentions = ({ children, titleModalMention, isThreadBoxOrTopicBox }: CustomModalMentionsProps) => {
-	const [maxHeight, setMaxHeight] = useState(window.innerHeight * (2 / 3));
-
-	useEffect(() => {
-		const updateHeight = () => setMaxHeight(window.innerHeight * (2 / 3));
-		window.addEventListener('resize', updateHeight);
-		return () => window.removeEventListener('resize', updateHeight);
-	}, []);
+	const { height } = useWindowSize();
+	const maxHeight = height * (2 / 3);
 
 	return (
 		<div
