@@ -240,7 +240,7 @@ export const AuthenticationLoader = () => {
 		await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		const [appInfo] = await Promise.all([getAppInfo()]);
 		const { app_platform: platform } = appInfo;
-		store.dispatch(authActions.logOut({ device_id: userProfile.user.username, platform: platform }));
+		store.dispatch(authActions.logOut({ device_id: userProfile?.user?.username, platform: platform }));
 		setIsSessionExpired(false);
 	}, []);
 
