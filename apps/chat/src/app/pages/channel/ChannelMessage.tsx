@@ -24,6 +24,7 @@ export type MessageProps = {
 	previousMessage: MessagesEntity;
 	isTopic?: boolean;
 	canSendMessage: boolean;
+	wrapperClassName?: string;
 };
 
 export type MessageRef = {
@@ -106,33 +107,27 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	return (
 		<>
 			{message.code === TypeMessage.Indicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
-				<div className="pb-10">
-					<OnBoardWelcome nextMessageId={nextMessageId} />
-				</div>
+				<OnBoardWelcome nextMessageId={nextMessageId} />
 			)}
 			{message.isFirst && (
 				<ChatWelcome isPrivate={isPrivate} key={messageId} name={channelLabel} avatarDM={avatarDM} username={username} mode={mode} />
 			)}
 
 			{!message.isFirst && (
-				<div
-					className={`fullBoxText relative group ${!isCombine || (mess.code !== TypeMessage.CreatePin && mess.references?.[0]?.message_ref_id) ? 'pt-3' : ''}`}
-				>
-					<MessageWithUser
-						allowDisplayShortProfile={true}
-						message={mess}
-						mode={mode}
-						isEditing={isEditing}
-						isHighlight={isHighlight}
-						popup={popup}
-						onContextMenu={handleContextMenu}
-						isCombine={isCombine}
-						showDivider={isDifferentDay}
-						checkMessageTargetToMoved={checkMessageTargetToMoved}
-						messageReplyHighlight={messageReplyHighlight}
-						isTopic={isTopic}
-					/>
-				</div>
+				<MessageWithUser
+					allowDisplayShortProfile={true}
+					message={mess}
+					mode={mode}
+					isEditing={isEditing}
+					isHighlight={isHighlight}
+					popup={popup}
+					onContextMenu={handleContextMenu}
+					isCombine={isCombine}
+					showDivider={isDifferentDay}
+					checkMessageTargetToMoved={checkMessageTargetToMoved}
+					messageReplyHighlight={messageReplyHighlight}
+					isTopic={isTopic}
+				/>
 			)}
 
 			{/* {!isMyMessage && isLastSeen && <UnreadMessageBreak />} */}
@@ -148,7 +143,7 @@ export const MemorizedChannelMessage = memo(
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
 		// prev.message.content === curr.message.content &&
-		prev.previousMessage === curr.previousMessage
+		prev.previousMessage?.id === curr.previousMessage?.id
 );
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';
