@@ -2,18 +2,15 @@ import { useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import {
-	MessagesEntity,
 	channelsActions,
-	directActions,
 	directMetaActions,
 	selectDmGroupCurrent,
-	selectLatestMessageId,
+	selectLastMessageByChannelId,
 	selectMemberClanByUserId2,
-	selectMessageByMessageId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { IMessageWithUser, TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
+import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -31,34 +28,28 @@ interface HeaderProps {
 	themeValue: any;
 	directMessageId: string;
 }
-function useChannelSeen(channelId: string) {
+function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const dispatch = useAppDispatch();
-	const lastSentMessageId = useAppSelector((state) => selectLatestMessageId(state, channelId));
-	const lastMessage = useAppSelector((state) => selectMessageByMessageId(state, channelId, lastSentMessageId)) || ({} as IMessageWithUser);
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
-	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
-		dispatch(directActions.setActiveDirect({ directId: channelId }));
-	};
-
 	const { markAsReadSeen } = useSeenMessagePool();
-	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
-	useEffect(() => {
-		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (lastMessage) {
-			markAsReadSeen(lastMessage, mode);
-		}
-	}, [channelId, currentDmGroup?.type, markAsReadSeen]);
 
+	const refCountWasCalled = useRef<number>(0);
 	useEffect(() => {
-		if (lastMessage) {
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(channelsActions.updateChannelBadgeCount({ clanId: '0', channelId: channelId || '', count: 0, isReset: true }));
-			updateChannelSeenState(channelId, lastMessage);
+		if (currentDmGroup?.type) {
+			const mode =
+				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+			if (lastMessage && refCountWasCalled.current <= 1) {
+				markAsReadSeen(lastMessage, mode);
+				const timestamp = Date.now() / 1000;
+				dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+				dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+				dispatch(channelsActions.updateChannelBadgeCount({ clanId: '0', channelId: channelId || '', count: 0, isReset: true }));
+				refCountWasCalled.current += 1;
+			}
 		}
-	}, [channelId, lastMessage]);
+	}, [lastMessage, channelId, currentDmGroup?.type, markAsReadSeen, dispatch]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -66,14 +57,13 @@ function useChannelSeen(channelId: string) {
 		}
 		if (lastMessage) {
 			mounted.current = channelId;
-			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
 
 const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, directMessageId }) => {
-	useChannelSeen(directMessageId || '');
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
+	useChannelSeen(directMessageId || '', currentDmGroup);
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const user = useSelector((state) => selectMemberClanByUserId2(state, currentDmGroup?.user_id?.[0]));
