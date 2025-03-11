@@ -1183,7 +1183,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							);
 						}
 					} else {
-						if (channelUpdated.channel_private) {
+						if (channelUpdated.channel_private && channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 							dispatch(channelsActions.remove({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 							dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
 							dispatch(
