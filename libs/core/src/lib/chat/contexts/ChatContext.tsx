@@ -1162,6 +1162,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								dataUpdate: { ...channelUpdated }
 							})
 						);
+						if (channelUpdated.parent_id !== '0') {
+							dispatch(
+								listChannelRenderAction.setActiveThread({
+									clanId: channelUpdated.clan_id as string,
+									channelId: channelUpdated.channel_id as string
+								})
+							);
+						}
 					} else {
 						if (channelUpdated.channel_private) {
 							dispatch(channelsActions.remove({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
