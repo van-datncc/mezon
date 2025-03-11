@@ -108,6 +108,7 @@ const SettingRightUser = ({
 		const createdFiles = await fetchAndCreateFiles(files);
 		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', files[0]?.filename || '', createdFiles[0]).then(
 			(attachment: any) => {
+				console.log('attachment.url :', attachment.url);
 				setUrlImage(attachment.url ?? '');
 			}
 		);

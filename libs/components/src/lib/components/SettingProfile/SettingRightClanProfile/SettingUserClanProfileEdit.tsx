@@ -5,10 +5,12 @@ import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import ImageEditor from '../ImageEditor/ImageEditor';
 import SettingRightClanCard from '../SettingUserClanProfileCard';
 import { SettingUserClanProfileSave } from './SettingUserClanProfileSave';
 
@@ -35,7 +37,13 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		setDraftProfile(userClansProfile);
 	}, [userClansProfile]);
 
+	const [openModalEditor, closeModalEditor] = useModal(() => {
+		return <ImageEditor imageSrc={draftProfile?.avatar as string} onClose={closeModalEditor} onApply={() => {}} />;
+	}, []);
+
 	const setUrlImage = (url_image: string) => {
+		console.log('1. url_image :', url_image);
+		openModalEditor();
 		setDraftProfile((prevState) => (prevState ? { ...prevState, avatar: url_image } : prevState));
 	};
 	const setDisplayName = (nick_name: string) => {
