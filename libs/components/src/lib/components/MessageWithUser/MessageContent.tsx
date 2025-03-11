@@ -197,7 +197,7 @@ const MessageText = memo(
 							message.code === TypeMessage.CreateThread ||
 							message.code === TypeMessage.AuditLog ||
 							message.code === TypeMessage.CreatePin) && (
-							<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">
+							<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px] pl-1 pt-[5px]">
 								{convertTimeString(message?.create_time as string)}
 							</div>
 						)}

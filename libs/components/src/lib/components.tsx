@@ -112,3 +112,4 @@ export { MentionFloatButton } from './components/MentionFloatButton';
 export { AudioAttachment } from './components/ThumbnailAttachmentRender/ThumbnailAttachmentRender';
 
 export * from './components/VoiceChannel';
+export * from './components/virtual-core/useVirtualizer';

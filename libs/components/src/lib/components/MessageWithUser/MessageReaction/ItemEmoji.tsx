@@ -51,7 +51,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			<div
 				style={{ height: 24 }}
 				className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row noselect
-          cursor-pointer justify-center items-center relative pl-7 text-sm font-medium dark:text-white text-black
+          cursor-pointer justify-center items-center relative pl-7 text-sm font-medium dark:text-[#E6E6E6] text-black
           ${Number(userSenderCount) > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
 				onClick={() =>
 					reactOnExistEmoji(
