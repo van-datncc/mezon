@@ -12311,17 +12311,17 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
-mezon-js-protobuf@1.7.20:
-  version "1.7.20"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.20.tgz#8e31ab21e822d5a73b84affdc6e21f0e0dbb6074"
-  integrity sha512-kKR9Rd62Q8WudfcLwmSPd9ttRoI5886JTFSvXQpRS/y9+o1dcXbMGOwA3BtKg/Vp7nCifNiyLQ/S7IDMyUvR7g==
+mezon-js-protobuf@1.7.22:
+  version "1.7.22"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.22.tgz#01899eb2d2dcf12fc82b3026366812626f606cbf"
+  integrity sha512-9JXiVSunIH5h7voEcgnyAokLYFwr6C8e7bytIXjdaGRce8PK9adh6AJUE8hE7cqHfapB0U55mEYokEfwzP32Ug==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@2.11.6:
-  version "2.11.6"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.6.tgz#78b50e20d29778cd925502e045ca9134c642b527"
-  integrity sha512-T/XDx74uboqNmekxCN7tpL2RPIbleZgdKSFTBm0ALqHv7XzwaSZZhEZLfu0PCUzzdBQ+wlljcFP1ypGbByrh1g==
+mezon-js@2.11.8:
+  version "2.11.8"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.8.tgz#fcbc54d1dc4fa489bbf0bef2c59d099921013714"
+  integrity sha512-8t2PRh1zN5GrR/xJEJQcujBvZ/crhfVtVvsQqKYmxhwdL/e5l3zmZ3cdUcIDrQHF0fVBuDbX9Y2ZN6s9l1ibYA==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"
@@ -14610,11 +14610,6 @@ react-image-file-resizer@^0.4.8:
   version "0.4.8"
   resolved "https://registry.yarnpkg.com/react-image-file-resizer/-/react-image-file-resizer-0.4.8.tgz#85f4ae4469fd2867d961568af660ef403d7a79af"
   integrity sha512-Ue7CfKnSlsfJ//SKzxNMz8avDgDSpWQDOnTKOp/GNRFJv4dO9L5YGHNEnj40peWkXXAK2OK0eRIoXhOYpUzUTQ==
-
-react-image@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/react-image/-/react-image-4.1.0.tgz#92f2d4a809a178b3bf69acd7bad7da7aa5e7364c"
-  integrity sha512-qwPNlelQe9Zy14K2pGWSwoL+vHsAwmJKS6gkotekDgRpcnRuzXNap00GfibD3eEPYu3WCPlyIUUNzcyHOrLHjw==
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"

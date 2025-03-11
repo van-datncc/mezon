@@ -328,7 +328,7 @@ const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
 	const messageDate = !message?.create_time ? '' : convertDateString(message?.create_time as string);
 	return (
 		<div className="relative text-center my-4 px-4">
-			<hr className="border-t border-gray-300 dark:border-gray-600 absolute top-1/2 left-0 right-0" />
+			<hr className="border-t border-gray-300 dark:border-borderDivider absolute top-1/2 left-0 right-0" />
 			<span className="relative inline-block px-3 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
 		</div>
 	);
@@ -366,7 +366,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 	// className="message-list-item" id={'msg-' + messageId}
 	return (
 		<div
-			className={`mb-1 message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}
