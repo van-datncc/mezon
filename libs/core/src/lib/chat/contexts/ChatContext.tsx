@@ -49,6 +49,7 @@ import {
 	policiesActions,
 	reactionActions,
 	rolesClanActions,
+	selectAllEmojiSuggestion,
 	selectAllTextChannel,
 	selectAllThreads,
 	selectAllUserClans,
@@ -139,7 +140,14 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction, ApiNotification } from 'mezon-js/api.gen';
-import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
+import {
+	ApiChannelMessageHeader,
+	ApiClanEmoji,
+	ApiNotificationUserChannel,
+	ApiPermissionUpdate,
+	ApiTokenSentEvent,
+	ApiWebhook
+} from 'mezon-js/dist/api.gen';
 import { ChannelCanvas, RemoveFriend, SdTopicEvent } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -830,20 +838,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventemoji = useCallback(
-		(eventEmoji: EventEmoji) => {
+		async (eventEmoji: EventEmoji) => {
+			const store = await getStoreAsync();
+			const state = store.getState() as RootState;
+			const emojiList = selectAllEmojiSuggestion(state) as ApiClanEmoji[];
+
 			if (eventEmoji.action === EEventAction.CREATED) {
-				dispatch(
-					emojiSuggestionActions.add({
-						category: eventEmoji.clan_name,
-						clan_id: eventEmoji.clan_id,
-						creator_id: eventEmoji.user_id,
-						id: eventEmoji.id,
-						shortname: eventEmoji.short_name,
-						src: eventEmoji.source,
-						logo: eventEmoji.logo,
-						clan_name: eventEmoji.clan_name
-					})
-				);
+				const newEmoji: ApiClanEmoji = {
+					category: eventEmoji.clan_name,
+					clan_id: eventEmoji.clan_id,
+					creator_id: eventEmoji.user_id,
+					id: eventEmoji.id,
+					shortname: eventEmoji.short_name,
+					src: eventEmoji.source,
+					logo: eventEmoji.logo,
+					clan_name: eventEmoji.clan_name
+				};
+
+				dispatch(emojiSuggestionActions.add(newEmoji));
+				dispatch(emojiSuggestionActions.updateEmojiCache([newEmoji, ...emojiList]));
 			} else if (eventEmoji.action === EEventAction.UPDATE) {
 				dispatch(
 					emojiSuggestionActions.update({
