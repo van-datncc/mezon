@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'tippy.js/dist/tippy.css';
+@import 'styles/tooltip.scss';
 @import 'quill/dist/quill.snow.css';
 
 @font-face {
@@ -153,19 +153,6 @@ body {
 
 .enableSelectText {
 	user-select: text;
-}
-
-//button voice control pannel
-.button {
-	line-height: 0;
-	width: 32px;
-	height: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	position: relative;
-	color: #e1e1e1;
 }
 
 // btn icon voice control pannel
@@ -1185,14 +1172,4 @@ input:-webkit-autofill:active {
 			0 100%,
 			0 0;
 	}
-}
-
-.rc-tooltip-inner {
-	background-color: transparent;
-	box-shadow: none;
-	padding: 0;
-}
-
-.rc-tooltip-placement-top {
-	padding-bottom: 4.5px;
 }

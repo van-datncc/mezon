@@ -11,9 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { MezonInput } from '../../../../../componentUI';
+import MezonInput from '../../../../../componentUI/MezonInput';
 import { SeparatorWithLine } from '../../../../../components/Common';
-import { threadDetailContext } from '../../../../../components/ThreadDetail/MenuThreadDetail';
 import { normalizeString } from '../../../../../utils/helpers';
 import { FriendListItem } from '../../Reusables';
 import { style } from './styles';
@@ -40,7 +39,6 @@ export const FriendList = React.memo(
 			refRBSheet: React.Ref<BottomSheetModal>
 		) => {
 			const currentChannelId = useSelector(selectCurrentChannelId);
-			const currentChannel = useContext(threadDetailContext);
 
 			const [currentInviteLink, setCurrentInviteLink] = useState('');
 			const [searchUserText, setSearchUserText] = useState('');

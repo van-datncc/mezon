@@ -7,7 +7,7 @@ import { safeJSONParse } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { MezonAvatar } from '../../../componentUI';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MessageNotification from '../MessageNotification';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { style } from './NotificationMentionItem.styles';

@@ -52,7 +52,6 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 						<Image
 							draggable="false"
 							src={createImgproxyUrl(option.logo ?? '', { width: 100, height: 100, resizeType: 'fit' }) || ''}
-							alt={option.clan_name || ''}
 							placeholder="blur"
 							width={48}
 							blurdataurl={option.logo}

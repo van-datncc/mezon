@@ -7,12 +7,13 @@ import {
 	directActions,
 	directMetaActions,
 	selectDmGroupCurrent,
-	selectLastMessageByChannelId,
+	selectLatestMessageId,
 	selectMemberClanByUserId2,
+	selectMessageByMessageId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
+import { IMessageWithUser, TIME_OFFSET, createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -32,7 +33,8 @@ interface HeaderProps {
 }
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const lastSentMessageId = useAppSelector((state) => selectLatestMessageId(state, channelId));
+	const lastMessage = useAppSelector((state) => selectMessageByMessageId(state, channelId, lastSentMessageId)) || ({} as IMessageWithUser);
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
@@ -46,7 +48,7 @@ function useChannelSeen(channelId: string) {
 		if (lastMessage) {
 			markAsReadSeen(lastMessage, mode);
 		}
-	}, [lastMessage, channelId, currentDmGroup?.type, markAsReadSeen]);
+	}, [channelId, currentDmGroup?.type, markAsReadSeen]);
 
 	useEffect(() => {
 		if (lastMessage) {
@@ -56,7 +58,7 @@ function useChannelSeen(channelId: string) {
 			dispatch(channelsActions.updateChannelBadgeCount({ clanId: '0', channelId: channelId || '', count: 0, isReset: true }));
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [lastMessage]);
+	}, [channelId, lastMessage]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -74,7 +76,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
-	const user = useSelector((state) => selectMemberClanByUserId2(state, firstUserId));
+	const user = useSelector((state) => selectMemberClanByUserId2(state, currentDmGroup?.user_id?.[0]));
 	const status = getUserStatusByMetadata(user?.user?.metadata);
 
 	const isModeDM = useMemo(() => {
@@ -83,10 +85,6 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 
 	const isTypeDMGroup = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
-	}, [currentDmGroup?.type]);
-
-	const dmType = useMemo(() => {
-		return currentDmGroup?.type;
 	}, [currentDmGroup?.type]);
 
 	const dmLabel = useMemo(() => {
@@ -98,11 +96,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 		return currentDmGroup?.channel_avatar?.[0];
 	}, [currentDmGroup?.channel_avatar?.[0]]);
 
-	const firstUserId = useMemo(() => {
-		return currentDmGroup?.user_id?.[0];
-	}, [currentDmGroup?.user_id?.[0]]);
-
-	const userStatus = useMemberStatus(isModeDM ? firstUserId : '');
+	const userStatus = useMemberStatus(isModeDM ? currentDmGroup?.user_id?.[0] : '');
 
 	const navigateToThreadDetail = useCallback(() => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
@@ -120,7 +114,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
-				receiverId: firstUserId,
+				receiverId: currentDmGroup?.user_id?.[0],
 				receiverAvatar: dmAvatar,
 				directMessageId
 			}
@@ -169,7 +163,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				)}
-				{!isTypeDMGroup && !!firstUserId && (
+				{!isTypeDMGroup && !!currentDmGroup?.user_id?.[0] && (
 					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
 						<Icons.PhoneCallIcon width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
