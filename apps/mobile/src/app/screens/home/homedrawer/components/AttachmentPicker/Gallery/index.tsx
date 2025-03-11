@@ -233,7 +233,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				}}
 				disabled={disabled}
 			>
-				<Image source={{ uri: item.node.image.uri, cache: 'force-cache' }} style={styles.imageGallery} />
+				<Image source={{ uri: item.node.image.uri }} style={styles.imageGallery} />
 				{isVideo && (
 					<View style={styles.videoOverlay}>
 						<PlayIcon width={size.s_20} height={size.s_20} />
