@@ -163,7 +163,7 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 							whiteSpace: 'pre-line'
 						}
 			}
-			className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
+			className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'}`}
 		>
 			{content}{' '}
 			{message.code === TypeMessage.CreatePin && (

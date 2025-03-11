@@ -232,10 +232,10 @@ function MessageWithUser({
 						>
 							{isMessageSystem ? (
 								<>
-									{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8" />}
-									{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6" />}
-									{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" />}
-									{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8" />}
+									{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 pr-1" />}
+									{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 pr-1" />}
+									{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" className="pr-1" />}
+									{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8 pr-1" />}
 								</>
 							) : message?.references?.length === 0 && isCombine && !isShowFull ? (
 								<>{/* <div className="w-10 flex items-center justify-center min-w-10">message hour</div> */}</>
