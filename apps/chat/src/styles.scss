@@ -429,14 +429,13 @@ input:-webkit-autofill:active {
 		/* Ensure the span behaves inline */
 
 		code {
-			color: #535353;
+			color: #e6e6e6;
 			border: 1px solid #e3e5e8 !important;
 			background-color: #f2f3f5;
 			border-radius: 6px;
 			padding: 3px 6px;
-			font-family: Consolas;
+			font-weight: 300;
 			font-size: 14px;
-			font-weight: 500;
 			display: inline;
 			/* Keep the code inline */
 			white-space: break-spaces;
@@ -458,14 +457,13 @@ input:-webkit-autofill:active {
 		/* Ensure the span behaves inline */
 
 		code {
-			color: #dfdfe0;
+			color: #e6e6e6;
 			border: 1px solid #1e1f22 !important;
 			background-color: #2b2d31;
 			border-radius: 6px;
 			padding: 3px 6px;
-			font-family: Consolas;
+			font-weight: 300;
 			font-size: 14px;
-			font-weight: 500;
 			display: inline;
 			/* Keep the code inline */
 			white-space: nowrap;
@@ -496,10 +494,10 @@ input:-webkit-autofill:active {
 
 			code {
 				font-size: 14px;
-				font-family: Consolas;
+				font-weight: 300;
 				border-radius: 6px;
 				padding: 3px 6px;
-				color: #fff;
+				color: #e6e6e6;
 				display: inline-block;
 				white-space: pre-wrap;
 				word-wrap: break-word;
@@ -522,10 +520,11 @@ input:-webkit-autofill:active {
 
 			code {
 				font-size: 14px;
-				font-family: Consolas;
 				border-radius: 6px;
 				padding: 3px 6px;
-				color: #535353;
+				color: #e6e6e6;
+				font-weight: 300;
+
 				display: inline-block;
 				white-space: pre-wrap;
 				word-wrap: break-word;
@@ -539,7 +538,7 @@ input:-webkit-autofill:active {
 
 	border: 1px solid #1e1f22 !important;
 	background-color: #2b2d31;
-	color: #fff;
+	color: #e6e6e6;
 	padding: 2px;
 	border-radius: 6px;
 	margin-top: 0;
@@ -555,7 +554,7 @@ input:-webkit-autofill:active {
 
 	border: 1px solid #e3e5e8 !important;
 	background-color: #f2f3f5;
-	color: #535353;
+	color: #e6e6e6;
 	padding: 2px;
 	border-radius: 6px;
 	margin-top: 0;

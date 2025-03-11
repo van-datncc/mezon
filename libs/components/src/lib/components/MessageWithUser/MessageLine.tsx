@@ -314,7 +314,7 @@ const RenderContent = ({
 							overflowWrap: 'break-word'
 						}
 			}
-			className={`basis-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
+			className={`basis-full break-all ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'}`}
 		>
 			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>
