@@ -5,7 +5,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
-import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
 import BuzzBadge from '../../../../../../components/BuzzBadge/BuzzBadge';
 import { style } from './styles';
 
