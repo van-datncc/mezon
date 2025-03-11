@@ -143,7 +143,8 @@ export function MemberProfile({
 		if (event.button === MouseButton.LEFT) {
 			// handle show profile item
 			const hasActivityPanel = !isFooter && status?.status && activityByUserId;
-			const heightPanel = isDM ? HEIGHT_PANEL_PROFILE_DM : HEIGHT_PANEL_PROFILE + (hasActivityPanel ? ACTIVITY_PANEL_HEIGHT : 0);
+			const heightPanel = isDM ? HEIGHT_PANEL_PROFILE_DM : HEIGHT_PANEL_PROFILE;
+
 			if (window.innerHeight - event.clientY > heightPanel) {
 				setPositionShortUser({
 					top: event.clientY,
@@ -151,7 +152,7 @@ export function MemberProfile({
 				});
 			} else {
 				setPositionShortUser({
-					top: window.innerHeight - heightPanel,
+					top: window.innerHeight - (heightPanel + (hasActivityPanel ? ACTIVITY_PANEL_HEIGHT : 0)),
 					left: window.innerWidth - WIDTH_CHANNEL_LIST_BOX - WIDTH_PANEL_PROFILE
 				});
 			}
