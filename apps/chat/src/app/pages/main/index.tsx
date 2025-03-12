@@ -282,9 +282,7 @@ function MyApp() {
 	return (
 		<>
 			{toastError.map((error) => (
-				<div className="z-[100]">
-					<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
-				</div>
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
 			))}
 			<div
 				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
