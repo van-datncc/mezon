@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons, InputField } from '@mezon/ui';
-import { ImageSourceObject, createImgproxyUrl, fileTypeImage, resizeFileImage } from '@mezon/utils';
+import { ImageSourceObject, MAX_FILE_SIZE_1MB, createImgproxyUrl, fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -93,7 +93,7 @@ const SettingRightUser = ({
 				return;
 			}
 
-			if (imageCropped.size > 1000000) {
+			if (imageCropped.size > MAX_FILE_SIZE_1MB) {
 				setOpenModal(true);
 				setImageObject(null);
 				setImageCropped(null);
