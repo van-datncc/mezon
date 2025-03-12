@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
+import InviteToChannel from '../InviteToChannel';
 import { style } from './styles';
 
 interface ICategoryMenuProps {
@@ -41,8 +42,11 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 		{
 			title: t('menu.inviteMenu.invite'),
 			onPress: () => {
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_INVITE_CHANNEL);
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				const data = {
+					snapPoints: ['70%', '90%'],
+					children: <InviteToChannel isUnknownChannel={false} />
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 			},
 			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />
 		}
@@ -110,9 +114,9 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 		{
 			items: watchMenu
 		},
-		{
-			items: inviteMenu
-		},
+		// {
+		// 	items: inviteMenu
+		// },
 		{
 			items: notificationMenu
 		},
