@@ -49,6 +49,7 @@ import {
 	policiesActions,
 	reactionActions,
 	rolesClanActions,
+	selectAllEmojiSuggestion,
 	selectAllTextChannel,
 	selectAllThreads,
 	selectAllUserClans,
@@ -127,6 +128,7 @@ import {
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
 	UnmuteEvent,
+	UnpinMessageEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -138,7 +140,14 @@ import {
 	WebrtcSignalingFwd
 } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction, ApiNotification } from 'mezon-js/api.gen';
-import { ApiChannelMessageHeader, ApiNotificationUserChannel, ApiPermissionUpdate, ApiTokenSentEvent, ApiWebhook } from 'mezon-js/dist/api.gen';
+import {
+	ApiChannelMessageHeader,
+	ApiClanEmoji,
+	ApiNotificationUserChannel,
+	ApiPermissionUpdate,
+	ApiTokenSentEvent,
+	ApiWebhook
+} from 'mezon-js/dist/api.gen';
 import { ChannelCanvas, RemoveFriend, SdTopicEvent } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -542,6 +551,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		}
 	}, []);
 
+	const onUnpinMessageEvent = useCallback((unpin_message_event: UnpinMessageEvent) => {
+		if (!unpin_message_event?.channel_id) return;
+		dispatch(
+			pinMessageActions.deleteChannelPinMessage({
+				channel_id: unpin_message_event.channel_id || '',
+				message_id: unpin_message_event.message_id
+			})
+		);
+		dispatch(pinMessageActions.clearPinMessagesCacheThunk(unpin_message_event.channel_id));
+	}, []);
+
 	const oneventnotiuserchannel = useCallback(
 		(notiUserChannel: ApiNotificationUserChannel) => {
 			dispatch(notificationSettingActions.upsertNotiSetting(notiUserChannel));
@@ -818,20 +838,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventemoji = useCallback(
-		(eventEmoji: EventEmoji) => {
+		async (eventEmoji: EventEmoji) => {
+			const store = await getStoreAsync();
+			const state = store.getState() as RootState;
+			const emojiList = selectAllEmojiSuggestion(state) as ApiClanEmoji[];
+
 			if (eventEmoji.action === EEventAction.CREATED) {
-				dispatch(
-					emojiSuggestionActions.add({
-						category: eventEmoji.clan_name,
-						clan_id: eventEmoji.clan_id,
-						creator_id: eventEmoji.user_id,
-						id: eventEmoji.id,
-						shortname: eventEmoji.short_name,
-						src: eventEmoji.source,
-						logo: eventEmoji.logo,
-						clan_name: eventEmoji.clan_name
-					})
-				);
+				const newEmoji: ApiClanEmoji = {
+					category: eventEmoji.clan_name,
+					clan_id: eventEmoji.clan_id,
+					creator_id: eventEmoji.user_id,
+					id: eventEmoji.id,
+					shortname: eventEmoji.short_name,
+					src: eventEmoji.source,
+					logo: eventEmoji.logo,
+					clan_name: eventEmoji.clan_name
+				};
+
+				dispatch(emojiSuggestionActions.add(newEmoji));
+				dispatch(emojiSuggestionActions.updateEmojiCache([newEmoji, ...emojiList]));
 			} else if (eventEmoji.action === EEventAction.UPDATE) {
 				dispatch(
 					emojiSuggestionActions.update({
@@ -1171,7 +1196,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							);
 						}
 					} else {
-						if (channelUpdated.channel_private) {
+						if (channelUpdated.channel_private && channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 							dispatch(channelsActions.remove({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
 							dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
 							dispatch(
@@ -1713,6 +1738,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
 
 			socket.onsdtopicevent = onsdtopicevent;
+
+			socket.onUnpinMessageEvent = onUnpinMessageEvent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1761,7 +1788,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onwebrtcsignalingfwd,
 			onclanupdated,
 			onJoinChannelAppEvent,
-			onsdtopicevent
+			onsdtopicevent,
+			onUnpinMessageEvent
 		]
 	);
 
@@ -1869,6 +1897,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onJoinChannelAppEvent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onsdtopicevent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onUnpinMessageEvent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1917,7 +1947,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oneventwebhook,
 		ontokensent,
 		onJoinChannelAppEvent,
-		onsdtopicevent
+		onsdtopicevent,
+		onUnpinMessageEvent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

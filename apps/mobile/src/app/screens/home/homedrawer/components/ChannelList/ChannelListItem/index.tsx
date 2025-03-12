@@ -32,7 +32,6 @@ import UserListVoiceChannel from '../ChannelListUserVoice';
 
 interface IChannelListItemProps {
 	data: any;
-	isFirstThread?: boolean;
 }
 
 export enum StatusVoiceChannel {
@@ -162,7 +161,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		<>
 			{!isChannelVoice && (
 				<ChannelItem
-					isFirstThread={props?.isFirstThread}
 					onPress={handleRouteData}
 					onLongPress={handleLongPressChannel}
 					data={props?.data}
