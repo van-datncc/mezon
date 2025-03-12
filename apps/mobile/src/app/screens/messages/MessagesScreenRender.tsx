@@ -4,8 +4,7 @@ import { DirectEntity, directActions, useAppDispatch } from '@mezon/store-mobile
 import { sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useCallback, useMemo, useState } from 'react';
-import { DeviceEventEmitter, Platform, Pressable, RefreshControl, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { DeviceEventEmitter, FlatList, Platform, Pressable, RefreshControl, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DmListItem } from './DmListItem';

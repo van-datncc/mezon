@@ -65,7 +65,7 @@ const ChannelMessageReactionListener = React.memo(() => {
 					data?.actionDelete ?? false,
 					currentDirectId ? false : isPublicChannel(currentChannel),
 					!!data?.topicId,
-					data?.channelId ?? ''
+					data?.topicId ?? ''
 				);
 			}
 		},
@@ -88,7 +88,7 @@ const ChannelMessageReactionListener = React.memo(() => {
 					data?.actionDelete ?? false,
 					currentDirectId ? false : isPublicChannel(currentChannel),
 					!!data?.topicId,
-					data?.channelId ?? ''
+					data?.topicId ?? ''
 				);
 			}
 		},
