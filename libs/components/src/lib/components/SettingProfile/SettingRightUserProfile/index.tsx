@@ -109,7 +109,6 @@ const SettingRightUser = ({
 			try {
 				setIsLoading(true);
 				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
-
 				const attachment = await handleUploadFile(
 					clientRef.current,
 					sessionRef.current,
