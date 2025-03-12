@@ -2,7 +2,7 @@ import { useAuth, useClanProfileSetting } from '@mezon/core';
 import { checkDuplicateClanNickName, selectUserClanProfileByClanID, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
-import { ImageSourceObject, fileTypeImage } from '@mezon/utils';
+import { ImageSourceObject, fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -74,33 +74,46 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	useEffect(() => {
 		if (!imageCropped) return;
 
-		if (!(imageCropped instanceof File)) {
-			console.error('imageCropped is not a valid File object');
-			return;
-		}
+		const processImage = async () => {
+			if (!(imageCropped instanceof File)) {
+				console.error('imageCropped is not a valid File object');
+				return;
+			}
 
-		if (imageCropped.size > 1000000) {
-			setOpenModal(true);
-			setImageObject(null);
-			setImageCropped(null);
-			return;
-		}
+			if (imageCropped.size > 1000000) {
+				setOpenModal(true);
+				setImageObject(null);
+				setImageCropped(null);
+				return;
+			}
 
-		if (!clientRef.current || !sessionRef.current) {
-			console.error('Client or session is not initialized');
-			return;
-		}
+			if (!clientRef.current || !sessionRef.current) {
+				console.error('Client or session is not initialized');
+				return;
+			}
 
-		handleUploadFile(clientRef.current, sessionRef.current, clanId, userProfile?.user?.id || '0', imageCropped.name, imageCropped)
-			.then((attachment) => {
+			try {
+				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
+
+				const attachment = await handleUploadFile(
+					clientRef.current,
+					sessionRef.current,
+					clanId,
+					userProfile?.user?.id || '0',
+					imageAvatarResize.name,
+					imageAvatarResize
+				);
+
 				setUrlImage(attachment.url || '');
 				setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
 				setImageObject(null);
 				setImageCropped(null);
-			})
-			.catch((error) => {
+			} catch (error) {
 				console.error('Error uploading file:', error);
-			});
+			}
+		};
+
+		processImage();
 	}, [imageCropped]);
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
