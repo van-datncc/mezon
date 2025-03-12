@@ -10,15 +10,15 @@ import {
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons, InputField } from '@mezon/ui';
-import { createImgproxyUrl, fetchAndCreateFiles, fileTypeImage } from '@mezon/utils';
+import { ImageSourceObject, createImgproxyUrl, fileTypeImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../../ChannelLink';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import PanelClan from '../../PanelClan';
+import ImageEditor from '../ImageEditor/ImageEditor';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 
 const SettingRightUser = ({
@@ -73,47 +73,67 @@ const SettingRightUser = ({
 		}
 	};
 
-	const handleFile = async (e: any) => {
-		const file = e?.target?.files[0];
-		const sizeImage = file?.size;
-		const session = sessionRef.current;
-		const client = clientRef.current;
+	// Editor Avatar Profile//
+	const [imageObject, setImageObject] = useState<ImageSourceObject | null>(null);
+	const [imageCropped, setImageCropped] = useState<File | null>(null);
+	const [openModalEditor, closeModalEditor] = useModal(
+		() =>
+			imageObject ? (
+				<ImageEditor setImageCropped={setImageCropped} setImageObject={setImageObject} onClose={closeModalEditor} imageSource={imageObject} />
+			) : null,
+		[imageObject]
+	);
 
-		const files = [
-			{
-				filename: file.name,
-				filetype: file.type,
-				size: file.size,
-				url: URL.createObjectURL(file)
-			}
-		] as ApiMessageAttachment[];
+	useEffect(() => {
+		if (!imageCropped) return;
 
-		if (!file) return;
-		if (!client || !session) {
-			throw new Error('Client or file is not initialized');
-		}
-
-		const allowedTypes = fileTypeImage;
-		if (!allowedTypes.includes(file.type)) {
-			setOpenModalType(true);
-			e.target.value = null;
+		if (!(imageCropped instanceof File)) {
+			console.error('imageCropped is not a valid File object');
 			return;
 		}
 
-		if (sizeImage > 1000000) {
+		if (imageCropped.size > 1000000) {
 			setOpenModal(true);
-			e.target.value = null;
+			setImageObject(null);
+			setImageCropped(null);
 			return;
 		}
-		const createdFiles = await fetchAndCreateFiles(files);
-		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', files[0]?.filename || '', createdFiles[0]).then(
-			(attachment: any) => {
-				console.log('attachment.url :', attachment.url);
-				setUrlImage(attachment.url ?? '');
-			}
-		);
+
+		if (!clientRef.current || !sessionRef.current) {
+			console.error('Client or session is not initialized');
+			return;
+		}
+
+		handleUploadFile(clientRef.current, sessionRef.current, currentClanId || '0', userProfile?.user?.id || '0', imageCropped.name, imageCropped)
+			.then((attachment) => {
+				setUrlImage(attachment.url || '');
+				setImageObject(null);
+				setImageCropped(null);
+			})
+			.catch((error) => {
+				console.error('Error uploading file:', error);
+			});
+	}, [imageCropped]);
+
+	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		if (!fileTypeImage.includes(file.type)) {
+			setOpenModalType(true);
+			return;
+		}
+		const newImageObject: ImageSourceObject = {
+			filename: file.name,
+			filetype: file.type,
+			size: file.size,
+			url: URL.createObjectURL(file)
+		};
 		setFlags(true);
+		setImageObject(newImageObject);
+		openModalEditor();
+		e.target.value = '';
 	};
+
 	const handleClose = () => {
 		setValueDisplayName(currentDisplayName);
 		setEditAboutUser(aboutMe);
@@ -226,7 +246,7 @@ const SettingRightUser = ({
 							<label>
 								<div
 									className="text-white font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]"
-									onChange={(e) => handleFile(e)}
+									// onChange={(e) => handleFile(e)}
 								>
 									Change avatar
 								</div>

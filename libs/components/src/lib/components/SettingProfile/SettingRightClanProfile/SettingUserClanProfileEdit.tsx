@@ -60,7 +60,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 
 	const { displayName, urlImage } = editProfile;
 
-	/////////////////
+	// Editor Avatar //
 	const [imageObject, setImageObject] = useState<ImageSourceObject | null>(null);
 	const [imageCropped, setImageCropped] = useState<File | null>(null);
 	const [openModalEditor, closeModalEditor] = useModal(
