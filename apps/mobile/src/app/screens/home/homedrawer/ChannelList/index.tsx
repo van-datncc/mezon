@@ -136,9 +136,6 @@ const ChannelList = () => {
 				<View style={{ height: 80 }} />
 				<ButtonNewUnread />
 			</View>
-
-			{/* add use idle */}
-			<ChannelListBottomSheet />
 		</>
 	);
 };
