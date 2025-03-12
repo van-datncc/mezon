@@ -1369,7 +1369,11 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
+export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false, className = '' }) => {
+	const classProps = className
+		? className
+		: `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`;
+
 	return (
 		<svg
 			x="0"
@@ -1379,7 +1383,7 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultFill ? defaultFill : ''}`}
+			className={`${classProps} ${defaultFill ? defaultFill : ''}`}
 			viewBox="0 0 24 24"
 		>
 			<path

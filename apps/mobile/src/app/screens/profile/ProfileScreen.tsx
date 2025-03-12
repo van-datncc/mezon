@@ -228,15 +228,19 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
-						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
-						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
-					</TouchableOpacity>
+					{!!user?.userProfile?.user?.display_name && (
+						<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
+							<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
+							<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
+						</TouchableOpacity>
+					)}
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
 					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}>
 						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
 						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
-							<Text style={styles.text}>{`${t('token')} ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}</Text>
+							<Text
+								style={styles.text}
+							>{`${t('token')} ${tokenInWallet ? formatNumber(Number(tokenInWallet), 'vi-VN', 'VND') : '0'}`}</Text>
 						</TouchableOpacity>
 					</View>
 					{userCustomStatus ? (

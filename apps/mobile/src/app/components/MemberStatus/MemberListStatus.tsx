@@ -11,7 +11,7 @@ import {
 import { ChannelMembersEntity, UsersClanEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, SectionList, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -49,7 +49,7 @@ export const MemberListStatus = React.memo(() => {
 		if (action === EActionButton.InviteMembers) {
 			const data = {
 				snapPoints: ['70%', '90%'],
-				children: <InviteToChannel isUnknownChannel={false} isDMThread={isDMThread} />
+				children: <InviteToChannel isUnknownChannel={false} isDMThread={isDMThread} channelId={currentChannel?.channel_id} />
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		}
