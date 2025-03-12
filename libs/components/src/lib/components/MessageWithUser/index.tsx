@@ -234,7 +234,7 @@ function MessageWithUser({
 								<>
 									{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 pr-1" />}
 									{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 pr-1" />}
-									{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6" className="pr-1" />}
+									{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6 pr-1" />}
 									{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8 pr-1" />}
 								</>
 							) : message?.references?.length === 0 && isCombine && !isShowFull ? (
@@ -254,9 +254,14 @@ function MessageWithUser({
 									/>
 								</>
 							)}
-							{!!message?.content?.fwd && <div className="border-l-4 dark:border-[#414348] border-[#ebebeb] rounded"></div>}
 							{!!message?.content?.fwd && (
-								<div className="flex gap-1 items-center italic text-[#5e6068] dark:text-[#949ba4] font-medium">
+								<div
+									style={{ height: `${!isCombine ? 'calc(100% - 50px)' : '100%'}` }}
+									className="border-l-4 dark:border-[#414348] border-[#ebebeb] rounded absolute left-[45px] bottom-0"
+								></div>
+							)}
+							{!!message?.content?.fwd && (
+								<div className="flex gap-1 items-center italic text-[#5e6068] dark:text-[#949ba4] font-medium w-full">
 									<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 									<p>Forwarded</p>
 								</div>
