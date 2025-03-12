@@ -9,7 +9,7 @@ interface ImageEditorProps {
 	setImageCropped: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
-const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImageObject, setImageCropped }) => {
+const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImageCropped }: ImageEditorProps) => {
 	const [zoom, setZoom] = useState<number>(1);
 	const [rotation, setRotation] = useState<number>(0);
 	const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -184,67 +184,107 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 	return (
 		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
 			<div className="bg-[#313338] rounded-lg text-white text-center flex flex-col items-center w-[600px] h-fit">
-				{/* Header */}
-				<div className="flex items-center justify-between px-4 py-5 rounded-t-lg w-full font-semibold text-lg">
-					<span>Edit Image</span>
-					<button onClick={handleClose} className="text-gray-400 hover:text-white text-xl" title="Close">
-						✕
-					</button>
-				</div>
-
-				{/* Canvas */}
-				<div className="relative flex justify-center items-center w-[500px] h-[500px]">
-					<canvas
-						ref={bgCanvasRef}
-						className="cursor-move absolute"
-						onMouseDown={handleMouseDown}
-						onMouseMove={handleMouseMove}
-						onMouseUp={handleMouseUp}
-						title="Move Image"
-					></canvas>
-					<canvas ref={overlayCanvasRef} className="absolute pointer-events-none"></canvas>
-				</div>
-
-				{/* Controls */}
-				<div className="p-0.5">
-					<div className="flex flex-row items-center gap-2">
-						<Icons.ImageThumbnail defaultSize="w-3 h-3" />
-						<input
-							type="range"
-							min="0.5"
-							max="2"
-							step="0.1"
-							value={zoom}
-							onChange={handleZoom}
-							className="w-[150px] my-4 cursor-pointer"
-							title="Adjust Zoom"
-						/>
-						<Icons.ImageThumbnail defaultSize="w-5 h-5" />
-						<Icons.RotateIcon onClick={handleRotate} className="cursor-pointer w-5 h-5 text-[#AEAEAE] hover:text-gray-300" />
-					</div>
-				</div>
-
-				{/* Footer Actions */}
-				<div className="flex items-center justify-between px-4 py-5 bg-[#2B2D31] rounded-b-lg w-full">
-					<button onClick={handleReset} className="text-gray-400 hover:text-gray-300 text-sm" title="Reset Changes">
-						Reset
-					</button>
-					<div className="flex gap-2">
-						<button onClick={handleClose} className="text-white text-sm hover:underline" title="Cancel Editing">
-							Cancel
-						</button>
-						<button
-							onClick={handleApply}
-							className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm px-4 py-2 rounded-md"
-							title="Apply Changes"
-						>
-							Apply
-						</button>
-					</div>
-				</div>
+				<ImageEditorHeader handleClose={handleClose} />
+				<ImageEditorCanvas
+					bgCanvasRef={bgCanvasRef}
+					overlayCanvasRef={overlayCanvasRef}
+					handleMouseDown={handleMouseDown}
+					handleMouseMove={handleMouseMove}
+					handleMouseUp={handleMouseUp}
+				/>
+				<ImageControls zoom={zoom} handleZoom={handleZoom} handleRotate={handleRotate} />
+				<ImageEditorFooter handleReset={handleReset} handleClose={handleClose} handleApply={handleApply} />
 			</div>
 		</div>
 	);
-};
+});
 
 export default ImageEditor;
+
+interface ImageEditorProps {
+	imageSource: ImageSourceObject;
+	onClose: () => void;
+	setImageObject: React.Dispatch<React.SetStateAction<ImageSourceObject | null>>;
+	setImageCropped: React.Dispatch<React.SetStateAction<File | null>>;
+}
+
+type ImageEditorHeaderProps = {
+	handleClose: () => void;
+};
+
+const ImageEditorHeader = React.memo(({ handleClose }: ImageEditorHeaderProps) => (
+	<div className="flex items-center justify-between px-4 py-5 rounded-t-lg w-full font-semibold text-lg">
+		<span>Edit Image</span>
+		<button onClick={handleClose} className="text-gray-400 hover:text-white text-xl" title="Close">
+			✕
+		</button>
+	</div>
+));
+
+type ImageEditorCanvasProps = {
+	bgCanvasRef: React.RefObject<HTMLCanvasElement>;
+	overlayCanvasRef: React.RefObject<HTMLCanvasElement>;
+	handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+	handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+	handleMouseUp: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+};
+
+const ImageEditorCanvas = React.memo(({ bgCanvasRef, overlayCanvasRef, handleMouseDown, handleMouseMove, handleMouseUp }: ImageEditorCanvasProps) => (
+	<div className="relative flex justify-center items-center w-[500px] h-[500px]">
+		<canvas
+			ref={bgCanvasRef}
+			className="cursor-move absolute"
+			onMouseDown={handleMouseDown}
+			onMouseMove={handleMouseMove}
+			onMouseUp={handleMouseUp}
+			title="Move Image"
+		></canvas>
+		<canvas ref={overlayCanvasRef} className="absolute pointer-events-none"></canvas>
+	</div>
+));
+
+type ImageControlsProps = {
+	zoom: number;
+	handleZoom: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	handleRotate: () => void;
+};
+
+const ImageControls = React.memo(({ zoom, handleZoom, handleRotate }: ImageControlsProps) => (
+	<div className="flex flex-row items-center gap-2 p-0.5">
+		<Icons.ImageThumbnail defaultSize="w-3 h-3" />
+		<input
+			type="range"
+			min="0.5"
+			max="2"
+			step="0.1"
+			value={zoom}
+			onChange={handleZoom}
+			className="w-[150px] my-4 cursor-pointer"
+			title="Adjust Zoom"
+		/>
+		<Icons.ImageThumbnail defaultSize="w-5 h-5" />
+		<Icons.RotateIcon onClick={handleRotate} className="cursor-pointer w-5 h-5 text-[#AEAEAE] hover:text-gray-300" />
+	</div>
+));
+
+type ImageEditorFooterProps = {
+	handleReset: () => void;
+	handleClose: () => void;
+	handleApply: () => void;
+};
+
+const ImageEditorFooter = React.memo(({ handleReset, handleClose, handleApply }: ImageEditorFooterProps) => (
+	<div className="flex items-center justify-between px-4 py-5 bg-[#2B2D31] rounded-b-lg w-full">
+		<button onClick={handleReset} className="text-gray-400 hover:text-gray-300 text-sm" title="Reset Changes">
+			Reset
+		</button>
+		<div className="flex gap-2">
+			<button onClick={handleClose} className="text-white text-sm hover:underline" title="Cancel Editing">
+				Cancel
+			</button>
+			<button onClick={handleApply} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm px-4 py-2 rounded-md" title="Apply Changes">
+				Apply
+			</button>
+		</div>
+	</div>
+));
