@@ -44,7 +44,6 @@ export enum IThreadActiveType {
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
-	const bottomSheetChannelStreamingRef = useRef<BottomSheetModal>(null);
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 	const [channelIdActive, setChannelIdActive] = useState<string>('');
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
@@ -77,9 +76,9 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			snapPoints: ['45%'],
 			children:
 				props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-					<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+					<JoinStreamingRoomBS channel={props?.data} />
 				) : (
-					<JoinChannelVoiceBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+					<JoinChannelVoiceBS channel={props?.data} />
 				)
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
