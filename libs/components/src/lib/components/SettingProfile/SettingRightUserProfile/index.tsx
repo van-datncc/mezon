@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons, InputField } from '@mezon/ui';
-import { ImageSourceObject, MAX_FILE_SIZE_1MB, createImgproxyUrl, fileTypeImage, resizeFileImage } from '@mezon/utils';
+import { ImageSourceObject, createImgproxyUrl, fileTypeImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -20,6 +20,7 @@ import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import PanelClan from '../../PanelClan';
 import ImageEditor from '../ImageEditor/ImageEditor';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import { processImage } from '../helper';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -86,48 +87,19 @@ const SettingRightUser = ({
 	);
 
 	useEffect(() => {
-		if (!imageCropped) return;
-
-		const processImage = async () => {
-			if (!(imageCropped instanceof File)) {
-				console.error('imageCropped is not a valid File object');
-				return;
-			}
-
-			if (imageCropped.size > MAX_FILE_SIZE_1MB) {
-				setOpenModal(true);
-				setImageObject(null);
-				setImageCropped(null);
-				return;
-			}
-
-			if (!clientRef.current || !sessionRef.current) {
-				console.error('Client or session is not initialized');
-				return;
-			}
-
-			try {
-				setIsLoading(true);
-				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
-				const attachment = await handleUploadFile(
-					clientRef.current,
-					sessionRef.current,
-					currentClanId || '0',
-					userProfile?.user?.id || '0',
-					imageAvatarResize.name,
-					imageAvatarResize
-				);
-
-				setUrlImage(attachment.url || '');
-				setImageObject(null);
-				setImageCropped(null);
-				setIsLoading(false);
-			} catch (error) {
-				console.error('Error uploading file:', error);
-			}
-		};
-
-		processImage();
+		processImage(
+			imageCropped,
+			dispatch,
+			clientRef,
+			sessionRef,
+			currentClanId || '0',
+			userProfile,
+			setUrlImage as any,
+			setImageObject as any,
+			setImageCropped as any,
+			setIsLoading,
+			setOpenModal
+		);
 	}, [imageCropped]);
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {

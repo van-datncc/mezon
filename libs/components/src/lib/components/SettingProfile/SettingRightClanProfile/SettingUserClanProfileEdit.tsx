@@ -1,10 +1,10 @@
 import { useAuth, useClanProfileSetting } from '@mezon/core';
 import { checkDuplicateClanNickName, selectUserClanProfileByClanID, useAppDispatch } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
-import { ImageSourceObject, MAX_FILE_SIZE_1MB, fileTypeImage, resizeFileImage } from '@mezon/utils';
+import { ImageSourceObject, fileTypeImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
@@ -12,6 +12,7 @@ import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import ImageEditor from '../ImageEditor/ImageEditor';
 import SettingRightClanCard from '../SettingUserClanProfileCard';
+import { processImage } from '../helper';
 import { SettingUserClanProfileSave } from './SettingUserClanProfileSave';
 
 interface SettingUserClanProfileEditProps {
@@ -37,9 +38,12 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		setDraftProfile(userClansProfile);
 	}, [userClansProfile]);
 
-	const setUrlImage = (url_image: string) => {
-		setDraftProfile((prevState) => (prevState ? { ...prevState, avatar: url_image } : prevState));
-	};
+	const setUrlImage = useCallback(
+		(url_image: string) => {
+			setDraftProfile((prevState) => (prevState ? { ...prevState, avatar: url_image } : prevState));
+		},
+		[setDraftProfile]
+	);
 	const setDisplayName = (nick_name: string) => {
 		setDraftProfile((prevState) => (prevState ? { ...prevState, nick_name } : prevState));
 	};
@@ -71,53 +75,21 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			) : null,
 		[imageObject]
 	);
-
 	useEffect(() => {
-		if (!imageCropped) return;
-
-		const processImage = async () => {
-			if (!(imageCropped instanceof File)) {
-				console.error('imageCropped is not a valid File object');
-				return;
-			}
-
-			if (imageCropped.size > MAX_FILE_SIZE_1MB) {
-				setOpenModal(true);
-				setImageObject(null);
-				setImageCropped(null);
-				return;
-			}
-
-			if (!clientRef.current || !sessionRef.current) {
-				console.error('Client or session is not initialized');
-				return;
-			}
-
-			try {
-				setIsLoading(true);
-
-				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
-
-				const attachment = await handleUploadFile(
-					clientRef.current,
-					sessionRef.current,
-					clanId,
-					userProfile?.user?.id || '0',
-					imageAvatarResize.name,
-					imageAvatarResize
-				);
-
-				setUrlImage(attachment.url || '');
-				setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
-				setImageObject(null);
-				setImageCropped(null);
-				setIsLoading(false);
-			} catch (error) {
-				console.error('Error uploading file:', error);
-			}
-		};
-
-		processImage();
+		processImage(
+			imageCropped,
+			dispatch,
+			clientRef,
+			sessionRef,
+			clanId,
+			userProfile,
+			setUrlImage as any,
+			setImageObject as any,
+			setImageCropped as any,
+			setIsLoading,
+			setOpenModal,
+			setFlagOption as any
+		);
 	}, [imageCropped]);
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
