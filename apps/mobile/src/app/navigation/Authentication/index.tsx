@@ -22,6 +22,7 @@ import { RenderVideoDetail } from '../../screens/home/homedrawer/components/Rend
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { APP_SCREEN } from '../ScreenTypes';
+import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
@@ -31,7 +32,6 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
-import { AuthenticationLoader } from './AuthenticationLoader';
 const RootStack = createStackNavigator();
 const { SharedPreferences } = NativeModules;
 
