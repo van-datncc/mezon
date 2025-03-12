@@ -4,12 +4,11 @@ import React, { useEffect, useRef, useState } from 'react';
 interface ImageEditorProps {
 	imageSource: ImageSourceObject;
 	onClose: () => void;
-	onApply: (editedImage: string) => void;
 	setImageObject: React.Dispatch<React.SetStateAction<ImageSourceObject | null>>;
-	setImageCropped: React.Dispatch<React.SetStateAction<ImageSourceObject | null>>;
+	setImageCropped: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
-const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, onApply, setImageObject, setImageCropped }) => {
+const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImageObject, setImageCropped }) => {
 	const [zoom, setZoom] = useState<number>(1);
 	const [rotation, setRotation] = useState<number>(0);
 	const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -124,47 +123,41 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, onApply
 
 	const handleClose = () => {
 		setImageObject(null);
+		setDragging(false);
 		onClose();
 	};
+
 	const handleApply = () => {
 		const bgCanvas = bgCanvasRef.current;
-		const cropCanvas = overlayCanvasRef.current;
-		if (!bgCanvas || !cropCanvas) return;
+		if (!bgCanvas) return;
 
-		const ctx = cropCanvas.getContext('2d');
+		const tempCanvas = document.createElement('canvas');
+		const ctx = tempCanvas.getContext('2d');
 		if (!ctx) return;
 
-		// Original canvas dimensions
-		const { width, height } = bgCanvas;
-		const radius = Math.min(width, height) / 2;
+		// Size of the cropped canvas
+		const radius = 140;
+		const diameter = radius * 2;
+		tempCanvas.width = diameter;
+		tempCanvas.height = diameter;
 
-		// Determine the square with the same position as the circle
-		const squareSize = radius * 2;
-		const startX = (width - squareSize) / 2;
-		const startY = (height - squareSize) / 2;
+		// Determine the position of the circle on the original canvas
+		const centerX = bgCanvas.width / 2;
+		const centerY = bgCanvas.height / 2;
 
-		// Update the dimensions of the cropped canvas
-		cropCanvas.width = squareSize;
-		cropCanvas.height = squareSize;
+		// Crop the image inside the circle
+		ctx.beginPath();
+		ctx.arc(radius, radius, radius, 0, Math.PI * 2);
+		ctx.closePath();
 
-		// Clear previous content and draw a square from `bgCanvas`
-		ctx.clearRect(0, 0, squareSize, squareSize);
-		ctx.drawImage(bgCanvas, startX, startY, squareSize, squareSize, 0, 0, squareSize, squareSize);
+		// Draw the cropped image onto the temporary canvas
+		ctx.drawImage(bgCanvas, centerX - radius, centerY - radius, diameter, diameter, 0, 0, diameter, diameter);
 
 		// Export the cropped image
-		cropCanvas.toBlob((blob) => {
+		tempCanvas.toBlob((blob) => {
 			if (!blob) return;
-
-			const file = new File([blob], 'cropped-square.png', { type: 'image/png' });
-
-			const newImageObject = {
-				filename: file.name,
-				filetype: file.type,
-				size: file.size,
-				url: URL.createObjectURL(file)
-			};
-
-			setImageCropped(newImageObject);
+			const file = new File([blob], `${imageSource.filename}+cropped`, { type: 'image/png' });
+			setImageCropped(file);
 			handleClose();
 		}, 'image/png');
 	};
