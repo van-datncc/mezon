@@ -674,7 +674,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 		return (
-			<div className="w-full h-full relative messages-container">
+			<div className="w-full h-full relative messages-container select-text">
 				<div
 					onWheelCapture={() => {
 						toggleDisableHover(chatRef.current, scrollTimeoutId2);

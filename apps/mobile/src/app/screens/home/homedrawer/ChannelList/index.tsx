@@ -1,17 +1,13 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectIsShowEmptyCategory, selectListChannelRenderByClanId, voiceActions } from '@mezon/store';
 import { selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, RefreshControl, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, Platform, RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
-import { AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import ChannelListBackground from '../components/ChannelList/ChannelListBackground';
-import ChannelListBottomSheet from '../components/ChannelList/ChannelListBottomSheet';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import { ChannelListItem } from '../components/ChannelList/ChannelListItem';
 import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
@@ -70,7 +66,6 @@ const ChannelList = () => {
 
 	const styles = style(themeValue, isTabletLandscape);
 
-	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 
@@ -82,10 +77,7 @@ const ChannelList = () => {
 		} else {
 			return (
 				<View key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}>
-					<ChannelListItem
-						data={item}
-						isFirstThread={item?.type === ChannelType.CHANNEL_TYPE_THREAD && data[index - 1]?.type !== ChannelType.CHANNEL_TYPE_THREAD}
-					/>
+					<ChannelListItem data={item} />
 				</View>
 			);
 		}
@@ -93,27 +85,41 @@ const ChannelList = () => {
 
 	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
 	return (
-		<>
-			<View style={styles.mainList}>
-				<ChannelListScroll data={data} flashListRef={flashListRef} />
-				<FlatList
-					ref={flashListRef}
-					data={data}
-					renderItem={renderItem}
-					keyExtractor={keyExtractor}
-					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-					stickyHeaderIndices={[1]}
-					showsVerticalScrollIndicator={true}
-					initialNumToRender={10}
-					maxToRenderPerBatch={10}
-					windowSize={10}
-					onEndReachedThreshold={0.7}
-					removeClippedSubviews={Platform.OS === 'android'}
-					keyboardShouldPersistTaps={'handled'}
-					ListHeaderComponent={() => {
-						return <ChannelListBackground />;
-					}}
-					onScrollToIndexFailed={(info) => {
+		<View style={styles.mainList}>
+			<ChannelListScroll data={data} flashListRef={flashListRef} />
+			<FlatList
+				ref={flashListRef}
+				data={data}
+				renderItem={renderItem}
+				keyExtractor={keyExtractor}
+				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+				stickyHeaderIndices={[1]}
+				showsVerticalScrollIndicator={true}
+				initialNumToRender={10}
+				maxToRenderPerBatch={10}
+				windowSize={10}
+				onEndReachedThreshold={0.7}
+				removeClippedSubviews={Platform.OS === 'android'}
+				keyboardShouldPersistTaps={'handled'}
+				ListHeaderComponent={() => {
+					return <ChannelListBackground />;
+				}}
+				getItemLayout={(data, index) => ({
+					length: index === 0 ? size.s_100 + size.s_10 : size.s_36,
+					offset: index === 0 ? size.s_100 + size.s_10 : size.s_36 * index,
+					index
+				})}
+				CellRendererComponent={({ children, index, style }) => {
+					if (index === 0) {
+						return <View style={[style, { zIndex: 10 }]}>{children}</View>;
+					}
+					if (data?.[index]?.threadIds) {
+						return <View style={[style, { backgroundColor: themeValue.secondary, zIndex: 1 }]}>{children}</View>;
+					}
+					return children;
+				}}
+				onScrollToIndexFailed={(info) => {
+					if (info?.highestMeasuredFrameIndex) {
 						const wait = new Promise((resolve) => setTimeout(resolve, 200));
 						if (info.highestMeasuredFrameIndex < info.index) {
 							flashListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: true });
@@ -121,16 +127,13 @@ const ChannelList = () => {
 								flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
 							});
 						}
-					}}
-					disableVirtualization
-				/>
-				<View style={{ height: 80 }} />
-				<ButtonNewUnread />
-			</View>
-
-			{/* add use idle */}
-			<ChannelListBottomSheet />
-		</>
+					}
+				}}
+				disableVirtualization
+			/>
+			<View style={{ height: 80 }} />
+			<ButtonNewUnread />
+		</View>
 	);
 };
 

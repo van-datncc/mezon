@@ -1,4 +1,12 @@
-import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithUser, OnBoardWelcome, useMessageContextMenu } from '@mezon/components';
+import {
+	ChannelMessageOpt,
+	ChatWelcome,
+	MessageContextMenuProps,
+	MessageWithSystem,
+	MessageWithUser,
+	OnBoardWelcome,
+	useMessageContextMenu
+} from '@mezon/components';
 import { MessagesEntity, selectChannelDraftMessage, selectIdMessageRefEdit, selectOpenEditMessageState, useAppSelector } from '@mezon/store';
 import { FOR_10_MINUTES, TypeMessage } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
@@ -104,6 +112,12 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		);
 	}, [message, handleContextMenu, isCombine, mode]);
 
+	const isMessageSystem =
+		message?.code === TypeMessage.Welcome ||
+		message?.code === TypeMessage.CreateThread ||
+		message?.code === TypeMessage.CreatePin ||
+		message?.code === TypeMessage.AuditLog;
+
 	return (
 		<>
 			{message.code === TypeMessage.Indicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
@@ -113,7 +127,11 @@ export const ChannelMessage: ChannelMessageComponent = ({
 				<ChatWelcome isPrivate={isPrivate} key={messageId} name={channelLabel} avatarDM={avatarDM} username={username} mode={mode} />
 			)}
 
-			{!message.isFirst && (
+			{isMessageSystem && (
+				<MessageWithSystem message={mess} mode={mode} popup={popup} onContextMenu={handleContextMenu} showDivider={isDifferentDay} />
+			)}
+
+			{!message.isFirst && !isMessageSystem && (
 				<MessageWithUser
 					allowDisplayShortProfile={true}
 					message={mess}
@@ -143,7 +161,8 @@ export const MemorizedChannelMessage = memo(
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
 		// prev.message.content === curr.message.content &&
-		prev.previousMessage?.id === curr.previousMessage?.id
+		prev.previousMessage?.id === curr.previousMessage?.id &&
+		prev.message?.code === curr.message?.code
 );
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';
