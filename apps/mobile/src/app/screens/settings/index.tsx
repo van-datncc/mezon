@@ -398,7 +398,6 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 						uri: linkRedirectLogout
 					}}
 					originWhitelist={['*']}
-					style={{ flex: 1, width: '100%', height: 500, zIndex: 11 }}
 					injectedJavaScriptBeforeContentLoaded={injectedJS}
 					javaScriptEnabled={true}
 					nestedScrollEnabled={true}
