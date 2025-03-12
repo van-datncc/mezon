@@ -33,7 +33,7 @@ const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
 	return (
 		<Tooltip
 			overlay={
-				<div style={{ width: 'max-content' }}>
+				<div className="p-2 dark:bg-[#2B2D31] bg-bgLightMode dark:text-[#E6E6E6] text-black max-w-max">
 					<p>{`Event: ${event.title}`}</p>
 					<p>{eventStatusNotice}</p>
 					<p>{timeFomat(event.start_time ?? '')}</p>

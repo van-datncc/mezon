@@ -333,7 +333,7 @@ const Notifications = () => {
 						paddingBottom: size.s_100 * 2
 					}}
 					estimatedItemSize={200}
-					keyExtractor={(item) => `${item.id}_item_noti`}
+					keyExtractor={(item, index) => `${item.id}_${index}_item_noti`}
 					onEndReached={fetchMoreData}
 					onEndReachedThreshold={0.5}
 					ListFooterComponent={isLoadMore && <ViewLoadMore />}
