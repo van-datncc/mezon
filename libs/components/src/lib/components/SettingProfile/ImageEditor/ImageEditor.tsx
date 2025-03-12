@@ -1,3 +1,4 @@
+import { Icons } from '@mezon/ui';
 import { ImageSourceObject } from '@mezon/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -30,12 +31,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 		const img = new Image();
 		img.src = imageSource?.url;
 		img.onload = () => {
-			bgCanvas.width = overlayCanvas.width = 600;
-			bgCanvas.height = overlayCanvas.height = 300;
+			bgCanvas.width = overlayCanvas.width = 500;
+			bgCanvas.height = overlayCanvas.height = 500;
 			setupCanvases(bgCanvas, overlayCanvas, img, zoom, rotation, offset);
 		};
 	}, [imageSource, zoom, rotation, offset]);
-
 	const setupCanvases = (
 		bgCanvas: HTMLCanvasElement,
 		overlayCanvas: HTMLCanvasElement,
@@ -47,20 +47,34 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 		const bgCtx = bgCanvas.getContext('2d')!;
 		const overlayCtx = overlayCanvas.getContext('2d')!;
 
-		// *** Draw the background image on bgCanvas ***
+		// Clear the canvas before redrawing
 		bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
 		bgCtx.save();
-		bgCtx.translate(bgCanvas.width / 2 + offset.x, bgCanvas.height / 2 + offset.y);
+
+		// Increase the default zoom level (e.g., 3 to enlarge the image more than usual)
+		const baseZoomFactor = 1;
+		const scaleX = (bgCanvas.width / img.width) * baseZoomFactor;
+		const scaleY = (bgCanvas.height / img.height) * baseZoomFactor;
+		const scaleFactor = Math.min(scaleX, scaleY) * zoom; // Take the smaller ratio to fit the image within the frame
+
+		const imgWidth = img.width * scaleFactor;
+		const imgHeight = img.height * scaleFactor;
+
+		// Center the image within the canvas
+		const centerX = bgCanvas.width / 2;
+		const centerY = bgCanvas.height / 2;
+
+		bgCtx.translate(centerX + offset.x, centerY + offset.y);
 		bgCtx.rotate((rotation * Math.PI) / 180);
-		bgCtx.drawImage(img, (-img.width / 2) * zoom, (-img.height / 2) * zoom, img.width * zoom, img.height * zoom);
+		bgCtx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
 		bgCtx.restore();
 
-		// *** Create a blur effect on overlayCanvas ***
+		// *** Draw overlay ***
 		overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 		overlayCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 		overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-		// Erase a circular area
+		// Remove the circular area in the center
 		const radius = 140;
 		overlayCtx.globalCompositeOperation = 'destination-out';
 		overlayCtx.beginPath();
@@ -68,7 +82,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 		overlayCtx.fill();
 		overlayCtx.globalCompositeOperation = 'source-over';
 
-		// Draw a white border
+		// White border for the circular area
 		overlayCtx.beginPath();
 		overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
 		overlayCtx.strokeStyle = 'white';
@@ -163,33 +177,65 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 	};
 
 	return (
-		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50  ">
-			<div className="bg-[#313338] p-6 rounded-lg text-white text-center  flex flex-col items-center w-[650px] h-[600px]">
-				<h3 className="text-lg font-semibold mb-4">Edit Image</h3>
-				<div className="relative flex justify-center items-center w-[600px] h-[500px]">
+		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+			<div className="bg-[#313338] rounded-lg text-white text-center flex flex-col items-center w-[600px] h-fit">
+				{/* Header */}
+				<div className="flex items-center justify-between px-4 py-5 rounded-t-lg w-full font-semibold text-lg">
+					<span>Edit Image</span>
+					<button onClick={handleClose} className="text-gray-400 hover:text-white text-xl" title="Close">
+						✕
+					</button>
+				</div>
+
+				{/* Canvas */}
+				<div className="relative flex justify-center items-center w-[500px] h-[500px]">
 					<canvas
 						ref={bgCanvasRef}
 						className="cursor-move absolute"
 						onMouseDown={handleMouseDown}
 						onMouseMove={handleMouseMove}
 						onMouseUp={handleMouseUp}
+						title="Move Image"
 					></canvas>
 					<canvas ref={overlayCanvasRef} className="absolute pointer-events-none"></canvas>
 				</div>
-				<input type="range" min="0.5" max="2" step="0.1" value={zoom} onChange={handleZoom} className="w-full my-4" />
-				<div className="flex justify-between mt-4 space-x-2">
-					<button onClick={handleReset} className="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-md">
+
+				{/* Controls */}
+				<div className="p-0.5">
+					<div className="flex flex-row items-center gap-2">
+						<Icons.ImageThumbnail defaultSize="w-3 h-3" />
+						<input
+							type="range"
+							min="0.5"
+							max="2"
+							step="0.1"
+							value={zoom}
+							onChange={handleZoom}
+							className="w-[150px] my-4 cursor-pointer"
+							title="Adjust Zoom"
+						/>
+						<Icons.ImageThumbnail defaultSize="w-5 h-5" />
+						<Icons.RotateIcon onClick={handleRotate} className="cursor-pointer w-5 h-5 text-[#AEAEAE] hover:text-gray-300" />
+					</div>
+				</div>
+
+				{/* Footer Actions */}
+				<div className="flex items-center justify-between px-4 py-5 bg-[#2B2D31] rounded-b-lg w-full">
+					<button onClick={handleReset} className="text-gray-400 hover:text-gray-300 text-sm" title="Reset Changes">
 						Reset
 					</button>
-					<button onClick={handleClose} className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-md">
-						Cancel
-					</button>
-					<button onClick={handleRotate} className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-md">
-						Rotate
-					</button>
-					<button onClick={handleApply} className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-md">
-						Apply
-					</button>
+					<div className="flex gap-2">
+						<button onClick={handleClose} className="text-white text-sm hover:underline" title="Cancel Editing">
+							Cancel
+						</button>
+						<button
+							onClick={handleApply}
+							className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm px-4 py-2 rounded-md"
+							title="Apply Changes"
+						>
+							Apply
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
