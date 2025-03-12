@@ -201,13 +201,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 
 export default ImageEditor;
 
-interface ImageEditorProps {
-	imageSource: ImageSourceObject;
-	onClose: () => void;
-	setImageObject: React.Dispatch<React.SetStateAction<ImageSourceObject | null>>;
-	setImageCropped: React.Dispatch<React.SetStateAction<File | null>>;
-}
-
+// Header
 type ImageEditorHeaderProps = {
 	handleClose: () => void;
 };
@@ -220,7 +214,7 @@ const ImageEditorHeader = React.memo(({ handleClose }: ImageEditorHeaderProps) =
 		</button>
 	</div>
 ));
-
+// Canvas
 type ImageEditorCanvasProps = {
 	bgCanvasRef: React.RefObject<HTMLCanvasElement>;
 	overlayCanvasRef: React.RefObject<HTMLCanvasElement>;
@@ -243,6 +237,7 @@ const ImageEditorCanvas = React.memo(({ bgCanvasRef, overlayCanvasRef, handleMou
 	</div>
 ));
 
+// Zoom, rotate
 type ImageControlsProps = {
 	zoom: number;
 	handleZoom: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -266,7 +261,7 @@ const ImageControls = React.memo(({ zoom, handleZoom, handleRotate }: ImageContr
 		<Icons.RotateIcon onClick={handleRotate} className="cursor-pointer w-5 h-5 text-[#AEAEAE] hover:text-gray-300" />
 	</div>
 ));
-
+// Footer
 type ImageEditorFooterProps = {
 	handleReset: () => void;
 	handleClose: () => void;

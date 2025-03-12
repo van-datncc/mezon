@@ -74,6 +74,7 @@ const SettingRightUser = ({
 	};
 
 	// Editor Avatar Profile//
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [imageObject, setImageObject] = useState<ImageSourceObject | null>(null);
 	const [imageCropped, setImageCropped] = useState<File | null>(null);
 	const [openModalEditor, closeModalEditor] = useModal(
@@ -106,6 +107,7 @@ const SettingRightUser = ({
 			}
 
 			try {
+				setIsLoading(true);
 				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
 
 				const attachment = await handleUploadFile(
@@ -120,6 +122,7 @@ const SettingRightUser = ({
 				setUrlImage(attachment.url || '');
 				setImageObject(null);
 				setImageCropped(null);
+				setIsLoading(false);
 			} catch (error) {
 				console.error('Error uploading file:', error);
 			}
@@ -257,10 +260,7 @@ const SettingRightUser = ({
 						<p className="font-semibold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
-								<div
-									className="text-white font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]"
-									// onChange={(e) => handleFile(e)}
-								>
+								<div className="text-white font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]">
 									Change avatar
 								</div>
 								<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
@@ -320,7 +320,7 @@ const SettingRightUser = ({
 				</div>
 				<div className="flex-1  text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
-					<SettingUserClanProfileCard profiles={editProfile} isDM={isDM} />
+					<SettingUserClanProfileCard isLoading={isLoading} profiles={editProfile} isDM={isDM} />
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||

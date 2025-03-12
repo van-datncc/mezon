@@ -61,6 +61,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	const { displayName, urlImage } = editProfile;
 
 	// Editor Avatar //
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [imageObject, setImageObject] = useState<ImageSourceObject | null>(null);
 	const [imageCropped, setImageCropped] = useState<File | null>(null);
 	const [openModalEditor, closeModalEditor] = useModal(
@@ -93,6 +94,8 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			}
 
 			try {
+				setIsLoading(true);
+
 				const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
 
 				const attachment = await handleUploadFile(
@@ -108,6 +111,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
 				setImageObject(null);
 				setImageCropped(null);
+				setIsLoading(false);
 			} catch (error) {
 				console.error('Error uploading file:', error);
 			}
@@ -250,6 +254,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 						profiles={editProfile}
 						currentDisplayName={!displayName ? userProfile?.user?.display_name : ''}
 						isDM={isDM}
+						isLoading={isLoading}
 					/>
 				</div>
 			</div>

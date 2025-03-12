@@ -11,6 +11,7 @@ export type Profilesform = {
 export type propProfilesform = {
 	profiles: Profilesform;
 	currentDisplayName?: string;
+	isLoading?: boolean;
 	isDM?: boolean;
 };
 const SettingUserClanProfileCard = (props: propProfilesform) => {
@@ -36,6 +37,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 		<div className="dark:bg-black bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative">
 			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]" style={{ backgroundColor: color }}></div>
 			<AvatarProfile
+				isLoading={props.isLoading}
 				avatar={profiles.urlImage}
 				username={userProfile?.user?.username}
 				userToDisplay={true}
