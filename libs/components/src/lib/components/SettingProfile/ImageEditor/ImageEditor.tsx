@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/ui';
 import { ImageSourceObject } from '@mezon/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ImageEditorProps {
 	imageSource: ImageSourceObject;
@@ -36,69 +36,71 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 			setupCanvases(bgCanvas, overlayCanvas, img, zoom, rotation, offset);
 		};
 	}, [imageSource, zoom, rotation, offset]);
-	const setupCanvases = (
-		bgCanvas: HTMLCanvasElement,
-		overlayCanvas: HTMLCanvasElement,
-		img: HTMLImageElement,
-		zoom: number,
-		rotation: number,
-		offset: { x: number; y: number }
-	) => {
-		const bgCtx = bgCanvas.getContext('2d')!;
-		const overlayCtx = overlayCanvas.getContext('2d')!;
+	const setupCanvases = useCallback(
+		(
+			bgCanvas: HTMLCanvasElement,
+			overlayCanvas: HTMLCanvasElement,
+			img: HTMLImageElement,
+			zoom: number,
+			rotation: number,
+			offset: { x: number; y: number }
+		) => {
+			const bgCtx = bgCanvas.getContext('2d')!;
+			const overlayCtx = overlayCanvas.getContext('2d')!;
 
-		// Clear the canvas before redrawing
-		bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-		bgCtx.save();
+			// Clear canvas
+			bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+			bgCtx.save();
 
-		// Increase the default zoom level (e.g., 3 to enlarge the image more than usual)
-		const baseZoomFactor = 1;
-		const scaleX = (bgCanvas.width / img.width) * baseZoomFactor;
-		const scaleY = (bgCanvas.height / img.height) * baseZoomFactor;
-		const scaleFactor = Math.min(scaleX, scaleY) * zoom; // Take the smaller ratio to fit the image within the frame
+			// Zoom & Scale calculations
+			const baseZoomFactor = 1;
+			const scaleX = (bgCanvas.width / img.width) * baseZoomFactor;
+			const scaleY = (bgCanvas.height / img.height) * baseZoomFactor;
+			const scaleFactor = Math.min(scaleX, scaleY) * zoom;
 
-		const imgWidth = img.width * scaleFactor;
-		const imgHeight = img.height * scaleFactor;
+			const imgWidth = img.width * scaleFactor;
+			const imgHeight = img.height * scaleFactor;
 
-		// Center the image within the canvas
-		const centerX = bgCanvas.width / 2;
-		const centerY = bgCanvas.height / 2;
+			// Center image
+			const centerX = bgCanvas.width / 2;
+			const centerY = bgCanvas.height / 2;
 
-		bgCtx.translate(centerX + offset.x, centerY + offset.y);
-		bgCtx.rotate((rotation * Math.PI) / 180);
-		bgCtx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
-		bgCtx.restore();
+			bgCtx.translate(centerX + offset.x, centerY + offset.y);
+			bgCtx.rotate((rotation * Math.PI) / 180);
+			bgCtx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+			bgCtx.restore();
 
-		// *** Draw overlay ***
-		overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-		overlayCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-		overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+			// Overlay setup
+			overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+			overlayCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+			overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-		// Remove the circular area in the center
-		const radius = 140;
-		overlayCtx.globalCompositeOperation = 'destination-out';
-		overlayCtx.beginPath();
-		overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
-		overlayCtx.fill();
-		overlayCtx.globalCompositeOperation = 'source-over';
+			// Transparent circular area
+			const radius = 140;
+			overlayCtx.globalCompositeOperation = 'destination-out';
+			overlayCtx.beginPath();
+			overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
+			overlayCtx.fill();
+			overlayCtx.globalCompositeOperation = 'source-over';
 
-		// White border for the circular area
-		overlayCtx.beginPath();
-		overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
-		overlayCtx.strokeStyle = 'white';
-		overlayCtx.lineWidth = 3;
-		overlayCtx.stroke();
-	};
+			// White border
+			overlayCtx.beginPath();
+			overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
+			overlayCtx.strokeStyle = 'white';
+			overlayCtx.lineWidth = 3;
+			overlayCtx.stroke();
+		},
+		[zoom, rotation, offset]
+	);
 
-	const handleZoom = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleZoom = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
 		setZoom(parseFloat(event.target.value));
-	};
+	}, []);
 
-	const handleWheelZoom = (event: WheelEvent) => {
+	const handleWheelZoom = useCallback((event: WheelEvent) => {
 		event.preventDefault();
 		setZoom((prev) => Math.min(2, Math.max(0.5, prev - event.deltaY * 0.001)));
-	};
-
+	}, []);
 	useEffect(() => {
 		const canvas = bgCanvasRef.current;
 		if (canvas) {
@@ -107,41 +109,44 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 		}
 	}, []);
 
-	const handleRotate = () => {
+	const handleRotate = useCallback(() => {
 		setRotation((prev) => prev + 90);
-	};
+	}, []);
 
-	const handleReset = () => {
+	const handleReset = useCallback(() => {
 		setZoom(1);
 		setRotation(0);
 		setOffset({ x: 0, y: 0 });
-	};
+	}, []);
 
-	const handleMouseDown = (e: React.MouseEvent) => {
+	const handleMouseDown = useCallback((e: React.MouseEvent) => {
 		setDragging(true);
 		setStart({ x: e.clientX, y: e.clientY });
-	};
+	}, []);
 
-	const handleMouseMove = (e: React.MouseEvent) => {
-		if (!dragging) return;
-		setOffset((prev) => ({
-			x: prev.x + (e.clientX - start.x),
-			y: prev.y + (e.clientY - start.y)
-		}));
-		setStart({ x: e.clientX, y: e.clientY });
-	};
+	const handleMouseMove = useCallback(
+		(e: React.MouseEvent) => {
+			if (!dragging) return;
+			setOffset((prev) => ({
+				x: prev.x + (e.clientX - start.x),
+				y: prev.y + (e.clientY - start.y)
+			}));
+			setStart({ x: e.clientX, y: e.clientY });
+		},
+		[dragging, start]
+	);
 
-	const handleMouseUp = () => {
+	const handleMouseUp = useCallback(() => {
 		setDragging(false);
-	};
+	}, []);
 
-	const handleClose = () => {
+	const handleClose = useCallback(() => {
 		setImageObject(null);
 		setDragging(false);
 		onClose();
-	};
+	}, [onClose]);
 
-	const handleApply = () => {
+	const handleApply = useCallback(() => {
 		const bgCanvas = bgCanvasRef.current;
 		if (!bgCanvas) return;
 
@@ -174,7 +179,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageSource, onClose, setImag
 			setImageCropped(file);
 			handleClose();
 		}, 'image/png');
-	};
+	}, [imageSource, handleClose]);
 
 	return (
 		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
