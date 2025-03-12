@@ -938,6 +938,7 @@ export const messagesSlice = createSlice({
 				case TypeMessage.CreateThread:
 				case TypeMessage.CreatePin:
 				case TypeMessage.MessageBuzz:
+				case TypeMessage.AuditLog:
 				case TypeMessage.SendToken:
 				case TypeMessage.Chat: {
 					if (topic_id !== '0' && topic_id) {
