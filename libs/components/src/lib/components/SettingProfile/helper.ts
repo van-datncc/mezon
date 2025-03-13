@@ -17,8 +17,6 @@ export const processImage = async (
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>,
 	setFlagOption?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-	if (!imageCropped) return;
-
 	let isMounted = true;
 
 	if (!(imageCropped instanceof File)) {

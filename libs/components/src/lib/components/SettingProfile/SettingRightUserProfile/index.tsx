@@ -87,6 +87,8 @@ const SettingRightUser = ({
 	);
 
 	useEffect(() => {
+		if (!imageCropped) return;
+
 		processImage(
 			imageCropped,
 			dispatch,

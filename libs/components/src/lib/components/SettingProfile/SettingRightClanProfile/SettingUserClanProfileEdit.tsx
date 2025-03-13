@@ -76,6 +76,8 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		[imageObject]
 	);
 	useEffect(() => {
+		if (!imageCropped) return;
+
 		processImage(
 			imageCropped,
 			dispatch,
