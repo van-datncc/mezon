@@ -312,7 +312,6 @@ export const style = (colors: Attributes) =>
 		wrapperMessageBox: {
 			flexDirection: 'row',
 			paddingLeft: size.s_6,
-			marginBottom: size.s_2,
 			paddingRight: size.s_28
 		},
 		aboveMessage: {

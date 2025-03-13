@@ -62,8 +62,7 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 	const data = parseObject(notify?.content);
 	const clan = useAppSelector(selectClanById(notify?.content?.clan_id as string));
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(notify?.sender_id);
-	const unixTimestamp = Math.floor(new Date(data?.create_time).getTime() / 1000);
-	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
+	const messageTimeDifference = convertTimestampToTimeAgo(data?.create_time?.seconds);
 	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 	const subjectText = useMemo(() => {
 		return clan?.clan_name && channelInfo?.channel_label

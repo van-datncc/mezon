@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EventViewer } from '../../../../../../components/Event';
-import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
+import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import ClanMenu from '../../ClanMenu/ClanMenu';
 import { style } from './styles';
 
@@ -15,7 +15,7 @@ const ChannelListHeader = () => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['clanMenu']);
 	const currentClan = useSelector(selectCurrentClan);
-	const navigation = useNavigation<AppStackScreenProps['navigation']>();
+	const navigation = useNavigation<any>();
 	const styles = style(themeValue);
 	const members = useSelector(selectMembersClanCount);
 	const previousClanName = useRef<string | null>(null);
@@ -38,8 +38,10 @@ const ChannelListHeader = () => {
 		});
 	};
 
-	const onOpenInvite = () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_INVITE_CHANNEL);
+	const onOpenScanQR = () => {
+		navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+			screen: APP_SCREEN.SETTINGS.QR_SCANNER
+		});
 	};
 
 	const handlePressEventCreate = useCallback(() => {
@@ -101,8 +103,8 @@ const ChannelListHeader = () => {
 					<Icons.MagnifyingIcon color={themeValue.text} height={size.s_18} width={size.s_18} />
 					<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity activeOpacity={0.8} onPress={onOpenInvite} style={styles.iconWrapper}>
-					<Icons.UserPlusIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
+				<TouchableOpacity activeOpacity={0.8} onPress={onOpenScanQR} style={styles.iconWrapper}>
+					<Icons.ScanQR height={size.s_18} width={size.s_18} color={themeValue.text} />
 				</TouchableOpacity>
 				<TouchableOpacity activeOpacity={0.8} onPress={onOpenEvent} style={styles.iconWrapper}>
 					<Icons.CalendarIcon height={size.s_18} width={size.s_18} color={themeValue.text} />

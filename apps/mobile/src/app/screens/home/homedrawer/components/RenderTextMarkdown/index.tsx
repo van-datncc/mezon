@@ -20,17 +20,6 @@ import ImageNative from '../../../../../components/ImageNative';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
-interface ElementToken {
-	s?: number;
-	e?: number;
-	kindOf: ETokenMessage;
-	user_id?: string;
-	role_id?: string;
-	channelid?: string;
-	emojiid?: string;
-	type?: EBacktickType;
-	username?: string;
-}
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
