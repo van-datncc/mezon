@@ -15,9 +15,10 @@ function Login() {
 	const [loginId, setLoginId] = useState<string | null>(null);
 	const [createSecond, setCreateSecond] = useState<number | null>(null);
 	const [hidden, setHidden] = useState<boolean>(false);
+	const [isRemember, setIsRemember] = useState<boolean>(false);
 	useEffect(() => {
 		const fetchQRCode = async () => {
-			const qRInfo = await qRCode();
+			const qRInfo = await qRCode(isRemember);
 			await setLoginId(qRInfo?.login_id as string);
 			await setCreateSecond(Number(qRInfo?.create_time_second));
 		};
@@ -64,7 +65,7 @@ function Login() {
 	}, [redirectTo, isLogin, navigate]);
 
 	const reloadQR = async () => {
-		const qRInfo = await qRCode();
+		const qRInfo = await qRCode(isRemember);
 		await setLoginId(qRInfo?.login_id as string);
 		await setCreateSecond(Number(qRInfo?.create_time_second));
 		setHidden(false);
@@ -87,7 +88,13 @@ function Login() {
 					</ol>
 
 					<div className="mt-4 flex items-center text-gray-400">
-						<input disabled type="checkbox" id="keepSignedIn" className="mr-2" />
+						<input
+							type="checkbox"
+							id="keepSignedIn"
+							className="mr-2"
+							checked={isRemember}
+							onChange={(e) => setIsRemember(e.target.checked)}
+						/>
 						<label htmlFor="keepSignedIn">Keep me signed in</label>
 					</div>
 				</div>

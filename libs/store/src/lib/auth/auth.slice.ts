@@ -100,9 +100,9 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories']);
 });
 
-export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {
+export const createQRLogin = createAsyncThunk('auth/getQRCode', async ({ isRemember }: { isRemember: boolean }, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const QRlogin = await mezon?.createQRLogin();
+	const QRlogin = await mezon?.createQRLogin(isRemember);
 
 	if (!QRlogin) {
 		return thunkAPI.rejectWithValue('Invalid session');
