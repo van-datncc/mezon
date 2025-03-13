@@ -6,6 +6,7 @@ import {
 	IUpdateChannelRequest,
 	IUpdateSystemMessage,
 	selectAppChannelById,
+	selectChannelById,
 	selectClanSystemMessage,
 	selectTheme,
 	updateSystemMessage,
@@ -27,12 +28,13 @@ export type OverviewChannelProps = {
 
 const OverviewChannel = (props: OverviewChannelProps) => {
 	const { channel } = props;
+	const realtimeChannel = useSelector((state) => selectChannelById(state, channel.channel_id ?? ''));
 	const appearanceTheme = useSelector(selectTheme);
 	const channelApp = useSelector(selectAppChannelById(channel?.id) || {});
 	const [appUrlInit, setAppUrlInit] = useState(channelApp?.url || '');
 	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
-	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label || '');
+	const [channelLabelInit, setChannelLabelInit] = useState(realtimeChannel.channel_label || '');
 	const [topicInit, setTopicInit] = useState(channel.topic);
 	const [ageRestrictedInit, setAgeRestrictedInit] = useState(channel.age_restricted);
 	const [e2eeInit, setE2eeInit] = useState(channel.e2ee);
