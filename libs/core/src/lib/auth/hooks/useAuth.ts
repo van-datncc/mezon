@@ -46,18 +46,20 @@ export function useAuth() {
 		[dispatch]
 	);
 
-	const qRCode = useCallback(
-		async (isRemember: boolean) => {
-			const action = await dispatch(authActions.createQRLogin({ isRemember }));
-			const loginQR = action.payload as ApiLoginIDResponse;
-			return loginQR;
-		},
-		[dispatch]
-	);
+	const qRCode = useCallback(async () => {
+		const action = await dispatch(authActions.createQRLogin());
+		const loginQR = action.payload as ApiLoginIDResponse;
+		return loginQR;
+	}, [dispatch]);
 
 	const checkLoginRequest = useCallback(
-		async (loginId: string) => {
-			const action = await dispatch(authActions.checkLoginRequest({ loginId: loginId || '' }));
+		async (loginId: string, isRemember: boolean) => {
+			const action = await dispatch(
+				authActions.checkLoginRequest({
+					loginId: loginId || '',
+					isRemember
+				})
+			);
 			const session = action.payload as Session;
 			return session;
 		},

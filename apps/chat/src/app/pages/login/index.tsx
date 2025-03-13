@@ -18,7 +18,7 @@ function Login() {
 	const [isRemember, setIsRemember] = useState<boolean>(false);
 	useEffect(() => {
 		const fetchQRCode = async () => {
-			const qRInfo = await qRCode(isRemember);
+			const qRInfo = await qRCode();
 			await setLoginId(qRInfo?.login_id as string);
 			await setCreateSecond(Number(qRInfo?.create_time_second));
 		};
@@ -36,7 +36,7 @@ function Login() {
 					setHidden(true);
 					clearInterval(intervalId);
 				} else {
-					const currentSession = await checkLoginRequest(loginId);
+					const currentSession = await checkLoginRequest(loginId, isRemember);
 					if (currentSession !== null && currentSession !== undefined) {
 						clearInterval(intervalId);
 					}
@@ -65,7 +65,7 @@ function Login() {
 	}, [redirectTo, isLogin, navigate]);
 
 	const reloadQR = async () => {
-		const qRInfo = await qRCode(isRemember);
+		const qRInfo = await qRCode();
 		await setLoginId(qRInfo?.login_id as string);
 		await setCreateSecond(Number(qRInfo?.create_time_second));
 		setHidden(false);
