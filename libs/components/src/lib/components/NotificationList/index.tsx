@@ -77,11 +77,11 @@ function NotificationList({ rootRef }: NotificationProps) {
 
 		let category = null;
 
-		if (currentTabNotify === InboxType.INDIVIDUAL) {
+		if (currentTabNotify === InboxType.INDIVIDUAL && allNotificationForYou.data.length === 0) {
 			category = NotificationCategory.FOR_YOU;
-		} else if (currentTabNotify === InboxType.MESSAGES) {
+		} else if (currentTabNotify === InboxType.MESSAGES && allNotificationClan.data.length === 0) {
 			category = NotificationCategory.MESSAGES;
-		} else if (currentTabNotify === InboxType.MENTIONS) {
+		} else if (currentTabNotify === InboxType.MENTIONS && allNotificationMentions.data.length === 0) {
 			category = NotificationCategory.MENTIONS;
 		}
 
