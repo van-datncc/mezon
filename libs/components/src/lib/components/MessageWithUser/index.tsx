@@ -79,13 +79,10 @@ function MessageWithUser({
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userId));
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
+	const isClickReply = useRef(false);
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
-
-	const modalState = useRef({
-		profileItem: false
-	});
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 
@@ -111,9 +108,6 @@ function MessageWithUser({
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string, isClickOnReply = false) => {
 			setIsAnonymousOnModal(isClickOnReply);
-			if (modalState.current.profileItem) {
-				return;
-			}
 			shortUserId.current = userId;
 			const heightPanel =
 				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
@@ -131,7 +125,6 @@ function MessageWithUser({
 				};
 			}
 			openProfileItem();
-			modalState.current.profileItem = true;
 		},
 		[mode]
 	);
@@ -152,16 +145,12 @@ function MessageWithUser({
 				<ModalUserProfile
 					onClose={() => {
 						closeProfileItem();
-						setTimeout(() => {
-							modalState.current.profileItem = false;
-						}, 100);
 					}}
 					userID={shortUserId.current}
 					classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 					message={message}
 					mode={mode}
-					positionType={''}
-					avatar={message?.clan_avatar || message?.avatar}
+					avatar={isClickReply.current ? message?.references?.[0]?.mesages_sender_avatar : message?.clan_avatar || message?.avatar}
 					name={message?.clan_nick || message?.display_name || message?.username}
 					isDM={isDM}
 					checkAnonymous={isAnonymousOnModal}
@@ -205,7 +194,10 @@ function MessageWithUser({
 							onClick={
 								checkAnonymousOnReplied
 									? () => {}
-									: (e) => handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string, checkAnonymousOnReplied)
+									: (e) => {
+											isClickReply.current = true;
+											handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string, checkAnonymousOnReplied);
+										}
 							}
 							isAnonymousReplied={checkAnonymousOnReplied}
 						/>
@@ -219,12 +211,26 @@ function MessageWithUser({
 									message={message}
 									isEditing={isEditing}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={
+										checkAnonymous
+											? () => {}
+											: (e) => {
+													isClickReply.current = false;
+													handleOpenShortUser(e, message?.sender_id);
+												}
+									}
 								/>
 								<MessageHead
 									message={message}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={
+										checkAnonymous
+											? () => {}
+											: (e) => {
+													isClickReply.current = false;
+													handleOpenShortUser(e, message?.sender_id);
+												}
+									}
 								/>
 							</>
 						)}
