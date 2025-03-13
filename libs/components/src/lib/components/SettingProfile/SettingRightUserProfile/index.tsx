@@ -19,7 +19,7 @@ import { Coords } from '../../ChannelLink';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import PanelClan from '../../PanelClan';
 import ImageEditor from '../ImageEditor/ImageEditor';
-import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import PreviewSetting, { Profilesform } from '../SettingUserClanProfileCard';
 import { processImage } from '../helper';
 
 const SettingRightUser = ({
@@ -293,7 +293,7 @@ const SettingRightUser = ({
 				</div>
 				<div className="flex-1  text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
-					<SettingUserClanProfileCard isLoading={isLoading} profiles={editProfile} isDM={isDM} />
+					<PreviewSetting isLoading={isLoading} profiles={editProfile} isDM={isDM} />
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||

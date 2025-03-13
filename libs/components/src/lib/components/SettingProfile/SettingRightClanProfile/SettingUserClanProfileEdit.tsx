@@ -11,7 +11,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import ImageEditor from '../ImageEditor/ImageEditor';
-import SettingRightClanCard from '../SettingUserClanProfileCard';
+import PreviewSetting from '../SettingUserClanProfileCard';
 import { processImage } from '../helper';
 import { SettingUserClanProfileSave } from './SettingUserClanProfileSave';
 
@@ -224,7 +224,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				</div>
 				<div className="flex-1 text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">PREVIEW</p>
-					<SettingRightClanCard
+					<PreviewSetting
 						profiles={editProfile}
 						currentDisplayName={!displayName ? userProfile?.user?.display_name : ''}
 						isDM={isDM}

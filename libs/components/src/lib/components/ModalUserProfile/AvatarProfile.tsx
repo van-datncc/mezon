@@ -20,7 +20,6 @@ type AvatarProfileProps = {
 	activityByUserId?: ApiUserActivity;
 	userStatus?: { status?: boolean; isMobile?: boolean };
 	statusOnline?: EUserStatus;
-	isLoading?: boolean;
 };
 
 const AvatarProfile = ({
@@ -34,8 +33,7 @@ const AvatarProfile = ({
 	isFooterProfile,
 	activityByUserId,
 	userStatus,
-	statusOnline,
-	isLoading
+	statusOnline
 }: AvatarProfileProps) => {
 	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
 
@@ -65,7 +63,6 @@ const AvatarProfile = ({
 		<div className=" text-black flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
 			<div className="relative h-fit">
 				<AvatarImage
-					isLoading={isLoading}
 					alt={username || ''}
 					username={username}
 					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}

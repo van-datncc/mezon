@@ -1,4 +1,3 @@
-import { Spinner } from 'flowbite-react';
 import { DetailedHTMLProps, ImgHTMLAttributes, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -8,10 +7,9 @@ export type AvatarImageProp = {
 	isAnonymous?: boolean;
 	classNameText?: string;
 	srcImgProxy?: string;
-	isLoading?: boolean;
 } & DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, isLoading, ...rest }: AvatarImageProp) => {
+export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
 
 	const computedClassName = twMerge('size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className);
@@ -38,14 +36,5 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 		);
 	}
 
-	return (
-		<div className="relative">
-			{isLoading && (
-				<div className="absolute inset-0 flex items-center justify-center">
-					<Spinner size="lg" />
-				</div>
-			)}
-			<img loading="lazy" onError={handleError} className={computedClassName} src={srcImgProxy} alt={alt} {...rest} />
-		</div>
-	);
+	return <img loading="lazy" onError={handleError} className={computedClassName} src={srcImgProxy} alt={alt} {...rest} />;
 };
