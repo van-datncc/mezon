@@ -139,6 +139,17 @@ function MessageWithUser({
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 
 	const [isAnonymousOnModal, setIsAnonymousOnModal] = useState<boolean>(false);
+	const [clickedOnReply, setClickedOnReply] = useState<boolean>(false);
+
+	const openUserProfileOnReply = (e: React.MouseEvent<HTMLImageElement, MouseEvent>, messageSenderId: string, isAnonymousReplied: boolean) => {
+		handleOpenShortUser(e, messageSenderId, isAnonymousReplied);
+		setClickedOnReply(true);
+	};
+
+	const openUserProfileOnHeader = (e: React.MouseEvent<HTMLImageElement, MouseEvent>, messageSenderId: string) => {
+		handleOpenShortUser(e, messageSenderId);
+		setClickedOnReply(false);
+	};
 
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
@@ -161,15 +172,14 @@ function MessageWithUser({
 					message={message}
 					mode={mode}
 					positionType={''}
-					avatar={message?.clan_avatar || message?.avatar}
+					avatar={!clickedOnReply ? message?.clan_avatar || message?.avatar : message?.references?.[0]?.mesages_sender_avatar}
 					name={message?.clan_nick || message?.display_name || message?.username}
 					isDM={isDM}
 					checkAnonymous={isAnonymousOnModal}
 				/>
 			</div>
 		);
-	}, [message]);
-
+	}, [message, clickedOnReply]);
 	return (
 		<>
 			{message && showDivider && <MessageDateDivider message={message} />}
@@ -205,7 +215,12 @@ function MessageWithUser({
 							onClick={
 								checkAnonymousOnReplied
 									? () => {}
-									: (e) => handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string, checkAnonymousOnReplied)
+									: (e) =>
+											openUserProfileOnReply(
+												e,
+												message?.references?.[0]?.message_sender_id as string,
+												checkAnonymousOnReplied as boolean
+											)
 							}
 							isAnonymousReplied={checkAnonymousOnReplied}
 						/>
@@ -219,12 +234,12 @@ function MessageWithUser({
 									message={message}
 									isEditing={isEditing}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={checkAnonymous ? () => {} : (e) => openUserProfileOnHeader(e, message?.sender_id)}
 								/>
 								<MessageHead
 									message={message}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={checkAnonymous ? () => {} : (e) => openUserProfileOnHeader(e, message?.sender_id)}
 								/>
 							</>
 						)}
