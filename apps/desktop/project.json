@@ -72,7 +72,7 @@
         "packElevateHelper": false,
         "runAfterFinish": true,
         "createDesktopShortcut": "always",
-        "createStartMenuShortcut": true,
+        "createStartMenuShortcut": false,
         "deleteAppDataOnUninstall": false
       },
       "portable": {
@@ -216,7 +216,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": "always",
-          "createStartMenuShortcut": true,
+          "createStartMenuShortcut": false,
           "deleteAppDataOnUninstall": false
         },
         "portable": {
@@ -314,7 +314,7 @@
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
           "createDesktopShortcut": "always",
-          "createStartMenuShortcut": true,
+          "createStartMenuShortcut": false,
           "deleteAppDataOnUninstall": false
         },
         "portable": {
