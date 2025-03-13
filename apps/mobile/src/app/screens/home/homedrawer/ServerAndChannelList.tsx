@@ -1,7 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { View } from 'react-native';
-// import BackNativeListener from './BackNativeListener';
 import { useIdleRender } from '@mezon/core';
 import ChannelList from './ChannelList';
 import ProfileBar from './ProfileBar';
@@ -31,7 +30,6 @@ const ServerAndChannelList = React.memo(({ isTablet }: { isTablet?: boolean }) =
 			<View style={styles.container}>
 				<View style={styles.rowContainer}>
 					{shouldRender && <ServerList />}
-					{/*{!isTablet && <BackNativeListener />}*/}
 					{shouldRender && <ChannelListWrapper />}
 				</View>
 				{isTablet && <ProfileBar />}
