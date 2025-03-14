@@ -1447,6 +1447,13 @@ export type IvoiceInfo = {
 	channelLabel: string;
 };
 
+export type ImageSourceObject = {
+	filename: string;
+	filetype: string;
+	size: number;
+	url: string;
+};
+
 export type HistoryItem = {
 	valueTextInput: string;
 	content: string;
