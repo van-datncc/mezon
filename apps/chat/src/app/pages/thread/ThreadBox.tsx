@@ -64,7 +64,7 @@ const ThreadBox = () => {
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference((currentChannelId || '') + '/createThread');
 	const { setOverUploadingState } = useDragAndDrop();
 	const appearanceTheme = useSelector(selectTheme);
-	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const { messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
@@ -74,7 +74,7 @@ const ThreadBox = () => {
 	const membersOfParent = useAppSelector((state) =>
 		threadCurrentChannel?.parent_id ? selectAllChannelMembers(state, threadCurrentChannel?.parent_id as string) : null
 	);
-	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useMemo(() => {
+	const { mentionList, hashtagList, emojiList } = useMemo(() => {
 		return processMention(request?.mentionRaw, rolesClan, membersOfChild as ChannelMembersEntity[], membersOfParent as ChannelMembersEntity[]);
 	}, [request?.mentionRaw, rolesClan, membersOfChild, membersOfParent]);
 	const attachmentData = useMemo(() => {
@@ -178,40 +178,38 @@ const ThreadBox = () => {
 
 	const onPastedFiles = useCallback(
 		async (event: React.ClipboardEvent<HTMLDivElement>) => {
-			const items = (event.clipboardData || (window as any).clipboardData).items;
-			const files: File[] = [];
-			if (items) {
-				for (let i = 0; i < items.length; i++) {
-					if (items[i].type.indexOf('image') !== -1) {
-						const file = items[i].getAsFile();
-						if (file) {
-							files.push(file);
-						}
-					}
-				}
+			const items = Array.from(event.clipboardData?.items || []);
+			const files = items
+				.filter((item) => item.type.startsWith('image'))
+				.map((item) => item.getAsFile())
+				.filter((file): file is File => Boolean(file));
 
-				if (files.length > 0) {
-					if (files.length + attachmentFilteredByChannelId?.files?.length > MAX_FILE_ATTACHMENTS) {
-						setOverUploadingState(true, UploadLimitReason.COUNT);
-						return;
-					}
-					const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+			if (!files.length) return;
 
-					dispatch(
-						referencesActions.setAtachmentAfterUpload({
-							channelId: (currentChannelId || '') + '/createThread',
-							files: updatedFiles
-						})
-					);
-				}
+			const totalFiles = files.length + (attachmentFilteredByChannelId?.files?.length || 0);
+			if (totalFiles > MAX_FILE_ATTACHMENTS) {
+				setOverUploadingState(true, UploadLimitReason.COUNT);
+				return;
 			}
+
+			const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: `${currentChannelId || ''}/createThread`,
+					files: updatedFiles
+				})
+			);
 		},
 		[currentChannelId, currentClanId, attachmentFilteredByChannelId?.files?.length]
 	);
 
-	const handleChangeNameThread = (nameThread: string) => {
-		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
-	};
+	const handleChangeNameThread = useCallback(
+		(nameThread: string) => {
+			dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
+		},
+		[currentChannelId]
+	);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey, metaKey } = event;
