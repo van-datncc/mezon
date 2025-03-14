@@ -1446,3 +1446,9 @@ export type IvoiceInfo = {
 	channelId: string;
 	channelLabel: string;
 };
+
+export type HistoryItem = {
+	valueTextInput: string;
+	content: string;
+	mentionRaw: any[];
+};
