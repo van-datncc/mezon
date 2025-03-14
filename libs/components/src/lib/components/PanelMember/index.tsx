@@ -500,7 +500,7 @@ const PanelMember = ({
 							)}
 						</GroupPanelMember>
 					)}
-					{!isSelf && isPrivateThread && isCreator && !hasClanOwnerPermission && (
+					{!isSelf && isPrivateThread && isCreator && !(hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (
 						<GroupPanelMember>
 							<ItemPanelMember
 								onClick={() => RemoveMemberFromPrivateThread(member?.user?.id as string)}
