@@ -82,6 +82,7 @@ import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
+import StickyModal from './StickyModal';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -459,11 +460,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+	const [isModalOpen, setIsModalOpen] = useState(true);
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
 			{isChannelApp ? (
-				<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
+				<StickyModal onClose={() => setIsModalOpen(false)}>
+					<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
+				</StickyModal>
 			) : (
 				<>
 					{isOverUploading && (
