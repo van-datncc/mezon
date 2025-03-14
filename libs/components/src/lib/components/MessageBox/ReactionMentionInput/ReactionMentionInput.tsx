@@ -325,11 +325,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			};
 			const checkedRequest = request ? request : emptyRequest;
 			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
-
-			if (!text) {
-				return;
-			}
-
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
@@ -360,7 +355,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				return;
 			}
 
-			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
+			if ((!text && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
 
