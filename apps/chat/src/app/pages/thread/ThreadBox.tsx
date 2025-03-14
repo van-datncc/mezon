@@ -52,7 +52,7 @@ import React, { Fragment, KeyboardEvent, useCallback, useMemo, useState } from '
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
-import ChannelMessages from '../channel/ChannelMessages';
+import MemoizedChannelMessages from '../channel/ChannelMessages';
 
 const ThreadBox = () => {
 	const dispatch = useAppDispatch();
@@ -303,7 +303,7 @@ const ThreadBox = () => {
 		<div className="flex flex-col flex-1 justify-end border-l dark:border-borderDivider border-bgLightTertiary pt-4">
 			{threadCurrentChannel && (
 				<div className={`overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden flex-1`}>
-					<ChannelMessages
+					<MemoizedChannelMessages
 						isThreadBox={true}
 						userIdsFromThreadBox={mapToMemberIds}
 						key={threadCurrentChannel.channel_id}
@@ -348,7 +348,7 @@ const ThreadBox = () => {
 			{checkAttachment && (
 				<div
 					className={`${
-						checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
+						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
 					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
 					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll `}>
