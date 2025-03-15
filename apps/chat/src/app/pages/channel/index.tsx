@@ -359,6 +359,25 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		[dispatch]
 	);
 
+	useEffect(() => {
+		const handleModalClosed = (_event: any, data: { appClanId: string; appChannelId: string }) => {
+			const { appClanId, appChannelId } = data;
+
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId: appClanId,
+					channelId: appChannelId
+				})
+			);
+		};
+
+		window.electron.onCloseChannelApp(handleModalClosed as any);
+
+		return () => {
+			window.electron.removeCloseChannelAppListener(handleModalClosed as any);
+		};
+	}, [dispatch]);
+
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
 			{appsList.length > 0 &&
@@ -367,7 +386,10 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						key={app?.url as string}
 						modalName={app?.url as string}
 						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)} // Truyền clanId & channelId
-						gameName={app.url as string}
+						appName={app.url as string}
+						appUrl={app.url as string}
+						appClanId={app.clan_id as string}
+						appChannelId={app.channel_id as string}
 					>
 						<ChannelApps appChannel={app} />
 					</StickyModal>

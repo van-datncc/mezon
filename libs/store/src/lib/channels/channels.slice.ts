@@ -1106,16 +1106,15 @@ export const channelsSlice = createSlice({
 		setAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponse }>) => {
 			const { clanId, channelId, appChannel } = action.payload;
 
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
+			state.byClans[clanId] ??= getInitialClanState();
 
-			const existingAppChannel = state.byClans[clanId].appChannelsListShowOnPopUp[channelId];
+			const existingAppChannel = state.byClans[clanId]?.appChannelsListShowOnPopUp?.[channelId];
 
-			if (!existingAppChannel || existingAppChannel.id !== appChannel.id) {
-				state.byClans[clanId].appChannelsListShowOnPopUp[channelId] = appChannel;
+			if (!existingAppChannel || existingAppChannel?.id !== appChannel.id) {
+				state.byClans[clanId]!.appChannelsListShowOnPopUp[channelId] = appChannel;
 			}
 		},
+
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
 

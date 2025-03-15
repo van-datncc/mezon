@@ -23,6 +23,8 @@ export type MezonElectronAPI = {
 		}
 	) => Promise<void>;
 	dowloadImage: (url: string) => Promise<void>;
+	onCloseChannelApp: (callback: (appClanId: string, appChannelId: string) => void) => void;
+	removeCloseChannelAppListener: (callback: (appClanId: string, appChannelId: string) => void) => void;
 };
 declare global {
 	interface Window {

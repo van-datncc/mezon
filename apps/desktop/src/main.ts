@@ -109,6 +109,23 @@ ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	}
 });
 
+ipcMain.on('open-modal', (event, { modalName, appName, appUrl, appClanId, appChannelId }) => {
+	const modalWindow = new BrowserWindow({
+		width: 800,
+		// height: 'auto',
+		title: appName,
+		webPreferences: {
+			nodeIntegration: true
+		}
+	});
+
+	modalWindow.loadURL(appUrl);
+
+	modalWindow.on('close', () => {
+		event.reply('modal-closed', { appClanId, appChannelId });
+	});
+});
+
 const handleWindowAction = async (window: BrowserWindow, action: string) => {
 	if (!window || window.isDestroyed()) {
 		return;

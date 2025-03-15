@@ -30,5 +30,13 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	handleActionShowImage: (action: string, url: any) => {
 		return ipcRenderer.invoke(ACTION_SHOW_IMAGE, { payload: { action, fileURL: url } });
+	},
+
+	onCloseChannelApp: (callback: (data: { appClanId: string; appChannelId: string }) => void) => {
+		ipcRenderer.on('modal-closed', (_event, data) => callback(data));
+	},
+
+	removeCloseChannelAppListener: (callback: (data: { appClanId: string; appChannelId: string }) => void) => {
+		ipcRenderer.removeListener('modal-closed', (_event, data) => callback(data));
 	}
 });
