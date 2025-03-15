@@ -355,7 +355,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				return;
 			}
 
-			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
+			if ((!text && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
 
