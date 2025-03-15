@@ -29,6 +29,7 @@ import {
 	selectAllRolesClan,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
+	selectAppChannelsListShowOnPopUp,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
@@ -74,7 +75,7 @@ import {
 	titleMission
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
+import { ApiChannelAppResponse, ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -257,6 +258,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const [isShowAgeRestricted, setIsShowAgeRestricted] = useState(false);
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, channelId));
+
 	const miniAppRef = useRef<HTMLIFrameElement>(null);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const currentUser = useAuth();
@@ -278,6 +280,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		[currentChannel?.id, dispatch]
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
+
 	const appearanceTheme = useSelector(selectTheme);
 	const channelAppUserData = useSelector(selectJoinChannelAppData);
 
@@ -350,6 +353,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		},
 		[dispatch, appChannel?.url]
 	);
+
+	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 
 	useEffect(() => {
 		if (appChannel?.url) {
@@ -460,15 +465,46 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-	const [isModalOpen, setIsModalOpen] = useState(true);
+
+	useEffect(() => {
+		if (isChannelApp && appChannel) {
+			dispatch(
+				channelsActions.setAppChannelsListShowOnPopUp({
+					clanId: appChannel?.clan_id as string,
+					channelId: appChannel?.channel_id as string,
+					appChannel: appChannel as ApiChannelAppResponse
+				})
+			);
+		}
+	}, [appChannel?.channel_id]);
+
+	const handleOncloseCallback = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{isChannelApp ? (
-				<StickyModal onClose={() => setIsModalOpen(false)}>
-					<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
+			{appsList.map((app) => (
+				<StickyModal
+					key={app?.url as string}
+					modalName={app?.url as string}
+					onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)} // Truyền clanId & channelId
+					gameName={app.url as string}
+				>
+					<ChannelApps appChannel={app} />
 				</StickyModal>
-			) : (
+			))}
+
+			{isChannelApp ? null : (
+				// <ChannelAppLayout appChannel={appChannel} />
 				<>
 					{isOverUploading && (
 						<TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />

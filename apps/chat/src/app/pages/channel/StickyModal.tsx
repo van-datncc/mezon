@@ -1,43 +1,44 @@
 import { initStore, MezonStoreProvider } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import React, { useEffect, useMemo } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import { preloadedState } from '../../mock/state';
 
-interface AppModalProps {
+interface StickyModalProps {
 	children: React.ReactNode;
 	onClose: () => void;
+	modalName: string;
+	gameName: string;
 }
 
-const StickyModal: React.FC<AppModalProps> = ({ children, onClose }) => {
+const StickyModal: React.FC<StickyModalProps> = ({ children, onClose, modalName, gameName }) => {
 	const mezon = useMezon();
 	const storeConfig = useMemo(() => (mezon ? initStore(mezon, preloadedState) : null), [mezon]);
+	const modalRef = useRef<Window | null>(null);
 
 	useEffect(() => {
-		const modalWindow = window.open('', 'AppModal', 'width=600,height=400,left=200,top=100');
+		const uniqueName = `StickyModal-${modalName}`;
 
+		if (!modalRef.current || modalRef.current.closed) {
+			modalRef.current = window.open('', uniqueName, `width=${window.innerWidth},height=${window.innerHeight},left=0,top=0`);
+		}
+
+		const modalWindow = modalRef.current;
 		if (!modalWindow || !storeConfig) return;
 
+		modalWindow.document.title = gameName;
+		modalWindow.document.body.style.margin = '0';
+		modalWindow.document.body.style.overflow = 'hidden';
 		modalWindow.document.body.innerHTML = "<div id='modal-root'></div>";
+
 		const modalRoot = modalWindow.document.getElementById('modal-root');
 
 		if (modalRoot) {
-			ReactDOM.render(
+			const root = createRoot(modalRoot);
+			root.render(
 				<MezonStoreProvider store={storeConfig.store} persistor={storeConfig.persistor} loading={null}>
-					<div className="p-6 bg-white shadow-lg rounded-lg">
-						<button
-							onClick={() => {
-								modalWindow.close();
-								onClose();
-							}}
-							className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-						>
-							&times;
-						</button>
-						{children}
-					</div>
-				</MezonStoreProvider>,
-				modalRoot
+					{children}
+				</MezonStoreProvider>
 			);
 		}
 
@@ -46,7 +47,7 @@ const StickyModal: React.FC<AppModalProps> = ({ children, onClose }) => {
 		return () => {
 			modalWindow.close();
 		};
-	}, [storeConfig]);
+	}, [storeConfig, modalName, gameName]);
 
 	return null;
 };
