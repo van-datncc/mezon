@@ -20,9 +20,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { ParticipantMeetState } from '@mezon/utils';
+import { ApiChannelAppResponseExtend, ParticipantMeetState } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { ApiChannelAppResponse, ApiTokenSentEvent } from 'mezon-js/api.gen';
+import { ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -64,7 +64,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse }) {
+export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseExtend }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();

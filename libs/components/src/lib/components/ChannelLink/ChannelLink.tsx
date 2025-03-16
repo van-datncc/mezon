@@ -20,10 +20,9 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ApiChannelAppResponseExtend, ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -175,7 +174,7 @@ const ChannelLinkComponent = ({
 				channelsActions.setAppChannelsListShowOnPopUp({
 					clanId: appChannel?.clan_id as string,
 					channelId: appChannel?.channel_id as string,
-					appChannel: appChannel as ApiChannelAppResponse
+					appChannel: appChannel as ApiChannelAppResponseExtend
 				})
 			);
 		}

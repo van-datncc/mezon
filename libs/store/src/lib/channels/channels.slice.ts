@@ -1,5 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import {
+	ApiChannelAppResponseExtend,
 	ApiChannelMessageHeaderWithChannel,
 	BuzzArgs,
 	ChannelThreads,
@@ -88,6 +89,11 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	};
 };
 
+type AppFocusedState = {
+	channelId: string;
+	isFocused: boolean;
+};
+
 export interface ChannelsState {
 	byClans: Record<
 		string,
@@ -101,7 +107,7 @@ export interface ChannelsState {
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
 			appChannelsList: Record<string, ApiChannelAppResponse>;
-			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponse>;
+			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponseExtend>;
 			fetchChannelSuccess: boolean;
 			favoriteChannels: string[];
 			buzzState: Record<string, BuzzArgs | null>;
@@ -1103,16 +1109,22 @@ export const channelsSlice = createSlice({
 			}
 			state.byClans[clanId].buzzState[channelId] = buzzState;
 		},
-		setAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponse }>) => {
+		setAppChannelsListShowOnPopUp: (
+			state,
+			action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponseExtend }>
+		) => {
 			const { clanId, channelId, appChannel } = action.payload;
 
 			state.byClans[clanId] ??= getInitialClanState();
 
-			const existingAppChannel = state.byClans[clanId]?.appChannelsListShowOnPopUp?.[channelId];
+			Object.keys(state.byClans[clanId]!.appChannelsListShowOnPopUp).forEach((key) => {
+				state.byClans[clanId]!.appChannelsListShowOnPopUp[key].isFocused = false;
+			});
 
-			if (!existingAppChannel || existingAppChannel?.id !== appChannel.id) {
-				state.byClans[clanId]!.appChannelsListShowOnPopUp[channelId] = appChannel;
-			}
+			state.byClans[clanId]!.appChannelsListShowOnPopUp[channelId] = {
+				...appChannel,
+				isFocused: true
+			};
 		},
 
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {

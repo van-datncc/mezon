@@ -187,7 +187,7 @@ ipcMain.handle(OPEN_APP_CHANNEL, (event, props) => {
 		return;
 	}
 
-	const { appId, appUrl, appClanId, appChannelId } = props.data;
+	const { appId, appUrl, appClanId, appChannelId, appFocused } = props.data;
 
 	const newWindow = new BrowserWindow({
 		width: 800,
