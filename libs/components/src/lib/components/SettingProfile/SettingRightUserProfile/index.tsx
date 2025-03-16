@@ -131,8 +131,7 @@ const SettingRightUser = ({
 				imageAvatarResize.name,
 				imageAvatarResize
 			);
-			const urlCleaned = attachment.url?.replace('WEBP@webp', '');
-			setUrlImage(urlCleaned || '');
+			setUrlImage(attachment?.url || '');
 			setFlags(true);
 			setIsLoading(false);
 		} else {

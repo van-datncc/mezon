@@ -120,8 +120,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				imageAvatarResize.name,
 				imageAvatarResize
 			);
-			const urlCleaned = attachment.url?.replace('WEBP@webp', '');
-			setUrlImage(urlCleaned || '');
+			setUrlImage(attachment.url || '');
 			setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
 			setIsLoading(false);
 		} else {
