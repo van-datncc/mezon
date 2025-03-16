@@ -23,8 +23,7 @@ export type MezonElectronAPI = {
 		}
 	) => Promise<void>;
 	dowloadImage: (url: string) => Promise<void>;
-	onCloseChannelApp: (callback: (appClanId: string, appChannelId: string) => void) => void;
-	removeCloseChannelAppListener: (callback: (appClanId: string, appChannelId: string) => void) => void;
+	openChannelApp: (eventName: string, data: any) => void;
 };
 declare global {
 	interface Window {
@@ -45,4 +44,10 @@ export interface MezonNotificationOptions extends NotificationOptions {
 export interface MezonDownloadFile {
 	url: string;
 	defaultFileName: string;
+}
+
+export interface CloseChannelAppPayload {
+	appId: string;
+	appClanId: string;
+	appChannelId: string;
 }

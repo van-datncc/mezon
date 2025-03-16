@@ -13,6 +13,8 @@ import {
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
 	NAVIGATE_TO_URL,
+	OPEN_APP_CHANNEL,
+	OPEN_APP_CHANNEL_CLOSE_ACTION,
 	OPEN_NEW_WINDOW,
 	SENDER_ID,
 	TITLE_BAR_ACTION,
@@ -195,6 +197,29 @@ ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, _options?: Electron.BrowserW
 
 	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, _data) => {
 		handleWindowAction(newWindow, action);
+	});
+});
+ipcMain.handle(OPEN_APP_CHANNEL, (event, props) => {
+	if (!props || !props.data) {
+		return;
+	}
+
+	const { appId, appUrl, appClanId, appChannelId } = props.data;
+
+	const newWindow = new BrowserWindow({
+		width: 800,
+		height: 600,
+		title: appUrl,
+		webPreferences: {
+			nodeIntegration: true
+		},
+		autoHideMenuBar: true
+	});
+
+	newWindow.loadURL(appUrl);
+
+	newWindow.on('closed', () => {
+		event.sender.send(OPEN_APP_CHANNEL_CLOSE_ACTION, { appId, appClanId, appChannelId });
 	});
 });
 

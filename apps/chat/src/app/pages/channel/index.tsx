@@ -55,9 +55,11 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	CloseChannelAppPayload,
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
 	IChannel,
+	OPEN_APP_CHANNEL_CLOSE_ACTION,
 	ParticipantMeetState,
 	SubPanelName,
 	TIME_OFFSET,
@@ -322,6 +324,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [appChannel]);
 
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
+	console.log('appsList :', appsList);
 	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
 		if (!savedChannelIds.includes(currentChannel.channel_id) && currentChannel.age_restricted === 1) {
@@ -360,37 +363,29 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	);
 
 	useEffect(() => {
-		const handleModalClosed = (_event: any, data: { appClanId: string; appChannelId: string }) => {
-			const { appClanId, appChannelId } = data;
-
-			dispatch(
-				channelsActions.removeAppChannelsListShowOnPopUp({
-					clanId: appClanId,
-					channelId: appChannelId
-				})
-			);
+		const handleAppClosed = (event: string, data: CloseChannelAppPayload) => {
+			if (!data || !data.appClanId || !data.appChannelId) {
+				return;
+			}
+			handleOncloseCallback(data.appClanId, data.appChannelId);
 		};
 
-		window.electron.onCloseChannelApp(handleModalClosed as any);
+		if (window.electron) {
+			window.electron.on(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
+		}
 
 		return () => {
-			window.electron.removeCloseChannelAppListener(handleModalClosed as any);
+			if (window.electron) {
+				window.electron.removeListener(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
+			}
 		};
-	}, [dispatch]);
+	}, []);
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
 			{appsList.length > 0 &&
 				appsList.map((app) => (
-					<StickyModal
-						key={app?.url as string}
-						modalName={app?.url as string}
-						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)} // Truyền clanId & channelId
-						appName={app.url as string}
-						appUrl={app.url as string}
-						appClanId={app.clan_id as string}
-						appChannelId={app.channel_id as string}
-					>
+					<StickyModal app={app} key={app.app_id} onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}>
 						<ChannelApps appChannel={app} />
 					</StickyModal>
 				))}
