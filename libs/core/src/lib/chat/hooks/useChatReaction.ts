@@ -2,22 +2,25 @@ import {
 	channelMetaActions,
 	ChannelsEntity,
 	channelUsersActions,
+	getStoreAsync,
 	reactionActions,
+	RootState,
 	selectAllAccount,
 	selectAllChannelMembers,
+	selectAllEmojiRecent,
 	selectClanView,
 	selectClickedOnThreadBoxStatus,
 	selectClickedOnTopicStatus,
 	selectCurrentChannel,
 	selectDirectById,
 	selectDmGroupCurrentId,
+	selectLastEmojiRecent,
 	selectThreadCurrentChannel,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { selectAllEmojiRecent, selectLastEmojiRecent } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -42,7 +45,6 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const thread = useSelector(selectThreadCurrentChannel);
 	const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
-	const lastEmojiRecent = useSelector(selectLastEmojiRecent);
 	const allEmojiRecent = useSelector(selectAllEmojiRecent);
 
 	const currentActive = useMemo(() => {
@@ -126,6 +128,8 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 
 	const emojiRecentId = useCallback(
 		async (emoji_id: string) => {
+			const store = await getStoreAsync();
+			const lastEmojiRecent = selectLastEmojiRecent(store.getState() as unknown as RootState);
 			if (lastEmojiRecent.emoji_id === emoji_id) {
 				return '';
 			}
@@ -135,7 +139,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			}
 			return '0';
 		},
-		[lastEmojiRecent, allEmojiRecent]
+		[allEmojiRecent]
 	);
 
 	const reactionMessageDispatch = useCallback(
