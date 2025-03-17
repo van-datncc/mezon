@@ -25,11 +25,11 @@ function Login() {
 	}, [qRCode]);
 
 	useEffect(() => {
+		const intervalMsec = 2000;
+		let timeElapsed = 0;
 		const intervalId = setInterval(async () => {
 			if (loginId && createSecond !== null) {
-				const currentTime = Math.floor(Date.now() / 1000);
-				const timeElapsed = currentTime - createSecond;
-
+				timeElapsed += intervalMsec / 1000;
 				if (timeElapsed >= 60) {
 					setHidden(true);
 					clearInterval(intervalId);
@@ -40,7 +40,7 @@ function Login() {
 					}
 				}
 			}
-		}, 2000);
+		}, intervalMsec);
 
 		return () => {
 			clearInterval(intervalId);
