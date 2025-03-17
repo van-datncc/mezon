@@ -66,7 +66,7 @@ const Notifications = () => {
 	const timeoutRef = useRef(null);
 	const [isLoadMore, setIsLoadMore] = useState(true);
 	const [firstLoading, setFirstLoading] = useState(true);
-	const [selectedTabs, setSelectedTabs] = useState<string>(InboxType.INDIVIDUAL);
+	const [selectedTabs, setSelectedTabs] = useState<string>(InboxType.MENTIONS);
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 	const allNotificationForYou = useSelector(selectNotificationForYou);
 	const allNotificationMentions = useSelector(selectNotificationMentions);
