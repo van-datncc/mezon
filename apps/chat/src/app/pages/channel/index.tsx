@@ -227,24 +227,14 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
-			{currentChannel && (
-				<div className={isAppChannel ? 'flex px-2 items-center' : ''}>
-					{isAppChannel && (
-						<div className="flex items-center gap-1 bg-[#2f6ea5] hover:bg-[#275b88] text-xs rounded-full py-1 px-2 cursor-pointer">
-							<Icons.Joystick className="w-6" />
-							<div className="font-medium">Launch</div>
-						</div>
-					)}
-					<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
-				</div>
-			)}
+			{currentChannel && <ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />}
 			{isAppChannel && (
-				<div className="flex gap-2 px-2 pt-2">
-					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-[#242f3d] dark:hover:bg-[#1c2530] bg-[#2f6ea5] hover:bg-[#275b88] py-2 px-2 rounded-md cursor-pointer font-medium">
+				<div className="flex gap-2 px-3 pt-2">
+					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium">
 						<Icons.Joystick className="w-6" />
 						<div>Launch App</div>
 					</div>
-					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-[#242f3d] dark:hover:bg-[#1c2530] bg-[#2f6ea5] hover:bg-[#275b88] py-2 px-2 rounded-md cursor-pointer font-medium">
+					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium">
 						<Icons.AppHelpIcon className="w-6" />
 						<div>Help</div>
 					</div>
