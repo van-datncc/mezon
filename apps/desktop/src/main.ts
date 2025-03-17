@@ -182,12 +182,26 @@ ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, _options?: Electron.BrowserW
 		handleWindowAction(newWindow, action);
 	});
 });
+
+const openWindowsApp = new Map();
+
 ipcMain.handle(OPEN_APP_CHANNEL, (event, props) => {
 	if (!props || !props.data) {
 		return;
 	}
 
-	const { appId, appUrl, appClanId, appChannelId, appFocused } = props.data;
+	const { appId, appUrl, appClanId, appChannelId } = props.data;
+
+	if (openWindowsApp.has(appId)) {
+		const existingWindow = openWindowsApp.get(appId);
+
+		if (existingWindow && !existingWindow.isDestroyed()) {
+			existingWindow.focus();
+			return;
+		} else {
+			openWindowsApp.delete(appId);
+		}
+	}
 
 	const newWindow = new BrowserWindow({
 		width: 800,
@@ -200,8 +214,10 @@ ipcMain.handle(OPEN_APP_CHANNEL, (event, props) => {
 	});
 
 	newWindow.loadURL(appUrl);
+	openWindowsApp.set(appId, newWindow);
 
 	newWindow.on('closed', () => {
+		openWindowsApp.delete(appId);
 		event.sender.send(OPEN_APP_CHANNEL_CLOSE_ACTION, { appId, appClanId, appChannelId });
 	});
 });
