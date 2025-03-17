@@ -1412,10 +1412,10 @@ export const selectPreviousChannels = createSelector(
 	(state, clanId) => state.byClans[clanId]?.previousChannels ?? []
 );
 
-export const selectAppChannelById = (channelId: string) =>
-	createSelector([getChannelsState, (state: RootState) => state.clans.currentClanId as string], (state, clanId) => {
-		return state.byClans[clanId]?.appChannelsList[channelId];
-	});
+export const selectAppChannelById = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, channelId: string) => channelId],
+	(state, clanId, channelId) => state.byClans[clanId]?.appChannelsList[channelId]
+);
 
 export const selectFetchChannelStatus = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],

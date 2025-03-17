@@ -124,7 +124,8 @@ const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
 	const roomId = useSelector(selectGetRoomId);
 	const joinCall = useSelector(selectEnableCall);
 	const [loading, setLoading] = useState(false);
-	const appChannel = useSelector(selectAppChannelById(channel?.channel_id || ''));
+
+	const appChannel = useAppSelector((state) => selectAppChannelById(state, channel?.channel_id as string));
 
 	useEffect(() => {
 		dispatch(channelAppActions.setRoomId(null));

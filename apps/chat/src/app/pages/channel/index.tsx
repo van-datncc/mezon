@@ -278,7 +278,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		},
 		[currentChannel?.id, dispatch]
 	);
-	const appChannel = useSelector(selectAppChannelById(channelId));
+
+	const appChannel = useAppSelector((state) => selectAppChannelById(state, channelId as string));
 
 	const appearanceTheme = useSelector(selectTheme);
 

@@ -21,7 +21,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { ParticipantMeetState } from '@mezon/utils';
+import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiChannelAppResponse, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -133,23 +133,21 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 			const handleMessage = async (event: MessageEvent) => {
 				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
 					const eventData = safeJSONParse(event.data ?? '{}') || {};
-					// eslint-disable-next-line no-console
-					console.log('[MEZON] < ', eventData);
 
 					const { eventType } = eventData;
 
 					if (!eventType) return;
 
-					if (eventType === 'PING') {
+					if (eventType === MiniAppEventType.PING) {
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
+							JSON.stringify({ eventType: MiniAppEventType.PONG, eventData: { message: MiniAppEventType.PONG } }),
 							appChannel.url ?? ''
 						);
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CURRENT_USER_INFO', eventData: currentUser?.userProfile }),
+							JSON.stringify({ eventType: MiniAppEventType.CURRENT_USER_INFO, eventData: currentUser?.userProfile }),
 							appChannel.url ?? ''
 						);
-					} else if (eventType === 'SEND_TOKEN') {
+					} else if (eventType === MiniAppEventType.SEND_TOKEN) {
 						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
 						const tokenEvent: ApiTokenSentEvent = {
 							sender_id: currentUser.userId as string,
@@ -161,29 +159,29 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 						};
 						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
 						dispatch(giveCoffeeActions.setShowModalSendToken(true));
-					} else if (eventType === 'GET_CLAN_ROLES') {
+					} else if (eventType === MiniAppEventType.GET_CLAN_ROLES) {
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
+							JSON.stringify({ eventType: MiniAppEventType.CLAN_ROLES_RESPONSE, eventData: allRolesInClan }),
 							appChannel.url ?? ''
 						);
-					} else if (eventType === 'SEND_BOT_ID') {
+					} else if (eventType === MiniAppEventType.SEND_BOT_ID) {
 						const { appId } = (eventData.eventData || {}) as any;
 						const hashData = await getUserHashInfo(appId);
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { message: hashData } }),
+							JSON.stringify({ eventType: MiniAppEventType.USER_HASH_INFO, eventData: { message: hashData } }),
 							appChannel.url ?? ''
 						);
-					} else if (eventType === 'GET_CLAN_USERS') {
+					} else if (eventType === MiniAppEventType.GET_CLAN_USERS) {
 						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CLAN_USERS_RESPONSE', eventData: userChannels }),
+							JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: userChannels }),
 							appChannel.url ?? ''
 						);
-					} else if (eventType === 'JOIN_ROOM') {
+					} else if (eventType === MiniAppEventType.JOIN_ROOM) {
 						const { roomId } = (eventData.eventData || {}) as any;
 						dispatch(channelAppActions.setRoomId(roomId));
-					} else if (eventType === 'LEAVE_ROOM') {
+					} else if (eventType === MiniAppEventType.LEAVE_ROOM) {
 						dispatch(channelAppActions.setRoomId(null));
-					} else if (eventType === 'CREATE_VOICE_ROOM') {
+					} else if (eventType === MiniAppEventType.CREATE_VOICE_ROOM) {
 						// eslint-disable-next-line no-console
 						const { roomId } = (eventData.eventData || {}) as any;
 						dispatch(channelAppActions.createChannelAppMeet({ channelId: appChannel?.channel_id as string, roomName: roomId }));
@@ -198,21 +196,27 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
+				JSON.stringify({ eventType: MiniAppEventType.SEND_TOKEN_RESPONSE_SUCCESS, eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		} else if (sendTokenEvent?.status === TOKEN_FAILED_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
+				JSON.stringify({ eventType: MiniAppEventType.SEND_TOKEN_RESPONSE_FAILED, eventData: infoSendToken?.sender_id }),
 				appChannel.url ?? ''
 			);
 		}
 	};
 
 	useEffect(() => {
-		handleTokenResponse();
-		dispatch(giveCoffeeActions.setSendTokenEvent(null));
-		dispatch(giveCoffeeActions.setInfoSendToken(null));
+		const handleTokenListerner = () => {
+			handleTokenResponse();
+			dispatch(giveCoffeeActions.setSendTokenEvent(null));
+			dispatch(giveCoffeeActions.setInfoSendToken(null));
+		};
+
+		if (sendTokenEvent) {
+			handleTokenListerner();
+		}
 	}, [sendTokenEvent]);
 
 	const token = useSelector(selectLiveToken);
