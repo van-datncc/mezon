@@ -12,7 +12,6 @@ import {
 	selectEnableMic,
 	selectEnableVideo,
 	selectInfoSendToken,
-	selectJoinChannelAppData,
 	selectLiveToken,
 	selectSendTokenEvent,
 	TOKEN_FAILED_STATUS,
@@ -21,11 +20,11 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
-import { ApiChannelAppResponse, ApiTokenSentEvent } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CurrentUser, MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
+import { ApiChannelAppResponse } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import useMiniAppEventListener from './useMiniAppEventListener';
 
 export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: string | undefined }) {
 	const enableMic = useSelector(selectEnableMic);
@@ -72,7 +71,6 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
-	const miniAppRef = useRef<HTMLIFrameElement>(null);
 	const currentUser = useAuth();
 	const store = getStore();
 	const allRolesInClan = selectAllRolesClan(store.getState());
@@ -80,7 +78,6 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const infoSendToken = selectInfoSendToken(store.getState());
 	const currentChannelAppClanId = selectChannelAppClanId(store.getState());
 	const currentChannelAppId = selectChannelAppChannelId(store.getState());
-	const channelAppUserData = selectJoinChannelAppData(store.getState());
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -118,80 +115,7 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 		[dispatch, appChannel?.url]
 	);
 
-	useEffect(() => {
-		if (appChannel?.url) {
-			const compareHost = (url1: string, url2: string) => {
-				try {
-					const parsedURL1 = new URL(url1);
-					const parsedURL2 = new URL(url2);
-					return parsedURL1.hostname === parsedURL2.hostname;
-				} catch (error) {
-					return false;
-				}
-			};
-
-			const handleMessage = async (event: MessageEvent) => {
-				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
-					const eventData = safeJSONParse(event.data ?? '{}') || {};
-
-					const { eventType } = eventData;
-
-					if (!eventType) return;
-
-					if (eventType === MiniAppEventType.PING) {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: MiniAppEventType.PONG, eventData: { message: MiniAppEventType.PONG } }),
-							appChannel.url ?? ''
-						);
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: MiniAppEventType.CURRENT_USER_INFO, eventData: currentUser?.userProfile }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === MiniAppEventType.SEND_TOKEN) {
-						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
-						const tokenEvent: ApiTokenSentEvent = {
-							sender_id: currentUser.userId as string,
-							sender_name: currentUser?.userProfile?.user?.username as string,
-							receiver_id,
-							amount,
-							note,
-							extra_attribute
-						};
-						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
-						dispatch(giveCoffeeActions.setShowModalSendToken(true));
-					} else if (eventType === MiniAppEventType.GET_CLAN_ROLES) {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: MiniAppEventType.CLAN_ROLES_RESPONSE, eventData: allRolesInClan }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === MiniAppEventType.SEND_BOT_ID) {
-						const { appId } = (eventData.eventData || {}) as any;
-						const hashData = await getUserHashInfo(appId);
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: MiniAppEventType.USER_HASH_INFO, eventData: { message: hashData } }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === MiniAppEventType.GET_CLAN_USERS) {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: userChannels }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === MiniAppEventType.JOIN_ROOM) {
-						const { roomId } = (eventData.eventData || {}) as any;
-						dispatch(channelAppActions.setRoomId(roomId));
-					} else if (eventType === MiniAppEventType.LEAVE_ROOM) {
-						dispatch(channelAppActions.setRoomId(null));
-					} else if (eventType === MiniAppEventType.CREATE_VOICE_ROOM) {
-						// eslint-disable-next-line no-console
-						const { roomId } = (eventData.eventData || {}) as any;
-						dispatch(channelAppActions.createChannelAppMeet({ channelId: appChannel?.channel_id as string, roomName: roomId }));
-					}
-				}
-			};
-			window.addEventListener('message', handleMessage);
-			return () => window.removeEventListener('message', handleMessage);
-		}
-	}, [appChannel?.url, channelAppUserData]);
+	const { miniAppRef } = useMiniAppEventListener(appChannel, allRolesInClan, userChannels, currentUser as CurrentUser, getUserHashInfo);
 
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {

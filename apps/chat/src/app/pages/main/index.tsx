@@ -63,7 +63,8 @@ import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ApiChannelAppResponse } from 'mezon-js/api.gen';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../channel/ChannelApp';
@@ -298,20 +299,9 @@ function MyApp() {
 	);
 	return (
 		<div ref={parentRef}>
-			{appsList.length > 0 &&
-				appsList.map((app) => (
-					<DraggableModal
-						headerTitle={app.url}
-						key={`${app.app_id}`}
-						parentRef={parentRef}
-						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}
-						children={<ChannelApps appChannel={app} />}
-					/>
-				))}
+			<MemoizedDraggableModals appsList={appsList} parentRef={parentRef} handleOncloseCallback={handleOncloseCallback} />
+			<MemoizedErrorModals toastError={toastError} />
 
-			{toastError.map((error) => (
-				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
-			))}
 			<div
 				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
 				onClick={handleClick}
@@ -524,3 +514,46 @@ const MessageModalImageWrapper = () => {
 		</MessageContextMenuProvider>
 	);
 };
+
+interface MemoizedDraggableModalsProps {
+	appsList: ApiChannelAppResponse[];
+	parentRef: React.RefObject<HTMLDivElement>;
+	handleOncloseCallback: (clanId: string, channelId: string) => void;
+}
+
+const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ appsList, parentRef, handleOncloseCallback }) => {
+	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
+		<>
+			{appsList.length > 0 &&
+				appsList.map((app) => (
+					<DraggableModal
+						key={app.app_id}
+						headerTitle={app.url}
+						parentRef={parentRef}
+						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}
+					>
+						<ChannelApps appChannel={app} />
+					</DraggableModal>
+				))}
+		</>
+	);
+});
+interface ToastError {
+	id: string;
+	message: string;
+}
+
+interface ErrorProps {
+	toastError: ToastError[];
+}
+
+const MemoizedErrorModals: React.FC<ErrorProps> = React.memo(({ toastError }) => {
+	return (
+		<>
+			{toastError.map((error) => (
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
+			))}
+		</>
+	);
+});
