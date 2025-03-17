@@ -17,6 +17,7 @@ import {
 } from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { selectAllEmojiRecent, selectLastEmojiRecent } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -41,6 +42,8 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 	const thread = useSelector(selectThreadCurrentChannel);
 	const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
 	const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
+	const lastEmojiRecent = useSelector(selectLastEmojiRecent);
+	const allEmojiRecent = useSelector(selectAllEmojiRecent);
 
 	const currentActive = useMemo(() => {
 		let clanIdActive = '';
@@ -120,6 +123,21 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 		},
 		[channel, membersOfParent, membersOfChild]
 	);
+
+	const emojiRecentId = useCallback(
+		async (emoji_id: string) => {
+			if (lastEmojiRecent.emoji_id === emoji_id) {
+				return '';
+			}
+			const foundEmoji = allEmojiRecent.find((emoji) => emoji.id === emoji_id) as any;
+			if (foundEmoji) {
+				return foundEmoji.emoji_recents_id;
+			}
+			return '0';
+		},
+		[lastEmojiRecent, allEmojiRecent]
+	);
+
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
@@ -150,7 +168,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				isPublicChannel: is_public,
 				isClanView: isClanView as boolean
 			});
-
+			const emoji_recent_id = await emojiRecentId(emoji_id);
 			const payloadDispatchReaction = {
 				id,
 				clanId: currentActive.clanIdActive,
@@ -164,7 +182,8 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				actionDelete: action_delete,
 				isPublic: payload.is_public,
 				userId: userId as string,
-				topic_id: isFocusTopicBox ? channelIdOnMessage : ''
+				topic_id: isFocusTopicBox ? channelIdOnMessage : '',
+				emoji_recent_id: emoji_recent_id
 			};
 
 			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();

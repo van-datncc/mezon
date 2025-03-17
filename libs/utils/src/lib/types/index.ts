@@ -591,6 +591,12 @@ export type IEmoji = {
 	clan_id?: string;
 };
 
+export type IEmojiRecent = {
+	emoji_id?: string;
+	emoji_recents_id?: string;
+	update_time?: string;
+};
+
 export type IChannelUser = ChannelDescription & {
 	id: string;
 	active?: number;
