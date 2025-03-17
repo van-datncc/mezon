@@ -39,16 +39,18 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 		}
 	}, [parentRef, size]);
 
-	const handleMouseDown = (e: React.MouseEvent) => {
+	const handleMouseDown = useCallback((e: React.MouseEvent) => {
 		e.preventDefault();
 		setIsDragging(true);
-	};
+	}, []);
 
-	const handleResizeMouseDown = (direction: string) => (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setResizeDir(direction);
-	};
+	const handleResizeMouseDown = useCallback((direction: string) => {
+		return (e: React.MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+			setResizeDir(direction);
+		};
+	}, []);
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
@@ -155,21 +157,20 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 			{/* Content */}
 			<div className="flex-1 overflow-auto relative">
 				{children}
-				{/* Overlay khi đang resize hoặc drag */}
 				{(isDragging || resizeDir) && <div className="absolute inset-0" style={{ background: 'transparent', zIndex: 10 }} />}
 			</div>
 
 			{/* Resize Handles */}
-			<div className="absolute top-0 left-0 w-full h-2 cursor-n-resize" onMouseDown={handleResizeMouseDown('top')} />
-			<div className="absolute top-1/2 left-0 w-2 h-1/2 cursor-w-resize" onMouseDown={handleResizeMouseDown('left')} />
-			<div className="absolute top-1/2 right-0 w-2 h-1/2 cursor-e-resize" onMouseDown={handleResizeMouseDown('right')} />
-			<div className="absolute bottom-0 left-1/2 w-1/2 h-2 cursor-s-resize" onMouseDown={handleResizeMouseDown('bottom')} />
+			<div className="absolute top-0 h-2 w-full cursor-n-resize z-40" onMouseDown={handleResizeMouseDown('top')} />
+			<div className="absolute bottom-0 h-2 w-full cursor-s-resize z-40" onMouseDown={handleResizeMouseDown('bottom')} />
+			<div className="absolute left-0 w-2 h-full cursor-w-resize z-40" onMouseDown={handleResizeMouseDown('left')} />
+			<div className="absolute right-0 w-2 h-full cursor-e-resize z-40" onMouseDown={handleResizeMouseDown('right')} />
 
 			{/* Corner Resizers */}
-			<div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize" onMouseDown={handleResizeMouseDown('bottom-right')} />
-			<div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize" onMouseDown={handleResizeMouseDown('bottom-left')} />
-			<div className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize" onMouseDown={handleResizeMouseDown('top-right')} />
-			<div className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize" onMouseDown={handleResizeMouseDown('top-left')} />
+			<div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50" onMouseDown={handleResizeMouseDown('bottom-right')} />
+			<div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize z-50" onMouseDown={handleResizeMouseDown('bottom-left')} />
+			<div className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize z-50" onMouseDown={handleResizeMouseDown('top-right')} />
+			<div className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize z-50" onMouseDown={handleResizeMouseDown('top-left')} />
 		</div>
 	);
 };
