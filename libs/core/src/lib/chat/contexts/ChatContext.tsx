@@ -1072,6 +1072,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				);
 			}
 		} else if (channelCreated.creator_id === userId) {
+			dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
 			dispatch(
 				listChannelsByUserActions.addOneChannel({
 					id: channelCreated.channel_id,
