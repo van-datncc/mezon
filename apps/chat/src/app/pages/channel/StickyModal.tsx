@@ -13,7 +13,6 @@ interface StickyModalProps {
 }
 
 const StickyModal: React.FC<StickyModalProps> = ({ children, onClose, app }) => {
-	console.log('app :', app);
 	const appUrl = app.url;
 	const appClanId = app.clan_id;
 	const appChannelId = app.channel_id;
