@@ -252,16 +252,13 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	}, [appChannel, participantMeetState]);
 	return appChannel?.url ? (
 		<>
-			<div className="w-full h-full border border-red-600">
+			<div className="w-full h-full">
 				<iframe
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}
-					style={{
-						width: '100vw',
-						height: '100vh'
-					}}
+					className="w-full h-full"
 				/>
 			</div>
 

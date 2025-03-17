@@ -22,6 +22,7 @@ const InitialRoutes = () => {
 		const SCOPE = process.env.NX_CHAT_APP_OAUTH2_SCOPE;
 		const authUrl = `${OAUTH2_AUTHORIZE_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&state=${STATE}`;
 		window.location.replace(authUrl);
+		// <GoogleButtonLogin />;
 	} else {
 		return <Navigate to="/chat/direct/friends" replace />;
 	}

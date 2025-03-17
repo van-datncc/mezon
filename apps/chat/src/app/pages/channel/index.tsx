@@ -73,11 +73,9 @@ import { ApiChannelAppResponse, ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
-import StickyModal from './StickyModal';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -383,13 +381,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{appsList.length > 0 &&
-				appsList.map((app) => (
-					<StickyModal app={app} key={app.app_id} onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}>
-						<ChannelApps appChannel={app} />
-					</StickyModal>
-				))}
-
 			{isChannelApp ? null : (
 				// <ChannelAppLayout appChannel={appChannel} />
 				<>
