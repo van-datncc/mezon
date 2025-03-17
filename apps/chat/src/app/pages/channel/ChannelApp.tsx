@@ -2,6 +2,7 @@ import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } 
 import { useAuth } from '@mezon/core';
 import {
 	channelAppActions,
+	getStore,
 	giveCoffeeActions,
 	handleParticipantMeetState,
 	selectAllChannelMembers,
@@ -73,13 +74,13 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
 	const miniAppRef = useRef<HTMLIFrameElement>(null);
 	const currentUser = useAuth();
-	const allRolesInClan = useSelector(selectAllRolesClan);
-	const sendTokenEvent = useSelector(selectSendTokenEvent);
-	const infoSendToken = useSelector(selectInfoSendToken);
-	const currentChannelAppClanId = useSelector(selectChannelAppClanId);
-	const currentChannelAppId = useSelector(selectChannelAppChannelId);
-
-	const channelAppUserData = useSelector(selectJoinChannelAppData);
+	const store = getStore();
+	const allRolesInClan = selectAllRolesClan(store.getState());
+	const sendTokenEvent = selectSendTokenEvent(store.getState());
+	const infoSendToken = selectInfoSendToken(store.getState());
+	const currentChannelAppClanId = selectChannelAppClanId(store.getState());
+	const currentChannelAppId = selectChannelAppChannelId(store.getState());
+	const channelAppUserData = selectJoinChannelAppData(store.getState());
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
