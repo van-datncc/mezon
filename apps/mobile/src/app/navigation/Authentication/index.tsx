@@ -5,7 +5,7 @@ import { ChatContext } from '@mezon/core';
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
 import { ColorRoleProvider } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import { Dimensions, NativeModules, Platform } from 'react-native';
@@ -112,7 +112,8 @@ export const Authentication = memo(() => {
 							headerShown: false,
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
-							gestureResponseDistance: Dimensions.get('window').width
+							gestureResponseDistance: Dimensions.get('window').width,
+							cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter
 						}}
 					/>
 					<RootStack.Screen
@@ -124,7 +125,8 @@ export const Authentication = memo(() => {
 							headerShadowVisible: false,
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
-							gestureResponseDistance: Dimensions.get('window').width
+							gestureResponseDistance: Dimensions.get('window').width,
+							cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
