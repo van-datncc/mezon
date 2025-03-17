@@ -285,12 +285,16 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			setDefaultNotifiName(notiLabels[defaultNotificationClan.notification_setting_type]);
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
+	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker(
+		[EPermission.clanOwner, EPermission.administrator],
+		channel?.channel_id ?? ''
+	);
 
 	const [canManageThread, canManageChannel] = usePermissionChecker(
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
 		channel?.channel_id ?? ''
 	);
-
+	const hasManageThreadPermission = (canManageThread && channel.creator_id === currentUserId) || hasClanOwnerPermission || hasAdminPermission;
 	const handClosePannel = useCallback(() => {
 		setIsShowPanelChannel(false);
 	}, []);
@@ -511,7 +515,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 						)}
 					</GroupPanels>
 
-					{canManageThread && (
+					{hasManageThreadPermission && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							{!isThread && <ItemPanel children="Create Thread" />}
