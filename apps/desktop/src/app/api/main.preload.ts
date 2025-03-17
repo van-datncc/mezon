@@ -1,15 +1,5 @@
-import { CloseChannelAppPayload } from '@mezon/utils';
 import { contextBridge, ipcRenderer } from 'electron';
-import {
-	ACTION_SHOW_IMAGE,
-	GET_APP_VERSION,
-	GET_DEVICE_ID,
-	OPEN_APP_CHANNEL,
-	OPEN_APP_CHANNEL_CLOSE_ACTION,
-	OPEN_NEW_WINDOW,
-	SENDER_ID,
-	SET_BADGE_COUNT
-} from '../events/constants';
+import { ACTION_SHOW_IMAGE, GET_APP_VERSION, GET_DEVICE_ID, OPEN_NEW_WINDOW, SENDER_ID, SET_BADGE_COUNT } from '../events/constants';
 
 contextBridge.exposeInMainWorld('electron', {
 	platform: process.platform,
@@ -40,14 +30,6 @@ contextBridge.exposeInMainWorld('electron', {
 		return ipcRenderer.invoke(OPEN_NEW_WINDOW, props, options, params);
 	},
 
-	openChannelApp: (props, data) => {
-		return ipcRenderer.invoke(OPEN_APP_CHANNEL, { props, data });
-	},
-	onCloseChannelApp: (callback: (data: CloseChannelAppPayload) => void) => {
-		ipcRenderer.on(OPEN_APP_CHANNEL_CLOSE_ACTION, (_event, data) => {
-			callback(data);
-		});
-	},
 	handleActionShowImage: (action: string, url: any) => {
 		return ipcRenderer.invoke(ACTION_SHOW_IMAGE, { payload: { action, fileURL: url } });
 	}
