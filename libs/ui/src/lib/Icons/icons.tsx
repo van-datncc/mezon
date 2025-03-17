@@ -4702,6 +4702,115 @@ export function AppChannelIcon({ fill, ...props }: ClassIconProps) {
 	);
 }
 
+export function PrivateAppChannelIcon({ fill, ...props }: ClassIconProps) {
+	return (
+		<svg
+			className="icon icon-tabler icon-tabler-apps"
+			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			height="24"
+			viewBox="0 0 24 24"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path d="M0 0h24v24H0z" fill="none" stroke="none" />
+			<rect height="6" rx="1" width="6" x="4" y="4" />
+			<rect height="6" rx="1" width="6" x="4" y="14" />
+			<rect height="6" rx="1" width="6" x="14" y="14" />
+			<line x1="14" x2="20" y1="7" y2="7" fill={fill} />
+			<line x1="17" x2="17" y1="4" y2="10" fill={fill} />
+			<path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M13.2117 3.45524V3.13004C13.2117 2.31703 13.8621 1.66663 14.6751 1.66663C15.4881 1.66663 16.1385 2.31703 16.1385 3.13004V3.45524H16.4637C16.7889 3.45524 17.0328 3.69915 17.0328 4.02435V6.95118C17.0328 7.27638 16.7889 7.52028 16.4637 7.52028H12.8865C12.5613 7.52028 12.3174 7.27638 12.3174 6.95118V4.02435C12.3174 3.69915 12.5613 3.45524 12.8865 3.45524H13.2117ZM13.7808 3.13004C13.7808 2.64224 14.1873 2.23573 14.6751 2.23573C15.1629 2.23573 15.5694 2.64224 15.5694 3.13004V3.45524H13.7808V3.13004ZM14.6751 4.83736C14.919 4.83736 15.0816 4.99996 15.0816 5.24386V5.81297C15.0816 6.05687 14.919 6.21947 14.6751 6.21947C14.4312 6.21947 14.2686 6.05687 14.2686 5.81297V5.24386C14.3499 4.99996 14.5125 4.83736 14.6751 4.83736Z"
+				fill="currentColor"
+			></path>
+		</svg>
+	);
+}
+
+export function Joystick(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			viewBox="0 0 128 128"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			aria-hidden="true"
+			role="img"
+			className="iconify iconify--noto"
+			preserveAspectRatio="xMidYMid meet"
+			fill="#000000"
+			{...props}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<path
+					d="M63.83 52.62c-5.04.32-13.84 5.04-26.08 10.2s-23.29 9.87-25.11 10.73c-1.82.86-3.33 1.37-3.43 4.38s38.63 27.6 38.63 27.6l38.1.64l32.05-28.74s-.05-2.11-2.11-3.78C113.94 72.08 97 65.5 90.34 62.82c-6.65-2.69-24.23-10.34-26.51-10.2z"
+					fill="#858585"
+				></path>
+				<path
+					d="M67.34 100.9c6.87-.1 15.25-5.55 28.11-12.32c9.91-5.22 19.9-10.68 20.33-10.85c1.62-.64 1.46-2.57 1.46-2.57s1.46 2.13 1.65 6.44c.17 3.87.11 12.56 0 13.63c-.11 1.07.21 2.79-2.25 4.19s-38.61 21.29-40.78 22.43c-2.26 1.19-4.61 2.6-7.42 2.6c-2.53.01-5.41-1.24-9.63-2.66c-2.02-.68-13.53-5.53-24.77-10.98c-7.51-3.64-15.62-7.63-20.31-10.31c-2.69-1.54-3.55-2.66-3.87-3.44c-.98-2.37-.71-16.77-.72-18.06c-.02-1.9.42-3 .42-3s1.26.99 5.03 2.79c3.32 1.58 13.73 7.1 22.75 11.09c22.1 9.76 26.79 11.07 30 11.02z"
+					fill="#5e6367"
+				></path>
+				<path
+					d="M63.88 57.54c-7.07.03-11.3 2.41-13.92 5.41c-3.45 3.96-3.42 9.03-3.15 11.23c.46 3.85 5.2 9 17.97 9c13.9 0 16.64-6.06 17.09-7.86c.47-1.89.83-8.66-3.77-13.13c-2.59-2.51-7.72-4.68-14.22-4.65z"
+					fill="#282828"
+				></path>
+				<path d="M57.81 42.79v20.39s1.02 3.08 6.18 3.11c5.29.03 6.27-2.47 6.27-2.47l.02-21.18l-12.47.15z" fill="#6da3ac"></path>
+				<path
+					d="M63.96 3.56c-13.39-.08-21.62 9.16-21.7 20.93c-.08 11.77 9.77 21.28 21.62 21.16c13.75-.15 21.61-9.05 21.48-22.29c-.11-12.63-10.32-19.74-21.4-19.8z"
+					fill="#ff4f28"
+				></path>
+				<path
+					d="M59.66 8.07c-2.49-1.33-6.76-.18-10.55 4.56c-3.78 4.71-4.35 12.07-.18 12.67c3.69.53 4.11-3.49 4.27-4.62c.36-2.53 2.27-5.51 4.62-6.31c.78-.26 2.69-.59 3.25-1.87c.85-1.97.09-3.63-1.41-4.43z"
+					fill="#fdfffc"
+				></path>
+				<path
+					d="M23.89 76.26c.14 3.81 5.62 5.42 10.08 5.42c6.19 0 9.76-2.51 9.69-5.83c-.08-3.68-5.44-5.46-9.9-5.52c-5.17-.05-10.01 2.04-9.87 5.93z"
+					fill="#dd0c22"
+				></path>
+				<path
+					d="M27.39 74.51c-.07 2.26 3.04 3.18 6.29 3.18s5.94-1.13 6.01-3.32c.07-2.19-3.89-3.18-6.44-3.04c-2.54.14-5.79.78-5.86 3.18z"
+					fill="#ff4c2a"
+				></path>
+			</g>
+		</svg>
+	);
+}
+
+export function AppHelpIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			version="1.0"
+			id="Layer_1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			viewBox="0 0 64 64"
+			enable-background="new 0 0 64 64"
+			xmlSpace="preserve"
+			fill="#000000"
+			className=""
+			{...props}
+		>
+			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<g>
+					{' '}
+					<path
+						fill="#394240"
+						d="M56,0H8C5.789,0,4,1.789,4,4v52c0,4.418,3.582,8,8,8h44c2.211,0,4-1.789,4-4V4C60,1.789,58.211,0,56,0z M52,56H16c-2.211,0-4-1.789-4-4s1.789-4,4-4h36V56z M52,40H12V8h40V40z"
+					></path>{' '}
+					<path fill="#F9EBB2" d="M52,56H16c-2.211,0-4-1.789-4-4s1.789-4,4-4h36V56z"></path>{' '}
+					<rect x="12" y="8" fill="#45AAB8" width="40" height="32"></rect>{' '}
+				</g>{' '}
+			</g>
+		</svg>
+	);
+}
+
 export function VideoIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" {...props}>

@@ -301,7 +301,12 @@ const ChannelLinkComponent = ({
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 								<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 							)}
-							{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && (
+								<Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />
+							)}
+							{isPrivate && channel.type === ChannelType.CHANNEL_TYPE_APP && (
+								<Icons.PrivateAppChannelIcon className={'w-5 h-5'} fill={theme} />
+							)}
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p

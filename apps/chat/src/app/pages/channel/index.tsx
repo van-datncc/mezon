@@ -169,11 +169,15 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const mode =
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_APP
 			? ChannelStreamMode.STREAM_MODE_CHANNEL
 			: ChannelStreamMode.STREAM_MODE_THREAD;
 
 	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
+	const isAppChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
+
 	const currentClan = useSelector(selectCurrentClan);
 	const missionDone = useSelector(selectMissionDone);
 	const missionSum = useSelector(selectMissionSum);
@@ -223,7 +227,29 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
-			{currentChannel && <ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />}
+			{currentChannel && (
+				<div className={isAppChannel ? 'flex px-2 items-center' : ''}>
+					{isAppChannel && (
+						<div className="flex items-center gap-1 bg-[#2f6ea5] hover:bg-[#275b88] text-xs rounded-full py-1 px-2 cursor-pointer">
+							<Icons.Joystick className="w-6" />
+							<div className="font-medium">Launch</div>
+						</div>
+					)}
+					<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
+				</div>
+			)}
+			{isAppChannel && (
+				<div className="flex gap-2 px-2 pt-2">
+					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-[#242f3d] dark:hover:bg-[#1c2530] bg-[#2f6ea5] hover:bg-[#275b88] py-2 px-2 rounded-md cursor-pointer font-medium">
+						<Icons.Joystick className="w-6" />
+						<div>Launch App</div>
+					</div>
+					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-[#242f3d] dark:hover:bg-[#1c2530] bg-[#2f6ea5] hover:bg-[#275b88] py-2 px-2 rounded-md cursor-pointer font-medium">
+						<Icons.AppHelpIcon className="w-6" />
+						<div>Help</div>
+					</div>
+				</div>
+			)}
 			{currentChannel && (
 				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel?.channel_private : false} />
 			)}
@@ -333,64 +359,59 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{isChannelApp ? null : (
-				// <ChannelAppLayout appChannel={appChannel} />
-				<>
-					{isOverUploading && (
-						<TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />
-					)}
-					<div
-						className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
-						id="mainChat"
-						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onDragEnter={canSendMessage ? handleDragEnter : () => {}}
-					>
-						<div
-							className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
-						>
-							{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
-								<div
-									className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
-								>
-									<div
-										className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
-										ref={messagesContainerRef}
-									>
-										<ChannelMedia currentChannel={currentChannel} />
-									</div>
-									<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
-								</div>
-							)}
-							{isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
-								<div
-									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-								>
-									<Canvas />
-								</div>
-							)}
-
-							{!isShowCanvas && isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
-								<div
-									className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-								>
-									<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
-								</div>
-							)}
-							{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
-								<div
-									onContextMenu={(event) => event.preventDefault()}
-									className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-									id="memberList"
-								>
-									<MemberList />
-								</div>
-							)}
-
-							{isSearchMessage && !isChannelMezonVoice && !isChannelStream && <SearchMessageChannel />}
-						</div>
-					</div>
-				</>
+			{isOverUploading && (
+				<TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />
 			)}
+			<div
+				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
+				id="mainChat"
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+			>
+				<div
+					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
+				>
+					{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
+						<div
+							className={`flex flex-col flex-1 min-w-60 pb-[10px] ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
+						>
+							<div
+								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatMobile' : 'h-heightMessageViewChatMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChat' : 'h-heightMessageViewChat'}`}`}
+								ref={messagesContainerRef}
+							>
+								<ChannelMedia currentChannel={currentChannel} />
+							</div>
+							<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
+						</div>
+					)}
+					{isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
+						<div
+							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
+							<Canvas />
+						</div>
+					)}
+
+					{!isShowCanvas && isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
+						<div
+							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
+							<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
+						</div>
+					)}
+					{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
+						<div
+							onContextMenu={(event) => event.preventDefault()}
+							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							id="memberList"
+						>
+							<MemberList />
+						</div>
+					)}
+
+					{isSearchMessage && !isChannelMezonVoice && !isChannelStream && <SearchMessageChannel />}
+				</div>
+			</div>
 		</div>
 	);
 };
