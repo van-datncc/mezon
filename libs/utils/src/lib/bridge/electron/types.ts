@@ -23,7 +23,6 @@ export type MezonElectronAPI = {
 		}
 	) => Promise<void>;
 	dowloadImage: (url: string) => Promise<void>;
-	openChannelApp: (eventName: string, data: any) => void;
 };
 declare global {
 	interface Window {

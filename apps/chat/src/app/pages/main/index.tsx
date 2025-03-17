@@ -18,6 +18,7 @@ import {
 	DMCallActions,
 	accountActions,
 	audioCallActions,
+	channelsActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
@@ -26,6 +27,7 @@ import {
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
+	selectAppChannelsListShowOnPopUp,
 	selectAudioBusyTone,
 	selectAudioDialTone,
 	selectAudioEndTone,
@@ -64,7 +66,9 @@ import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import { ChannelApps } from '../channel/ChannelApp';
 import ChannelStream from '../channel/ChannelStream';
+import DraggableModal from '../channel/DraggableModal/DraggableModal';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
 import DirectUnread from './directUnreads';
@@ -278,9 +282,33 @@ function MyApp() {
 	};
 
 	const toastError = useSelector(selectToastErrors);
+	const parentRef = useRef<HTMLDivElement>(null);
+	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 
+	const handleOncloseCallback = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
 	return (
-		<>
+		<div ref={parentRef}>
+			{appsList.length > 0 &&
+				appsList.map((app) => (
+					<DraggableModal
+						headerTitle={app.url}
+						key={`${app.app_id}`}
+						parentRef={parentRef}
+						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}
+						children={<ChannelApps appChannel={app} />}
+					/>
+				))}
+
 			{toastError.map((error) => (
 				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
 			))}
@@ -321,7 +349,7 @@ function MyApp() {
 				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 				{isShowPopupQuickMess && <PopupQuickMess />}
 			</div>
-		</>
+		</div>
 	);
 }
 

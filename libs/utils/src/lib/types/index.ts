@@ -11,7 +11,6 @@ import {
 import {
 	ApiAccount,
 	ApiCategoryDesc,
-	ApiChannelAppResponse,
 	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiChannelMessageHeader,
@@ -1455,6 +1454,8 @@ export type ImageSourceObject = {
 	url: string;
 };
 
-export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
-	isFocused: boolean;
-}
+export type HistoryItem = {
+	valueTextInput: string;
+	content: string;
+	mentionRaw: any[];
+};

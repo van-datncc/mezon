@@ -20,9 +20,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { ApiChannelAppResponseExtend, ParticipantMeetState } from '@mezon/utils';
+import { ParticipantMeetState } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { ApiTokenSentEvent } from 'mezon-js/api.gen';
+import { ApiChannelAppResponse, ApiTokenSentEvent } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -64,7 +64,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseExtend }) {
+export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
@@ -252,16 +252,13 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseE
 	}, [appChannel, participantMeetState]);
 	return appChannel?.url ? (
 		<>
-			<div className="w-full h-full border border-red-600">
+			<div className="w-full h-full">
 				<iframe
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}
-					style={{
-						width: '100vw',
-						height: '100vh'
-					}}
+					className="w-full h-full"
 				/>
 			</div>
 

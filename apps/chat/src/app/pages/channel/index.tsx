@@ -24,7 +24,6 @@ import {
 	onboardingActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
-	selectAppChannelsListShowOnPopUp,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
@@ -55,12 +54,9 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
-	ApiChannelAppResponseExtend,
-	CloseChannelAppPayload,
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
 	IChannel,
-	OPEN_APP_CHANNEL_CLOSE_ACTION,
 	ParticipantMeetState,
 	SubPanelName,
 	TIME_OFFSET,
@@ -74,11 +70,9 @@ import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
-import StickyModal from './StickyModal';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -324,8 +318,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel]);
 
-	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
-
 	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
 		if (!savedChannelIds.includes(currentChannel.channel_id) && currentChannel.age_restricted === 1) {
@@ -339,58 +331,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
-	useEffect(() => {
-		if (isChannelApp && appChannel) {
-			dispatch(
-				channelsActions.setAppChannelsListShowOnPopUp({
-					clanId: appChannel?.clan_id as string,
-					channelId: appChannel?.channel_id as string,
-					appChannel: appChannel as ApiChannelAppResponseExtend
-				})
-			);
-		}
-	}, [appChannel?.channel_id]);
-
-	const handleOncloseCallback = useCallback(
-		(clanId: string, channelId: string) => {
-			dispatch(
-				channelsActions.removeAppChannelsListShowOnPopUp({
-					clanId,
-					channelId
-				})
-			);
-		},
-		[dispatch]
-	);
-
-	useEffect(() => {
-		const handleAppClosed = (event: string, data: CloseChannelAppPayload) => {
-			if (!data || !data.appClanId || !data.appChannelId) {
-				return;
-			}
-			handleOncloseCallback(data.appClanId, data.appChannelId);
-		};
-
-		if (window.electron) {
-			window.electron.on(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
-		}
-
-		return () => {
-			if (window.electron) {
-				window.electron.removeListener(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
-			}
-		};
-	}, []);
-
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{appsList.length > 0 &&
-				appsList.map((app) => (
-					<StickyModal app={app} key={app.app_id} onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}>
-						<ChannelApps appChannel={app} />
-					</StickyModal>
-				))}
-
 			{isChannelApp ? null : (
 				// <ChannelAppLayout appChannel={appChannel} />
 				<>
