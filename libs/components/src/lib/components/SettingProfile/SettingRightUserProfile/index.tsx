@@ -289,7 +289,10 @@ const SettingRightUser = ({
 						</div>
 					</div>
 
-					<div className="mt-8 flex items-center bg-bgTertiary p-4 rounded justify-between" onContextMenu={handleMouseClick}>
+					<div
+						className="mt-8 flex items-center dark:bg-bgTertiary bg-[#F0F0F0] p-4 rounded justify-between"
+						onContextMenu={handleMouseClick}
+					>
 						<p className="font-semibold tracking-wide text-sm">Direct Message Icon</p>
 						<div className="flex gap-x-5">
 							<label
