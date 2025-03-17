@@ -28,15 +28,26 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 
 	useEffect(() => {
 		const parent = parentRef?.current;
-		if (parent) {
+		if (!parent) return;
+
+		const updateBounds = () => {
 			const parentRect = parent.getBoundingClientRect();
 			setBounds({
 				minX: 0,
 				maxX: parentRect.width - size.width,
 				minY: 0,
-				maxY: parentRect.height - size.height
+				maxY: parentRect.height - size.height - 20
 			});
-		}
+		};
+
+		updateBounds();
+
+		const resizeObserver = new ResizeObserver(updateBounds);
+		resizeObserver.observe(parent);
+
+		return () => {
+			resizeObserver.disconnect();
+		};
 	}, [parentRef, size]);
 
 	const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -136,7 +147,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	return (
 		<div
 			ref={modalRef}
-			className="absolute bg-white shadow-lg rounded z-50 border"
+			className="absolute dark:bg-[#1E1F22] bg-[#E3E5E8] shadow-lg rounded-sm z-50"
 			style={{
 				left: `${position.x}px`,
 				top: `${position.y}px`,
@@ -147,15 +158,22 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 			}}
 		>
 			{/* Header (Drag) */}
-			<div className="cursor-move bg-gray-200 p-2 flex justify-between items-center" onMouseDown={handleMouseDown}>
-				<span>{headerTitle}</span>
-				<button onClick={onClose} className="bg-red-500 text-white px-2 py-1 rounded">
-					X
-				</button>
+			<div
+				className="cursor-move dark:bg-[#1E1F22] bg-[#E3E5E8] px-3 py-1 flex justify-between items-center rounded-t-xl"
+				onMouseDown={handleMouseDown}
+			>
+				<span className="dark:text-white text-black text-sm">{headerTitle}</span>
+				{/* Nút X */}
+				<button
+					onClick={onClose}
+					className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm  hover:bg-[#404249] hover:text-white transition"
+				>
+					✕
+				</button>{' '}
 			</div>
 
 			{/* Content */}
-			<div className="flex-1 overflow-auto relative">
+			<div className="flex-1 overflow-auto relative p-0.1">
 				{children}
 				{(isDragging || resizeDir) && <div className="absolute inset-0" style={{ background: 'transparent', zIndex: 10 }} />}
 			</div>
