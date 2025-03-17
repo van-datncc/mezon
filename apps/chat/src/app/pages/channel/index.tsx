@@ -12,23 +12,19 @@ import {
 import {
 	ChannelsEntity,
 	ETypeMission,
-	TOKEN_FAILED_STATUS,
-	TOKEN_SUCCESS_STATUS,
 	channelAppActions,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
 	directMetaActions,
 	gifsStickerEmojiActions,
-	giveCoffeeActions,
 	handleParticipantMeetState,
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	onboardingActions,
-	selectAllChannelMembers,
-	selectAllRolesClan,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
+	selectAppChannelsListShowOnPopUp,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
@@ -36,13 +32,11 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectFetchChannelStatus,
-	selectInfoSendToken,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
 	selectIsUnreadChannelById,
-	selectJoinChannelAppData,
 	selectLastMessageByChannelId,
 	selectListChannelRenderByClanId,
 	selectMissionDone,
@@ -51,7 +45,6 @@ import {
 	selectOnboardingMode,
 	selectPreviousChannels,
 	selectProcessingByClan,
-	selectSendTokenEvent,
 	selectStatusMenu,
 	selectTheme,
 	selectTopicByChannelId,
@@ -62,9 +55,12 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	ApiChannelAppResponseExtend,
+	CloseChannelAppPayload,
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
 	IChannel,
+	OPEN_APP_CHANNEL_CLOSE_ACTION,
 	ParticipantMeetState,
 	SubPanelName,
 	TIME_OFFSET,
@@ -74,7 +70,7 @@ import {
 	titleMission
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { ApiOnboardingItem, ApiTokenSentEvent } from 'mezon-js/api.gen';
+import { ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -82,6 +78,7 @@ import { ChannelApps } from './ChannelApp';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
+import StickyModal from './StickyModal';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -255,13 +252,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const [isShowAgeRestricted, setIsShowAgeRestricted] = useState(false);
-	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, channelId));
-	const miniAppRef = useRef<HTMLIFrameElement>(null);
+
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
-	const currentUser = useAuth();
-	const allRolesInClan = useSelector(selectAllRolesClan);
-	const sendTokenEvent = useSelector(selectSendTokenEvent);
-	const infoSendToken = useSelector(selectInfoSendToken);
 	const { userProfile } = useAuth();
 	const currentChannelAppClanId = useSelector(selectChannelAppClanId);
 	const currentChannelAppId = useSelector(selectChannelAppChannelId);
@@ -277,12 +269,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		[currentChannel?.id, dispatch]
 	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
-	const appearanceTheme = useSelector(selectTheme);
-	const channelAppUserData = useSelector(selectJoinChannelAppData);
 
-	const miniAppDataHash = useMemo(() => {
-		return `userChannels=${JSON.stringify(userChannels)}`;
-	}, [userChannels]);
+	const appearanceTheme = useSelector(selectTheme);
 
 	const [openUploadFileModal, closeUploadFileModal] = useModal(() => {
 		return <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />;
@@ -336,116 +324,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [appChannel]);
 
-	const getUserHashInfo = useCallback(
-		async (appId: string) => {
-			try {
-				const response = await dispatch(channelAppActions.generateAppUserHash({ appId: appId })).unwrap();
-
-				return response;
-			} catch (error) {
-				console.error('Error:', error);
-				return null;
-			}
-		},
-		[dispatch, appChannel?.url]
-	);
-
-	useEffect(() => {
-		if (appChannel?.url) {
-			const compareHost = (url1: string, url2: string) => {
-				try {
-					const parsedURL1 = new URL(url1);
-					const parsedURL2 = new URL(url2);
-					return parsedURL1.hostname === parsedURL2.hostname;
-				} catch (error) {
-					return false;
-				}
-			};
-
-			const handleMessage = async (event: MessageEvent) => {
-				if (appChannel?.url && compareHost(event.origin, appChannel?.url ?? '')) {
-					const eventData = safeJSONParse(event.data ?? '{}') || {};
-					// eslint-disable-next-line no-console
-					console.log('[MEZON] < ', eventData);
-
-					const { eventType } = eventData;
-
-					if (!eventType) return;
-
-					if (eventType === 'PING') {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'PONG', eventData: { message: 'PONG' } }),
-							appChannel.url ?? ''
-						);
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CURRENT_USER_INFO', eventData: currentUser?.userProfile }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === 'SEND_TOKEN') {
-						const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
-						const tokenEvent: ApiTokenSentEvent = {
-							sender_id: currentUser.userId as string,
-							sender_name: currentUser?.userProfile?.user?.username as string,
-							receiver_id,
-							amount,
-							note,
-							extra_attribute
-						};
-						dispatch(giveCoffeeActions.setInfoSendToken(tokenEvent));
-						dispatch(giveCoffeeActions.setShowModalSendToken(true));
-					} else if (eventType === 'GET_CLAN_ROLES') {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CLAN_ROLES_RESPONSE', eventData: allRolesInClan }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === 'SEND_BOT_ID') {
-						const { appId } = (eventData.eventData || {}) as any;
-						const hashData = await getUserHashInfo(appId);
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'USER_HASH_INFO', eventData: { message: hashData } }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === 'GET_CLAN_USERS') {
-						miniAppRef.current?.contentWindow?.postMessage(
-							JSON.stringify({ eventType: 'CLAN_USERS_RESPONSE', eventData: userChannels }),
-							appChannel.url ?? ''
-						);
-					} else if (eventType === 'JOIN_ROOM') {
-						const { roomId } = (eventData.eventData || {}) as any;
-						dispatch(channelAppActions.setRoomId(roomId));
-					} else if (eventType === 'LEAVE_ROOM') {
-						dispatch(channelAppActions.setRoomId(null));
-					} else if (eventType === 'CREATE_VOICE_ROOM') {
-						// eslint-disable-next-line no-console
-						const { roomId } = (eventData.eventData || {}) as any;
-						dispatch(channelAppActions.createChannelAppMeet({ channelId, roomName: roomId }));
-					}
-				}
-			};
-			window.addEventListener('message', handleMessage);
-			return () => window.removeEventListener('message', handleMessage);
-		}
-	}, [appChannel?.url, channelAppUserData]);
-
-	const handleTokenResponse = () => {
-		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
-			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_SUCCESS', eventData: infoSendToken?.sender_id }),
-				appChannel.url ?? ''
-			);
-		} else if (sendTokenEvent?.status === TOKEN_FAILED_STATUS) {
-			miniAppRef.current?.contentWindow?.postMessage(
-				JSON.stringify({ eventType: 'SEND_TOKEN_RESPONSE_FAILED', eventData: infoSendToken?.sender_id }),
-				appChannel.url ?? ''
-			);
-		}
-	};
-
-	useEffect(() => {
-		handleTokenResponse();
-		dispatch(giveCoffeeActions.setSendTokenEvent(null));
-		dispatch(giveCoffeeActions.setInfoSendToken(null));
-	}, [sendTokenEvent]);
+	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 
 	useEffect(() => {
 		const savedChannelIds = safeJSONParse(localStorage.getItem('agerestrictedchannelIds') || '[]');
@@ -460,11 +339,60 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelApp = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
+	useEffect(() => {
+		if (isChannelApp && appChannel) {
+			dispatch(
+				channelsActions.setAppChannelsListShowOnPopUp({
+					clanId: appChannel?.clan_id as string,
+					channelId: appChannel?.channel_id as string,
+					appChannel: appChannel as ApiChannelAppResponseExtend
+				})
+			);
+		}
+	}, [appChannel?.channel_id]);
+
+	const handleOncloseCallback = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	useEffect(() => {
+		const handleAppClosed = (event: string, data: CloseChannelAppPayload) => {
+			if (!data || !data.appClanId || !data.appChannelId) {
+				return;
+			}
+			handleOncloseCallback(data.appClanId, data.appChannelId);
+		};
+
+		if (window.electron) {
+			window.electron.on(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
+		}
+
+		return () => {
+			if (window.electron) {
+				window.electron.removeListener(OPEN_APP_CHANNEL_CLOSE_ACTION, handleAppClosed);
+			}
+		};
+	}, []);
+
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{isChannelApp ? (
-				<ChannelApps appChannel={appChannel} miniAppRef={miniAppRef} miniAppDataHash={miniAppDataHash} />
-			) : (
+			{appsList.length > 0 &&
+				appsList.map((app) => (
+					<StickyModal app={app} key={app.app_id} onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}>
+						<ChannelApps appChannel={app} />
+					</StickyModal>
+				))}
+
+			{isChannelApp ? null : (
+				// <ChannelAppLayout appChannel={appChannel} />
 				<>
 					{isOverUploading && (
 						<TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />
@@ -623,6 +551,7 @@ const OnboardingGuide = ({
 		}
 	}, [missionDone]);
 	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{missionDone < missionSum && currentMission ? (
 				<div

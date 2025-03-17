@@ -7,6 +7,7 @@ import {
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
+	selectAppChannelById,
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
@@ -19,7 +20,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ApiChannelAppResponseExtend, ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
@@ -143,6 +144,10 @@ const ChannelLinkComponent = ({
 	};
 
 	const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
+	const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
+
+	const appChannel = useSelector(selectAppChannelById(channel.channel_id as string));
+
 	const handleClick = () => {
 		if (channel.category_id === FAVORITE_CATEGORY_ID) {
 			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parent_id ?? '' }));
@@ -163,6 +168,15 @@ const ChannelLinkComponent = ({
 		dispatch(appActions.setIsShowCanvas(false));
 		if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
 			dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
+		}
+		if (isChannelApp && appChannel) {
+			dispatch(
+				channelsActions.setAppChannelsListShowOnPopUp({
+					clanId: appChannel?.clan_id as string,
+					channelId: appChannel?.channel_id as string,
+					appChannel: appChannel as ApiChannelAppResponseExtend
+				})
+			);
 		}
 	};
 
