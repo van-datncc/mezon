@@ -11,7 +11,6 @@ import {
 import {
 	ApiAccount,
 	ApiCategoryDesc,
-	ApiChannelAppResponse,
 	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiChannelMessageHeader,
@@ -1454,7 +1453,3 @@ export type ImageSourceObject = {
 	size: number;
 	url: string;
 };
-
-export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
-	isFocused: boolean;
-}

@@ -55,7 +55,6 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
-	ApiChannelAppResponseExtend,
 	CloseChannelAppPayload,
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
@@ -70,7 +69,7 @@ import {
 	titleMission
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { ApiChannelAppResponse, ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -345,7 +344,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				channelsActions.setAppChannelsListShowOnPopUp({
 					clanId: appChannel?.clan_id as string,
 					channelId: appChannel?.channel_id as string,
-					appChannel: appChannel as ApiChannelAppResponseExtend
+					appChannel: appChannel as ApiChannelAppResponse
 				})
 			);
 		}

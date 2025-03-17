@@ -1,6 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
 import {
-	ApiChannelAppResponseExtend,
 	ApiChannelMessageHeaderWithChannel,
 	BuzzArgs,
 	ChannelThreads,
@@ -107,7 +106,7 @@ export interface ChannelsState {
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
 			appChannelsList: Record<string, ApiChannelAppResponse>;
-			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponseExtend>;
+			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponse>;
 			fetchChannelSuccess: boolean;
 			favoriteChannels: string[];
 			buzzState: Record<string, BuzzArgs | null>;
@@ -1109,24 +1108,19 @@ export const channelsSlice = createSlice({
 			}
 			state.byClans[clanId].buzzState[channelId] = buzzState;
 		},
-		setAppChannelsListShowOnPopUp: (
-			state,
-			action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponseExtend }>
-		) => {
+		setAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponse }>) => {
 			const { clanId, channelId, appChannel } = action.payload;
 
-			state.byClans[clanId] ??= getInitialClanState();
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
 
-			Object.keys(state.byClans[clanId]!.appChannelsListShowOnPopUp).forEach((key) => {
-				state.byClans[clanId]!.appChannelsListShowOnPopUp[key].isFocused = false;
-			});
+			const existingAppChannel = state.byClans[clanId]?.appChannelsListShowOnPopUp?.[channelId];
 
-			state.byClans[clanId]!.appChannelsListShowOnPopUp[channelId] = {
-				...appChannel,
-				isFocused: true
-			};
+			if (!existingAppChannel || existingAppChannel.id !== appChannel.id) {
+				state.byClans[clanId].appChannelsListShowOnPopUp[channelId] = appChannel;
+			}
 		},
-
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
 
