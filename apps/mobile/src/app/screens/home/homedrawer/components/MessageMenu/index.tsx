@@ -21,7 +21,7 @@ import { createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
