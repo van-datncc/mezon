@@ -63,7 +63,6 @@ import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -282,25 +281,12 @@ function MyApp() {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
 
-	const toastError = useSelector(selectToastErrors);
 	const parentRef = useRef<HTMLDivElement>(null);
-	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 
-	const handleOncloseCallback = useCallback(
-		(clanId: string, channelId: string) => {
-			dispatch(
-				channelsActions.removeAppChannelsListShowOnPopUp({
-					clanId,
-					channelId
-				})
-			);
-		},
-		[dispatch]
-	);
 	return (
 		<div ref={parentRef}>
-			<MemoizedDraggableModals appsList={appsList} parentRef={parentRef} handleOncloseCallback={handleOncloseCallback} />
-			<MemoizedErrorModals toastError={toastError} />
+			<MemoizedDraggableModals parentRef={parentRef} />
+			<MemoizedErrorModals />
 
 			<div
 				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
@@ -516,12 +502,24 @@ const MessageModalImageWrapper = () => {
 };
 
 interface MemoizedDraggableModalsProps {
-	appsList: ApiChannelAppResponse[];
 	parentRef: React.RefObject<HTMLDivElement>;
-	handleOncloseCallback: (clanId: string, channelId: string) => void;
 }
 
-const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ appsList, parentRef, handleOncloseCallback }) => {
+const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
+	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
+	const dispatch = useAppDispatch();
+
+	const handleOncloseCallback = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
@@ -539,16 +537,10 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		</>
 	);
 });
-interface ToastError {
-	id: string;
-	message: string;
-}
 
-interface ErrorProps {
-	toastError: ToastError[];
-}
+const MemoizedErrorModals: React.FC = React.memo(() => {
+	const toastError = useSelector(selectToastErrors);
 
-const MemoizedErrorModals: React.FC<ErrorProps> = React.memo(({ toastError }) => {
 	return (
 		<>
 			{toastError.map((error) => (
