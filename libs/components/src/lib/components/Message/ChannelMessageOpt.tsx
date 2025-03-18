@@ -51,6 +51,7 @@ type ChannelMessageOptProps = {
 	isDifferentDay: boolean;
 	hasPermission: boolean;
 	isTopic: boolean;
+	canSendMessage: boolean;
 };
 
 type JsonObject = {
@@ -76,7 +77,8 @@ const ChannelMessageOpt = ({
 	mode,
 	isDifferentDay,
 	hasPermission = true,
-	isTopic
+	isTopic,
+	canSendMessage
 }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isAppChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
@@ -93,7 +95,7 @@ const ChannelMessageOpt = ({
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
 	const checkMessageOnTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.channel_id ?? ''));
 	const checkMessageHasTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.topic_id ?? ''));
-	const doNotAllowCreateTopic = (isTopic && checkMessageOnTopic) || (isTopic && checkMessageHasTopic) || !hasPermission;
+	const doNotAllowCreateTopic = (isTopic && checkMessageOnTopic) || (isTopic && checkMessageHasTopic) || !hasPermission || !canSendMessage;
 	const createTopicMenu = useTopicMenuBuilder(message, doNotAllowCreateTopic);
 	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
 	return (

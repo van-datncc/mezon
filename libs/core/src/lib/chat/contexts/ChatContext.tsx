@@ -97,6 +97,7 @@ import {
 	electronBridge
 } from '@mezon/utils';
 import isElectron from 'is-electron';
+import { emojiRecentActions } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -972,18 +973,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const onmessagereaction = useCallback(async (e: ApiMessageReaction) => {
-		const reactionEntity = mapReactionToEntity(e);
-		const store = await getStoreAsync();
-		const isFocusTopicBox = selectClickedOnTopicStatus(store.getState());
-		const currenTopicId = selectCurrentTopicId(store.getState());
-		if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox && currenTopicId) {
-			reactionEntity.channel_id = reactionEntity.topic_id ?? '';
-		}
+	const onmessagereaction = useCallback(
+		async (e: ApiMessageReaction) => {
+			if (e.sender_id === userId) {
+				dispatch(emojiRecentActions.setLastEmojiRecent({ emoji_recents_id: e.emoji_recent_id, emoji_id: e.emoji_id }));
+				dispatch(emojiRecentActions.addFirstEmojiRecent({ emoji_recents_id: e.emoji_recent_id, emoji_id: e.emoji_id }));
+			}
+			const reactionEntity = mapReactionToEntity(e);
+			const store = await getStoreAsync();
+			const isFocusTopicBox = selectClickedOnTopicStatus(store.getState());
+			const currenTopicId = selectCurrentTopicId(store.getState());
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox && currenTopicId) {
+				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
+			}
 
-		dispatch(reactionActions.setReactionDataSocket(reactionEntity));
-		dispatch(messagesActions.updateMessageReactions(reactionEntity));
-	}, []);
+			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
+			dispatch(messagesActions.updateMessageReactions(reactionEntity));
+		},
+		[userId]
+	);
 
 	const onchannelcreated = useCallback(async (channelCreated: ChannelCreatedEvent) => {
 		if (channelCreated.parent_id) {
