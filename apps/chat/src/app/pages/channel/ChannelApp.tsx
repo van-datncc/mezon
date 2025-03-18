@@ -64,7 +64,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelAppResponse; onFocus?: () => void }) {
+export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState<boolean>(false);
