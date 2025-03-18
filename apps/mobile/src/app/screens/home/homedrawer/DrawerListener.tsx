@@ -33,7 +33,7 @@ function useChannelSeen(channelId: string) {
 		const mode =
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 		if (lastMessage) {
-			markAsReadSeen(lastMessage, mode);
+			markAsReadSeen(lastMessage, mode, 0);
 		}
 	}, [lastMessage, channelId, markAsReadSeen, currentChannel?.type]);
 
