@@ -1,5 +1,62 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+type ModalHeaderProps = {
+	onClose: () => void;
+	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	title?: string;
+	isFocused?: boolean;
+	zIndex?: string;
+};
+
+const ModalHeader = ({ title, onClose, handleMouseDown, isFocused, zIndex }: ModalHeaderProps) => {
+	const bgColor = isFocused ? 'bg-[#1E1F22]' : 'bg-[#404249]';
+
+	return (
+		<div className={`px-3 py-1 flex justify-between items-center  ${zIndex} ${bgColor}`} onMouseDown={handleMouseDown}>
+			<span className="text-sm text-white">{title}</span>
+			<button
+				onClick={onClose}
+				className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
+			>
+				✕
+			</button>
+		</div>
+	);
+};
+
+type ModalContentProps = {
+	children: React.ReactNode;
+	isDragging: boolean;
+	resizeDir: string | null;
+	onFocus?: () => void;
+};
+
+const ModalContent: React.FC<ModalContentProps> = ({ children, isDragging, resizeDir, onFocus }) => (
+	<div onMouseDown={onFocus} className="flex-1 overflow-auto relative p-0.1">
+		{children}
+		{(isDragging || resizeDir) && <div className="absolute inset-0" style={{ background: 'transparent', zIndex: 10 }} />}
+	</div>
+);
+
+type ResizeHandlesProps = {
+	handleResizeMouseDown: (dir: string) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+};
+
+const ResizeHandles: React.FC<ResizeHandlesProps> = ({ handleResizeMouseDown }) => (
+	<>
+		<div className="absolute top-0 left-1 w-[calc(100%-8px)] h-1 cursor-n-resize z-50 " onMouseDown={handleResizeMouseDown('top')} />
+		<div className="absolute bottom-0 left-1 w-[calc(100%-8px)] h-1 cursor-s-resize z-50 " onMouseDown={handleResizeMouseDown('bottom')} />
+
+		<div className="absolute left-0 top-1 h-[calc(100%-8px)] w-1 cursor-w-resize z-50 " onMouseDown={handleResizeMouseDown('left')} />
+		<div className="absolute right-0 top-1 h-[calc(100%-8px)] w-1 cursor-e-resize z-50 " onMouseDown={handleResizeMouseDown('right')} />
+
+		<div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize z-50 " onMouseDown={handleResizeMouseDown('bottom-right')} />
+		<div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize z-50 " onMouseDown={handleResizeMouseDown('bottom-left')} />
+		<div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize z-50 " onMouseDown={handleResizeMouseDown('top-right')} />
+		<div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize z-50 " onMouseDown={handleResizeMouseDown('top-left')} />
+	</>
+);
+
 interface DraggableModalProps {
 	onClose: () => void;
 	children: React.ReactNode;
@@ -8,6 +65,8 @@ interface DraggableModalProps {
 	initialHeight?: number;
 	aspectRatio?: number | null;
 	headerTitle?: string;
+	isFocused?: boolean;
+	onFocus?: () => void;
 }
 
 const DraggableModal: React.FC<DraggableModalProps> = ({
@@ -17,7 +76,9 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	initialWidth = 600,
 	initialHeight = 400,
 	aspectRatio = null,
-	headerTitle
+	headerTitle,
+	isFocused,
+	onFocus
 }) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -25,6 +86,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [resizeDir, setResizeDir] = useState<string | null>(null);
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
+	const zIndex = isFocused ? 'z-50' : 'z-40';
 
 	useEffect(() => {
 		const parent = parentRef?.current;
@@ -146,8 +208,9 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 
 	return (
 		<div
+			onMouseDown={onFocus}
 			ref={modalRef}
-			className="absolute dark:bg-[#1E1F22] bg-[#E3E5E8] shadow-lg rounded-sm z-50"
+			className={`absolute dark:bg-[#1E1F22] bg-[#E3E5E8] shadow-lg rounded-sm ${zIndex}`}
 			style={{
 				left: `${position.x}px`,
 				top: `${position.y}px`,
@@ -157,38 +220,11 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 				flexDirection: 'column'
 			}}
 		>
-			{/* Header (Drag) */}
-			<div
-				className="cursor-move dark:bg-[#1E1F22] bg-[#E3E5E8] px-3 py-1 flex justify-between items-center rounded-t-xl"
-				onMouseDown={handleMouseDown}
-			>
-				<span className="dark:text-white text-black text-sm">{headerTitle}</span>
-				{/* Nút X */}
-				<button
-					onClick={onClose}
-					className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm  hover:bg-[#404249] hover:text-white transition"
-				>
-					✕
-				</button>{' '}
-			</div>
-
-			{/* Content */}
-			<div className="flex-1 overflow-auto relative p-0.1">
+			<ModalHeader zIndex={zIndex} isFocused={isFocused} onClose={onClose} title={headerTitle} handleMouseDown={handleMouseDown} />
+			<ModalContent onFocus={onFocus} isDragging={isDragging} resizeDir={resizeDir}>
 				{children}
-				{(isDragging || resizeDir) && <div className="absolute inset-0" style={{ background: 'transparent', zIndex: 10 }} />}
-			</div>
-
-			{/* Resize Handles */}
-			<div className="absolute top-0 h-2 w-full cursor-n-resize z-40 " onMouseDown={handleResizeMouseDown('top')} />
-			<div className="absolute bottom-0 h-2 w-full cursor-s-resize z-40" onMouseDown={handleResizeMouseDown('bottom')} />
-			<div className="absolute left-0 w-2 h-full cursor-w-resize z-40" onMouseDown={handleResizeMouseDown('left')} />
-			<div className="absolute right-0 w-2 h-full cursor-e-resize z-40 " onMouseDown={handleResizeMouseDown('right')} />
-
-			{/* Corner Resizers */}
-			<div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50" onMouseDown={handleResizeMouseDown('bottom-right')} />
-			<div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize z-50" onMouseDown={handleResizeMouseDown('bottom-left')} />
-			<div className="absolute top-0 right-0 w-2 h-2 cursor-ne-resize z-50 " onMouseDown={handleResizeMouseDown('top-right')} />
-			<div className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize z-50" onMouseDown={handleResizeMouseDown('top-left')} />
+			</ModalContent>
+			<ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />
 		</div>
 	);
 };

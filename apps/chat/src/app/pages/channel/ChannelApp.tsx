@@ -64,7 +64,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse }) {
+export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelAppResponse; onFocus?: () => void }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -183,6 +183,7 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 		<>
 			<div className="w-full h-full">
 				<iframe
+					onMouseDown={onFocus}
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}

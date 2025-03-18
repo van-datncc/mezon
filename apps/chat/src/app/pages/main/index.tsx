@@ -508,8 +508,9 @@ interface MemoizedDraggableModalsProps {
 const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
+	const [focusedModalId, setFocusedModalId] = useState<string | null>(null);
 
-	const handleOncloseCallback = useCallback(
+	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
@@ -520,20 +521,27 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		},
 		[dispatch]
 	);
+
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{appsList.length > 0 &&
-				appsList.map((app) => (
-					<DraggableModal
-						key={app.app_id}
-						headerTitle={app.url}
-						parentRef={parentRef}
-						onClose={() => handleOncloseCallback(app.clan_id as string, app.channel_id as string)}
-					>
-						<ChannelApps appChannel={app} />
-					</DraggableModal>
-				))}
+				appsList.map((app) => {
+					const isFocused = focusedModalId === app.app_id;
+
+					return (
+						<DraggableModal
+							key={app.app_id}
+							headerTitle={app.url}
+							parentRef={parentRef}
+							isFocused={isFocused}
+							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
+							onFocus={() => setFocusedModalId(app.app_id as string)}
+						>
+							<ChannelApps appChannel={app} onFocus={() => setFocusedModalId(app.app_id as string)} />
+						</DraggableModal>
+					);
+				})}
 		</>
 	);
 });
