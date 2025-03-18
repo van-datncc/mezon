@@ -108,6 +108,7 @@ export const ChannelMessage: ChannelMessageComponent = ({
 				isDifferentDay={isDifferentDay}
 				hasPermission={isChannelThreadDmGroup || (!isTopic ? !!canSendMessage : true)}
 				isTopic={isTopic}
+				canSendMessage={canSendMessage}
 			/>
 		);
 	}, [message, handleContextMenu, isCombine, mode]);

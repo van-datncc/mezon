@@ -17,8 +17,12 @@ function Login() {
 	useEffect(() => {
 		const fetchQRCode = async () => {
 			const qRInfo = await qRCode();
-			await setLoginId(qRInfo?.login_id as string);
-			await setCreateSecond(Number(qRInfo?.create_time_second));
+			if (!qRInfo || !qRInfo.login_id) {
+				setHidden(true);
+			} else {
+				await setLoginId(qRInfo?.login_id as string);
+				await setCreateSecond(Number(qRInfo?.create_time_second));
+			}
 		};
 
 		fetchQRCode();
@@ -55,9 +59,13 @@ function Login() {
 
 	const reloadQR = async () => {
 		const qRInfo = await qRCode();
-		await setLoginId(qRInfo?.login_id as string);
-		await setCreateSecond(Number(qRInfo?.create_time_second));
-		setHidden(false);
+		if (!qRInfo || !qRInfo.login_id) {
+			setHidden(true);
+		} else {
+			await setLoginId(qRInfo?.login_id as string);
+			await setCreateSecond(Number(qRInfo?.create_time_second));
+			setHidden(false);
+		}
 	};
 
 	return (
