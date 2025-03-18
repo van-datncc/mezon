@@ -53,7 +53,7 @@ export const AddMemberBsContent = memo((props: IAddMemberBsContentProps) => {
 	const handleAddMemberToRole = useCallback(async () => {
 		const response = await updateRole(role?.clan_id, role?.id, role?.title, role?.color || '', selectedMemberIdList, [], [], []);
 		onClose && onClose();
-		if (response) {
+		if (response === true) {
 			Toast.show({
 				type: 'success',
 				props: {
