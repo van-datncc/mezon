@@ -75,6 +75,7 @@ import { topicsReducer } from './topicDiscussion/topicDiscussions.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { VOICE_FEATURE_KEY, voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import {emojiRecentReducer, ONBOARDING_FEATURE_KEY, onboardingReducer} from "@mezon/store";
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -361,6 +362,23 @@ const persistedVoiceReducer = persistReducer(
 	voiceReducer
 );
 
+const persistedEmojiRecentReducer = persistReducer(
+	{
+		key: 'emojiRecent',
+		storage
+	},
+	emojiRecentReducer
+);
+
+const persistedOnboardingReducer = persistReducer(
+	{
+		key: ONBOARDING_FEATURE_KEY,
+		storage,
+		whitelist: ['keepAnswers', 'answerByClanId']
+	},
+	onboardingReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: persistAccountReducer,
@@ -386,11 +404,11 @@ const reducer = {
 	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
-	direct: persistedDirectReducer,
+	direct: directReducer,
 	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
-	[OVERRIDDEN_POLICIES_FEATURE_KEY]: persistOverriddenPoliciesReducer,
+	[OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
 	notificationsetting: notificationSettingReducer,
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: persistedDefaultNotiClanReducer,
@@ -416,6 +434,7 @@ const reducer = {
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
+	emojiRecent: persistedEmojiRecentReducer,
 	gifs: gifsReducer,
 	gifsStickersEmojis: persistedGifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
@@ -429,6 +448,7 @@ const reducer = {
 	settingClanChannel: settingChannelReducer,
 	clanMembersMeta: clanMembersMetaReducer,
 	directmembersmeta: directMembersMetaReducer,
+	[ONBOARDING_FEATURE_KEY]: persistedOnboardingReducer,
 	dmcall: DMCallReducer,
 	[USER_STATUS_API_FEATURE_KEY]: userStatusAPIReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
@@ -450,10 +470,10 @@ export type PreloadedRootState = RootState | undefined;
 // const LIMIT_CHANNEL_CACHE = 10;
 const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Check if the action is of type 'persist/REHYDRATE' and the key is 'channels'
-	if (action.type === 'persist/REHYDRATE' && action?.key === 'channels') {
-		if (action.payload && action.payload.byClans) {
+	if (action?.type === 'persist/REHYDRATE' && action?.key === 'channels') {
+		if (action?.payload && action?.payload?.byClans) {
 			Object.keys(action.payload.byClans)?.forEach((clanId) => {
-				if (action.payload.byClans[clanId].currentChannelId) {
+				if (action?.payload?.byClans?.[clanId]?.currentChannelId) {
 					delete action.payload.byClans[clanId].currentChannelId;
 				}
 			});
