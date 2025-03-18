@@ -112,6 +112,7 @@ export interface ChannelsState {
 			buzzState: Record<string, BuzzArgs | null>;
 			isOpenCreateNewChannel?: boolean;
 			currentCategory?: ICategory;
+			appFocused?: Record<string, boolean>;
 		}
 	>;
 	loadingStatus: LoadingStatus;
@@ -135,7 +136,8 @@ const getInitialClanState = () => {
 		appChannelsListShowOnPopUp: {},
 		fetchChannelSuccess: false,
 		favoriteChannels: [],
-		buzzState: {}
+		buzzState: {},
+		appFocused: {}
 	};
 };
 
@@ -1493,4 +1495,9 @@ export const selectCurrentCategory = createSelector(
 export const selectAppChannelsListShowOnPopUp = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => Object.values(state.byClans[clanId]?.appChannelsListShowOnPopUp || {})
+);
+
+export const selectCheckAppFocused = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, appId: string) => appId],
+	(state, clanId, appId) => !!state.byClans[clanId]?.appFocused?.[appId]
 );

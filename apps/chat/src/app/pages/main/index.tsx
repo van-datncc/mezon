@@ -22,6 +22,7 @@ import {
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
+	getStore,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMemberIds,
@@ -33,6 +34,7 @@ import {
 	selectAudioEndTone,
 	selectAudioRingTone,
 	selectChatStreamWidth,
+	selectCheckAppFocused,
 	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
@@ -509,6 +511,7 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
 	const [focusedModalId, setFocusedModalId] = useState<string | null>(null);
+	const store = getStore();
 
 	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
@@ -527,7 +530,7 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const isFocused = focusedModalId === app.app_id;
+					const isFocused = selectCheckAppFocused(store.getState(), app.app_id as string);
 
 					return (
 						<DraggableModal
@@ -536,7 +539,6 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 							parentRef={parentRef}
 							isFocused={isFocused}
 							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
-							onFocus={() => setFocusedModalId(app.app_id as string)}
 						>
 							<ChannelApps appChannel={app} onFocus={() => setFocusedModalId(app.app_id as string)} />
 						</DraggableModal>
