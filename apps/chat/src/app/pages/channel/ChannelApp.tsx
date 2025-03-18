@@ -1,10 +1,10 @@
 import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } from '@livekit/components-react';
-import { useAuth } from '@mezon/core';
 import {
 	channelAppActions,
 	getStore,
 	giveCoffeeActions,
 	handleParticipantMeetState,
+	selectAllAccount,
 	selectAllChannelMembers,
 	selectAllRolesClan,
 	selectChannelAppChannelId,
@@ -16,11 +16,10 @@ import {
 	selectSendTokenEvent,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { CurrentUser, MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
+import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -67,12 +66,11 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
-	const { userProfile } = useAuth();
 	const [loading, setLoading] = useState<boolean>(false);
-
-	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
-	const currentUser = useAuth();
 	const store = getStore();
+
+	const userChannels = selectAllChannelMembers(store.getState(), appChannel?.channel_id);
+	const userProfile = selectAllAccount(store.getState());
 	const allRolesInClan = selectAllRolesClan(store.getState());
 	const sendTokenEvent = selectSendTokenEvent(store.getState());
 	const infoSendToken = selectInfoSendToken(store.getState());
@@ -115,7 +113,7 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 		[dispatch, appChannel?.url]
 	);
 
-	const { miniAppRef } = useMiniAppEventListener(appChannel, allRolesInClan, userChannels, currentUser as CurrentUser, getUserHashInfo);
+	const { miniAppRef } = useMiniAppEventListener(appChannel, allRolesInClan, userChannels, userProfile, getUserHashInfo);
 
 	const handleTokenResponse = () => {
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {

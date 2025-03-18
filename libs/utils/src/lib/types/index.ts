@@ -1459,11 +1459,3 @@ export type HistoryItem = {
 	content: string;
 	mentionRaw: any[];
 };
-export type CurrentUser = {
-	userId: string;
-	userProfile?: {
-		user?: {
-			username?: string;
-		};
-	};
-};

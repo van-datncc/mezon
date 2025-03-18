@@ -1,7 +1,7 @@
 import { channelAppActions, giveCoffeeActions, RolesClanEntity, useAppDispatch } from '@mezon/store';
-import { ChannelMembersEntity, CurrentUser, MiniAppEventType } from '@mezon/utils';
+import { ChannelMembersEntity, MiniAppEventType } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
+import { ApiAccount, ApiChannelAppResponse } from 'mezon-js/api.gen';
 import { useEffect, useRef } from 'react';
 
 type GetUserHashInfo = (appId: string) => Promise<any>;
@@ -10,7 +10,7 @@ const useMiniAppEventListener = (
 	appChannel: ApiChannelAppResponse | null,
 	allRolesInClan: RolesClanEntity[],
 	userChannels: ChannelMembersEntity[],
-	currentUser: CurrentUser,
+	userProfile: ApiAccount | null | undefined,
 	getUserHashInfo: GetUserHashInfo
 ) => {
 	const dispatch = useAppDispatch();
@@ -43,7 +43,7 @@ const useMiniAppEventListener = (
 						appChannel.url
 					);
 					miniAppRef.current?.contentWindow?.postMessage(
-						JSON.stringify({ eventType: MiniAppEventType.CURRENT_USER_INFO, eventData: currentUser?.userProfile }),
+						JSON.stringify({ eventType: MiniAppEventType.CURRENT_USER_INFO, eventData: userProfile as ApiAccount }),
 						appChannel.url
 					);
 					break;
@@ -52,8 +52,8 @@ const useMiniAppEventListener = (
 					const { amount, note, receiver_id, extra_attribute } = (eventData.eventData || {}) as any;
 					dispatch(
 						giveCoffeeActions.setInfoSendToken({
-							sender_id: currentUser.userId,
-							sender_name: currentUser?.userProfile?.user?.username,
+							sender_id: userProfile?.user?.id,
+							sender_name: userProfile?.user?.username,
 							receiver_id,
 							amount,
 							note,
@@ -105,7 +105,7 @@ const useMiniAppEventListener = (
 
 		window.addEventListener('message', handleMessage);
 		return () => window.removeEventListener('message', handleMessage);
-	}, [appChannel?.url, currentUser, allRolesInClan, userChannels, dispatch]);
+	}, [appChannel?.url, userProfile, allRolesInClan, userChannels, dispatch]);
 
 	return { miniAppRef };
 };
