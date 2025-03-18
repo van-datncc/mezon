@@ -1,17 +1,19 @@
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, selectCurrentClan } from '@mezon/store-mobile';
+import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
+import { categoriesActions, channelsActions, selectCurrentChannelId, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission, ICategoryChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
+import MezonConfirm from '../../../../../componentUI/MezonConfirm';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
 import InviteToChannel from '../InviteToChannel';
 import { style } from './styles';
@@ -28,7 +30,22 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const [isCanManageChannel] = usePermissionChecker([EPermission.manageChannel], currentChanelId ?? '');
+	const [isShowModalDeleteCategory, setIsShowModalDeleteCategory] = useState<boolean>(false);
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
+	const { dismiss } = useBottomSheetModal();
+	const dispatch = useAppDispatch();
+
+	const handleRemoveCategory = useCallback(() => {
+		dismiss();
+		dispatch(
+			categoriesActions.deleteCategory({
+				clanId: category?.clan_id as string,
+				categoryId: category?.id as string,
+				categoryLabel: category?.category_name as string
+			})
+		);
+		dispatch(channelsActions.fetchChannels({ clanId: category?.clan_id, noCache: true, isMobile: true }));
+	}, [category?.category_name, category?.clan_id, category?.id]);
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
@@ -93,6 +110,15 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 			},
 			icon: <Icons.PlusLargeIcon color={themeValue.textStrong} />,
 			isShow: isCanManageChannel
+		},
+		{
+			title: t('menu.organizationMenu.delete'),
+			onPress: () => setIsShowModalDeleteCategory(true),
+			icon: <Icons.CloseLargeIcon color={Colors.textRed} />,
+			isShow: isCanManageChannel,
+			textStyle: {
+				color: Colors.textRed
+			}
 		}
 	];
 
@@ -140,6 +166,14 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 			<View>
 				<MezonMenu menu={menu} />
 			</View>
+			<MezonConfirm
+				visible={isShowModalDeleteCategory}
+				title={t('menu.modalConfirm.title')}
+				confirmText={t('menu.modalConfirm.confirmText')}
+				content={t('menu.modalConfirm.content')}
+				onConfirm={handleRemoveCategory}
+				onVisibleChange={setIsShowModalDeleteCategory}
+			/>
 		</View>
 	);
 }

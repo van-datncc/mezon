@@ -25,9 +25,11 @@ contextBridge.exposeInMainWorld('electron', {
 		ipcRenderer.on('window-focused', callback);
 	},
 	invoke: (channel, data) => ipcRenderer.invoke(channel, data),
+
 	openImageWindow: (props: any, options?: Electron.BrowserWindowConstructorOptions, params?: Record<string, string>) => {
 		return ipcRenderer.invoke(OPEN_NEW_WINDOW, props, options, params);
 	},
+
 	handleActionShowImage: (action: string, url: any) => {
 		return ipcRenderer.invoke(ACTION_SHOW_IMAGE, { payload: { action, fileURL: url } });
 	}

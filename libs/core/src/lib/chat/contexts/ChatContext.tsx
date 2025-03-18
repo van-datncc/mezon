@@ -577,7 +577,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		const timestamp = Date.now() / 1000;
 		dispatch(listChannelRenderAction.removeBadgeFromChannel({ channelId: lastSeenMess.channel_id, clanId: lastSeenMess.clan_id }));
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
-		await dispatch(clansActions.updateBageClanWS({ channel_id: lastSeenMess.channel_id ?? '' }));
+		await dispatch(clansActions.updateBageClanWS({ clan_id: lastSeenMess.clan_id, badge_count: lastSeenMess.badge_count }));
 		dispatch(
 			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
 		);

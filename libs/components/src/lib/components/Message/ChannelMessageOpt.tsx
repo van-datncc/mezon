@@ -81,6 +81,7 @@ const ChannelMessageOpt = ({
 	canSendMessage
 }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isAppChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
 	const refOpt = useRef<HTMLDivElement>(null);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 	const isShowIconThread = !!(currentChannel && !Snowflake.isValid(currentChannel.parent_id ?? '') && canManageThread);
@@ -88,7 +89,7 @@ const ChannelMessageOpt = ({
 	const replyMenu = useMenuReplyMenuBuilder(message, hasPermission);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
-	const threadMenu = useThreadMenuBuilder(message, isShowIconThread, hasPermission);
+	const threadMenu = useThreadMenuBuilder(message, isShowIconThread, hasPermission, isAppChannel);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
@@ -467,7 +468,7 @@ function useReactMenuBuilder(message: IMessageWithUser) {
 	});
 }
 
-function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boolean, hasPermission: boolean) {
+function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boolean, hasPermission: boolean, isAppChannel: boolean) {
 	const [thread, setThread] = useState(false);
 	const dispatch = useAppDispatch();
 
@@ -502,7 +503,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boole
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setThread, thread, setValueThread]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(isShowIconThread && hasPermission, (builder) => {
+		builder.when(isShowIconThread && hasPermission && !isAppChannel, (builder) => {
 			builder.addMenuItem('thread', 'thread', handleItemClick, <Icons.ThreadIcon isWhite={thread} />);
 		});
 	});

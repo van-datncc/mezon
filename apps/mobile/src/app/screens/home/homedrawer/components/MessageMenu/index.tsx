@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { ENotificationActive, ENotificationChannelId, Icons, UserMinus } from '@mezon/mobile-components';
+import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons, UserMinus } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
@@ -21,9 +21,9 @@ import { createImgproxyUrl } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { DeviceEventEmitter, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../../../../componentUI/MezonConfirm';
@@ -39,7 +39,6 @@ interface IServerMenuProps {
 function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const { t } = useTranslation(['dmMessage']);
 	const { themeValue } = useTheme();
-	const [isVisibleLeaveGroupModal, setIsVisibleLeaveGroupModal] = useState<boolean>(false);
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
@@ -75,7 +74,21 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const leaveGroupMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => {
-				setIsVisibleLeaveGroupModal(true);
+				const data = {
+					children: (
+						<MezonConfirm
+							onConfirm={handleLeaveGroupConfirm}
+							title={t('confirm.title', {
+								groupName: messageInfo?.channel_label
+							})}
+							content={t('confirm.content', {
+								groupName: messageInfo?.channel_label
+							})}
+							confirmText={t('confirm.confirmText')}
+						/>
+					)
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 			},
 			isShow: isGroup,
 			title: lastOne ? t('delete.leaveGroup') : t('menu.leaveGroup'),
@@ -217,8 +230,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		}
 
 		await dispatch(fetchDirectMessage({ noCache: true }));
-		setIsVisibleLeaveGroupModal(false);
-		dismiss();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 	};
 
 	return (
@@ -255,19 +267,6 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			<View>
 				<MezonMenu menu={menu} />
 			</View>
-
-			<MezonConfirm
-				visible={isVisibleLeaveGroupModal}
-				onConfirm={handleLeaveGroupConfirm}
-				onVisibleChange={setIsVisibleLeaveGroupModal}
-				title={t('confirm.title', {
-					groupName: messageInfo?.channel_label
-				})}
-				content={t('confirm.content', {
-					groupName: messageInfo?.channel_label
-				})}
-				confirmText={t('confirm.confirmText')}
-			/>
 		</View>
 	);
 }

@@ -18,6 +18,7 @@ import {
 	DMCallActions,
 	accountActions,
 	audioCallActions,
+	channelsActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
@@ -26,6 +27,7 @@ import {
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
+	selectAppChannelsListShowOnPopUp,
 	selectAudioBusyTone,
 	selectAudioDialTone,
 	selectAudioEndTone,
@@ -61,10 +63,12 @@ import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import { ChannelApps } from '../channel/ChannelApp';
 import ChannelStream from '../channel/ChannelStream';
+import DraggableModal from '../channel/DraggableModal/DraggableModal';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
 import DirectUnread from './directUnreads';
@@ -277,13 +281,13 @@ function MyApp() {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
 
-	const toastError = useSelector(selectToastErrors);
+	const parentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<>
-			{toastError.map((error) => (
-				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
-			))}
+		<div ref={parentRef}>
+			<MemoizedDraggableModals parentRef={parentRef} />
+			<MemoizedErrorModals />
+
 			<div
 				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
 				onClick={handleClick}
@@ -321,7 +325,7 @@ function MyApp() {
 				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 				{isShowPopupQuickMess && <PopupQuickMess />}
 			</div>
-		</>
+		</div>
 	);
 }
 
@@ -496,3 +500,60 @@ const MessageModalImageWrapper = () => {
 		</MessageContextMenuProvider>
 	);
 };
+
+interface MemoizedDraggableModalsProps {
+	parentRef: React.RefObject<HTMLDivElement>;
+}
+
+const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
+	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
+	const dispatch = useAppDispatch();
+	const [focusedModalId, setFocusedModalId] = useState<string | null>(null);
+
+	const handleOnCloseCallback = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
+		<>
+			{appsList.length > 0 &&
+				appsList.map((app) => {
+					const isFocused = focusedModalId === app.app_id;
+
+					return (
+						<DraggableModal
+							key={app.app_id}
+							headerTitle={app.url}
+							parentRef={parentRef}
+							isFocused={isFocused}
+							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
+							onFocus={() => setFocusedModalId(app.app_id as string)}
+						>
+							<ChannelApps appChannel={app} onFocus={() => setFocusedModalId(app.app_id as string)} />
+						</DraggableModal>
+					);
+				})}
+		</>
+	);
+});
+
+const MemoizedErrorModals: React.FC = React.memo(() => {
+	const toastError = useSelector(selectToastErrors);
+
+	return (
+		<>
+			{toastError.map((error) => (
+				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
+			))}
+		</>
+	);
+});
