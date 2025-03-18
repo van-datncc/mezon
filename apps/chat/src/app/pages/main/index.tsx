@@ -15,6 +15,7 @@ import {
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
+	ChannelsEntity,
 	DMCallActions,
 	accountActions,
 	audioCallActions,
@@ -22,6 +23,7 @@ import {
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
+	getStore,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMemberIds,
@@ -32,6 +34,7 @@ import {
 	selectAudioDialTone,
 	selectAudioEndTone,
 	selectAudioRingTone,
+	selectChannelById,
 	selectChatStreamWidth,
 	selectClanNumber,
 	selectClanView,
@@ -508,7 +511,7 @@ interface MemoizedDraggableModalsProps {
 const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
-
+	const store = getStore();
 	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
@@ -537,19 +540,19 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const zIndex = app.isFocused ? 'z-50' : 'z-40';
-
+					const zIndex = app?.isFocused ? 'z-50' : 'z-40';
+					const channel = selectChannelById(store.getState(), app?.channel_id as string) as ChannelsEntity;
 					return (
 						<DraggableModal
 							zIndex={zIndex}
 							key={app?.app_id}
-							headerTitle={app?.url}
+							headerTitle={channel?.channel_label}
 							parentRef={parentRef}
 							isFocused={app?.isFocused}
-							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
-							onFocus={() => handleFocused(app.clan_id as string, app.channel_id as string)}
-							clanId={app.clan_id}
-							channelId={app.channel_id}
+							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
+							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
+							clanId={app?.clan_id}
+							channelId={app?.channel_id}
 						>
 							<ChannelApps appChannel={app} />
 						</DraggableModal>
