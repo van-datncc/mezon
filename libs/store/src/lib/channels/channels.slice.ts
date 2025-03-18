@@ -1,5 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import {
+	ApiChannelAppResponseExtend,
 	ApiChannelMessageHeaderWithChannel,
 	BuzzArgs,
 	ChannelThreads,
@@ -88,11 +89,6 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	};
 };
 
-type AppFocusedState = {
-	channelId: string;
-	isFocused: boolean;
-};
-
 export interface ChannelsState {
 	byClans: Record<
 		string,
@@ -106,7 +102,7 @@ export interface ChannelsState {
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
 			appChannelsList: Record<string, ApiChannelAppResponse>;
-			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponse>;
+			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponseExtend>;
 			fetchChannelSuccess: boolean;
 			favoriteChannels: string[];
 			buzzState: Record<string, BuzzArgs | null>;
@@ -1110,7 +1106,10 @@ export const channelsSlice = createSlice({
 			}
 			state.byClans[clanId].buzzState[channelId] = buzzState;
 		},
-		setAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponse }>) => {
+		setAppChannelsListShowOnPopUp: (
+			state,
+			action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponseExtend }>
+		) => {
 			const { clanId, channelId, appChannel } = action.payload;
 
 			if (!state.byClans[clanId]) {
@@ -1121,12 +1120,35 @@ export const channelsSlice = createSlice({
 				state.byClans[clanId].appChannelsListShowOnPopUp = {};
 			}
 
-			const existingAppChannel = state.byClans[clanId]?.appChannelsListShowOnPopUp?.[channelId];
+			const appChannelsList = state.byClans[clanId].appChannelsListShowOnPopUp;
 
-			if (!existingAppChannel || existingAppChannel.id !== appChannel.id) {
-				state.byClans[clanId].appChannelsListShowOnPopUp[channelId] = appChannel;
+			Object.keys(appChannelsList).forEach((key) => {
+				if (key !== channelId) {
+					appChannelsList[key].isFocused = false;
+				}
+			});
+
+			if (appChannelsList[channelId]) {
+				appChannelsList[channelId].isFocused = true;
+			} else {
+				appChannelsList[channelId] = {
+					...appChannel,
+					isFocused: true
+				};
 			}
 		},
+
+		setAppChannelFocus: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (!state.byClans[clanId] || !state.byClans[clanId].appChannelsListShowOnPopUp) {
+				return;
+			}
+			const appChannelsList = state.byClans[clanId].appChannelsListShowOnPopUp;
+			Object.keys(appChannelsList).forEach((key) => {
+				appChannelsList[key].isFocused = key === channelId;
+			});
+		},
+
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
 
@@ -1134,6 +1156,7 @@ export const channelsSlice = createSlice({
 				delete state.byClans[clanId].appChannelsListShowOnPopUp[channelId];
 			}
 		},
+
 		setShowPinBadgeOfChannel: (state, action: PayloadAction<{ clanId: string; channelId: string; isShow: boolean }>) => {
 			const { clanId, channelId, isShow } = action.payload;
 			if (!state.byClans[clanId]) {

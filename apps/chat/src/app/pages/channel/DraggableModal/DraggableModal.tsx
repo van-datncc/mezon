@@ -28,10 +28,11 @@ type ModalContentProps = {
 	children: React.ReactNode;
 	isDragging: boolean;
 	resizeDir: string | null;
+	zIndex?: string;
 };
 
-const ModalContent: React.FC<ModalContentProps> = ({ children, isDragging, resizeDir }) => (
-	<div className="flex-1 overflow-auto relative p-0.1">
+const ModalContent: React.FC<ModalContentProps> = ({ children, isDragging, resizeDir, zIndex }) => (
+	<div className={`flex-1 overflow-auto relative p-0.1 ${zIndex}`}>
 		{children}
 		{(isDragging || resizeDir) && <div className="absolute inset-0" style={{ background: 'transparent', zIndex: 10 }} />}
 	</div>
@@ -39,6 +40,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ children, isDragging, resiz
 
 type ResizeHandlesProps = {
 	handleResizeMouseDown: (dir: string) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	zIndex?: string;
 };
 
 const ResizeHandles: React.FC<ResizeHandlesProps> = ({ handleResizeMouseDown }) => (
@@ -56,6 +58,7 @@ const ResizeHandles: React.FC<ResizeHandlesProps> = ({ handleResizeMouseDown }) 
 
 interface DraggableModalProps {
 	onClose: () => void;
+	onFocus: () => void;
 	children: React.ReactNode;
 	parentRef: React.RefObject<HTMLDivElement>;
 	initialWidth?: number;
@@ -63,6 +66,7 @@ interface DraggableModalProps {
 	aspectRatio?: number | null;
 	headerTitle?: string;
 	isFocused?: boolean;
+	zIndex?: string;
 }
 
 const DraggableModal: React.FC<DraggableModalProps> = ({
@@ -73,7 +77,9 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	initialHeight = 400,
 	aspectRatio = null,
 	headerTitle,
-	isFocused
+	isFocused,
+	onFocus,
+	zIndex
 }) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -81,7 +87,6 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [resizeDir, setResizeDir] = useState<string | null>(null);
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
-	const zIndex = isFocused ? 'z-50' : 'z-40';
 
 	useEffect(() => {
 		const parent = parentRef?.current;
@@ -203,6 +208,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 
 	return (
 		<div
+			onMouseDown={() => onFocus()}
 			ref={modalRef}
 			className={`absolute dark:bg-[#1E1F22] bg-[#E3E5E8] shadow-lg rounded-sm ${zIndex}`}
 			style={{
@@ -215,7 +221,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 			}}
 		>
 			<ModalHeader zIndex={zIndex} isFocused={isFocused} onClose={onClose} title={headerTitle} handleMouseDown={handleMouseDown} />
-			<ModalContent isDragging={isDragging} resizeDir={resizeDir}>
+			<ModalContent zIndex={zIndex} isDragging={isDragging} resizeDir={resizeDir}>
 				{children}
 			</ModalContent>
 			<ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />

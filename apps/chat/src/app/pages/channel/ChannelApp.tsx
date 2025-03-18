@@ -183,7 +183,6 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 		<>
 			<div className="w-full h-full">
 				<iframe
-					onMouseDown={onFocus}
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
