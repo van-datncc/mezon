@@ -179,15 +179,15 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 			</div>
 
 			{/* Resize Handles */}
-			<div className="absolute top-0 h-2 w-full cursor-n-resize z-40" onMouseDown={handleResizeMouseDown('top')} />
+			<div className="absolute top-0 h-2 w-full cursor-n-resize z-40 " onMouseDown={handleResizeMouseDown('top')} />
 			<div className="absolute bottom-0 h-2 w-full cursor-s-resize z-40" onMouseDown={handleResizeMouseDown('bottom')} />
 			<div className="absolute left-0 w-2 h-full cursor-w-resize z-40" onMouseDown={handleResizeMouseDown('left')} />
-			<div className="absolute right-0 w-2 h-full cursor-e-resize z-40" onMouseDown={handleResizeMouseDown('right')} />
+			<div className="absolute right-0 w-2 h-full cursor-e-resize z-40 " onMouseDown={handleResizeMouseDown('right')} />
 
 			{/* Corner Resizers */}
 			<div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50" onMouseDown={handleResizeMouseDown('bottom-right')} />
 			<div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize z-50" onMouseDown={handleResizeMouseDown('bottom-left')} />
-			<div className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize z-50" onMouseDown={handleResizeMouseDown('top-right')} />
+			<div className="absolute top-0 right-0 w-2 h-2 cursor-ne-resize z-50 " onMouseDown={handleResizeMouseDown('top-right')} />
 			<div className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize z-50" onMouseDown={handleResizeMouseDown('top-left')} />
 		</div>
 	);

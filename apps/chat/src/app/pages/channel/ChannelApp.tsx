@@ -16,7 +16,8 @@ import {
 	selectSendTokenEvent,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
@@ -69,19 +70,18 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const [loading, setLoading] = useState<boolean>(false);
 	const store = getStore();
 
-	const userChannels = selectAllChannelMembers(store.getState(), appChannel?.channel_id);
-	const userProfile = selectAllAccount(store.getState());
-	const allRolesInClan = selectAllRolesClan(store.getState());
-	const sendTokenEvent = selectSendTokenEvent(store.getState());
-	const infoSendToken = selectInfoSendToken(store.getState());
-	const currentChannelAppClanId = selectChannelAppClanId(store.getState());
-	const currentChannelAppId = selectChannelAppChannelId(store.getState());
+	const allRolesInClan = useSelector(selectAllRolesClan);
+	const sendTokenEvent = useSelector(selectSendTokenEvent);
+	const userProfile = useSelector(selectAllAccount);
+	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
 	}, [userChannels]);
 
 	useEffect(() => {
+		const currentChannelAppClanId = selectChannelAppClanId(store.getState());
+		const currentChannelAppId = selectChannelAppChannelId(store.getState());
 		if (currentChannelAppId && currentChannelAppClanId) {
 			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
 			dispatch(
@@ -116,6 +116,8 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponse 
 	const { miniAppRef } = useMiniAppEventListener(appChannel, allRolesInClan, userChannels, userProfile, getUserHashInfo);
 
 	const handleTokenResponse = () => {
+		const infoSendToken = selectInfoSendToken(store.getState());
+
 		if (sendTokenEvent?.status === TOKEN_SUCCESS_STATUS) {
 			miniAppRef.current?.contentWindow?.postMessage(
 				JSON.stringify({ eventType: MiniAppEventType.SEND_TOKEN_RESPONSE_SUCCESS, eventData: infoSendToken?.sender_id }),
