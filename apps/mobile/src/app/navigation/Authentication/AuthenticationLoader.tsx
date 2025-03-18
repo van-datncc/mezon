@@ -123,7 +123,7 @@ export const AuthenticationLoader = () => {
 	}, [dispatch, navigation, userProfile?.user?.id]);
 
 	useEffect(() => {
-		checkNotificationPermission();
+		checkPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
@@ -168,6 +168,10 @@ export const AuthenticationLoader = () => {
 			unsubscribe();
 		};
 	}, []);
+
+	const checkPermission = async () => {
+		await checkNotificationPermission();
+	};
 
 	const playBuzzSound = () => {
 		Sound.setCategory('Playback');

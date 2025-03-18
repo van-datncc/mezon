@@ -8,7 +8,8 @@ import {
 	TypeMessage,
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_CLAN_SIDE_BAR,
-	convertDateString
+	convertDateString,
+	convertTimeHour
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
@@ -78,12 +79,10 @@ function MessageWithUser({
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userId));
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
+	const isClickReply = useRef(false);
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
-
-	const modalState = useRef({
-		profileItem: false
-	});
+	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 
@@ -109,9 +108,6 @@ function MessageWithUser({
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string, isClickOnReply = false) => {
 			setIsAnonymousOnModal(isClickOnReply);
-			if (modalState.current.profileItem) {
-				return;
-			}
 			shortUserId.current = userId;
 			const heightPanel =
 				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
@@ -129,14 +125,11 @@ function MessageWithUser({
 				};
 			}
 			openProfileItem();
-			modalState.current.profileItem = true;
 		},
 		[mode]
 	);
 
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
-
-	const avatar = isDM ? message?.avatar : message?.clan_avatar || message?.avatar;
 
 	const [isAnonymousOnModal, setIsAnonymousOnModal] = useState<boolean>(false);
 
@@ -152,29 +145,19 @@ function MessageWithUser({
 				<ModalUserProfile
 					onClose={() => {
 						closeProfileItem();
-						setTimeout(() => {
-							modalState.current.profileItem = false;
-						}, 100);
 					}}
 					userID={shortUserId.current}
 					classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 					message={message}
 					mode={mode}
-					positionType={''}
-					avatar={avatar}
+					avatar={isClickReply.current ? message?.references?.[0]?.mesages_sender_avatar : message?.clan_avatar || message?.avatar}
 					name={message?.clan_nick || message?.display_name || message?.username}
 					isDM={isDM}
 					checkAnonymous={isAnonymousOnModal}
 				/>
 			</div>
 		);
-	}, [message, avatar]);
-
-	const isMessageSystem =
-		message?.code === TypeMessage.Welcome ||
-		message?.code === TypeMessage.CreateThread ||
-		message?.code === TypeMessage.CreatePin ||
-		message?.code === TypeMessage.AuditLog;
+	}, [message]);
 
 	return (
 		<>
@@ -184,7 +167,7 @@ function MessageWithUser({
 					isSearchMessage={isSearchMessage}
 					popup={popup}
 					onContextMenu={onContextMenu}
-					messageId={message?.id}
+					messageId={message.id}
 					className={classNames(
 						'fullBoxText relative group',
 						{
@@ -201,9 +184,9 @@ function MessageWithUser({
 						{ 'bg-bgMessageReplyHighline': messageReplyHighlight },
 						isHighlight ? 'bg-[#383B47]' : ''
 					)}
+					create_time={message.create_time}
+					showMessageHead={showMessageHead}
 				>
-					{/* <div className={!isMessageSystem ? childDivClass : 'absolute w-0.5 h-full left-0'}></div> */}
-					{/* <div className={!isMessageSystem ? parentDivClass : 'flex h-15 flex-col w-auto px-3 pt-[2px]'}> */}
 					{checkMessageHasReply && (
 						<MessageReply
 							message={message}
@@ -211,7 +194,10 @@ function MessageWithUser({
 							onClick={
 								checkAnonymousOnReplied
 									? () => {}
-									: (e) => handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string, checkAnonymousOnReplied)
+									: (e) => {
+											isClickReply.current = true;
+											handleOpenShortUser(e, message?.references?.[0]?.message_sender_id as string, checkAnonymousOnReplied);
+										}
 							}
 							isAnonymousReplied={checkAnonymousOnReplied}
 						/>
@@ -219,27 +205,32 @@ function MessageWithUser({
 					<div
 						className={`pl-[72px] justify-start inline-flex flex-wrap w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 					>
-						{isMessageSystem ? (
-							<>
-								{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 pr-1" />}
-								{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 pr-1" />}
-								{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6 pr-1" />}
-								{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8 pr-1" />}
-							</>
-						) : message?.references?.length === 0 && isCombine && !isShowFull ? (
-							<>{/* <div className="w-10 flex items-center justify-center min-w-10">message hour</div> */}</>
-						) : (
+						{showMessageHead && (
 							<>
 								<MessageAvatar
 									message={message}
 									isEditing={isEditing}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={
+										checkAnonymous
+											? () => {}
+											: (e) => {
+													isClickReply.current = false;
+													handleOpenShortUser(e, message?.sender_id);
+												}
+									}
 								/>
 								<MessageHead
 									message={message}
 									mode={mode}
-									onClick={checkAnonymous ? () => {} : (e) => handleOpenShortUser(e, message?.sender_id)}
+									onClick={
+										checkAnonymous
+											? () => {}
+											: (e) => {
+													isClickReply.current = false;
+													handleOpenShortUser(e, message?.sender_id);
+												}
+									}
 								/>
 							</>
 						)}
@@ -318,11 +309,10 @@ function MessageWithUser({
 }
 
 const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
-	const messageDate = !message?.create_time ? '' : convertDateString(message?.create_time as string);
+	const messageDate = !message.create_time ? '' : convertDateString(message.create_time as string);
 	return (
-		<div className="relative text-center p-4">
-			<hr className="border-t border-gray-300 dark:border-borderDivider absolute top-1/2 left-0 right-0" />
-			<span className="relative inline-block px-3 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
+		<div className="mt-5 mb-2 dark:bg-borderDivider w-full h-px flex items-center justify-center">
+			<span className="px-4 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
 		</div>
 	);
 };
@@ -334,8 +324,19 @@ interface HoverStateWrapperProps {
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	messageId?: string;
 	className?: string;
+	create_time?: string;
+	showMessageHead?: boolean;
 }
-const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, isSearchMessage, onContextMenu, messageId, className }) => {
+const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
+	children,
+	popup,
+	isSearchMessage,
+	onContextMenu,
+	messageId,
+	className,
+	create_time,
+	showMessageHead
+}) => {
 	const [isHover, setIsHover] = useState(false);
 	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -356,7 +357,6 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 			setIsHover(false);
 		}, 100);
 	};
-	// className="message-list-item" id={'msg-' + messageId}
 	return (
 		<div
 			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
@@ -366,7 +366,16 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup, 
 			id={`msg-${messageId}`}
 		>
 			{children}
-			{isHover && popup && popup()}
+			{isHover && (
+				<>
+					{!showMessageHead && create_time && (
+						<span className="absolute left-[24px] top-[4px] dark:text-zinc-400 text-colorTextLightMode text-[10px]">
+							{convertTimeHour(create_time)}
+						</span>
+					)}
+					{popup?.()}
+				</>
+			)}
 		</div>
 	);
 };

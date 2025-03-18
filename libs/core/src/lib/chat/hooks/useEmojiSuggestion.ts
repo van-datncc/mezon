@@ -9,7 +9,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { selectAllEmojiRecent } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -30,46 +30,7 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 
 export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = {}) {
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	const userId = useAuth();
-	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
-
-	useEffect(() => {
-		const fetchRecentEmojis = async () => {
-			try {
-				const recentEmojis = await AsyncStorage.getItem('recentEmojis');
-				if (recentEmojis !== null) {
-					setEmojiRecentData(recentEmojis);
-				}
-			} catch (error) {
-				console.error('Error fetching recent emojis:', error);
-			}
-		};
-
-		if (isMobile) {
-			fetchRecentEmojis();
-		} else {
-			const emojiRecentStorage = localStorage.getItem('recentEmojis');
-			setEmojiRecentData(emojiRecentStorage);
-		}
-	}, [isMobile]);
-
-	const emojisRecentDataParse = useMemo(() => {
-		if (!emojiRecentData) return [];
-		const parsedData = safeJSONParse(emojiRecentData);
-		return parsedData.filter((emojiItem: EmojiStorage) => emojiItem.senderId === userId.userId);
-	}, [emojiRecentData, userId.userId]);
-
-	const emojiConverted = useMemo(() => {
-		return emojisRecentDataParse.reverse().map((item: EmojiStorage) => {
-			const emojiFound = emojiMetadata.find((emoji) => emoji.shortname === item.emoji);
-			return {
-				id: emojiFound?.id,
-				src: emojiFound?.src,
-				category: 'Recent',
-				shortname: emojiFound?.shortname
-			};
-		});
-	}, [emojisRecentDataParse, emojiMetadata]);
+	const emojiConverted = useSelector(selectAllEmojiRecent);
 
 	const emojis = useMemo(() => filterEmojiData([...emojiMetadata, ...emojiConverted]), [emojiMetadata, emojiConverted]);
 

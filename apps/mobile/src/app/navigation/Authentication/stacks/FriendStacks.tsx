@@ -107,7 +107,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					headerTitle: t('headerTitle.friendRequestSettings'),
 					headerStyle: {
 						backgroundColor: themeValue.primary
-					},
+					}
 				}}
 			/>
 		</Stack.Navigator>

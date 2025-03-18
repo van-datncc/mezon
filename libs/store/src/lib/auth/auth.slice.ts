@@ -22,6 +22,7 @@ export interface ISession {
 	username?: string;
 	user_id?: string;
 	vars?: object;
+	is_remember?: boolean;
 }
 
 export const initialAuthState: AuthState = {
@@ -83,7 +84,10 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 		return sessionState;
 	}
 
-	const session = await mezon?.refreshSession(sessionState);
+	const session = await mezon?.refreshSession({
+		...sessionState,
+		is_remember: sessionState.is_remember ?? false
+	});
 
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');

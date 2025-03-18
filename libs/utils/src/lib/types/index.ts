@@ -591,6 +591,12 @@ export type IEmoji = {
 	clan_id?: string;
 };
 
+export type IEmojiRecent = {
+	emoji_id?: string;
+	emoji_recents_id?: string;
+	update_time?: string;
+};
+
 export type IChannelUser = ChannelDescription & {
 	id: string;
 	active?: number;
@@ -1445,4 +1451,17 @@ export type IvoiceInfo = {
 	clanName: string;
 	channelId: string;
 	channelLabel: string;
+};
+
+export type ImageSourceObject = {
+	filename: string;
+	filetype: string;
+	size: number;
+	url: string;
+};
+
+export type HistoryItem = {
+	valueTextInput: string;
+	content: string;
+	mentionRaw: any[];
 };
