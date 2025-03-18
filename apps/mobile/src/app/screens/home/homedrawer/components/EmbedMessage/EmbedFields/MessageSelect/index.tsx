@@ -23,11 +23,10 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [currentContent, setCurrentContent] = useState(defaultValue?.title || placeholder);
-	const bottomSheetRef = useRef<BottomSheetModalMethods>();
 
 	function handleChange(item: ISelectItem) {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		setCurrentContent(item?.title || placeholder);
-		bottomSheetRef?.current?.dismiss();
 		onChange && onChange(item);
 	}
 

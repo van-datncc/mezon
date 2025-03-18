@@ -1,5 +1,6 @@
-import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
+	ActionEmitEvent,
 	BellIcon,
 	CheckIcon,
 	Icons,
@@ -23,9 +24,9 @@ import {
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../componentUI/MezonConfirm';
@@ -77,7 +78,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		return channel?.category_name;
 	}, [channel?.category_name]);
 	useBackHardWare();
-	const { dismiss } = useBottomSheetModal();
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	navigation.setOptions({
@@ -356,6 +356,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				clanId: channel?.clan_id
 			})
 		);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		navigation.navigate(APP_SCREEN.HOME);
 		if (channel?.parent_id !== '0') {
 			await dispatch(
@@ -389,7 +390,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			})
 		);
 		navigation.navigate(APP_SCREEN.HOME);
-		dismiss();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		handleJoinChannel();
 	}, []);
 
@@ -398,15 +399,35 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	};
 
 	const handlePressLeaveChannel = () => {
-		setIsVisibleLeaveChannelModal(true);
-	};
-
-	const handleDeleteModalVisibleChange = (visible: boolean) => {
-		setIsVisibleDeleteChannelModal(visible);
+		const data = {
+			children: (
+				<MezonConfirm
+					onConfirm={handleConfirmLeaveThread}
+					title={t('confirm.leave.title')}
+					confirmText={t('confirm.leave.confirmText')}
+					content={t('confirm.leave.content', {
+						channelName: channel?.channel_label
+					})}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const handlePressDeleteChannel = () => {
-		setIsVisibleDeleteChannelModal(true);
+		const data = {
+			children: (
+				<MezonConfirm
+					onConfirm={handleDeleteChannel}
+					title={t('confirm.delete.title')}
+					confirmText={t('confirm.delete.confirmText')}
+					content={t('confirm.delete.content', {
+						channelName: channel?.channel_label
+					})}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	return (
@@ -449,28 +470,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			/>
 
 			<MezonMenu menu={bottomMenu} />
-
-			<MezonConfirm
-				visible={isVisibleDeleteChannelModal}
-				onVisibleChange={handleDeleteModalVisibleChange}
-				onConfirm={handleDeleteChannel}
-				title={t('confirm.delete.title')}
-				confirmText={t('confirm.delete.confirmText')}
-				content={t('confirm.delete.content', {
-					channelName: channel?.channel_label
-				})}
-			/>
-
-			<MezonConfirm
-				visible={isVisibleLeaveChannelModal}
-				onVisibleChange={handleLeaveModalVisibleChange}
-				onConfirm={handleConfirmLeaveThread}
-				title={t('confirm.leave.title')}
-				confirmText={t('confirm.leave.confirmText')}
-				content={t('confirm.leave.content', {
-					channelName: channel?.channel_label
-				})}
-			/>
 			<AddMemberOrRoleBS bottomSheetRef={bottomSheetRef} channel={channel} />
 		</ScrollView>
 	);

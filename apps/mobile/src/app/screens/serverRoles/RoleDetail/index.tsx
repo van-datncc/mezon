@@ -1,11 +1,11 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
-import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
+import { ActionEmitEvent, CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, DeviceEventEmitter, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
@@ -25,7 +25,6 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { t } = useTranslation('clanRoles');
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
-	const [showModalConfirmSave, setShowModalConfirmSave] = useState(false);
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
@@ -49,7 +48,17 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			navigation?.goBack();
 			return;
 		}
-		setShowModalConfirmSave(true);
+		const data = {
+			children: (
+				<MezonConfirm
+					onConfirm={() => handleSave()}
+					title={t('roleDetail.confirmSaveTitle')}
+					confirmText={t('roleDetail.yes')}
+					content={t('roleDetail.confirmSaveContent')}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, [isNotChange, navigation]);
 
 	navigation.setOptions({
@@ -87,7 +96,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	});
 
 	const handleSave = async () => {
-		setShowModalConfirmSave(false);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
 		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
 		const response = await updateRole(
@@ -269,15 +278,6 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 						</View>
 					)}
 				</View>
-
-				<MezonConfirm
-					visible={showModalConfirmSave}
-					onVisibleChange={onConfirmModalChange}
-					onConfirm={() => handleSave()}
-					title={t('roleDetail.confirmSaveTitle')}
-					confirmText={t('roleDetail.yes')}
-					content={t('roleDetail.confirmSaveContent')}
-				/>
 			</View>
 		</TouchableWithoutFeedback>
 	);
