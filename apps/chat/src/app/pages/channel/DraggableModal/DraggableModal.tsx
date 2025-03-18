@@ -1,3 +1,4 @@
+import { useAppNavigation } from '@mezon/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type ModalHeaderProps = {
@@ -5,20 +6,42 @@ type ModalHeaderProps = {
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	title?: string;
 	isFocused?: boolean;
+	clanId?: string;
+	channelId?: string;
 };
 
-const ModalHeader = ({ title, onClose, handleMouseDown, isFocused }: ModalHeaderProps) => {
+const ModalHeader = ({ title, onClose, handleMouseDown, isFocused, clanId, channelId }: ModalHeaderProps) => {
 	const bgColor = isFocused ? 'bg-[#1E1F22]' : 'bg-[#404249]';
-
+	const { navigate, toChannelPage } = useAppNavigation();
+	const onBack = useCallback(() => {
+		const channelPath = toChannelPage(channelId ?? '', clanId ?? '');
+		navigate(channelPath);
+	}, []);
 	return (
-		<div className={`px-3 py-1 flex justify-between items-center  ${bgColor}`} onMouseDown={handleMouseDown}>
+		<div className={`px-3 py-1 flex items-center justify-between relative ${bgColor}`} onMouseDown={handleMouseDown}>
 			<span className="text-sm text-white">{title}</span>
-			<button
-				onClick={onClose}
-				className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
-			>
-				✕
-			</button>
+
+			<div className="absolute top-0 right-0 flex">
+				<div className="group relative">
+					<button
+						onClick={onBack}
+						className="w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
+						title="Back"
+					>
+						↩
+					</button>
+				</div>
+
+				<div className="group relative">
+					<button
+						title="Close"
+						onClick={onClose}
+						className="w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
+					>
+						✕
+					</button>
+				</div>
+			</div>
 		</div>
 	);
 };
@@ -64,6 +87,8 @@ interface DraggableModalProps {
 	headerTitle?: string;
 	isFocused?: boolean;
 	zIndex?: string;
+	clanId?: string;
+	channelId?: string;
 }
 
 const DraggableModal: React.FC<DraggableModalProps> = ({
@@ -76,7 +101,9 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	headerTitle,
 	isFocused,
 	onFocus,
-	zIndex
+	zIndex,
+	clanId,
+	channelId
 }) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -217,7 +244,14 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 				flexDirection: 'column'
 			}}
 		>
-			<ModalHeader isFocused={isFocused} onClose={onClose} title={headerTitle} handleMouseDown={handleMouseDown} />
+			<ModalHeader
+				clanId={clanId}
+				channelId={channelId}
+				isFocused={isFocused}
+				onClose={onClose}
+				title={headerTitle}
+				handleMouseDown={handleMouseDown}
+			/>
 			<ModalContent isDragging={isDragging} resizeDir={resizeDir}>
 				{children}
 			</ModalContent>
