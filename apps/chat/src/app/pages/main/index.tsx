@@ -538,7 +538,6 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 			{appsList.length > 0 &&
 				appsList.map((app) => {
 					const zIndex = app.isFocused ? 'z-50' : 'z-40';
-					console.log('app: ', app);
 
 					return (
 						<DraggableModal

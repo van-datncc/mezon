@@ -1528,3 +1528,13 @@ export const selectCheckAppFocused = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, appId: string) => appId],
 	(state, clanId, appId) => !!state.byClans[clanId]?.appFocused?.[appId]
 );
+
+export const selectAppChannelsKeysShowOnPopUp = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => Object.keys(state.byClans[clanId]?.appChannelsListShowOnPopUp || {})
+);
+
+export const selectToCheckAppIsOpening = createSelector(
+	[selectAppChannelsKeysShowOnPopUp, (state: RootState, channelId: string) => channelId],
+	(keys, channelId) => keys.includes(channelId)
+);
