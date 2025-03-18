@@ -1,7 +1,7 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
+import { rolesClanActions, selectRoleByRoleId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,20 +28,18 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
+	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 	const clanRole = useSelector(selectRoleByRoleId(roleId));
-	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
-		EPermission.administrator,
-		EPermission.manageClan,
-		EPermission.clanOwner
-	]);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
 	}, [originRoleName, currentRoleName]);
 
 	const isCanEditRole = useMemo(() => {
 		if (!clanRole) return false;
-		return hasAdminPermission || hasManageClanPermission || isClanOwner;
-	}, [clanRole, hasAdminPermission, hasManageClanPermission, isClanOwner]);
+		return isClanOwner || Number(userMaxPermissionLevel) > Number(clanRole.max_level_permission);
+	}, [clanRole, isClanOwner, userMaxPermissionLevel]);
 
 	const handleBack = useCallback(() => {
 		if (isNotChange) {
@@ -109,7 +107,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			[],
 			[]
 		);
-		if (response) {
+		if (response === true) {
 			Toast.show({
 				type: 'success',
 				props: {
