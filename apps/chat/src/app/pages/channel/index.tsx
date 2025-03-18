@@ -107,6 +107,13 @@ function useChannelSeen(channelId: string) {
 					channelId: currentChannel.channel_id as string
 				})
 			);
+			dispatch(
+				listChannelsByUserActions.updateChannelBadgeCount({
+					channelId: currentChannel.id,
+					count: 0,
+					isReset: true
+				})
+			);
 
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
