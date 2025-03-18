@@ -119,7 +119,7 @@ export const checkLoginRequest = createAsyncThunk(
 	async ({ loginId, isRemember }: { loginId: string; isRemember: boolean }, thunkAPI) => {
 		const mezon = getMezonCtx(thunkAPI);
 
-		const session = await mezon?.checkLoginRequest({ login_id: loginId, isRemember: isRemember });
+		const session = await mezon?.checkLoginRequest({ login_id: loginId, is_remember: isRemember });
 		if (session) {
 			return normalizeSession(session);
 		}
