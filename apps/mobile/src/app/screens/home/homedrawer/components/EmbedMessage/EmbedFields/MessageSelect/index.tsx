@@ -1,7 +1,6 @@
-import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { IMezonFakeBoxProps } from '../../../../../../../componentUI/MezonFakeBox';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../../../../../../componentUI/MezonMenu';
