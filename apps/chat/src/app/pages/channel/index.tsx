@@ -340,7 +340,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		async (appId: string) => {
 			try {
 				const response = await dispatch(channelAppActions.generateAppUserHash({ appId: appId })).unwrap();
-
 				return response;
 			} catch (error) {
 				console.error('Error:', error);

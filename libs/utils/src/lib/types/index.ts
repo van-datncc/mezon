@@ -1459,3 +1459,9 @@ export type ImageSourceObject = {
 	size: number;
 	url: string;
 };
+
+export type HistoryItem = {
+	valueTextInput: string;
+	content: string;
+	mentionRaw: any[];
+};

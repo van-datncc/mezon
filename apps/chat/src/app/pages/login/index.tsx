@@ -1,7 +1,6 @@
 import { QRSection } from '@mezon/components';
 import { useAppNavigation, useAuth } from '@mezon/core';
 import { selectIsLogin } from '@mezon/store';
-import { useGoogleOneTapLogin } from '@react-oauth/google';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
@@ -11,7 +10,7 @@ function Login() {
 	const { navigate } = useAppNavigation();
 	const isLogin = useSelector(selectIsLogin);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
-	const { loginByGoogle, qRCode, checkLoginRequest } = useAuth();
+	const { qRCode, checkLoginRequest } = useAuth();
 	const [loginId, setLoginId] = useState<string | null>(null);
 	const [createSecond, setCreateSecond] = useState<number | null>(null);
 	const [hidden, setHidden] = useState<boolean>(false);
@@ -26,11 +25,11 @@ function Login() {
 	}, [qRCode]);
 
 	useEffect(() => {
+		const intervalMsec = 2000;
+		let timeElapsed = 0;
 		const intervalId = setInterval(async () => {
 			if (loginId && createSecond !== null) {
-				const currentTime = Math.floor(Date.now() / 1000);
-				const timeElapsed = currentTime - createSecond;
-
+				timeElapsed += intervalMsec / 1000;
 				if (timeElapsed >= 60) {
 					setHidden(true);
 					clearInterval(intervalId);
@@ -41,21 +40,12 @@ function Login() {
 					}
 				}
 			}
-		}, 2000);
+		}, intervalMsec);
 
 		return () => {
 			clearInterval(intervalId);
 		};
-	}, [loginId]);
-
-	useGoogleOneTapLogin({
-		onSuccess: async (credentialResponse) => {
-			await loginByGoogle(credentialResponse.credential as string);
-		},
-		auto_select: true,
-		cancel_on_tap_outside: false,
-		use_fedcm_for_prompt: true
-	});
+	}, [checkLoginRequest, createSecond, loginId]);
 
 	useEffect(() => {
 		if (isLogin) {
