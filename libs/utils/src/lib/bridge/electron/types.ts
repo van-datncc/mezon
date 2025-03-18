@@ -44,3 +44,9 @@ export interface MezonDownloadFile {
 	url: string;
 	defaultFileName: string;
 }
+
+export interface CloseChannelAppPayload {
+	appId: string;
+	appClanId: string;
+	appChannelId: string;
+}
