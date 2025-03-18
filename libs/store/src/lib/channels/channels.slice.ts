@@ -1117,6 +1117,10 @@ export const channelsSlice = createSlice({
 				state.byClans[clanId] = getInitialClanState();
 			}
 
+			if (!state.byClans[clanId].appChannelsListShowOnPopUp) {
+				state.byClans[clanId].appChannelsListShowOnPopUp = {};
+			}
+
 			const existingAppChannel = state.byClans[clanId]?.appChannelsListShowOnPopUp?.[channelId];
 
 			if (!existingAppChannel || existingAppChannel.id !== appChannel.id) {
