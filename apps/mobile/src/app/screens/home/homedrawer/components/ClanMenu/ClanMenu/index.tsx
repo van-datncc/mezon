@@ -181,9 +181,9 @@ export default function ClanMenu() {
 
 	function handleToggleEmptyCategories(value: boolean) {
 		if (value) {
-			dispatch(categoriesActions.setShowEmptyCategory());
+			dispatch(categoriesActions.setShowEmptyCategory(currentClan?.clan_id));
 		} else {
-			dispatch(categoriesActions.setHideEmptyCategory());
+			dispatch(categoriesActions.setHideEmptyCategory(currentClan?.clan_id));
 		}
 		setShowEmptyCategories(value);
 	}
