@@ -7,6 +7,7 @@ import {
 	channelsActions,
 	notificationSettingActions,
 	onboardingActions,
+	selectAppChannelById,
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
@@ -22,6 +23,7 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -143,6 +145,10 @@ const ChannelLinkComponent = ({
 	};
 
 	const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
+	const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
+
+	const appChannel = useAppSelector((state) => selectAppChannelById(state, channel.channel_id as string));
+
 	const handleClick = () => {
 		if (channel.category_id === FAVORITE_CATEGORY_ID) {
 			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parent_id ?? '' }));
@@ -163,6 +169,15 @@ const ChannelLinkComponent = ({
 		dispatch(appActions.setIsShowCanvas(false));
 		if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
 			dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
+		}
+		if (isChannelApp && appChannel) {
+			dispatch(
+				channelsActions.setAppChannelsListShowOnPopUp({
+					clanId: appChannel?.clan_id as string,
+					channelId: appChannel?.channel_id as string,
+					appChannel: appChannel as ApiChannelAppResponse
+				})
+			);
 		}
 	};
 
@@ -286,7 +301,12 @@ const ChannelLinkComponent = ({
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 								<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 							)}
-							{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && (
+								<Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />
+							)}
+							{isPrivate && channel.type === ChannelType.CHANNEL_TYPE_APP && (
+								<Icons.PrivateAppChannelIcon className={'w-5 h-5'} fill={theme} />
+							)}
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p
