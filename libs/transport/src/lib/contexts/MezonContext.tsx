@@ -216,7 +216,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return newSession;
 			}
 
-			const session2 = await socketRef.current.connect(newSession, true, isFromMobile ? '0' : '1');
+			const session2 = await socketRef.current.connect(newSession, true, isFromMobile ? '1' : '0');
 			sessionRef.current = session2;
 			return newSession;
 		},
