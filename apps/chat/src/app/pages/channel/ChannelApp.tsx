@@ -1,6 +1,7 @@
 import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } from '@livekit/components-react';
 import {
 	channelAppActions,
+	channelsActions,
 	getStore,
 	giveCoffeeActions,
 	handleParticipantMeetState,
@@ -20,8 +21,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
+import { ApiChannelAppResponseExtend, MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useMiniAppEventListener from './useMiniAppEventListener';
@@ -64,7 +64,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelAppResponse; onFocus?: () => void }) {
+export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseExtend }) {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -179,11 +179,22 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 
 		joinRoom();
 	}, [appChannel, participantMeetState]);
+
+	const handleFocused = useCallback(() => {
+		dispatch(
+			channelsActions.setAppChannelFocus({
+				clanId: appChannel.clan_id as string,
+				channelId: appChannel.channel_id as string
+			})
+		);
+	}, [dispatch]);
+
 	return appChannel?.url ? (
-		<>
+		<div className="relative w-full h-full">
+			{!appChannel.isFocused && <div className="absolute inset-0 bg-transparent z-10 cursor-pointer" onClick={handleFocused} />}
+
 			<div className="w-full h-full">
 				<iframe
-					onMouseDown={onFocus}
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
@@ -192,12 +203,12 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 				/>
 			</div>
 
-			{token ? (
+			{token && (
 				<div className="hidden">
 					<VideoRoom token={token} serverUrl={serverUrl} />
 				</div>
-			) : null}
-		</>
+			)}
+		</div>
 	) : (
 		<div className="w-full h-full flex items-center justify-center">
 			<Loading />
