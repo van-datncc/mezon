@@ -28,7 +28,7 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 		<div className={`px-3 py-1 flex items-center justify-between relative ${bgColor}`} onMouseDown={handleMouseDown}>
 			<span className="text-sm text-white">{title}</span>
 			{roomId && (
-				<div className="flex justify-between items-center gap-2 text-sm text-white pr-5">
+				<div className="flex justify-between items-center gap-2 text-sm text-white pr-12">
 					<button
 						onClick={() => {
 							dispatch(channelAppActions.setEnableCall(!isJoinVoice));
