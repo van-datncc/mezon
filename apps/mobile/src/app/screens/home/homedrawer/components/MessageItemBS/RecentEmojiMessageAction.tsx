@@ -7,11 +7,9 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { emojiFakeData } from '../fakeData';
 import { style } from './styles';
-
 interface IRecentEmojiMessageAction {
 	messageId: string;
 	handleReact?: any;
@@ -36,35 +34,34 @@ export const RecentEmojiMessageAction = React.memo((props: IRecentEmojiMessageAc
 		const uniqueEmojis = [
 			...emojiRecentList,
 			...(emojiFakeData.filter((emoji) => !emojiRecentList.some((recent) => recent?.id === emoji?.id)) || [])
-		];
+		]?.slice(0, 5);
 		return uniqueEmojis;
 	}, [emojiRecentList]);
 
+	const handleShowPicker = () => {
+		setIsShowEmojiPicker(true);
+	};
+
 	return (
 		<View style={styles.reactWrapper}>
-			<ScrollView horizontal>
-				{recentEmoji?.map((item, index) => {
-					return (
-						<Pressable
-							key={index}
-							style={styles.favouriteIconItem}
-							onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, item.id, item.shortname, userId)}
-						>
-							<FastImage
-								source={{
-									uri: getSrcEmoji(item.id)
-								}}
-								resizeMode={'contain'}
-								style={{
-									width: size.s_28,
-									height: size.s_28
-								}}
-							/>
-						</Pressable>
-					);
-				})}
-			</ScrollView>
-			<Pressable onPress={() => setIsShowEmojiPicker(true)} style={styles.emojiButton}>
+			{recentEmoji?.map((item, index) => {
+				return (
+					<Pressable
+						key={index}
+						style={styles.favouriteIconItem}
+						onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, item.id, item.shortname, userId)}
+					>
+						<FastImage
+							source={{
+								uri: getSrcEmoji(item.id)
+							}}
+							resizeMode={'contain'}
+							style={styles.reactionImage}
+						/>
+					</Pressable>
+				);
+			})}
+			<Pressable onPress={handleShowPicker} style={styles.emojiButton}>
 				<Icons.ReactionIcon color={themeValue.text} height={size.s_30} width={size.s_30} />
 			</Pressable>
 		</View>
