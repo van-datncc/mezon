@@ -43,28 +43,8 @@ export class MezonNotificationService {
 	public static instance: MezonNotificationService;
 	private currentChannelId: string | undefined;
 	private pingTimeout: NodeJS.Timeout | null = null;
-	private isFocusOnApp = false;
 	private previousAppId = 0;
 	private currentUserId: string | null = null;
-
-	private constructor() {
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		if (isElectron()) {
-			window.electron.onWindowFocused(() => {
-				this.isFocusOnApp = true;
-			});
-			window.electron.onWindowBlurred(() => {
-				this.isFocusOnApp = false;
-			});
-		} else {
-			window.onfocus = () => {
-				this.isFocusOnApp = true;
-			};
-			window.onblur = () => {
-				this.isFocusOnApp = false;
-			};
-		}
-	}
 
 	public static getInstance() {
 		if (!MezonNotificationService.instance) {
