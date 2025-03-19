@@ -1,6 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
 import {
-	ApiChannelAppResponseExtend,
 	ApiChannelMessageHeaderWithChannel,
 	BuzzArgs,
 	ChannelThreads,
@@ -27,11 +26,11 @@ import { ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEv
 import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
+	ApiChannelAppResponse,
 	ApiChannelDescription,
 	ApiCreateChannelDescRequest,
 	ApiMarkAsReadRequest
 } from 'mezon-js/api.gen';
-import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { categoriesActions, FetchCategoriesPayload } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -102,7 +101,7 @@ export interface ChannelsState {
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
 			appChannelsList: Record<string, ApiChannelAppResponse>;
-			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponseExtend>;
+			appChannelsListShowOnPopUp: Record<string, ApiChannelAppResponse>;
 			fetchChannelSuccess: boolean;
 			favoriteChannels: string[];
 			buzzState: Record<string, BuzzArgs | null>;
@@ -1106,52 +1105,32 @@ export const channelsSlice = createSlice({
 			}
 			state.byClans[clanId].buzzState[channelId] = buzzState;
 		},
-		setAppChannelsListShowOnPopUp: (
-			state,
-			action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponseExtend }>
-		) => {
+		setAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponse }>) => {
 			const { clanId, channelId, appChannel } = action.payload;
 
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
+			state.byClans[clanId] = state.byClans[clanId] ?? getInitialClanState();
 
-			if (!state.byClans[clanId].appChannelsListShowOnPopUp) {
-				state.byClans[clanId].appChannelsListShowOnPopUp = {};
-			}
+			state.byClans[clanId].appChannelsListShowOnPopUp ??= {};
 
-			const appChannelsList = state.byClans[clanId].appChannelsListShowOnPopUp;
+			state.byClans[clanId].appChannelsListShowOnPopUp[channelId] = appChannel;
 
-			Object.keys(appChannelsList).forEach((key) => {
-				if (key !== channelId) {
-					appChannelsList[key].isFocused = false;
-				}
-			});
+			state.byClans[clanId].appFocused ??= {};
 
-			if (appChannelsList[channelId]) {
-				appChannelsList[channelId].isFocused = true;
-			} else {
-				appChannelsList[channelId] = {
-					...appChannel,
-					isFocused: true
-				};
-			}
+			state.byClans[clanId].appFocused = { [channelId]: true };
 		},
 
 		setAppChannelFocus: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
-			if (!state.byClans[clanId] || !state.byClans[clanId].appChannelsListShowOnPopUp) {
-				return;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
 			}
-			const appChannelsList = state.byClans[clanId].appChannelsListShowOnPopUp;
-			Object.keys(appChannelsList).forEach((key) => {
-				appChannelsList[key].isFocused = key === channelId;
-			});
+			if (!state.byClans[clanId].appFocused) {
+				state.byClans[clanId].appFocused = {};
+			}
+			state.byClans[clanId].appFocused = { [channelId]: true };
 		},
-
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
-
 			if (state.byClans[clanId]) {
 				delete state.byClans[clanId].appChannelsListShowOnPopUp[channelId];
 			}
@@ -1525,8 +1504,8 @@ export const selectAppChannelsListShowOnPopUp = createSelector(
 );
 
 export const selectCheckAppFocused = createSelector(
-	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, appId: string) => appId],
-	(state, clanId, appId) => !!state.byClans[clanId]?.appFocused?.[appId]
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, channelId: string) => channelId],
+	(state, clanId, channelId) => !!state.byClans[clanId]?.appFocused?.[channelId]
 );
 
 export const selectAppChannelsKeysShowOnPopUp = createSelector(
