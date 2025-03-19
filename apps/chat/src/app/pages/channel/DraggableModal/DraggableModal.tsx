@@ -18,7 +18,7 @@ const ModalHeader = ({ title, onClose, handleMouseDown, isFocused, clanId, chann
 		navigate(channelPath);
 	}, []);
 	return (
-		<div className={`px-3 py-1 flex items-center justify-between relative ${bgColor}`} onMouseDown={handleMouseDown}>
+		<div className={`rounded-t-lg px-3 py-1 flex items-center justify-between relative ${bgColor}`} onMouseDown={handleMouseDown}>
 			<span className="text-sm text-white">{title}</span>
 
 			<div className="absolute top-0 right-0 flex">
@@ -59,6 +59,22 @@ const ModalContent: React.FC<ModalContentProps> = ({ children, isDragging, resiz
 	</div>
 );
 
+type ModalFooterProps = {
+	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	footerTitle?: string;
+	isFocused?: boolean;
+};
+
+const ModalFooter = ({ handleMouseDown, footerTitle, isFocused }: ModalFooterProps) => {
+	const bgColor = isFocused ? 'bg-[#1E1F22]' : 'bg-[#404249]';
+
+	return (
+		<div className={`rounded-b-lg px-3 py-1 flex items-center justify-between relative ${bgColor}`} onMouseDown={handleMouseDown}>
+			<span className="text-sm text-white">{footerTitle}</span>
+		</div>
+	);
+};
+
 type ResizeHandlesProps = {
 	handleResizeMouseDown: (dir: string) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 };
@@ -89,6 +105,7 @@ interface DraggableModalProps {
 	zIndex?: string;
 	clanId?: string;
 	channelId?: string;
+	footerTitle?: string;
 }
 
 const DraggableModal: React.FC<DraggableModalProps> = ({
@@ -103,7 +120,8 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	onFocus,
 	zIndex,
 	clanId,
-	channelId
+	channelId,
+	footerTitle
 }) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -234,7 +252,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 		<div
 			onMouseDown={() => onFocus()}
 			ref={modalRef}
-			className={`absolute dark:bg-[#1E1F22] bg-[#E3E5E8] shadow-lg rounded-sm ${zIndex}`}
+			className={`absolute bg-transparent border border-red-500 shadow-lg rounded-lg ${zIndex} `}
 			style={{
 				left: `${position.x}px`,
 				top: `${position.y}px`,
@@ -255,6 +273,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 			<ModalContent isDragging={isDragging} resizeDir={resizeDir}>
 				{children}
 			</ModalContent>
+			<ModalFooter isFocused={isFocused} footerTitle={footerTitle} handleMouseDown={handleMouseDown} />
 			<ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />
 		</div>
 	);
