@@ -53,7 +53,8 @@ export const style = (colors: Attributes) =>
 		favouriteIconItem: {
 			backgroundColor: colors.secondary,
 			padding: size.s_10,
-			borderRadius: 50
+			borderRadius: 50,
+			marginRight: size.s_16
 		},
 		reactIcon: {
 			fontSize: size.h4,
@@ -88,5 +89,9 @@ export const style = (colors: Attributes) =>
 			borderTopLeftRadius: size.s_14,
 			borderTopRightRadius: size.s_14,
 			overflow: 'hidden'
+		},
+		emojiButton: {
+			height: size.s_28,
+			width: size.s_34
 		}
 	});
