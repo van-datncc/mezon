@@ -145,8 +145,8 @@ const ChannelLinkComponent = ({
 	};
 
 	const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
-	const store = getStore();
 	const handleClick = () => {
+		const store = getStore();
 		const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
 		const appIsOpening = selectToCheckAppIsOpening(store.getState(), channel.channel_id as string);
 		if (channel.category_id === FAVORITE_CATEGORY_ID) {
