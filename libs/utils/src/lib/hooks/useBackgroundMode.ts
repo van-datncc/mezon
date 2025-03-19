@@ -1,6 +1,7 @@
-import { AnyToVoidFunction, createCallbackManager } from '@mezon/utils';
+import useLastCallback from 'libs/core/src/lib/chat/hooks/useLastCallback';
 import { useEffect } from 'react';
-import useLastCallback from './useLastCallback';
+import { AnyToVoidFunction } from '../types';
+import { createCallbackManager } from '../utils';
 
 const blurCallbacks = createCallbackManager();
 const focusCallbacks = createCallbackManager();
