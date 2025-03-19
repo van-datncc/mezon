@@ -4,7 +4,7 @@ import { selectAllFriends } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -31,9 +31,11 @@ function MessageHeader() {
 	return (
 		<View style={styles.headerWrapper}>
 			<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
-			<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-				<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-				<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
+			<View style={styles.addFriendWrapper}>
+				<TouchableOpacity style={styles.btnAddFriend} onPress={() => navigateToAddFriendScreen()}>
+					<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
+				</TouchableOpacity>
 				{!!quantityPendingRequest && (
 					<View
 						style={{
@@ -51,7 +53,7 @@ function MessageHeader() {
 						<Text style={styles.textQuantityPending}>{quantityPendingRequest}</Text>
 					</View>
 				)}
-			</Pressable>
+			</View>
 		</View>
 	);
 }
