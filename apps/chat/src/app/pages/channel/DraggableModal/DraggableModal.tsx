@@ -1,5 +1,8 @@
 import { useAppNavigation } from '@mezon/core';
+import { channelAppActions, selectEnableCall, selectEnableMic, selectGetRoomId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 type ModalHeaderProps = {
 	onClose: () => void;
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -12,6 +15,10 @@ type ModalHeaderProps = {
 };
 
 const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, channelId, onCollapseToggle, isCollapsed }: ModalHeaderProps) => {
+	const dispatch = useDispatch();
+	const isJoinVoice = useSelector(selectEnableCall);
+	const isTalking = useSelector(selectEnableMic);
+	const roomId = useSelector(selectGetRoomId);
 	const bgColor = isFocused ? 'bg-[#1E1F22]' : 'bg-[#404249]';
 	const roundedBottom = isCollapsed ? 'rounded-b-lg' : '';
 	const { navigate, toChannelPage } = useAppNavigation();
@@ -33,6 +40,34 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 				{title}
 			</span>
 			<div className="absolute top-0 right-0 flex ">
+				{roomId && (
+					<div className="flex justify-between items-center gap-2 text-sm text-white ">
+						<button
+							onClick={() => {
+								dispatch(channelAppActions.setEnableCall(!isJoinVoice));
+								if (isJoinVoice) {
+									dispatch(channelAppActions.setEnableVoice(false));
+									dispatch(channelAppActions.setRoomToken(undefined));
+								}
+							}}
+						>
+							{isJoinVoice ? (
+								<Icons.StopCall className="size-4 text-red-600" />
+							) : (
+								<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+							)}
+						</button>
+						{isJoinVoice && (
+							<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
+								{isTalking ? (
+									<Icons.MicDisable className="size-4 text-red-600" />
+								) : (
+									<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+								)}
+							</button>
+						)}
+					</div>
+				)}
 				<div className="group relative">
 					<button
 						onClick={onCollapseToggle}
