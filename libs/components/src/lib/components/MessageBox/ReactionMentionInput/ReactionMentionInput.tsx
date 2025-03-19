@@ -57,6 +57,7 @@ import {
 import {
 	CHANNEL_INPUT_ID,
 	ChannelMembersEntity,
+	ETypeMEntion,
 	GENERAL_INPUT_ID,
 	HistoryItem,
 	IEmojiOnMessage,
@@ -127,6 +128,7 @@ type ChannelsMentionProps = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
+	const editorRef = useRef<HTMLInputElement | null>(null);
 	const appStore = useStore();
 	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
@@ -268,6 +270,69 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			}
 		}
 
+		if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
+			if (!editorRef.current) return;
+			const start = editorRef.current.selectionStart ?? 0;
+			const end = editorRef.current.selectionEnd ?? 0;
+			if (start === end) return;
+			console.log('start: ', start);
+			console.log('end: ', end);
+			let alternativeValueTextInput = request.content;
+			const boldedText = request.content.substring(start, end);
+			console.log('boldedText: ', boldedText);
+			let inputValueStartIndex = start;
+			let inputValueEndIndex = end;
+
+			request.mentionRaw?.forEach((item) => {
+				if (item.childIndex === ETypeMEntion.MENTION) {
+					const mentionWithIdTemplate = `@[${item.display.slice(1)}](${item.id})`;
+					console.log('mentionWithIdTemplate: ', mentionWithIdTemplate);
+					alternativeValueTextInput =
+						alternativeValueTextInput.slice(0, item.index) +
+						mentionWithIdTemplate +
+						alternativeValueTextInput.slice(item.index + item.display.length);
+					console.log('alternativeValueTextInput: ', alternativeValueTextInput);
+					inputValueStartIndex += 23;
+					inputValueEndIndex += 23;
+				}
+			});
+
+			const mentionItem: MentionItem = {
+				display: boldedText,
+				id: '',
+				childIndex: 4,
+				index: inputValueStartIndex,
+				plainTextIndex: start
+			};
+			console.log('mentionItem: ', mentionItem);
+
+			// request.mentionRaw.forEach((mention)=>{
+			// 	if(mention.)
+			// })
+
+			if (request.mentionRaw.length > 0) {
+				setRequestInput({
+					...request,
+					mentionRaw: [...request.mentionRaw, mentionItem],
+					valueTextInput:
+						request.valueTextInput.slice(0, inputValueStartIndex) +
+						`**${boldedText}**` +
+						request.valueTextInput.slice(inputValueEndIndex),
+					content: request.content.slice(0, start) + `**${boldedText}**` + request.content.slice(end)
+				});
+			} else {
+				setRequestInput({
+					...request,
+					mentionRaw: [mentionItem],
+					valueTextInput:
+						request.valueTextInput.slice(0, inputValueStartIndex) +
+						`**${boldedText}**` +
+						request.valueTextInput.slice(inputValueEndIndex),
+					content: request.content.slice(0, start) + `**${boldedText}**` + request.content.slice(end)
+				});
+			}
+		}
+
 		switch (key) {
 			case 'Enter': {
 				if (shiftKey || isComposing) {
@@ -284,8 +349,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			}
 		}
 	};
+	console.log('request: ', request);
 
-	const editorRef = useRef<HTMLInputElement | null>(null);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 
 	const closeMenu = useSelector(selectCloseMenu);
@@ -315,6 +380,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const checkedRequest = request ? request : emptyRequest;
 			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
+			console.log('mk: ', mk);
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
 				t: text,
@@ -322,6 +388,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				ej: adjustedEmojiPos as IEmojiOnMessage[],
 				mk
 			};
+			console.log('payload: ', payload);
 
 			const addMentionToPayload = addMention(payload, adjustedMentionsPos);
 			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
@@ -439,6 +506,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			} else {
+				console.log('normal sending');
 				props.onSend(
 					filterEmptyArrays(payload),
 					isPasteMulti ? mentionUpdated : adjustedMentionsPos,
@@ -541,6 +609,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	}, [request?.content]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		console.log('mentions: ', mentions);
+		console.log('newValue: ', newValue);
+		console.log('newPlainTextValue: ', newPlainTextValue);
 		const previousValue = prevValueRef.current;
 		const previousPlainText = prevPlainTextRef.current;
 		const newMentions = updateMentionPositions(mentions, newValue, newPlainTextValue);
@@ -968,6 +1039,16 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					}}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
+				/>
+				<Mention
+					trigger="**"
+					markup="**__display__**"
+					data={[]}
+					displayTransform={(id: any, display: any) => {
+						return `**${display}**`;
+					}}
+					className="!drop-shadow-lg dark:!text-white !text-black"
+					style={{ WebkitTextStroke: 2, WebkitTextStrokeColor: 'white' }}
 				/>
 			</MentionsInput>
 			{isShowEmojiPicker && (
