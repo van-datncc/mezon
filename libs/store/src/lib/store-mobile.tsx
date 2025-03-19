@@ -60,6 +60,7 @@ import { notifiReactMessageReducer } from './notificationSetting/notificationRea
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboarding.slice';
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
@@ -76,7 +77,6 @@ import { topicsReducer } from './topicDiscussion/topicDiscussions.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { VOICE_FEATURE_KEY, voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import {emojiRecentReducer, ONBOARDING_FEATURE_KEY, onboardingReducer} from "@mezon/store";
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -110,14 +110,6 @@ const persistedEmojiSuggestionReducer = persistReducer(
 		storage
 	},
 	emojiSuggestionReducer
-);
-
-const persistedEmojiRecentReducer = persistReducer(
-	{
-		key: 'emojiRecent',
-		storage
-	},
-	emojiRecentReducer
 );
 
 const transformJumpingError = createTransform<MessagesState, MessagesState>(
