@@ -181,14 +181,14 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 	}, [appChannel, participantMeetState]);
 
 	return appChannel?.url ? (
-		<div className="relative w-full h-full">
+		<div className="relative w-full h-full rounded-b-lg">
 			<div className="w-full h-full">
 				<iframe
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}
-					className="w-full h-full"
+					className="w-full h-full rounded-b-lg"
 				/>
 			</div>
 
@@ -199,7 +199,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 			)}
 		</div>
 	) : (
-		<div className="w-full h-full flex items-center justify-center">
+		<div className="w-full h-full flex items-center justify-center rounded-b-lg">
 			<Loading />
 		</div>
 	);

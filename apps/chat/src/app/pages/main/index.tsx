@@ -555,7 +555,6 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
 							clanId={app?.clan_id}
 							channelId={app?.channel_id}
-							footerTitle="@ncc.asia"
 						>
 							<ChannelApps appChannel={app} />
 						</DraggableModal>
