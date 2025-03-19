@@ -11,7 +11,6 @@ import {
 import {
 	ApiAccount,
 	ApiCategoryDesc,
-	ApiChannelAppResponse,
 	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiChannelMessageHeader,
@@ -1466,7 +1465,3 @@ export type HistoryItem = {
 	content: string;
 	mentionRaw: any[];
 };
-
-export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
-	isFocused?: boolean;
-}

@@ -1,6 +1,7 @@
 import {
 	emojiSuggestionActions,
 	selectAddEmojiState,
+	selectAllEmojiRecent,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
 	selectEmojiObjSuggestion,
@@ -9,7 +10,6 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
-import { selectAllEmojiRecent } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -32,7 +32,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
 	const emojiConverted = useSelector(selectAllEmojiRecent);
 
-	const emojis = useMemo(() => filterEmojiData([...emojiMetadata, ...emojiConverted]), [emojiMetadata, emojiConverted]);
+	const emojis = useMemo(() => filterEmojiData([...(emojiMetadata || []), ...(emojiConverted || [])]), [emojiMetadata, emojiConverted]);
 
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
