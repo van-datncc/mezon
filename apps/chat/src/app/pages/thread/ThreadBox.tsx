@@ -61,7 +61,8 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference((currentChannelId || '') + '/createThread');
+	const currentInputChannelId = threadCurrentChannel?.channel_id || 'creatingThread';
+	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
 	const appearanceTheme = useSelector(selectTheme);
 	const { messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
@@ -154,7 +155,7 @@ const ThreadBox = () => {
 						);
 						dispatch(
 							referencesActions.setAtachmentAfterUpload({
-								channelId: (currentChannelId ?? '') + '/createThread',
+								channelId: currentInputChannelId,
 								files: []
 							})
 						);
@@ -196,7 +197,7 @@ const ThreadBox = () => {
 
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
-					channelId: `${currentChannelId || ''}/createThread`,
+					channelId: currentInputChannelId,
 					files: updatedFiles
 				})
 			);
@@ -355,7 +356,7 @@ const ThreadBox = () => {
 								<Fragment key={index}>
 									<AttachmentPreviewThumbnail
 										attachment={item}
-										channelId={(currentChannelId || '') + '/createThread'}
+										channelId={currentInputChannelId}
 										onRemove={removeAttachmentByIndex}
 										indexOfItem={index}
 									/>
@@ -372,7 +373,7 @@ const ThreadBox = () => {
 					className={`h-fit w-full dark:bg-channelTextarea bg-channelTextareaLight rounded-lg ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
 				>
 					<MentionReactInput
-						currentChannelId={(currentChannelId || '') + '/createThread'}
+						currentChannelId={currentInputChannelId}
 						handlePaste={onPastedFiles}
 						onSend={handleSend}
 						onTyping={handleTypingDebounced}
