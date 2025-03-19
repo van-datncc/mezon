@@ -15,6 +15,7 @@ import {
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
+	ChannelsEntity,
 	DMCallActions,
 	accountActions,
 	audioCallActions,
@@ -22,6 +23,7 @@ import {
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
+	getStore,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMemberIds,
@@ -32,7 +34,9 @@ import {
 	selectAudioDialTone,
 	selectAudioEndTone,
 	selectAudioRingTone,
+	selectChannelById,
 	selectChatStreamWidth,
+	selectCheckAppFocused,
 	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
@@ -508,12 +512,22 @@ interface MemoizedDraggableModalsProps {
 const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
-	const [focusedModalId, setFocusedModalId] = useState<string | null>(null);
-
+	const store = getStore();
 	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
+	const handleFocused = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.setAppChannelFocus({
 					clanId,
 					channelId
 				})
@@ -527,18 +541,22 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const isFocused = focusedModalId === app.app_id;
-
+					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string) as boolean;
+					const zIndex = isFocused ? 'z-50' : 'z-40';
+					const channel = selectChannelById(store.getState(), app?.channel_id as string) as ChannelsEntity;
 					return (
 						<DraggableModal
-							key={app.app_id}
-							headerTitle={app.url}
+							key={app?.app_id}
+							zIndex={zIndex}
+							headerTitle={channel?.channel_label}
 							parentRef={parentRef}
 							isFocused={isFocused}
-							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
-							onFocus={() => setFocusedModalId(app.app_id as string)}
+							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
+							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
+							clanId={app?.clan_id}
+							channelId={app?.channel_id}
 						>
-							<ChannelApps appChannel={app} onFocus={() => setFocusedModalId(app.app_id as string)} />
+							<ChannelApps appChannel={app} />
 						</DraggableModal>
 					);
 				})}

@@ -5,6 +5,7 @@ import {
 	appActions,
 	categoriesActions,
 	channelsActions,
+	getStore,
 	notificationSettingActions,
 	onboardingActions,
 	selectBuzzStateByChannelId,
@@ -12,6 +13,7 @@ import {
 	selectCurrentMission,
 	selectEventsByChannelId,
 	selectTheme,
+	selectToCheckAppIsOpening,
 	threadsActions,
 	useAppDispatch,
 	useAppSelector,
@@ -143,8 +145,10 @@ const ChannelLinkComponent = ({
 	};
 
 	const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
-
 	const handleClick = () => {
+		const store = getStore();
+		const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
+		const appIsOpening = selectToCheckAppIsOpening(store.getState(), channel.channel_id as string);
 		if (channel.category_id === FAVORITE_CATEGORY_ID) {
 			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parent_id ?? '' }));
 		}
@@ -164,6 +168,14 @@ const ChannelLinkComponent = ({
 		dispatch(appActions.setIsShowCanvas(false));
 		if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
 			dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
+		}
+		if (isChannelApp && appIsOpening) {
+			dispatch(
+				channelsActions.setAppChannelFocus({
+					clanId: channel.clan_id as string,
+					channelId: channel.channel_id as string
+				})
+			);
 		}
 	};
 
