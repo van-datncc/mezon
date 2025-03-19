@@ -548,6 +548,8 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 							isFocused={app?.isFocused}
 							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
 							onFocus={() => handleFocused(app.clan_id as string, app.channel_id as string)}
+							clanId={app.clan_id}
+							channelId={app.channel_id}
 						>
 							<ChannelApps appChannel={app} />
 						</DraggableModal>
