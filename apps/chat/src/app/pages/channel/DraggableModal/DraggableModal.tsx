@@ -75,6 +75,25 @@ const ResizeHandles: React.FC<ResizeHandlesProps> = memo(({ handleResizeMouseDow
 		<div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize z-50 " onMouseDown={handleResizeMouseDown('top-left')} />
 	</>
 ));
+
+type OverlayProps = {
+	isFocused?: boolean;
+	onFocus?: () => void;
+	headerHeight: number;
+};
+
+const Overlay: React.FC<OverlayProps> = ({ isFocused, onFocus, headerHeight }) => {
+	if (isFocused) return null;
+
+	return (
+		<div
+			className="absolute inset-0 bg-black opacity-20 z-50 cursor-pointer"
+			onClick={onFocus}
+			style={{ top: `${headerHeight}px`, height: `calc(100% - ${headerHeight}px)` }}
+		/>
+	);
+};
+
 interface DraggableModalProps {
 	onClose: () => void;
 	onFocus: () => void;
@@ -110,7 +129,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [resizeDir, setResizeDir] = useState<string | null>(null);
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
-
+	const headerHeight = 28;
 	useEffect(() => {
 		const parent = parentRef?.current;
 		if (!parent) return;
@@ -243,6 +262,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
 				flexDirection: 'column'
 			}}
 		>
+			<Overlay isFocused={isFocused} onFocus={onFocus} headerHeight={headerHeight} />
 			<ModalHeader
 				clanId={clanId}
 				channelId={channelId}
