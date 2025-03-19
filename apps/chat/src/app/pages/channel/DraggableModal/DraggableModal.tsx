@@ -293,15 +293,14 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 			<div
 				onMouseDown={() => onFocus()}
 				ref={modalRef}
-				className={`absolute bg-transparent  shadow-lg rounded-lg ${zIndex} `}
+				className={`absolute bg-transparent  shadow-lg rounded-lg ${zIndex} contain-strict`}
 				style={{
 					left: `${position.x}px`,
 					top: `${position.y}px`,
 					width: `${size.width}px`,
 					height: `${size.height}px`,
 					display: 'flex',
-					flexDirection: 'column',
-					contain: 'style'
+					flexDirection: 'column'
 				}}
 			>
 				{!isCollapsed && <Overlay isFocused={isFocused} onFocus={onFocus} headerHeight={headerHeight} />}
