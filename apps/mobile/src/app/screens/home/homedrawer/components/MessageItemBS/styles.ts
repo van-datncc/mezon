@@ -93,5 +93,9 @@ export const style = (colors: Attributes) =>
 		emojiButton: {
 			height: size.s_28,
 			width: size.s_34
+		},
+		reactionImage: {
+			width: size.s_28,
+			height: size.s_28
 		}
 	});
