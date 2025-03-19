@@ -1,12 +1,11 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, channelsActions, selectCurrentChannelId, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
-import { EPermission, ICategoryChannel } from '@mezon/utils';
+import { EPermission, ICategoryChannel, sleep } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -30,13 +29,11 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const [isCanManageChannel] = usePermissionChecker([EPermission.manageChannel], currentChanelId ?? '');
-	const [isShowModalDeleteCategory, setIsShowModalDeleteCategory] = useState<boolean>(false);
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
-	const { dismiss } = useBottomSheetModal();
 	const dispatch = useAppDispatch();
 
 	const handleRemoveCategory = useCallback(() => {
-		dismiss();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		dispatch(
 			categoriesActions.deleteCategory({
 				clanId: category?.clan_id as string,
@@ -113,7 +110,22 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 		},
 		{
 			title: t('menu.organizationMenu.delete'),
-			onPress: () => setIsShowModalDeleteCategory(true),
+			onPress: async () => {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+
+				await sleep(500);
+				const data = {
+					children: (
+						<MezonConfirm
+							title={t('menu.modalConfirm.title')}
+							confirmText={t('menu.modalConfirm.confirmText')}
+							content={t('menu.modalConfirm.content')}
+							onConfirm={handleRemoveCategory}
+						/>
+					)
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+			},
 			icon: <Icons.CloseLargeIcon color={Colors.textRed} />,
 			isShow: isCanManageChannel,
 			textStyle: {
@@ -166,14 +178,6 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 			<View>
 				<MezonMenu menu={menu} />
 			</View>
-			<MezonConfirm
-				visible={isShowModalDeleteCategory}
-				title={t('menu.modalConfirm.title')}
-				confirmText={t('menu.modalConfirm.confirmText')}
-				content={t('menu.modalConfirm.content')}
-				onConfirm={handleRemoveCategory}
-				onVisibleChange={setIsShowModalDeleteCategory}
-			/>
 		</View>
 	);
 }
