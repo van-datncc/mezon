@@ -29,6 +29,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	CREATING_THREAD,
 	ChannelMembersEntity,
 	HistoryItem,
 	IEmojiOnMessage,
@@ -61,7 +62,7 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector(selectSession);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const currentInputChannelId = threadCurrentChannel?.channel_id || 'creatingThread';
+	const currentInputChannelId = threadCurrentChannel?.channel_id || CREATING_THREAD;
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
 	const appearanceTheme = useSelector(selectTheme);

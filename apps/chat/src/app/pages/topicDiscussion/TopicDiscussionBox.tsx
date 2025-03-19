@@ -16,7 +16,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason, getWebUploadedAttachments, processFile, sleep } from '@mezon/utils';
+import {
+	CREATING_TOPIC,
+	IMessageSendPayload,
+	MAX_FILE_ATTACHMENTS,
+	UploadLimitReason,
+	getWebUploadedAttachments,
+	processFile,
+	sleep
+} from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -39,7 +47,7 @@ const TopicDiscussionBox = () => {
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
 	const { userProfile } = useAuth();
 	const dataReferences = useSelector(selectDataReferences(currentTopicId ?? ''));
-	const currentInputChannelId = currentTopicId || 'creatingTopic';
+	const currentInputChannelId = currentTopicId || CREATING_TOPIC;
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
 
