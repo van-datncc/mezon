@@ -29,7 +29,7 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 
 	return (
 		<div
-			className={`rounded-t-lg px-3 py-1 flex items-center justify-between relative ${bgColor} ${roundedBottom}`}
+			className={`rounded-t-lg px-3 py-1 flex items-center justify-between relative  w-full ${bgColor} ${roundedBottom}`}
 			onMouseDown={handleMouseDown}
 			style={{
 				transition: 'max-width 0.3s ease',
@@ -324,11 +324,12 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 				window.removeEventListener('mouseup', handleMouseUp);
 			};
 		}, [handleMouseMove, handleMouseUp]);
+		const isContentStrict = !isCollapsed ? 'contain-strict' : '';
 		return (
 			<div
 				onMouseDown={() => onFocus()}
 				ref={modalRef}
-				className={`absolute bg-transparent  shadow-lg rounded-lg ${zIndex} contain-strict`}
+				className={`absolute bg-transparent z-50 shadow-lg rounded-lg ${zIndex} ${isContentStrict}`}
 				style={{
 					left: `${position.x}px`,
 					top: `${position.y}px`,
