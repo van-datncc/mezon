@@ -36,6 +36,7 @@ import {
 	selectAudioRingTone,
 	selectChannelById,
 	selectChatStreamWidth,
+	selectCheckAppFocused,
 	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
@@ -540,15 +541,16 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const zIndex = app?.isFocused ? 'z-50' : 'z-40';
+					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string) as boolean;
+					const zIndex = isFocused ? 'z-50' : 'z-40';
 					const channel = selectChannelById(store.getState(), app?.channel_id as string) as ChannelsEntity;
 					return (
 						<DraggableModal
-							zIndex={zIndex}
 							key={app?.app_id}
+							zIndex={zIndex}
 							headerTitle={channel?.channel_label}
 							parentRef={parentRef}
-							isFocused={app?.isFocused}
+							isFocused={isFocused}
 							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
 							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
 							clanId={app?.clan_id}
