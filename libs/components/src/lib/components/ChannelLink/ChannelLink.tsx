@@ -5,14 +5,15 @@ import {
 	appActions,
 	categoriesActions,
 	channelsActions,
+	getStore,
 	notificationSettingActions,
 	onboardingActions,
-	selectAppChannelById,
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
 	selectEventsByChannelId,
 	selectTheme,
+	selectToCheckAppIsOpening,
 	threadsActions,
 	useAppDispatch,
 	useAppSelector,
@@ -23,7 +24,6 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiChannelAppResponse } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -145,11 +145,10 @@ const ChannelLinkComponent = ({
 	};
 
 	const currentMission = useSelector((state) => selectCurrentMission(state, clanId as string));
-	const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
-
-	const appChannel = useAppSelector((state) => selectAppChannelById(state, channel.channel_id as string));
-
 	const handleClick = () => {
+		const store = getStore();
+		const isChannelApp = channel.type === ChannelType.CHANNEL_TYPE_APP;
+		const appIsOpening = selectToCheckAppIsOpening(store.getState(), channel.channel_id as string);
 		if (channel.category_id === FAVORITE_CATEGORY_ID) {
 			dispatch(categoriesActions.setCtrlKFocusChannel({ id: channel?.id, parentId: channel?.parent_id ?? '' }));
 		}
@@ -170,12 +169,11 @@ const ChannelLinkComponent = ({
 		if (currentMission && currentMission.channel_id === channel.id && currentMission.task_type === ETypeMission.VISIT) {
 			dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
 		}
-		if (isChannelApp && appChannel) {
+		if (isChannelApp && appIsOpening) {
 			dispatch(
-				channelsActions.setAppChannelsListShowOnPopUp({
-					clanId: appChannel?.clan_id as string,
-					channelId: appChannel?.channel_id as string,
-					appChannel: appChannel as ApiChannelAppResponse
+				channelsActions.setAppChannelFocus({
+					clanId: channel.clan_id as string,
+					channelId: channel.channel_id as string
 				})
 			);
 		}

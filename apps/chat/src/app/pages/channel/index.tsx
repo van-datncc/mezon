@@ -17,6 +17,7 @@ import {
 	channelsActions,
 	clansActions,
 	directMetaActions,
+	getStore,
 	gifsStickerEmojiActions,
 	handleParticipantMeetState,
 	listChannelRenderAction,
@@ -66,10 +67,10 @@ import {
 	titleMission
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { ApiOnboardingItem } from 'mezon-js/api.gen';
+import { ApiChannelAppResponse, ApiOnboardingItem } from 'mezon-js/api.gen';
 import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
@@ -95,7 +96,7 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		markAsReadSeen(lastMessage, mode);
+		markAsReadSeen(lastMessage, mode, numberNotification);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1)) {
@@ -173,7 +174,8 @@ type ChannelMainContentTextProps = {
 
 const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainContentTextProps) => {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId ?? '')) || {};
-
+	const store = getStore();
+	const dispatch = useDispatch();
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
@@ -231,13 +233,29 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 		);
 	}
 
+	const handleLaunchApp = () => {
+		if (isAppChannel) {
+			const appChannel = selectAppChannelById(store.getState(), channelId);
+			dispatch(
+				channelsActions.setAppChannelsListShowOnPopUp({
+					clanId: appChannel?.clan_id as string,
+					channelId: appChannel?.channel_id as string,
+					appChannel: appChannel as ApiChannelAppResponse
+				})
+			);
+		}
+	};
+
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
 			{currentChannel && <ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />}
 			{isAppChannel && (
 				<div className="flex gap-2 px-3 pt-2 dark:text-channelTextLabel text-colorTextLightMode">
-					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black">
+					<div
+						onClick={handleLaunchApp}
+						className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black"
+					>
 						<Icons.Joystick className="w-6" />
 						<div>Launch App</div>
 					</div>
