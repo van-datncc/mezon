@@ -50,7 +50,7 @@ function Login() {
 		return () => {
 			clearInterval(intervalId);
 		};
-	}, [checkLoginRequest, createSecond, loginId]);
+	}, [checkLoginRequest, createSecond, isRemember, loginId]);
 
 	useEffect(() => {
 		if (isLogin) {
