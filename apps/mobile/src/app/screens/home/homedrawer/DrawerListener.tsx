@@ -30,10 +30,10 @@ function useChannelSeen(channelId: string) {
 
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
-		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		const mode =
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 		if (lastMessage) {
+			const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 			markAsReadSeen(lastMessage, mode, numberNotification);
 		}
 	}, [lastMessage, channelId, markAsReadSeen, currentChannel?.type, currentChannel?.count_mess_unread]);
