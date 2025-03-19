@@ -108,6 +108,11 @@ const ThreadBox = () => {
 				return;
 			}
 
+			if (!nameValueThread.length && !checkAttachment) {
+				toast('A starter message is required to start a thread.');
+				return;
+			}
+
 			const timestamp = Date.now() / 1000;
 			const body: any = {
 				clan_id: currentClanId?.toString(),
