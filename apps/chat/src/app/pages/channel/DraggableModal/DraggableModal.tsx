@@ -1,4 +1,7 @@
+import { channelAppActions, selectEnableCall, selectEnableMic, selectGetRoomId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 type ModalHeaderProps = {
 	onClose: () => void;
@@ -8,11 +11,44 @@ type ModalHeaderProps = {
 };
 
 const ModalHeader = ({ title, onClose, handleMouseDown, isFocused }: ModalHeaderProps) => {
+	const dispatch = useDispatch();
+	const isJoinVoice = useSelector(selectEnableCall);
+	const isTalking = useSelector(selectEnableMic);
+	const roomId = useSelector(selectGetRoomId);
+
 	const bgColor = isFocused ? 'bg-[#1E1F22]' : 'bg-[#404249]';
 
 	return (
 		<div className={`px-3 py-1 flex justify-between items-center  ${bgColor}`} onMouseDown={handleMouseDown}>
 			<span className="text-sm text-white">{title}</span>
+			{roomId && (
+				<div className="flex justify-between items-center gap-2 text-sm text-white pr-5">
+					<button
+						onClick={() => {
+							dispatch(channelAppActions.setEnableCall(!isJoinVoice));
+							if (isJoinVoice) {
+								dispatch(channelAppActions.setEnableVoice(false));
+								dispatch(channelAppActions.setRoomToken(undefined));
+							}
+						}}
+					>
+						{isJoinVoice ? (
+							<Icons.StopCall className="size-4 text-red-600" />
+						) : (
+							<Icons.StartCall className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+						)}
+					</button>
+					{isJoinVoice && (
+						<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
+							{isTalking ? (
+								<Icons.MicDisable className="size-4 text-red-600" />
+							) : (
+								<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+							)}
+						</button>
+					)}
+				</div>
+			)}
 			<button
 				onClick={onClose}
 				className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"

@@ -2,6 +2,7 @@ import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } 
 import {
 	channelAppActions,
 	channelsActions,
+	generateMeetToken,
 	getStore,
 	giveCoffeeActions,
 	handleParticipantMeetState,
@@ -10,8 +11,10 @@ import {
 	selectAllRolesClan,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
+	selectEnableCall,
 	selectEnableMic,
 	selectEnableVideo,
+	selectGetRoomId,
 	selectInfoSendToken,
 	selectLiveToken,
 	selectSendTokenEvent,
@@ -74,6 +77,9 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseE
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
 	const userProfile = useSelector(selectAllAccount);
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
+	const roomId = useSelector(selectGetRoomId);
+	const isJoinVoice = useSelector(selectEnableCall);
+	const token = useSelector(selectLiveToken);
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -98,6 +104,30 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseE
 		dispatch(channelAppActions.setChannelId(appChannel.channel_id || ''));
 		dispatch(channelAppActions.setClanId(appChannel?.clan_id || null));
 	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			if (!roomId || !isJoinVoice) return;
+
+			try {
+				const result = await dispatch(
+					generateMeetToken({
+						channelId: appChannel?.channel_id as string,
+						roomName: roomId
+					})
+				).unwrap();
+
+				if (result) {
+					dispatch(channelAppActions.setRoomToken(result));
+				}
+			} catch (err) {
+				console.error('Failed to join room:', err);
+				dispatch(channelAppActions.setRoomToken(undefined));
+			}
+		};
+
+		fetchData();
+	}, [roomId, isJoinVoice]);
 
 	const getUserHashInfo = useCallback(
 		async (appId: string) => {
@@ -143,7 +173,6 @@ export function ChannelApps({ appChannel }: { appChannel: ApiChannelAppResponseE
 		}
 	}, [sendTokenEvent]);
 
-	const token = useSelector(selectLiveToken);
 	const participantMeetState = useCallback(
 		async (state: ParticipantMeetState, channelId: string) => {
 			try {
