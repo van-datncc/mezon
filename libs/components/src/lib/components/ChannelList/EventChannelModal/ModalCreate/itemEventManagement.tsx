@@ -18,6 +18,7 @@ import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
 import { timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
+import ModalShareEvent from './modalShareEvent';
 import PanelEventItem from './panelEventItem';
 
 export type ItemEventManagementProps = {
@@ -70,6 +71,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 
 	const [openPanel, setOpenPanel] = useState(false);
 	const [openModalDelEvent, setOpenModalDelEvent] = useState(false);
+	const [openModalShare, setOpenModalShare] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -215,11 +217,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black rotate-90" />
 						</div>
 
-						<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
-							{checkOptionVoice && <Icons.IconShareEventVoice />}
-							{checkOptionLocation && <Icons.IConShareEventLocation />}
-							Share
-						</button>
+						{!checkOptionLocation && (
+							<button
+								onClick={() => setOpenModalShare(true)}
+								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+							>
+								{checkOptionVoice && <Icons.IconShareEventVoice />}
+								{checkOptionLocation && <Icons.IConShareEventLocation />}
+								Share
+							</button>
+						)}
 
 						{eventIsOngoing && isClanOwner ? (
 							<button
@@ -265,7 +272,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				/>
 			)}
 			{openModalDelEvent && <ModalDelEvent event={event} setOpenModalDelEvent={setOpenModalDelEvent} />}
-			{/* {openModalShare && <ModalShareEvent channel={channelVoice} setOpenModalShareEvent={setOpenModalShare} />} */}
+			{openModalShare && <ModalShareEvent channel={channelVoice} setOpenModalShareEvent={setOpenModalShare} />}
 		</div>
 	);
 };
