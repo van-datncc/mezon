@@ -123,10 +123,10 @@ export const getEmojiRecentState = (rootState: { [EMOJI_RECENT_FEATURE_KEY]: Emo
 export const selectLastEmojiRecent = createSelector(getEmojiRecentState, (emojisState) => emojisState.lastEmojiRecent);
 
 export const selectAllEmojiRecent = createSelector([selectAllEmojiSuggestion, getEmojiRecentState], (allEmojiSuggestion, allEmojiRecentId) => {
-	if (allEmojiSuggestion.length === 0 || allEmojiRecentId.ids.length === 0) return [];
+	if (allEmojiSuggestion?.length === 0 || allEmojiRecentId?.ids?.length === 0) return [];
 
-	const emojiRecents = allEmojiRecentId.ids
-		.map((id) => {
+	const emojiRecents = allEmojiRecentId?.ids
+		?.map((id) => {
 			const emoji = allEmojiSuggestion.find((emoji) => emoji.id === id);
 			const recentEmoji = allEmojiRecentId.entities[id];
 
