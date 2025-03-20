@@ -277,48 +277,6 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [height, width, size, parentRef.current]);
 
-		useEffect(() => {
-			const updateSize = () => {
-				let newWidth = size.width;
-				let newHeight = size.height;
-
-				if (newWidth > width) {
-					newWidth = width;
-				}
-
-				if (newHeight > height) {
-					newHeight = height;
-				}
-
-				if (newWidth > width && newHeight > height) {
-					newWidth = width;
-					newHeight = height;
-				}
-
-				const finalWidth = Math.max(newWidth, initialWidth);
-				const finalHeight = Math.max(newHeight, initialHeight);
-
-				setSize({
-					width: finalWidth,
-					height: finalHeight
-				});
-			};
-			updateSize();
-		}, [width, height]);
-
-		const handleMouseDown = useCallback((e: React.MouseEvent) => {
-			e.preventDefault();
-			setIsDragging(true);
-		}, []);
-
-		const handleResizeMouseDown = useCallback((direction: string) => {
-			return (e: React.MouseEvent) => {
-				e.preventDefault();
-				e.stopPropagation();
-				setResizeDir(direction);
-			};
-		}, []);
-
 		const handleMouseMove = useCallback(
 			(e: MouseEvent) => {
 				if (!isDragging && !resizeDir) return;
@@ -385,6 +343,49 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 			[isDragging, resizeDir, bounds, size, position, aspectRatio, parentRef]
 		);
 
+		useEffect(() => {
+			const updateSize = () => {
+				let newWidth = size.width;
+				let newHeight = size.height;
+
+				if (newWidth > width) {
+					newWidth = width;
+				}
+
+				if (newHeight > height) {
+					newHeight = height;
+				}
+
+				if (newWidth > width && newHeight > height) {
+					newWidth = width;
+					newHeight = height;
+				}
+
+				const finalWidth = Math.max(newWidth, initialWidth);
+				const finalHeight = Math.max(newHeight, initialHeight);
+
+				setSize({
+					width: finalWidth,
+					height: finalHeight
+				});
+			};
+			updateSize();
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [width, height]);
+
+		const handleMouseDown = useCallback((e: React.MouseEvent) => {
+			e.preventDefault();
+			setIsDragging(true);
+		}, []);
+
+		const handleResizeMouseDown = useCallback((direction: string) => {
+			return (e: React.MouseEvent) => {
+				e.preventDefault();
+				e.stopPropagation();
+				setResizeDir(direction);
+			};
+		}, []);
+
 		const handleMouseUp = useCallback(() => {
 			setIsDragging(false);
 			setResizeDir(null);
@@ -404,7 +405,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 			<div
 				onMouseDown={() => onFocus()}
 				ref={modalRef}
-				className={`absolute bg-transparent z-50 shadow-lg rounded-lg ${zIndex} ${isContentStrict}`}
+				className={`absolute bg-transparent shadow-lg rounded-lg ${zIndex} ${isContentStrict}`}
 				style={{
 					left: `${position.x}px`,
 					top: `${position.y}px`,
