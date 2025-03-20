@@ -124,6 +124,10 @@
 
 // fix later
 
+::-webkit-scrollbar {
+	width: 8px;
+}
+
 /* Track */
 ::-webkit-scrollbar-track {
 	background: #2b2d31;
