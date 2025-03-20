@@ -1,5 +1,6 @@
 import { ChannelsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 
@@ -15,13 +16,20 @@ const ModalShareEvent = (props: ModalShareEventProps) => {
 
 	const [copied, setCopied] = useState(false);
 
+	const origin = isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin;
+
 	const link =
 		channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE
 			? `https://meet.google.com/${channel.meeting_code}`
-			: `${window.location.origin}/chat/clans/${channel.clan_id}/channels/${channel.channel_id}`;
+			: `${origin}/chat/clans/${channel.clan_id}/channels/${channel.channel_id}`;
 
 	const copyToClipboard = () => {
-		navigator.clipboard.writeText(link);
+		navigator.clipboard
+			.writeText(link)
+			.then()
+			.catch((err) => {
+				console.error('Failed to copy the link: ', err);
+			});
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 	};
@@ -46,10 +54,10 @@ const ModalShareEvent = (props: ModalShareEventProps) => {
 							✕
 						</button>
 					</div>
-					<p className="pb-4 flex gap-x-2">
+					<div className="pb-4 flex gap-x-2">
 						<Icons.Speaker />
 						<p>{channel.channel_label}</p>
-					</p>
+					</div>
 					<p className="pb-4">Share this link with others to grant access to this server</p>
 					<div
 						className={`flex items-center dark:bg-black bg-gray-300 p-1 rounded-lg border ${copied ? 'border-green-500' : 'dark:border-black border-gray-300'}`}
