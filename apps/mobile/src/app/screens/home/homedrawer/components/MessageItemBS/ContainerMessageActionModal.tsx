@@ -83,54 +83,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		message?.code === TypeMessage.CreateThread ||
 		message?.code === TypeMessage.CreatePin ||
 		message?.code === TypeMessage.AuditLog;
-	console.log('currentMessageId', message?.channel_id, currentChannelId);
-
-	const onClose = () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-	};
-
-	const onDeleteMessage = useCallback(
-		async (messageId: string) => {
-			const socket = socketRef.current;
-			const isPublic = currentDmId ? false : isPublicChannel(currentChannel);
-
-			dispatch(
-				messagesActions.remove({
-					channelId: currentDmId ? currentDmId : currentChannelId,
-					messageId
-				})
-			);
-			await socket.removeChatMessage(
-				currentDmId ? '0' : currentClanId || '',
-				currentDmId ? currentDmId : currentChannelId,
-				mode,
-				isPublic,
-				messageId
-			);
-		},
-		[currentChannel, currentChannelId, currentClanId, currentDmId, dispatch, mode, socketRef]
-	);
-
-	const onConfirmAction = useCallback(
-		(payload: IConfirmActionPayload) => {
-			const { type, message } = payload;
-			switch (type) {
-				case EMessageActionType.DeleteMessage:
-					onDeleteMessage(message?.id);
-					break;
-				case EMessageActionType.ForwardMessage:
-				case EMessageActionType.Report:
-				case EMessageActionType.PinMessage:
-				case EMessageActionType.UnPinMessage:
-					setCurrentMessageActionType(type);
-					break;
-				default:
-					break;
-			}
-		},
-		[onDeleteMessage, setCurrentMessageActionType]
-	);
-
 	const onClose = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
