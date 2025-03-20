@@ -4,8 +4,6 @@ import cycleRestrict from '../utils/cycleRestrict';
 import { MAX_WORKERS, requestMediaWorker } from '../utils/launchMediaWorkers';
 import useLastCallback from './useLastCallback';
 
-const RADIUS_RATIO = 0.1; // Use 10% of the smallest dimension as the blur radius
-
 let lastWorkerIndex = -1;
 
 export default function useOffscreenCanvasBlur(
@@ -19,11 +17,10 @@ export default function useOffscreenCanvasBlur(
 	const blurThumb = useLastCallback(async (canvas: HTMLCanvasElement, uri: string) => {
 		requestMutation(() => {
 			offscreenRef.current = canvas.transferControlToOffscreen();
-			const radius = Math.ceil(Math.min(32, 14) * RADIUS_RATIO);
 			requestMediaWorker(
 				{
 					name: 'offscreen-canvas:blurThumb',
-					args: [offscreenRef.current, uri, radius],
+					args: [offscreenRef.current, uri],
 					transferables: [offscreenRef.current]
 				},
 				workerIndex
