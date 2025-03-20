@@ -211,6 +211,7 @@ export interface EventManagementState {
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
 	ongoingEvent: EventManagementOnGogoing | null;
+	showModelDetailEvent?: boolean;
 }
 
 export const initialEventManagementState: EventManagementState = {
@@ -219,7 +220,8 @@ export const initialEventManagementState: EventManagementState = {
 	error: null,
 	chooseEvent: null,
 	ongoingEvent: null,
-	creatingStatus: 'not loaded'
+	creatingStatus: 'not loaded',
+	showModelDetailEvent: false
 };
 
 export const eventManagementSlice = createSlice({
@@ -237,7 +239,9 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-
+		showModelDetailEvent: (state, action) => {
+			state.showModelDetailEvent = action.payload;
+		},
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
 			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[action.payload.clan_id].entities, event_id);
@@ -375,6 +379,8 @@ export const selectEventsByClanId = createSelector(
 export const selectNumberEvent = createSelector(selectEventsByClanId, (events) => events?.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
+
+export const selectShowModelDetailEvent = createSelector(getEventManagementState, (state) => state.showModelDetailEvent);
 
 export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);
 
