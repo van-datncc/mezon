@@ -78,7 +78,7 @@ const ChannelList = () => {
 			return (
 				<View
 					key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
-					style={[item?.threadIds && { backgroundColor: themeValue.secondary, zIndex: 1 }]}
+					style={[{ backgroundColor: themeValue.secondary }, item?.threadIds && { zIndex: 1 }]}
 				>
 					<ChannelListItem data={item} />
 				</View>
@@ -119,6 +119,12 @@ const ChannelList = () => {
 					}
 				}}
 				disableVirtualization
+				contentContainerStyle={{
+					backgroundColor: themeValue.secondary
+				}}
+				style={{
+					backgroundColor: themeValue.secondary
+				}}
 			/>
 			<View style={{ height: 80 }} />
 			<ButtonNewUnread />
