@@ -1,6 +1,5 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { requestMutation } from '../fasterdom';
-import { preloadImage } from '../helper/files';
 import cycleRestrict from '../utils/cycleRestrict';
 import { MAX_WORKERS, requestMediaWorker } from '../utils/launchMediaWorkers';
 import useLastCallback from './useLastCallback';
@@ -18,19 +17,9 @@ export default function useOffscreenCanvasBlur(
 	const offscreenRef = useRef<OffscreenCanvas>();
 
 	const blurThumb = useLastCallback(async (canvas: HTMLCanvasElement, uri: string) => {
-		const image = await preloadImage(uri);
-		if (!image) {
-			return;
-		}
-
 		requestMutation(() => {
-			canvas.width = image.width;
-			canvas.height = image.height;
-
 			offscreenRef.current = canvas.transferControlToOffscreen();
-
-			const radius = Math.ceil(Math.min(image.width, image.height) * RADIUS_RATIO);
-
+			const radius = Math.ceil(Math.min(32, 14) * RADIUS_RATIO);
 			requestMediaWorker(
 				{
 					name: 'offscreen-canvas:blurThumb',
