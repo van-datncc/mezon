@@ -409,10 +409,12 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 				style={{
 					left: `${position.x}px`,
 					top: `${position.y}px`,
-					width: `${size.width}px`,
-					height: `${size.height}px`,
+					width: !isCollapsed ? `${size.width}px` : '',
+					height: isCollapsed ? '0px' : `${size.height}px`,
 					display: 'flex',
-					flexDirection: 'column'
+					flexDirection: 'column',
+					minWidth: !isCollapsed ? '300px' : '',
+					minHeight: !isCollapsed ? '440px' : ''
 				}}
 			>
 				{!isCollapsed && <Overlay isFocused={isFocused} onFocus={onFocus} headerHeight={headerHeight} />}
