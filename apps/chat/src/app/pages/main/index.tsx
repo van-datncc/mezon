@@ -15,6 +15,7 @@ import {
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
+	ChannelsEntity,
 	DMCallActions,
 	accountActions,
 	audioCallActions,
@@ -22,6 +23,7 @@ import {
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
+	getStore,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMemberIds,
@@ -32,7 +34,9 @@ import {
 	selectAudioDialTone,
 	selectAudioEndTone,
 	selectAudioRingTone,
+	selectChannelById,
 	selectChatStreamWidth,
+	selectCheckAppFocused,
 	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
@@ -61,7 +65,7 @@ import {
 
 import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
-import { IClan, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
+import { IClan, PLATFORM_ENV, Platform, TIME_OF_SHOWING_FIRST_POPUP, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -209,8 +213,7 @@ function MyApp() {
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
-			const platform = getPlatform();
-			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
+			const prefixKey = PLATFORM_ENV === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				dispatch(fetchDirectMessage({}));
@@ -508,12 +511,22 @@ interface MemoizedDraggableModalsProps {
 const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
-	const [focusedModalId, setFocusedModalId] = useState<string | null>(null);
-
+	const store = getStore();
 	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
+					clanId,
+					channelId
+				})
+			);
+		},
+		[dispatch]
+	);
+	const handleFocused = useCallback(
+		(clanId: string, channelId: string) => {
+			dispatch(
+				channelsActions.setAppChannelFocus({
 					clanId,
 					channelId
 				})
@@ -527,18 +540,22 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const isFocused = focusedModalId === app.app_id;
-
+					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string) as boolean;
+					const zIndex = isFocused ? 'z-50' : 'z-40';
+					const channel = selectChannelById(store.getState(), app?.channel_id as string) as ChannelsEntity;
 					return (
 						<DraggableModal
-							key={app.app_id}
-							headerTitle={app.url}
+							key={app?.app_id}
+							zIndex={zIndex}
+							headerTitle={channel?.channel_label}
 							parentRef={parentRef}
 							isFocused={isFocused}
-							onClose={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
-							onFocus={() => setFocusedModalId(app.app_id as string)}
+							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
+							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
+							clanId={app?.clan_id}
+							channelId={app?.channel_id}
 						>
-							<ChannelApps appChannel={app} onFocus={() => setFocusedModalId(app.app_id as string)} />
+							<ChannelApps appChannel={app} />
 						</DraggableModal>
 					);
 				})}

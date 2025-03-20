@@ -19,9 +19,8 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
+import { transformPayloadWriteSocket } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 export type UseMessageReactionOption = {
@@ -156,16 +155,6 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			isFocusTopicBox?: boolean,
 			channelIdOnMessage?: string
 		) => {
-			if (isMobile) {
-				const emojiLastest: EmojiStorage = {
-					emojiId: emoji_id ?? '',
-					emoji: emoji ?? '',
-					messageId: messageId ?? '',
-					senderId: message_sender_id ?? '',
-					action: action_delete ?? false
-				};
-				saveRecentEmojiMobile(emojiLastest);
-			}
 			isClanView && addMemberToThread(userId || '');
 			const payload = transformPayloadWriteSocket({
 				clanId: currentActive.clanIdActive,
@@ -201,25 +190,4 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 		}),
 		[reactionMessageDispatch]
 	);
-}
-
-function saveRecentEmojiMobile(emojiLastest: EmojiStorage) {
-	AsyncStorage.getItem('recentEmojis').then((storedEmojis) => {
-		const emojisRecentParse = storedEmojis ? safeJSONParse(storedEmojis) : [];
-
-		const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
-			return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
-		});
-
-		if (emojiLastest.action === true) {
-			if (duplicateIndex !== -1) {
-				emojisRecentParse.splice(duplicateIndex, 1);
-			}
-		} else {
-			if (duplicateIndex === -1) {
-				emojisRecentParse.push(emojiLastest);
-			}
-		}
-		AsyncStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
-	});
 }

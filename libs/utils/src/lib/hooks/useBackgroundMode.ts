@@ -1,5 +1,6 @@
-import { AnyToVoidFunction, createCallbackManager } from '@mezon/utils';
 import { useEffect } from 'react';
+import { AnyToVoidFunction } from '../types';
+import { createCallbackManager } from '../utils';
 import useLastCallback from './useLastCallback';
 
 const blurCallbacks = createCallbackManager();

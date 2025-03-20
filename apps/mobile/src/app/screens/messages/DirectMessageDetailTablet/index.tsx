@@ -41,7 +41,7 @@ function useChannelSeen(channelId: string, currentDmGroup: any) {
 					currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 				const lastMessage = selectLastMessageByChannelId(store.getState(), channelId);
 				if (lastMessage && refCountWasCalled.current <= 1) {
-					markAsReadSeen(lastMessage, mode);
+					markAsReadSeen(lastMessage, mode, 0);
 					const timestamp = Date.now() / 1000;
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 					dispatch(directMetaActions.updateLastSeenTime(lastMessage));

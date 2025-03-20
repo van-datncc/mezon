@@ -1,8 +1,5 @@
 import { useRef } from 'react';
 
-/**
- * @deprecated
- */
 function usePreviousDeprecated<T>(next: T): T | undefined;
 function usePreviousDeprecated<T>(next: T, shouldSkipUndefined: true): Exclude<T, undefined> | undefined;
 function usePreviousDeprecated<T>(next: T, shouldSkipUndefined?: boolean): Exclude<T, undefined> | undefined;
