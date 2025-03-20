@@ -1,4 +1,4 @@
-import { Icons, STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
+import { STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	selectCurrentStreamInfo,
@@ -12,8 +12,10 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo } from 'react';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
+import { IconCDN } from '../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { style } from './StreamingRoom.styles';
@@ -79,7 +81,7 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 								}}
 								style={styles.buttonCircle}
 							>
-								<Icons.ChevronSmallDownIcon />
+								<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
 							</TouchableOpacity>
 						</View>
 						{/*<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20 }}>*/}
@@ -113,11 +115,11 @@ function StreamingRoom({ onPressMinimizeRoom, isAnimationComplete }: { onPressMi
 								}}
 							>
 								<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-									<Icons.ChatIcon />
+									<MezonIconCDN icon={IconCDN.chatIcon} />
 								</TouchableOpacity>
 
 								<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
-									<Icons.PhoneCallIcon />
+									<MezonIconCDN icon={IconCDN.phoneCallIcon} />
 								</TouchableOpacity>
 							</View>
 						</View>
