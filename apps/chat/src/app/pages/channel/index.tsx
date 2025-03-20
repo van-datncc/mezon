@@ -23,7 +23,6 @@ import {
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	onboardingActions,
-	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
@@ -80,7 +79,6 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
-	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const previousChannels = useSelector(selectPreviousChannels);
 	useEffect(() => {
@@ -99,7 +97,7 @@ function useChannelSeen(channelId: string) {
 		markAsReadSeen(lastMessage, mode, numberNotification);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
-		if (previousChannels.at(1)) {
+		if (previousChannels.at(1) && lastMessage) {
 			const timestamp = Date.now() / 1000;
 
 			dispatch(
