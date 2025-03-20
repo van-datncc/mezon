@@ -98,12 +98,6 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 
 	const profileMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => reserve(),
-			title: t('menu.profile'),
-			isShow: !isGroup,
-			icon: <Icons.UserBoxIcon color={baseColor.gray} />
-		},
-		{
 			onPress: async () => {
 				await dispatch(directActions.closeDirectMessage({ channel_id: messageInfo?.channel_id }));
 				dismiss();
@@ -211,9 +205,6 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		},
 		{
 			items: markAsReadMenu
-		},
-		{
-			items: favoriteMenu
 		},
 		{
 			items: optionsMenu

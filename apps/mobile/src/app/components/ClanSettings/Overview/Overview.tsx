@@ -1,12 +1,20 @@
 import { useClans, usePermissionChecker } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
+import {
+	checkDuplicateNameClan,
+	fetchSystemMessageByClanId,
+	getStoreAsync,
+	selectChannelById2,
+	selectClanSystemMessage,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import MezonImagePicker from '../../../componentUI/MezonImagePicker';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../componentUI/MezonMenu';
@@ -15,6 +23,7 @@ import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes
 import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
 import { ErrorInput } from '../../ErrorInput';
+import ChannelsMessageSystem from './MessageSystemChannel';
 import { style } from './styles';
 
 export const { width } = Dimensions.get('window');
@@ -24,7 +33,6 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
-	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
@@ -35,6 +43,10 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	]);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const systemMessage = useSelector(selectClanSystemMessage);
+	const channelMessage = useSelector((state) => selectChannelById2(state, systemMessage?.channel_id || ''));
+
+	const dispatch = useAppDispatch();
 
 	const handleCheckDuplicateClanname = async () => {
 		const store = await getStoreAsync();
@@ -53,6 +65,15 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 			setIsCheckValid(validInput(clanName));
 		}
 	}, [clanName, banner]);
+
+	const fetchSystemMessage = async () => {
+		if (!currentClan?.clan_id) return;
+		await dispatch(fetchSystemMessageByClanId(currentClan?.clan_id));
+	};
+
+	useEffect(() => {
+		fetchSystemMessage();
+	}, []);
 
 	const disabled = useMemo(() => {
 		return !(hasAdminPermission || hasManageClanPermission || clanOwnerPermission);
@@ -112,6 +133,22 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		setBanner('');
 	};
 
+	const openBottomSheet = () => {
+		const data = {
+			heightFitContent: true,
+			children: <DeleteClanModal />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	};
+
+	const openBottomSheetSystemChannel = () => {
+		const data = {
+			heightFitContent: true,
+			children: <ChannelsMessageSystem />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	};
+
 	const inactiveMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.inactive.inactiveChannel'),
@@ -133,8 +170,8 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		{
 			title: t('menu.systemMessage.channel'),
 			expandable: true,
-			component: <Text style={{ color: 'white', fontSize: 11 }}>general</Text>,
-			onPress: () => reserve(),
+			component: <Text style={{ color: 'white', fontSize: 11 }}>{channelMessage?.channel_label || 'general'}</Text>,
+			onPress: openBottomSheetSystemChannel,
 			disabled: disabled
 		}
 		// {
@@ -167,18 +204,16 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		{
 			title: t('menu.deleteServer.delete'),
 			textStyle: { color: 'red' },
-			onPress: () => {
-				setIsVisibleDeleteModal(true);
-			}
+			onPress: openBottomSheet
 		}
 	];
 
 	const generalMenu: IMezonMenuSectionProps[] = [
-		{
-			items: inactiveMenu,
-			title: t('menu.inactive.title'),
-			bottomDescription: t('menu.inactive.description')
-		},
+		// {
+		// 	items: inactiveMenu,
+		// 	title: t('menu.inactive.title'),
+		// 	bottomDescription: t('menu.inactive.description')
+		// },
 		{
 			items: systemMessageMenu,
 			title: t('menu.systemMessage.title'),
@@ -247,14 +282,6 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				/>
 				{!disabled && <MezonMenu menu={dangerMenu} />}
 			</ScrollView>
-			{!disabled && (
-				<DeleteClanModal
-					isVisibleModal={isVisibleDeleteModal}
-					visibleChange={(isVisible) => {
-						setIsVisibleDeleteModal(isVisible);
-					}}
-				></DeleteClanModal>
-			)}
 		</View>
 	);
 }
