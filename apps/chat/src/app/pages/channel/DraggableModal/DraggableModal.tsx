@@ -1,4 +1,4 @@
-import { useAppNavigation } from '@mezon/core';
+import { useAppNavigation, useWindowSize } from '@mezon/core';
 import { channelAppActions, selectEnableCall, selectEnableMic, selectGetRoomId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -31,10 +31,6 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 		<div
 			className={`rounded-t-lg px-3 py-1 flex items-center justify-between relative  w-full ${bgColor} ${roundedBottom}`}
 			onMouseDown={handleMouseDown}
-			style={{
-				transition: 'max-width 0.3s ease',
-				maxWidth: isCollapsed ? '240px' : '430px'
-			}}
 		>
 			<span className="text-sm text-white  truncate" style={{ maxWidth: '150px' }}>
 				{title}
@@ -206,30 +202,109 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(
 				return !prev;
 			});
 		}, [initialHeight, initialWidth]);
+		const { height, width } = useWindowSize();
 
 		useEffect(() => {
 			const parent = parentRef?.current;
 			if (!parent) return;
-
 			const updateBounds = () => {
-				const parentRect = parent.getBoundingClientRect();
 				setBounds({
 					minX: 0,
-					maxX: parentRect.width - size.width,
+					maxX: width - size.width,
 					minY: 0,
-					maxY: parentRect.height - size.height - 20
+					maxY: height - size.height
 				});
 			};
 
+			const updatePositon = () => {
+				const isOverHorizontal = position.y + size.height > height;
+				const isOverVertical = position.x + size.width > width;
+
+				const isUnderHorizontal = position.y < 0;
+				const isUnderVertical = position.x < 0;
+
+				if (isOverHorizontal) {
+					setPosition({
+						x: position.x,
+						y: height - size.height
+					});
+				} else if (isUnderHorizontal) {
+					setPosition({
+						x: position.x,
+						y: 0
+					});
+				}
+
+				if (isOverVertical) {
+					setPosition({
+						x: width - size.width,
+						y: position.y
+					});
+				} else if (isUnderVertical) {
+					setPosition({
+						x: 0,
+						y: position.y
+					});
+				}
+
+				if (isOverHorizontal && isOverVertical) {
+					setPosition({
+						x: width - size.width,
+						y: height - size.height
+					});
+				} else if (isUnderHorizontal && isUnderVertical) {
+					setPosition({
+						x: 0,
+						y: 0
+					});
+				}
+			};
+
 			updateBounds();
+			updatePositon();
+			const handleResize = () => {
+				updateBounds();
+				updatePositon();
+			};
 
-			const resizeObserver = new ResizeObserver(updateBounds);
+			window.addEventListener('resize', handleResize);
+			const resizeObserver = new ResizeObserver(handleResize);
 			resizeObserver.observe(parent);
-
 			return () => {
 				resizeObserver.disconnect();
+				window.removeEventListener('resize', handleResize);
 			};
-		}, [parentRef, size]);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [height, width, size, parentRef.current]);
+
+		useEffect(() => {
+			const updateSize = () => {
+				let newWidth = size.width;
+				let newHeight = size.height;
+
+				if (newWidth > width) {
+					newWidth = width;
+				}
+
+				if (newHeight > height) {
+					newHeight = height;
+				}
+
+				if (newWidth > width && newHeight > height) {
+					newWidth = width;
+					newHeight = height;
+				}
+
+				const finalWidth = Math.max(newWidth, initialWidth);
+				const finalHeight = Math.max(newHeight, initialHeight);
+
+				setSize({
+					width: finalWidth,
+					height: finalHeight
+				});
+			};
+			updateSize();
+		}, [width, height]);
 
 		const handleMouseDown = useCallback((e: React.MouseEvent) => {
 			e.preventDefault();
