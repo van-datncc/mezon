@@ -1085,7 +1085,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						return `${display}`;
 					}}
 					className="dark:!text-white !text-black"
-					style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: 'white' }}
+					style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: appearanceTheme === 'dark' ? 'white' : 'black' }}
 				/>
 			</MentionsInput>
 			{isShowEmojiPicker && (
