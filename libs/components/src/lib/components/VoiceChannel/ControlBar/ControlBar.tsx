@@ -23,7 +23,7 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
-	const screenTrackRef = useRef<LocalTrackPublication | null>(null); // Lưu track để hủy sau này
+	const screenTrackRef = useRef<LocalTrackPublication | null>(null);
 	const isDesktop = isElectron();
 	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
 	variation ??= defaultVariation;
