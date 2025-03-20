@@ -25,28 +25,28 @@
   self.moduleName = @"Mobile";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
-    RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
-    [RNCallKeep setup:@{
-        @"appName": @"VideoSDK Call Trigger",
-        @"maximumCallGroups": @3,
-        @"maximumCallsPerCallGroup": @1,
-        @"supportsVideo": @YES,
-      }];
-    RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
-                                                     moduleName:@"ReactNativeCallTrigger"
-                                              initialProperties:nil];
-    if (@available(iOS 13.0, *)) {
-        rootView.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-        rootView.backgroundColor = [UIColor whiteColor];
-    }
-
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    UIViewController *rootViewController = [UIViewController new];
-    rootViewController.view = rootView;
-    self.window.rootViewController = rootViewController;
-    [self.window makeKeyAndVisible];
-
+//     RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+//     [RNCallKeep setup:@{
+//         @"appName": @"VideoSDK Call Trigger",
+//         @"maximumCallGroups": @3,
+//         @"maximumCallsPerCallGroup": @1,
+//         @"supportsVideo": @YES,
+//       }];
+//     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+//                                                      moduleName:@"ReactNativeCallTrigger"
+//                                               initialProperties:nil];
+//     if (@available(iOS 13.0, *)) {
+//         rootView.backgroundColor = [UIColor systemBackgroundColor];
+//     } else {
+//         rootView.backgroundColor = [UIColor whiteColor];
+//     }
+//
+//     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+//     UIViewController *rootViewController = [UIViewController new];
+//     rootViewController.view = rootView;
+//     self.window.rootViewController = rootViewController;
+//     [self.window makeKeyAndVisible];
+//
     self.initialProps = [RNFBMessagingModule addCustomPropsToUserProps:nil withLaunchOptions:launchOptions];
   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 

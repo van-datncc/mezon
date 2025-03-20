@@ -1,7 +1,7 @@
-import useLastCallback from 'libs/core/src/lib/chat/hooks/useLastCallback';
 import { useEffect } from 'react';
 import { AnyToVoidFunction } from '../types';
 import { createCallbackManager } from '../utils';
+import useLastCallback from './useLastCallback';
 
 const blurCallbacks = createCallbackManager();
 const focusCallbacks = createCallbackManager();

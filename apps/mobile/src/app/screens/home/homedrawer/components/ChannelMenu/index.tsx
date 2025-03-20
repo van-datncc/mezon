@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
 import MezonConfirm from '../../../../../componentUI/MezonConfirm';
-import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../../../../componentUI/MezonMenu';
 import NotificationSetting from '../../../../../components/NotificationSetting';
 import InviteToChannel from '../InviteToChannel';
 import { style } from './styles';
@@ -209,12 +209,12 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 			isShow: isCanManageChannel
 		},
-		{
-			title: t('menu.organizationMenu.duplicateChannel'),
-			onPress: () => reserve(),
-			icon: <Icons.CopyIcon color={themeValue.textStrong} />,
-			isShow: isCanManageChannel
-		},
+		// {
+		// 	title: t('menu.organizationMenu.duplicateChannel'),
+		// 	onPress: () => reserve(),
+		// 	icon: <Icons.CopyIcon color={themeValue.textStrong} />,
+		// 	isShow: isCanManageChannel
+		// },
 		{
 			title: t('menu.organizationMenu.deleteChannel'),
 			icon: <Icons.CloseSmallBoldIcon color={Colors.textRed} />,

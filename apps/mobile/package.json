@@ -14,7 +14,7 @@
 		"@miblanchard/react-native-slider": "2.6.0",
 		"@notifee/react-native": "7.8.2",
 		"@react-native-async-storage/async-storage": "2.1.1",
-		"@react-native-camera-roll/camera-roll": "7.8.1",
+		"@react-native-camera-roll/camera-roll": "7.10.0",
 		"@react-native-clipboard/clipboard": "1.15.0",
 		"@react-native-community/geolocation": "3.4.0",
 		"@react-native-community/netinfo": "11.3.2",
@@ -47,11 +47,11 @@
 		"react-native-create-thumbnail": "^2.0.1",
 		"react-native-date-picker": "5.0.4",
 		"react-native-device-info": "11.1.0",
-		"react-native-document-picker": "9.2.0",
+		"react-native-document-picker": "9.3.1",
 		"react-native-dotenv": "3.4.11",
 		"react-native-fast-image": "8.6.3",
 		"react-native-fs": "2.20.0",
-		"react-native-gesture-handler": "2.23.1",
+		"react-native-gesture-handler": "2.24.0",
 		"react-native-gzip": "1.1.0",
 		"react-native-image-colors": "1.5.1",
 		"react-native-image-crop-picker": "0.41.2",
@@ -65,10 +65,10 @@
 		"react-native-modal": "13.0.1",
 		"react-native-permissions": "5.2.5",
 		"react-native-raw-bottom-sheet": "3.0.0",
-		"react-native-reanimated": "3.15.0",
+		"react-native-reanimated": "3.17.1",
 		"react-native-receive-sharing-intent": "2.0.0",
 		"react-native-safe-area-context": "5.2.0",
-		"react-native-screens": "4.7.0",
+		"react-native-screens": "4.9.1",
 		"react-native-shimmer-placeholder": "2.0.9",
 		"react-native-sound": "0.11.2",
 		"react-native-store-version": "1.4.1",
@@ -95,5 +95,6 @@
 	},
 	"devDependencies": {
 		"reactotron-react-native": "5.1.10"
-	}
+	},
+	"packageManager": "yarn@3.6.4"
 }
