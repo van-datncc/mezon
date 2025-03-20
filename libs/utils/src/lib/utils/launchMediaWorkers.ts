@@ -60,7 +60,7 @@ const workerCode = `
   }
 
   // API implementation
-   async function blurThumb(canvas, thumbData, radius) {
+   async function blurThumb(canvas, thumbData) {
       const { width, height } = canvas;
   const ctx = canvas.getContext('2d');
 
