@@ -128,6 +128,22 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
+function addSymbolsAndIdsLengthOfMention(value: number, mentionType: number) {
+	let newValue = value;
+	if (mentionType === ETypeMEntion.HASHTAG || mentionType === ETypeMEntion.MENTION) {
+		newValue += 23;
+	} else if (mentionType === ETypeMEntion.EMOJI) {
+		newValue += 25;
+	} else {
+		newValue += 4;
+	}
+	return newValue;
+}
+
+function sortMentionsByIndex(mentions: MentionItem[]) {
+	return [...mentions].sort((a, b) => a.index - b.index);
+}
+
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const appStore = useStore();
@@ -273,64 +289,77 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 		if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
 			if (!editorRef.current) return;
-			const start = editorRef.current.selectionStart ?? 0;
-			const end = editorRef.current.selectionEnd ?? 0;
-			if (start === end) return;
-			const boldedText = request.content.substring(start, end);
+			let plainTextStart = editorRef.current.selectionStart ?? 0;
+			let plainTextEnd = editorRef.current.selectionEnd ?? 0;
+			if (plainTextStart === plainTextEnd) return;
 
-			let tempStart = start;
-			let tempEnd = end;
-
+			let valueStart = plainTextStart;
+			let valueEnd = plainTextEnd;
+			const sortedMentionsArr = sortMentionsByIndex(request.mentionRaw);
 			const newMentionArr: MentionItem[] = [];
 
-			request.mentionRaw.map((item, index) => {
-				if (item.plainTextIndex < start) {
+			let selectedTextIsInsideMention = false;
+
+			for (let index = 0; index < sortedMentionsArr.length; index++) {
+				const item = sortedMentionsArr[index];
+				const plainMentionStartPosition = item.plainTextIndex;
+				const plainMentionEndPosition = item.plainTextIndex + item.display.length;
+				const mentionWithValueStartPosition = item.index;
+				const mentionWithValueEndPosition = item.index + addSymbolsAndIdsLengthOfMention(item.display.length, item.childIndex);
+
+				if (plainTextStart > plainMentionStartPosition && plainTextEnd > plainMentionEndPosition) {
 					newMentionArr.push(item);
-					switch (item.childIndex) {
-						case ETypeMEntion.HASHTAG:
-						case ETypeMEntion.MENTION:
-							tempStart += 23;
-							tempEnd += 23;
-							break;
-						case ETypeMEntion.EMOJI:
-							tempStart += 25;
-							tempEnd += 25;
-							break;
-						case ETypeMEntion.BOLD:
-							tempStart += 4;
-							tempEnd += 4;
-							break;
-						default:
-							break;
+					valueStart = addSymbolsAndIdsLengthOfMention(valueStart, item.childIndex);
+					valueEnd = addSymbolsAndIdsLengthOfMention(valueEnd, item.childIndex);
+					if (plainTextStart < plainMentionEndPosition) {
+						valueStart = mentionWithValueEndPosition;
+						plainTextStart = plainMentionEndPosition;
 					}
+				} else if (plainTextStart >= plainMentionStartPosition && plainTextEnd <= plainMentionEndPosition) {
+					selectedTextIsInsideMention = true;
+					break;
+				} else if (plainTextStart <= plainMentionStartPosition && plainTextEnd >= plainMentionEndPosition) {
+					selectedTextIsInsideMention = true;
+					break;
 				} else {
 					const mentionWithNewIndex: MentionItem = {
 						...item,
 						index: item.index + 4
 					};
 					newMentionArr.push(mentionWithNewIndex);
+					if (
+						plainTextStart < plainMentionStartPosition &&
+						plainTextEnd <= plainMentionEndPosition &&
+						plainTextEnd > plainMentionStartPosition
+					) {
+						valueEnd = mentionWithValueStartPosition;
+						plainTextEnd = plainMentionStartPosition;
+					}
 				}
-			});
+			}
+			const boldedText = request.content.substring(plainTextStart, plainTextEnd);
+
+			if (boldedText.trim() === '' || selectedTextIsInsideMention) return;
 
 			const mentionItem: MentionItem = {
 				display: boldedText,
 				id: '',
 				childIndex: ETypeMEntion.BOLD,
-				index: tempStart,
-				plainTextIndex: start
+				index: valueStart,
+				plainTextIndex: plainTextStart
 			};
 
 			if (request.mentionRaw.length > 0) {
 				setRequestInput({
 					...request,
 					mentionRaw: [...newMentionArr, mentionItem],
-					valueTextInput: request.valueTextInput.slice(0, tempStart) + `**${boldedText}**` + request.valueTextInput.slice(tempEnd)
+					valueTextInput: request.valueTextInput.slice(0, valueStart) + `**${boldedText}**` + request.valueTextInput.slice(valueEnd)
 				});
 			} else {
 				setRequestInput({
 					...request,
 					mentionRaw: [mentionItem],
-					valueTextInput: request.valueTextInput.slice(0, tempStart) + `**${boldedText}**` + request.valueTextInput.slice(tempEnd)
+					valueTextInput: request.valueTextInput.slice(0, valueStart) + `**${boldedText}**` + request.valueTextInput.slice(valueEnd)
 				});
 			}
 		}
@@ -380,7 +409,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			};
 			const checkedRequest = request ? request : emptyRequest;
 			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
-			let mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
+			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
 			const boldMarkdownArr: IMarkdownOnMessage[] = [];
 
@@ -394,14 +423,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				}
 			});
 
-			mk = [...mk, ...boldMarkdownArr];
-
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload = {
 				t: text,
 				hg: adjustedHashtagPos as IHashtagOnMessage[],
 				ej: adjustedEmojiPos as IEmojiOnMessage[],
-				mk
+				mk: [...mk, ...boldMarkdownArr]
 			};
 
 			const addMentionToPayload = addMention(payload, adjustedMentionsPos);
@@ -1058,7 +1085,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						return `${display}`;
 					}}
 					className="dark:!text-white !text-black"
-					style={{ WebkitTextStroke: 0.75, WebkitTextStrokeColor: 'white' }}
+					style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: 'white' }}
 				/>
 			</MentionsInput>
 			{isShowEmojiPicker && (
