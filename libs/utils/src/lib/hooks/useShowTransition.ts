@@ -64,7 +64,6 @@ export default function useShowTransition<RefType extends HTMLElement = HTMLDivE
 		onCloseAnimationEnd
 	} = params;
 
-	// eslint-disable-next-line no-null/no-null
 	const localRef = useRef<RefType>(null);
 	const ref = params.ref || localRef;
 	const closingTimeoutRef = useRef<number>();

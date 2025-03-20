@@ -41,6 +41,7 @@ export function getFromMemory(url: string) {
 	return memoryCache.get(url) as ApiPreparedMedia;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function cancelProgress(progressCallback: ApiOnProgress) {}
 
 export function removeCallback(url: string, callbackUniqueId: string) {
