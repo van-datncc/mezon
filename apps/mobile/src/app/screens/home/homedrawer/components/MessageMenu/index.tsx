@@ -213,9 +213,6 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			items: markAsReadMenu
 		},
 		{
-			items: favoriteMenu
-		},
-		{
 			items: optionsMenu
 		}
 	];
