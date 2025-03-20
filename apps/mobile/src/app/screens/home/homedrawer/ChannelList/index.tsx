@@ -126,7 +126,7 @@ const ChannelList = () => {
 					backgroundColor: themeValue.secondary
 				}}
 			/>
-			<View style={{ height: 80 }} />
+			{!isTabletLandscape && <View style={{ height: 80 }} />}
 			<ButtonNewUnread />
 		</View>
 	);
