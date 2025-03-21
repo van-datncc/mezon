@@ -41,12 +41,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 					}}
 				>
 					<td>
-						<p
-							className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5"
-							// onClick={() => {
-							// 	setShowModal(false);
-							// }}
-						>
+						<p className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5">
 							{role.role_icon ? (
 								<img src={role.role_icon} alt="" className={'size-5'} />
 							) : (
