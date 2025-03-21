@@ -51,7 +51,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const userCustomStatus = useMemo(() => {
 		const metadata = myProfile.userProfile?.user?.metadata;
 		try {
-			return JSON.parse(metadata || '{}')?.status || '';
+			return safeJSONParse(metadata || '{}')?.status || '';
 		} catch (e) {
 			const unescapedJSON = metadata?.replace(/\\./g, (match) => {
 				switch (match) {
