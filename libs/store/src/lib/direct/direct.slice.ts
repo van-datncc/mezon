@@ -557,29 +557,22 @@ export const directSlice = createSlice({
 		},
 		updateMenberDMGroup: (state, action: PayloadAction<{ dmId: string; user_id: string; avatar: string; display_name: string }>) => {
 			const { dmId, user_id, avatar, display_name } = action.payload;
-
-			const dmGroup = state.entities?.[dmId as string];
+			const dmGroup = state.entities?.[dmId];
 
 			if (!dmGroup || !user_id) return;
 
-			dmGroup.user_id = dmGroup.user_id ?? [];
+			const index = (dmGroup.user_id ??= []).indexOf(user_id);
+			if (index === -1) return;
 
-			const index = dmGroup.user_id?.indexOf(user_id);
+			if (avatar && dmGroup.channel_avatar) dmGroup.channel_avatar[index] = avatar;
 
-			if (index !== undefined && index !== -1) {
-				if (avatar && dmGroup.channel_avatar) {
-					dmGroup.channel_avatar[index] = avatar;
+			if (display_name && dmGroup.display_names) {
+				if (dmGroup.channel_label) {
+					const labels = dmGroup.channel_label.split(',');
+					if (labels[index] === dmGroup.display_names[index]) labels[index] = display_name;
+					dmGroup.channel_label = labels.join(',');
 				}
-				if (display_name && dmGroup.display_names) {
-					if (dmGroup.channel_label) {
-						const labels = dmGroup.channel_label.split(',');
-						if (labels[index] !== undefined && labels[index] === dmGroup.display_names[index]) {
-							labels[index] = display_name;
-						}
-						dmGroup.channel_label = labels.join(',');
-					}
-					dmGroup.display_names[index] = display_name;
-				}
+				dmGroup.display_names[index] = display_name;
 			}
 		},
 		setDmActiveStatus: (state, action: PayloadAction<{ dmId: string; isActive: boolean }>) => {
