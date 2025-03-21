@@ -1,5 +1,5 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
-import { ActionEmitEvent, CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
+import { ActionEmitEvent, CheckIcon, isEqual } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectRoleByRoleId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
@@ -9,8 +9,10 @@ import { Alert, DeviceEventEmitter, FlatList, Keyboard, TouchableOpacity, Toucha
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import { SeparatorWithLine } from '../../../components/Common';
+import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import RoleCoLourComponent from '../RoleCoLourComponent/RoleCoLourComponent';
 
@@ -86,7 +88,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			return (
 				<TouchableOpacity onPress={handleBack}>
 					<View style={{ marginLeft: size.s_16 }}>
-						<Icons.ArrowLargeLeftIcon color={themeValue.white} height={size.s_22} width={size.s_22} />
+						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
 					</View>
 				</TouchableOpacity>
 			);
@@ -121,7 +123,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+					leadingIcon: <MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} width={20} height={20} />
 				}
 			});
 		}
@@ -151,7 +153,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 							type: 'success',
 							props: {
 								text2: t('failed'),
-								leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+								leadingIcon: <MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} width={20} height={20} />
 							}
 						});
 					}
@@ -241,11 +243,16 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 											<View style={{ flex: 1, flexDirection: 'row', gap: size.s_6 }}>
 												<Text color={themeValue.white}>{item.actionTitle}</Text>
 												{item?.isView && (
-													<Icons.LockIcon color={themeValue.textDisabled} height={size.s_16} width={size.s_16} />
+													<MezonIconCDN
+														icon={IconCDN.lockIcon}
+														color={themeValue.textDisabled}
+														height={size.s_16}
+														width={size.s_16}
+													/>
 												)}
 											</View>
 											<View>
-												<Icons.ChevronSmallRightIcon color={themeValue.text} />
+												<MezonIconCDN icon={IconCDN.chevronSmallRightIcon} color={themeValue.text} />
 											</View>
 										</View>
 									</TouchableOpacity>

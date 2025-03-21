@@ -9,6 +9,8 @@ import { DeviceEventEmitter, Dimensions, Pressable, Text, View } from 'react-nat
 import FastImage from 'react-native-fast-image';
 import { FlatList } from 'react-native-gesture-handler';
 import UserProfile from '../../UserProfile';
+import MezonIconCDN from '../../../../../../../../src/app/componentUI/MezonIconCDN';
+import { IconCDN } from '../../../../../../../../src/app/constants/icon_cdn';
 import { style } from '../styles';
 import { ReactionMember } from './ReactionMember';
 
@@ -122,12 +124,12 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 						<View>
 							{showConfirmDeleteEmoji ? (
 								<Pressable style={styles.confirmDeleteEmoji} onPress={() => onRemoveEmoji()}>
-									<TrashIcon width={size.s_20} height={size.s_20} />
+									<MezonIconCDN icon={IconCDN.trashIcon} width={size.s_20} height={size.s_20} />
 									<Text style={styles.confirmText}>{t('reactions.removeActions')}</Text>
 								</Pressable>
 							) : (
 								<Pressable onPress={() => setShowConfirmDeleteEmoji(true)}>
-									<TrashIcon width={size.s_20} height={size.s_20} />
+									<MezonIconCDN icon={IconCDN.trashIcon} width={size.s_20} height={size.s_20} />
 								</Pressable>
 							)}
 						</View>

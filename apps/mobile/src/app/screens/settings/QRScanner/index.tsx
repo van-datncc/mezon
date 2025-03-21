@@ -1,5 +1,4 @@
 import { useAuth } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
 import { baseColor, Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
@@ -15,6 +14,8 @@ import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-cam
 import RNQRGenerator from 'rn-qr-generator';
 import LogoMezonDark from '../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../assets/svg/logoMezonLight.svg';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 
@@ -167,7 +168,7 @@ export const QRScanner = () => {
 								navigation.goBack();
 							}}
 						>
-							<Icons.CloseSmallBoldIcon width={size.s_28} height={size.s_28} color={baseColor.white} />
+							<MezonIconCDN icon={IconCDN.closeSmallBold} width={size.s_28} height={size.s_28} color={baseColor.white} />
 						</TouchableOpacity>
 					</View>
 					<TouchableOpacity
@@ -206,7 +207,7 @@ export const QRScanner = () => {
 								navigation.goBack();
 							}}
 						>
-							<Icons.CloseSmallBoldIcon width={size.s_28} height={size.s_28} color={baseColor.white} />
+							<MezonIconCDN icon={IconCDN.closeSmallBold} width={size.s_28} height={size.s_28} color={baseColor.white} />
 						</TouchableOpacity>
 						<TouchableOpacity onPress={onMyQRCode}>
 							<View
@@ -221,7 +222,7 @@ export const QRScanner = () => {
 									justifyContent: 'center'
 								}}
 							>
-								<Icons.UserIcon width={size.s_24} height={size.s_24} color={baseColor.white} />
+								<MezonIconCDN icon={IconCDN.userIcon} width={size.s_24} height={size.s_24} color={baseColor.white} />
 								<Text style={styles.textMyQRCode}>{t('myQRCode')}</Text>
 							</View>
 						</TouchableOpacity>
@@ -236,7 +237,7 @@ export const QRScanner = () => {
 					</View>
 					<View style={styles.mainOverlay}></View>
 					<TouchableOpacity style={styles.iconLibrary} onPress={openLibrary}>
-						<Icons.ImageIcon width={size.s_34} height={size.s_34} />
+						<MezonIconCDN icon={IconCDN.imageIcon} width={size.s_34} height={size.s_34} />
 					</TouchableOpacity>
 				</View>
 			) : (

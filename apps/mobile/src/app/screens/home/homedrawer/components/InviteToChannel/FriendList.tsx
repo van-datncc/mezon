@@ -1,5 +1,4 @@
 import { useDMInvite, useDirect, useInvite, useSendInviteMessage } from '@mezon/core';
-import { Icons, LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectCurrentClanId } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -11,8 +10,10 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../../../componentUI/MezonInput';
 import { SeparatorWithLine } from '../../../../../components/Common';
+import { IconCDN } from '../../../../../constants/icon_cdn';
 import { normalizeString } from '../../../../../utils/helpers';
 import { FriendListItem } from '../../Reusables';
 import { style } from './styles';
@@ -60,7 +61,7 @@ export const FriendList = React.memo(
 				type: 'success',
 				props: {
 					text2: t('copyLink'),
-					leadingIcon: <LinkIcon color={Colors.textLink} />
+					leadingIcon: <MezonIconCDN icon={IconCDN.linkIcon} color={Colors.textLink} />
 				}
 			});
 		}, [currentInviteLink, t]);
@@ -140,27 +141,27 @@ export const FriendList = React.memo(
 			const iconList: IInviteToChannelIconProp[] = [
 				{
 					title: t('iconTitle.shareInvite'),
-					icon: <Icons.ShareIcon color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.shareIcon} color={themeValue.text} />,
 					onPress: () => showUpdating()
 				},
 				{
 					title: t('iconTitle.copyLink'),
-					icon: <Icons.LinkIcon color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.linkIcon} color={themeValue.text} />,
 					onPress: () => addInviteLinkToClipboard()
 				},
 				{
 					title: t('iconTitle.youtube'),
-					icon: <Icons.BrandYoutubeIcon color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.brandYoutubeIcon} color={themeValue.text} />,
 					onPress: () => showUpdating()
 				},
 				{
 					title: t('iconTitle.facebook'),
-					icon: <Icons.BrandFacebookIcon color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.brandFacebookIcon} color={themeValue.text} />,
 					onPress: () => showUpdating()
 				},
 				{
 					title: t('iconTitle.twitter'),
-					icon: <Icons.BrandTwitterIcon color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.brandTwitterIcon} color={themeValue.text} />,
 					onPress: () => showUpdating()
 				}
 			];
@@ -200,7 +201,7 @@ export const FriendList = React.memo(
 								placeHolder={'Invite friend to channel'}
 								onTextChange={setSearchUserText}
 								value={searchUserText}
-								prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+								prefixIcon={<MezonIconCDN icon={IconCDN.magnifyingIcon} color={themeValue.text} height={20} width={20} />}
 							/>
 
 							<View style={styles.editInviteLinkWrapper}>
