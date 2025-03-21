@@ -190,6 +190,10 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			if (!client || !session || !socket || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
+			const trimContent: IMessageSendPayload = {
+				...content,
+				t: content.t?.trim()
+			};
 
 			await socket.updateChatMessage(
 				getClanId || '',
@@ -197,7 +201,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				mode,
 				isPublic,
 				messageId,
-				content,
+				trimContent,
 				mentions,
 				attachments,
 				hide_editted,
@@ -205,7 +209,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				!!isTopic
 			);
 			if (topic_id && !isTopic) {
-				dispatch(topicsActions.updateInitMessage({ content: content, mentions: mentions }));
+				dispatch(topicsActions.updateInitMessage({ content: trimContent, mentions: mentions }));
 			}
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
