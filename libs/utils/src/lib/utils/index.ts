@@ -1216,3 +1216,23 @@ export const updateMentionPositions = (mentions: MentionItem[], newValue: string
 
 	return newMentions;
 };
+
+export const mapChannelToAppEntity = (
+	payload: any
+): {
+	app_id?: string;
+	channel_id?: string;
+	clan_id?: string;
+	id?: string;
+	url?: string;
+} => {
+	const timestamp = Date.now().toString();
+
+	return {
+		app_id: timestamp,
+		channel_id: payload.channel_id,
+		clan_id: payload.clan_id,
+		id: timestamp,
+		url: payload.app_url
+	};
+};
