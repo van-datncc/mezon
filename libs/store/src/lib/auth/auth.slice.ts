@@ -195,8 +195,9 @@ export const authSlice = createSlice({
 			.addCase(refreshSession.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'not loaded';
 				state.error = action.error.message;
-				state.session = null;
-				state.isLogin = false;
+				// Comment for when Refresh Session Fail will retry, not Clear Session
+				// state.session = null;
+				// state.isLogin = false;
 			});
 
 		builder
