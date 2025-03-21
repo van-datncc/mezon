@@ -16,16 +16,6 @@ export function useAuth() {
 		return action.payload;
 	}, [dispatch]);
 
-	const loginByGoogle = useCallback(
-		async (token: string) => {
-			const action = await dispatch(authActions.authenticateGoogle(token));
-			const session = action.payload;
-			dispatch(accountActions.setAccount(session));
-			return session;
-		},
-		[dispatch]
-	);
-
 	const loginByEmail = useCallback(
 		async (token: string) => {
 			const action = await dispatch(authActions.authenticateMezon(token));
@@ -79,7 +69,6 @@ export function useAuth() {
 		() => ({
 			userProfile,
 			userId,
-			loginByGoogle,
 			loginByEmail,
 			qRCode,
 			checkLoginRequest,
@@ -87,6 +76,6 @@ export function useAuth() {
 			fetchUserProfile,
 			confirmLoginRequest
 		}),
-		[userProfile, userId, loginByGoogle, qRCode, loginByApple, fetchUserProfile, loginByEmail]
+		[userProfile, userId, qRCode, loginByApple, fetchUserProfile, loginByEmail]
 	);
 }
