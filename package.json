@@ -6,8 +6,8 @@
   "productName": "mezon",
   "repository": "https://github.com/nccasia/mezon-fe",
   "scripts": {
-    "dev:chat": "nx run chat:serve",
-    "dev:admin": "nx run admin:serve",
+    "dev:chat": "nx run chat:serve --host=127.0.0.1 --port=4200",
+    "dev:admin": "nx run admin:serve --host=127.0.0.1 --port=4200",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format": "nx format:check",
@@ -47,7 +47,6 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@sentry/react": "^8.30.0",
     "@swc/helpers": "~0.5.3",
-    "@tanstack/react-virtual": "^3.10.8",
     "@theinternetfolks/snowflake": "^1.3.0",
     "@xyflow/react": "^12.2.1",
     "date-fns": "^3.3.1",
