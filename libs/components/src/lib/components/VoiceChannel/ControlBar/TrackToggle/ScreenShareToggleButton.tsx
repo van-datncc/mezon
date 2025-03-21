@@ -1,22 +1,22 @@
-import { selectShowScreen, voiceActions } from '@mezon/store';
+import { selectShowScreen } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-export const ScreenShareToggleButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(({ className, ...props }, ref) => {
-	const dispatch = useDispatch();
-	const showScreen = useSelector(selectShowScreen);
+export interface ScreenShareToggleProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
+	onClick?: () => void;
+}
 
-	const defaultClassName = 'lk-button lk-track-toggle';
+export const ScreenShareToggleButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
+	({ className, onClick, ...props }, ref) => {
+		const showScreen = useSelector(selectShowScreen);
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		dispatch(voiceActions.setShowScreen(!showScreen));
-		props.onClick?.(event);
-	};
+		const defaultClassName = 'lk-button lk-track-toggle';
 
-	return (
-		<button ref={ref} className={`${defaultClassName} ${className}`} onClick={handleClick} {...props}>
-			{showScreen ? <Icons.VoiceScreenShareStopIcon /> : <Icons.VoiceScreenShareIcon />}
-		</button>
-	);
-});
+		return (
+			<button ref={ref} className={`${defaultClassName} ${className}`} onClick={onClick} {...props}>
+				{showScreen ? <Icons.VoiceScreenShareStopIcon /> : <Icons.VoiceScreenShareIcon />}
+			</button>
+		);
+	}
+);
