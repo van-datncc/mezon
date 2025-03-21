@@ -853,9 +853,8 @@ type ImgproxyOptions = {
 };
 
 export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptions = { width: 100, height: 100, resizeType: 'fit' }) => {
-	//const extension = sourceImageUrl.split('.').pop()?.toLowerCase();
 	if (!sourceImageUrl) return '';
-	if (!sourceImageUrl.startsWith(`${process.env.NX_BASE_IMG_URL}`) || sourceImageUrl.startsWith(`${process.env.NX_BASE_IMG_URL}/stickers`)) {
+	if (!sourceImageUrl.startsWith('https://cdn.mezon')) {
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;
