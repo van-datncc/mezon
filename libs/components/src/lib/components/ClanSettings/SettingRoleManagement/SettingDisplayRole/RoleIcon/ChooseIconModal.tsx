@@ -1,5 +1,6 @@
 import { useEscapeKeyClose, useOnClickOutside, useRoles } from '@mezon/core';
 import {
+	RootState,
 	getNewAddMembers,
 	getNewColorRole,
 	getNewNameRole,
@@ -7,6 +8,7 @@ import {
 	getRemoveMemberRoles,
 	getRemovePermissions,
 	getSelectedRoleId,
+	getStoreAsync,
 	roleSlice,
 	selectCurrentClanId,
 	selectTheme
@@ -28,19 +30,11 @@ enum ESelectRoleIconMethod {
 }
 
 const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
-	const currentClanId = useSelector(selectCurrentClanId);
-	const currentRoleId = useSelector(getSelectedRoleId);
 	const modalRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [selectMethod, setSelectMethod] = useState<ESelectRoleIconMethod>(ESelectRoleIconMethod.IMAGE);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { sessionRef, clientRef } = useMezon();
-	const nameRoleNew = useSelector(getNewNameRole);
-	const colorRoleNew = useSelector(getNewColorRole);
-	const newSelectedPermissions = useSelector(getNewSelectedPermissions);
-	const removeMemberRoles = useSelector(getRemoveMemberRoles);
-	const removePermissions = useSelector(getRemovePermissions);
-	const newAddMembers = useSelector(getNewAddMembers);
 	const appearanceTheme = useSelector(selectTheme);
 	const dispatch = useDispatch();
 	const { updateRole } = useRoles();
@@ -60,6 +54,17 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 		const file = e.target.files?.[0];
 
 		if (!clientRef?.current || !sessionRef?.current || !file) return;
+
+		const store = await getStoreAsync();
+		const state = store.getState() as RootState;
+		const currentClanId = selectCurrentClanId(state);
+		const currentRoleId = getSelectedRoleId(state);
+		const nameRoleNew = getNewNameRole(state);
+		const colorRoleNew = getNewColorRole(state);
+		const newSelectedPermissions = getNewSelectedPermissions(state);
+		const removeMemberRoles = getRemoveMemberRoles(state);
+		const removePermissions = getRemovePermissions(state);
+		const newAddMembers = getNewAddMembers(state);
 
 		setIsLoading(true);
 		const resizeFile = (await resizeFileImage(file, 64, 64, 'file')) as File;

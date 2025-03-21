@@ -40,6 +40,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const appearanceTheme = useSelector(selectTheme);
 	const { createRole } = useRoles();
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const handleShowDeleteRoleModal = (roleId: string) => {
 		setSelectedRoleID(roleId);
@@ -73,7 +74,9 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	}, [valueSearch, roles]);
 
 	const handleCreateNewRole = async () => {
+		setIsLoading(true);
 		const newRole = await createRole(currentClanId || '', 'New Role', DEFAULT_ROLE_COLOR, [], []);
+		setIsLoading(false);
 
 		dispatch(setSelectedRoleId(newRole?.id || ''));
 		dispatch(setNameRoleNew('New Role'));
@@ -109,7 +112,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 						</div>
 						<Icons.ArrowDown defaultSize="w-[20px] h-[30px] -rotate-90 dark:text-textThreadPrimary text-gray-500 dark:group-hover:text-white group-hover:text-black" />
 					</div>
-					<div className="flex items-center space-x-4">
+					<div className="flex items-center space-x-4 ">
 						<div className="w-full flex-grow">
 							<InputField
 								type="text"
@@ -119,10 +122,12 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 							/>
 						</div>
 						<button
-							className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium"
+							className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium inline-flex items-center justify-center h-[32.5px]"
 							onClick={handleCreateNewRole}
 						>
-							Create Role
+							<span className="relative inline-flex items-center justify-center min-w-[100px]">
+								{isLoading ? <Icons.IconLoadingTyping bgFill="mx-auto" /> : 'Create Role'}
+							</span>
 						</button>
 					</div>
 					<p className="dark:text-textThreadPrimary text-gray-500 text-sm mt-2">
