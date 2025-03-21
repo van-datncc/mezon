@@ -124,6 +124,7 @@ export const differenceTime = (end: string) => {
 
 export const getTimeFomatDay = () => {
 	const date = new Date();
+	// TODO: update time
 	date.setUTCHours(date.getUTCHours() + 7);
 	const hours = date.getHours().toString().padStart(2, '0');
 	const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -132,6 +133,7 @@ export const getTimeFomatDay = () => {
 
 export const formatTimeStringToHourFormat = (timeString: string) => {
 	const date = new Date(timeString);
+	// TODO: update time
 	date.setUTCHours(date.getUTCHours() + 7);
 	const hours = date.getUTCHours().toString().padStart(2, '0');
 	const minutes = date.getUTCMinutes().toString().padStart(2, '0');
@@ -159,7 +161,7 @@ export const formatToLocalDateString = (timeString: string | Date) => {
 	} else {
 		throw new Error(`Invalid input: timeString must be a string or Date object`);
 	}
-
+	// TODO: update time
 	date.setUTCHours(date.getUTCHours() + 7);
 	return date.toISOString().slice(0, -1);
 };
