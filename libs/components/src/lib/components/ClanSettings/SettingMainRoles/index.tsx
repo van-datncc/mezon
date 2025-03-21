@@ -1,11 +1,14 @@
+import { useRoles } from '@mezon/core';
 import {
 	rolesClanActions,
+	roleSlice,
 	selectAllRolesClan,
 	selectCurrentClanId,
 	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
 	setColorRoleNew,
+	setCurrentRoleIcon,
 	setNameRoleNew,
 	setRemoveMemberRoles,
 	setRemovePermissions,
@@ -35,6 +38,14 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const [activeRoles, setActiveRoles] = useState(roles);
 	const numRoles = useMemo(() => activeRoles.length, [activeRoles]);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const appearanceTheme = useSelector(selectTheme);
+	const { createRole } = useRoles();
+
+	const handleShowDeleteRoleModal = (roleId: string) => {
+		setSelectedRoleID(roleId);
+		setShowModal(true);
+	};
+
 	const handleRoleClick = (roleId: string) => {
 		setSelectedRoleID(roleId);
 		const activeRole = rolesClan.find((role) => role.id === roleId);
@@ -49,17 +60,29 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		dispatchRole(setRemovePermissions([]));
 		dispatchRole(setAddMemberRoles(memberIDRoles));
 		dispatchRole(setRemoveMemberRoles([]));
+		dispatchRole(setCurrentRoleIcon(activeRole?.role_icon || ''));
 	};
 
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || '' }));
 	};
-	const appearanceTheme = useSelector(selectTheme);
 
 	const [valueSearch, setValueSearch] = useState('');
 	useEffect(() => {
 		setActiveRoles(roles.filter((role) => role?.title?.toLowerCase().includes(valueSearch.toLowerCase())));
 	}, [valueSearch, roles]);
+
+	const handleCreateNewRole = async () => {
+		const newRole = await createRole(currentClanId || '', 'New Role', DEFAULT_ROLE_COLOR, [], []);
+
+		dispatch(setSelectedRoleId(newRole?.id || ''));
+		dispatch(setNameRoleNew('New Role'));
+		dispatch(setColorRoleNew(DEFAULT_ROLE_COLOR));
+		dispatch(setAddPermissions([]));
+		dispatch(setAddMemberRoles([]));
+		dispatch(roleSlice.actions.setCurrentRoleIcon(''));
+		setOpenEdit(true);
+	};
 
 	return (
 		<>
@@ -97,14 +120,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 						</div>
 						<button
 							className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium"
-							onClick={() => {
-								dispatch(setSelectedRoleId('New Role'));
-								dispatch(setNameRoleNew('New Role'));
-								dispatch(setColorRoleNew(DEFAULT_ROLE_COLOR));
-								dispatch(setAddPermissions([]));
-								dispatch(setAddMemberRoles([]));
-								setOpenEdit(true);
-							}}
+							onClick={handleCreateNewRole}
 						>
 							Create Role
 						</button>
@@ -151,7 +167,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								) : (
 									<ListActiveRole
 										activeRoles={activeRoles}
-										setShowModal={setShowModal}
+										setShowModal={handleShowDeleteRoleModal}
 										handleRoleClick={handleRoleClick}
 										setOpenEdit={setOpenEdit}
 									/>

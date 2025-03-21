@@ -4301,14 +4301,6 @@
   resolved "https://registry.yarnpkg.com/@theinternetfolks/snowflake/-/snowflake-1.3.0.tgz#da26407eba4a0639d23e6ea08136e66270ee0e03"
   integrity sha512-/5fjyE+JIa95Lm1uDJ9fx52W7/ZHBVvKo5GbpR+swpchbriLzVgFAIUOVwLsscnUTBixyQ+JsEh5pJQM/zKNzQ==
 
-"@tippy.js/react@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@tippy.js/react/-/react-3.1.1.tgz#027e4595e55f31430741fe8e0d92aaddfbe47efd"
-  integrity sha512-KF45vW/jKh/nBXk/2zzTFslv/T46zOMkIoDJ56ymZ+M00yHttk58J5wZ29oqGqDIUnobWSZD+cFpbR4u/UUvgw==
-  dependencies:
-    prop-types "^15.6.2"
-    tippy.js "^5.1.1"
-
 "@tokenizer/token@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@tokenizer/token/-/token-0.3.0.tgz#fe98a93fe789247e998c75e74e9c7c63217aa276"
@@ -12311,17 +12303,17 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
-mezon-js-protobuf@1.7.27:
-  version "1.7.27"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.27.tgz#fa44a50de627a3dda003827d6c69845fba12a314"
-  integrity sha512-0yhTMA4l0kDEFRBbI1QKugCVKnodScpxgZl91MrGKJvghPBaOEkenfztwOvsJnz6NKrVix95qCx94vSKjVlzTQ==
+mezon-js-protobuf@1.7.30:
+  version "1.7.30"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.30.tgz#132bd28fbdecb2b260148e8be64a34ba1c316cf5"
+  integrity sha512-NfTqM5PDx3kT2HUO4ZNZnHRTv6ESjdZqYpIVH+yiEtT8/zR+2yW95ez02OaMFUAkFzyhoKC4Rgssz3gkZhzbbw==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@2.11.14:
-  version "2.11.14"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.14.tgz#9a0285ddae5365584925ff3d9940e4a269f2b41f"
-  integrity sha512-6jZ5z/zEgzsIf4QbmhQwDOKfVQkwlPZnXCSEaYjTALUzeH00rQ0W2KVPJqjQRuaHpQBUiSeGK68KHW3ym2t1Zw==
+mezon-js@2.11.17:
+  version "2.11.17"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.17.tgz#22cf4765fc44f165ef7ea9eac2562c01ad71d79e"
+  integrity sha512-I/cHGOxXVEWWpJ8z8t8T1lo4PR6ws69SuHxkM1bKQ/JWMxMCAOKhLRVKzj5ZqV/NjqF2PJjVb/qmzxKwNikHKg==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"
@@ -13817,11 +13809,6 @@ pony-cause@^2.1.10:
   version "2.1.11"
   resolved "https://registry.yarnpkg.com/pony-cause/-/pony-cause-2.1.11.tgz#d69a20aaccdb3bdb8f74dd59e5c68d8e6772e4bd"
   integrity sha512-M7LhCsdNbNgiLYiP4WjsfLUuFmCfnjdF6jKe2R9NKl4WFN+HZPGHJZ9lnLP7f9ZnKe3U9nuWD0szirmj+migUg==
-
-popper.js@^1.16.0:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
-  integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
 
 portfinder@^1.0.28:
   version "1.0.32"
@@ -16545,13 +16532,6 @@ tiny-typed-emitter@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/tiny-typed-emitter/-/tiny-typed-emitter-2.1.0.tgz#b3b027fdd389ff81a152c8e847ee2f5be9fad7b5"
   integrity sha512-qVtvMxeXbVej0cQWKqVSSAHmKZEHAvxdF8HEUBFWts8h+xEo5m/lEiPakuyZ3BnCBjOD8i24kzNOiOLLgsSxhA==
-
-tippy.js@^5.1.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/tippy.js/-/tippy.js-5.2.1.tgz#e08d7332c103a15e427124d710d881fca82365d6"
-  integrity sha512-66UT6JRVn3dXNCORE+0UvUK3JZqV/VhLlU6HTDm3FmrweUUFUxUGvT8tUQ7ycMp+uhuLAwQw6dBabyC+iKf/MA==
-  dependencies:
-    popper.js "^1.16.0"
 
 tmp-promise@^3.0.2:
   version "3.0.3"

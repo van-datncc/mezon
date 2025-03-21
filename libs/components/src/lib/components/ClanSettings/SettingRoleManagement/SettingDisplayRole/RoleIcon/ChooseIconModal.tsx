@@ -1,0 +1,134 @@
+import { useEscapeKeyClose, useOnClickOutside, useRoles } from '@mezon/core';
+import {
+	getNewAddMembers,
+	getNewColorRole,
+	getNewNameRole,
+	getNewSelectedPermissions,
+	getRemoveMemberRoles,
+	getRemovePermissions,
+	getSelectedRoleId,
+	roleSlice,
+	selectCurrentClanId,
+	selectTheme
+} from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Icons } from '@mezon/ui';
+import { resizeFileImage } from '@mezon/utils';
+import React, { useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AttachmentLoader } from '../../../../MessageWithUser/MessageLinkFile';
+
+type ChooseIconModalProps = {
+	onClose: () => void;
+};
+
+enum ESelectRoleIconMethod {
+	IMAGE = 'IMAGE',
+	EMOJI = 'EMOJI'
+}
+
+const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentRoleId = useSelector(getSelectedRoleId);
+	const modalRef = useRef<HTMLDivElement>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [selectMethod, setSelectMethod] = useState<ESelectRoleIconMethod>(ESelectRoleIconMethod.IMAGE);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { sessionRef, clientRef } = useMezon();
+	const nameRoleNew = useSelector(getNewNameRole);
+	const colorRoleNew = useSelector(getNewColorRole);
+	const newSelectedPermissions = useSelector(getNewSelectedPermissions);
+	const removeMemberRoles = useSelector(getRemoveMemberRoles);
+	const removePermissions = useSelector(getRemovePermissions);
+	const newAddMembers = useSelector(getNewAddMembers);
+	const appearanceTheme = useSelector(selectTheme);
+	const dispatch = useDispatch();
+	const { updateRole } = useRoles();
+
+	useOnClickOutside(modalRef, onClose);
+	useEscapeKeyClose(modalRef, onClose);
+
+	const handleChangeSelectMethod = (method: ESelectRoleIconMethod) => {
+		setSelectMethod(method);
+	};
+
+	const handleIconClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	const handleChooseImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+
+		if (!clientRef?.current || !sessionRef?.current || !file) return;
+
+		setIsLoading(true);
+		const resizeFile = (await resizeFileImage(file, 64, 64, 'file')) as File;
+		const roleIcon = await handleUploadFile(clientRef.current, sessionRef.current, currentClanId || '', 'roleIcon', file.name, resizeFile);
+
+		await updateRole(
+			currentClanId || '',
+			currentRoleId || '',
+			nameRoleNew,
+			colorRoleNew,
+			newAddMembers,
+			newSelectedPermissions,
+			removeMemberRoles,
+			removePermissions,
+			roleIcon.url
+		);
+		dispatch(roleSlice.actions.setCurrentRoleIcon(roleIcon?.url || ''));
+		onClose();
+		setIsLoading(false);
+	};
+
+	return (
+		<div
+			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+			tabIndex={0}
+		>
+			<div
+				className="w-[400px] h-[400px] dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-center items-start gap-3 inline-flex overflow-hidden p-3"
+				ref={modalRef}
+			>
+				{isLoading && (
+					<div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-60 z-10 text-white">
+						<AttachmentLoader appearanceTheme={appearanceTheme} />
+					</div>
+				)}
+
+				<div className={'flex items-center justify-start gap-3 h-fit w-full'}>
+					<div
+						className={`text-white ${
+							selectMethod === ESelectRoleIconMethod.IMAGE && 'bg-bgIconDark'
+						} rounded px-5 py-1 font-semibold cursor-pointer hover:bg-bgAvatarDark`}
+						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.IMAGE)}
+					>
+						Upload image
+					</div>
+
+					{/*WIP*/}
+					<div
+						className={`text-white ${
+							selectMethod === ESelectRoleIconMethod.EMOJI && 'bg-bgIconDark'
+						} rounded px-5 py-1 font-semibold cursor-pointer  hover:bg-bgAvatarDark`}
+						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.EMOJI)}
+					>
+						Emoji
+					</div>
+				</div>
+				<div className={'flex-1 w-full flex flex-col justify-center items-center gap-2'}>
+					<div
+						className={'dark:bg-bgSecondary600 bg-bgIconDark rounded flex justify-center items-center w-20 h-20 cursor-pointer group'}
+						onClick={handleIconClick}
+					>
+						<Icons.ImageUploadIcon className="w-6 h-6 group-hover:scale-110 ease-in-out duration-75" />
+					</div>
+					<p className={'dark:text-textSecondary text-textSecondary800'}>Choose an image to upload</p>
+					<input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleChooseImage} />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default ChooseIconModal;
