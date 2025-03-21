@@ -146,6 +146,7 @@ export const voiceSlice = createSlice({
 			state.fullScreen = false;
 			state.isJoined = false;
 			state.token = '';
+			state.stream = null;
 		}
 		// ...
 	},
