@@ -371,8 +371,8 @@ export type MezonSuspenseProps = {
 };
 
 const MezonSuspense: React.FC<MezonSuspenseProps> = ({ children }: MezonSuspenseProps) => {
-	const { clientRef, sessionRef, socketRef } = React.useContext(MezonContext);
-	if (!clientRef.current || !sessionRef.current || !socketRef.current) {
+	const { clientRef, socketRef } = React.useContext(MezonContext);
+	if (!clientRef.current || !socketRef.current) {
 		return <>Loading...</>;
 	}
 	// eslint-disable-next-line react/jsx-no-useless-fragment

@@ -1,21 +1,21 @@
-import { stickerSettingActions, useAppDispatch } from '@mezon/store';
+import { authActions, selectIsLogin, stickerSettingActions, useAppDispatch } from '@mezon/store';
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet, useLoaderData } from 'react-router-dom';
+import { IAuthLoaderData } from '../loaders/authLoader';
 
 const ProtectedRoutes = () => {
-	// const { isLogin: isLoginLoader, redirect } = useLoaderData() as IAuthLoaderData;
-	// const isLoginStore = useSelector(selectIsLogin);
-	// const isLogin = isLoginLoader && isLoginStore;
+	const { isLogin: isLoginLoader, redirect } = useLoaderData() as IAuthLoaderData;
+	const isLoginStore = useSelector(selectIsLogin);
+	const isLogin = isLoginLoader && isLoginStore;
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(stickerSettingActions.fetchStickerByUserId({}));
 	}, [dispatch]);
-
-	// Comment for when Refresh Session Fail will retry, not Clear Session
-	// if (!isLogin) {
-	// 	dispatch(authActions.setLogout());
-	// 	return <Navigate to={redirect || '/desktop/login'} replace />;
-	// }
+	if (!isLogin) {
+		dispatch(authActions.setLogout());
+		return <Navigate to={redirect || '/desktop/login'} replace />;
+	}
 
 	return <Outlet />;
 };

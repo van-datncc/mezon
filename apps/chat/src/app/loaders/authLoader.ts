@@ -32,45 +32,34 @@ function getRedirectTo(initialPath?: string): string {
 	return '';
 }
 
-const handleSessionExpired = async (initialPath: string) => {
-	const redirectTo = getRedirectTo(initialPath);
-	const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
-	return {
-		isLogin: false,
-		redirect: redirect
-	} as IAuthLoaderData;
-};
-
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
 	let retries = 3;
+	let isRedirectLogin = false;
 	while (retries > 0) {
 		try {
 			const response = await dispatch(authActions.refreshSession());
-			if ((response as unknown as IWithError).error) {
-				retries -= 1;
-				if (retries === 0) {
-					console.error('Session expired after 3 retries');
-					return await handleSessionExpired(initialPath);
-				}
-				console.error(`Session expired, retrying... (${3 - retries}/3)`);
-				await sleep(1000);
-				continue;
+			if (response?.payload === 'Redirect Login') {
+				isRedirectLogin = true;
 			}
-			const profileResponse = await dispatch(accountActions.getUserProfile());
-			if ((profileResponse as unknown as IWithError).error) {
+			if (!(response as unknown as IWithError).error) {
+				const profileResponse = await dispatch(accountActions.getUserProfile());
+				if (!(profileResponse as unknown as IWithError).error) {
+					return { isLogin: true } as IAuthLoaderData;
+				}
 				throw new Error('Session expired');
 			}
-			// Exit the loop if no error
-			return {
-				isLogin: true
-			} as IAuthLoaderData;
 		} catch (error) {
-			retries -= 1;
-			if (retries === 0) {
-				return await handleSessionExpired(initialPath);
-			}
 			console.error(`Error in refreshSession, retrying... (${3 - retries}/3)`, error);
+		}
+		retries -= 1;
+		if (retries > 0) {
+			console.error(`Session expired, retrying... (${3 - retries}/3)`);
 			await sleep(1000);
+		} else {
+			console.error('Session expired after 3 retries');
+			const redirectTo = getRedirectTo(initialPath);
+			const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
+			return { isLogin: !isRedirectLogin, redirect: isRedirectLogin ? redirect : '' } as IAuthLoaderData;
 		}
 	}
 };

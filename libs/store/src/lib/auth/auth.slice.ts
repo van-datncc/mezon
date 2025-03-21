@@ -83,11 +83,15 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 	if (mezon.sessionRef.current?.token === sessionState?.token) {
 		return sessionState;
 	}
-
-	const session = await mezon?.refreshSession({
-		...sessionState,
-		is_remember: sessionState.is_remember ?? false
-	});
+	let session;
+	try {
+		session = await mezon?.refreshSession({
+			...sessionState,
+			is_remember: sessionState.is_remember ?? false
+		});
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+	}
 
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');
@@ -195,9 +199,6 @@ export const authSlice = createSlice({
 			.addCase(refreshSession.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'not loaded';
 				state.error = action.error.message;
-				// Comment for when Refresh Session Fail will retry, not Clear Session
-				// state.session = null;
-				// state.isLogin = false;
 			});
 
 		builder
