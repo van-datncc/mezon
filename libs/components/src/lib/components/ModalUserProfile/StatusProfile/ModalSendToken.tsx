@@ -1,12 +1,11 @@
 import { DirectEntity, selectAllDirectMessages, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Label, Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AvatarImage } from '../../../components';
+import { AvatarImage, useVirtualizer } from '../../../components';
 
 type ModalSendTokenProps = {
 	openModal: boolean;

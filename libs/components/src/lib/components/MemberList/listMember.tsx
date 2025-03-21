@@ -9,9 +9,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useVirtualizer } from '../../components';
 import MemberItem from './MemberItem';
 
 const heightTopBar = 60;

@@ -1,6 +1,6 @@
+import { useVirtualizer } from '@mezon/components';
 import { FriendsEntity, selectAllActivities, selectAllUserDM, selectTheme } from '@mezon/store';
 import { IUserItemActivity, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ActivityListItem from './ActivityListItem';

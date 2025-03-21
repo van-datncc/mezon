@@ -10,10 +10,10 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { isLinuxDesktop, isWindowsDesktop, toggleDisableHover } from '@mezon/utils';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useVirtualizer } from '../../components';
 import DMListItem from './DMListItem';
 
 type ListDMChannelProps = {
