@@ -30,6 +30,15 @@ export const directMembersMetaSlice = createSlice({
 				directMembersMeta.user.metadata = directMembersMeta.user.metadata || {};
 				directMembersMeta.user.metadata.user_status = user_status;
 			}
+		},
+		updateStatus: (state, action: PayloadAction<{ userId: string; status: any }>) => {
+			const { userId, status } = action.payload;
+			const directMembersMeta = state.entities[userId];
+			if (directMembersMeta) {
+				directMembersMeta.user = directMembersMeta.user || {};
+				directMembersMeta.user.metadata = directMembersMeta.user.metadata || {};
+				directMembersMeta.user.metadata.status = status;
+			}
 		}
 	}
 });

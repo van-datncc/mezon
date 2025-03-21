@@ -35,15 +35,6 @@ function normalizeSession(session: Session): ISession {
 	return session;
 }
 
-export const authenticateGoogle = createAsyncThunk('auth/authenticateGoogle', async (token: string, thunkAPI) => {
-	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon.authenticateGoogle(token);
-	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	return normalizeSession(session);
-});
-
 export const authenticateApple = createAsyncThunk('auth/authenticateApple', async (token: string, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
 	const session = await mezon.authenticateApple(token);
@@ -83,11 +74,15 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 	if (mezon.sessionRef.current?.token === sessionState?.token) {
 		return sessionState;
 	}
-
-	const session = await mezon?.refreshSession({
-		...sessionState,
-		is_remember: sessionState.is_remember ?? false
-	});
+	let session;
+	try {
+		session = await mezon?.refreshSession({
+			...sessionState,
+			is_remember: sessionState.is_remember ?? false
+		});
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+	}
 
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');
@@ -156,20 +151,6 @@ export const authSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(authenticateGoogle.pending, (state: AuthState) => {
-				state.loadingStatus = 'loading';
-			})
-			.addCase(authenticateGoogle.fulfilled, (state: AuthState, action) => {
-				state.loadingStatus = 'loaded';
-				state.session = action.payload;
-				state.isLogin = true;
-			})
-			.addCase(authenticateGoogle.rejected, (state: AuthState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
-
-		builder
 			.addCase(authenticateApple.pending, (state: AuthState) => {
 				state.loadingStatus = 'loading';
 			})
@@ -195,8 +176,6 @@ export const authSlice = createSlice({
 			.addCase(refreshSession.rejected, (state: AuthState, action) => {
 				state.loadingStatus = 'not loaded';
 				state.error = action.error.message;
-				state.session = null;
-				state.isLogin = false;
 			});
 
 		builder
@@ -244,7 +223,6 @@ export const authReducer = authSlice.reducer;
 
 export const authActions = {
 	...authSlice.actions,
-	authenticateGoogle,
 	authenticateApple,
 	authenticateMezon,
 	refreshSession,

@@ -1,4 +1,4 @@
-import { useAuth, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAuth, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	TOKEN_FAILED_STATUS,
@@ -48,7 +48,22 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const myProfile = useAuth();
 	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
 
-	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
+	const userCustomStatus = useMemo(() => {
+		const metadata = myProfile.userProfile?.user?.metadata;
+		try {
+			return safeJSONParse(metadata || '{}')?.status || '';
+		} catch (e) {
+			const unescapedJSON = metadata?.replace(/\\./g, (match) => {
+				switch (match) {
+					case '\\"':
+						return '"';
+					default:
+						return match[1];
+				}
+			});
+			return safeJSONParse(unescapedJSON || '{}')?.status;
+		}
+	}, [myProfile]);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');

@@ -37,7 +37,7 @@ const ActivityListItem = ({ user }: ActivityProps) => {
 						key={user?.user?.id}
 						numberCharacterCollapse={100}
 						positionType={MemberProfileType.LIST_ACTIVITY}
-						customStatus={(user?.user?.metadata as MetaDateStatusUser).status ?? ''}
+						customStatus={(user?.user?.metadata as MetaDateStatusUser)?.status ?? ''}
 						isDM={true}
 						user={user as ChannelMembersEntity}
 					/>
