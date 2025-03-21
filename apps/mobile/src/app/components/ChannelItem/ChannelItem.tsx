@@ -1,26 +1,27 @@
-import { Icons, LockIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import MezonIconCDN from '../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../constants/icon_cdn';
 import IconChannel from '../IconChannel';
 import style from './ChannelItem.styles';
 
 type ChannelItemProps = {
 	channelData?: ChannelUsersEntity;
-	onPress: (channelData: ChannelUsersEntity) => void;
 };
 
-export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
+export const ChannelItem = React.memo(({ channelData }: ChannelItemProps) => {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const { themeValue } = useTheme();
 	const parentChannel = useAppSelector((state) => selectChannelById(state, channelData?.parent_id || ''));
 	const parentLabel = useMemo(() => (parentChannel?.channel_label ? `(${parentChannel.channel_label})` : ''), [parentChannel]);
 	const styles = style(themeValue);
 	const handleOnPress = () => {
-		onPress && onPress(channelData);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_ROUTER, { channel: channelData });
 	};
 	return (
 		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
@@ -46,13 +47,13 @@ export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProp
 								<Text style={styles.channelName} numberOfLines={1}>
 									{channelData?.channel_label}
 								</Text>
-								<LockIcon width={10} height={10} color={Colors.textGray} />
+								<MezonIconCDN icon={IconCDN.lockIcon} width={10} height={10} color={Colors.textGray} />
 							</View>
 							{!!channelData?.clan_name && <Text style={styles.categoryChannel}>{channelData?.clan_name}</Text>}
 						</View>
 					</View>
 					<View style={styles.joinChannelBtn}>
-						<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_20} height={size.s_20} color={Colors.textGray} />
 						<Text style={styles.joinChannelBtnText}>{t('joinChannel')}</Text>
 					</View>
 				</View>
