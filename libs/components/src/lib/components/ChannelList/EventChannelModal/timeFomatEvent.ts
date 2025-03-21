@@ -35,7 +35,7 @@ export const handleTimeISO = (fullDateStr: Date, timeStr: string) => {
 	const day = date.getDate().toString().padStart(2, '0');
 
 	const [hours, minutes] = timeStr.split(':').map(Number);
-	const isoDate = new Date(Date.UTC(year, Number(month) - 1, Number(day), hours, minutes));
+	const isoDate = new Date(year, Number(month) - 1, Number(day), hours, minutes);
 
 	return isoDate.toISOString();
 };
@@ -124,6 +124,7 @@ export const differenceTime = (end: string) => {
 
 export const getTimeFomatDay = () => {
 	const date = new Date();
+	date.setUTCHours(date.getUTCHours() + 7);
 	const hours = date.getHours().toString().padStart(2, '0');
 	const minutes = date.getMinutes().toString().padStart(2, '0');
 	return `${hours}:${minutes}`;
@@ -131,6 +132,7 @@ export const getTimeFomatDay = () => {
 
 export const formatTimeStringToHourFormat = (timeString: string) => {
 	const date = new Date(timeString);
+	date.setUTCHours(date.getUTCHours() + 7);
 	const hours = date.getUTCHours().toString().padStart(2, '0');
 	const minutes = date.getUTCMinutes().toString().padStart(2, '0');
 
@@ -138,24 +140,26 @@ export const formatTimeStringToHourFormat = (timeString: string) => {
 };
 
 export const formatToLocalDateString = (timeString: string | Date) => {
+	let date: Date;
+
 	if (timeString instanceof Date) {
 		if (isNaN(timeString.getTime())) {
 			throw new Error(`Invalid Date object: Unable to parse ${timeString}`);
 		}
-		return timeString.toISOString().slice(0, -1);
-	}
-
-	if (typeof timeString === 'string') {
+		date = new Date(timeString);
+	} else if (typeof timeString === 'string') {
 		if (timeString.includes('T') && timeString.endsWith('Z')) {
-			return timeString.slice(0, -1);
+			date = new Date(timeString);
+		} else {
+			date = new Date(timeString);
 		}
-
-		const date = new Date(timeString);
 		if (isNaN(date.getTime())) {
 			throw new Error(`Invalid timeString: Unable to parse ${timeString}`);
 		}
-		return date.toISOString().slice(0, -1);
+	} else {
+		throw new Error(`Invalid input: timeString must be a string or Date object`);
 	}
 
-	throw new Error(`Invalid input: timeString must be a string or Date object`);
+	date.setUTCHours(date.getUTCHours() + 7);
+	return date.toISOString().slice(0, -1);
 };

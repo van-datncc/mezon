@@ -96,7 +96,8 @@ import {
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
-	electronBridge
+	electronBridge,
+	isBackgroundModeActive
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -157,7 +158,6 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { useDirect } from '../hooks/useDirect';
-import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -179,7 +179,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const navigate = useCustomNavigate();
 	// update later
-	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	const onvoiceended = useCallback(
 		(voice: VoiceEndedEvent) => {
 			if (voice) {
@@ -344,13 +343,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 					const path = isElectron() ? window.location.hash : window.location.pathname;
 					const isFriendPageView = path.includes('/chat/direct/friends');
+					const isFocus = !isBackgroundModeActive();
+
 					const isNotCurrentDirect =
 						isFriendPageView ||
 						isClanView ||
 						!currentDirectId ||
 						(currentDirectId && !RegExp(currentDirectId).test(message?.channel_id)) ||
-						(isElectron() && isFocusDesktop === false) ||
-						isTabVisible === false;
+						!isFocus;
 
 					if (isNotCurrentDirect) {
 						dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
@@ -396,7 +396,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				captureSentryError(message, 'onchannelmessage');
 			}
 		},
-		[userId, isFocusDesktop, isTabVisible]
+		[userId]
 	);
 
 	const onchannelpresence = useCallback(
@@ -473,13 +473,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
 			const isClanView = selectClanView(store.getState());
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
+			const isFocus = !isBackgroundModeActive();
 
 			if (
 				(currentChannel?.channel_id !== notification?.channel_id && notification?.clan_id !== '0') ||
 				isDirectViewPage ||
 				isFriendPageView ||
-				(isElectron() && isFocusDesktop === false) ||
-				isTabVisible === false
+				!isFocus
 			) {
 				dispatch(
 					notificationActions.add({ data: mapNotificationToEntity(notification), category: notification.category as NotificationCategory })
@@ -490,8 +490,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					isClanView ||
 					!currentDirectId ||
 					(currentDirectId && !RegExp(currentDirectId).test(notification?.channel_id || '')) ||
-					(isElectron() && isFocusDesktop === false) ||
-					isTabVisible === false;
+					!isFocus;
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: notification?.clan_id || '', count: 1 }));
 
@@ -538,7 +537,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[userId, isFocusDesktop, isTabVisible]
+		[userId]
 	);
 
 	const onpinmessage = useCallback((pin: LastPinMessageEvent) => {
