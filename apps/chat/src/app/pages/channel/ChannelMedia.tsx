@@ -3,7 +3,7 @@ import { useChatSending } from '@mezon/core';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { TypeMessage } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ChannelMessages from './ChannelMessages';
 
 type ChannelMediaProps = {
@@ -66,13 +66,13 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		};
 	}, [isModalOpen]);
 
-	const handleSend = () => {
+	const handleSend = useCallback(() => {
 		if (messageText.trim()) {
 			sendMessage({ t: messageText }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 		}
 		setIsModalOpen(false);
 		setMessageText('');
-	};
+	}, [messageText, sendMessage, setIsModalOpen, setMessageText]);
 
 	return (
 		<>

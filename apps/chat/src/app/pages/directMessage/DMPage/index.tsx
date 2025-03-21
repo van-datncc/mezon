@@ -381,13 +381,13 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		};
 	}, [isModalOpen]);
 
-	const handleSend = () => {
+	const handleSend = useCallback(() => {
 		if (messageText.trim()) {
 			sendMessage({ t: messageText }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 		}
 		setIsModalOpen(false);
 		setMessageText('');
-	};
+	}, [messageText, sendMessage, setIsModalOpen, setMessageText]);
 
 	return (
 		<>
