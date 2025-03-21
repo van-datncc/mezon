@@ -30,7 +30,6 @@ export type MezonContextValue = {
 	socketRef: React.MutableRefObject<Socket | null>;
 	createClient: () => Promise<Client>;
 	authenticateDevice: (username: string) => Promise<Session>;
-	authenticateGoogle: (token: string) => Promise<Session>;
 	authenticateMezon: (token: string, isRemember?: boolean) => Promise<Session>;
 	createQRLogin: () => Promise<ApiLoginIDResponse>;
 	checkLoginRequest: (LoginRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
@@ -91,29 +90,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		const session = await clientRef.current.confirmLogin(sessionRef.current, confirmRequest);
 		return session;
 	}, []);
-
-	const authenticateGoogle = useCallback(
-		async (token: string) => {
-			if (!clientRef.current) {
-				throw new Error('Mezon client not initialized');
-			}
-			const session = await clientRef.current.authenticateGoogle(token);
-			sessionRef.current = session;
-
-			const socket = await createSocket(); // Create socket after authentication
-			socketRef.current = socket;
-
-			if (!socketRef.current) {
-				return session;
-			}
-
-			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
-			sessionRef.current = session2;
-
-			return session;
-		},
-		[createSocket, isFromMobile]
-	);
 
 	const authenticateMezon = useCallback(
 		async (token: string, isRemember?: boolean) => {
@@ -326,7 +302,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			checkLoginRequest,
 			confirmLoginRequest,
 			authenticateDevice,
-			authenticateGoogle,
 			authenticateApple,
 			refreshSession,
 			createSocket,
@@ -343,7 +318,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			checkLoginRequest,
 			confirmLoginRequest,
 			authenticateDevice,
-			authenticateGoogle,
 			authenticateApple,
 			refreshSession,
 			createSocket,

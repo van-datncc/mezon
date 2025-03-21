@@ -1,12 +1,13 @@
 import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent, safeJSONParse } from 'mezon-js';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import { ChannelsEntity } from '../channels/channels.slice';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { selectClanView } from '../clans/clans.slice';
+import { selectDirectMembersMetaEntities } from '../direct/direct.members.meta';
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -137,7 +138,6 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 				if (!existingMember) {
 					thunkAPI.dispatch(channelMembersActions.addNewMember({ channel_id: channelPresence.channel_id, user_ids: [userId] }));
 					thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
-					thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
 				}
 			}
 		} catch (error) {
@@ -153,7 +153,6 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 			const userId = leave.user_id;
 			const isMobile = leave.is_mobile;
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: false, isMobile: isMobile }));
-			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: leave.status }));
 		}
 	}
 	if (statusPresence?.joins?.length) {
@@ -161,7 +160,6 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 			const userId = join.user_id;
 			const isMobile = join.is_mobile;
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
-			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: join.status }));
 		}
 	}
 });
@@ -263,20 +261,11 @@ export const channelMembers = createSlice({
 			const channelEntity = state.memberChannels[channelId];
 			channelEntity && (channelEntity.ids = []);
 		},
-		setManyCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs[]>) => {
-			for (const i of action.payload) {
-				state.customStatusUser[i.userId] = i.customStatus;
-			}
-		},
 		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
 			state.followingUserIds = action.payload;
 		},
 		setStatusUser: (state, action: PayloadAction<StatusUserArgs>) => {
 			state.onlineStatusUser[action.payload.userId] = action.payload.online;
-		},
-
-		setCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs>) => {
-			state.customStatusUser[action.payload.userId] = action.payload.customStatus;
 		},
 		setMemberChannels: (state, action: PayloadAction<{ channelId: string; members: ChannelUserListChannelUser[] }>) => {
 			const { channelId, members } = action.payload;
@@ -396,8 +385,6 @@ const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanStat
 
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
 
-export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
-
 export const selectMemberIdsByChannelId = createSelector(
 	[getChannelMembersState, (state, channelId: string) => channelId],
 	(getChannelMembersState, channelId) => {
@@ -408,43 +395,20 @@ export const selectMemberIdsByChannelId = createSelector(
 export const selectMemberCustomStatusById = createSelector(
 	[
 		getUsersClanState,
-		selectDirectMessageEntities,
-		selectAllAccount,
-		selectCustomUserStatus,
+		selectDirectMembersMetaEntities,
 		(state: RootState, userId: string, isDM?: boolean) => {
 			//DO NOT EDIT UNLESS YOU KNOW WHAT ARE YOU DOING: thanh.levan
-			return `${userId},${state?.direct.currentDirectMessageId},${isDM}`;
+			return `${userId},${isDM}`;
 		}
 	],
-	(usersClanState, directs, currentUserProfile, statusList, payload) => {
-		const [userId, currentDirectMessageId, isDM] = payload.split(',');
-		const myId = currentUserProfile?.user?.id;
+	(usersClanState, statusList, payload) => {
+		const [userId, isDM] = payload.split(',');
 		const userClan = usersClanState.entities[userId];
-		const userGroup = directs?.[currentDirectMessageId];
-
 		if (statusList?.[userId]) {
-			return statusList?.[userId] || false;
+			return statusList?.[userId].user?.metadata?.status || false;
 		}
 		if (userClan && (isDM === 'false' || 'undefined')) {
 			return (userClan?.user?.metadata as any)?.status || '';
-		}
-		const index = userGroup?.user_id?.findIndex((item) => item === userId) ?? -1;
-		if (index === -1) {
-			return false;
-		}
-		try {
-			return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
-		} catch (e) {
-			const unescapedJSON = userGroup?.metadata?.[index].replace(/\\./g, (match) => {
-				switch (match) {
-					case '\\"':
-						return '"';
-					// Add more escape sequences as needed
-					default:
-						return match[1]; // Remove the backslash
-				}
-			});
-			return safeJSONParse(unescapedJSON || '{}')?.status;
 		}
 	}
 );

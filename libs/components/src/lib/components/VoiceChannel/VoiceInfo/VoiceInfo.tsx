@@ -11,6 +11,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ParticipantMeetState, useMediaPermissions } from '@mezon/utils';
+import isElectron from 'is-electron';
 import Tooltip from 'rc-tooltip';
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -133,7 +134,13 @@ const VoiceInfo = React.memo(() => {
 				>
 					<button
 						className="flex justify-center items-center bg-buttonSecondary hover:bg-buttonSecondaryHover p-[6px] rounded-md"
-						onClick={() => dispatch(voiceActions.setShowScreen(!showScreen))}
+						onClick={() => {
+							if (isElectron() && !showScreen) {
+								dispatch(voiceActions.setShowSelectScreenModal(true));
+								return;
+							}
+							dispatch(voiceActions.setShowScreen(!showScreen));
+						}}
 					>
 						{showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5" /> : <Icons.VoiceScreenShareIcon className="w-5 h-5" />}
 					</button>

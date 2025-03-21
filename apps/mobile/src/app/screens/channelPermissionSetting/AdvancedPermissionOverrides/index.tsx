@@ -1,5 +1,5 @@
 import { useMyRole } from '@mezon/core';
-import { ActionEmitEvent, Icons, isEqual } from '@mezon/mobile-components';
+import { ActionEmitEvent, isEqual } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { permissionRoleChannelActions, selectAllPermissionRoleChannel, selectPermissionChannel, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,6 +8,8 @@ import { DeviceEventEmitter, ScrollView, TouchableOpacity, View } from 'react-na
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../../navigation/ScreenTypes';
 import { PermissionItem } from '../components/PermissionItem';
 import { EOverridePermissionType, EPermissionStatus, ERequestStatus } from '../types/channelPermission.enum';
@@ -60,7 +62,11 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			type: 'success',
 			props: {
 				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
-				leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+				leadingIcon: isError ? (
+					<MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} />
+				) : (
+					<MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
+				)
 			}
 		});
 	};
@@ -110,7 +116,7 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			return (
 				<TouchableOpacity onPress={handleBack}>
 					<View style={{ marginLeft: size.s_16 }}>
-						<Icons.ArrowLargeLeftIcon color={themeValue.white} height={size.s_22} width={size.s_22} />
+						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
 					</View>
 				</TouchableOpacity>
 			);

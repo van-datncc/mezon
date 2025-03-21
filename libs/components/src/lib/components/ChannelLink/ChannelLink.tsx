@@ -193,8 +193,8 @@ const ChannelLinkComponent = ({
 	const notVoiceOrAppOrStreamChannel =
 		channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 		channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING;
-
+		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
+		channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
 	const notMuteAndUnread =
 		(channel?.is_mute === undefined ? true : !channel?.is_mute) && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;

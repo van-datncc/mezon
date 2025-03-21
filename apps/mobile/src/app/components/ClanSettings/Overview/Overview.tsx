@@ -1,5 +1,5 @@
 import { useClans, usePermissionChecker } from '@mezon/core';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	checkDuplicateNameClan,
@@ -15,10 +15,12 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonImagePicker from '../../../componentUI/MezonImagePicker';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../componentUI/MezonMenu';
 import MezonOption from '../../../componentUI/MezonOption';
+import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
@@ -259,7 +261,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				/>
 
 				<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_34 }} onPress={handleClearBanner}>
-					<Icons.CircleXIcon height={25} width={25} color={themeValue.white} />
+					<MezonIconCDN icon={IconCDN.circleXIcon} height={25} width={25} color={themeValue.white} />
 				</Pressable>
 
 				<View style={{ marginVertical: 10 }}>

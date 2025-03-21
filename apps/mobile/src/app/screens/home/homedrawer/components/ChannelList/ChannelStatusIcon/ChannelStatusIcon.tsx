@@ -1,9 +1,10 @@
-import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
+import MezonIconCDN from '../../../../../../../app/componentUI/MezonIconCDN';
+import { IconCDN } from '../../../../../../constants/icon_cdn';
 
 export const ChannelStatusIcon = ({ channel, isUnRead }: { channel: ChannelsEntity; isUnRead?: boolean }) => {
 	const { themeValue } = useTheme();
@@ -14,36 +15,63 @@ export const ChannelStatusIcon = ({ channel, isUnRead }: { channel: ChannelsEnti
 			{channel?.channel_private === ChannelStatusEnum.isPrivate &&
 				(channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) &&
 				!isAgeRestrictedChannel && (
-					<Icons.VoiceLockIcon
-						width={size.s_18}
+					<MezonIconCDN
+						icon={IconCDN.channelVoiceLock}
 						height={size.s_18}
+						width={size.s_18}
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
 					/>
 				)}
 			{channel?.channel_private === ChannelStatusEnum.isPrivate &&
 				channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
 				!isAgeRestrictedChannel && (
-					<Icons.TextLockIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+					<MezonIconCDN
+						icon={IconCDN.channelTextLock}
+						height={size.s_18}
+						width={size.s_18}
+						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+					/>
 				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate &&
 				(channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) && (
-					<Icons.VoiceNormalIcon
-						width={size.s_18}
+					<MezonIconCDN
+						icon={IconCDN.channelVoice}
 						height={size.s_18}
+						width={size.s_18}
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
 					/>
 				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-				<Icons.TextIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+				<MezonIconCDN
+					icon={IconCDN.channelText}
+					height={size.s_18}
+					width={size.s_18}
+					color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+				/>
 			)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-				<Icons.StreamIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
+				<MezonIconCDN
+					icon={IconCDN.channelStream}
+					height={size.s_18}
+					width={size.s_18}
+					color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+				/>
 			)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_APP && (
-				<Icons.AppChannelIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
+				<MezonIconCDN
+					icon={IconCDN.channelApp}
+					height={size.s_18}
+					width={size.s_18}
+					color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+				/>
 			)}
 			{channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel && (
-				<Icons.HashtagWarning width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+				<MezonIconCDN
+					icon={IconCDN.channelTextWarning}
+					height={size.s_18}
+					width={size.s_18}
+					color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+				/>
 			)}
 		</>
 	);
