@@ -68,7 +68,7 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 				<div className="group relative">
 					<button
 						onClick={onCollapseToggle}
-						className="w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
+						className="w-[30px] h-[30px] flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
 						title={isCollapsed ? 'Expand' : 'Collapse'}
 					>
 						{isCollapsed ? '▼' : '▲'}
@@ -77,7 +77,7 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 				<div className="group relative">
 					<button
 						onClick={onBack}
-						className="w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
+						className="w-[30px] h-[30px] flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition"
 						title="Back"
 					>
 						↩
@@ -88,7 +88,7 @@ const ModalHeader = memo(({ title, onClose, handleMouseDown, isFocused, clanId, 
 					<button
 						title="Close"
 						onClick={onClose}
-						className="w-7 h-7 flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition rounded-tr-lg "
+						className="w-[30px] h-[30px] flex items-center justify-center text-[#B5BAC1] text-sm hover:bg-[#404249] hover:text-white transition rounded-tr-lg "
 					>
 						✕
 					</button>
