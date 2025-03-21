@@ -1,5 +1,5 @@
 import { voiceActions } from '@mezon/store';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 type ScreenItemsProps = {
@@ -9,7 +9,7 @@ type ScreenItemsProps = {
 	onClose?: () => void;
 };
 
-const ScreenItems = ({ id, name, thumbnail, onClose }: ScreenItemsProps) => {
+const ScreenItems = memo(({ id, name, thumbnail, onClose }: ScreenItemsProps) => {
 	const dispatch = useDispatch();
 
 	const selectStreamScreen = useCallback(async () => {
@@ -27,12 +27,13 @@ const ScreenItems = ({ id, name, thumbnail, onClose }: ScreenItemsProps) => {
 		dispatch(voiceActions.setShowScreen(true));
 		onClose?.();
 	}, [id, dispatch, onClose]);
+
 	return (
 		<div onClick={() => selectStreamScreen()}>
 			<img src={thumbnail} alt={thumbnail} />
 			<p>{name}</p>
 		</div>
 	);
-};
+});
 
 export default ScreenItems;

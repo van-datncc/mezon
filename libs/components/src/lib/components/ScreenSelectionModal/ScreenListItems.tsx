@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import ScreenItems from './ScreenItem';
 
 type ScreenListItemsProp = {
@@ -11,7 +11,7 @@ type ScreenItems = {
 	thumbnail: string;
 };
 
-const ScreenListItems = ({ source, onClose }: ScreenListItemsProp) => {
+const ScreenListItems = memo(({ source, onClose }: ScreenListItemsProp) => {
 	const [screens, setScreens] = useState<ScreenItems[]>([]);
 
 	const getListScreen = useCallback(async () => {
@@ -26,9 +26,10 @@ const ScreenListItems = ({ source, onClose }: ScreenListItemsProp) => {
 	return (
 		<>
 			{screens.map((screen) => (
-				<ScreenItems onClose={onClose} id={screen.id} name={screen.name} thumbnail={screen.thumbnail} />
+				<ScreenItems key={screen.id} onClose={onClose} id={screen.id} name={screen.name} thumbnail={screen.thumbnail} />
 			))}
 		</>
 	);
-};
+});
+
 export default ScreenListItems;
