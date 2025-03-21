@@ -1,16 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import {
-	ActionEmitEvent,
-	BellIcon,
-	CheckIcon,
-	Icons,
-	LinkIcon,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	TrashIcon,
-	getUpdateOrAddClanChannelCache,
-	isEqual,
-	save
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, CheckIcon, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, isEqual, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,

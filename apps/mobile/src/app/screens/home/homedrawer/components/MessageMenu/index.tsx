@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons, UserMinus } from '@mezon/mobile-components';
+import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,

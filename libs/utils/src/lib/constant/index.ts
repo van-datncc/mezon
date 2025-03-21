@@ -131,3 +131,5 @@ export enum MiniAppEventType {
 
 export const CREATING_THREAD = 'CREATING_THREAD';
 export const CREATING_TOPIC = 'CREATING_TOPIC';
+
+export const POPUP_HEIGHT_COLLAPSE = '30px';

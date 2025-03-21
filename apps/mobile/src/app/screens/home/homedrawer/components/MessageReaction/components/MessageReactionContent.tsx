@@ -1,5 +1,5 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, TrashIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { EmojiDataOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlatList } from 'react-native-gesture-handler';
-import UserProfile from '../../UserProfile';
 import MezonIconCDN from '../../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../../src/app/constants/icon_cdn';
+import UserProfile from '../../UserProfile';
 import { style } from '../styles';
 import { ReactionMember } from './ReactionMember';
 

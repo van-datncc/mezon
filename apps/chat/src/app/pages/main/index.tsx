@@ -15,7 +15,6 @@ import {
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
-	ChannelsEntity,
 	DMCallActions,
 	accountActions,
 	audioCallActions,
@@ -284,11 +283,9 @@ function MyApp() {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
 
-	const parentRef = useRef<HTMLDivElement>(null);
-
 	return (
-		<div ref={parentRef}>
-			<MemoizedDraggableModals parentRef={parentRef} />
+		<div className="relative overflow-hidden w-full h-full">
+			<DraggableModals />
 			<MemoizedErrorModals />
 
 			<div
@@ -503,15 +500,11 @@ const MessageModalImageWrapper = () => {
 		</MessageContextMenuProvider>
 	);
 };
-
-interface MemoizedDraggableModalsProps {
-	parentRef: React.RefObject<HTMLDivElement>;
-}
-
-const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.memo(({ parentRef }) => {
+const DraggableModals: React.FC = () => {
 	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
 	const dispatch = useAppDispatch();
 	const store = getStore();
+
 	const handleOnCloseCallback = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
@@ -523,6 +516,7 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		},
 		[dispatch]
 	);
+
 	const handleFocused = useCallback(
 		(clanId: string, channelId: string) => {
 			dispatch(
@@ -540,15 +534,15 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 		<>
 			{appsList.length > 0 &&
 				appsList.map((app) => {
-					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string) as boolean;
+					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
 					const zIndex = isFocused ? 'z-50' : 'z-40';
-					const channel = selectChannelById(store.getState(), app?.channel_id as string) as ChannelsEntity;
+					const channel = selectChannelById(store.getState(), app?.channel_id as string);
+
 					return (
 						<DraggableModal
 							key={app?.app_id}
 							zIndex={zIndex}
 							headerTitle={channel?.channel_label}
-							parentRef={parentRef}
 							isFocused={isFocused}
 							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
 							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
@@ -561,7 +555,7 @@ const MemoizedDraggableModals: React.FC<MemoizedDraggableModalsProps> = React.me
 				})}
 		</>
 	);
-});
+};
 
 const MemoizedErrorModals: React.FC = React.memo(() => {
 	const toastError = useSelector(selectToastErrors);

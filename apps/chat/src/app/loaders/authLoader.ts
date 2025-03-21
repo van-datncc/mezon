@@ -1,5 +1,6 @@
 import {
 	accountActions,
+	AppDispatch,
 	authActions,
 	clansActions,
 	directActions,
@@ -7,7 +8,7 @@ import {
 	listChannelsByUserActions,
 	listUsersByUserActions
 } from '@mezon/store';
-import { IWithError } from '@mezon/utils';
+import { IWithError, sleep } from '@mezon/utils';
 import { emojiRecentActions } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -30,6 +31,38 @@ function getRedirectTo(initialPath?: string): string {
 
 	return '';
 }
+
+const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
+	let retries = 3;
+	let isRedirectLogin = false;
+	while (retries > 0) {
+		try {
+			const response = await dispatch(authActions.refreshSession());
+			if (response?.payload === 'Redirect Login') {
+				isRedirectLogin = true;
+			}
+			if (!(response as unknown as IWithError).error) {
+				const profileResponse = await dispatch(accountActions.getUserProfile());
+				if (!(profileResponse as unknown as IWithError).error) {
+					return { isLogin: true } as IAuthLoaderData;
+				}
+				throw new Error('Session expired');
+			}
+		} catch (error) {
+			console.error(`Error in refreshSession, retrying... (${3 - retries}/3)`, error);
+		}
+		retries -= 1;
+		if (retries > 0) {
+			console.error(`Session expired, retrying... (${3 - retries}/3)`);
+			await sleep(1000);
+		} else {
+			console.error('Session expired after 3 retries');
+			const redirectTo = getRedirectTo(initialPath);
+			const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
+			return { isLogin: !isRedirectLogin, redirect: isRedirectLogin ? redirect : '' } as IAuthLoaderData;
+		}
+	}
+};
 
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
 	dispatch(clansActions.joinClan({ clanId: '0' }));
@@ -56,29 +89,7 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 			window.addEventListener('online', handleOnline);
 		});
 	}
-
-	try {
-		const response = await dispatch(authActions.refreshSession());
-		if ((response as unknown as IWithError).error) {
-			throw new Error('Session expired');
-		}
-
-		const profileResponse = await dispatch(accountActions.getUserProfile());
-
-		if ((profileResponse as unknown as IWithError).error) {
-			throw new Error('Session expired');
-		}
-		return {
-			isLogin: true
-		} as IAuthLoaderData;
-	} catch (error) {
-		const redirectTo = getRedirectTo(initialPath);
-		const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
-		return {
-			isLogin: false,
-			redirect: redirect
-		} as IAuthLoaderData;
-	}
+	return await refreshSession({ dispatch, initialPath: initialPath as string });
 };
 
 export const shouldRevalidateAuth = () => {
