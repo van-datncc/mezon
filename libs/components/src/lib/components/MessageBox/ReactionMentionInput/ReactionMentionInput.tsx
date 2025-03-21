@@ -85,6 +85,7 @@ import {
 	generateMentionItems,
 	getDisplayMention,
 	getMarkupInsertIndex,
+	handleBoldShortCut,
 	insertStringAt,
 	parseHtmlAsFormattedText,
 	parsePastedMentionData,
@@ -127,22 +128,6 @@ type ChannelsMentionProps = {
 	display: string;
 	subText: string;
 };
-
-function addSymbolsAndIdsLengthOfMention(value: number, mentionType: number) {
-	let newValue = value;
-	if (mentionType === ETypeMEntion.HASHTAG || mentionType === ETypeMEntion.MENTION) {
-		newValue += 23;
-	} else if (mentionType === ETypeMEntion.EMOJI) {
-		newValue += 25;
-	} else {
-		newValue += 4;
-	}
-	return newValue;
-}
-
-function sortMentionsByIndex(mentions: MentionItem[]) {
-	return [...mentions].sort((a, b) => a.index - b.index);
-}
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const editorRef = useRef<HTMLInputElement | null>(null);
@@ -288,80 +273,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 
 		if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
-			if (!editorRef.current) return;
-			let plainTextStart = editorRef.current.selectionStart ?? 0;
-			let plainTextEnd = editorRef.current.selectionEnd ?? 0;
-			if (plainTextStart === plainTextEnd) return;
-
-			let valueStart = plainTextStart;
-			let valueEnd = plainTextEnd;
-			const sortedMentionsArr = sortMentionsByIndex(request.mentionRaw);
-			const newMentionArr: MentionItem[] = [];
-
-			let selectedTextIsInsideMention = false;
-
-			for (let index = 0; index < sortedMentionsArr.length; index++) {
-				const item = sortedMentionsArr[index];
-				const plainMentionStartPosition = item.plainTextIndex;
-				const plainMentionEndPosition = item.plainTextIndex + item.display.length;
-				const mentionWithValueStartPosition = item.index;
-				const mentionWithValueEndPosition = item.index + addSymbolsAndIdsLengthOfMention(item.display.length, item.childIndex);
-
-				if (plainTextStart > plainMentionStartPosition && plainTextEnd > plainMentionEndPosition) {
-					newMentionArr.push(item);
-					valueStart = addSymbolsAndIdsLengthOfMention(valueStart, item.childIndex);
-					valueEnd = addSymbolsAndIdsLengthOfMention(valueEnd, item.childIndex);
-					if (plainTextStart < plainMentionEndPosition) {
-						valueStart = mentionWithValueEndPosition;
-						plainTextStart = plainMentionEndPosition;
-					}
-				} else if (plainTextStart >= plainMentionStartPosition && plainTextEnd <= plainMentionEndPosition) {
-					selectedTextIsInsideMention = true;
-					break;
-				} else if (plainTextStart <= plainMentionStartPosition && plainTextEnd >= plainMentionEndPosition) {
-					selectedTextIsInsideMention = true;
-					break;
-				} else {
-					const mentionWithNewIndex: MentionItem = {
-						...item,
-						index: item.index + 4
-					};
-					newMentionArr.push(mentionWithNewIndex);
-					if (
-						plainTextStart < plainMentionStartPosition &&
-						plainTextEnd <= plainMentionEndPosition &&
-						plainTextEnd > plainMentionStartPosition
-					) {
-						valueEnd = mentionWithValueStartPosition;
-						plainTextEnd = plainMentionStartPosition;
-					}
-				}
-			}
-			const boldedText = request.content.substring(plainTextStart, plainTextEnd);
-
-			if (boldedText.trim() === '' || selectedTextIsInsideMention) return;
-
-			const mentionItem: MentionItem = {
-				display: boldedText,
-				id: '',
-				childIndex: ETypeMEntion.BOLD,
-				index: valueStart,
-				plainTextIndex: plainTextStart
-			};
-
-			if (request.mentionRaw.length > 0) {
-				setRequestInput({
-					...request,
-					mentionRaw: [...newMentionArr, mentionItem],
-					valueTextInput: request.valueTextInput.slice(0, valueStart) + `**${boldedText}**` + request.valueTextInput.slice(valueEnd)
-				});
-			} else {
-				setRequestInput({
-					...request,
-					mentionRaw: [mentionItem],
-					valueTextInput: request.valueTextInput.slice(0, valueStart) + `**${boldedText}**` + request.valueTextInput.slice(valueEnd)
-				});
-			}
+			handleBoldShortCut({ editorRef: editorRef, request: request, setRequestInput });
 		}
 
 		switch (key) {

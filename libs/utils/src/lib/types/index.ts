@@ -1468,3 +1468,9 @@ export type HistoryItem = {
 	content: string;
 	mentionRaw: any[];
 };
+
+export enum SymbolsAndIdsLengthOfMentionValue {
+	MENTION_OR_HASHTAG = 23,
+	EMOJI = 25,
+	BOLD = 4
+}
