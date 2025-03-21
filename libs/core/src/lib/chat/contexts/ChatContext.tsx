@@ -1452,8 +1452,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
 
 			// Check repeat
-			const isEventNotRepeat =
-				eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT || eventCreatedEvent.repeat_type === ERepeatType.DEFAULT;
+			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
 
 			// Check status
 			const isEventUpcoming = eventCreatedEvent.event_status === EEventStatus.UPCOMING;

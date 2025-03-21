@@ -16,8 +16,10 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import ImageNative from '../../../components/ImageNative';
 import { UserStatus } from '../../../components/UserStatus';
+import { IconCDN } from '../../../constants/icon_cdn';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { getUserStatusByMetadata } from '../../../utils/helpers';
@@ -112,12 +114,12 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	return (
 		<View style={styles.headerWrapper}>
 			<Pressable onPress={handleBack} style={styles.backButton}>
-				<Icons.ArrowLargeLeftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
+				<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.text} height={size.s_20} width={size.s_20} />
 			</Pressable>
 			<Pressable style={styles.channelTitle} onPress={navigateToThreadDetail}>
 				{isTypeDMGroup ? (
 					<View style={styles.groupAvatar}>
-						<Icons.GroupIcon width={18} height={18} />
+						<MezonIconCDN icon={IconCDN.groupIcon} width={18} height={18} />
 					</View>
 				) : (
 					<View style={styles.avatarWrapper}>
@@ -147,7 +149,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 				)}
 				{!isTypeDMGroup && !!currentDmGroup?.user_id?.[0] && (
 					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
-						<Icons.PhoneCallIcon width={size.s_18} height={size.s_18} color={themeValue.text} />
+						<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 				)}
 			</Pressable>

@@ -172,7 +172,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				title: contentSubmit.topic === currentEvent.title ? undefined : contentSubmit.topic,
 				start_time: timeValueStart === convertToLongUTCFormat(currentEvent.start_time as string) ? undefined : timeValueStart,
 				end_time: timeValueEnd === convertToLongUTCFormat(currentEvent.end_time as string) ? undefined : timeValueEnd,
-				repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? ERepeatType.DEFAULT : contentSubmit.repeatType
+				repeat_type: contentSubmit.repeatType === currentEvent.repeat_type ? ERepeatType.DOES_NOT_REPEAT : contentSubmit.repeatType
 			};
 
 			const additionalFields: Partial<Record<string, string | number | undefined>> = {
