@@ -14,6 +14,7 @@ function Login() {
 	const [loginId, setLoginId] = useState<string | null>(null);
 	const [createSecond, setCreateSecond] = useState<number | null>(null);
 	const [hidden, setHidden] = useState<boolean>(false);
+	const [isRemember, setIsRemember] = useState<boolean>(false);
 	useEffect(() => {
 		const fetchQRCode = async () => {
 			const qRInfo = await qRCode();
@@ -38,7 +39,7 @@ function Login() {
 					setHidden(true);
 					clearInterval(intervalId);
 				} else {
-					const currentSession = await checkLoginRequest(loginId);
+					const currentSession = await checkLoginRequest(loginId, isRemember);
 					if (currentSession !== null && currentSession !== undefined) {
 						clearInterval(intervalId);
 					}
@@ -49,7 +50,7 @@ function Login() {
 		return () => {
 			clearInterval(intervalId);
 		};
-	}, [checkLoginRequest, createSecond, loginId]);
+	}, [checkLoginRequest, createSecond, isRemember, loginId]);
 
 	useEffect(() => {
 		if (isLogin) {
@@ -85,7 +86,13 @@ function Login() {
 					</ol>
 
 					<div className="mt-4 flex items-center text-gray-400">
-						<input disabled type="checkbox" id="keepSignedIn" className="mr-2" />
+						<input
+							type="checkbox"
+							id="keepSignedIn"
+							className="mr-2"
+							checked={isRemember}
+							onChange={(e) => setIsRemember(e.target.checked)}
+						/>
 						<label htmlFor="keepSignedIn">Keep me signed in</label>
 					</div>
 				</div>

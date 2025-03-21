@@ -1,12 +1,20 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { usePermissionChecker } from '@mezon/core';
+import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
-import { categoriesActions, channelsActions, selectCurrentChannelId, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
-import { EPermission, ICategoryChannel } from '@mezon/utils';
+import {
+	appActions,
+	categoriesActions,
+	channelsActions,
+	defaultNotificationCategoryActions,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	useAppDispatch
+} from '@mezon/store-mobile';
+import { EPermission, ICategoryChannel, sleep } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -14,10 +22,17 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import MezonClanAvatar from '../../../../../componentUI/MezonClanAvatar';
 import MezonConfirm from '../../../../../componentUI/MezonConfirm';
-import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../../../../componentUI/MezonMenu';
+import CategoryNotificationSetting from '../../../../../components/CategoryNotificationSetting';
 import InviteToChannel from '../InviteToChannel';
 import { style } from './styles';
 
+enum StatusMarkAsReadCategory {
+	Error = 'error',
+	Success = 'success',
+	Idle = 'idle',
+	Pending = 'pending'
+}
 interface ICategoryMenuProps {
 	category: ICategoryChannel;
 }
@@ -30,13 +45,13 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const [isCanManageChannel] = usePermissionChecker([EPermission.manageChannel], currentChanelId ?? '');
-	const [isShowModalDeleteCategory, setIsShowModalDeleteCategory] = useState<boolean>(false);
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
+	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
 	const { dismiss } = useBottomSheetModal();
 	const dispatch = useAppDispatch();
 
 	const handleRemoveCategory = useCallback(() => {
-		dismiss();
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		dispatch(
 			categoriesActions.deleteCategory({
 				clanId: category?.clan_id as string,
@@ -47,13 +62,57 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 		dispatch(channelsActions.fetchChannels({ clanId: category?.clan_id, noCache: true, isMobile: true }));
 	}, [category?.category_name, category?.clan_id, category?.id]);
 
+	const handleMarkAsRead = useCallback(async () => {
+		handleMarkAsReadCategory(category);
+	}, [category, handleMarkAsReadCategory]);
+
+	useEffect(() => {
+		dispatch(appActions.setLoadingMainMobile(statusMarkAsReadCategory === StatusMarkAsReadCategory.Pending));
+	}, [dispatch, statusMarkAsReadCategory]);
+
+	useEffect(() => {
+		dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({ categoryId: category?.id }));
+	}, []);
+
+	const openBottomSheet = () => {
+		const data = {
+			heightFitContent: true,
+			children: <CategoryNotificationSetting category={category} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	};
+
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.watchMenu.markAsRead'),
-			onPress: () => reserve(),
+			onPress: handleMarkAsRead,
 			icon: <Icons.EyeIcon color={themeValue.textStrong} />
 		}
 	];
+
+	const handleDelete = async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		await sleep(500);
+		const data = {
+			children: (
+				<MezonConfirm
+					onConfirm={handleRemoveCategory}
+					title={t('menu.modalConfirm.title')}
+					confirmText={t('menu.modalConfirm.confirmText')}
+					content={t('menu.modalConfirm.content')}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	};
+
+	const handleMuteCategory = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+			screen: APP_SCREEN.MENU_THREAD.MUTE_CATEGORY_DETAIL,
+			params: { currentCategory: category }
+		});
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+	};
 
 	const inviteMenu: IMezonMenuItemProps[] = [
 		{
@@ -72,12 +131,12 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 	const notificationMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.notification.muteCategory'),
-			onPress: () => reserve(),
+			onPress: handleMuteCategory,
 			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />
 		},
 		{
 			title: t('menu.notification.notification'),
-			onPress: () => reserve(),
+			onPress: openBottomSheet,
 			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />
 		}
 	];
@@ -113,7 +172,7 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 		},
 		{
 			title: t('menu.organizationMenu.delete'),
-			onPress: () => setIsShowModalDeleteCategory(true),
+			onPress: handleDelete,
 			icon: <Icons.CloseLargeIcon color={Colors.textRed} />,
 			isShow: isCanManageChannel,
 			textStyle: {
@@ -166,14 +225,6 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
 			<View>
 				<MezonMenu menu={menu} />
 			</View>
-			<MezonConfirm
-				visible={isShowModalDeleteCategory}
-				title={t('menu.modalConfirm.title')}
-				confirmText={t('menu.modalConfirm.confirmText')}
-				content={t('menu.modalConfirm.content')}
-				onConfirm={handleRemoveCategory}
-				onVisibleChange={setIsShowModalDeleteCategory}
-			/>
 		</View>
 	);
 }

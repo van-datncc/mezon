@@ -157,13 +157,13 @@ export function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScre
 			},
 			expandable: true,
 			icon: <Icons.LinkIcon color={themeValue.text} />
-		},
-		{
-			title: t('menu.userManagement.bans'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.HammerIcon color={themeValue.text} />
 		}
+		// {
+		// 	title: t('menu.userManagement.bans'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.HammerIcon color={themeValue.text} />
+		// }
 	];
 
 	const menu: IMezonMenuSectionProps[] = [

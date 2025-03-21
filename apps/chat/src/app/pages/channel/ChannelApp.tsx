@@ -1,6 +1,7 @@
 import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, VideoConference } from '@livekit/components-react';
 import {
 	channelAppActions,
+	generateMeetToken,
 	getStore,
 	giveCoffeeActions,
 	handleParticipantMeetState,
@@ -9,8 +10,10 @@ import {
 	selectAllRolesClan,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
+	selectEnableCall,
 	selectEnableMic,
 	selectEnableVideo,
+	selectGetRoomId,
 	selectInfoSendToken,
 	selectLiveToken,
 	selectSendTokenEvent,
@@ -22,7 +25,7 @@ import {
 import { Loading } from '@mezon/ui';
 import { MiniAppEventType, ParticipantMeetState } from '@mezon/utils';
 import { ApiChannelAppResponse } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useMiniAppEventListener from './useMiniAppEventListener';
 
@@ -64,7 +67,7 @@ export function VideoRoom({ token, serverUrl }: { token: string; serverUrl: stri
 	);
 }
 
-export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelAppResponse; onFocus?: () => void }) {
+export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelAppResponse }) => {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -74,6 +77,9 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
 	const userProfile = useSelector(selectAllAccount);
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
+	const roomId = useSelector(selectGetRoomId);
+	const isJoinVoice = useSelector(selectEnableCall);
+	const token = useSelector(selectLiveToken);
 
 	const miniAppDataHash = useMemo(() => {
 		return `userChannels=${JSON.stringify(userChannels)}`;
@@ -98,6 +104,30 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 		dispatch(channelAppActions.setChannelId(appChannel.channel_id || ''));
 		dispatch(channelAppActions.setClanId(appChannel?.clan_id || null));
 	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			if (!roomId || !isJoinVoice) return;
+
+			try {
+				const result = await dispatch(
+					generateMeetToken({
+						channelId: appChannel?.channel_id as string,
+						roomName: roomId
+					})
+				).unwrap();
+
+				if (result) {
+					dispatch(channelAppActions.setRoomToken(result));
+				}
+			} catch (err) {
+				console.error('Failed to join room:', err);
+				dispatch(channelAppActions.setRoomToken(undefined));
+			}
+		};
+
+		fetchData();
+	}, [roomId, isJoinVoice]);
 
 	const getUserHashInfo = useCallback(
 		async (appId: string) => {
@@ -143,7 +173,6 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 		}
 	}, [sendTokenEvent]);
 
-	const token = useSelector(selectLiveToken);
 	const participantMeetState = useCallback(
 		async (state: ParticipantMeetState, channelId: string) => {
 			try {
@@ -179,31 +208,31 @@ export function ChannelApps({ appChannel, onFocus }: { appChannel: ApiChannelApp
 
 		joinRoom();
 	}, [appChannel, participantMeetState]);
+
 	return appChannel?.url ? (
-		<>
+		<div className="relative w-full h-full rounded-b-lg">
 			<div className="w-full h-full">
 				<iframe
-					onMouseDown={onFocus}
 					allow="clipboard-read; clipboard-write"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}
-					className="w-full h-full"
+					className="w-full h-full rounded-b-lg"
 				/>
 			</div>
 
-			{token ? (
+			{token && (
 				<div className="hidden">
 					<VideoRoom token={token} serverUrl={serverUrl} />
 				</div>
-			) : null}
-		</>
+			)}
+		</div>
 	) : (
-		<div className="w-full h-full flex items-center justify-center">
+		<div className="w-full h-full flex items-center justify-center rounded-b-lg">
 			<Loading />
 		</div>
 	);
-}
+});
 
 function VideoControls() {
 	const enableVideo = useSelector(selectEnableVideo);

@@ -7,6 +7,7 @@ export class CustomFile extends File {
 	url?: string;
 	width?: number;
 	height?: number;
+	thumbnail?: string;
 }
 
 export const isValidUrl = (urlString: string) => {
@@ -87,7 +88,19 @@ export async function handleUploadFile(
 			const buf = await file?.arrayBuffer();
 
 			resolve(
-				uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename, file.width, file.height)
+				uploadFile(
+					client,
+					session,
+					filePath,
+					shortFileType,
+					file.size,
+					Buffer.from(buf),
+					false,
+					originalFilename,
+					file.width,
+					file.height,
+					file.thumbnail
+				)
 			);
 		} catch (error) {
 			reject(new Error(`${error}`));
@@ -161,7 +174,8 @@ export async function uploadFile(
 	isMobile?: boolean,
 	originalFilename?: string,
 	width?: number,
-	height?: number
+	height?: number,
+	thumbnail?: string
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -181,14 +195,15 @@ export async function uploadFile(
 			if (res.status !== 200) {
 				throw new Error('Failed to upload file to MinIO.');
 			}
-			const url = 'https://cdn.mezon.vn/' + filename;
+			const url = `https://${process.env.NX_BASE_IMG_URL}/` + filename;
 			resolve({
 				filename: originalFilename,
 				url: url,
 				filetype: type,
 				size: size,
 				width,
-				height
+				height,
+				thumbnail
 			});
 		} catch (error) {
 			reject(new Error(`${error}`));
