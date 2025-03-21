@@ -27,6 +27,8 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	fullScreen?: boolean;
 	isJoined: boolean;
 	token: string;
+	stream: MediaStream | null | undefined;
+	showSelectScreenModal: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -83,7 +85,9 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	voiceInfo: null,
 	fullScreen: false,
 	isJoined: false,
-	token: ''
+	token: '',
+	stream: null,
+	showSelectScreenModal: false
 });
 
 export const voiceSlice = createSlice({
@@ -118,11 +122,17 @@ export const voiceSlice = createSlice({
 		setShowScreen: (state, action: PayloadAction<boolean>) => {
 			state.showScreen = action.payload;
 		},
+		setShowSelectScreenModal: (state, action: PayloadAction<boolean>) => {
+			state.showSelectScreenModal = action.payload;
+		},
 		setStatusCall: (state, action: PayloadAction<boolean>) => {
 			state.statusCall = action.payload;
 		},
 		setVoiceConnectionState: (state, action: PayloadAction<boolean>) => {
 			state.voiceConnectionState = action.payload;
+		},
+		setStreamScreen: (state, action: PayloadAction<MediaStream | null | undefined>) => {
+			state.stream = action.payload;
 		},
 		setFullScreen: (state, action: PayloadAction<boolean>) => {
 			state.fullScreen = action.payload;
@@ -136,6 +146,7 @@ export const voiceSlice = createSlice({
 			state.fullScreen = false;
 			state.isJoined = false;
 			state.token = '';
+			state.stream = null;
 		}
 		// ...
 	},
@@ -224,6 +235,9 @@ const selectChannelId = (_: RootState, channelId: string) => channelId;
 export const selectVoiceChannelMembersByChannelId = createSelector([selectAllVoice, selectChannelId], (entities, channelId) => {
 	return entities.filter((member) => member && member.voice_channel_id === channelId);
 });
+export const selectStreamScreen = createSelector(getVoiceState, (state) => state.stream);
+
+export const selectShowSelectScreenModal = createSelector(getVoiceState, (state) => state.showSelectScreenModal);
 
 export const selectNumberMemberVoiceChannel = createSelector([selectVoiceChannelMembersByChannelId], (members) => members.length);
 

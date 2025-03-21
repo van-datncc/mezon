@@ -732,12 +732,17 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			prev.dataReferences === curr.dataReferences &&
 			prev.idMessageNotified === curr.idMessageNotified &&
 			prev.lastMessageUnreadId === curr.lastMessageUnreadId &&
-			prev.appearanceTheme === curr.appearanceTheme
+			prev.appearanceTheme === curr.appearanceTheme &&
+			prev.avatarDM === curr.avatarDM &&
+			prev.channelLabel === curr.channelLabel
 		);
 	}
 );
 
-const MemoizedChannelMessages = memo(ChannelMessages, (prev, cur) => prev.channelId === cur.channelId) as unknown as typeof ChannelMessages & {
+const MemoizedChannelMessages = memo(
+	ChannelMessages,
+	(prev, cur) => prev.channelId === cur.channelId && prev.avatarDM === cur.avatarDM && prev.channelLabel === cur.channelLabel
+) as unknown as typeof ChannelMessages & {
 	Skeleton: typeof ChannelMessages.Skeleton;
 };
 

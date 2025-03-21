@@ -128,10 +128,18 @@ const Attachments: React.FC<{
 };
 
 // TODO: refactor component for message lines
-const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentProps) => {
+const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionForLoading }: MessageAttachmentProps) => {
 	const validateAttachment = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
 	if (!validateAttachment) return null;
-	return <Attachments mode={mode} message={message} attachments={validateAttachment} onContextMenu={onContextMenu} />;
+	return (
+		<Attachments
+			mode={mode}
+			message={message}
+			attachments={validateAttachment}
+			onContextMenu={onContextMenu}
+			observeIntersectionForLoading={observeIntersectionForLoading}
+		/>
+	);
 };
 
 const ImageAlbum = ({
@@ -274,7 +282,7 @@ const ImageAlbum = ({
 		dispatch(attachmentActions.setMessageId(message.id));
 	}, []);
 
-	if (images.length > 2) {
+	if (images.length >= 2) {
 		const albumLayout = calculateAlbumLayout(false, true, images, false);
 		return (
 			<div className="w-full">

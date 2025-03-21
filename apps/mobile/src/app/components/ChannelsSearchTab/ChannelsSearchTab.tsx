@@ -1,15 +1,10 @@
-import { ActionEmitEvent, ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { ChannelTypeHeader } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
-import { ChannelThreads } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
+import { ChannelUsersEntity } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, FlatList, Keyboard, Linking, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { linkGoogleMeet } from '../../utils/helpers';
+import { FlatList, Keyboard, Text, View } from 'react-native';
 import { ChannelItem } from '../ChannelItem';
 import { EmptySearchPage } from '../EmptySearchPage';
 import style from './ChannelsSearchTab.styles';
@@ -20,11 +15,8 @@ type ChannelsSearchTabProps = {
 
 export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	const { t } = useTranslation(['searchMessageChannel']);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const timeoutRef = useRef<NodeJS.Timeout>();
-	const navigation = useNavigation<any>();
 	const listVoiceChannel = useMemo(
 		() =>
 			listChannelSearch?.filter(
@@ -58,55 +50,11 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		[listTextChannel, listVoiceChannel, listStreamingChannel, t]
 	);
 
-	const handleRouteData = useCallback(
-		async (channelData: ChannelThreads) => {
-			requestAnimationFrame(async () => {
-				if (channelData?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.meeting_code) {
-					const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
-					await Linking.openURL(urlVoice);
-					return;
-				}
-
-				const clanId = channelData?.clan_id;
-				const store = await getStoreAsync();
-				// Join clan
-				if (currentClanId !== clanId) {
-					store.dispatch(clansActions.joinClan({ clanId: clanId }));
-					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-				}
-
-				if (channelData?.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelData?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-					const channelId = channelData?.channel_id;
-					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-					timeoutRef.current = setTimeout(async () => {
-						await store.dispatch(
-							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, noCache: true })
-						);
-					}, 0);
-
-					// Set cache
-					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				} else if (channelData?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-					navigation.goBack();
-					if (!channelData.meeting_code) return;
-					const data = {
-						channelId: channelData?.channel_id || '',
-						roomName: channelData?.meeting_code
-					};
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
-				}
-			});
-		},
-		[currentClanId, navigation]
-	);
-
 	const renderItem = ({ item }) => {
 		if (item?.type === ChannelTypeHeader) {
 			return <Text style={styles.title}>{item.title}</Text>;
 		}
-		return <ChannelItem onPress={handleRouteData} channelData={item} key={item?.id} />;
+		return <ChannelItem channelData={item} key={item?.id} />;
 	};
 
 	return (

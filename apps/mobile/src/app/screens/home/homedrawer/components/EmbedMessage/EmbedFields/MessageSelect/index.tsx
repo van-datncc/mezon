@@ -1,9 +1,11 @@
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { IMezonFakeBoxProps } from '../../../../../../../componentUI/MezonFakeBox';
+import MezonIconCDN from '../../../../../../../componentUI/MezonIconCDN';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../../../../../../componentUI/MezonMenu';
+import { IconCDN } from '../../../../../../../constants/icon_cdn';
 import { style } from './styles';
 
 type ISelectItem = {
@@ -64,7 +66,7 @@ export default function MessageSelect({ data, placeholder, defaultValue, onChang
 				<TouchableOpacity onPress={handlePress}>
 					<View style={styles.fakeBox}>
 						<Text style={styles.text}>{currentContent as string}</Text>
-						<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
 					</View>
 				</TouchableOpacity>
 			</View>

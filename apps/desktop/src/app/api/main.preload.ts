@@ -41,5 +41,5 @@ contextBridge.exposeInMainWorld('electron', {
 	handleActionShowImage: (action: string, url: any) => {
 		return ipcRenderer.invoke(ACTION_SHOW_IMAGE, { payload: { action, fileURL: url } });
 	},
-	getScreenSources: () => ipcRenderer.invoke(REQUEST_PERMISSION_SCREEN)
+	getScreenSources: (source: string) => ipcRenderer.invoke(REQUEST_PERMISSION_SCREEN, source)
 });
