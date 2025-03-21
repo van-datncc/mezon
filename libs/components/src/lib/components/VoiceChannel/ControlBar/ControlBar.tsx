@@ -1,12 +1,26 @@
-import { ControlBarControls, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
-import { selectShowCamera, selectShowMicrophone, selectShowScreen, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
+import { ControlBarControls, useLocalParticipant, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
+import {
+	selectShowCamera,
+	selectShowMicrophone,
+	selectShowScreen,
+	selectShowSelectScreenModal,
+	selectStreamScreen,
+	selectVoiceFullScreen,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useMediaPermissions } from '@mezon/utils';
-import { Track } from 'livekit-client';
+
+import isElectron from 'is-electron';
+import { LocalTrackPublication, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModal';
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
+import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
@@ -20,10 +34,11 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
-
+	const screenTrackRef = useRef<LocalTrackPublication | null>(null);
+	const isDesktop = isElectron();
 	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
 	variation ??= defaultVariation;
-
+	const stream = useSelector(selectStreamScreen);
 	const visibleControls = { leave: true, ...controls };
 
 	const showScreen = useSelector(selectShowScreen);
@@ -31,8 +46,9 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 	const showMicrophone = useSelector(selectShowMicrophone);
 
 	const isFullScreen = useSelector(selectVoiceFullScreen);
-
+	const isShowSelectScreenModal = useSelector(selectShowSelectScreenModal);
 	const localPermissions = useLocalParticipantPermissions();
+	const localParticipant = useLocalParticipant();
 
 	if (!localPermissions) {
 		visibleControls.camera = false;
@@ -60,8 +76,60 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 		[dispatch]
 	);
 
+	useEffect(() => {
+		if (isShowSelectScreenModal) {
+			openScreenSelection();
+		}
+	}, [isShowSelectScreenModal]);
+
+	const [openScreenSelection, closeScreenSelection] = useModal(() => {
+		return <ScreenSelectionModal onClose={closeScreenSelection} />;
+	});
+
+	useEffect(() => {
+		if (!showScreen && isDesktop) {
+			if (screenTrackRef.current?.track) {
+				screenTrackRef.current.track.stop?.();
+				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+				screenTrackRef.current = null;
+			}
+			dispatch(voiceActions.setStreamScreen(null));
+		}
+	}, [dispatch, isDesktop, localParticipant.localParticipant, showScreen]);
+
+	useEffect(() => {
+		const publishScreenTrack = async () => {
+			if (!stream) return;
+
+			const videoTrack = stream.getVideoTracks()[0];
+
+			try {
+				const trackPublication = await localParticipant.localParticipant.publishTrack(videoTrack, {
+					name: 'screen-share',
+					source: Track.Source.ScreenShare
+				});
+
+				screenTrackRef.current = trackPublication;
+			} catch (error) {
+				console.error('Error publishing screen track:', error);
+			}
+		};
+
+		publishScreenTrack();
+	}, [dispatch, localParticipant.localParticipant, stream]);
+
+	const handleOpenScreenSelection = useCallback(() => {
+		if (isDesktop) {
+			if (!showScreen) {
+				dispatch(voiceActions.setShowSelectScreenModal(true));
+			} else {
+				dispatch(voiceActions.setShowScreen(false));
+			}
+		}
+	}, [isDesktop, openScreenSelection, showScreen]);
+
 	const onScreenShare = useCallback(
-		(enabled: boolean, isUserInitiated: boolean) => {
+		async (enabled: boolean, isUserInitiated: boolean) => {
 			if (enabled) {
 				dispatch(voiceActions.setFullScreen(false));
 			}
@@ -159,15 +227,22 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
 						destroyTooltipOnHide
 					>
-						<TrackToggle
-							key={+showScreen}
-							initialState={showScreen}
-							className="w-14 h-14 !rounded-full flex justify-center items-center"
-							source={Track.Source.ScreenShare}
-							captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
-							onChange={onScreenShare}
-							onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
-						/>
+						{!isDesktop ? (
+							<TrackToggle
+								key={+showScreen}
+								initialState={showScreen}
+								className="w-14 h-14 !rounded-full flex justify-center items-center"
+								source={Track.Source.ScreenShare}
+								captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
+								onChange={onScreenShare}
+								onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
+							/>
+						) : (
+							<ScreenShareToggleButton
+								onClick={handleOpenScreenSelection}
+								className="w-14 h-14 !rounded-full flex justify-center items-center"
+							/>
+						)}
 					</Tooltip>
 				)}
 				{visibleControls.leave && (
@@ -282,6 +357,27 @@ function useMediaQuery(query: string): boolean {
 	return matches;
 }
 
-function supportsScreenSharing(): boolean {
+const supportsScreenSharing = () => {
 	return typeof navigator !== 'undefined' && navigator.mediaDevices && !!navigator.mediaDevices.getDisplayMedia;
+};
+
+async function getElectronScreenStream() {
+	if (!isElectron() || !window.electron) return null;
+	const sources = await window.electron.getScreenSources('screen');
+	if (!sources.length) return null;
+	try {
+		const stream = await navigator.mediaDevices.getUserMedia({
+			audio: false,
+			video: {
+				mandatory: {
+					chromeMediaSource: 'desktop',
+					chromeMediaSourceId: sources[0].id
+				}
+			}
+		} as MediaStreamConstraints);
+		return stream;
+	} catch (error) {
+		console.error('Error getting screen stream:', error);
+		return null;
+	}
 }

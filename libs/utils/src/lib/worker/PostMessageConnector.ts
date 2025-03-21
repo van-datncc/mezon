@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { AnyFunction, AnyToVoidFunction } from '../types';
 import { throttleWithTickEnd } from '../utils';
 import generateUniqueId from '../utils/generateUniqueId';

@@ -2,7 +2,6 @@ import { useCategorizedAllChannels } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	CheckIcon,
-	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
@@ -20,8 +19,10 @@ import { DeviceEventEmitter, Pressable, ScrollView, Text } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonConfirm from '../../componentUI/MezonConfirm';
+import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import MezonInput from '../../componentUI/MezonInput';
 import { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
+import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { style } from './styles';
 
@@ -63,7 +64,7 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 				{
 					title: t('fields.categoryPermission.permission'),
 					expandable: true,
-					icon: <Icons.UserShieldIcon color={themeValue.text} />
+					icon: <MezonIconCDN icon={IconCDN.shieldUserIcon} color={themeValue.text} />
 				}
 			] satisfies IMezonMenuItemProps[],
 		[]

@@ -930,7 +930,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
-			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent?.user_id, customStatus: statusEvent?.status }));
+			dispatch(directMembersMetaActions.updateStatus({ userId: statusEvent.user_id, status: statusEvent.status }));
 			if (statusEvent.user_id === userId) {
 				dispatch(accountActions.setCustomStatus(statusEvent.status));
 			}
@@ -1230,6 +1230,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(userUpdated: UserProfileUpdatedEvent) => {
 			if (userUpdated.user_id === userId) {
 				dispatch(accountActions.setUpdateAccount({ encrypt_private_key: userUpdated?.encrypt_private_key }));
+			} else {
+				dispatch(
+					directActions.updateMenberDMGroup({
+						dmId: userUpdated.channel_id,
+						user_id: userUpdated.user_id,
+						avatar: userUpdated.avatar,
+						display_name: userUpdated.display_name
+					})
+				);
 			}
 		},
 		[dispatch, userId]
@@ -1452,8 +1461,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
 
 			// Check repeat
-			const isEventNotRepeat =
-				eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT || eventCreatedEvent.repeat_type === ERepeatType.DEFAULT;
+			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
 
 			// Check status
 			const isEventUpcoming = eventCreatedEvent.event_status === EEventStatus.UPCOMING;

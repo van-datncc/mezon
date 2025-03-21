@@ -35,15 +35,6 @@ function normalizeSession(session: Session): ISession {
 	return session;
 }
 
-export const authenticateGoogle = createAsyncThunk('auth/authenticateGoogle', async (token: string, thunkAPI) => {
-	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon.authenticateGoogle(token);
-	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	return normalizeSession(session);
-});
-
 export const authenticateApple = createAsyncThunk('auth/authenticateApple', async (token: string, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
 	const session = await mezon.authenticateApple(token);
@@ -156,20 +147,6 @@ export const authSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(authenticateGoogle.pending, (state: AuthState) => {
-				state.loadingStatus = 'loading';
-			})
-			.addCase(authenticateGoogle.fulfilled, (state: AuthState, action) => {
-				state.loadingStatus = 'loaded';
-				state.session = action.payload;
-				state.isLogin = true;
-			})
-			.addCase(authenticateGoogle.rejected, (state: AuthState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
-
-		builder
 			.addCase(authenticateApple.pending, (state: AuthState) => {
 				state.loadingStatus = 'loading';
 			})
@@ -244,7 +221,6 @@ export const authReducer = authSlice.reducer;
 
 export const authActions = {
 	...authSlice.actions,
-	authenticateGoogle,
 	authenticateApple,
 	authenticateMezon,
 	refreshSession,

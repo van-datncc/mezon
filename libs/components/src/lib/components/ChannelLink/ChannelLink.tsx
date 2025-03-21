@@ -193,8 +193,8 @@ const ChannelLinkComponent = ({
 	const notVoiceOrAppOrStreamChannel =
 		channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 		channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING;
-
+		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
+		channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
 	const notMuteAndUnread =
 		(channel?.is_mute === undefined ? true : !channel?.is_mute) && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
@@ -302,9 +302,9 @@ const ChannelLinkComponent = ({
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && (
 								<Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />
 							)}
-							{isPrivate && channel.type === ChannelType.CHANNEL_TYPE_APP && (
+							{isPrivate && channel.type === ChannelType.CHANNEL_TYPE_APP ? (
 								<Icons.PrivateAppChannelIcon className={'w-5 h-5'} fill={theme} />
-							)}
+							) : null}
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p

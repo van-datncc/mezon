@@ -9,7 +9,6 @@ const useLayoutEffectWithPrevDeps = <const T extends readonly any[]>(cb: (args: 
 		prevDepsRef.current = dependencies;
 
 		return cb(prevDeps || []);
-		// eslint-disable-next-line react-hooks-static-deps/exhaustive-deps
 	}, dependencies);
 };
 

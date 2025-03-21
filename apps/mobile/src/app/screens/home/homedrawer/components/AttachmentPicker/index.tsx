@@ -1,15 +1,20 @@
-import { Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { appActions, referencesActions } from '@mezon/store-mobile';
+import { ChannelsEntity, appActions, getStoreAsync, referencesActions, selectChannelById, selectDmGroupCurrentId } from '@mezon/store-mobile';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { checkIsThread } from '@mezon/utils';
 import Geolocation from '@react-native-community/geolocation';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
+import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IFile } from '../../../../../componentUI/MezonImagePicker';
+import ShareLocationConfirmModal from '../../../../../components/ShareLocationConfirmModal';
+import { IconCDN } from '../../../../../constants/icon_cdn';
 import { AlbumPanel } from '../../AlbumPannel';
 import Gallery from './Gallery';
 import { style } from './styles';
@@ -17,7 +22,7 @@ export type AttachmentPickerProps = {
 	mode?: number;
 	currentChannelId?: string;
 	currentClanId?: string;
-	onCancel?: () => void;
+	onCancel?: (isForcesKeyboard?: boolean) => void;
 };
 
 function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: AttachmentPickerProps) {
@@ -180,8 +185,35 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		const permissionGranted = await requestLocationPermission();
 		if (permissionGranted) {
 			try {
+				onCancel?.(false);
 				const { latitude, longitude } = await getCurrentPosition();
-				dispatch(referencesActions.setGeolocation({ latitude, longitude }));
+				const store = await getStoreAsync();
+				let mode = ChannelStreamMode.STREAM_MODE_CHANNEL;
+				const currentDirectId = selectDmGroupCurrentId(store.getState());
+				if (currentDirectId) {
+					mode = ChannelStreamMode.STREAM_MODE_DM;
+				} else {
+					const channel = selectChannelById(store.getState(), currentChannelId as string) as ChannelsEntity;
+					const isThread = checkIsThread(channel);
+					if (isThread) {
+						mode = ChannelStreamMode.STREAM_MODE_THREAD;
+					}
+				}
+
+				const geoLocation = {
+					latitude,
+					longitude
+				};
+				const data = {
+					children: (
+						<ShareLocationConfirmModal
+							mode={mode}
+							channelId={currentDirectId ? currentDirectId : currentChannelId}
+							geoLocation={geoLocation}
+						/>
+					)
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 			} catch (error) {
 				console.error(error);
 			}
@@ -205,21 +237,21 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			{isShowAlbum && <AlbumPanel valueAlbum={currentAlbum} onAlbumChange={handleChangeAlbum} />}
 			<View style={styles.wrapperHeader}>
 				<TouchableOpacity activeOpacity={0.8} style={styles.buttonHeader} onPress={() => handleLinkGoogleMap()}>
-					<Icons.LocationIcon height={20} width={20} color={themeValue.text} />
+					<MezonIconCDN icon={IconCDN.locationIcon} height={20} width={20} color={themeValue.text} />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.location')}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity activeOpacity={0.8} style={styles.buttonAlbum} onPress={handleShow}>
 					<View style={styles.albumButtonGroup}>
 						<Text style={styles.albumTitle}>{currentAlbum}</Text>
 						{isShowAlbum ? (
-							<Icons.ChevronSmallUpIcon color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
+							<MezonIconCDN icon={IconCDN.chevronSmallUpIcon} color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
 						) : (
-							<Icons.ChevronSmallDownIcon color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
+							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
 						)}
 					</View>
 				</TouchableOpacity>
 				<TouchableOpacity activeOpacity={0.8} onPress={onPickFiles} style={styles.buttonHeader}>
-					<Icons.AttachmentIcon height={20} width={20} color={themeValue.text} />
+					<MezonIconCDN icon={IconCDN.attachmentIcon} height={20} width={20} color={themeValue.text} />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>

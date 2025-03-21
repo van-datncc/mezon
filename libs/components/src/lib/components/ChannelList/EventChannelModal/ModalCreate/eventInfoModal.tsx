@@ -48,14 +48,15 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	};
 
 	const weekdayOccurrence = getWeekdayOccurrence(contentSubmit.selectedDateStart);
+	const [selectedFrequency, setSelectedFrequency] = useState(0);
 
 	useEffect(() => {
-		if (errorEnd || errorStart) {
+		if (errorEnd || (errorStart && !selectedFrequency)) {
 			setErrorTime(true);
 		} else {
 			setErrorTime(false);
 		}
-	}, [errorStart, errorEnd]);
+	}, [errorStart, errorEnd, selectedFrequency]);
 
 	const frequencies = useMemo(() => {
 		const options = [
@@ -79,7 +80,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		return options;
 	}, [startDate, startDayOfWeek, startMonth, weekdayOccurrence]);
 
-	const [selectedFrequency, setSelectedFrequency] = useState(0);
 	useEffect(() => {
 		setSelectedFrequency(contentSubmit.repeatType ?? 0);
 	}, []);
@@ -258,7 +258,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						</option>
 					))}
 				</select>
-				{errorStart && <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p>}
+				{errorStart && !selectedFrequency ? <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p> : null}
 				{errorEnd && <p className="text-[#e44141] text-xs font-thin">The end time must be bigger than start time.</p>}
 			</div>
 			<div className="mb-4">

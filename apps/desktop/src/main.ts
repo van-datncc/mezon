@@ -1,4 +1,4 @@
-import { BrowserWindow, app, clipboard, dialog, ipcMain, nativeImage, screen, shell } from 'electron';
+import { BrowserWindow, app, clipboard, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from 'electron';
 import log from 'electron-log/main';
 import fs from 'fs';
 import { ChannelStreamMode } from 'mezon-js';
@@ -14,6 +14,7 @@ import {
 	MINIMIZE_WINDOW,
 	NAVIGATE_TO_URL,
 	OPEN_NEW_WINDOW,
+	REQUEST_PERMISSION_SCREEN,
 	SENDER_ID,
 	TITLE_BAR_ACTION,
 	UNMAXIMIZE_WINDOW
@@ -92,6 +93,15 @@ ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
 		console.error('Error downloading file:', error);
 		throw new Error('Failed to download file');
 	}
+});
+
+ipcMain.handle(REQUEST_PERMISSION_SCREEN, async (_event, source) => {
+	const sources = await desktopCapturer.getSources({ types: [source] });
+	return sources.map((src) => ({
+		id: src.id,
+		name: src.name,
+		thumbnail: src.thumbnail.toDataURL()
+	}));
 });
 
 ipcMain.handle(SENDER_ID, () => {
