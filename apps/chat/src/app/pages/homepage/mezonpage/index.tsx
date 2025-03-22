@@ -25,9 +25,9 @@ function MezonPage() {
 	const version = mezonPackage.version;
 
 	const downloadUrl: string = useMemo(() => {
-		if (platform === 'MacOS') {
+		if (platform === Platform.MACOS) {
 			return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-mac-arm64.dmg`;
-		} else if (platform === 'Linux') {
+		} else if (platform === Platform.LINUX) {
 			return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-win-x64.exe`;
@@ -135,7 +135,7 @@ function MezonPage() {
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
-							{platform === 'MacOS' ? (
+							{platform === Platform.MACOS ? (
 								<DropdownButton
 									icon={<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />}
 									downloadLinks={[

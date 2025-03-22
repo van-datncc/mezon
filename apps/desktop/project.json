@@ -27,7 +27,10 @@
         "appId": "E9Y2J54ZH3.app.mezon.ai",
         "category": "public.app-category.productivity",
         "target": {
-          "arch": ["x64", "arm64"],
+          "arch": [
+            "x64",
+            "arm64"
+          ],
           "target": "default"
         },
         "publish": [
@@ -91,7 +94,7 @@
         "publisherDisplayName": "NCCPLUS",
         "identityName": "MEZON.Mezon",
         "displayName": "MEZON"
-       },
+      },
       "linux": {
         "icon": "apps/desktop/src/assets/linux-icon.icns",
         "category": "Utility",
@@ -119,6 +122,11 @@
             "glob": "**/*",
             "input": "apps/desktop/src/assets/",
             "output": "./assets/"
+          },
+          {
+            "glob": "apps/chat/src/assets/js",
+            "input": "./",
+            "output": "./"
           },
           {
             "glob": "apps/chat/src/assets/favicon.ico",
@@ -171,7 +179,10 @@
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
           "target": {
-            "arch": ["x64", "arm64"],
+            "arch": [
+              "x64",
+              "arm64"
+            ],
             "target": "default"
           },
           "publish": [
@@ -229,13 +240,13 @@
           ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
-      "appx": {
-        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-        "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
-        "publisherDisplayName": "NCCPLUS",
-        "identityName": "MEZON.Mezon",
-        "displayName": "MEZON"
-       },
+        "appx": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
+          "publisherDisplayName": "NCCPLUS",
+          "identityName": "MEZON.Mezon",
+          "displayName": "MEZON"
+        },
         "linux": {
           "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",
@@ -270,7 +281,10 @@
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
           "target": {
-            "arch": ["x64", "arm64"],
+            "arch": [
+              "x64",
+              "arm64"
+            ],
             "target": "default"
           },
           "publish": [
@@ -327,13 +341,13 @@
           ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
-      "appx": {
-        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-        "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
-        "publisherDisplayName": "NCCPLUS",
-        "identityName": "MEZON.Mezon",
-        "displayName": "MEZON"
-       },
+        "appx": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publisher": "CN=877DCBF5-53BD-4E9B-82DE-DA6D88F92FF3",
+          "publisherDisplayName": "NCCPLUS",
+          "identityName": "MEZON.Mezon",
+          "displayName": "MEZON"
+        },
         "linux": {
           "icon": "apps/desktop/src/assets/linux-icon.icns",
           "category": "Utility",
