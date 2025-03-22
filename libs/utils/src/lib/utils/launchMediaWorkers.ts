@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { MediaWorkerApi } from '../mediaWorker/index.worker';
 import { Connector, createConnector } from '../worker/PostMessageConnector';
 
@@ -10,9 +11,35 @@ let instances:
 	  }[]
 	| undefined;
 
-const workerCode = `
+let cachedBlurhashPath: string | null = null;
+
+function getBlurhashPath() {
+	if (cachedBlurhashPath) {
+		return cachedBlurhashPath;
+	}
+
+	if (isElectron()) {
+		const pathParts = window.location.pathname.split('/');
+		const chatIndex = pathParts.findIndex((part) => part === 'chat');
+
+		if (chatIndex !== -1) {
+			const appPath = pathParts.slice(0, chatIndex + 1).join('/');
+			cachedBlurhashPath = `file://${appPath}/assets/js/blurhash.js`;
+		} else {
+			cachedBlurhashPath = 'file://' + window.location.pathname.replace(/\/index\.html.*$/, '/assets/js/blurhash.js');
+		}
+	} else {
+		cachedBlurhashPath = window.location.origin + '/assets/js/blurhash.js';
+	}
+
+	return cachedBlurhashPath;
+}
+
+function createWorkerCode() {
+	const blurhashPath = getBlurhashPath();
+	return `
   var module = { exports: {} };
-  importScripts(self.location.origin + '/assets/js/blurhash.js');
+  importScripts('${blurhashPath}');
   self.blurhash = module.exports;
 
   // Define utility functions
@@ -207,9 +234,12 @@ const workerCode = `
     });
   });
 `;
+}
 
 export default function launchMediaWorkers() {
 	if (!instances) {
+		const workerCode = createWorkerCode();
+
 		instances = new Array(MAX_WORKERS).fill(undefined).map(() => {
 			const blob = new Blob([workerCode], { type: 'application/javascript' });
 			// const worker = new Worker(new URL('./index.worker.ts', import.meta.url));
