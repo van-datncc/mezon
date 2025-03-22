@@ -1,14 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import {
-	useAppNavigation,
-	useAuth,
-	useDragAndDrop,
-	usePermissionChecker,
-	useSearchMessages,
-	useSeenMessagePool,
-	useWindowFocusState
-} from '@mezon/core';
+import { useAppNavigation, useAuth, useDragAndDrop, usePermissionChecker, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ETypeMission,
@@ -61,6 +53,7 @@ import {
 	SubPanelName,
 	TIME_OFFSET,
 	UploadLimitReason,
+	isBackgroundModeActive,
 	isLinuxDesktop,
 	isWindowsDesktop,
 	titleMission
@@ -79,11 +72,12 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
-	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const isFocus = !isBackgroundModeActive();
+
 	const previousChannels = useSelector(selectPreviousChannels);
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	}, [channelId, currentChannel, dispatch, isFocusDesktop, isTabVisible]);
+	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 	useEffect(() => {
@@ -136,12 +130,12 @@ function useChannelSeen(channelId: string) {
 		if (!statusFetchChannel) return;
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		if (isTabVisible) {
+		if (isFocus) {
 			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 			dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
 		}
-	}, [statusFetchChannel, isFocusDesktop, isTabVisible]);
+	}, [statusFetchChannel, isFocus]);
 
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {

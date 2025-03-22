@@ -6,11 +6,9 @@
 // set timeout to 1 second, if no new action comes in, send the latest action to clan
 
 import { channelMetaActions, directMetaActions, messagesActions, MessagesEntity, seenMessagePool, useAppDispatch } from '@mezon/store';
-import { IMessage, TIME_OFFSET } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { IMessage, isBackgroundModeActive, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
-import { useWindowFocusState } from './useWindowFocusState';
 
 export function useSeenMessagePool() {
 	const dispatch = useAppDispatch();
@@ -49,7 +47,7 @@ export function useSeenMessagePool() {
 			mode: message.mode as number
 		});
 	}, []);
-	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const isFocus = !isBackgroundModeActive();
 
 	const markAsReadSeen = useCallback(
 		(message: MessagesEntity, mode: number, badge_count: number) => {
@@ -67,7 +65,7 @@ export function useSeenMessagePool() {
 					badge_count
 				})
 			);
-			if ((isFocusDesktop === true && isElectron()) || isTabVisible) {
+			if (isFocus) {
 				const timestamp = Date.now() / 1000;
 				if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
 					dispatch(
@@ -82,7 +80,7 @@ export function useSeenMessagePool() {
 				}
 			}
 		},
-		[isFocusDesktop, isTabVisible]
+		[isFocus]
 	);
 
 	return useMemo(
