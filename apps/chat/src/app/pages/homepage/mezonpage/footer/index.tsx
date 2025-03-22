@@ -1,5 +1,5 @@
 import { Icons, Image } from '@mezon/ui';
-import { getPlatform } from '@mezon/utils';
+import { Platform, getPlatform } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { DropdownButton } from '..';
 interface FooterProps {
@@ -136,7 +136,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 								<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
 									<Image src={`assets/google-play.svg`} className="max-w-[135px]" />
 								</a>
-								{platform === 'MacOS' ? (
+								{platform === Platform.MACOS ? (
 									<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
 										<button onClick={toggleDropdown}>
 											<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
