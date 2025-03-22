@@ -1,4 +1,5 @@
 import { rolesClanActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { ApiRole } from 'mezon-js/dist/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useMyRole } from './useMyRole';
@@ -27,7 +28,7 @@ export function useRoles() {
 				})
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId, noCache: true }));
-			return response?.payload;
+			return response?.payload as ApiRole;
 		},
 		[dispatch]
 	);
@@ -41,10 +42,11 @@ export function useRoles() {
 			addUserIds: string[],
 			activePermissionIds: string[],
 			removeUserIds: string[],
-			removePermissionIds: string[]
+			removePermissionIds: string[],
+			roleIcon?: string
 		) => {
 			const response = await dispatch(
-				rolesClanActions.fetchUpdateRole({
+				rolesClanActions.updateRole({
 					roleId,
 					title,
 					color,
@@ -53,7 +55,8 @@ export function useRoles() {
 					removeUserIds,
 					removePermissionIds,
 					clanId,
-					maxPermissionId: maxPermissionId
+					maxPermissionId: maxPermissionId,
+					roleIcon: roleIcon || ''
 				})
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId, noCache: true }));

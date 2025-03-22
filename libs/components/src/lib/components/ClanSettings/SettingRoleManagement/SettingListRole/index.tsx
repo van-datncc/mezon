@@ -4,6 +4,7 @@ import {
 	getNewColorRole,
 	getNewNameRole,
 	getSelectedRoleId,
+	roleSlice,
 	selectTheme,
 	setAddMemberRoles,
 	setColorRoleNew,
@@ -49,6 +50,7 @@ const SettingListRole = (props: closeEditRole) => {
 			dispatch(setSelectedPermissions(permissionIds));
 			setClickedRole(roleId);
 			dispatch(setSelectedRoleId(roleId));
+			dispatch(roleSlice.actions.setCurrentRoleIcon(activeRole?.role_icon || ''));
 		}
 	};
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
@@ -88,6 +90,7 @@ const SettingListRole = (props: closeEditRole) => {
 							color={role.color || ''}
 							onHandle={() => handleRoleClick(role.id)}
 							isChoose={clickedRole === role.id}
+							iconUrl={role.role_icon}
 						/>
 					</div>
 				))}
@@ -104,9 +107,10 @@ type ItemRoleProps = {
 	color: string;
 	isChoose?: boolean;
 	onHandle?: () => void;
+	iconUrl?: string;
 };
 
-const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, color, isChoose, onHandle }, ref) => {
+const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, color, isChoose, onHandle, iconUrl }, ref) => {
 	return (
 		<div ref={ref} onClick={onHandle}>
 			<button
@@ -115,6 +119,8 @@ const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, color, isCh
 				`}
 			>
 				<div className="size-3 rounded-full min-w-3" style={{ backgroundColor: color || DEFAULT_ROLE_COLOR }}></div>
+				{iconUrl && <img src={iconUrl} alt="" className={'w-5 h-5'} />}
+
 				<span className="one-line">{title}</span>
 			</button>
 		</div>

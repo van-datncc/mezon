@@ -217,19 +217,25 @@ const RoleClanItem = ({
 	return (
 		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
-				<button
-					className="p-0.5 rounded-full h-fit"
-					onClick={() => deleteRole(role.id)}
-					style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
-					onMouseEnter={() => setIsHovered(true)}
-					onMouseLeave={() => setIsHovered(false)}
-				>
-					<span title="Remove role">
-						<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
-					</span>
-				</button>
+				<>
+					<button
+						className="p-0.5 rounded-full h-fit"
+						onClick={() => deleteRole(role.id)}
+						style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
+						onMouseEnter={() => setIsHovered(true)}
+						onMouseLeave={() => setIsHovered(false)}
+					>
+						<span title="Remove role">
+							<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
+						</span>
+					</button>
+					{role?.role_icon && <img src={role.role_icon} alt="" className={'size-3'} />}
+				</>
 			) : (
-				<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
+				<>
+					<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
+					{role?.role_icon && <img src={role.role_icon} alt="" className={'size-3'} />}
+				</>
 			)}
 			<span className="text-xs font-medium">{role.title}</span>
 		</span>

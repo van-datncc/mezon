@@ -24,6 +24,14 @@ function formatFileSize(bytes: number) {
 	}
 }
 
+export const AttachmentLoader = ({ appearanceTheme }: { appearanceTheme: 'light' | 'dark' | 'system' }) => {
+	return (
+		<div className="w-[30px] h-[30px] flex justify-center items-center">
+			<div className={appearanceTheme === 'light' ? 'light-attachment-loader' : 'dark-attachment-loader'} />
+		</div>
+	);
+};
+
 function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 	const handleDownload = async () => {
 		// window.open(attachmentData.);
@@ -64,14 +72,6 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const AttachmentLoader = () => {
-		return (
-			<div className="w-[30px] h-[30px] flex justify-center items-center">
-				<div className={appearanceTheme === 'light' ? 'light-attachment-loader' : 'dark-attachment-loader'} />
-			</div>
-		);
-	};
-
 	const [showModal, closeModal] = useModal(() => {
 		if (message && mode) {
 			return (
@@ -98,7 +98,11 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 			className={`break-all w-full cursor-default gap-3 flex items-center mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
-			{message?.isSending ? <AttachmentLoader /> : <div className="flex items-center">{thumbnailAttachment}</div>}
+			{message?.isSending ? (
+				<AttachmentLoader appearanceTheme={appearanceTheme} />
+			) : (
+				<div className="flex items-center">{thumbnailAttachment}</div>
+			)}
 
 			{attachmentData.filename === EFailAttachment.FAIL_ATTACHMENT ? (
 				<div className="text-red-500">Attachment failed to load.</div>
