@@ -1,5 +1,13 @@
 import { useRoles } from '@mezon/core';
-import { RolesClanEntity, getSelectedRoleId, selectAllUserClans, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
+import {
+	RolesClanEntity,
+	getSelectedRoleId,
+	selectAllUserClans,
+	selectCurrentClan,
+	selectCurrentRoleIcon,
+	selectTheme,
+	setAddMemberRoles
+} from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ThemeApp, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -17,6 +25,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 	const currentClan = useSelector(selectCurrentClan);
 	const usersClan = useSelector(selectAllUserClans);
 	const selectedRoleId = useSelector(getSelectedRoleId);
+	const currentRoleIcon = useSelector(selectCurrentRoleIcon);
 
 	const { updateRole } = useRoles();
 
@@ -70,7 +79,17 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		if (selectedRoleId === 'New Role') {
 			dispatch(setAddMemberRoles(userIds));
 		} else {
-			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', selectedRole?.color ?? '', userIds, [], [], []);
+			await updateRole(
+				currentClan?.id ?? '',
+				selectedRoleId,
+				selectedRole?.title ?? '',
+				selectedRole?.color ?? '',
+				userIds,
+				[],
+				[],
+				[],
+				currentRoleIcon
+			);
 		}
 	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 

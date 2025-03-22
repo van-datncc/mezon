@@ -150,6 +150,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 								<RoleNameCard
 									roleName={userRolesClan.sortedRoles[0].title || ''}
 									roleColor={userRolesClan.sortedRoles[0].color || ''}
+									roleIcon={userRolesClan.sortedRoles[0].role_icon || ''}
 								/>
 								{userRolesClan.length > 1 && (
 									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-opacity-50 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
@@ -162,7 +163,11 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 												>
 													{userRolesClan.sortedRoles.slice(1).map((userRole) => (
 														<div className={'my-0.5'} key={userRole.id}>
-															<RoleNameCard roleName={userRole.title || ''} roleColor={userRole.color || ''} />
+															<RoleNameCard
+																roleName={userRole.title || ''}
+																roleColor={userRole.color || ''}
+																roleIcon={userRole.role_icon || ''}
+															/>
 														</div>
 													))}
 												</div>
@@ -235,10 +240,10 @@ const ListOptionRole = ({
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
 		if (userRolesClan.usersRole[role.id]) {
-			await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [], [], [userId], []);
+			await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [], [], [userId], [], role.role_icon || '');
 			return;
 		}
-		await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [userId], [], [], []);
+		await updateRole(role.clan_id || '', role.id, role.title || '', role.color || '', [userId], [], [], [], role.role_icon || '');
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: role.id,

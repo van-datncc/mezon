@@ -7,6 +7,7 @@ import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
 
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
+export const ROLE_FEATURE_KEY = 'roleId';
 
 /*
  * Update these interfaces according to your requirements.
@@ -171,12 +172,24 @@ type UpdateRolePayload = {
 	removePermissionIds: string[];
 	clanId: string;
 	maxPermissionId: string;
+	roleIcon?: string;
 };
 
-export const fetchUpdateRole = createAsyncThunk(
+export const updateRole = createAsyncThunk(
 	'UpdateRole/fetchUpdateRole',
 	async (
-		{ roleId, title, color, addUserIds, activePermissionIds, removeUserIds, removePermissionIds, clanId, maxPermissionId }: UpdateRolePayload,
+		{
+			roleId,
+			title,
+			color,
+			addUserIds,
+			activePermissionIds,
+			removeUserIds,
+			removePermissionIds,
+			clanId,
+			maxPermissionId,
+			roleIcon = ''
+		}: UpdateRolePayload,
 		thunkAPI
 	) => {
 		try {
@@ -185,7 +198,7 @@ export const fetchUpdateRole = createAsyncThunk(
 				role_id: roleId,
 				title: title ?? '',
 				color: color ?? '',
-				role_icon: '',
+				role_icon: roleIcon,
 				description: '',
 				display_online: 0,
 				allow_mention: 0,
@@ -319,18 +332,33 @@ export const RolesClanSlice = createSlice({
 	}
 });
 
+export type RoleState = {
+	selectedRoleId: string;
+	nameRoleNew: string;
+	colorRoleNew: string;
+	selectedPermissions: string[];
+	addPermissions: string[];
+	addMemberRoles: string[];
+	removePermissions: string[];
+	removeMemberRoles: string[];
+	currentRoleIcon: string;
+};
+
+const roleStateInitialState: RoleState = {
+	selectedRoleId: '',
+	nameRoleNew: '',
+	colorRoleNew: '',
+	selectedPermissions: [],
+	addPermissions: [],
+	addMemberRoles: [],
+	removePermissions: [],
+	removeMemberRoles: [],
+	currentRoleIcon: ''
+};
+
 export const roleSlice = createSlice({
-	name: 'roleId',
-	initialState: {
-		selectedRoleId: '',
-		nameRoleNew: '',
-		colorRoleNew: '',
-		selectedPermissions: [] as string[],
-		addPermissions: [],
-		addMemberRoles: [] as string[],
-		removePermissions: [],
-		removeMemberRoles: []
-	},
+	name: ROLE_FEATURE_KEY,
+	initialState: roleStateInitialState,
 	reducers: {
 		setSelectedRoleId: (state, action) => {
 			state.selectedRoleId = action.payload;
@@ -355,6 +383,9 @@ export const roleSlice = createSlice({
 		},
 		setRemoveMemberRoles: (state, action) => {
 			state.removeMemberRoles = action.payload;
+		},
+		setCurrentRoleIcon: (state, action) => {
+			state.currentRoleIcon = action.payload;
 		}
 	}
 });
@@ -369,9 +400,11 @@ export const {
 	setAddMemberRoles,
 	setRemovePermissions,
 	setRemoveMemberRoles,
-	setSelectedPermissions
+	setSelectedPermissions,
+	setCurrentRoleIcon
 } = roleSlice.actions;
 
+export const getRoleState = (rootState: { [ROLE_FEATURE_KEY]: RoleState }): RoleState => rootState[ROLE_FEATURE_KEY];
 export const getSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
 
 export const getNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
@@ -387,6 +420,8 @@ export const getNewAddMembers = (state: RootState) => state.roleId.addMemberRole
 export const getRemovePermissions = (state: RootState) => state.roleId.removePermissions;
 
 export const getRemoveMemberRoles = (state: RootState) => state.roleId.removeMemberRoles;
+
+export const selectCurrentRoleIcon = createSelector(getRoleState, (state) => state.currentRoleIcon);
 
 export const updateRoleSlice = createSlice({
 	name: 'isshow',
@@ -419,7 +454,7 @@ export const rolesClanActions = {
 	fetchMembersRole,
 	fetchDeleteRole,
 	fetchCreateRole,
-	fetchUpdateRole,
+	updateRole,
 	updatePermissionUserByRoleId
 };
 
