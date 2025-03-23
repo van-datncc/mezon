@@ -115,6 +115,7 @@ export interface ChannelsState {
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
 	error?: string | null;
+	scrollOffset: Record<string, number>;
 }
 
 const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -134,7 +135,8 @@ const getInitialClanState = () => {
 		fetchChannelSuccess: false,
 		favoriteChannels: [],
 		buzzState: {},
-		appFocused: {}
+		appFocused: {},
+		scrollOffset: {}
 	};
 };
 
@@ -782,6 +784,7 @@ export const initialChannelsState: ChannelsState = {
 	byClans: {},
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
+	scrollOffset: {},
 	error: null
 };
 
@@ -1217,6 +1220,23 @@ export const channelsSlice = createSlice({
 			const { channels, clanId } = action.payload;
 			if (!state.byClans[clanId]) return;
 			channelsAdapter.setAll(state.byClans[clanId]?.entities, channels);
+		},
+		setScrollOffset: (state, action: PayloadAction<{ clanId: string; channelId: string; offset: number }>) => {
+			const { clanId, channelId, offset } = action.payload;
+			if (!state.byClans[clanId]) {
+				state.byClans[clanId] = getInitialClanState();
+			}
+			if (!state.scrollOffset) {
+				state.scrollOffset = {};
+			}
+			state.scrollOffset[channelId] = offset;
+		},
+
+		clearScrollOffset: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			const { clanId, channelId } = action.payload;
+			if (state.scrollOffset) {
+				delete state.scrollOffset[channelId];
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -1586,6 +1606,7 @@ export const selectToCheckAppIsOpening = createSelector(
 	(keys, channelId) => keys.includes(channelId)
 );
 
+
 export const selectAppChannelsList = createSelector([getChannelsState, (state: RootState) => state.clans.currentClanId as string], (state, clanId) =>
 	Object.values(state.byClans[clanId]?.appChannelsList || {})
 );
@@ -1596,4 +1617,9 @@ export const selectAppFocusedChannel = createSelector(
 		const focusedApps = Object.values(state.byClans[clanId]?.appFocused || {});
 		return focusedApps.length > 0 ? focusedApps[0] : null;
 	}
+
+export const selectScrollOffsetByChannelId = createSelector(
+	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, channelId: string) => channelId],
+	(state, channelId) => state.scrollOffset?.[channelId] ?? 0
+
 );

@@ -1190,3 +1190,11 @@ input:-webkit-autofill:active {
 		transition-duration: 0.3s;
 	}
 }
+
+.message-list-item {
+  min-height: 30px;
+}
+
+.bg-skeleton-dark {
+  background: oklab(0.9 0 0 / 0.12);
+}
