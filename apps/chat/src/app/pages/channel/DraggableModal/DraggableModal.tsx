@@ -338,6 +338,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const [resizeDir, setResizeDir] = useState<string | null>(null);
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 	const [isCollapsed, setIsCollapsed] = useState(false);
+	const [isInteracting, setIsInteracting] = useState(false);
+
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
 			const newHeight = prev ? initialHeight : 30;
@@ -357,6 +359,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
 			if (!isDragging && !resizeDir) return;
+			setIsInteracting(true);
 
 			if (isDragging) {
 				setPosition((prev) => ({
@@ -418,6 +421,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const handleMouseDown = useCallback((e: React.MouseEvent) => {
 		e.preventDefault();
 		setIsDragging(true);
+		setIsInteracting(true);
 	}, []);
 
 	const handleResizeMouseDown = useCallback((direction: string) => {
@@ -425,12 +429,14 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 			e.preventDefault();
 			e.stopPropagation();
 			setResizeDir(direction);
+			setIsInteracting(true);
 		};
 	}, []);
 
 	const handleMouseUp = useCallback(() => {
 		setIsDragging(false);
 		setResizeDir(null);
+		setTimeout(() => setIsInteracting(false), 200);
 	}, []);
 
 	useEffect(() => {
@@ -460,6 +466,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 							flexDirection: 'column'
 						}}
 					>
+						{isInteracting && <Overlay />}
+
 						<DraggableModalTabs
 							appChannelList={appChannelList}
 							onCollapseToggle={onCollapseToggle}
@@ -476,3 +484,12 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 });
 
 export default DraggableModal;
+
+const Overlay: React.FC = () => {
+	return (
+		<div
+			className="absolute inset-0  bg-transparent z-50 cursor-pointer rounded-b-lg "
+			style={{ top: `${POPUP_HEIGHT_COLLAPSE}`, height: `calc(100% - ${POPUP_HEIGHT_COLLAPSE})` }}
+		/>
+	);
+};
