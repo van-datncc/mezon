@@ -15,13 +15,11 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
-import classNames from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
-import { ChannelJumpToPresent } from './ChannelJumpToPresent';
 
 export type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription;
@@ -124,18 +122,6 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			<div className="absolute bottom-[calc(100%-10px)] left-0 right-0">
-				{isViewingOldMessage && (
-					<div
-						className={classNames(
-							'relative z-0 px-2 py-1 text-sm bg-[#6d6f78] dark:bg-bgDarkAccent font-semibold rounded-md',
-							dataReferences.message_ref_id ? 'top-[8px]' : ''
-						)}
-					>
-						<ChannelJumpToPresent clanId={clanId || ''} channelId={channelId ?? ''} className="pb-[10px]" />
-					</div>
-				)}
-			</div>
 			{dataReferences.message_ref_id && (
 				<div className="relative z-1 pb-[4px]">
 					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />

@@ -4,6 +4,7 @@ import { LoadMoreDirection, useMessageObservers, usePermissionChecker, useScroll
 import {
 	MessagesEntity,
 	RootState,
+	channelsActions,
 	getStore,
 	messagesActions,
 	selectAllAccount,
@@ -18,21 +19,26 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectLastMessageByChannelId,
+	selectLatestMessageId,
 	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId2,
 	selectMessageIsLoading,
 	selectMessageNotified,
+	selectScrollOffsetByChannelId,
 	selectTheme,
 	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import {
+	BooleanToVoidFunction,
 	ChannelMembersEntity,
 	Direction_Mode,
 	EOverriddenPermission,
 	animateScroll,
+	buildClassName,
 	convertInitialMessageOfTopic,
+	debounce,
 	forceMeasure,
 	isAnimatingScroll,
 	isBackgroundModeActive,
@@ -42,6 +48,7 @@ import {
 	restartCurrentScrollAnimation,
 	toggleDisableHover,
 	useContainerHeight,
+	useLastCallback,
 	useLayoutEffectWithPrevDeps,
 	useStateRef,
 	useSyncEffect
@@ -74,6 +81,9 @@ const MESSAGE_LIST_SLICE = 50;
 const MESSAGE_ANIMATION_DURATION = 500;
 const BOTTOM_THRESHOLD = 100;
 const BOTTOM_FOCUS_MARGIN = 20;
+const SCROLL_DEBOUNCE = 200;
+
+const runDebouncedForScroll = debounce((cb) => cb(), SCROLL_DEBOUNCE, false);
 
 function ChannelMessages({
 	clanId,
@@ -263,32 +273,95 @@ function ChannelMessages({
 	// 	}
 	// }, [dispatch, isJumpingToPresent, channelId, scrollToLastMessage]);
 
+	const [isScrollDownNeeded, setIsScrollDownShown] = useState(false);
+
+	const [isNotchShown, setIsNotchShown] = useState<boolean | undefined>();
+
+	const handleJumpToPresent = async () => {
+		await dispatch(messagesActions.fetchMessages({ clanId, channelId, isFetchingLatestMessages: true, noCache: true, isClearMessage: true }));
+		dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
+	};
+
+	const handleScrollDownClick = useLastCallback(() => {
+		// if (!withScrollDown) {
+		// 	return;
+		// }
+		const messagesContainer = chatRef.current;
+		if (!messagesContainer) return;
+		const state = getStore().getState();
+
+		const lastSentMessageId = selectLatestMessageId(state, channelId);
+		const jumpPresent = !!lastSentMessageId && !messageIds.includes(lastSentMessageId as string) && messageIds.length >= 20;
+		if (jumpPresent) {
+			handleJumpToPresent();
+			return;
+		}
+
+		const messageElements = messagesContainer.querySelectorAll<HTMLDivElement>('.message-list-item');
+		const lastMessageElement = messageElements[messageElements.length - 1];
+		if (!lastMessageElement) {
+			return;
+		}
+
+		animateScroll({
+			container: messagesContainer,
+			element: lastMessageElement,
+			position: 'end',
+			margin: BOTTOM_FOCUS_MARGIN
+		});
+	});
+
 	return (
-		<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
-			<ChatMessageList
-				key={channelId}
-				messageIds={messageIds}
-				chatRef={chatRef}
-				userActiveScroll={userActiveScroll}
-				appearanceTheme={appearanceTheme}
-				lastMessageId={lastMessageId as string}
-				dataReferences={dataReferences}
-				idMessageNotified={idMessageNotified}
-				lastMessageUnreadId={lastMessageUnreadId as string}
-				avatarDM={avatarDM}
-				username={username}
-				channelId={channelId}
-				mode={mode}
-				channelLabel={channelLabel}
-				onChange={handleOnChange}
-				isTopic={isTopicBox}
-				skipCalculateScroll={skipCalculateScroll}
-				anchorIdRef={anchorIdRef}
-				anchorTopRef={anchorTopRef}
-				setAnchor={setAnchor}
-				isPrivate={isPrivate}
-			/>
-		</MessageContextMenuProvider>
+		<>
+			<MessageContextMenuProvider channelId={channelId} allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
+				<ChatMessageList
+					key={channelId}
+					messageIds={messageIds}
+					chatRef={chatRef}
+					userActiveScroll={userActiveScroll}
+					appearanceTheme={appearanceTheme}
+					lastMessageId={lastMessageId as string}
+					dataReferences={dataReferences}
+					idMessageNotified={idMessageNotified}
+					lastMessageUnreadId={lastMessageUnreadId as string}
+					avatarDM={avatarDM}
+					username={username}
+					channelId={channelId}
+					mode={mode}
+					channelLabel={channelLabel}
+					onChange={handleOnChange}
+					isTopic={isTopicBox}
+					skipCalculateScroll={skipCalculateScroll}
+					anchorIdRef={anchorIdRef}
+					anchorTopRef={anchorTopRef}
+					setAnchor={setAnchor}
+					isPrivate={isPrivate}
+					clanId={clanId}
+					onScrollDownToggle={setIsScrollDownShown}
+					onNotchToggle={setIsNotchShown}
+				/>
+			</MessageContextMenuProvider>
+			<button
+				onClick={handleScrollDownClick}
+				className={`${isScrollDownNeeded ? 'opacity-100' : 'opacity-0'} cursor-pointer absolute z-10 rounded-full bg-clip-padding border text-token-text-secondary border-token-border-light bg-token-main-surface-primary w-8 h-8 flex items-center justify-center bottom-5 right-5`}
+			>
+				<svg
+					width={24}
+					height={24}
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					className="icon-md text-token-text-primary"
+				>
+					<path
+						fillRule="evenodd"
+						clipRule="evenodd"
+						d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z"
+						fill="currentColor"
+					/>
+				</svg>
+			</button>
+		</>
 	);
 }
 
@@ -328,6 +401,9 @@ type ChatMessageListProps = {
 	anchorIdRef: React.MutableRefObject<string | null>;
 	anchorTopRef: React.MutableRefObject<number | null>;
 	setAnchor: React.MutableRefObject<number | null>;
+	clanId: string;
+	onScrollDownToggle: BooleanToVoidFunction;
+	onNotchToggle: BooleanToVoidFunction;
 };
 
 const ChatMessageList: React.FC<ChatMessageListProps> = memo(
@@ -351,7 +427,10 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		anchorIdRef,
 		anchorTopRef,
 		setAnchor,
-		isPrivate
+		isPrivate,
+		clanId,
+		onScrollDownToggle,
+		onNotchToggle
 	}) => {
 		const dispatch = useAppDispatch();
 		const userId = useSelector(selectAllAccount)?.user?.id;
@@ -360,17 +439,21 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
 		const jumpToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
 		const firstMsgOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
+		const scrollOffset = useAppSelector((state) => selectScrollOffsetByChannelId(state, channelId));
+
 		const [getContainerHeight, prevContainerHeightRef] = useContainerHeight(chatRef, true);
 
+		const isLoading = useAppSelector(selectMessageIsLoading);
+		const [loadingDirection, setLoadingDirection] = useState<ELoadMoreDirection | null>(null);
+
+		const isScrollTopJustUpdatedRef = useRef(false);
 		const isViewportNewest = true;
 		const isUnread = true;
 		const isReady = true;
 
-		const [isScrollDownNeeded, setIsScrollDownShown] = useState(false);
-
-		const [isNotchShown, setIsNotchShown] = useState<boolean | undefined>();
-
 		const [forceRender, setForceRender] = useState<boolean>(false);
+
+		const scrollOffsetRef = useRef<number>(scrollOffset || 0);
 
 		useEffect(() => {
 			if (chatRef.current && jumpToPresent) {
@@ -386,10 +469,15 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			getContainerHeight,
 			isViewportNewest,
 			isUnread,
-			setIsScrollDownShown,
-			setIsNotchShown,
+			onScrollDownToggle,
+			onNotchToggle,
 			isReady,
 			(event: { direction: LoadMoreDirection }) => {
+				if (event.direction === LoadMoreDirection.Backwards) {
+					setLoadingDirection(ELoadMoreDirection.top);
+				} else if (event.direction === LoadMoreDirection.Forwards) {
+					setLoadingDirection(ELoadMoreDirection.bottom);
+				}
 				onChange(event.direction);
 			}
 		);
@@ -397,8 +485,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const { observeIntersectionForLoading } = useMessageObservers('thread', chatRef, null, null, channelId);
 
 		const listItemElementsRef = useRef<HTMLDivElement[]>();
-
-		const scrollOffsetRef = useRef<number>(0);
 
 		const memoFocusingIdRef = useRef<number>();
 
@@ -414,6 +500,30 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		// useSyncEffect(() => {
 		// 	memoFocusingIdRef.current = focusingId;
 		// }, [focusingId]);
+
+		const handleScroll = useLastCallback(() => {
+			if (isScrollTopJustUpdatedRef.current) {
+				isScrollTopJustUpdatedRef.current = false;
+				return;
+			}
+
+			const container = chatRef.current;
+
+			if (!container) {
+				return;
+			}
+
+			runDebouncedForScroll(() => {
+				scrollOffsetRef.current = container.scrollHeight - container.scrollTop;
+				dispatch(
+					channelsActions.setScrollOffset({
+						clanId: clanId || '0',
+						channelId: channelId,
+						offset: scrollOffsetRef.current
+					})
+				);
+			});
+		});
 
 		// Handles updated message list, takes care of scroll repositioning
 		useLayoutEffectWithPrevDeps(
@@ -493,18 +603,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
-							// firstUnreadElement
-							// noMessageSendingAnimation
-							// if (!shouldScrollToBottom) return;
-							animateScroll(
+							animateScroll({
 								container,
-								shouldScrollToBottom ? lastItemElement! : null!,
-								shouldScrollToBottom ? 'end' : 'start',
-								BOTTOM_FOCUS_MARGIN,
-								undefined,
-								undefined,
-								undefined
-							);
+								element: shouldScrollToBottom ? lastItemElement! : null!,
+								position: shouldScrollToBottom ? 'end' : 'start',
+								margin: BOTTOM_FOCUS_MARGIN,
+								forceDuration: undefined
+							});
 						});
 					}
 
@@ -531,12 +636,12 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						resetScroll(container, Math.ceil(newScrollTop));
 						restartCurrentScrollAnimation();
 						scrollOffsetRef.current = Math.max(Math.ceil(scrollHeight - newScrollTop), offsetHeight);
-						// if (!memoFocusingIdRef.current) {
-						// 	isScrollTopJustUpdatedRef.current = true;
-						// 	requestMeasure(() => {
-						// 		isScrollTopJustUpdatedRef.current = false;
-						// 	});
-						// }
+						if (!memoFocusingIdRef.current) {
+							isScrollTopJustUpdatedRef.current = true;
+							requestMeasure(() => {
+								isScrollTopJustUpdatedRef.current = false;
+							});
+						}
 					};
 				});
 				// This should match deps for `useSyncEffect` above
@@ -675,6 +780,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		return (
 			<div className="w-full h-full relative messages-container select-text">
 				<div
+					onScroll={handleScroll}
 					onWheelCapture={() => {
 						toggleDisableHover(chatRef.current, scrollTimeoutId2);
 						userActiveScroll.current = true;
@@ -715,10 +821,21 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							</div>
 						)}
 						{withHistoryTriggers && <div ref={backwardsTriggerRef} key="backwards-trigger" className="backwards-trigger" />}
+						{messageIds?.[0] && (
+							<div className="py-2">
+								<MessageSkeleton count={3} imageFrequency={0.5} randomKey={`top-${messageIds[0] || ''}`} />
+							</div>
+						)}
 						{renderedMessages}
 						{withHistoryTriggers && <div ref={forwardsTriggerRef} key="forwards-trigger" className="forwards-trigger" />}
 
-						<div ref={fabTriggerRef} key="fab-trigger" className="fab-trigger" />
+						{loadingDirection === ELoadMoreDirection.bottom && isLoading && (
+							<div className="py-2">
+								<MessageSkeleton count={3} imageFrequency={0.5} randomKey={`top-${messageIds[0] || ''}`} />
+							</div>
+						)}
+
+						<div ref={fabTriggerRef} key="fab-trigger" className="fab-trigger"></div>
 						<div className="h-[20px] w-[1px] pointer-events-none"></div>
 					</div>
 				</div>
@@ -749,3 +866,72 @@ const MemoizedChannelMessages = memo(
 export default MemoizedChannelMessages;
 
 (MemoizedChannelMessages as any).displayName = 'MemoizedChannelMessages';
+
+interface MessageSkeletonProps {
+	count?: number;
+	className?: string;
+	imageFrequency?: number; // 0-1 probability of messages having images
+	randomKey?: string;
+}
+
+export const MessageSkeleton = memo(
+	function MessageSkeleton({ count = 3, className, imageFrequency = 0.4, randomKey }: MessageSkeletonProps) {
+		return (
+			<div className={buildClassName('flex flex-col px-4 py-2', className)}>
+				{Array.from({ length: count }).map((_, index) => {
+					const hasImage = Math.random() < imageFrequency;
+					const imageWidth = Math.floor(Math.random() * 200) + 200;
+					const imageHeight = Math.floor(Math.random() * 150) + 150;
+					const isWideImage = Math.random() > 0.7;
+					const wideImageWidth = Math.floor(Math.random() * 300) + 300;
+
+					// animate-pulse
+					return (
+						<div key={index} className="flex items-start gap-3">
+							<div className="rounded-full dark:bg-skeleton-dark bg-skeleton-white h-10 w-10 flex-shrink-0" />
+							<div className="flex-1 py-2">
+								<div className="flex items-center gap-2 pb-2">
+									<div className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded w-24" />
+									<div className="h-3 dark:bg-skeleton-dark bg-skeleton-white rounded w-16" />
+								</div>
+								<div className="flex items-center gap-2">
+									<div
+										className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded"
+										style={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+									/>
+									{Math.random() > 0.5 && (
+										<div
+											className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded"
+											style={{ width: `${Math.floor(Math.random() * 50) + 30}%` }}
+										/>
+									)}
+								</div>
+
+								{hasImage && (
+									<div
+										className="dark:bg-skeleton-dark bg-skeleton-white rounded-md mt-2"
+										style={{
+											width: isWideImage ? wideImageWidth : imageWidth,
+											height: isWideImage ? wideImageWidth * 0.6 : imageHeight,
+											maxWidth: '100%'
+										}}
+									/>
+								)}
+
+								{Math.random() > 0.6 && (
+									<div className="flex gap-2 mt-2">
+										<div className="h-6 dark:bg-skeleton-dark bg-skeleton-white rounded w-12" />
+										{Math.random() > 0.5 && <div className="h-6 dark:bg-skeleton-dark bg-skeleton-white rounded w-12" />}
+									</div>
+								)}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		);
+	},
+	(prevProps, nextProps) => {
+		return prevProps.randomKey === nextProps.randomKey;
+	}
+);

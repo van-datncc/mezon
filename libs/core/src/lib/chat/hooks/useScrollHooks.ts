@@ -1,6 +1,6 @@
-import { useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
 
-import { BooleanToVoidFunction, debounce, Signal, useIntersectionObserver, useOnIntersect } from '@mezon/utils';
+import { BooleanToVoidFunction, debounce, requestMeasure, Signal, useIntersectionObserver, useLastCallback, useOnIntersect } from '@mezon/utils';
 
 export enum LoadMoreDirection {
 	Backwards,
@@ -9,7 +9,7 @@ export enum LoadMoreDirection {
 }
 
 // update later
-export const MESSAGE_LIST_SENSITIVE_AREA = 250;
+export const MESSAGE_LIST_SENSITIVE_AREA = 750;
 
 const FAB_THRESHOLD = 50;
 const NOTCH_THRESHOLD = 1; // Notch has zero height so we at least need a 1px margin to intersect
@@ -43,36 +43,36 @@ export function useScrollHooks(
 	const forwardsTriggerRef = useRef<HTMLDivElement>(null);
 	const fabTriggerRef = useRef<HTMLDivElement>(null);
 
-	// const toggleScrollTools = useLastCallback(() => {
-	// 	if (!isReady) return;
+	const toggleScrollTools = useLastCallback(() => {
+		if (!isReady) return;
 
-	// 	if (!messageIds?.length) {
-	// 		onScrollDownToggle(false);
-	// 		onNotchToggle(false);
-	// 		return;
-	// 	}
+		if (!messageIds?.length) {
+			onScrollDownToggle(false);
+			onNotchToggle(false);
+			return;
+		}
 
-	// 	if (!isViewportNewest) {
-	// 		onScrollDownToggle(true);
-	// 		onNotchToggle(true);
-	// 		return;
-	// 	}
+		if (!isViewportNewest) {
+			onScrollDownToggle(true);
+			onNotchToggle(true);
+			return;
+		}
 
-	// 	const container = containerRef.current;
-	// 	const fabTrigger = fabTriggerRef.current;
-	// 	if (!container || !fabTrigger) return;
+		const container = containerRef.current;
+		const fabTrigger = fabTriggerRef.current;
+		if (!container || !fabTrigger) return;
 
-	// 	const { offsetHeight, scrollHeight, scrollTop } = container;
-	// 	const fabOffsetTop = fabTrigger.offsetTop;
-	// 	const scrollBottom = Math.round(fabOffsetTop - scrollTop - offsetHeight);
-	// 	const isNearBottom = scrollBottom <= FAB_THRESHOLD;
-	// 	const isAtBottom = scrollBottom <= NOTCH_THRESHOLD;
+		const { offsetHeight, scrollHeight, scrollTop } = container;
+		const fabOffsetTop = fabTrigger.offsetTop;
+		const scrollBottom = Math.round(fabOffsetTop - scrollTop - offsetHeight);
+		const isNearBottom = scrollBottom <= FAB_THRESHOLD;
+		const isAtBottom = scrollBottom <= NOTCH_THRESHOLD;
 
-	// 	if (scrollHeight === 0) return;
+		if (scrollHeight === 0) return;
 
-	// 	onScrollDownToggle(isUnread ? !isAtBottom : !isNearBottom);
-	// 	onNotchToggle(!isAtBottom);
-	// });
+		onScrollDownToggle(isUnread ? !isAtBottom : !isNearBottom);
+		onNotchToggle(!isAtBottom);
+	});
 
 	const { observe: observeIntersectionForHistory } = useIntersectionObserver(
 		{
@@ -103,51 +103,51 @@ export function useScrollHooks(
 	useOnIntersect(backwardsTriggerRef, withHistoryTriggers ? observeIntersectionForHistory : undefined);
 	useOnIntersect(forwardsTriggerRef, withHistoryTriggers ? observeIntersectionForHistory : undefined);
 
-	// const {
-	// 	observe: observeIntersectionForFab,
-	// 	freeze: freezeForFab,
-	// 	unfreeze: unfreezeForFab
-	// } = useIntersectionObserver(
-	// 	{
-	// 		rootRef: containerRef,
-	// 		margin: FAB_THRESHOLD * 2,
-	// 		throttleScheduler: requestMeasure
-	// 	},
-	// 	toggleScrollTools
-	// );
+	const {
+		observe: observeIntersectionForFab,
+		freeze: freezeForFab,
+		unfreeze: unfreezeForFab
+	} = useIntersectionObserver(
+		{
+			rootRef: containerRef,
+			margin: FAB_THRESHOLD * 2,
+			throttleScheduler: requestMeasure as any
+		},
+		toggleScrollTools
+	);
 
-	// useOnIntersect(fabTriggerRef, observeIntersectionForFab);
+	useOnIntersect(fabTriggerRef, observeIntersectionForFab);
 
-	// const {
-	// 	observe: observeIntersectionForNotch,
-	// 	freeze: freezeForNotch,
-	// 	unfreeze: unfreezeForNotch
-	// } = useIntersectionObserver(
-	// 	{
-	// 		rootRef: containerRef,
-	// 		margin: NOTCH_THRESHOLD,
-	// 		throttleScheduler: requestMeasure
-	// 	},
-	// 	toggleScrollTools
-	// );
+	const {
+		observe: observeIntersectionForNotch,
+		freeze: freezeForNotch,
+		unfreeze: unfreezeForNotch
+	} = useIntersectionObserver(
+		{
+			rootRef: containerRef,
+			margin: NOTCH_THRESHOLD,
+			throttleScheduler: requestMeasure as any
+		},
+		toggleScrollTools
+	);
 
-	// useOnIntersect(fabTriggerRef, observeIntersectionForNotch);
+	useOnIntersect(fabTriggerRef, observeIntersectionForNotch);
 
-	// useEffect(() => {
-	// 	if (isReady) {
-	// 		toggleScrollTools();
-	// 	}
-	// }, [isReady, toggleScrollTools]);
+	useEffect(() => {
+		if (isReady) {
+			toggleScrollTools();
+		}
+	}, [isReady, toggleScrollTools]);
 
-	// const freezeShortly = useLastCallback(() => {
-	// 	freezeForFab();
-	// 	freezeForNotch();
+	const freezeShortly = useLastCallback(() => {
+		freezeForFab();
+		freezeForNotch();
 
-	// 	setTimeout(() => {
-	// 		unfreezeForNotch();
-	// 		unfreezeForFab();
-	// 	}, TOOLS_FREEZE_TIMEOUT);
-	// });
+		setTimeout(() => {
+			unfreezeForNotch();
+			unfreezeForFab();
+		}, TOOLS_FREEZE_TIMEOUT);
+	});
 
 	// Workaround for FAB and notch flickering with tall incoming message
 	// useSyncEffect(freezeShortly, [freezeShortly, messageIds]);
