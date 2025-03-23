@@ -116,6 +116,7 @@ export interface ChannelsState {
 	socketStatus: LoadingStatus;
 	error?: string | null;
 	scrollOffset: Record<string, number>;
+	showScrollDownButton: Record<string, boolean>;
 }
 
 const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -136,7 +137,8 @@ const getInitialClanState = () => {
 		favoriteChannels: [],
 		buzzState: {},
 		appFocused: {},
-		scrollOffset: {}
+		scrollOffset: {},
+		showScrollDownButton: {}
 	};
 };
 
@@ -785,7 +787,8 @@ export const initialChannelsState: ChannelsState = {
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
 	scrollOffset: {},
-	error: null
+	error: null,
+	showScrollDownButton: {}
 };
 
 export const channelsSlice = createSlice({
@@ -1221,11 +1224,9 @@ export const channelsSlice = createSlice({
 			if (!state.byClans[clanId]) return;
 			channelsAdapter.setAll(state.byClans[clanId]?.entities, channels);
 		},
-		setScrollOffset: (state, action: PayloadAction<{ clanId: string; channelId: string; offset: number }>) => {
-			const { clanId, channelId, offset } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
+		setScrollOffset: (state, action: PayloadAction<{ channelId: string; offset: number }>) => {
+			const { channelId, offset } = action.payload;
+
 			if (!state.scrollOffset) {
 				state.scrollOffset = {};
 			}
@@ -1233,10 +1234,19 @@ export const channelsSlice = createSlice({
 		},
 
 		clearScrollOffset: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
-			const { clanId, channelId } = action.payload;
+			const { channelId } = action.payload;
 			if (state.scrollOffset) {
 				delete state.scrollOffset[channelId];
 			}
+		},
+
+		setScrollDownVisibility: (state, action: PayloadAction<{ channelId: string; isVisible: boolean }>) => {
+			const { channelId, isVisible } = action.payload;
+
+			if (!state.showScrollDownButton) {
+				state.showScrollDownButton = {};
+			}
+			state.showScrollDownButton[channelId] = isVisible;
 		}
 	},
 	extraReducers: (builder) => {
@@ -1619,7 +1629,12 @@ export const selectAppFocusedChannel = createSelector(
 	}
 
 export const selectScrollOffsetByChannelId = createSelector(
-	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (_: RootState, channelId: string) => channelId],
+	[getChannelsState, (state, channelId) => channelId],
 	(state, channelId) => state.scrollOffset?.[channelId] ?? 0
 
+);
+
+export const selectShowScrollDownButton = createSelector(
+	[getChannelsState, (state, channelId) => channelId],
+	(state, channelId) => state.showScrollDownButton?.[channelId] ?? 0
 );

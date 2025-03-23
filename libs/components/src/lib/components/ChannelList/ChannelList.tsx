@@ -1,4 +1,4 @@
-import { usePermissionChecker, useWindowSize } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import {
 	ClansEntity,
 	FAVORITE_CATEGORY_ID,
@@ -26,7 +26,8 @@ import {
 	createImgproxyUrl,
 	isLinuxDesktop,
 	isWindowsDesktop,
-	toggleDisableHover
+	toggleDisableHover,
+	useWindowSize
 } from '@mezon/utils';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';

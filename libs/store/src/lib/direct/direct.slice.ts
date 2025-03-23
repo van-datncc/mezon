@@ -4,11 +4,8 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ChannelMessage, ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { toast } from 'react-toastify';
-import { selectAllAccount } from '../account/account.slice';
-import { StatusUserArgs, channelMembersActions } from '../channelmembers/channel.members';
+import { StatusUserArgs } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
-import { hashtagDmActions } from '../channels/hashtagDm.slice';
-import { e2eeActions } from '../e2ee/e2ee.slice';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { RootState } from '../store';
@@ -259,26 +256,28 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 						isClearMessage
 					})
 				);
-				const fetchChannelMembersResult = await thunkAPI.dispatch(
-					channelMembersActions.fetchChannelMembers({
-						clanId: '',
-						channelId: directMessageId,
-						channelType: ChannelType.CHANNEL_TYPE_CHANNEL,
-						noCache
-					})
-				);
-				const members = fetchChannelMembersResult.payload as members[];
-				const state = thunkAPI.getState() as RootState;
-				const currentUserId = selectAllAccount(state)?.user?.id;
-				const userIds = members?.filter((m) => m.user_id && m.user_id !== currentUserId).map((m) => m.user_id) as string[];
-				if (userIds?.length) {
-					await thunkAPI.dispatch(e2eeActions.getPubKeys({ userIds }));
-				}
 
-				if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
-					const userIds = members.map((member) => member?.user_id as string);
-					thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
-				}
+				// TODO: update e2ee later
+				// const fetchChannelMembersResult = await thunkAPI.dispatch(
+				// 	channelMembersActions.fetchChannelMembers({
+				// 		clanId: '',
+				// 		channelId: directMessageId,
+				// 		channelType: ChannelType.CHANNEL_TYPE_CHANNEL,
+				// 		noCache
+				// 	})
+				// );
+				// const members = fetchChannelMembersResult.payload as members[];
+				// const state = thunkAPI.getState() as RootState;
+				// const currentUserId = selectAllAccount(state)?.user?.id;
+				// const userIds = members?.filter((m) => m.user_id && m.user_id !== currentUserId).map((m) => m.user_id) as string[];
+				// if (userIds?.length) {
+				// 	await thunkAPI.dispatch(e2eeActions.getPubKeys({ userIds }));
+				// }
+
+				// if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
+				// 	const userIds = members.map((member) => member?.user_id as string);
+				// 	thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
+				// }
 			}
 			thunkAPI.dispatch(
 				channelsActions.joinChat({

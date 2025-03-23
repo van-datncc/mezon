@@ -1,5 +1,4 @@
-/* eslint-disable jsx-a11y/accessible-emoji */
-import { useAppNavigation, useWindowSize } from '@mezon/core';
+import { useAppNavigation } from '@mezon/core';
 import {
 	channelAppActions,
 	channelsActions,
@@ -17,7 +16,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiChannelAppResponseExtend } from '@mezon/utils';
+import { ApiChannelAppResponseExtend, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../ChannelApp';
