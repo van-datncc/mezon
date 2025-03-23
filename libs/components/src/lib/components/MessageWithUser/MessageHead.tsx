@@ -50,7 +50,9 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 				}}
 			>
 				{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? nameShowed : priorityName}
-				{userRolesClan.highestPermissionRoleIcon && <img src={userRolesClan.highestPermissionRoleIcon} alt="" className={'w-5 h-5 ml-1'} />}
+				{userRolesClan.highestPermissionRoleIcon && (
+					<img loading="lazy" src={userRolesClan.highestPermissionRoleIcon} alt="" className="'w-5 h-5 ml-1" />
+				)}
 			</div>
 			<div className="pl-1 pt-[5px] dark:text-zinc-400 text-colorTextLightMode text-[10px]">{messageTime}</div>
 		</>

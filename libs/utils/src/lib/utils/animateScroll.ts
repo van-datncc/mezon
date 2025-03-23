@@ -15,16 +15,26 @@ import { IS_ANDROID } from './windowEnvironment';
 type Params = Parameters<typeof createMutateFunction>;
 
 let isAnimating = false;
-let currentArgs: Parameters<typeof createMutateFunction> | undefined;
+let currentArgs: AnimateScrollArgs | undefined;
 let onHeavyAnimationEnd: NoneToVoidFunction | undefined;
 
-export function animateScroll(...args: Params | [...Params, boolean]) {
-	currentArgs = args.slice(0, 8) as Params;
+export type AnimateScrollArgs = {
+	container: HTMLElement;
+	element: HTMLElement;
+	position: ScrollTargetPosition;
+	margin?: number;
+	maxDistance?: number;
+	forceDirection?: FocusDirection;
+	forceDuration?: number;
+	forceNormalContainerHeight?: boolean;
+	shouldReturnMutationFn?: boolean;
+};
 
-	const mutate = createMutateFunction(...currentArgs);
+export function animateScroll(args: AnimateScrollArgs) {
+	currentArgs = args;
+	const mutate = createMutateFunction(args);
 
-	const shouldReturnMutationFn = args[8];
-	if (shouldReturnMutationFn) {
+	if (args.shouldReturnMutationFn) {
 		return mutate;
 	}
 
@@ -40,40 +50,40 @@ export function restartCurrentScrollAnimation() {
 	cancelSingleAnimation();
 
 	requestMeasure(() => {
-		requestMutation(createMutateFunction(...currentArgs!));
+		requestMutation(createMutateFunction(currentArgs!));
 	});
 }
 
-function createMutateFunction(
-	container: HTMLElement,
-	element: HTMLElement,
-	position: ScrollTargetPosition,
-	margin = 0,
-	maxDistance = SCROLL_MAX_DISTANCE,
-	forceDirection?: FocusDirection,
-	forceDuration?: number,
-	forceNormalContainerHeight?: boolean
-) {
-	// enable animation mode setting performance
-	if (forceDirection === FocusDirection.Static) {
+export function getOffsetToContainer(element: HTMLElement, container: HTMLElement) {
+	let offsetTop = 0;
+	let offsetLeft = 0;
+
+	let current: HTMLElement | null = element;
+
+	while (current && current !== container && !current.contains(container)) {
+		offsetTop += current.offsetTop;
+		offsetLeft += current.offsetLeft;
+
+		current = current.offsetParent as HTMLElement;
+	}
+
+	return { top: offsetTop, left: offsetLeft };
+}
+
+function createMutateFunction(args: AnimateScrollArgs) {
+	const { container, element, position, margin = 0, maxDistance = SCROLL_MAX_DISTANCE, forceDirection, forceNormalContainerHeight } = args;
+
+	let forceDuration = args.forceDuration;
+
+	const canAnimate = true;
+
+	if (forceDirection === FocusDirection.Static || !canAnimate) {
 		forceDuration = 0;
 	}
 
-	let elementTop: number;
-	let elementHeight: number;
-	let currentScrollTop: number;
-	let containerHeight: number;
-	let scrollHeight: number;
-
-	try {
-		({ offsetTop: elementTop, offsetHeight: elementHeight } = element);
-		({ scrollTop: currentScrollTop, offsetHeight: containerHeight, scrollHeight } = container);
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		if (elementTop === 0 && elementHeight === 0) return () => {};
-	} catch (error) {
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		return () => {};
-	}
+	const { offsetHeight: elementHeight } = element;
+	const { scrollTop: currentScrollTop, offsetHeight: containerHeight, scrollHeight } = container;
+	const elementTop = getOffsetToContainer(element, container).top;
 
 	const targetContainerHeight =
 		forceNormalContainerHeight && container.dataset.normalHeight ? Number(container.dataset.normalHeight) : containerHeight;
@@ -153,7 +163,6 @@ function createMutateFunction(
 		}, requestMutation);
 	};
 }
-
 export function isAnimatingScroll() {
 	return isAnimating;
 }
