@@ -1616,7 +1616,6 @@ export const selectToCheckAppIsOpening = createSelector(
 	(keys, channelId) => keys.includes(channelId)
 );
 
-
 export const selectAppChannelsList = createSelector([getChannelsState, (state: RootState) => state.clans.currentClanId as string], (state, clanId) =>
 	Object.values(state.byClans[clanId]?.appChannelsList || {})
 );
@@ -1627,11 +1626,11 @@ export const selectAppFocusedChannel = createSelector(
 		const focusedApps = Object.values(state.byClans[clanId]?.appFocused || {});
 		return focusedApps.length > 0 ? focusedApps[0] : null;
 	}
+);
 
 export const selectScrollOffsetByChannelId = createSelector(
 	[getChannelsState, (state, channelId) => channelId],
 	(state, channelId) => state.scrollOffset?.[channelId] ?? 0
-
 );
 
 export const selectShowScrollDownButton = createSelector(
