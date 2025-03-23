@@ -11,6 +11,7 @@ import {
 import {
 	ApiAccount,
 	ApiCategoryDesc,
+	ApiChannelAppResponse,
 	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiChannelMessageHeader,
@@ -1472,4 +1473,8 @@ export enum SymbolsAndIdsLengthOfMentionValue {
 	MENTION_OR_HASHTAG = 23,
 	EMOJI = 25,
 	BOLD = 4
+}
+
+export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
+	isBlank: boolean;
 }

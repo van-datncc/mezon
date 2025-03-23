@@ -8,6 +8,7 @@ import {
 	getStore,
 	notificationSettingActions,
 	onboardingActions,
+	selectAppChannelById,
 	selectBuzzStateByChannelId,
 	selectCloseMenu,
 	selectCurrentMission,
@@ -21,7 +22,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
+import { ApiChannelAppResponseExtend, ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
@@ -170,12 +171,8 @@ const ChannelLinkComponent = ({
 			dispatch(onboardingActions.doneMission({ clan_id: clanId as string }));
 		}
 		if (isChannelApp && appIsOpening) {
-			dispatch(
-				channelsActions.setAppChannelFocus({
-					clanId: channel.clan_id as string,
-					channelId: channel.channel_id as string
-				})
-			);
+			const appChannel = selectAppChannelById(store.getState(), channel.channel_id as string);
+			dispatch(channelsActions.setAppChannelFocus({ app: appChannel as ApiChannelAppResponseExtend }));
 		}
 	};
 
