@@ -1476,5 +1476,5 @@ export enum SymbolsAndIdsLengthOfMentionValue {
 }
 
 export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
-	isBlank: boolean;
+	isBlank?: boolean;
 }
