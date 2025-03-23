@@ -101,7 +101,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 			);
 		}
 		dispatch(channelAppActions.setRoomId(null));
-		dispatch(channelAppActions.setChannelId(appChannel.channel_id || ''));
+		dispatch(channelAppActions.setChannelId(appChannel?.channel_id || ''));
 		dispatch(channelAppActions.setClanId(appChannel?.clan_id || null));
 	}, []);
 
