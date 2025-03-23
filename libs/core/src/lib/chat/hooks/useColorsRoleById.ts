@@ -1,9 +1,10 @@
 import { useColorRole } from '../contexts/ColorRoleContext';
 
 export function useColorsRoleById(messageSenderId: string) {
-	const { getUserHighestRoleColor } = useColorRole();
+	const { getUserHighestRoleColor, getUserHighestRoleIcon } = useColorRole();
 
 	return {
-		highestPermissionRoleColor: getUserHighestRoleColor(messageSenderId)
+		highestPermissionRoleColor: getUserHighestRoleColor(messageSenderId),
+		highestPermissionRoleIcon: getUserHighestRoleIcon(messageSenderId)
 	};
 }

@@ -9,6 +9,7 @@ import {
 	getRemovePermissions,
 	getSelectedRoleId,
 	selectCurrentClan,
+	selectCurrentRoleIcon,
 	setColorRoleNew,
 	setNameRoleNew,
 	setSelectedPermissions,
@@ -42,6 +43,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isChange = useSelector(getIsShow);
 	const isCreateNewRole = clickRole === 'New Role';
+	const currentRoleIcon = useSelector(selectCurrentRoleIcon);
 
 	const handleClose = () => {
 		if (isCreateNewRole) {
@@ -63,7 +65,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 			const respond = await createRole(currentClan?.id || '', nameRole, colorRole, addUsers, addPermissions);
 			if (!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
 		} else {
-			await updateRole(currentClan?.id ?? '', clickRole, nameRole, colorRole, [], addPermissions, [], removePermissions);
+			await updateRole(currentClan?.id ?? '', clickRole, nameRole, colorRole, [], addPermissions, [], removePermissions, currentRoleIcon || '');
 		}
 	};
 

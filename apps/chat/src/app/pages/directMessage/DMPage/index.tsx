@@ -16,8 +16,7 @@ import {
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useSearchMessages,
-	useSeenMessagePool,
-	useWindowFocusState
+	useSeenMessagePool
 } from '@mezon/core';
 import {
 	DirectEntity,
@@ -46,8 +45,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, TypeMessage, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { EmojiPlaces, SubPanelName, TypeMessage, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,7 +57,7 @@ function useChannelSeen(channelId: string) {
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
-	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const isFocus = !isBackgroundModeActive();
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
@@ -92,11 +90,11 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [previousChannels]);
 	useEffect(() => {
-		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
+		if (lastMessage && isFocus) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [isFocusDesktop, isTabVisible]);
+	}, [isFocus]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
