@@ -1,7 +1,7 @@
 import type { TrackReferenceOrPlaceholder } from '@livekit/components-core';
 import { getScrollBarWidth } from '@livekit/components-core';
 import { TrackLoop, useVisualStableUpdate } from '@livekit/components-react';
-import { useWindowSize } from '@mezon/core';
+import { useWindowSize } from '@mezon/utils';
 import { HTMLAttributes, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const MIN_HEIGHT = 130;

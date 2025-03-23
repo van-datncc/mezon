@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, type RefObject } from 'react';
-
-import { BooleanToVoidFunction, debounce, requestMeasure, Signal, useIntersectionObserver, useLastCallback, useOnIntersect } from '@mezon/utils';
+import { requestMeasure } from '../fasterdom';
+import { BooleanToVoidFunction } from '../types';
+import { Signal, debounce } from '../utils';
+import { useIntersectionObserver, useOnIntersect } from './useIntersectionObserver';
+import useLastCallback from './useLastCallback';
+import { useSyncEffect } from './useSyncEffect';
 
 export enum LoadMoreDirection {
 	Backwards,
@@ -9,6 +13,7 @@ export enum LoadMoreDirection {
 }
 
 // update later
+
 export const MESSAGE_LIST_SENSITIVE_AREA = 750;
 
 const FAB_THRESHOLD = 50;
@@ -150,7 +155,7 @@ export function useScrollHooks(
 	});
 
 	// Workaround for FAB and notch flickering with tall incoming message
-	// useSyncEffect(freezeShortly, [freezeShortly, messageIds]);
+	useSyncEffect(freezeShortly, [freezeShortly, messageIds]);
 
 	// Workaround for notch flickering when opening Composer Embedded Message
 	// const getContainerHeightDebounced = useDebouncedSignal(getContainerHeight, CONTAINER_HEIGHT_DEBOUNCE);
