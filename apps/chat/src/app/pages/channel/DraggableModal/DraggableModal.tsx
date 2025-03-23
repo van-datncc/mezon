@@ -46,7 +46,11 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 	const store = getStore();
 
 	const handleOnCloseCallback = useCallback(
-		(clanId: string, channelId: string) => {
+		(event: React.MouseEvent, clanId: string, channelId: string) => {
+			event.stopPropagation(); // Ngăn sự kiện lan truyền
+
+			const getAppFocused = selectAppFocusedChannel(store.getState());
+
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
 					clanId,
@@ -123,7 +127,7 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 									{isFocused && (
 										<button
 											title="Close"
-											onClick={() => handleOnCloseCallback(app.clan_id as string, app.channel_id as string)}
+											onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
 											className="absolute right-0 flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white w-8 h-full"
 										>
 											✕

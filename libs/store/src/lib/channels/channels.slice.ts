@@ -103,7 +103,7 @@ export interface ChannelsState {
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
 			appChannelsList: Record<string, ApiChannelAppResponse>;
-			appChannelsListShowOnPopUp: ApiChannelAppResponse[];
+			appChannelsListShowOnPopUp: ApiChannelAppResponseExtend[];
 			fetchChannelSuccess: boolean;
 			favoriteChannels: string[];
 			buzzState: Record<string, BuzzArgs | null>;
@@ -1150,15 +1150,27 @@ export const channelsSlice = createSlice({
 
 		removeAppChannelsListShowOnPopUp: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
+			const clanState = state.byClans[clanId];
 
-			if (!state.byClans[clanId] || !Array.isArray(state.byClans[clanId].appChannelsListShowOnPopUp)) {
-				return;
+			if (!clanState || !Array.isArray(clanState.appChannelsListShowOnPopUp)) return;
+
+			const appList = clanState.appChannelsListShowOnPopUp;
+			const index = appList.findIndex((app) => app.channel_id === channelId);
+
+			if (index === -1) return;
+
+			const focusCandidates = index === 0 ? [appList[1]] : [appList[index - 1], appList[index]].filter(Boolean);
+
+			appList.splice(index, 1);
+
+			if (appList.length > 0 && focusCandidates.length > 0) {
+				const newFocusApp = focusCandidates[0];
+				clanState.appFocused = { [newFocusApp.channel_id as string]: { ...newFocusApp, isBlank: false } };
+			} else {
+				clanState.appFocused = {};
 			}
-
-			state.byClans[clanId].appChannelsListShowOnPopUp = state.byClans[clanId].appChannelsListShowOnPopUp.filter(
-				(app) => app.channel_id !== channelId
-			);
 		},
+
 		replaceAppChannelsListShowOnPopUp: (
 			state,
 			action: PayloadAction<{ clanId: string; channelId: string; newApp: ApiChannelAppResponseExtend }>
