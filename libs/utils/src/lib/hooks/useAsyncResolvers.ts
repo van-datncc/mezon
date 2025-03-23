@@ -1,4 +1,4 @@
-import { Scheduler, Signal } from '@mezon/utils';
+import { Scheduler, Signal } from '../utils';
 import useDerivedSignal from './useDerivedSignal';
 import useThrottledCallback from './useThrottledCallback';
 import { useDebouncedCallback } from './useWindowSize';

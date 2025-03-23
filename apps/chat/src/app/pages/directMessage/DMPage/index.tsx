@@ -8,16 +8,7 @@ import {
 	ModalUserProfile,
 	SearchMessageChannelRender
 } from '@mezon/components';
-import {
-	useApp,
-	useAppParams,
-	useAuth,
-	useChatSending,
-	useDragAndDrop,
-	useGifsStickersEmoji,
-	useSearchMessages,
-	useSeenMessagePool
-} from '@mezon/core';
+import { useApp, useAuth, useChatSending, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
@@ -29,6 +20,7 @@ import {
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectCurrentDM,
 	selectDirectById,
 	selectDmGroupCurrent,
 	selectHasKeyE2ee,
@@ -114,7 +106,9 @@ function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: st
 
 const DirectMessage = () => {
 	// TODO: move selector to store
-	const { directId, type } = useAppParams();
+	const currentDirect = useSelector(selectCurrentDM);
+	const directId = currentDirect?.id;
+	const type = currentDirect?.type;
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);

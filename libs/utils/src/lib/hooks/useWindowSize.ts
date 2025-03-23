@@ -1,5 +1,6 @@
-import { AnyToVoidFunction, debounce, throttle, windowSize } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnyToVoidFunction } from '../types';
+import { debounce, throttle, windowSize } from '../utils';
 
 const THROTTLE = 250;
 

@@ -1,4 +1,3 @@
-import { useWindowSize } from '@mezon/core';
 import {
 	selectAllChannelMembers,
 	selectClanMemberMetaUserId,
@@ -8,7 +7,7 @@ import {
 	selectTheme,
 	useAppSelector
 } from '@mezon/store';
-import { MemberProfileType, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { MemberProfileType, isLinuxDesktop, isWindowsDesktop, useWindowSize } from '@mezon/utils';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useVirtualizer } from '../../components';

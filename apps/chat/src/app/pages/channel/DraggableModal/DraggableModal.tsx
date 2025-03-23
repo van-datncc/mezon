@@ -1,7 +1,7 @@
-import { useAppNavigation, useWindowSize } from '@mezon/core';
+import { useAppNavigation } from '@mezon/core';
 import { channelAppActions, selectEnableCall, selectEnableMic, selectGetRoomId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { POPUP_HEIGHT_COLLAPSE } from '@mezon/utils';
+import { POPUP_HEIGHT_COLLAPSE, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 type ModalHeaderProps = {
