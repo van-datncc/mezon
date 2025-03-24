@@ -13,7 +13,6 @@ import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { MyQRCode } from '../../../screens/settings/MyQRCode';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { QRScanner } from '../../../screens/settings/QRScanner';
-import { SendCoffeeScreen } from '../../../screens/settings/SendCoffee';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
@@ -124,17 +123,6 @@ export const SettingStacks = ({}: any) => {
 				}}
 			/>
 
-			<Stack.Screen
-				name={APP_SCREEN.SETTINGS.SEND_COFFEE}
-				component={SendCoffeeScreen}
-				options={{
-					headerTitle: t('settingStack.sendToken'),
-					gestureEnabled: Platform.OS === 'ios',
-					headerStyle: {
-						backgroundColor: themeValue.primary
-					}
-				}}
-			/>
 			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.MY_QR_CODE}
 				component={MyQRCode}

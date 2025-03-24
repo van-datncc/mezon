@@ -1598,7 +1598,7 @@ export const selectCurrentCategory = createSelector(
 
 export const selectAppChannelsListShowOnPopUp = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
-	(state, clanId) => Object.values(state.byClans[clanId]?.appChannelsListShowOnPopUp || {})
+	(state, clanId) => Object.values(state.byClans[clanId]?.appChannelsListShowOnPopUp || [])
 );
 
 export const selectCheckAppFocused = createSelector(
