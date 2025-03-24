@@ -125,17 +125,6 @@ export const SettingStacks = ({}: any) => {
 			/>
 
 			<Stack.Screen
-				name={APP_SCREEN.SETTINGS.SEND_COFFEE}
-				component={SendCoffeeScreen}
-				options={{
-					headerTitle: t('settingStack.sendToken'),
-					gestureEnabled: Platform.OS === 'ios',
-					headerStyle: {
-						backgroundColor: themeValue.primary
-					}
-				}}
-			/>
-			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.MY_QR_CODE}
 				component={MyQRCode}
 				options={{

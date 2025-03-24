@@ -1,13 +1,13 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { selectCategoryExpandStateByCategoryId, selectIsUnreadChannelById, selectIsUnreadThreadInChannel, useAppSelector } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter } from 'react-native';
+import React, { useMemo } from 'react';
 import ChannelItem from '../ChannelItem';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 
 interface IChannelListItemProps {
 	data: any;
+	isChannelActive?: boolean;
+	isHaveParentActive?: boolean;
 }
 
 export enum StatusVoiceChannel {
@@ -21,7 +21,8 @@ export enum IThreadActiveType {
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
-	const [channelIdActive, setChannelIdActive] = useState<string>('');
+	const isChannelActive = props?.isChannelActive;
+	const isHaveParentActive = props?.isHaveParentActive;
 	const isCategoryExpanded = useAppSelector((state) => selectCategoryExpandStateByCategoryId(state, props?.data?.category_id as string));
 	const isChannelVoice = useMemo(() => {
 		return (
@@ -32,38 +33,19 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	}, [props?.data?.type]);
 	const hasUnread = useAppSelector((state) => selectIsUnreadThreadInChannel(state, props?.data?.threadIds || []));
 
-	const timeoutRef = useRef<any>();
-
-	useEffect(() => {
-		const event = DeviceEventEmitter.addListener(ActionEmitEvent.CHANNEL_ID_ACTIVE, (channelId: string) => {
-			setChannelIdActive(channelId);
-		});
-
-		return () => {
-			event.remove();
-			timeoutRef.current && clearTimeout(timeoutRef.current);
-		};
-	}, [props.data.id]);
-
-	const shouldDisplay =
-		isCategoryExpanded ||
-		isUnRead ||
-		isChannelVoice ||
-		channelIdActive === props?.data?.channel_id ||
-		props?.data?.threadIds?.includes(channelIdActive) ||
-		hasUnread;
+	const shouldDisplay = isCategoryExpanded || isUnRead || isChannelVoice || isChannelActive || isHaveParentActive || hasUnread;
 
 	if (!shouldDisplay) return null;
 	return (
 		<>
-			{!isChannelVoice && <ChannelItem data={props?.data} isUnRead={isUnRead} isActive={channelIdActive === props?.data?.channel_id} />}
+			{!isChannelVoice && <ChannelItem data={props?.data} isUnRead={isUnRead} isActive={isChannelActive} />}
 			{isChannelVoice && (
 				<UserListVoiceChannel
 					channelId={props?.data?.channel_id}
 					isCategoryExpanded={isCategoryExpanded}
 					data={props?.data}
 					isUnRead={false}
-					isActive={channelIdActive === props?.data?.channel_id}
+					isActive={isChannelActive}
 				/>
 			)}
 		</>
