@@ -329,8 +329,7 @@ const UserProfile = React.memo(
 														style={{
 															width: size.s_15,
 															height: size.s_15,
-															borderRadius: size.s_50,
-															backgroundColor: role?.color || DEFAULT_ROLE_COLOR
+															borderRadius: size.s_50
 														}}
 													/>
 												) : (
