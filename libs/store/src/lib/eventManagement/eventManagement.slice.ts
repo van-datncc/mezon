@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement } from 'mezon-js/api.gen';
+import { ApiEventManagement, ApiUserEventRequest } from 'mezon-js/api.gen';
 import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -198,6 +198,26 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 		}
 	}
 );
+
+export const addUserEvent = createAsyncThunk('userEvent/addUserEvent', async (request: ApiUserEventRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.addUserEvent(mezon.session, request);
+	} catch (error) {
+		captureSentryError(error, 'userEvent/addUserEvent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const deleteUserEvent = createAsyncThunk('userEvent/deleteUserEvent', async (eventId: string, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.deleteUserEvent(mezon.session, eventId);
+	} catch (error) {
+		captureSentryError(error, 'userEvent/deleteUserEvent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 
 export interface EventManagementState {
 	byClans: Record<

@@ -1,6 +1,7 @@
 import {
 	eventManagementActions,
 	EventManagementEntity,
+	RootState,
 	selectChannelById,
 	selectChooseEvent,
 	selectCurrentClan,
@@ -55,7 +56,7 @@ const ModalDetailItemEvent = () => {
 					</span>
 				</div>
 				{currentTab === tabs.event && <EventInfoDetail event={event} />}
-				{currentTab === tabs.interest && <InterestedDetail userID={event?.creator_id} />}
+				{currentTab === tabs.interest && <InterestedDetail userIds={event?.user_ids || []} />}
 			</div>
 		</div>
 	);
@@ -101,7 +102,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 			</div>
 			<div className="flex items-center gap-x-3">
 				<Icons.MemberList />
-				<p>1 person is interested</p>
+				<p>{event?.user_ids?.length} person is interested</p>
 			</div>
 			<div className="flex items-center gap-x-3">
 				<img src={userCreate?.user?.avatar_url} alt={userCreate?.user?.avatar_url} className="size-5 rounded-full" />
@@ -115,19 +116,22 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 };
 
 type InterestedDetailProps = {
-	userID: string | undefined;
+	userIds: Array<string>;
 };
 
-const InterestedDetail = (props: InterestedDetailProps) => {
-	const { userID } = props;
-	const userCreate = useSelector(selectMemberClanByUserId(userID || ''));
+const InterestedDetail = ({ userIds }: InterestedDetailProps) => {
+	const userData = useSelector((state: RootState) => userIds.map((userId) => selectMemberClanByUserId(userId)(state)));
+
+	const memoizedUserData = useMemo(() => userData, [userData]);
 
 	return (
 		<div className="p-4 space-y-1 dark:text-zinc-300 text-colorTextLightMode text-base font-semibold max-h-[250px] h-[250px] hide-scrollbar overflow-auto">
-			<div className="flex items-center gap-x-3 rounded dark:hover:bg-slate-600 hover:bg-bgLightModeButton p-2">
-				<img src={createImgproxyUrl(userCreate?.user?.avatar_url ?? '')} alt={userCreate?.user?.avatar_url} className="size-7 rounded-full" />
-				<p>{userCreate?.user?.username}</p>
-			</div>
+			{memoizedUserData.map((user, index) => (
+				<div key={index} className="flex items-center gap-x-3 rounded dark:hover:bg-slate-600 hover:bg-bgLightModeButton p-2">
+					<img src={createImgproxyUrl(user?.user?.avatar_url ?? '')} alt={user?.user?.avatar_url} className="size-7 rounded-full" />
+					<p>{user?.user?.username}</p>
+				</div>
+			))}
 		</div>
 	);
 };
