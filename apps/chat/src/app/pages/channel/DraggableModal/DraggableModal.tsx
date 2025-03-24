@@ -23,7 +23,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiChannelAppResponseExtend, INIT_HEIGHT_POPUP, INIT_WIDTH_POPUP, POPUP_HEIGHT_COLLAPSE, useWindowSize } from '@mezon/utils';
+import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../ChannelApp';
@@ -131,7 +131,7 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 					✕
 				</button>
 			</div>
-			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${POPUP_HEIGHT_COLLAPSE}px]`}>
+			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${COLLAPSED_SIZE.height}px]`}>
 				{appChannelList.map((app) => (
 					<DraggableModalTabItem
 						key={app.app_id}
@@ -296,7 +296,6 @@ const BlankChannelComponent: React.FC = () => {
 	const onClickAppItem = (app: ApiChannelAppResponseExtend) => {
 		const appIsOpening = selectToCheckAppIsOpening(store.getState(), app.channel_id as string);
 		const getAppFocused = selectAppFocusedChannel(store.getState());
-
 		if (appIsOpening) {
 			dispatch(channelsActions.setAppChannelFocus({ app: app as ApiChannelAppResponseExtend }));
 		} else {
@@ -365,181 +364,168 @@ interface DraggableModalProps {
 	aspectRatio?: number | null;
 }
 
-const DraggableModal: React.FC<DraggableModalProps> = memo(
-	({ initialWidth = INIT_WIDTH_POPUP, initialHeight = INIT_HEIGHT_POPUP, aspectRatio = null }) => {
-		const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
-		const isShowModal = appChannelList && appChannelList.length > 0;
-		const modalRef = useRef<HTMLDivElement>(null);
-		const dispatch = useDispatch();
+const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
+	const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
+	const isShowModal = appChannelList && appChannelList.length > 0;
 
-		const position = useSelector(selectPostionPopupApps);
-		console.log('position: ', position);
-		const size = useSelector(selectSizePopupApps);
-		console.log('size: ', size);
-		const prePosition = useSelector(selectPrePostionPopupApps);
-		console.log('prePosition: ', prePosition);
-		const preSize = useSelector(selectPreSizePopupApps);
-		console.log('preSize: ', preSize);
+	const [isCollapsed, setIsCollapsed] = useState(false);
+	const [isFullSize, setIsFullSize] = useState(false);
 
-		const [isDragging, setIsDragging] = useState(false);
-		const [resizeDir, setResizeDir] = useState<string | null>(null);
-		const [isCollapsed, setIsCollapsed] = useState(false);
-		const [isInteracting, setIsInteracting] = useState(false);
-		const [isFullSize, setIsFullSize] = useState(false);
-		const { height, width } = useWindowSize();
+	// Toggle full size
+	const onFullSizeToggle = useCallback(() => {
+		setIsFullSize((prev) => {
+			return !prev;
+		});
+	}, []);
 
-		// Toggle full size
-		const onFullSizeToggle = useCallback(() => {
-			setIsFullSize((prev) => {
-				return !prev;
-			});
-		}, []);
+	// // Toggle collapse
+	const onCollapseToggle = useCallback(() => {
+		setIsCollapsed((prev) => {
+			return !prev;
+		});
+	}, []);
 
-		// // Toggle collapse
-		const onCollapseToggle = useCallback(() => {
-			setIsCollapsed((prev) => {
-				return !prev;
-			});
-		}, []);
+	const modalElementRef = useRef<HTMLDivElement>(null);
+	const dispatch = useDispatch();
+	const [dragging, setDragging] = useState(false);
+	const [resizeDirection, setResizeDirection] = useState<string | null>(null);
 
-		// useEffect(() => {
-		// 	const clampedX = Math.min(Math.max(position.x, 0), width - size.width);
-		// 	const clampedY = Math.min(Math.max(position.y, 0), height - size.height);
+	const storedPosition = useSelector(selectPostionPopupApps);
+	const storedSize = useSelector(selectSizePopupApps);
+	const [modalSize, setModalSize] = useState(storedSize || INIT_SIZE);
+	const [modalPosition, setModalPosition] = useState(storedPosition || DEFAULT_POSITION);
+	const priPos = useSelector(selectPrePostionPopupApps);
+	const preSize = useSelector(selectPreSizePopupApps);
+	const [overlay, setOverlay] = useState(false);
 
-		// 	// Chỉ cập nhật vị trí nếu nó thay đổi
-		// 	if (clampedX !== position.x || clampedY !== position.y) {
-		// 		dispatch(channelAppActions.setPosition({ x: clampedX, y: clampedY }));
-		// 	}
-		// }, [size, width, height, position, dispatch]);
+	useEffect(() => {
+		if (modalElementRef.current) {
+			const rect = modalElementRef.current.getBoundingClientRect();
+			dispatch(channelAppActions.setPosition({ x: rect.left, y: rect.top }));
+			dispatch(channelAppActions.setSize({ width: rect.width, height: rect.height }));
+		}
+	}, [dispatch]);
 
-		// console.log(size);
-		// console.log(position);
+	const handleMouseDown = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			if (e.target instanceof HTMLDivElement && e.target.dataset.resize) {
+				setResizeDirection(e.target.dataset.resize);
+			} else {
+				setDragging(true);
+			}
+		},
+		[modalPosition, overlay]
+	);
+	const handleMouseMove = useCallback(
+		(e: MouseEvent) => {
+			if (!dragging && !resizeDirection) return;
 
-		const handleMouseMove = useCallback(
-			(e: MouseEvent) => {
-				if (!isDragging && !resizeDir) return;
-				setIsInteracting(true);
+			setOverlay(true);
+			if (dragging) {
+				setModalPosition((prev) => ({
+					x: Math.max(0, Math.min(prev.x + e.movementX, window.innerWidth - modalSize.width)),
+					y: Math.max(0, Math.min(prev.y + e.movementY, window.innerHeight - modalSize.height))
+				}));
+			} else if (resizeDirection) {
+				let newWidth = modalSize.width;
+				let newHeight = modalSize.height;
+				let newX = modalPosition.x;
+				let newY = modalPosition.y;
+				const isCorner = resizeDirection.includes('-');
+				const shouldMaintainAspect = ASPECT_RATIO && isCorner;
 
-				if (isDragging) {
-					dispatch(
-						channelAppActions.setPosition({
-							x: Math.min(Math.max(position.x + e.movementX, 0), width - size.width),
-							y: Math.min(Math.max(position.y + e.movementY, 0), height - size.height)
-						})
-					);
-				} else if (resizeDir) {
-					let newWidth = size.width;
-					let newHeight = size.height;
-					let newX = position.x;
-					let newY = position.y;
-
-					const isCorner = resizeDir.includes('-');
-					const shouldMaintainAspect = aspectRatio && isCorner;
-
-					if (resizeDir.includes('right')) {
-						newWidth = Math.min(Math.max(initialWidth, size.width + e.movementX), width - position.x);
-					}
-					if (resizeDir.includes('left')) {
-						newWidth = Math.min(Math.max(initialWidth, size.width - e.movementX), width - newX);
-						newX = Math.min(Math.max(newX + e.movementX, 0), width - newWidth);
-					}
-					if (resizeDir.includes('bottom')) {
-						newHeight = Math.min(Math.max(initialHeight, size.height + e.movementY), height - position.y);
-					}
-					if (resizeDir.includes('top')) {
-						newHeight = Math.min(Math.max(initialHeight, size.height - e.movementY), height - newY);
-						newY = Math.min(Math.max(newY + e.movementY, 0), height - newHeight);
-					}
-
-					if (shouldMaintainAspect && aspectRatio) {
-						newHeight = newWidth / aspectRatio;
-						if (resizeDir === 'top-left' || resizeDir === 'top-right') {
-							newY = position.y + (size.height - newHeight);
-						}
-					}
-
-					dispatch(channelAppActions.setSize({ width: newWidth, height: newHeight }));
-					dispatch(channelAppActions.setPosition({ x: newX, y: newY }));
+				if (resizeDirection.includes('right')) {
+					newWidth = Math.min(modalSize.width + e.movementX, window.innerWidth - modalPosition.x);
 				}
-			},
-			[isDragging, resizeDir, width, height, size, position, aspectRatio]
-		);
+				if (resizeDirection.includes('left')) {
+					newWidth = Math.min(modalSize.width - e.movementX, window.innerWidth - newX);
+					newX = Math.max(0, newX + e.movementX);
+				}
+				if (resizeDirection.includes('bottom')) {
+					newHeight = Math.min(modalSize.height + e.movementY, window.innerHeight - modalPosition.y);
+				}
+				if (resizeDirection.includes('top')) {
+					newHeight = Math.min(modalSize.height - e.movementY, window.innerHeight - newY);
+					newY = Math.max(0, newY + e.movementY);
+				}
 
-		const handleMouseDown = useCallback((e: React.MouseEvent) => {
-			e.preventDefault();
-			setIsDragging(true);
-			setIsInteracting(true);
-		}, []);
+				if (shouldMaintainAspect) {
+					newHeight = newWidth / ASPECT_RATIO;
+				}
 
-		const handleResizeMouseDown = useCallback((direction: string) => {
-			return (e: React.MouseEvent) => {
-				e.preventDefault();
-				e.stopPropagation();
-				setResizeDir(direction);
-				setIsInteracting(true);
-			};
-		}, []);
+				setModalSize({ width: newWidth, height: newHeight });
+				setModalPosition({ x: newX, y: newY });
+			}
+		},
+		[dragging, resizeDirection, modalSize, modalPosition, ASPECT_RATIO, overlay]
+	);
 
-		const handleMouseUp = useCallback(() => {
-			setIsDragging(false);
-			setResizeDir(null);
-			setTimeout(() => setIsInteracting(false), 200);
-		}, []);
+	const handleMouseUp = useCallback(() => {
+		setOverlay(false);
+		if (modalElementRef.current) {
+			dispatch(channelAppActions.setPosition({ x: modalPosition.x, y: modalPosition.y }));
+			dispatch(channelAppActions.setSize({ width: modalSize.width, height: modalSize.height }));
+		}
+		setDragging(false);
+		setResizeDirection(null);
+	}, [dispatch, modalPosition, modalSize, overlay]);
 
-		useEffect(() => {
-			window.addEventListener('mousemove', handleMouseMove);
-			window.addEventListener('mouseup', handleMouseUp);
+	const handleResizeMouseDown = useCallback((dir: string) => {
+		return (e: React.MouseEvent<HTMLDivElement>) => {
+			e.stopPropagation();
+			setResizeDirection(dir);
+		};
+	}, []);
 
-			return () => {
-				window.removeEventListener('mousemove', handleMouseMove);
-				window.removeEventListener('mouseup', handleMouseUp);
-			};
-		}, [handleMouseMove, handleMouseUp]);
-		// const isContentStrict = !isCollapsed ? 'contain-strict' : '';
-		return (
-			// eslint-disable-next-line react/jsx-no-useless-fragment
-			<>
-				{isShowModal && (
-					<div className=" relative z-50">
-						<div
-							ref={modalRef}
-							className={`absolute bg-[#212121] shadow-lg rounded-xl  contain-strict top-30 `}
-							style={{
-								left: `${position.x}px`,
-								top: `${position.y}px`,
-								width: `${size.width}px`,
-								height: `${size.height}px`,
-								display: 'flex',
-								flexDirection: 'column'
-							}}
-						>
-							{isInteracting && <Overlay />}
+	useEffect(() => {
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseup', handleMouseUp);
+		return () => {
+			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('mouseup', handleMouseUp);
+		};
+	}, [handleMouseMove, handleMouseUp]);
 
-							<DraggableModalTabs
-								appChannelList={appChannelList}
-								onCollapseToggle={onCollapseToggle}
-								isCollapsed={isCollapsed}
-								handleMouseDown={handleMouseDown}
-								onFullSizeToggle={onFullSizeToggle}
-								isFullSize={isFullSize}
-							/>
-							<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList as ApiChannelAppResponseExtend[]} />
-							{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}
-						</div>
-					</div>
-				)}
-			</>
-		);
-	}
-);
+	return (
+		isShowModal && (
+			<div className="relative z-50">
+				<div
+					ref={modalElementRef}
+					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict"
+					style={{
+						left: `${modalPosition.x}px`,
+						top: `${modalPosition.y}px`,
+						width: `${modalSize.width}px`,
+						height: `${modalSize.height}px`,
+						display: 'flex',
+						flexDirection: 'column'
+					}}
+					onMouseDown={handleMouseDown}
+				>
+					{overlay && <Overlay />}
+					<DraggableModalTabs
+						appChannelList={appChannelList}
+						onCollapseToggle={onCollapseToggle}
+						isCollapsed={isCollapsed}
+						handleMouseDown={handleMouseDown}
+						onFullSizeToggle={onFullSizeToggle}
+						isFullSize={isFullSize}
+					/>
+					<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList} />
+					{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}
+				</div>
+			</div>
+		)
+	);
+});
 
 export default DraggableModal;
 
 const Overlay: React.FC = () => {
 	return (
 		<div
-			className="absolute inset-0  bg-transparent z-50 cursor-pointer rounded-b-lg "
-			style={{ top: `${POPUP_HEIGHT_COLLAPSE}`, height: `calc(100% - ${POPUP_HEIGHT_COLLAPSE})` }}
+			className="absolute inset-0  bg-transparent z-40 cursor-pointer rounded-b-lg"
+			style={{ top: `${COLLAPSED_SIZE.height}`, height: `calc(100% - ${COLLAPSED_SIZE.height})` }}
 		/>
 	);
 };

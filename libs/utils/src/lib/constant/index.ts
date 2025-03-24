@@ -132,7 +132,8 @@ export enum MiniAppEventType {
 export const CREATING_THREAD = 'CREATING_THREAD';
 export const CREATING_TOPIC = 'CREATING_TOPIC';
 
-export const INIT_WIDTH_POPUP = 430;
-export const INIT_HEIGHT_POPUP = 630;
-export const POPUP_HEIGHT_COLLAPSE = 48;
-export const POPUP_WIDTH_COLLAPSE = 270;
+export const COLLAPSED_SIZE = { width: 270, height: 48 };
+export const INIT_SIZE = { width: 430, height: 630 };
+export const DEFAULT_POSITION = { x: 100, y: 100 };
+
+export const ASPECT_RATIO = 4 / 3;

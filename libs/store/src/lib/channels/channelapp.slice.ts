@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { INIT_HEIGHT_POPUP, INIT_WIDTH_POPUP, LoadingStatus } from '@mezon/utils';
+import { DEFAULT_POSITION, INIT_SIZE, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { JoinChannelAppData } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -47,10 +47,10 @@ export const initialChannelAppState: ChannelAppState = {
 	enableVideo: false,
 	enableCall: false,
 	channelId: null,
-	position: { x: 100, y: 100 },
-	size: { width: INIT_WIDTH_POPUP, height: INIT_HEIGHT_POPUP },
-	prePosition: { x: 100, y: 100 },
-	preSize: { width: INIT_WIDTH_POPUP, height: INIT_HEIGHT_POPUP }
+	position: DEFAULT_POSITION,
+	size: INIT_SIZE,
+	prePosition: DEFAULT_POSITION,
+	preSize: INIT_SIZE
 };
 export const createChannelAppMeet = createAsyncThunk(
 	`${CHANNEL_APP}/CreateMeetingRoom`,
