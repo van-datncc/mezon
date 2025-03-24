@@ -6,6 +6,7 @@ import {
 	selectChooseEvent,
 	selectCurrentClan,
 	selectMemberClanByUserId,
+	selectMembersByUserIds,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -120,13 +121,11 @@ type InterestedDetailProps = {
 };
 
 const InterestedDetail = ({ userIds }: InterestedDetailProps) => {
-	const userData = useSelector((state: RootState) => userIds.map((userId) => selectMemberClanByUserId(userId)(state)));
-
-	const memoizedUserData = useMemo(() => userData, [userData]);
+	const userData = useSelector((state: RootState) => selectMembersByUserIds(state, userIds));
 
 	return (
 		<div className="p-4 space-y-1 dark:text-zinc-300 text-colorTextLightMode text-base font-semibold max-h-[250px] h-[250px] hide-scrollbar overflow-auto">
-			{memoizedUserData.map((user, index) => (
+			{userData.map((user, index) => (
 				<div key={index} className="flex items-center gap-x-3 rounded dark:hover:bg-slate-600 hover:bg-bgLightModeButton p-2">
 					<img src={createImgproxyUrl(user?.user?.avatar_url ?? '')} alt={user?.user?.avatar_url} className="size-7 rounded-full" />
 					<p>{user?.user?.username}</p>
