@@ -4,6 +4,7 @@ import { useAppNavigation, useAuth, useDragAndDrop, usePermissionChecker, useSea
 import {
 	ChannelsEntity,
 	ETypeMission,
+	RootState,
 	channelAppActions,
 	channelMetaActions,
 	channelsActions,
@@ -81,6 +82,7 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
+
 	useEffect(() => {
 		if (!lastMessage) {
 			return;
@@ -89,7 +91,11 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		markAsReadSeen(lastMessage, mode, numberNotification);
+
+		const store = getStore();
+		const state = store.getState() as RootState;
+		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
