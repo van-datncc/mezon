@@ -1432,7 +1432,9 @@ export interface UsersClanEntity extends IUsersClan {
 export enum EEventAction {
 	CREATED = 1,
 	UPDATE = 2,
-	DELETE = 3
+	DELETE = 3,
+	INTERESTED = 4,
+	UNINTERESTED = 5
 }
 
 export enum ERepeatType {

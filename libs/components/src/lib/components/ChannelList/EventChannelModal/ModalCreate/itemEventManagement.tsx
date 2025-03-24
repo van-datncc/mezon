@@ -13,6 +13,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { ApiUserEventRequest } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -66,8 +67,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
 	const textChannel = useAppSelector((state) => selectChannelById(state, textChannelId ?? '')) || {};
 	const isThread = textChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
-	const [selectedEvent, setSelectedEvent] = useState<EventManagementEntity | null>(event ?? null);
-	const userCreate = useSelector(selectMemberClanByUserId(selectedEvent?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
@@ -81,18 +81,18 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
-	const eventIsUpcomming = selectedEvent?.event_status === EEventStatus.UPCOMING;
-	const eventIsOngoing = selectedEvent?.event_status === EEventStatus.ONGOING;
+	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
+	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
 
-	const handleOpenPanel = (selectedEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		const mouseX = selectedEvent.clientX;
-		const mouseY = selectedEvent.clientY + window.screenY;
+	const handleOpenPanel = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
-		const distanceToBottom = windowHeight - selectedEvent.clientY;
+		const distanceToBottom = windowHeight - event.clientY;
 		setCoords({ mouseX, mouseY, distanceToBottom });
 		setOpenPanel(true);
 	};
@@ -102,7 +102,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 
 	const cssEventStatus = useMemo(() => {
 		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
-	}, [selectedEvent?.event_status]);
+	}, [event?.event_status]);
 
 	const { toChannelPage, navigate } = useAppNavigation();
 
@@ -115,8 +115,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	};
 
 	const setChooseEvent = useCallback(
-		(selectedEvent: EventManagementEntity) => {
-			dispatch(eventManagementActions.setChooseEvent(selectedEvent));
+		(event: EventManagementEntity) => {
+			dispatch(eventManagementActions.setChooseEvent(event));
 			dispatch(eventManagementActions.showModelDetailEvent(true));
 		},
 		[dispatch]
@@ -126,36 +126,32 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const [isInterested, setIsInterested] = useState(false);
 
 	useEffect(() => {
-		if (userId && selectedEvent?.user_ids) {
-			setIsInterested(selectedEvent.user_ids.includes(userId));
+		if (userId && event?.user_ids) {
+			setIsInterested(event.user_ids.includes(userId));
 		}
-	}, [userId, selectedEvent]);
+	}, [userId, event]);
 
 	const handleToggleUserEvent = () => {
-		if (!selectedEvent?.id) return;
+		if (!event?.id) return;
 
-		const updatedUserIds = isInterested
-			? (selectedEvent.user_ids?.filter((id) => id !== userId) ?? [])
-			: [...(selectedEvent.user_ids ?? []), userId].filter((id): id is string => !!id);
+		const request: ApiUserEventRequest = {
+			clan_id: event.clan_id,
+			event_id: event.id
+		};
 
 		if (isInterested) {
-			dispatch(deleteUserEvent(selectedEvent.id));
+			dispatch(deleteUserEvent(request));
 		} else {
-			dispatch(addUserEvent({ event_id: selectedEvent.id }));
+			dispatch(addUserEvent(request));
 		}
 
 		setIsInterested(!isInterested);
-
-		setSelectedEvent({
-			...selectedEvent,
-			user_ids: updatedUserIds || selectedEvent.user_ids || []
-		});
 	};
 
 	return (
 		<div className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden" ref={panelRef}>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
-			<div className="p-4 border-b dark:border-slate-600 border-white" onClick={() => selectedEvent && setChooseEvent(selectedEvent)}>
+			<div className="p-4 border-b dark:border-slate-600 border-white" onClick={() => event && setChooseEvent(event)}>
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
@@ -164,11 +160,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								? '10 minutes left. Join in!'
 								: eventIsOngoing
 									? 'Event is taking place!'
-									: timeFomat(selectedEvent?.start_time || start)}
+									: timeFomat(event?.start_time || start)}
 						</p>
 						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
 					</div>
-					{selectedEvent?.creator_id && (
+					{event?.creator_id && (
 						<Tooltip overlay={<p style={{ width: 'max-content' }}>{`Created by ${userCreate?.user?.username}`}</p>}>
 							<div>
 								<AvatarImage
@@ -187,7 +183,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					<div className={`${isReviewEvent || !logoRight ? 'w-full' : 'w-3/5'}`}>
 						<p className="hover:underline font-bold dark:text-white text-black text-base">{topic}</p>
 						<div className="break-all max-h-[75px] eventDescriptionTruncate">
-							{isReviewEvent ? reviewDescription : selectedEvent?.description}
+							{isReviewEvent ? reviewDescription : event?.description}
 						</div>
 					</div>
 					{logoRight && (
@@ -239,7 +235,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					)}
 				</div>
 
-				{selectedEvent && (
+				{event && (
 					<div
 						className="flex gap-x-2 items-center"
 						onClick={(e) => {
@@ -292,16 +288,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					</span>
 				)}
 			</div>
-			{openPanel && selectedEvent && (
+			{openPanel && (
 				<PanelEventItem
-					event={selectedEvent}
+					event={event}
 					coords={coords}
 					onHandle={handleStopPropagation}
 					setOpenModalUpdateEvent={openModelUpdate}
 					setOpenModalDelEvent={setOpenModalDelEvent}
 					onTrigerEventUpdateId={() => {
 						if (onEventUpdateId) {
-							onEventUpdateId(selectedEvent?.id || '');
+							onEventUpdateId(event?.id || '');
 						}
 					}}
 					onClose={() => setOpenPanel(false)}

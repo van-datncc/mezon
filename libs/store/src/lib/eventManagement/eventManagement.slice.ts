@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
+import { EEventAction, EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEventManagement, ApiUserEventRequest } from 'mezon-js/api.gen';
 import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
@@ -209,10 +209,10 @@ export const addUserEvent = createAsyncThunk('userEvent/addUserEvent', async (re
 	}
 });
 
-export const deleteUserEvent = createAsyncThunk('userEvent/deleteUserEvent', async (eventId: string, thunkAPI) => {
+export const deleteUserEvent = createAsyncThunk('userEvent/deleteUserEvent', async (request: ApiUserEventRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		await mezon.client.deleteUserEvent(mezon.session, eventId);
+		await mezon.client.deleteUserEvent(mezon.session, request.clan_id, request.event_id);
 	} catch (error) {
 		captureSentryError(error, 'userEvent/deleteUserEvent');
 		return thunkAPI.rejectWithValue(error);
@@ -283,6 +283,31 @@ export const eventManagementSlice = createSlice({
 				}
 			});
 		},
+		updateUserEvent: (state, action) => {
+			const { event_id, user_id, clan_id } = action.payload;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[clan_id]?.entities, event_id);
+
+			if (!existingEvent) {
+				return;
+			}
+
+			let updatedUserIds = [...(existingEvent.user_ids || [])];
+			if (action.payload.action === EEventAction.INTERESTED) {
+				if (!updatedUserIds.includes(user_id)) {
+					updatedUserIds.push(user_id);
+				}
+			} else if (action.payload.action === EEventAction.UNINTERESTED) {
+				updatedUserIds = updatedUserIds.filter((id) => id !== user_id);
+			}
+
+			eventManagementAdapter.updateOne(state.byClans[clan_id].entities, {
+				id: event_id,
+				changes: {
+					user_ids: updatedUserIds
+				}
+			});
+		},
+
 		updateNewStartTime: (state, action) => {
 			const { event_id, start_time } = action.payload;
 			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[action.payload.clan_id].entities, event_id);

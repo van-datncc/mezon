@@ -41,7 +41,7 @@ const ModalDetailItemEvent = () => {
 								className={`pb-4 ${currentTab === tabs.event ? 'dark:text-white text-black border-b border-white' : 'text-zinc-400'}`}
 								onClick={() => setCurrentTab(tabs.event)}
 							>
-								Events
+								Event Info
 							</h4>
 							<h4
 								className={`pb-4 ${currentTab === tabs.interest ? 'dark:text-white text-black border-b border-white' : 'text-zinc-400'}`}
