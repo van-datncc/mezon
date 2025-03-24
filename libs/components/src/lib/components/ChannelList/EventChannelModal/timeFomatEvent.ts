@@ -1,6 +1,7 @@
 export const timeFomat = (start: string) => {
 	const date = new Date(start);
-
+	const timezoneOffsetMinutes = -date.getTimezoneOffset();
+	date.setUTCMinutes(date.getUTCMinutes() + timezoneOffsetMinutes);
 	const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const dayName = daysOfWeek[date.getUTCDay()];
 
@@ -124,8 +125,8 @@ export const differenceTime = (end: string) => {
 
 export const getTimeFomatDay = () => {
 	const date = new Date();
-	// TODO: update time
-	date.setUTCHours(date.getUTCHours() + 7);
+	const timezoneOffsetMinutes = -date.getTimezoneOffset();
+	date.setUTCMinutes(date.getUTCMinutes() + timezoneOffsetMinutes);
 	const hours = date.getHours().toString().padStart(2, '0');
 	const minutes = date.getMinutes().toString().padStart(2, '0');
 	return `${hours}:${minutes}`;
@@ -133,8 +134,8 @@ export const getTimeFomatDay = () => {
 
 export const formatTimeStringToHourFormat = (timeString: string) => {
 	const date = new Date(timeString);
-	// TODO: update time
-	date.setUTCHours(date.getUTCHours() + 7);
+	const timezoneOffsetMinutes = -date.getTimezoneOffset();
+	date.setUTCMinutes(date.getUTCMinutes() + timezoneOffsetMinutes);
 	const hours = date.getUTCHours().toString().padStart(2, '0');
 	const minutes = date.getUTCMinutes().toString().padStart(2, '0');
 
@@ -161,7 +162,7 @@ export const formatToLocalDateString = (timeString: string | Date) => {
 	} else {
 		throw new Error(`Invalid input: timeString must be a string or Date object`);
 	}
-	// TODO: update time
-	date.setUTCHours(date.getUTCHours() + 7);
+	const timezoneOffsetMinutes = -date.getTimezoneOffset();
+	date.setUTCMinutes(date.getUTCMinutes() + timezoneOffsetMinutes);
 	return date.toISOString().slice(0, -1);
 };

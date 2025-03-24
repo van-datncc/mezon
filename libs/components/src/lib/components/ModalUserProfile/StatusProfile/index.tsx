@@ -102,7 +102,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					placement="right-start"
 					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
-					<ItemStatus onClick={handleSendToken} children="Move Money" startIcon={<Icons.SendMoney />} />
+					<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney />} />
 					<ItemStatus
 						onClick={handleOpenWithdrawModal}
 						children="Withdraw"

@@ -9,11 +9,9 @@ import {
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch
 } from '@mezon/store';
-import { EmojiStorage, IEmoji } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IEmoji } from '@mezon/utils';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useAuth } from '../../auth/hooks/useAuth';
 
 interface EmojiSuggestionProps {
 	isMobile?: boolean;
@@ -135,32 +133,6 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 }
 
 export function useEmojiConverted() {
-	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	const userId = useAuth();
-	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
-
-	useEffect(() => {
-		const emojiRecentStorage = localStorage.getItem('recentEmojis');
-		setEmojiRecentData(emojiRecentStorage);
-	}, []);
-
-	const emojisRecentDataParse = useMemo(() => {
-		if (!emojiRecentData) return [];
-		const parsedData = safeJSONParse(emojiRecentData);
-		return parsedData.filter((emojiItem: EmojiStorage) => emojiItem.senderId === userId.userId);
-	}, [emojiRecentData, userId.userId]);
-
-	const emojiConverted = useMemo(() => {
-		return emojisRecentDataParse.reverse().map((item: EmojiStorage) => {
-			const emojiFound = emojiMetadata.find((emoji) => emoji.shortname === item.emoji);
-			return {
-				id: emojiFound?.id,
-				src: emojiFound?.src,
-				category: 'Recent',
-				shortname: emojiFound?.shortname
-			};
-		});
-	}, [emojisRecentDataParse, emojiMetadata]);
-
-	return emojiConverted;
+	const emojiMetadata = useSelector(selectAllEmojiRecent);
+	return emojiMetadata;
 }

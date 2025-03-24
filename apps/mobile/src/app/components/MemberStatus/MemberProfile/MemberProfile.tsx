@@ -54,10 +54,10 @@ export function MemberProfile({
 			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
 	}, [userColorRolesClan, currentChannel?.type]);
 
-	const status = getUserStatusByMetadata(user?.user?.metadata);
+	const status = getUserStatusByMetadata(user?.user?.metadata || user?.metadata);
 
 	return (
-		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
+		<View style={{ ...styles.container }}>
 			{/* Avatar */}
 			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={userStatus} customStatus={status} />
 

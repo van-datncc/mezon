@@ -15,6 +15,7 @@ import { SeparatorWithLine } from '../../../components/Common';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import RoleCoLourComponent from '../RoleCoLourComponent/RoleCoLourComponent';
+import RoleImagePicker from '../RoleImagePicker';
 
 enum EActionType {
 	permissions,
@@ -205,6 +206,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			}
 		];
 	}, [t, isCanEditRole]);
+
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<View style={{ backgroundColor: themeValue.primary, flex: 1, paddingHorizontal: size.s_14 }}>
@@ -220,6 +222,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 
 				<View style={{ marginVertical: size.s_10, flex: 1 }}>
 					<RoleCoLourComponent roleId={roleId} />
+					<RoleImagePicker roleId={roleId} />
 					<View style={{ borderRadius: size.s_10, overflow: 'hidden' }}>
 						<FlatList
 							data={actionList}
