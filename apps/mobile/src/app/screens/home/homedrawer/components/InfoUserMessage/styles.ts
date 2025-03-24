@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '700',
-		maxWidth: '65%'
+		maxWidth: '60%'
 	},
 	dateMessageBox: {
 		fontSize: size.small,
@@ -18,5 +18,10 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'flex-end',
 		marginBottom: size.s_6
+	},
+	roleIcon: {
+		height: size.s_16,
+		width: size.s_16,
+		marginRight: size.s_4
 	}
 });

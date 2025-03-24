@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 
 type ColorRoleContextType = {
 	getUserHighestRoleColor: (userId: string) => string;
+	getUserHighestRoleIcon: (userId: string) => string;
 };
 
 const ColorRoleContext = createContext<ColorRoleContextType | null>(null);
@@ -20,7 +21,7 @@ export const useColorRole = () => {
 export const ColorRoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const rolesClan = useSelector(selectAllRolesClan);
 	const userColorMap = useMemo(() => {
-		const map = new Map<string, { roleId: string; color: string; max_level_permission: number }>();
+		const map = new Map<string, { roleId: string; color: string; icon: string; max_level_permission: number }>();
 
 		rolesClan.forEach((role) => {
 			role?.role_user_list?.role_users?.forEach((user) => {
@@ -30,6 +31,7 @@ export const ColorRoleProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 				const newRole = {
 					roleId: role.id,
 					color: role.color || DEFAULT_ROLE_COLOR,
+					icon: role?.role_icon || '',
 					max_level_permission: role.max_level_permission ?? 0
 				};
 
@@ -44,7 +46,8 @@ export const ColorRoleProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
 	const contextValue = useMemo(
 		() => ({
-			getUserHighestRoleColor: (userId: string) => userColorMap.get(userId)?.color || DEFAULT_ROLE_COLOR
+			getUserHighestRoleColor: (userId: string) => userColorMap.get(userId)?.color || DEFAULT_ROLE_COLOR,
+			getUserHighestRoleIcon: (userId: string) => userColorMap.get(userId)?.icon || ''
 		}),
 		[userColorMap]
 	);

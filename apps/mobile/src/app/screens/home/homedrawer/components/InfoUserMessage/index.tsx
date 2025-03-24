@@ -3,6 +3,7 @@ import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, convertTimeString } from '@
 import { ChannelStreamMode } from 'mezon-js';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
+import ImageNative from '../../../../../components/ImageNative';
 import { styles } from './styles';
 
 interface IProps {
@@ -19,6 +20,10 @@ export const InfoUserMessage = ({ createTime, isShow, onPress, senderDisplayName
 		mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
 			? userRolesClan.highestPermissionRoleColor
 			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
+	const imageSenderName =
+		mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+			? userRolesClan.highestPermissionRoleIcon
+			: '';
 
 	if (isShow) {
 		return (
@@ -26,6 +31,7 @@ export const InfoUserMessage = ({ createTime, isShow, onPress, senderDisplayName
 				<Text style={{ ...styles.usernameMessageBox, color: colorSenderName }} numberOfLines={1} ellipsizeMode="tail">
 					{senderDisplayName}
 				</Text>
+				{!!imageSenderName && <ImageNative url={imageSenderName} style={styles.roleIcon} />}
 				<Text style={styles.dateMessageBox}>{createTime ? convertTimeString(createTime) : ''}</Text>
 			</TouchableOpacity>
 		);

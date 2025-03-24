@@ -72,22 +72,22 @@ export const CustomStatusUser = forwardRef(function CustomStatusUser(props: ICus
 				{
 					title: t('userStatus.online'),
 					value: EUserStatus.ONLINE,
-					icon: <MezonIconCDN icon={IconCDN.onlineStatusIcon} color="#16A34A" />
+					icon: <MezonIconCDN icon={IconCDN.onlineStatusIcon} color="#16A34A" height={size.s_12} width={size.s_20} />
 				},
 				{
 					title: t('userStatus.idle'),
 					value: EUserStatus.IDLE,
-					icon: <MezonIconCDN icon={IconCDN.disturbStatusIcon} color="#16A34A" />
+					icon: <MezonIconCDN icon={IconCDN.idleStatusIcon} color="#F0B232" height={size.s_20} width={size.s_20} />
 				},
 				{
 					title: t('userStatus.doNotDisturb'),
 					value: EUserStatus.DO_NOT_DISTURB,
-					icon: <MezonIconCDN icon={IconCDN.disturbStatusIcon} color="#F23F43" />
+					icon: <MezonIconCDN icon={IconCDN.disturbStatusIcon} color="#F23F43" height={size.s_20} width={size.s_20} />
 				},
 				{
 					title: t('userStatus.invisible'),
 					value: EUserStatus.INVISIBLE,
-					icon: <MezonIconCDN icon={IconCDN.offlineStatusIcon} color="#AEAEAE" />
+					icon: <MezonIconCDN icon={IconCDN.offlineStatusIcon} color="#AEAEAE" height={size.s_12} width={size.s_20} />
 				}
 			] as IMezonOptionData,
 		[]
