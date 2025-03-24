@@ -59,6 +59,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const dispatch = useAppDispatch();
 
 	const addRole = async (roleId: string) => {
+		setIsVisible(false);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', activeRole?.color ?? '', userIDArray || [], [], [], []);
@@ -85,8 +86,17 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	const isLightMode = appearanceTheme === 'light';
+	const [isVisible, setIsVisible] = useState(false);
+
+	const handleOpenAddRoleModal = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		setIsVisible(true);
+	};
+	const handleCloseAddRoleModal = () => {
+		setIsVisible(false);
+	};
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col" onClick={handleCloseAddRoleModal}>
 			{/* {userRolesClan.length > 0 && <div className="font-bold tracking-wider text-sm pt-2">ROLES</div>} */}
 			<div className="mt-2 flex flex-wrap gap-2">
 				{userRolesClan.slice(0, 6).map((role, index) => (
@@ -129,23 +139,21 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 					</span>
 				)}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
-					<Tooltip
-						overlay={
-							<div className="dark:bg-transparent bg-transparent p-0 h-60 w-[300px]">
+					<div className="relative flex items-center justify-center">
+						{isVisible ? (
+							<div className="absolute bottom-8 dark:bg-transparent bg-transparent p-0 max-h-60 w-[300px]">
 								<AddRolesComp addRole={addRole} filteredListRoleBySearch={filteredListRoleBySearch} setSearchTerm={setSearchTerm} />
 							</div>
-						}
-						trigger="click"
-						placement="bottom-start"
-					>
+						) : null}
 						<button
 							title="Add roles"
+							onClick={handleOpenAddRoleModal}
 							className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-800 bg-slate-300 items-center"
 						>
 							<Icons.Plus className="size-5 select-none" />
 							<p className="text-xs m-0 font-medium select-none">Add Role</p>
 						</button>
-					</Tooltip>
+					</div>
 				</UserRestrictionZone>
 			</div>
 		</div>
@@ -166,7 +174,7 @@ const AddRolesComp = ({
 	};
 
 	return (
-		<div className="absolute w-[300px] max-h-60 dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto rounded border border-slate-300 dark:border-slate-700 flex flex-col gap-3">
+		<div className="w-[300px] max-h-60 dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto rounded border border-slate-300 dark:border-slate-700 flex flex-col gap-3">
 			<div className="relative w-full h-9">
 				<input
 					type="text"
@@ -217,19 +225,25 @@ const RoleClanItem = ({
 	return (
 		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
-				<button
-					className="p-0.5 rounded-full h-fit"
-					onClick={() => deleteRole(role.id)}
-					style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
-					onMouseEnter={() => setIsHovered(true)}
-					onMouseLeave={() => setIsHovered(false)}
-				>
-					<span title="Remove role">
-						<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
-					</span>
-				</button>
+				<>
+					<button
+						className="p-0.5 rounded-full h-fit"
+						onClick={() => deleteRole(role.id)}
+						style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}
+						onMouseEnter={() => setIsHovered(true)}
+						onMouseLeave={() => setIsHovered(false)}
+					>
+						<span title="Remove role">
+							<Icons.IconRemove className="size-2" fill={isHovered ? 'black' : role.color || DEFAULT_ROLE_COLOR} />
+						</span>
+					</button>
+					{role?.role_icon && <img src={role.role_icon} alt="" className={'size-3'} />}
+				</>
 			) : (
-				<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
+				<>
+					<div className="size-2 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>
+					{role?.role_icon && <img src={role.role_icon} alt="" className={'size-3'} />}
+				</>
 			)}
 			<span className="text-xs font-medium">{role.title}</span>
 		</span>

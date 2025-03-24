@@ -166,5 +166,7 @@ module.exports = {
 	'custom-purple-dark': '#6729a8',
 	'custom-pink-dark': '#8d3f6c',
 	'custom-purple-active': '#4e1f7a',
-	'custom-pink-active': '#6d2f4e'
+	'custom-pink-active': '#6d2f4e',
+	'skeleton-dark': 'oklab(1 0 0 / 0.04)',
+	'skeleton-white': 'oklab(0.9 0 0 / 0.39)'
 };

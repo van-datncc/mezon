@@ -1,5 +1,13 @@
 import { useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUserClans, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import {
+	getNewAddMembers,
+	getSelectedRoleId,
+	RolesClanEntity,
+	selectAllUserClans,
+	selectCurrentClan,
+	selectCurrentRoleIcon,
+	setAddMemberRoles
+} from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -18,6 +26,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const commonUsers = usersClan.filter((user) => addUsers.includes(user.id));
+	const currentRoleIcon = useSelector(selectCurrentRoleIcon);
 
 	const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
 	const handleOpenModal = () => {
@@ -49,7 +58,17 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 
 	const handleRemoveMember = async (userID: string) => {
 		const userIDArray = userID?.split(',');
-		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', activeRole?.color ?? '', [], [], userIDArray, []);
+		await updateRole(
+			currentClan?.id ?? '',
+			clickRole,
+			activeRole?.title ?? '',
+			activeRole?.color ?? '',
+			[],
+			[],
+			userIDArray,
+			[],
+			currentRoleIcon
+		);
 	};
 	return (
 		<div>

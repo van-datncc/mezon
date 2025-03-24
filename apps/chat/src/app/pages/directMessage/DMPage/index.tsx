@@ -8,17 +8,7 @@ import {
 	ModalUserProfile,
 	SearchMessageChannelRender
 } from '@mezon/components';
-import {
-	useApp,
-	useAppParams,
-	useAuth,
-	useChatSending,
-	useDragAndDrop,
-	useGifsStickersEmoji,
-	useSearchMessages,
-	useSeenMessagePool,
-	useWindowFocusState
-} from '@mezon/core';
+import { useApp, useAuth, useChatSending, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
@@ -30,6 +20,7 @@ import {
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectCurrentDM,
 	selectDirectById,
 	selectDmGroupCurrent,
 	selectHasKeyE2ee,
@@ -46,8 +37,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, TypeMessage, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { EmojiPlaces, SubPanelName, TypeMessage, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,7 +49,7 @@ function useChannelSeen(channelId: string) {
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const mounted = useRef('');
 
-	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const isFocus = !isBackgroundModeActive();
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
@@ -92,11 +82,11 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [previousChannels]);
 	useEffect(() => {
-		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
+		if (lastMessage && isFocus) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [isFocusDesktop, isTabVisible]);
+	}, [isFocus]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -116,7 +106,9 @@ function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: st
 
 const DirectMessage = () => {
 	// TODO: move selector to store
-	const { directId, type } = useAppParams();
+	const currentDirect = useSelector(selectCurrentDM);
+	const directId = currentDirect?.id;
+	const type = currentDirect?.type;
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
@@ -219,7 +211,7 @@ const DirectMessage = () => {
 						className={`flex-col flex-1 h-full pb-[10px] ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM || isShowMemberListDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>
 						<div
-							className={`overflow-y-auto  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink`}
+							className={`relative overflow-y-auto  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink`}
 							ref={messagesContainerRef}
 						>
 							{

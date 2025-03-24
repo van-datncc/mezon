@@ -38,7 +38,7 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	return (
 		<>
 			<div
-				className="text-base font-medium tracking-normal cursor-pointer break-all username hover:underline"
+				className="text-base font-medium tracking-normal cursor-pointer break-all username hover:underline flex items-center"
 				onClick={onClick}
 				role="button"
 				style={{
@@ -50,6 +50,9 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 				}}
 			>
 				{mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? nameShowed : priorityName}
+				{userRolesClan.highestPermissionRoleIcon && (
+					<img loading="lazy" src={userRolesClan.highestPermissionRoleIcon} alt="" className="'w-5 h-5 ml-1" />
+				)}
 			</div>
 			<div className="pl-1 pt-[5px] dark:text-zinc-400 text-colorTextLightMode text-[10px]">{messageTime}</div>
 		</>

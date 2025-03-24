@@ -881,6 +881,8 @@ export const messagesSlice = createSlice({
 	initialState: initialMessagesState,
 	reducers: {
 		updateLastFiftyMessagesAction: (state, action: PayloadAction<string>) => {
+			// recheck and update later
+			return;
 			const channelId = action.payload;
 			const messageIds = state.channelMessages[channelId]?.ids as string[];
 			if (!messageIds || messageIds?.length <= 50) return;
@@ -1377,6 +1379,17 @@ export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersB
 	return typingUsers?.users;
 });
 
+export const selectIsUserTypingInChannel = createSelector(
+	[selectTypingUserIdsByChannelId, (_, channelId) => channelId, (_, __, userId) => userId],
+	(typingUsers, channelId, userId) => {
+		if (!typingUsers || !channelId || !userId) return false;
+		if (Array.isArray(userId)) {
+			return typingUsers.some((user) => userId.includes(user.id));
+		}
+		return typingUsers.some((user) => user.id === userId);
+	}
+);
+
 export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
 
 export const selectHasMoreMessageByChannelId2 = createSelector([getMessagesState, getChannelIdAsSecondParam], (state, channelId) => {
@@ -1388,18 +1401,6 @@ export const selectHasMoreMessageByChannelId2 = createSelector([getMessagesState
 	// if the first message is not in the channel's messages, then there are more messages
 	return !isFirstMessageInChannel;
 });
-
-// has more bottom when last message is not the channel's messages
-export const selectHasMoreBottomByChannelId = (channelId: string) =>
-	createSelector(getMessagesState, (state) => {
-		const lastMessage = state.lastMessageByChannel[channelId];
-
-		if (!lastMessage || !lastMessage.id) return false;
-
-		const isLastMessageInChannel = state.channelMessages[channelId]?.entities[lastMessage.id];
-
-		return !isLastMessageInChannel;
-	});
 
 export const selectHasMoreBottomByChannelId2 = createSelector([getMessagesState, getChannelIdAsSecondParam], (state, channelId) => {
 	const lastMessage = state.lastMessageByChannel[channelId];

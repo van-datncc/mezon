@@ -25,9 +25,9 @@ function MezonPage() {
 	const version = mezonPackage.version;
 
 	const downloadUrl: string = useMemo(() => {
-		if (platform === 'MacOS') {
+		if (platform === Platform.MACOS) {
 			return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-mac-arm64.dmg`;
-		} else if (platform === 'Linux') {
+		} else if (platform === Platform.LINUX) {
 			return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-win-x64.exe`;
@@ -115,7 +115,7 @@ function MezonPage() {
 					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">
 							<h1 className="tracking-[-.02em] text-center text-[60px] max-md:text-[36px] font-black leading-[72px] max-md:leading-[48px] font-semibold font-['Poppins'] text-[#F4F7F9] max-md:text-textDarkTheme">
-								Your clan & your world
+								The Live, Work, and Play Platform.
 							</h1>
 							<div className="text-[20px] text-[#C2D5DF] text-center leading-[30px] font-normal hidden md:block">
 								<div>Mezon is great for playing games and chilling with friends, </div>
@@ -135,7 +135,7 @@ function MezonPage() {
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
-							{platform === 'MacOS' ? (
+							{platform === Platform.MACOS ? (
 								<DropdownButton
 									icon={<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />}
 									downloadLinks={[

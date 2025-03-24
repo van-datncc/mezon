@@ -18,24 +18,19 @@ import {
 	DMCallActions,
 	accountActions,
 	audioCallActions,
-	channelsActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
-	getStore,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
-	selectAppChannelsListShowOnPopUp,
 	selectAudioBusyTone,
 	selectAudioDialTone,
 	selectAudioEndTone,
 	selectAudioRingTone,
-	selectChannelById,
 	selectChatStreamWidth,
-	selectCheckAppFocused,
 	selectClanNumber,
 	selectClanView,
 	selectCloseMenu,
@@ -69,7 +64,6 @@ import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChannelApps } from '../channel/ChannelApp';
 import ChannelStream from '../channel/ChannelStream';
 import DraggableModal from '../channel/DraggableModal/DraggableModal';
 import { MainContent } from './MainContent';
@@ -285,7 +279,7 @@ function MyApp() {
 
 	return (
 		<div className="relative overflow-hidden w-full h-full">
-			<DraggableModals />
+			<DraggableModal />
 			<MemoizedErrorModals />
 
 			<div
@@ -498,62 +492,6 @@ const MessageModalImageWrapper = () => {
 		<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
 			<MessageModalImage />
 		</MessageContextMenuProvider>
-	);
-};
-const DraggableModals: React.FC = () => {
-	const appsList = useSelector(selectAppChannelsListShowOnPopUp);
-	const dispatch = useAppDispatch();
-	const store = getStore();
-
-	const handleOnCloseCallback = useCallback(
-		(clanId: string, channelId: string) => {
-			dispatch(
-				channelsActions.removeAppChannelsListShowOnPopUp({
-					clanId,
-					channelId
-				})
-			);
-		},
-		[dispatch]
-	);
-
-	const handleFocused = useCallback(
-		(clanId: string, channelId: string) => {
-			dispatch(
-				channelsActions.setAppChannelFocus({
-					clanId,
-					channelId
-				})
-			);
-		},
-		[dispatch]
-	);
-
-	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<>
-			{appsList.length > 0 &&
-				appsList.map((app) => {
-					const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
-					const zIndex = isFocused ? 'z-50' : 'z-40';
-					const channel = selectChannelById(store.getState(), app?.channel_id as string);
-
-					return (
-						<DraggableModal
-							key={app?.app_id}
-							zIndex={zIndex}
-							headerTitle={channel?.channel_label}
-							isFocused={isFocused}
-							onClose={() => handleOnCloseCallback(app?.clan_id as string, app?.channel_id as string)}
-							onFocus={() => handleFocused(app?.clan_id as string, app?.channel_id as string)}
-							clanId={app?.clan_id}
-							channelId={app?.channel_id}
-						>
-							<ChannelApps appChannel={app} />
-						</DraggableModal>
-					);
-				})}
-		</>
 	);
 };
 

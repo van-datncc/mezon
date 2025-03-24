@@ -67,6 +67,10 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_THREAD;
 			channelIdActive = channel?.id || '';
+		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_APP) {
+			clanIdActive = channel?.clan_id || '';
+			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
+			channelIdActive = channel?.id || '';
 		} else if (isClanView && channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 			clanIdActive = channel?.clan_id || '';
 			modeActive = ChannelStreamMode.STREAM_MODE_CHANNEL;
@@ -178,7 +182,6 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				topic_id: isFocusTopicBox ? channelIdOnMessage : '',
 				emoji_recent_id: emoji_recent_id
 			};
-
 			return dispatch(reactionActions.writeMessageReaction(payloadDispatchReaction)).unwrap();
 		},
 		[dispatch, isMobile, isClanView, userId, currentActive, addMemberToThread]

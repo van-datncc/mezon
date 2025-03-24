@@ -97,6 +97,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 						return;
 					}
 					const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+					console.log(updatedFiles, 'updatedFiles');
 
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({

@@ -22,7 +22,7 @@ export interface ChannelAppEntity {
 export interface ChannelAppState {
 	loadingStatus: LoadingStatus;
 	roomName: string | null;
-	roomId: string | null;
+	roomId: Record<string, string | null>;
 	channelId: string | null;
 	clanId: string | null;
 	roomToken: string | undefined;
@@ -36,7 +36,7 @@ export const initialChannelAppState: ChannelAppState = {
 	loadingStatus: 'not loaded',
 	roomName: null,
 	joinChannelAppData: undefined,
-	roomId: null,
+	roomId: {},
 	clanId: null,
 	roomToken: undefined,
 	enableMic: false,
@@ -44,7 +44,6 @@ export const initialChannelAppState: ChannelAppState = {
 	enableCall: false,
 	channelId: null
 };
-
 export const createChannelAppMeet = createAsyncThunk(
 	`${CHANNEL_APP}/CreateMeetingRoom`,
 	async ({ channelId, roomName }: CreateChannelAppMeetPayload, thunkAPI) => {
@@ -93,8 +92,8 @@ export const channelAppSlice = createSlice({
 		setJoinChannelAppData: (state, action: PayloadAction<{ dataUpdate: JoinChannelAppData | undefined }>) => {
 			state.joinChannelAppData = action.payload.dataUpdate;
 		},
-		setRoomId: (state, action: PayloadAction<string | null>) => {
-			state.roomId = action.payload;
+		setRoomId: (state, action: PayloadAction<{ channelId: string; roomId: string | null }>) => {
+			state.roomId[action.payload.channelId] = action.payload.roomId;
 		},
 		setClanId: (state, action: PayloadAction<string | null>) => {
 			state.clanId = action.payload;
@@ -135,7 +134,7 @@ export const getChannelAppState = (rootState: { [CHANNEL_APP]: ChannelAppState }
 
 export const selectLoadingStatusChannelApp = createSelector(getChannelAppState, (state) => state.loadingStatus);
 export const selectEnableVideo = createSelector(getChannelAppState, (state) => state.enableVideo);
-export const selectGetRoomId = createSelector(getChannelAppState, (state) => state.roomId);
+export const selectGetRoomId = createSelector([getChannelAppState, (state, channelId) => channelId], (state, channelId) => state.roomId?.[channelId]);
 export const selectEnableMic = createSelector(getChannelAppState, (state) => state.enableMic);
 export const selectEnableCall = createSelector(getChannelAppState, (state) => state.enableCall);
 export const selectRoomName = createSelector(getChannelAppState, (state) => state.roomName);

@@ -7092,3 +7092,19 @@ export function RotateIcon(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function CornerTab(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			{...props}
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			viewBox="0 0 16 16"
+			fill="none"
+			style={{ display: 'block' }} // Ensure proper rendering
+		>
+			<path fillRule="evenodd" clipRule="evenodd" d="M16 16V0C16 8.83656 8.83656 16 0 16H16Z" fill="black" />
+		</svg>
+	);
+}

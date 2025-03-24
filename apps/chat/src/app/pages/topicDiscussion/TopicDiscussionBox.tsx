@@ -183,7 +183,7 @@ const TopicDiscussionBox = () => {
 	return (
 		<>
 			{(isFetchMessageDone || firstMessageOfThisTopic) && (
-				<div className={isElectron() ? 'h-[calc(100%_-_60px_-_30px)]' : 'h-full'}>
+				<div className={`relative ${isElectron() ? 'h-[calc(100%_-_60px_-_30px)]' : 'h-full'}`}>
 					<MemoizedChannelMessages
 						isPrivate={currentChannel?.channel_private}
 						channelId={currentTopicId as string}

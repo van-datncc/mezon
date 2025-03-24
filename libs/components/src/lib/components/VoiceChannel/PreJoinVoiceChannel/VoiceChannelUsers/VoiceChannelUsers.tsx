@@ -1,7 +1,6 @@
-import { useWindowSize } from '@mezon/core';
 import { selectMemberClanByGoogleId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannelMember, createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
+import { IChannelMember, createImgproxyUrl, getAvatarForPrioritize, useWindowSize } from '@mezon/utils';
 import { useCallback, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
