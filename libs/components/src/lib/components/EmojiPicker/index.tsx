@@ -101,7 +101,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiId, setEmojiId] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
-
 	const handleEmojiSelect = useCallback(
 		async (emojiId: string, emojiPicked: string) => {
 			if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
@@ -128,7 +127,21 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				}
 			}
 		},
-		[subPanelActive, props.messageEmojiId, messageEmoji, currentChannel, dispatch, setSubPanelActive, addEmojiState, shiftPressedState]
+		[
+			subPanelActive,
+			reactionMessageDispatch,
+			props.messageEmojiId,
+			props.isFocusTopicBox,
+			messageEmoji?.sender_id,
+			messageEmoji?.channel_id,
+			currentChannel,
+			setSubPanelActive,
+			dispatch,
+			setAddEmojiActionChatbox,
+			addEmojiState,
+			setSuggestionEmojiObjPicked,
+			shiftPressedState
+		]
 	);
 
 	const handleOnHover = useCallback((emojiHover: any) => {

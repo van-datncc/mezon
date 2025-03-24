@@ -29,9 +29,9 @@ const ScreenItems = memo(({ id, name, thumbnail, onClose }: ScreenItemsProps) =>
 	}, [id, dispatch, onClose]);
 
 	return (
-		<div onClick={() => selectStreamScreen()}>
-			<img src={thumbnail} alt={thumbnail} />
-			<p>{name}</p>
+		<div onClick={() => selectStreamScreen()} className="h-40 overflow-hidden flex flex-col gap-2">
+			<img className="w-full h-[136px] object-cover" src={thumbnail} alt={thumbnail} />
+			<p className="text-base h-4 truncate leading-4">{name}</p>
 		</div>
 	);
 });

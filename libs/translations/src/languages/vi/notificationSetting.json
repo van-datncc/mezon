@@ -10,7 +10,8 @@
       "allMessage": "Tất cả",
       "notThingMessage": "Không có gì",
       "mentionMessage": "Chỉ @đề cập"
-    }
+    },
+    "muteCategoryUntil": "Bạn đã tắt thông báo cho danh mục này cho đến khi"
   },
   "notifySettingThreadModal": {
     "headerTitleMuteThread": "Tắt thông báo chủ đề này",

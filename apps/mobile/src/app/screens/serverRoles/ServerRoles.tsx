@@ -8,6 +8,7 @@ import { FlatList, Pressable, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { SeparatorWithLine } from '../../components/Common';
+import ImageNative from '../../components/ImageNative';
 import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 
@@ -104,6 +105,9 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 												}}
 											>
 												<MezonIconCDN icon={IconCDN.shieldUserIcon} color={'gray'} height={size.s_32} width={size.s_32} />
+												{!!item?.role_icon && (
+													<ImageNative url={item?.role_icon} style={{ height: size.s_32, width: size.s_32 }} />
+												)}
 												<View style={{ flex: 1 }}>
 													<View style={{ flexDirection: 'row', gap: size.s_6 }}>
 														<Text color={themeValue.white}>{item.title}</Text>

@@ -54,5 +54,6 @@
       "reset": "Reset",
       "save": "Save"
     },
+    "roleImagePicker": "Role Icon",
     "notifyEveryone":"Notify everyone who has permission to see this channel."
 }
