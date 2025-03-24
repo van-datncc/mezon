@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import { useAppNavigation } from '@mezon/core';
 import {
 	channelAppActions,
@@ -30,9 +31,18 @@ type DraggableModalTabsProps = {
 	onCollapseToggle?: () => void;
 	isCollapsed?: boolean;
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	onFullSizeToggle?: () => void;
+	isFullSize?: boolean;
 };
 
-const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList, onCollapseToggle, isCollapsed, handleMouseDown }) => {
+const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
+	appChannelList,
+	onCollapseToggle,
+	isCollapsed,
+	handleMouseDown,
+	onFullSizeToggle,
+	isFullSize
+}) => {
 	const dispatch = useAppDispatch();
 	const store = getStore();
 
@@ -138,13 +148,20 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 					</button>
 				</div>
 			</div>
-			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
+			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center right-3">
 				<button
 					onClick={onCollapseToggle}
 					title={isCollapsed ? 'Expand tabs' : 'Collapse tabs'}
-					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm font-bold rounded-full w-[30px] h-[30px] bg-gray-800"
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm  rounded-full w-[30px] h-[30px]"
 				>
 					{isCollapsed ? '▼' : '▲'}
+				</button>
+				<button
+					onClick={onFullSizeToggle}
+					title={isFullSize ? 'Exit Full Screen' : 'Enter Full Screen'}
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm rounded-full w-[30px] h-[30px]"
+				>
+					{isFullSize ? '🗗' : '⛶'}
 				</button>
 			</div>
 		</div>
@@ -355,6 +372,21 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isInteracting, setIsInteracting] = useState(false);
+	const [isFullSize, setIsFullSize] = useState(false);
+	const { height, width } = useWindowSize();
+
+	const onFullSizeToggle = useCallback(() => {
+		setIsFullSize((prev) => {
+			const newSize = prev ? { width: initialWidth, height: initialHeight } : { width, height };
+
+			const newPosition = prev ? { x: 100, y: 100 } : { x: 0, y: 0 };
+
+			setSize(newSize);
+			setPosition(newPosition);
+
+			return !prev;
+		});
+	}, [width, height, initialWidth, initialHeight]);
 
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
@@ -370,7 +402,6 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 			return !prev;
 		});
 	}, [initialHeight, initialWidth]);
-	const { height, width } = useWindowSize();
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
@@ -489,6 +520,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 							onCollapseToggle={onCollapseToggle}
 							isCollapsed={isCollapsed}
 							handleMouseDown={handleMouseDown}
+							onFullSizeToggle={onFullSizeToggle}
+							isFullSize={isFullSize}
 						/>
 						<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList as ApiChannelAppResponseExtend[]} />
 						{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}
