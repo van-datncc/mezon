@@ -97,7 +97,7 @@ const ThreadBox = () => {
 	}, [membersOfParent]);
 
 	const createThread = useCallback(
-		async (value: ThreadValue) => {
+		async (value: ThreadValue, messageContent?: IMessageSendPayload) => {
 			if (value.nameValueThread.length <= 3) {
 				toast('Thread name must be longer than 3 characters');
 				return;
@@ -108,8 +108,8 @@ const ThreadBox = () => {
 				return;
 			}
 
-			if (!nameValueThread.length && !checkAttachment) {
-				toast('A starter message is required to start a thread.');
+			if (!messageContent?.t && !checkAttachment) {
+				toast.warning('An Initial message is required to start a thread.');
 				return;
 			}
 
@@ -128,7 +128,7 @@ const ThreadBox = () => {
 			const thread = await dispatch(createNewChannel(body));
 			return thread.payload;
 		},
-		[currentChannel, currentChannelId, currentClanId, dispatch]
+		[checkAttachment, currentChannel?.category_id, currentChannelId, currentClanId]
 	);
 
 	const handleSend = useCallback(
@@ -141,7 +141,7 @@ const ThreadBox = () => {
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread && !threadCurrentChannel) {
-					const thread = (await createThread(value)) as ApiChannelDescription;
+					const thread = (await createThread(value, content)) as ApiChannelDescription;
 					if (thread) {
 						await dispatch(
 							channelsActions.joinChat({
