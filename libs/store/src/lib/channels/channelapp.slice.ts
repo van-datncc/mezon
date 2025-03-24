@@ -122,11 +122,15 @@ export const channelAppSlice = createSlice({
 			state.enableCall = action.payload;
 		},
 		setPosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
-			state.prePosition = { ...state.position };
 			state.position = action.payload;
 		},
 		setSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
-			state.preSize = { ...state.size };
+			state.size = action.payload;
+		},
+		setPrePosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
+			state.position = action.payload;
+		},
+		setPreSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
 			state.size = action.payload;
 		}
 	},

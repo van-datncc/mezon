@@ -352,7 +352,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 		});
 	}, []);
 
-	// // Toggle collapse
+	// Toggle collapse
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
 			return !prev;
@@ -372,13 +372,21 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 	const preSize = useSelector(selectPreSizePopupApps);
 	const [overlay, setOverlay] = useState(false);
 
+	// useEffect(() => {
+	// 	if (modalElementRef.current) {
+	// 		const rect = modalElementRef.current.getBoundingClientRect();
+	// 		dispatch(channelAppActions.setPosition({ x: rect.left, y: rect.top }));
+	// 		dispatch(channelAppActions.setSize({ width: rect.width, height: rect.height }));
+	// 	}
+	// }, [dispatch]);
+
 	useEffect(() => {
-		if (modalElementRef.current) {
-			const rect = modalElementRef.current.getBoundingClientRect();
-			dispatch(channelAppActions.setPosition({ x: rect.left, y: rect.top }));
-			dispatch(channelAppActions.setSize({ width: rect.width, height: rect.height }));
+		if (isCollapsed) {
+			setModalSize(COLLAPSED_SIZE);
+		} else {
+			setModalSize(preSize);
 		}
-	}, [dispatch]);
+	}, [isCollapsed]);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
@@ -459,7 +467,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 			window.removeEventListener('mouseup', handleMouseUp);
 		};
 	}, [handleMouseMove, handleMouseUp]);
-
+	console.log('modalSize', modalSize);
 	return (
 		isShowModal && (
 			<div className="relative z-50">
