@@ -118,7 +118,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const handleCloseModalSendToken = () => {
 		setToken(0);
 		setSelectedUserId('');
-		setNote('move money');
+		setNote('transfer funds');
 		setUserSearchError('');
 		setError('');
 		setSendTokenInputsState({ isSendTokenInputDisabled: false, isUserSelectionDisabled: false });
