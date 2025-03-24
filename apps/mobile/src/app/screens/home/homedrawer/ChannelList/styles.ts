@@ -7,7 +7,6 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		mainList: {
 			height: '100%',
 			flex: 1,
-			borderTopLeftRadius: size.s_4,
 			overflow: 'hidden',
 			backgroundColor: isTablet ? colors.primary : colors.secondary
 		},
