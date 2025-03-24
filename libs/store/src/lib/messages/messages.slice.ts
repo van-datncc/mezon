@@ -1380,8 +1380,8 @@ export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersB
 });
 
 export const selectIsUserTypingInChannel = createSelector(
-	[selectTypingUserIdsByChannelId, (_, channelId, userId) => ({ channelId, userId })],
-	(typingUsers, { channelId, userId }) => {
+	[selectTypingUserIdsByChannelId, (_, channelId) => channelId, (_, __, userId) => userId],
+	(typingUsers, channelId, userId) => {
 		if (!typingUsers || !channelId || !userId) return false;
 		if (Array.isArray(userId)) {
 			return typingUsers.some((user) => userId.includes(user.id));
