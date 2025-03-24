@@ -105,16 +105,6 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 
 	const { navigate, toChannelPage } = useAppNavigation();
 
-	const onBack = useCallback(
-		(event: React.MouseEvent, channelId?: string, clanId?: string) => {
-			event.stopPropagation();
-
-			const channelPath = toChannelPage(channelId as string, clanId as string);
-			navigate(channelPath);
-		},
-		[toChannelPage, navigate]
-	);
-
 	return (
 		<div onMouseDown={handleMouseDown} className="flex items-center justify-between bg-[#1E1F22] z-50">
 			{/* close_button */}
@@ -129,13 +119,7 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 			</div>
 			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${POPUP_HEIGHT_COLLAPSE}px]`}>
 				{appChannelList.map((app) => (
-					<DraggableModalTabItem
-						key={app.app_id}
-						app={app}
-						handleFocused={handleFocused}
-						onBack={onBack}
-						handleOnCloseCallback={handleOnCloseCallback}
-					/>
+					<DraggableModalTabItem key={app.app_id} app={app} handleFocused={handleFocused} handleOnCloseCallback={handleOnCloseCallback} />
 				))}
 				<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
 					{' '}
@@ -171,11 +155,10 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 interface DraggableModalTabItemProps {
 	app: ApiChannelAppResponseExtend;
 	handleFocused: (event: React.MouseEvent<HTMLDivElement>, app: ApiChannelAppResponseExtend) => void;
-	onBack: (event: React.MouseEvent<HTMLButtonElement>, channelId: string, clanId: string) => void;
 	handleOnCloseCallback: (event: React.MouseEvent<HTMLButtonElement>, clanId: string, channelId: string) => void;
 }
 
-const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, handleFocused, onBack, handleOnCloseCallback }) => {
+const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, handleFocused, handleOnCloseCallback }) => {
 	const dispatch = useDispatch();
 	const store = getStore();
 	const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
@@ -229,15 +212,6 @@ const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, hand
 									</button>
 								)}
 							</div>
-						)}
-						{Boolean(app.isBlank) === false && (
-							<button
-								onClick={(e) => onBack(e, app.channel_id as string, app.clan_id as string)}
-								className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
-								title="Back"
-							>
-								↩
-							</button>
 						)}
 
 						<button
