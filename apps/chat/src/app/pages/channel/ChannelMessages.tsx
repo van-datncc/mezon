@@ -690,13 +690,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					// Animate incoming message, but if app is in background mode, scroll to the first unread
 					if (isAtBottom && !isAlreadyFocusing) {
 						// Break out of `forceLayout`
-						// if (!lastItemElement) return;
+						if (!lastItemElement) return;
 
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
 							animateScroll({
 								container,
-								element: shouldScrollToBottom ? lastItemElement! : null!,
+								element: shouldScrollToBottom ? lastItemElement : null!,
 								position: shouldScrollToBottom ? 'end' : 'start',
 								margin: BOTTOM_FOCUS_MARGIN,
 								forceDuration: undefined
@@ -918,7 +918,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						{renderedMessages}
 						{withHistoryTriggers && <div ref={forwardsTriggerRef} key="forwards-trigger" className="forwards-trigger" />}
 
-						{loadingDirection === ELoadMoreDirection.bottom && isLoading && (
+						{userActiveScroll.current && loadingDirection === ELoadMoreDirection.bottom && isLoading && (
 							<div className="py-2">
 								<MessageSkeleton count={3} imageFrequency={0.5} randomKey={`top-${messageIds[0] || ''}`} />
 							</div>
