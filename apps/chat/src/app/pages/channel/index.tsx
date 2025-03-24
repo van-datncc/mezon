@@ -11,7 +11,6 @@ import {
 	clansActions,
 	directMetaActions,
 	getStore,
-	getStoreAsync,
 	gifsStickerEmojiActions,
 	handleParticipantMeetState,
 	listChannelRenderAction,
@@ -92,14 +91,11 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		const asyncBadge = async () => {
-			const store = await getStoreAsync();
-			const state = store.getState() as RootState;
-			const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
 
-			markAsReadSeen(lastMessage, mode, badgeCountClan);
-		};
-		asyncBadge();
+		const store = getStore();
+		const state = store.getState() as RootState;
+		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
