@@ -1609,10 +1609,14 @@ export const selectCheckAppFocused = createSelector(
 export const selectAppChannelsKeysShowOnPopUp = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => {
-		if (!Array.isArray(state.byClans[clanId]?.appChannelsListShowOnPopUp)) {
+		if (!state.byClans[clanId]) {
 			return [];
 		}
-		return state.byClans[clanId]?.appChannelsListShowOnPopUp?.map((app) => app.channel_id) || [];
+		const appChannelsList = state.byClans[clanId].appChannelsListShowOnPopUp;
+		if (!Array.isArray(appChannelsList) || appChannelsList.length === 0) {
+			return [];
+		}
+		return appChannelsList.map((app) => app.channel_id);
 	}
 );
 
