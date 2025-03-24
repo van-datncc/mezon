@@ -92,9 +92,6 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 		},
 		[dispatch]
 	);
-	// const isJoinVoice = useSelector(selectEnableCall);
-	// const isTalking = useSelector(selectEnableMic);
-	// const roomId = useSelector(selectGetRoomId);
 
 	const { navigate, toChannelPage } = useAppNavigation();
 
