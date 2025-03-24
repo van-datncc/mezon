@@ -13,6 +13,8 @@ import {
 	selectEnableCall,
 	selectEnableMic,
 	selectGetRoomId,
+	selectPostionPopupApps,
+	selectSizePopupApps,
 	selectToCheckAppIsOpening,
 	useAppDispatch,
 	useAppSelector
@@ -365,11 +367,13 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
 	const isShowModal = appChannelList && appChannelList.length > 0;
 	const modalRef = useRef<HTMLDivElement>(null);
-	const [position, setPosition] = useState({ x: 100, y: 100 });
-	const [size, setSize] = useState({ width: initialWidth, height: initialHeight });
+	const dispatch = useDispatch();
+
+	const position = useSelector(selectPostionPopupApps);
+	const size = useSelector(selectSizePopupApps);
+
 	const [isDragging, setIsDragging] = useState(false);
 	const [resizeDir, setResizeDir] = useState<string | null>(null);
-	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isInteracting, setIsInteracting] = useState(false);
 	const [isFullSize, setIsFullSize] = useState(false);
@@ -380,9 +384,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 			const newSize = prev ? { width: initialWidth, height: initialHeight } : { width, height };
 
 			const newPosition = prev ? { x: 100, y: 100 } : { x: 0, y: 0 };
-
-			setSize(newSize);
-			setPosition(newPosition);
+			dispatch(channelAppActions.setSize(newSize));
+			dispatch(channelAppActions.setPosition(newPosition));
 
 			return !prev;
 		});
@@ -390,15 +393,9 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
-			const newHeight = prev ? initialHeight : 30;
-			const newWidth = prev ? initialWidth : 240;
-
-			setSize((prevSize) => ({
-				...prevSize,
-				height: newHeight,
-				width: newWidth
-			}));
-
+			const newHeight = prev ? size.height : 30;
+			const newWidth = prev ? size.width : 240;
+			dispatch(channelAppActions.setSize({ height: newHeight, width: newWidth }));
 			return !prev;
 		});
 	}, [initialHeight, initialWidth]);
@@ -409,10 +406,12 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 			setIsInteracting(true);
 
 			if (isDragging) {
-				setPosition((prev) => ({
-					x: Math.min(Math.max(prev.x + e.movementX, 0), width - size.width),
-					y: Math.min(Math.max(prev.y + e.movementY, 0), height - size.height)
-				}));
+				dispatch(
+					channelAppActions.setPosition({
+						x: Math.min(Math.max(position.x + e.movementX, 0), width - size.width),
+						y: Math.min(Math.max(position.y + e.movementY, 0), height - size.height)
+					})
+				);
 			} else if (resizeDir) {
 				let newWidth = size.width;
 				let newHeight = size.height;
@@ -444,8 +443,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 					}
 				}
 
-				setSize({ width: newWidth, height: newHeight });
-				setPosition({ x: newX, y: newY });
+				dispatch(channelAppActions.setSize({ width: newWidth, height: newHeight }));
+				dispatch(channelAppActions.setPosition({ x: newX, y: newY }));
 			}
 		},
 		[isDragging, resizeDir, width, height, size, position, aspectRatio]
@@ -453,16 +452,12 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 
 	// setBound and re-set Position when the size of window changed
 	useEffect(() => {
-		setBounds({
-			minX: 0,
-			maxX: width,
-			minY: 0,
-			maxY: height
-		});
-		setPosition((prev) => ({
-			x: Math.min(Math.max(prev.x, 0), width - size.width),
-			y: Math.min(Math.max(prev.y, 0), height - size.height)
-		}));
+		dispatch(
+			channelAppActions.setPosition({
+				x: Math.min(Math.max(position.x, 0), width - size.width),
+				y: Math.min(Math.max(position.y, 0), height - size.height)
+			})
+		);
 	}, [height, width, isCollapsed]);
 
 	const handleMouseDown = useCallback((e: React.MouseEvent) => {

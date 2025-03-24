@@ -30,6 +30,9 @@ export interface ChannelAppState {
 	enableVideo: boolean;
 	joinChannelAppData: JoinChannelAppData | undefined;
 	enableCall: boolean;
+	position: { x: number; y: number };
+	size: { width: number; height: number };
+	// bounds: { minX: number; maxX: number; minY: number; maxY: number };
 }
 
 export const initialChannelAppState: ChannelAppState = {
@@ -42,7 +45,11 @@ export const initialChannelAppState: ChannelAppState = {
 	enableMic: false,
 	enableVideo: false,
 	enableCall: false,
-	channelId: null
+	channelId: null,
+	//
+	position: { x: 100, y: 100 },
+	size: { width: 430, height: 630 }
+	// bounds: { minX: 0, maxX: 0, minY: 0, maxY: 0 }
 };
 export const createChannelAppMeet = createAsyncThunk(
 	`${CHANNEL_APP}/CreateMeetingRoom`,
@@ -112,7 +119,16 @@ export const channelAppSlice = createSlice({
 		},
 		setEnableCall: (state, action: PayloadAction<boolean>) => {
 			state.enableCall = action.payload;
+		},
+		setPosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
+			state.position = action.payload;
+		},
+		setSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
+			state.size = action.payload;
 		}
+		// setBounds: (state, action: PayloadAction<{ minX: number; maxX: number; minY: number; maxY: number }>) => {
+		// 	state.bounds = action.payload;
+		// }
 	},
 	extraReducers: (builder) => {
 		builder
@@ -142,6 +158,9 @@ export const selectLiveToken = createSelector(getChannelAppState, (state) => sta
 export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
 export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
 export const selectJoinChannelAppData = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
+
+export const selectPostionPopupApps = createSelector(getChannelAppState, (state) => state.position);
+export const selectSizePopupApps = createSelector(getChannelAppState, (state) => state.size);
 
 export const channelAppReducer = channelAppSlice.reducer;
 
