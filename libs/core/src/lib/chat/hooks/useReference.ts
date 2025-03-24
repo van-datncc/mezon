@@ -18,7 +18,7 @@ export function useReference(channelId?: string) {
 
 	const checkAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId?.files?.length > 0;
-	}, [attachmentFilteredByChannelId]);
+	}, [attachmentFilteredByChannelId?.files]);
 
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
