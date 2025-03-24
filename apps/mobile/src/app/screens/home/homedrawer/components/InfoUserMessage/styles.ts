@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
 	usernameMessageBox: {
 		fontSize: size.medium,
-		marginRight: size.s_10,
+		marginRight: size.s_6,
 		fontWeight: '700',
 		maxWidth: '60%'
 	},
@@ -20,8 +20,8 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_6
 	},
 	roleIcon: {
-		height: size.s_16,
-		width: size.s_16,
+		height: size.s_18,
+		width: size.s_18,
 		marginRight: size.s_4
 	}
 });
