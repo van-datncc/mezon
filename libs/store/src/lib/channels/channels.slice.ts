@@ -1598,7 +1598,7 @@ export const selectCurrentCategory = createSelector(
 
 export const selectAppChannelsListShowOnPopUp = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
-	(state, clanId) => Object.values(state.byClans[clanId]?.appChannelsListShowOnPopUp || {})
+	(state, clanId) => Object.values(state.byClans[clanId]?.appChannelsListShowOnPopUp || [])
 );
 
 export const selectCheckAppFocused = createSelector(
@@ -1608,7 +1608,12 @@ export const selectCheckAppFocused = createSelector(
 
 export const selectAppChannelsKeysShowOnPopUp = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
-	(state, clanId) => state.byClans[clanId]?.appChannelsListShowOnPopUp?.map((app) => app.channel_id) || []
+	(state, clanId) => {
+		if (!Array.isArray(state.byClans[clanId]?.appChannelsListShowOnPopUp)) {
+			return [];
+		}
+		return state.byClans[clanId]?.appChannelsListShowOnPopUp?.map((app) => app.channel_id) || [];
+	}
 );
 
 export const selectToCheckAppIsOpening = createSelector(
