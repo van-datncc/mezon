@@ -16,6 +16,7 @@ import {
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAppChannelById,
+	selectBadgeCountByClanId,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
@@ -81,6 +82,9 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
+
+	const badgeCountClan = useSelector(selectBadgeCountByClanId(currentChannel.clan_id as string)) || 0;
+
 	useEffect(() => {
 		if (!lastMessage) {
 			return;
@@ -89,7 +93,7 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		markAsReadSeen(lastMessage, mode, numberNotification);
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
