@@ -11,8 +11,7 @@ import {
 	selectAllAccount,
 	selectAllDirectMessages,
 	selectAllFriends,
-	selectAllUserClans,
-	selectUpdateToken
+	selectAllUserClans
 } from '@mezon/store-mobile';
 import { TypeMessage, formatMoney } from '@mezon/utils';
 import debounce from 'lodash.debounce';
@@ -23,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
-import { captureRef } from 'react-native-view-shot';
+import ViewShot from 'react-native-view-shot';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -39,15 +38,25 @@ type Receiver = {
 	username?: Array<string>;
 	avatar_url?: string;
 };
-
+const formatTokenAmount = (amount: any) => {
+	let sanitizedText = String(amount).replace(/[^0-9]/g, '');
+	if (sanitizedText === '') return '0';
+	sanitizedText = sanitizedText.replace(/^0+/, '');
+	const numericValue = parseInt(sanitizedText, 10) || 0;
+	return numericValue.toLocaleString();
+};
 type ScreenSendToken = typeof APP_SCREEN.SETTINGS.SEND_TOKEN;
 export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<ScreenSendToken>) => {
 	const { t } = useTranslation(['token']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const formValue = route?.params?.formValue;
+	const jsonObject: ApiTokenSentEvent = safeJSONParse(formValue || '{}');
+	const formattedAmount = formatTokenAmount(jsonObject?.amount || '0');
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
-	const [tokenCount, setTokenCount] = useState('0');
-	const [note, setNote] = useState(t('sendToken'));
+	const [tokenCount, setTokenCount] = useState(formattedAmount || '0');
+	const [note, setNote] = useState(jsonObject?.note || t('sendToken'));
+	const [plainTokenCount, setPlainTokenCount] = useState(jsonObject?.amount || 0);
 	const userProfile = useSelector(selectAllAccount);
 	const usersClan = useSelector(selectAllUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -56,7 +65,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const [selectedUser, setSelectedUser] = useState<Receiver>(null);
 	const [searchText, setSearchText] = useState<string>('');
-	const [plainTokenCount, setPlainTokenCount] = useState(0);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const [successTime, setSuccessTime] = useState('');
@@ -69,7 +77,6 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
 	}, [userProfile?.wallet]);
-	const getTokenSocket = useSelector(selectUpdateToken(userProfile?.user?.id ?? ''));
 
 	const mergeUser = useMemo(() => {
 		const userMap = new Map<string, Receiver>();
@@ -121,14 +128,14 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	}, [friendList, listDM, userProfile?.user?.id, usersClan]);
 
 	const directMessageId = useMemo(() => {
-		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === selectedUser?.id);
+		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === (jsonObject?.receiver_id || selectedUser?.id));
 		return directMessage?.id;
-	}, [listDM, selectedUser?.id]);
+	}, [jsonObject?.receiver_id, listDM, selectedUser?.id]);
 
 	const sendToken = async () => {
 		const store = await getStoreAsync();
 		try {
-			if (!selectedUser) {
+			if (!selectedUser && !jsonObject?.receiver_id) {
 				Toast.show({
 					type: 'error',
 					text1: t('toast.error.mustSelectUser')
@@ -155,40 +162,38 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			const tokenEvent: ApiTokenSentEvent = {
 				sender_id: userProfile?.user?.id || '',
 				sender_name: userProfile?.user?.username?.[0] || userProfile?.user?.username || '',
-				receiver_id: selectedUser?.id || '',
+				receiver_id: jsonObject?.receiver_id || selectedUser?.id || '',
+				extra_attribute: jsonObject?.extra_attribute || '',
 				amount: Number(plainTokenCount || 1),
-				note: note || '',
-				extra_attribute: ''
+				note: note || ''
 			};
 
-			const res = store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
+			const res = await store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
 			store.dispatch(appActions.setLoadingMainMobile(false));
-			if (directMessageId) {
-				sendInviteMessage(
-					`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
-					directMessageId,
-					ChannelStreamMode.STREAM_MODE_DM,
-					TypeMessage.SendToken
-				);
-			} else {
-				const response = await createDirectMessageWithUser(selectedUser?.id);
-				if (response?.channel_id) {
-					sendInviteMessage(
-						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
-						response?.channel_id,
-						ChannelStreamMode.STREAM_MODE_DM,
-						TypeMessage.SendToken
-					);
-				}
-			}
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			if (res?.action?.action?.requestStatus === 'rejected' || !res) {
+			if (res?.meta?.requestStatus === 'rejected' || !res) {
 				Toast.show({
 					type: 'error',
 					text1: t('toast.error.anErrorOccurred')
 				});
 			} else {
+				if (directMessageId) {
+					sendInviteMessage(
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
+						directMessageId,
+						ChannelStreamMode.STREAM_MODE_DM,
+						TypeMessage.SendToken
+					);
+				} else {
+					const response = await createDirectMessageWithUser(jsonObject?.receiver_id || selectedUser?.id);
+					if (response?.channel_id) {
+						sendInviteMessage(
+							`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
+							response?.channel_id,
+							ChannelStreamMode.STREAM_MODE_DM,
+							TypeMessage.SendToken
+						);
+					}
+				}
 				const now = new Date();
 				const formattedTime = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1)
 					.toString()
@@ -258,21 +263,33 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	const handleShare = async () => {
-		const dataUri = await captureRef(viewToSnapshotRef, { result: 'tmpfile' });
-		if (!dataUri) {
-			console.error('Failed to capture screenshot');
-			return;
+		try {
+			if (viewToSnapshotRef?.current) {
+				const dataUri = await viewToSnapshotRef?.current?.capture?.();
+				if (!dataUri) {
+					Toast.show({
+						type: 'error',
+						text1: 'Failed to share transfer money'
+					});
+					return;
+				}
+				const shareData = {
+					subject: null,
+					mimeType: 'image/png',
+					fileName: `share` + Date.now() + '.png',
+					text: null,
+					weblink: null,
+					contentUri: dataUri,
+					filePath: dataUri
+				};
+				setFileShared([shareData]);
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				text1: 'Failed to share transfer money'
+			});
 		}
-		const shareData = {
-			subject: null,
-			mimeType: 'image/jpeg',
-			fileName: `share` + Date.now(),
-			text: null,
-			weblink: null,
-			contentUri: dataUri,
-			filePath: dataUri
-		};
-		setFileShared([shareData]);
 	};
 
 	const handleSendNewToken = () => {
@@ -294,16 +311,25 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				<Text style={styles.heading}>{t('sendToken')}</Text>
 				<View>
 					<Text style={styles.title}>{t('sendTokenTo')}</Text>
-					<TouchableOpacity style={[styles.textField, { height: size.s_50 }]} onPress={handleOpenBottomSheet}>
-						<Text style={styles.username}>{selectedUser?.username}</Text>
+					<TouchableOpacity
+						disabled={!!jsonObject?.receiver_id}
+						style={[styles.textField, { height: size.s_50 }]}
+						onPress={handleOpenBottomSheet}
+					>
+						<Text style={styles.username}>
+							{/*eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+							{/*@ts-expect-error*/}
+							{jsonObject?.receiver_name ? jsonObject?.receiver_name || 'KOMU' : selectedUser?.username}
+						</Text>
 					</TouchableOpacity>
 				</View>
 				<View>
 					<Text style={styles.title}>{t('token')}</Text>
 					<View style={styles.textField}>
 						<TextInput
+							editable={!jsonObject?.amount}
 							style={styles.textInput}
-							value={tokenCount}
+							value={jsonObject?.amount?.toString() || tokenCount}
 							keyboardType="numeric"
 							placeholderTextColor="#535353"
 							onChangeText={handleInputChange}
@@ -317,7 +343,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 							style={[styles.textInput, { height: size.s_100, paddingVertical: size.s_10, paddingTop: size.s_10 }]}
 							placeholderTextColor="#535353"
 							autoCapitalize="none"
-							value={note}
+							value={jsonObject?.note?.toString() || note}
 							numberOfLines={5}
 							multiline={true}
 							textAlignVertical="top"
@@ -342,50 +368,56 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				{fileShared ? (
 					<Sharing data={fileShared} onClose={onCloseFileShare} />
 				) : (
-					<View ref={viewToSnapshotRef} style={styles.fullscreenModal}>
-						<View style={styles.modalHeader}>
-							<View>
-								<Icons.TickIcon width={100} height={100} />
-							</View>
-							<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
-							<Text style={styles.amountText}>
-								{tokenCount} {plainTokenCount === 1 ? `token` : `tokens`}
-							</Text>
-						</View>
-
-						<View style={styles.modalBody}>
-							<View style={styles.infoRow}>
-								<Text style={styles.label}>{t('receiver')}</Text>
-								<Text style={[styles.value, { fontSize: size.s_20 }]}>{selectedUser?.username || 'Unknown'}</Text>
-							</View>
-
-							<View style={styles.infoRow}>
-								<Text style={styles.label}>{t('note')}</Text>
-								<Text style={styles.value}>{note || ''}</Text>
+					<ViewShot
+						ref={viewToSnapshotRef}
+						options={{ fileName: 'send_money_success_mobile', format: 'png', quality: 1 }}
+						style={{ width: '100%', height: '100%' }}
+					>
+						<View style={styles.fullscreenModal}>
+							<View style={styles.modalHeader}>
+								<View>
+									<Icons.TickIcon width={100} height={100} />
+								</View>
+								<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
+								<Text style={styles.amountText}>
+									{tokenCount} {plainTokenCount === 1 ? `token` : `tokens`}
+								</Text>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.label}>{t('date')}</Text>
-								<Text style={styles.value}>{successTime}</Text>
+							<View style={styles.modalBody}>
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('receiver')}</Text>
+									<Text style={[styles.value, { fontSize: size.s_20 }]}>{selectedUser?.username || 'Unknown'}</Text>
+								</View>
+
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('note')}</Text>
+									<Text style={styles.value}>{note || ''}</Text>
+								</View>
+
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('date')}</Text>
+									<Text style={styles.value}>{successTime}</Text>
+								</View>
 							</View>
-						</View>
-						<View style={styles.action}>
-							<View style={styles.actionMore}>
-								<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
-									<MezonIconCDN icon={IconCDN.shareIcon} width={24} height={24} />
-									<Text style={styles.textActionMore}>{t('share')}</Text>
+							<View style={styles.action}>
+								<View style={styles.actionMore}>
+									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
+										<MezonIconCDN icon={IconCDN.shareIcon} width={24} height={24} />
+										<Text style={styles.textActionMore}>{t('share')}</Text>
+									</TouchableOpacity>
+									<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
+										<Icons.ArrowLeftRightIcon />
+										<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
+									</TouchableOpacity>
+								</View>
+
+								<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
+									<Text style={styles.confirmText}>{t('complete')}</Text>
 								</TouchableOpacity>
-								<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
-									<Icons.ArrowLeftRightIcon />
-									<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
-								</TouchableOpacity>
 							</View>
-
-							<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
-								<Text style={styles.confirmText}>{t('complete')}</Text>
-							</TouchableOpacity>
 						</View>
-					</View>
+					</ViewShot>
 				)}
 			</Modal>
 			<BottomSheetModal

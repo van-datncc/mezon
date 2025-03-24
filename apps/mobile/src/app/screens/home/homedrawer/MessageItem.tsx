@@ -323,7 +323,7 @@ const MessageItem = React.memo(
 											/>
 										) : isSendTokenLog ? (
 											<MessageSendTokenLog messageContent={message?.content?.t} />
-										) : (
+										) : message?.content?.t ? (
 											<RenderTextMarkdownContent
 												content={{
 													...(typeof message.content === 'object' ? message.content : {}),
@@ -342,7 +342,7 @@ const MessageItem = React.memo(
 												isOnlyContainEmoji={isOnlyContainEmoji}
 												onLongPress={handleLongPressMessage}
 											/>
-										)}
+										) : null}
 										{!!message?.content?.embed?.length &&
 											message?.content?.embed?.map((embed, index) => (
 												<EmbedMessage message_id={message?.id} embed={embed} key={`message_embed_${message?.id}_${index}`} />

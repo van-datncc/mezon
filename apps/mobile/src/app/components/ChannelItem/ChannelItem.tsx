@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelUsersEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
+import { ChannelUsersEntity, clansActions, getStore, selectChannelById, selectCurrentClanId, useAppSelector } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,13 @@ export const ChannelItem = React.memo(({ channelData }: ChannelItemProps) => {
 	const parentLabel = useMemo(() => (parentChannel?.channel_label ? `(${parentChannel.channel_label})` : ''), [parentChannel]);
 	const styles = style(themeValue);
 	const handleOnPress = () => {
+		const store = getStore();
+		const clanIdStore = selectCurrentClanId(store.getState());
+
+		if (clanIdStore !== channelData?.clan_id) {
+			store.dispatch(clansActions.joinClan({ clanId: channelData?.clan_id }));
+			store.dispatch(clansActions.changeCurrentClan({ clanId: channelData?.clan_id }));
+		}
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_ROUTER, { channel: channelData });
 	};
 	return (

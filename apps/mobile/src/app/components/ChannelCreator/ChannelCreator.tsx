@@ -97,7 +97,6 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			const dataSave = getUpdateOrAddClanChannelCache(clanID, channelID);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			await sleep(1000);
-			DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelID);
 		} else {
 			navigation.navigate(APP_SCREEN.HOME);
 		}
@@ -152,12 +151,12 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 
 	const channelVoiceTypeList = [
 		{
-			title: t('fields.channelVoiceType.gMeet'),
-			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE
-		},
-		{
 			title: t('fields.channelVoiceType.mezon'),
 			value: ChannelType.CHANNEL_TYPE_MEZON_VOICE
+		},
+		{
+			title: t('fields.channelVoiceType.gMeet'),
+			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE
 		}
 	];
 
