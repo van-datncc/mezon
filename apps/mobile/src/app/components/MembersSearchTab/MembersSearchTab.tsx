@@ -1,7 +1,8 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity } from '@mezon/store-mobile';
+import { ChannelMembersEntity, getStore, selectClanMemberMetaUserId } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
-import { useState } from 'react';
+import { User } from 'mezon-js';
+import { useCallback, useState } from 'react';
 import { Keyboard, View } from 'react-native';
 import { EmptySearchPage } from '../EmptySearchPage';
 import { MemberItem } from '../MemberStatus/MemberItem';
@@ -18,7 +19,33 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const handleCloseUserInfoBS = () => {
 		setSelectedUser(null);
 	};
+	const store = getStore();
 
+	const onDetailMember = useCallback((user: ChannelMembersEntity) => {
+		setSelectedUser(user);
+	}, []);
+
+	const renderItem = useCallback(
+		({ item, index }) => {
+			const userMeta = selectClanMemberMetaUserId(store.getState(), item.id);
+			const user = {
+				...item,
+				metadata: {
+					user_status: userMeta?.status
+				}
+			};
+			return (
+				<MemberItem
+					onPress={onDetailMember}
+					isHiddenStatus={!userMeta}
+					isOffline={!userMeta?.online}
+					user={user}
+					key={`${item?.['id']}_member_search_${index}}`}
+				/>
+			);
+		},
+		[store]
+	);
 	return (
 		<View style={[styles.container, { backgroundColor: listMemberSearch?.length > 0 ? themeValue.primary : themeValue.secondary }]}>
 			{listMemberSearch?.length > 0 ? (
@@ -28,15 +55,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 						data={listMemberSearch}
 						keyboardShouldPersistTaps={'handled'}
 						onScrollBeginDrag={Keyboard.dismiss}
-						renderItem={({ item, index }) => (
-							<MemberItem
-								onPress={(user) => {
-									setSelectedUser(user);
-								}}
-								user={item as any}
-								key={`${item?.['id']}_member_search_${index}}`}
-							/>
-						)}
+						renderItem={renderItem}
 						estimatedItemSize={100}
 						removeClippedSubviews={true}
 					/>
@@ -45,7 +64,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 				<EmptySearchPage />
 			)}
 			<UserInformationBottomSheet
-				user={selectedUser?.user || selectedUser}
+				user={(selectedUser?.user || selectedUser) as User}
 				userId={selectedUser?.user?.id || selectedUser?.id}
 				onClose={handleCloseUserInfoBS}
 			/>

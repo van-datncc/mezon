@@ -19,17 +19,14 @@ export default function MezonSelect({ data, onChange, ...props }: IMezonSelectPr
 	const styles = style(themeValue);
 	const [currentValue, setCurrentValue] = useState(data?.[0]?.value || 0);
 	const [currentContent, setCurrentContent] = useState(data?.[0]?.title || 'unknown');
-	const bottomSheetRef = useRef<BottomSheetModalMethods>();
 
 	function handleChange(value: number) {
 		setCurrentValue(value);
 		setCurrentContent(data?.filter((item) => item.value === value)?.[0]?.title || 'unknown');
-		bottomSheetRef?.current?.dismiss();
 		onChange && onChange(value);
 	}
 
 	function handlePress() {
-		bottomSheetRef?.current?.present();
 		const dataBottomSheet = {
 			heightFitContent: true,
 			title: props.title,
