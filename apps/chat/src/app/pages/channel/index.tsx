@@ -4,19 +4,20 @@ import { useAppNavigation, useAuth, useDragAndDrop, usePermissionChecker, useSea
 import {
 	ChannelsEntity,
 	ETypeMission,
+	RootState,
 	channelAppActions,
 	channelMetaActions,
 	channelsActions,
 	clansActions,
 	directMetaActions,
 	getStore,
+	getStoreAsync,
 	gifsStickerEmojiActions,
 	handleParticipantMeetState,
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	onboardingActions,
 	selectAppChannelById,
-	selectBadgeCountByClanId,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
@@ -83,8 +84,6 @@ function useChannelSeen(channelId: string) {
 	const { markAsReadSeen } = useSeenMessagePool();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 
-	const badgeCountClan = useSelector(selectBadgeCountByClanId(currentChannel.clan_id as string)) || 0;
-
 	useEffect(() => {
 		if (!lastMessage) {
 			return;
@@ -93,7 +92,14 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		markAsReadSeen(lastMessage, mode, badgeCountClan);
+		const asyncBadge = async () => {
+			const store = await getStoreAsync();
+			const state = store.getState() as RootState;
+			const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+
+			markAsReadSeen(lastMessage, mode, badgeCountClan);
+		};
+		asyncBadge();
 	}, [lastMessage, channelId, isUnreadChannel]);
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
