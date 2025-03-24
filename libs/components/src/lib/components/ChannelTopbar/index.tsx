@@ -1,15 +1,11 @@
 import { useAppNavigation, useGifsStickersEmoji, usePathMatch } from '@mezon/core';
 import {
-	AppDispatch,
 	RootState,
 	appActions,
-	channelAppActions,
 	channelsActions,
-	generateMeetToken,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
-	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -18,9 +14,6 @@ import {
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
-	selectEnableCall,
-	selectEnableMic,
-	selectGetRoomId,
 	selectIsPinModalVisible,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
@@ -51,8 +44,6 @@ import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import FileModal from './TopBarComponents/FilesModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
-import { MicButton } from './TopBarComponents/SFUButton/MicIcon';
-import { StartCallButton } from './TopBarComponents/SFUButton/StartCallButton';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
@@ -116,73 +107,6 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 		</>
 	);
 });
-
-const TopBarChannelApps = ({ channel, mode }: ChannelTopbarProps) => {
-	const dispatch = useDispatch<AppDispatch>();
-	const joinVoice = useSelector(selectEnableCall);
-	const enableMic = useSelector(selectEnableMic);
-	const roomId = useSelector(selectGetRoomId);
-	const joinCall = useSelector(selectEnableCall);
-	const [loading, setLoading] = useState(false);
-
-	const appChannel = useAppSelector((state) => selectAppChannelById(state, channel?.channel_id as string));
-
-	useEffect(() => {
-		dispatch(channelAppActions.setRoomId(null));
-	}, [channel, dispatch]);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			if (!roomId || !joinCall || !appChannel || !appChannel.url) {
-				dispatch(channelAppActions.setRoomToken(undefined));
-				return;
-			}
-			setLoading(true);
-
-			try {
-				const channelId = String(appChannel.channel_id ?? '');
-				const roomName = `${appChannel?.url}-${roomId}`;
-
-				const result = await dispatch(generateMeetToken({ channelId, roomName })).unwrap();
-
-				dispatch(channelAppActions.setRoomToken(result || undefined));
-			} catch (err) {
-				console.error('Failed to join room:', err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchData();
-	}, [channel, dispatch, roomId, joinCall, appChannel]);
-
-	return (
-		roomId && (
-			<>
-				<div className="justify-start items-center gap-1 flex">
-					<ChannelLabel channel={channel} />
-				</div>
-
-				<div className="items-center h-full ml-auto flex">
-					<div className="justify-end items-center gap-2 flex">
-						<div className="flex">
-							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<StartCallButton
-									loading={loading}
-									onClick={() => dispatch(channelAppActions.setEnableCall(!joinVoice))}
-									isJoinVoice={joinVoice}
-								/>
-
-								<MicButton onClick={() => dispatch(channelAppActions.setEnableVoice(!enableMic))} isTalking={enableMic} />
-								{/* <VideoButoon onClick={() => dispatch(channelAppActions.setEnableVideo(!enableVideo))} isEnable={enableVideo} /> */}
-							</div>
-						</div>
-					</div>
-				</div>
-			</>
-		)
-	);
-};
 
 const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();

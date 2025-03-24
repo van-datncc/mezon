@@ -75,7 +75,7 @@ export default function InvitePage() {
 					<div className="w-[70px] h-[70px] rounded-lg flex justify-center items-center text-contentSecondary text-[25px] bg-zinc-900 ">
 						{clanName.charAt(0).toUpperCase()}
 					</div>
-					<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invite to join</p>
+					<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invited to join</p>
 					<p className="text-4xl text-white font-semibold mt-4">{clanName}</p>
 					{channelName && <p className="text-4xl text-white text-[18px]">#{channelName}</p>}
 				</div>

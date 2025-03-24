@@ -13,7 +13,6 @@ import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { MyQRCode } from '../../../screens/settings/MyQRCode';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { QRScanner } from '../../../screens/settings/QRScanner';
-import { SendCoffeeScreen } from '../../../screens/settings/SendCoffee';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 

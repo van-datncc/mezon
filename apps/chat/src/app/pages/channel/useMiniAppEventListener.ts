@@ -85,10 +85,10 @@ const useMiniAppEventListener = (
 					);
 					break;
 				case MiniAppEventType.JOIN_ROOM:
-					dispatch(channelAppActions.setRoomId(eventData.eventData?.roomId));
+					dispatch(channelAppActions.setRoomId({ channelId: appChannel?.channel_id as string, roomId: eventData.eventData?.roomId }));
 					break;
 				case MiniAppEventType.LEAVE_ROOM:
-					dispatch(channelAppActions.setRoomId(null));
+					dispatch(channelAppActions.setRoomId({ channelId: appChannel?.channel_id as string, roomId: null }));
 					break;
 				case MiniAppEventType.CREATE_VOICE_ROOM:
 					dispatch(
