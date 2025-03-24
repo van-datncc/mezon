@@ -64,7 +64,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		logo: currentEvent ? currentEvent.logo || '' : '',
 		description: currentEvent ? currentEvent.description || '' : '',
 		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
-		repeatType: currentEvent ? currentEvent.repeat_type || 0 : 0
+		repeatType: currentEvent ? currentEvent.repeat_type || ERepeatType.DOES_NOT_REPEAT : ERepeatType.DOES_NOT_REPEAT
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);

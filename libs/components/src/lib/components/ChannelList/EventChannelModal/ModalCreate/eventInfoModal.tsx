@@ -48,10 +48,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	};
 
 	const weekdayOccurrence = getWeekdayOccurrence(contentSubmit.selectedDateStart);
-	const [selectedFrequency, setSelectedFrequency] = useState(0);
+	const [selectedFrequency, setSelectedFrequency] = useState(ERepeatType.DOES_NOT_REPEAT);
 
 	useEffect(() => {
-		if (errorEnd || (errorStart && !selectedFrequency)) {
+		if (errorEnd || (errorStart && selectedFrequency === ERepeatType.DOES_NOT_REPEAT)) {
 			setErrorTime(true);
 		} else {
 			setErrorTime(false);
@@ -81,7 +81,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	}, [startDate, startDayOfWeek, startMonth, weekdayOccurrence]);
 
 	useEffect(() => {
-		setSelectedFrequency(contentSubmit.repeatType ?? 0);
+		setSelectedFrequency(contentSubmit.repeatType ?? ERepeatType.DOES_NOT_REPEAT);
 	}, []);
 	// this one to check error timeStart/timeEnd
 	useMemo(() => {
@@ -258,7 +258,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						</option>
 					))}
 				</select>
-				{errorStart && !selectedFrequency ? <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p> : null}
+				{errorStart && selectedFrequency === ERepeatType.DOES_NOT_REPEAT ? (
+					<p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p>
+				) : null}
 				{errorEnd && <p className="text-[#e44141] text-xs font-thin">The end time must be bigger than start time.</p>}
 			</div>
 			<div className="mb-4">
