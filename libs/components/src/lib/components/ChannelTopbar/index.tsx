@@ -133,7 +133,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
-				<ChannelLabel channel={channel} />
+				{isMemberPath ? <p className="text-base font-semibold">Members</p> : <ChannelLabel channel={channel} />}
 			</div>
 			<div className="items-center h-full ml-auto flex">
 				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
