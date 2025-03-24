@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import { useAppNavigation } from '@mezon/core';
 import {
 	channelAppActions,
@@ -13,13 +14,16 @@ import {
 	selectEnableMic,
 	selectGetRoomId,
 	selectToCheckAppIsOpening,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiChannelAppResponseExtend, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../ChannelApp';
+
+import React from 'react';
 export const POPUP_HEIGHT_COLLAPSE = 48;
 
 type DraggableModalTabsProps = {
@@ -27,9 +31,18 @@ type DraggableModalTabsProps = {
 	onCollapseToggle?: () => void;
 	isCollapsed?: boolean;
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	onFullSizeToggle?: () => void;
+	isFullSize?: boolean;
 };
 
-const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList, onCollapseToggle, isCollapsed, handleMouseDown }) => {
+const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
+	appChannelList,
+	onCollapseToggle,
+	isCollapsed,
+	handleMouseDown,
+	onFullSizeToggle,
+	isFullSize
+}) => {
 	const dispatch = useAppDispatch();
 	const store = getStore();
 
@@ -89,9 +102,7 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 		},
 		[dispatch]
 	);
-	const isJoinVoice = useSelector(selectEnableCall);
-	const isTalking = useSelector(selectEnableMic);
-	const roomId = useSelector(selectGetRoomId);
+
 	const { navigate, toChannelPage } = useAppNavigation();
 
 	const onBack = useCallback(
@@ -117,85 +128,15 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 				</button>
 			</div>
 			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${POPUP_HEIGHT_COLLAPSE}px]`}>
-				{appChannelList.map((app) => {
-					const isFocused = selectCheckAppFocused(store.getState(), app.channel_id as string);
-					const channel = selectChannelById(store.getState(), app.channel_id as string);
-
-					return (
-						<div key={app.channel_id} className="relative w-fit flex flex-row z-50">
-							{isFocused && <Icons.CornerTab className="absolute bottom-0 right-[100%]" />}
-
-							<div title={channel?.channel_label} onClick={(event) => handleFocused(event, app as ApiChannelAppResponseExtend)}>
-								<div
-									className={`rounded-t-xl flex items-center transition-all duration-300 ease-in-out relative gap-2 ${
-										isFocused ? 'w-fit min-w-[270px] px-2 pr-8 bg-black' : 'w-[60px] justify-center bg-transparent'
-									} h-[48px]`}
-								>
-									{/* Avatar */}
-									<span className="text-white text-xs font-bold w-[30px] h-[30px] bg-slate-800 flex justify-center items-center rounded-full">
-										{(channel?.channel_label || 'New tab').charAt(0).toLocaleUpperCase()}
-									</span>
-
-									{isFocused && (
-										<span className="text-white text-sm font-medium truncate max-w-[120px]">
-											{channel?.channel_label || 'New tab'}
-										</span>
-									)}
-									{isFocused && (
-										<div className="flex flex-row items-center gap-2 absolute right-2">
-											{roomId && (
-												<div className="flex justify-between items-center gap-2 text-sm text-white">
-													<button
-														onClick={() => {
-															dispatch(channelAppActions.setEnableCall(!isJoinVoice));
-															if (isJoinVoice) {
-																dispatch(channelAppActions.setEnableVoice(false));
-																dispatch(channelAppActions.setRoomToken(undefined));
-															}
-														}}
-													>
-														{isJoinVoice ? (
-															<Icons.StopCall className="size-4 text-red-600" />
-														) : (
-															<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-														)}
-													</button>
-													{isJoinVoice && (
-														<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
-															{isTalking ? (
-																<Icons.MicDisable className="size-4 text-red-600" />
-															) : (
-																<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-															)}
-														</button>
-													)}
-												</div>
-											)}
-											{Boolean(app.isBlank) === false && (
-												<button
-													onClick={(e) => onBack(e, app.channel_id as string, app.clan_id as string)}
-													className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
-													title="Back"
-												>
-													↩
-												</button>
-											)}
-
-											<button
-												title="Close"
-												onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
-												className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
-											>
-												✕
-											</button>
-										</div>
-									)}
-								</div>
-							</div>
-							{isFocused && <Icons.CornerTab className="absolute bottom-0 right-[-16px] rotate-90" />}
-						</div>
-					);
-				})}
+				{appChannelList.map((app) => (
+					<DraggableModalTabItem
+						key={app.app_id}
+						app={app}
+						handleFocused={handleFocused}
+						onBack={onBack}
+						handleOnCloseCallback={handleOnCloseCallback}
+					/>
+				))}
 				<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
 					{' '}
 					<button
@@ -207,14 +148,193 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 					</button>
 				</div>
 			</div>
-			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
+			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center right-3">
 				<button
 					onClick={onCollapseToggle}
 					title={isCollapsed ? 'Expand tabs' : 'Collapse tabs'}
-					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm font-bold rounded-full w-[30px] h-[30px] bg-gray-800"
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm  rounded-full w-[30px] h-[30px]"
 				>
 					{isCollapsed ? '▼' : '▲'}
 				</button>
+				<button
+					onClick={onFullSizeToggle}
+					title={isFullSize ? 'Exit Full Screen' : 'Enter Full Screen'}
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm rounded-full w-[30px] h-[30px]"
+				>
+					{isFullSize ? '🗗' : '⛶'}
+				</button>
+			</div>
+		</div>
+	);
+};
+
+interface DraggableModalTabItemProps {
+	app: ApiChannelAppResponseExtend;
+	handleFocused: (event: React.MouseEvent<HTMLDivElement>, app: ApiChannelAppResponseExtend) => void;
+	onBack: (event: React.MouseEvent<HTMLButtonElement>, channelId: string, clanId: string) => void;
+	handleOnCloseCallback: (event: React.MouseEvent<HTMLButtonElement>, clanId: string, channelId: string) => void;
+}
+
+const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, handleFocused, onBack, handleOnCloseCallback }) => {
+	const dispatch = useDispatch();
+	const store = getStore();
+	const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
+	const channel = selectChannelById(store.getState(), app?.channel_id as string);
+	const roomId = useAppSelector((state) => selectGetRoomId(state, app?.channel_id));
+	const isJoinVoice = useSelector(selectEnableCall);
+	const isTalking = useSelector(selectEnableMic);
+	return (
+		<div onClick={(event) => handleFocused(event, app as ApiChannelAppResponseExtend)}>
+			<div
+				title={channel?.channel_label}
+				className={`rounded-t-xl flex items-center transition-all duration-300 ease-in-out relative gap-2 ${
+					isFocused ? 'w-fit min-w-[270px] px-2 pr-8 bg-black' : 'w-[60px] justify-center bg-transparent'
+				} h-[48px]`}
+			>
+				{/* Avatar */}
+				<span className="text-white text-xs font-bold w-[30px] h-[30px] bg-slate-800 flex justify-center items-center rounded-full">
+					{(channel?.channel_label || 'New tab').charAt(0).toLocaleUpperCase()}
+				</span>
+
+				{isFocused && <span className="text-white text-sm font-medium truncate max-w-[120px]">{channel?.channel_label || 'New tab'}</span>}
+				{isFocused && (
+					<div className="flex flex-row items-center gap-2 absolute right-2">
+						{roomId && (
+							<div
+								className="flex justify-between items-center gap-2 text-sm text-white"
+								onMouseEnter={(event) => event.stopPropagation()}
+							>
+								<button
+									onClick={() => {
+										dispatch(channelAppActions.setEnableCall(!isJoinVoice));
+										if (isJoinVoice) {
+											dispatch(channelAppActions.setEnableVoice(false));
+											dispatch(channelAppActions.setRoomToken(undefined));
+										}
+									}}
+								>
+									{isJoinVoice ? (
+										<Icons.StopCall className="size-4 text-red-600" />
+									) : (
+										<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+									)}
+								</button>
+								{isJoinVoice && (
+									<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
+										{isTalking ? (
+											<Icons.MicDisable className="size-4 text-red-600" />
+										) : (
+											<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+										)}
+									</button>
+								)}
+							</div>
+						)}
+						{Boolean(app.isBlank) === false && (
+							<button
+								onClick={(e) => onBack(e, app.channel_id as string, app.clan_id as string)}
+								className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
+								title="Back"
+							>
+								↩
+							</button>
+						)}
+
+						<button
+							title="Close"
+							onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
+							className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
+						>
+							✕
+						</button>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+};
+
+interface DraggableModalTabItemProps {
+	app: ApiChannelAppResponseExtend;
+	handleFocused: (event: React.MouseEvent<HTMLDivElement>, app: ApiChannelAppResponseExtend) => void;
+	onBack: (event: React.MouseEvent<HTMLButtonElement>, channelId: string, clanId: string) => void;
+	handleOnCloseCallback: (event: React.MouseEvent<HTMLButtonElement>, clanId: string, channelId: string) => void;
+}
+
+const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, handleFocused, onBack, handleOnCloseCallback }) => {
+	const dispatch = useDispatch();
+	const store = getStore();
+	const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
+	const channel = selectChannelById(store.getState(), app?.channel_id as string);
+	const roomId = useAppSelector((state) => selectGetRoomId(state, app?.channel_id));
+	const isJoinVoice = useSelector(selectEnableCall);
+	const isTalking = useSelector(selectEnableMic);
+	return (
+		<div onClick={(event) => handleFocused(event, app as ApiChannelAppResponseExtend)}>
+			<div
+				title={channel?.channel_label}
+				className={`rounded-t-xl flex items-center transition-all duration-300 ease-in-out relative gap-2 ${
+					isFocused ? 'w-fit min-w-[270px] px-2 pr-8 bg-black' : 'w-[60px] justify-center bg-transparent'
+				} h-[48px]`}
+			>
+				{/* Avatar */}
+				<span className="text-white text-xs font-bold w-[30px] h-[30px] bg-slate-800 flex justify-center items-center rounded-full">
+					{(channel?.channel_label || 'New tab').charAt(0).toLocaleUpperCase()}
+				</span>
+
+				{isFocused && <span className="text-white text-sm font-medium truncate max-w-[120px]">{channel?.channel_label || 'New tab'}</span>}
+				{isFocused && (
+					<div className="flex flex-row items-center gap-2 absolute right-2">
+						{roomId && (
+							<div
+								className="flex justify-between items-center gap-2 text-sm text-white"
+								onMouseEnter={(event) => event.stopPropagation()}
+							>
+								<button
+									onClick={() => {
+										dispatch(channelAppActions.setEnableCall(!isJoinVoice));
+										if (isJoinVoice) {
+											dispatch(channelAppActions.setEnableVoice(false));
+											dispatch(channelAppActions.setRoomToken(undefined));
+										}
+									}}
+								>
+									{isJoinVoice ? (
+										<Icons.StopCall className="size-4 text-red-600" />
+									) : (
+										<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+									)}
+								</button>
+								{isJoinVoice && (
+									<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
+										{isTalking ? (
+											<Icons.MicDisable className="size-4 text-red-600" />
+										) : (
+											<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+										)}
+									</button>
+								)}
+							</div>
+						)}
+						{Boolean(app.isBlank) === false && (
+							<button
+								onClick={(e) => onBack(e, app.channel_id as string, app.clan_id as string)}
+								className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
+								title="Back"
+							>
+								↩
+							</button>
+						)}
+
+						<button
+							title="Close"
+							onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
+							className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
+						>
+							✕
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -338,6 +458,21 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isInteracting, setIsInteracting] = useState(false);
+	const [isFullSize, setIsFullSize] = useState(false);
+	const { height, width } = useWindowSize();
+
+	const onFullSizeToggle = useCallback(() => {
+		setIsFullSize((prev) => {
+			const newSize = prev ? { width: initialWidth, height: initialHeight } : { width, height };
+
+			const newPosition = prev ? { x: 100, y: 100 } : { x: 0, y: 0 };
+
+			setSize(newSize);
+			setPosition(newPosition);
+
+			return !prev;
+		});
+	}, [width, height, initialWidth, initialHeight]);
 
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
@@ -353,7 +488,6 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 			return !prev;
 		});
 	}, [initialHeight, initialWidth]);
-	const { height, width } = useWindowSize();
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
@@ -472,6 +606,8 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430
 							onCollapseToggle={onCollapseToggle}
 							isCollapsed={isCollapsed}
 							handleMouseDown={handleMouseDown}
+							onFullSizeToggle={onFullSizeToggle}
+							isFullSize={isFullSize}
 						/>
 						<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList as ApiChannelAppResponseExtend[]} />
 						{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}

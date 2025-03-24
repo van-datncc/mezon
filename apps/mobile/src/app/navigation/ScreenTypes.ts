@@ -265,10 +265,9 @@ type SettingStackParamList = {
 	[APP_SCREEN.SETTINGS.ACCOUNT]: undefined;
 	[APP_SCREEN.SETTINGS.BLOCKED_USERS]: undefined;
 	[APP_SCREEN.SETTINGS.MY_QR_CODE]: undefined;
-	[APP_SCREEN.SETTINGS.SEND_COFFEE]: {
-		formValue: string;
+	[APP_SCREEN.SETTINGS.SEND_TOKEN]: {
+		formValue?: string;
 	};
-	[APP_SCREEN.SETTINGS.SEND_TOKEN]: undefined;
 	[APP_SCREEN.SETTINGS.HISTORY_TRANSACTION]: undefined;
 };
 
