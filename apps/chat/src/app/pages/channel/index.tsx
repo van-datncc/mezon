@@ -343,7 +343,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				})
 			);
 		}
-		dispatch(channelAppActions.setRoomId(null));
+		dispatch(channelAppActions.setRoomId({ channelId: channelId, roomId: null }));
+
 		if (isChannelApp) {
 			dispatch(channelAppActions.setChannelId(channelId));
 			dispatch(channelAppActions.setClanId(currentChannel?.clan_id || null));
