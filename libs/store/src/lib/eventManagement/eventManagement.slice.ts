@@ -232,6 +232,7 @@ export interface EventManagementState {
 	chooseEvent: EventManagementEntity | null;
 	ongoingEvent: EventManagementOnGogoing | null;
 	showModalDetailEvent?: boolean;
+	showModalEvent?: boolean;
 }
 
 export const initialEventManagementState: EventManagementState = {
@@ -241,7 +242,8 @@ export const initialEventManagementState: EventManagementState = {
 	chooseEvent: null,
 	ongoingEvent: null,
 	creatingStatus: 'not loaded',
-	showModalDetailEvent: false
+	showModalDetailEvent: false,
+	showModalEvent: false
 };
 
 export const eventManagementSlice = createSlice({
@@ -261,6 +263,9 @@ export const eventManagementSlice = createSlice({
 		},
 		showModalDetailEvent: (state, action) => {
 			state.showModalDetailEvent = action.payload;
+		},
+		showModalEvent: (state, action) => {
+			state.showModalEvent = action.payload;
 		},
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
@@ -425,6 +430,8 @@ export const selectEventsByClanId = createSelector(
 export const selectNumberEvent = createSelector(selectEventsByClanId, (events) => events?.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
+
+export const selectShowModelEvent = createSelector(getEventManagementState, (state) => state.showModalEvent);
 
 export const selectShowModelDetailEvent = createSelector(getEventManagementState, (state) => state.showModalDetailEvent);
 

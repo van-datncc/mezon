@@ -34,7 +34,7 @@ export const InfoUserMessage = ({ createTime, isShow, onPress, senderDisplayName
 				<Text style={{ ...styles.usernameMessageBox, color: colorSenderName }} numberOfLines={1} ellipsizeMode="tail">
 					{senderDisplayName}
 				</Text>
-				{!!imageRoleUrl && <ImageNative url={imageRoleUrl} style={styles.roleIcon} />}
+				{!!imageRoleUrl && <ImageNative url={imageRoleUrl} style={styles.roleIcon} resizeMode={'contain'} />}
 				<Text style={styles.dateMessageBox}>{createTime ? convertTimeString(createTime) : ''}</Text>
 			</TouchableOpacity>
 		);

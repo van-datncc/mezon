@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectCurrentChannelId, selectIsShowEmptyCategory, selectListChannelRenderByClanId, voiceActions } from '@mezon/store';
 import { selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
@@ -134,7 +134,8 @@ const ChannelList = () => {
 				}}
 				disableVirtualization
 				contentContainerStyle={{
-					backgroundColor: themeValue.secondary
+					backgroundColor: themeValue.secondary,
+					paddingBottom: size.s_6
 				}}
 				style={{
 					backgroundColor: themeValue.secondary

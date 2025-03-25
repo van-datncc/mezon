@@ -269,7 +269,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				if (!dataUri) {
 					Toast.show({
 						type: 'error',
-						text1: 'Failed to share transfer money'
+						text1: 'Failed to share transfer funds'
 					});
 					return;
 				}
@@ -287,7 +287,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 		} catch (error) {
 			Toast.show({
 				type: 'error',
-				text1: 'Failed to share transfer money'
+				text1: 'Failed to share transfer funds'
 			});
 		}
 	};
