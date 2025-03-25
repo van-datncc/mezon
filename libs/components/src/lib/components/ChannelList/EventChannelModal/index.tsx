@@ -13,7 +13,7 @@ const EventModal = (props: EventModalProps) => {
 	const { onClose } = props;
 	const [openModal, setOpenModal] = useState(false);
 	const [eventUpdateId, setEventUpdatedId] = useState<string>('');
-	const showModelDetailEvent = useSelector(selectShowModelDetailEvent);
+	const showModalDetailEvent = useSelector(selectShowModelDetailEvent);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const onEventUpdateId = (id: string) => {
@@ -53,7 +53,7 @@ const EventModal = (props: EventModalProps) => {
 					</div>
 				)}
 			</div>
-			{showModelDetailEvent && <ModalDetailItemEvent />}
+			{showModalDetailEvent && <ModalDetailItemEvent />}
 		</div>
 	);
 };

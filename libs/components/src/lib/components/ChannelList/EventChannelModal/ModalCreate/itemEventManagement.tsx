@@ -117,7 +117,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const setChooseEvent = useCallback(
 		(event: EventManagementEntity) => {
 			dispatch(eventManagementActions.setChooseEvent(event));
-			dispatch(eventManagementActions.showModelDetailEvent(true));
+			dispatch(eventManagementActions.showModalDetailEvent(true));
 		},
 		[dispatch]
 	);
