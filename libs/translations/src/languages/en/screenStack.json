@@ -33,7 +33,7 @@
         "profile": "Profile Settings",
         "account": "Account",
         "blockedUsers": "Blocked Users",
-        "sendToken": "Transfer Money",
+        "sendToken": "Transfer Funds",
         "withdrawToken": "Withdraw",
         "historyTransaction": "History Transaction"
     }
