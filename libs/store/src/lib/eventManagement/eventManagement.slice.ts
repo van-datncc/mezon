@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
-import { EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
+import { EEventAction, EEventStatus, ERepeatType, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement } from 'mezon-js/api.gen';
+import { ApiEventManagement, ApiUserEventRequest } from 'mezon-js/api.gen';
 import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -199,6 +199,26 @@ export const fetchDeleteEventManagement = createAsyncThunk(
 	}
 );
 
+export const addUserEvent = createAsyncThunk('userEvent/addUserEvent', async (request: ApiUserEventRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.addUserEvent(mezon.session, request);
+	} catch (error) {
+		captureSentryError(error, 'userEvent/addUserEvent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const deleteUserEvent = createAsyncThunk('userEvent/deleteUserEvent', async (request: ApiUserEventRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.deleteUserEvent(mezon.session, request.clan_id, request.event_id);
+	} catch (error) {
+		captureSentryError(error, 'userEvent/deleteUserEvent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export interface EventManagementState {
 	byClans: Record<
 		string,
@@ -211,6 +231,8 @@ export interface EventManagementState {
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
 	ongoingEvent: EventManagementOnGogoing | null;
+	showModalDetailEvent?: boolean;
+	showModalEvent?: boolean;
 }
 
 export const initialEventManagementState: EventManagementState = {
@@ -219,7 +241,9 @@ export const initialEventManagementState: EventManagementState = {
 	error: null,
 	chooseEvent: null,
 	ongoingEvent: null,
-	creatingStatus: 'not loaded'
+	creatingStatus: 'not loaded',
+	showModalDetailEvent: false,
+	showModalEvent: false
 };
 
 export const eventManagementSlice = createSlice({
@@ -237,7 +261,12 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-
+		showModalDetailEvent: (state, action) => {
+			state.showModalDetailEvent = action.payload;
+		},
+		showModalEvent: (state, action) => {
+			state.showModalEvent = action.payload;
+		},
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
 			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[action.payload.clan_id].entities, event_id);
@@ -259,6 +288,31 @@ export const eventManagementSlice = createSlice({
 				}
 			});
 		},
+		updateUserEvent: (state, action) => {
+			const { event_id, user_id, clan_id } = action.payload;
+			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[clan_id]?.entities, event_id);
+
+			if (!existingEvent) {
+				return;
+			}
+
+			let updatedUserIds = [...(existingEvent.user_ids || [])];
+			if (action.payload.action === EEventAction.INTERESTED) {
+				if (!updatedUserIds.includes(user_id)) {
+					updatedUserIds.push(user_id);
+				}
+			} else if (action.payload.action === EEventAction.UNINTERESTED) {
+				updatedUserIds = updatedUserIds.filter((id) => id !== user_id);
+			}
+
+			eventManagementAdapter.updateOne(state.byClans[clan_id].entities, {
+				id: event_id,
+				changes: {
+					user_ids: updatedUserIds
+				}
+			});
+		},
+
 		updateNewStartTime: (state, action) => {
 			const { event_id, start_time } = action.payload;
 			const existingEvent = eventManagementAdapter.getSelectors().selectById(state.byClans[action.payload.clan_id].entities, event_id);
@@ -288,6 +342,7 @@ export const eventManagementSlice = createSlice({
 				channel_id: normalizedChannelId,
 				channel_voice_id: normalizedVoiceChannelId,
 				event_status,
+				user_ids: [action.payload.creator_id],
 				...restPayload
 			});
 		},
@@ -375,6 +430,10 @@ export const selectEventsByClanId = createSelector(
 export const selectNumberEvent = createSelector(selectEventsByClanId, (events) => events?.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
+
+export const selectShowModelEvent = createSelector(getEventManagementState, (state) => state.showModalEvent);
+
+export const selectShowModelDetailEvent = createSelector(getEventManagementState, (state) => state.showModalDetailEvent);
 
 export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);
 

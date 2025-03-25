@@ -8,13 +8,12 @@ import ListEventManagement from './ListEventManagement';
 type StartEventModalProps = {
 	onClose: () => void;
 	onOpenCreate: () => void;
-	onOpenDetailItem: (status: boolean) => void;
 	onEventUpdateId: (eventId: string) => void;
 	rootRef: RefObject<HTMLElement>;
 };
 
 export const StartEventModal = (props: StartEventModalProps) => {
-	const { onClose, onOpenCreate, onOpenDetailItem, onEventUpdateId } = props;
+	const { onClose, onOpenCreate, onEventUpdateId } = props;
 	const { numberEventManagement } = useEventManagementQuantity();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allEventManagement = useAppSelector((state) => selectEventsByClanId(state, currentClanId as string));
@@ -46,7 +45,6 @@ export const StartEventModal = (props: StartEventModalProps) => {
 				<div className="dark:bg-[#313339] bg-white h-fit min-h-80 max-h-[80vh]  overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col">
 					<ListEventManagement
 						allEventManagement={allEventManagement}
-						onOpenDetailItem={onOpenDetailItem}
 						openModelUpdate={onOpenCreate}
 						onUpdateEventId={onEventUpdateId}
 						onClose={onClose}

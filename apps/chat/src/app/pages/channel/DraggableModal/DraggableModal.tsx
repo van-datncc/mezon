@@ -1,4 +1,5 @@
-import { useAppNavigation } from '@mezon/core';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/accessible-emoji */
 import {
 	channelAppActions,
 	channelsActions,
@@ -12,24 +13,37 @@ import {
 	selectEnableCall,
 	selectEnableMic,
 	selectGetRoomId,
+	selectPostionPopupApps,
+	selectSizePopupApps,
 	selectToCheckAppIsOpening,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiChannelAppResponseExtend, useWindowSize } from '@mezon/utils';
+import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../ChannelApp';
-export const POPUP_HEIGHT_COLLAPSE = 48;
+
+import React from 'react';
 
 type DraggableModalTabsProps = {
 	appChannelList: ApiChannelAppResponseExtend[];
-	onCollapseToggle?: () => void;
+	onCollapseToggle?: (() => void | undefined) | undefined;
 	isCollapsed?: boolean;
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	onFullSizeToggle?: () => void;
+	isFullSize?: boolean;
 };
 
-const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList, onCollapseToggle, isCollapsed, handleMouseDown }) => {
+const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
+	appChannelList,
+	onCollapseToggle,
+	isCollapsed,
+	handleMouseDown,
+	onFullSizeToggle,
+	isFullSize
+}) => {
 	const dispatch = useAppDispatch();
 	const store = getStore();
 
@@ -89,20 +103,6 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 		},
 		[dispatch]
 	);
-	const isJoinVoice = useSelector(selectEnableCall);
-	const isTalking = useSelector(selectEnableMic);
-	const roomId = useSelector(selectGetRoomId);
-	const { navigate, toChannelPage } = useAppNavigation();
-
-	const onBack = useCallback(
-		(event: React.MouseEvent, channelId?: string, clanId?: string) => {
-			event.stopPropagation();
-
-			const channelPath = toChannelPage(channelId as string, clanId as string);
-			navigate(channelPath);
-		},
-		[toChannelPage, navigate]
-	);
 
 	return (
 		<div onMouseDown={handleMouseDown} className="flex items-center justify-between bg-[#1E1F22] z-50">
@@ -116,86 +116,10 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 					✕
 				</button>
 			</div>
-			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${POPUP_HEIGHT_COLLAPSE}px]`}>
-				{appChannelList.map((app) => {
-					const isFocused = selectCheckAppFocused(store.getState(), app.channel_id as string);
-					const channel = selectChannelById(store.getState(), app.channel_id as string);
-
-					return (
-						<div key={app.channel_id} className="relative w-fit flex flex-row z-50">
-							{isFocused && <Icons.CornerTab className="absolute bottom-0 right-[100%]" />}
-
-							<div title={channel?.channel_label} onClick={(event) => handleFocused(event, app as ApiChannelAppResponseExtend)}>
-								<div
-									className={`rounded-t-xl flex items-center transition-all duration-300 ease-in-out relative gap-2 ${
-										isFocused ? 'w-fit min-w-[270px] px-2 pr-8 bg-black' : 'w-[60px] justify-center bg-transparent'
-									} h-[48px]`}
-								>
-									{/* Avatar */}
-									<span className="text-white text-xs font-bold w-[30px] h-[30px] bg-slate-800 flex justify-center items-center rounded-full">
-										{(channel?.channel_label || 'New tab').charAt(0).toLocaleUpperCase()}
-									</span>
-
-									{isFocused && (
-										<span className="text-white text-sm font-medium truncate max-w-[120px]">
-											{channel?.channel_label || 'New tab'}
-										</span>
-									)}
-									{isFocused && (
-										<div className="flex flex-row items-center gap-2 absolute right-2">
-											{roomId && (
-												<div className="flex justify-between items-center gap-2 text-sm text-white">
-													<button
-														onClick={() => {
-															dispatch(channelAppActions.setEnableCall(!isJoinVoice));
-															if (isJoinVoice) {
-																dispatch(channelAppActions.setEnableVoice(false));
-																dispatch(channelAppActions.setRoomToken(undefined));
-															}
-														}}
-													>
-														{isJoinVoice ? (
-															<Icons.StopCall className="size-4 text-red-600" />
-														) : (
-															<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-														)}
-													</button>
-													{isJoinVoice && (
-														<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
-															{isTalking ? (
-																<Icons.MicDisable className="size-4 text-red-600" />
-															) : (
-																<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
-															)}
-														</button>
-													)}
-												</div>
-											)}
-											{Boolean(app.isBlank) === false && (
-												<button
-													onClick={(e) => onBack(e, app.channel_id as string, app.clan_id as string)}
-													className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
-													title="Back"
-												>
-													↩
-												</button>
-											)}
-
-											<button
-												title="Close"
-												onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
-												className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
-											>
-												✕
-											</button>
-										</div>
-									)}
-								</div>
-							</div>
-							{isFocused && <Icons.CornerTab className="absolute bottom-0 right-[-16px] rotate-90" />}
-						</div>
-					);
-				})}
+			<div className={`flex items-center flex-1 overflow-x-auto scrollbar-hide h-[${COLLAPSED_SIZE.height}px]`}>
+				{appChannelList.map((app) => (
+					<DraggableModalTabItem key={app.app_id} app={app} handleFocused={handleFocused} handleOnCloseCallback={handleOnCloseCallback} />
+				))}
 				<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
 					{' '}
 					<button
@@ -207,14 +131,97 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({ appChannelList,
 					</button>
 				</div>
 			</div>
-			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center">
+			<div className="w-[60px] h-[48px] justify-center bg-transparent flex items-center right-3">
 				<button
 					onClick={onCollapseToggle}
 					title={isCollapsed ? 'Expand tabs' : 'Collapse tabs'}
-					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm font-bold rounded-full w-[30px] h-[30px] bg-gray-800"
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm  rounded-full w-[30px] h-[30px]"
 				>
 					{isCollapsed ? '▼' : '▲'}
 				</button>
+				<button
+					onClick={onFullSizeToggle}
+					title={isFullSize ? 'Exit Full Screen' : 'Enter Full Screen'}
+					className="left-0 flex items-center justify-center text-[#B5BAC1] text-sm rounded-full w-[30px] h-[30px]"
+				>
+					{isFullSize ? '🗗' : '⛶'}
+				</button>
+			</div>
+		</div>
+	);
+};
+
+interface DraggableModalTabItemProps {
+	app: ApiChannelAppResponseExtend;
+	handleFocused: (event: React.MouseEvent<HTMLDivElement>, app: ApiChannelAppResponseExtend) => void;
+	handleOnCloseCallback: (event: React.MouseEvent<HTMLButtonElement>, clanId: string, channelId: string) => void;
+}
+
+const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, handleFocused, handleOnCloseCallback }) => {
+	const dispatch = useDispatch();
+	const store = getStore();
+	const isFocused = selectCheckAppFocused(store.getState(), app?.channel_id as string);
+	const channel = selectChannelById(store.getState(), app?.channel_id as string);
+	const roomId = useAppSelector((state) => selectGetRoomId(state, app?.channel_id));
+	const isJoinVoice = useSelector(selectEnableCall);
+	const isTalking = useSelector(selectEnableMic);
+	return (
+		<div onClick={(event) => handleFocused(event, app as ApiChannelAppResponseExtend)}>
+			<div
+				title={channel?.channel_label}
+				className={`rounded-t-xl flex items-center transition-all duration-300 ease-in-out relative gap-2 ${
+					isFocused ? 'w-fit min-w-[270px] px-2 pr-8 bg-black' : 'w-[60px] justify-center bg-transparent'
+				} h-[48px]`}
+			>
+				{/* Avatar */}
+				<span className="text-white text-xs font-bold w-[30px] h-[30px] bg-slate-800 flex justify-center items-center rounded-full">
+					{(channel?.channel_label || 'New tab').charAt(0).toLocaleUpperCase()}
+				</span>
+
+				{isFocused && <span className="text-white text-sm font-medium truncate max-w-[120px]">{channel?.channel_label || 'New tab'}</span>}
+				{isFocused && (
+					<div className="flex flex-row items-center gap-2 absolute right-2">
+						{roomId && (
+							<div
+								className="flex justify-between items-center gap-2 text-sm text-white"
+								onMouseEnter={(event) => event.stopPropagation()}
+							>
+								<button
+									onClick={() => {
+										dispatch(channelAppActions.setEnableCall(!isJoinVoice));
+										if (isJoinVoice) {
+											dispatch(channelAppActions.setEnableVoice(false));
+											dispatch(channelAppActions.setRoomToken(undefined));
+										}
+									}}
+								>
+									{isJoinVoice ? (
+										<Icons.StopCall className="size-4 text-red-600" />
+									) : (
+										<Icons.StartCall className="size-3 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+									)}
+								</button>
+								{isJoinVoice && (
+									<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
+										{isTalking ? (
+											<Icons.MicDisable className="size-4 text-red-600" />
+										) : (
+											<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+										)}
+									</button>
+								)}
+							</div>
+						)}
+
+						<button
+							title="Close"
+							onClick={(e) => handleOnCloseCallback(e, app.clan_id as string, app.channel_id as string)}
+							className="flex items-center justify-center text-[#B5BAC1] text-sm hover:text-white transition"
+						>
+							✕
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -258,7 +265,6 @@ const BlankChannelComponent: React.FC = () => {
 	const onClickAppItem = (app: ApiChannelAppResponseExtend) => {
 		const appIsOpening = selectToCheckAppIsOpening(store.getState(), app.channel_id as string);
 		const getAppFocused = selectAppFocusedChannel(store.getState());
-
 		if (appIsOpening) {
 			dispatch(channelsActions.setAppChannelFocus({ app: app as ApiChannelAppResponseExtend }));
 		} else {
@@ -327,158 +333,167 @@ interface DraggableModalProps {
 	aspectRatio?: number | null;
 }
 
-const DraggableModal: React.FC<DraggableModalProps> = memo(({ initialWidth = 430, initialHeight = 630, aspectRatio = null }) => {
+const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 	const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
 	const isShowModal = appChannelList && appChannelList.length > 0;
-	const modalRef = useRef<HTMLDivElement>(null);
-	const [position, setPosition] = useState({ x: 100, y: 100 });
-	const [size, setSize] = useState({ width: initialWidth, height: initialHeight });
-	const [isDragging, setIsDragging] = useState(false);
-	const [resizeDir, setResizeDir] = useState<string | null>(null);
-	const [bounds, setBounds] = useState({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
+
 	const [isCollapsed, setIsCollapsed] = useState(false);
-	const [isInteracting, setIsInteracting] = useState(false);
+	const [isFullSize, setIsFullSize] = useState(false);
+	const { width, height } = useWindowSize();
+
+	const modalElementRef = useRef<HTMLDivElement>(null);
+	const dispatch = useDispatch();
+	const [dragging, setDragging] = useState(false);
+	const [resizeDirection, setResizeDirection] = useState<string | null>(null);
+	const storedPosition = useSelector(selectPostionPopupApps);
+	const storedSize = useSelector(selectSizePopupApps);
+	const [modalSize, setModalSize] = useState(storedSize || INIT_SIZE);
+	const [modalPosition, setModalPosition] = useState(storedPosition || DEFAULT_POSITION);
+	const [overlay, setOverlay] = useState(false);
+
+	const handleMouseDown = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			setResizeDirection(null);
+			if (e.target instanceof HTMLDivElement && e.target.dataset.resize) {
+				setResizeDirection(e.target.dataset.resize);
+			} else {
+				setDragging(true);
+			}
+		},
+		[modalPosition, overlay]
+	);
+
+	const onFullSizeToggle = useCallback(() => {
+		setIsFullSize((prev) => {
+			const nextFullSize = !prev;
+			setIsCollapsed(false);
+			setDragging(false);
+			setResizeDirection(null);
+			setModalSize(nextFullSize ? { width, height } : storedSize);
+			setModalPosition(nextFullSize ? MIN_POSITION : storedPosition);
+			return nextFullSize;
+		});
+	}, [width, height, storedPosition, storedSize]);
 
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
-			const newHeight = prev ? initialHeight : 30;
-			const newWidth = prev ? initialWidth : 240;
-
-			setSize((prevSize) => ({
-				...prevSize,
-				height: newHeight,
-				width: newWidth
-			}));
-
-			return !prev;
+			const nextCollapsed = !prev;
+			setDragging(false);
+			setResizeDirection(null);
+			setModalSize(nextCollapsed ? COLLAPSED_SIZE : storedSize);
+			if (isFullSize) {
+				setModalPosition(MIN_POSITION);
+				setModalSize(storedSize);
+			}
+			return nextCollapsed;
 		});
-	}, [initialHeight, initialWidth]);
-	const { height, width } = useWindowSize();
+	}, [storedSize]);
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
-			if (!isDragging && !resizeDir) return;
-			setIsInteracting(true);
+			if (!dragging && !resizeDirection) return;
 
-			if (isDragging) {
-				setPosition((prev) => ({
-					x: Math.min(Math.max(prev.x + e.movementX, 0), width - size.width),
-					y: Math.min(Math.max(prev.y + e.movementY, 0), height - size.height)
+			setOverlay(true);
+			if (dragging) {
+				setModalPosition((prev) => ({
+					x: Math.max(0, Math.min(prev.x + e.movementX, window.innerWidth - modalSize.width)),
+					y: Math.max(0, Math.min(prev.y + e.movementY, window.innerHeight - modalSize.height))
 				}));
-			} else if (resizeDir) {
-				let newWidth = size.width;
-				let newHeight = size.height;
-				let newX = position.x;
-				let newY = position.y;
+			} else if (resizeDirection) {
+				let newWidth = modalSize.width;
+				let newHeight = modalSize.height;
+				let newX = modalPosition.x;
+				let newY = modalPosition.y;
+				const isCorner = resizeDirection.includes('-');
+				const shouldMaintainAspect = ASPECT_RATIO && isCorner;
 
-				const isCorner = resizeDir.includes('-');
-				const shouldMaintainAspect = aspectRatio && isCorner;
-
-				if (resizeDir.includes('right')) {
-					newWidth = Math.min(Math.max(initialWidth, size.width + e.movementX), width - position.x);
+				if (resizeDirection.includes('right')) {
+					newWidth = Math.min(modalSize.width + e.movementX, window.innerWidth - modalPosition.x);
 				}
-				if (resizeDir.includes('left')) {
-					newWidth = Math.min(Math.max(initialWidth, size.width - e.movementX), width - newX);
-					newX = Math.min(Math.max(newX + e.movementX, 0), width - newWidth);
+				if (resizeDirection.includes('left')) {
+					newWidth = Math.min(modalSize.width - e.movementX, window.innerWidth - newX);
+					newX = Math.max(0, newX + e.movementX);
 				}
-				if (resizeDir.includes('bottom')) {
-					newHeight = Math.min(Math.max(initialHeight, size.height + e.movementY), height - position.y);
+				if (resizeDirection.includes('bottom')) {
+					newHeight = Math.min(modalSize.height + e.movementY, window.innerHeight - modalPosition.y);
 				}
-				if (resizeDir.includes('top')) {
-					newHeight = Math.min(Math.max(initialHeight, size.height - e.movementY), height - newY);
-					newY = Math.min(Math.max(newY + e.movementY, 0), height - newHeight);
-				}
-
-				if (shouldMaintainAspect && aspectRatio) {
-					newHeight = newWidth / aspectRatio;
-					if (resizeDir === 'top-left' || resizeDir === 'top-right') {
-						newY = position.y + (size.height - newHeight);
-					}
+				if (resizeDirection.includes('top')) {
+					newHeight = Math.min(modalSize.height - e.movementY, window.innerHeight - newY);
+					newY = Math.max(0, newY + e.movementY);
 				}
 
-				setSize({ width: newWidth, height: newHeight });
-				setPosition({ x: newX, y: newY });
+				if (shouldMaintainAspect) {
+					newHeight = newWidth / ASPECT_RATIO;
+				}
+
+				setModalSize({ width: newWidth, height: newHeight });
+				setModalPosition({ x: newX, y: newY });
 			}
 		},
-		[isDragging, resizeDir, width, height, size, position, aspectRatio]
+		[dragging, resizeDirection, modalSize, modalPosition, ASPECT_RATIO, overlay]
 	);
 
-	// setBound and re-set Position when the size of window changed
-	useEffect(() => {
-		setBounds({
-			minX: 0,
-			maxX: width,
-			minY: 0,
-			maxY: height
-		});
-		setPosition((prev) => ({
-			x: Math.min(Math.max(prev.x, 0), width - size.width),
-			y: Math.min(Math.max(prev.y, 0), height - size.height)
-		}));
-	}, [height, width, isCollapsed]);
-
-	const handleMouseDown = useCallback((e: React.MouseEvent) => {
-		e.preventDefault();
-		setIsDragging(true);
-		setIsInteracting(true);
-	}, []);
-
-	const handleResizeMouseDown = useCallback((direction: string) => {
-		return (e: React.MouseEvent) => {
-			e.preventDefault();
-			e.stopPropagation();
-			setResizeDir(direction);
-			setIsInteracting(true);
-		};
-	}, []);
-
 	const handleMouseUp = useCallback(() => {
-		setIsDragging(false);
-		setResizeDir(null);
-		setTimeout(() => setIsInteracting(false), 200);
+		if (modalElementRef.current) {
+			const isSameAsWindowSize = modalSize.width === width && modalSize.height === height;
+			const isSameAsCollapsedSize = modalSize.width === COLLAPSED_SIZE.width && modalSize.height === COLLAPSED_SIZE.height;
+			if (!isSameAsCollapsedSize && !isSameAsWindowSize) {
+				dispatch(channelAppActions.setPosition({ x: modalPosition.x, y: modalPosition.y }));
+				dispatch(channelAppActions.setSize({ width: modalSize.width, height: modalSize.height }));
+			}
+		}
+		setDragging(false);
+		setResizeDirection(null);
+		setOverlay(false);
+	}, [dispatch, modalPosition, modalSize, width, height]);
+
+	const handleResizeMouseDown = useCallback((dir: string) => {
+		return (e: React.MouseEvent<HTMLDivElement>) => {
+			e.stopPropagation();
+			setResizeDirection(dir);
+		};
 	}, []);
 
 	useEffect(() => {
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
-
 		return () => {
 			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseup', handleMouseUp);
 		};
 	}, [handleMouseMove, handleMouseUp]);
-	const isContentStrict = !isCollapsed ? 'contain-strict' : '';
-	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<>
-			{isShowModal && (
-				<div className=" relative z-50">
-					<div
-						ref={modalRef}
-						className={`absolute bg-[#212121] shadow-lg rounded-xl   ${isContentStrict} `}
-						style={{
-							left: `${position.x}px`,
-							top: `${position.y}px`,
-							width: `${size.width}px`,
-							height: `${size.height}px`,
-							display: 'flex',
-							flexDirection: 'column'
-						}}
-					>
-						{isInteracting && <Overlay />}
 
-						<DraggableModalTabs
-							appChannelList={appChannelList}
-							onCollapseToggle={onCollapseToggle}
-							isCollapsed={isCollapsed}
-							handleMouseDown={handleMouseDown}
-						/>
-						<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList as ApiChannelAppResponseExtend[]} />
-						{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}
-					</div>
+	return (
+		isShowModal && (
+			<div className="relative">
+				<div
+					ref={modalElementRef}
+					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict z-50"
+					style={{
+						left: `${modalPosition.x}px`,
+						top: `${modalPosition.y}px`,
+						width: `${modalSize.width}px`,
+						height: `${modalSize.height}px`,
+						display: 'flex',
+						flexDirection: 'column',
+						minHeight: `${COLLAPSED_SIZE.height}px`
+					}}
+					onMouseDown={handleMouseDown}
+				>
+					{overlay && <Overlay />}
+					<DraggableModalTabs
+						appChannelList={appChannelList}
+						onCollapseToggle={onCollapseToggle}
+						isCollapsed={isCollapsed}
+						handleMouseDown={handleMouseDown}
+						onFullSizeToggle={onFullSizeToggle}
+						isFullSize={isFullSize}
+					/>
+					<ModalContent isCollapsed={isCollapsed} appChannelList={appChannelList} />
+					{!isCollapsed && <ResizeHandles handleResizeMouseDown={handleResizeMouseDown} />}
 				</div>
-			)}
-		</>
+			</div>
+		)
 	);
 });
 
@@ -487,8 +502,8 @@ export default DraggableModal;
 const Overlay: React.FC = () => {
 	return (
 		<div
-			className="absolute inset-0  bg-transparent z-50 cursor-pointer rounded-b-lg "
-			style={{ top: `${POPUP_HEIGHT_COLLAPSE}`, height: `calc(100% - ${POPUP_HEIGHT_COLLAPSE})` }}
+			className="absolute inset-0  bg-transparent z-40 cursor-pointer rounded-b-lg"
+			style={{ top: `${COLLAPSED_SIZE.height}`, height: `calc(100% - ${COLLAPSED_SIZE.height})` }}
 		/>
 	);
 };

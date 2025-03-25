@@ -77,7 +77,8 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
 	const userProfile = useSelector(selectAllAccount);
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
-	const roomId = useSelector(selectGetRoomId);
+	const roomId = useAppSelector((state) => selectGetRoomId(state, appChannel?.channel_id));
+
 	const isJoinVoice = useSelector(selectEnableCall);
 	const token = useSelector(selectLiveToken);
 
@@ -100,7 +101,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 				})
 			);
 		}
-		dispatch(channelAppActions.setRoomId(null));
+		dispatch(channelAppActions.setRoomId({ channelId: appChannel?.channel_id as string, roomId: null }));
 		dispatch(channelAppActions.setChannelId(appChannel?.channel_id || ''));
 		dispatch(channelAppActions.setClanId(appChannel?.clan_id || null));
 	}, []);
@@ -213,7 +214,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 		<div className="relative w-full h-full rounded-b-lg">
 			<div className="w-full h-full">
 				<iframe
-					allow="clipboard-read; clipboard-write"
+					allow="clipboard-read; clipboard-write; camera"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}

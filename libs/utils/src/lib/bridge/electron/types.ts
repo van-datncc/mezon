@@ -23,7 +23,7 @@ export type MezonElectronAPI = {
 		}
 	) => Promise<void>;
 	dowloadImage: (url: string) => Promise<void>;
-	getScreenSources: (source: string) => Promise<{ id: string; name: string; thumbnail: string }[]>;
+	getScreenSources: (source: string) => Promise<{ id: string; name: string; thumbnail: string; icon: string }[]>;
 };
 declare global {
 	interface Window {

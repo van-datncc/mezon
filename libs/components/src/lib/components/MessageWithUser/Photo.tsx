@@ -75,7 +75,6 @@ const Photo = <T,>({
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 	const isPaidPreview = photo.mediaType === 'extendedMediaPreview';
-
 	const localBlobUrl = (photo as any).blobUrl;
 
 	const isIntersecting = useIsIntersecting(ref, observeIntersection);
@@ -86,17 +85,22 @@ const Photo = <T,>({
 	const [isLoadAllowed, setIsLoadAllowed] = useState(canAutoLoad);
 	const shouldLoad = isLoadAllowed && isIntersecting;
 
-	const { width, height, isSmall } =
-		dimensions ||
-		calculateMediaDimensions({
-			media: photo,
-			isOwn,
-			asForwarded,
-			noAvatars,
-			isMobile,
-			messageText,
-			isInWebPage
-		});
+	const { width: realWidth, height: realHeight } = photo;
+	const hasZeroDimension = !realWidth || !realHeight;
+
+	const { width, height, isSmall } = hasZeroDimension
+		? { width: 0, height: 150, isSmall: false }
+		: dimensions ||
+			calculateMediaDimensions({
+				media: photo,
+				isOwn,
+				asForwarded,
+				noAvatars,
+				isMobile,
+				messageText,
+				isInWebPage
+			});
+
 	const { mediaData, loadProgress } = useMediaWithLoadProgress(
 		createImgproxyUrl(photo.url ?? '', { width: width, height: height, resizeType: 'fit' }),
 		!isIntersecting
@@ -158,7 +162,6 @@ const Photo = <T,>({
 				}
 			: undefined;
 
-	const { width: realWidth, height: realHeight } = photo;
 	let displayWidth, displayHeight;
 
 	const originalAspectRatio = realWidth && realHeight ? realWidth / realHeight : 1;
@@ -189,8 +192,8 @@ const Photo = <T,>({
 				displayHeight = Math.min(height, Math.round(width / originalAspectRatio));
 			}
 		} else {
-			displayWidth = width || 300;
-			displayHeight = height || 300;
+			displayWidth = width || 0;
+			displayHeight = height || 150;
 		}
 	}
 

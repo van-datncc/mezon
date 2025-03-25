@@ -3,7 +3,7 @@ import { STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
 import { ChannelMembersEntity, DirectEntity, selectCurrentClan } from '@mezon/store-mobile';
 import { IChannel, UsersClanEntity } from '@mezon/utils';
 import { memo, useMemo } from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
 
@@ -15,6 +15,7 @@ interface IProps {
 	currentChannel?: IChannel | DirectEntity;
 	isDMThread?: boolean;
 	isMobile?: boolean;
+	isHiddenStatus?: boolean;
 }
 
 type MemberItemProps = {
@@ -31,7 +32,7 @@ export const MemoizedMemberItem = memo((props: MemberItemProps) => {
 	return <MemberItem {...rest} user={user} listProfile={true} isOffline={!user?.user?.online} isMobile={user?.user?.is_mobile} />;
 });
 
-export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread, isMobile }: IProps) {
+export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread, isMobile, isHiddenStatus = false }: IProps) {
 	const userStatus = useMemberStatus(user?.id || '');
 
 	const currentClan = useSelector(selectCurrentClan);
@@ -50,7 +51,7 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 		>
 			<MemberProfile
 				user={user}
-				userStatus={{ status: isMe ? true : !isOffline, isMobile }}
+				userStatus={isHiddenStatus ? null : { status: isMe ? true : !isOffline, isMobile }}
 				numCharCollapse={30}
 				isHideIconStatus={userStatus ? false : true}
 				isOffline={isMe ? false : isOffline}

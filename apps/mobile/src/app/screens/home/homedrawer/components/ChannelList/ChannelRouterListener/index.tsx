@@ -56,7 +56,6 @@ const ChannelRouterListener = () => {
 				const store = await getStoreAsync();
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-				DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
 				store.dispatch(
 					channelsActions.joinChannel({
 						clanId: clanId ?? '',

@@ -22,6 +22,7 @@ import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import MezonAvatar from '../../../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
+import ImageNative from '../../../../../components/ImageNative';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import { getUserStatusByMetadata } from '../../../../../utils/helpers';
 import { style } from './UserProfile.styles';
@@ -232,8 +233,8 @@ const UserProfile = React.memo(
 							height={size.s_80}
 							avatarUrl={
 								!isDM
-									? messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url
-									: userById?.user?.avatar_url || user?.user?.avatar_url || user?.avatar_url || messageAvatar
+									? (messageAvatar ?? userById?.clan_avatar ?? userById?.user?.avatar_url)
+									: (userById?.user?.avatar_url ?? user?.user?.avatar_url ?? user?.avatar_url ?? messageAvatar)
 							}
 							username={user?.user?.username}
 							userStatus={userStatus}
@@ -322,14 +323,25 @@ const UserProfile = React.memo(
 									<View style={[styles.roles]}>
 										{userRolesClan?.map((role, index) => (
 											<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
-												<View
-													style={{
-														width: size.s_15,
-														height: size.s_15,
-														borderRadius: size.s_50,
-														backgroundColor: role?.color || DEFAULT_ROLE_COLOR
-													}}
-												></View>
+												{role?.role_icon ? (
+													<ImageNative
+														url={role?.role_icon}
+														style={{
+															width: size.s_15,
+															height: size.s_15,
+															borderRadius: size.s_50
+														}}
+													/>
+												) : (
+													<View
+														style={{
+															width: size.s_15,
+															height: size.s_15,
+															borderRadius: size.s_50,
+															backgroundColor: role?.color || DEFAULT_ROLE_COLOR
+														}}
+													></View>
+												)}
 												<Text style={[styles.textRole]}>{role?.title}</Text>
 											</View>
 										))}

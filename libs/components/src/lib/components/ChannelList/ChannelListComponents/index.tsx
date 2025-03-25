@@ -39,11 +39,13 @@ export const Events = memo(() => {
 	const { numberEventManagement, numberEventUpcoming } = useEventManagementQuantity();
 	const closeModal = () => {
 		closeEventModal();
+		dispatch(eventManagementActions.showModalEvent(false));
 	};
 
 	const openModal = () => {
 		openEventModal();
 		setClanShowNumEvent(false);
+		dispatch(eventManagementActions.showModalEvent(true));
 	};
 
 	const handleOpenDetail = () => {
@@ -61,7 +63,7 @@ export const Events = memo(() => {
 	});
 
 	const [openEventModal, closeEventModal] = useModal(() => {
-		return <EventModal onClose={closeModal} openModalDetail={openModalDetail} setOpenModalDetail={setOpenModalDetail} />;
+		return <EventModal onClose={closeModal} />;
 	}, []);
 
 	const dispatch = useAppDispatch();

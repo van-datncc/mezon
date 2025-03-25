@@ -1,5 +1,5 @@
-import { useTheme } from '@mezon/mobile-ui';
-import { channelsActions, selectIsShowEmptyCategory, selectListChannelRenderByClanId, voiceActions } from '@mezon/store';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { channelsActions, selectCurrentChannelId, selectIsShowEmptyCategory, selectListChannelRenderByClanId, voiceActions } from '@mezon/store';
 import { selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -28,6 +28,7 @@ const ChannelList = () => {
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 	const [refreshing, setRefreshing] = useState(false);
@@ -71,24 +72,29 @@ const ChannelList = () => {
 	const flashListRef = useRef(null);
 	const channelsPositionRef = useRef<ChannelsPositionRef>();
 
-	const renderItem = useCallback(({ item, index }) => {
-		if (index === 0) {
-			return <ChannelListBackground />;
-		} else if (index === 1) {
-			return <ChannelListHeader />;
-		} else if (item.channels) {
-			return <ChannelListSection channelsPositionRef={channelsPositionRef} data={item} />;
-		} else {
-			return (
-				<View
-					key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
-					style={[{ backgroundColor: themeValue.secondary }, item?.threadIds && { zIndex: 1 }]}
-				>
-					<ChannelListItem data={item} />
-				</View>
-			);
-		}
-	}, []);
+	const renderItem = useCallback(
+		({ item, index }) => {
+			if (index === 0) {
+				return <ChannelListBackground />;
+			} else if (index === 1) {
+				return <ChannelListHeader />;
+			} else if (item.channels) {
+				return <ChannelListSection channelsPositionRef={channelsPositionRef} data={item} />;
+			} else {
+				const isActive = item?.id === currentChannelId;
+				const isHaveParentActive = item?.threadIds?.includes(currentChannelId);
+				return (
+					<View
+						key={`${item?.id}_${item?.isFavor}_${index}_ItemChannel}`}
+						style={[{ backgroundColor: themeValue.secondary }, item?.threadIds && { zIndex: 1 }]}
+					>
+						<ChannelListItem data={item} isChannelActive={isActive} isHaveParentActive={isHaveParentActive} />
+					</View>
+				);
+			}
+		},
+		[currentChannelId, themeValue.secondary]
+	);
 
 	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
 	return (
@@ -128,7 +134,8 @@ const ChannelList = () => {
 				}}
 				disableVirtualization
 				contentContainerStyle={{
-					backgroundColor: themeValue.secondary
+					backgroundColor: themeValue.secondary,
+					paddingBottom: size.s_6
 				}}
 				style={{
 					backgroundColor: themeValue.secondary
