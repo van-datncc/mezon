@@ -12,6 +12,7 @@ import {
 	selectIsShowSettingFooter,
 	selectShowCamera,
 	selectShowMicrophone,
+	selectShowModelEvent,
 	selectTokenJoinVoice,
 	selectVoiceFullScreen,
 	selectVoiceInfo,
@@ -119,11 +120,12 @@ const ChannelVoice = memo(
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 
 		const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
+		const showModalEvent = useSelector(selectShowModelEvent);
 		const { channelId } = useAppParams();
 
 		return (
 			<div
-				className={`${!isChannelMezonVoice || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
+				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
 				style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
 			>
 				{token === '' || !serverUrl ? (
