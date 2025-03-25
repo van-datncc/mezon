@@ -88,17 +88,17 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 
 	useEffect(() => {
 		if (!showScreen && isDesktop) {
-			if (screenTrackRef.current?.track) {
-				screenTrackRef.current.track.stop?.();
-				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
-				screenTrackRef.current = null;
-			}
 			dispatch(voiceActions.setStreamScreen(null));
 		}
-	}, [dispatch, isDesktop, localParticipant.localParticipant, showScreen]);
+	}, [dispatch, showScreen]);
 
 	useEffect(() => {
 		const publishScreenTrack = async () => {
+			if (screenTrackRef.current?.track) {
+				screenTrackRef.current.track.stop?.();
+				await localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+				screenTrackRef.current = null;
+			}
 			if (!stream) return;
 
 			const videoTrack = stream.getVideoTracks()[0];
@@ -116,7 +116,14 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 		};
 
 		publishScreenTrack();
-	}, [dispatch, localParticipant.localParticipant, stream]);
+		return () => {
+			if (screenTrackRef.current?.track) {
+				screenTrackRef.current.track.stop?.();
+				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+				screenTrackRef.current = null;
+			}
+		};
+	}, [stream]);
 
 	const handleOpenScreenSelection = useCallback(() => {
 		if (isDesktop) {

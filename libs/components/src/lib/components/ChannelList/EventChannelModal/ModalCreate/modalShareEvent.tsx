@@ -1,18 +1,17 @@
+import { useOnClickOutside } from '@mezon/core';
 import { ChannelsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type ModalShareEventProps = {
 	channel: ChannelsEntity;
-	onClose: () => void;
 	setOpenModalShareEvent: React.Dispatch<React.SetStateAction<boolean>>;
-	onHandle: (e: any) => void;
 };
 
 const ModalShareEvent = (props: ModalShareEventProps) => {
-	const { channel, onClose, setOpenModalShareEvent, onHandle } = props;
+	const { channel, setOpenModalShareEvent } = props;
 
 	const [copied, setCopied] = useState(false);
 
@@ -38,15 +37,15 @@ const ModalShareEvent = (props: ModalShareEventProps) => {
 		setOpenModalShareEvent(false);
 	};
 
+	const panelRef = useRef(null);
+	useOnClickOutside(panelRef, closeModal);
+
 	return (
-		<div
-			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
-			onClick={(e) => {
-				onHandle(e);
-				onClose();
-			}}
-		>
-			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
+		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+			<div
+				ref={panelRef}
+				className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden"
+			>
 				<div className="dark:text-white text-black w-[440px] p-4">
 					<div className="flex justify-between pb-4 font-bold text-base">
 						<h3>Invite friends to event?</h3>

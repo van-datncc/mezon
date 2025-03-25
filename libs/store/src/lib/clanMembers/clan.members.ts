@@ -168,6 +168,10 @@ export const selectMemberClanByUserId2 = createSelector(
 	(entities, userId) => entities[userId]
 );
 
+export const selectMembersByUserIds = createSelector([selectEntitesUserClans, (_, userIds: string[]) => userIds], (entities, userIds) =>
+	userIds.map((userId) => entities[userId] ?? null)
+);
+
 export const selectMemberClanByGoogleId = createSelector([selectAllUserClans, (_, googleId: string) => googleId], (members, googleId) => {
 	return members.find((member) => member.user?.google_id === googleId);
 });
