@@ -1,7 +1,9 @@
+import { selectClanById } from '@mezon/store';
 import { Checkbox } from '@mezon/ui';
 import { filterListByName, sortFilteredList, TypeSearch } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 
 type ListSearchForwardMessageProps = {
@@ -44,6 +46,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 							searchText={searchText}
 							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.id)}
 							handleToggle={() => handleToggle(item.id, item.type || 0, item.isPublic, item.clanId, item.channelLabel || '')}
+							clanId={item.clanId}
 						/>
 					)}
 				</div>
@@ -93,16 +96,19 @@ type ItemChannelProps = {
 	searchText: string;
 	checked: boolean;
 	handleToggle: () => void;
+	clanId: string;
 };
 
 const ItemChannel = (props: ItemChannelProps) => {
-	const { id, name, subText, searchText, checked, handleToggle } = props;
+	const { id, name, subText, searchText, checked, handleToggle, clanId } = props;
+	const clanByClanId = useSelector(selectClanById(clanId));
+
 	return (
 		<>
 			<div className="flex-1 mr-1">
 				<SuggestItem
 					display={name}
-					subText={subText}
+					subText={clanByClanId?.clan_name || ''}
 					channelId={id}
 					valueHightLight={searchText}
 					subTextStyle="uppercase"
