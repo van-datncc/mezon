@@ -90,7 +90,7 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 		if (!showScreen && isDesktop) {
 			dispatch(voiceActions.setStreamScreen(null));
 		}
-	}, [dispatch, isDesktop, localParticipant.localParticipant, showScreen]);
+	}, [dispatch, showScreen]);
 
 	useEffect(() => {
 		const publishScreenTrack = async () => {
@@ -116,6 +116,13 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 		};
 
 		publishScreenTrack();
+		return () => {
+			if (screenTrackRef.current?.track) {
+				screenTrackRef.current.track.stop?.();
+				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+				screenTrackRef.current = null;
+			}
+		};
 	}, [stream]);
 
 	const handleOpenScreenSelection = useCallback(() => {
