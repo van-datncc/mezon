@@ -58,7 +58,8 @@ import {
 	isBackgroundModeActive,
 	isLinuxDesktop,
 	isWindowsDesktop,
-	titleMission
+	titleMission,
+	useBackgroundMode
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
@@ -84,29 +85,26 @@ function useChannelSeen(channelId: string) {
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 
 	useEffect(() => {
-		if (!lastMessage) {
-			return;
-		}
-		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
-				? ChannelStreamMode.STREAM_MODE_CHANNEL
-				: ChannelStreamMode.STREAM_MODE_THREAD;
-
-		const store = getStore();
-		const state = store.getState() as RootState;
-		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
-		markAsReadSeen(lastMessage, mode, badgeCountClan);
-	}, [lastMessage, channelId, isUnreadChannel]);
-	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
 			const timestamp = Date.now() / 1000;
-
 			dispatch(
 				listChannelRenderAction.removeBadgeFromChannel({
-					clanId: currentChannel.clan_id as string,
-					channelId: currentChannel.channel_id as string
+					clanId: previousChannels.at(1)?.clanId as string,
+					channelId: previousChannels.at(1)?.channelId as string
 				})
 			);
+			if (!lastMessage) {
+				return;
+			}
+			const mode =
+				currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+					? ChannelStreamMode.STREAM_MODE_CHANNEL
+					: ChannelStreamMode.STREAM_MODE_THREAD;
+
+			const store = getStore();
+			const state = store.getState() as RootState;
+			const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+			markAsReadSeen(lastMessage, mode, badgeCountClan);
 			dispatch(
 				listChannelsByUserActions.updateChannelBadgeCount({
 					channelId: currentChannel.id,
@@ -133,16 +131,30 @@ function useChannelSeen(channelId: string) {
 		return (channel as IChannel)?.count_mess_unread || 0;
 	}, [listChannelRender, currentChannel.id]);
 
-	useEffect(() => {
+	const handleReadMessage = () => {
+		if (!lastMessage) {
+			return;
+		}
+		const mode =
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+				? ChannelStreamMode.STREAM_MODE_CHANNEL
+				: ChannelStreamMode.STREAM_MODE_THREAD;
+		const store = getStore();
+		const state = store.getState() as RootState;
+		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
+	};
+
+	const readMessage = useCallback(() => {
 		if (!statusFetchChannel) return;
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		if (isFocus) {
-			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-			dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
-		}
-	}, [statusFetchChannel, isFocus]);
+		dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
+		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
+		handleReadMessage();
+	}, [numberNotification, lastMessage]);
+	useBackgroundMode(undefined, readMessage, isFocus);
 
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
@@ -156,9 +168,16 @@ function useChannelSeen(channelId: string) {
 		}
 		if (numberNotification && numberNotification > 0) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
 			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
 		}
 	}, [currentChannel?.id]);
+
+	useEffect(() => {
+		if (lastMessage && isFocus) {
+			handleReadMessage();
+		}
+	}, [lastMessage]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
