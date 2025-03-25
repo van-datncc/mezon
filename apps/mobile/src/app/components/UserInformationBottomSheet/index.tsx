@@ -2,10 +2,9 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
 import { User } from 'mezon-js';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
 import UserProfile from '../../screens/home/homedrawer/components/UserProfile';
-import { styles } from './styles';
 
 interface IUserInformationBottomSheetProps {
 	userId?: string;

@@ -14,13 +14,13 @@ const ScreenItems = memo(({ id, name, thumbnail, onClose }: ScreenItemsProps) =>
 
 	const selectStreamScreen = useCallback(async () => {
 		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: false,
 			video: {
 				mandatory: {
 					chromeMediaSource: 'desktop',
 					chromeMediaSourceId: id
 				}
-			}
+			},
+			audio: false
 		} as MediaStreamConstraints);
 		dispatch(voiceActions.setShowSelectScreenModal(false));
 		dispatch(voiceActions.setStreamScreen(stream));
