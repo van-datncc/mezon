@@ -49,6 +49,7 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType } from '../../enums';
 import { IConfirmActionPayload, IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
+import { ConfirmBuzzMessageModal } from '../ConfirmBuzzMessage';
 import { ConfirmPinMessageModal } from '../ConfirmPinMessageModal';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import ForwardMessageModal from '../ForwardMessage';
@@ -371,9 +372,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 	};
 
-	const handleBuzzMessage = () => {
+	const handleActionBuzzMessage = () => {
+		setCurrentMessageActionType(EMessageActionType.Buzz);
+	};
+
+	const handleBuzzMessage = (text: string) => {
 		onClose();
-		sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 	};
 
 	const implementAction = (type: EMessageActionType) => {
@@ -430,7 +435,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				handleActionTopicDiscussion();
 				break;
 			case EMessageActionType.Buzz:
-				handleBuzzMessage();
+				handleActionBuzzMessage();
 				break;
 			default:
 				break;
@@ -674,6 +679,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					onClose={onClose}
 					message={message}
 					type={currentMessageActionType}
+				/>
+			)}
+			{currentMessageActionType === EMessageActionType.Buzz && (
+				<ConfirmBuzzMessageModal
+					isVisible={currentMessageActionType === EMessageActionType.Buzz}
+					onClose={onClose}
+					onSubmit={handleBuzzMessage}
 				/>
 			)}
 		</View>
