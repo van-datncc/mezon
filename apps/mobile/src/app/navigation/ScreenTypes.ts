@@ -138,7 +138,6 @@ type MessagesStackParamList = {
 	[APP_SCREEN.MESSAGES.NEW_GROUP]: undefined;
 	[APP_SCREEN.MESSAGES.CHAT_STREAMING]: undefined;
 	[APP_SCREEN.MESSAGES.TOPIC_DISCUSSION]: undefined;
-	[APP_SCREEN.MESSAGES.CHANNEL_APP]: { channelId: string };
 };
 
 type FriendsStackParamList = {

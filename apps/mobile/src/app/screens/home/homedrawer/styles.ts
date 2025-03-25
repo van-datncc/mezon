@@ -848,7 +848,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			backgroundColor: Colors.secondaryLight,
-			paddingVertical: size.s_4,
+			paddingVertical: size.s_10,
+			marginBottom: size.s_6,
 			borderRadius: size.s_10
 		}
 	});
