@@ -1083,13 +1083,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		} else if (channelCreated.creator_id === userId) {
 			dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
-			dispatch(
-				listChannelsByUserActions.addOneChannel({
-					id: channelCreated.channel_id,
-					type: channelCreated.channel_type,
-					...channelCreated
-				})
-			);
+			if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_DM && channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(
+					listChannelsByUserActions.addOneChannel({
+						id: channelCreated.channel_id,
+						type: channelCreated.channel_type,
+						...channelCreated
+					})
+				);
+			}
 		}
 	}, []);
 
