@@ -363,7 +363,6 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 		[modalPosition, overlay]
 	);
 
-	// Toggle full size
 	const onFullSizeToggle = useCallback(() => {
 		setIsFullSize((prev) => {
 			const nextFullSize = !prev;
@@ -374,9 +373,7 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 			setModalPosition(nextFullSize ? MIN_POSITION : storedPosition);
 			return nextFullSize;
 		});
-	}, [width, height, storedPosition]);
-
-	// Toggle collapse
+	}, [width, height, storedPosition, storedSize]);
 
 	const onCollapseToggle = useCallback(() => {
 		setIsCollapsed((prev) => {
