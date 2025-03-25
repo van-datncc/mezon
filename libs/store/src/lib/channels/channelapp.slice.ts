@@ -32,8 +32,6 @@ export interface ChannelAppState {
 	enableCall: boolean;
 	position: { x: number; y: number };
 	size: { width: number; height: number };
-	prePosition: { x: number; y: number };
-	preSize: { width: number; height: number };
 }
 
 export const initialChannelAppState: ChannelAppState = {
@@ -48,9 +46,7 @@ export const initialChannelAppState: ChannelAppState = {
 	enableCall: false,
 	channelId: null,
 	position: DEFAULT_POSITION,
-	size: INIT_SIZE,
-	prePosition: DEFAULT_POSITION,
-	preSize: INIT_SIZE
+	size: INIT_SIZE
 };
 export const createChannelAppMeet = createAsyncThunk(
 	`${CHANNEL_APP}/CreateMeetingRoom`,
@@ -126,12 +122,6 @@ export const channelAppSlice = createSlice({
 		},
 		setSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
 			state.size = action.payload;
-		},
-		setPrePosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
-			state.position = action.payload;
-		},
-		setPreSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
-			state.size = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -165,8 +155,7 @@ export const selectJoinChannelAppData = createSelector(getChannelAppState, (stat
 
 export const selectPostionPopupApps = createSelector(getChannelAppState, (state) => state.position);
 export const selectSizePopupApps = createSelector(getChannelAppState, (state) => state.size);
-export const selectPrePostionPopupApps = createSelector(getChannelAppState, (state) => state.prePosition);
-export const selectPreSizePopupApps = createSelector(getChannelAppState, (state) => state.preSize);
+
 export const channelAppReducer = channelAppSlice.reducer;
 
 // Export actions & reducer

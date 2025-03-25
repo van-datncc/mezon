@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/accessible-emoji */
-import { useAppNavigation } from '@mezon/core';
 import {
 	channelAppActions,
 	channelsActions,
@@ -15,15 +14,13 @@ import {
 	selectEnableMic,
 	selectGetRoomId,
 	selectPostionPopupApps,
-	selectPrePostionPopupApps,
-	selectPreSizePopupApps,
 	selectSizePopupApps,
 	selectToCheckAppIsOpening,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE } from '@mezon/utils';
+import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelApps } from '../ChannelApp';
@@ -32,7 +29,7 @@ import React from 'react';
 
 type DraggableModalTabsProps = {
 	appChannelList: ApiChannelAppResponseExtend[];
-	onCollapseToggle?: () => void;
+	onCollapseToggle?: (() => void | undefined) | undefined;
 	isCollapsed?: boolean;
 	handleMouseDown: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	onFullSizeToggle?: () => void;
@@ -106,8 +103,6 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 		},
 		[dispatch]
 	);
-
-	const { navigate, toChannelPage } = useAppNavigation();
 
 	return (
 		<div onMouseDown={handleMouseDown} className="flex items-center justify-between bg-[#1E1F22] z-50">
@@ -344,52 +339,21 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isFullSize, setIsFullSize] = useState(false);
-
-	// Toggle full size
-	const onFullSizeToggle = useCallback(() => {
-		setIsFullSize((prev) => {
-			return !prev;
-		});
-	}, []);
-
-	// Toggle collapse
-	const onCollapseToggle = useCallback(() => {
-		setIsCollapsed((prev) => {
-			return !prev;
-		});
-	}, []);
+	const { width, height } = useWindowSize();
 
 	const modalElementRef = useRef<HTMLDivElement>(null);
 	const dispatch = useDispatch();
 	const [dragging, setDragging] = useState(false);
 	const [resizeDirection, setResizeDirection] = useState<string | null>(null);
-
 	const storedPosition = useSelector(selectPostionPopupApps);
 	const storedSize = useSelector(selectSizePopupApps);
 	const [modalSize, setModalSize] = useState(storedSize || INIT_SIZE);
 	const [modalPosition, setModalPosition] = useState(storedPosition || DEFAULT_POSITION);
-	const priPos = useSelector(selectPrePostionPopupApps);
-	const preSize = useSelector(selectPreSizePopupApps);
 	const [overlay, setOverlay] = useState(false);
-
-	// useEffect(() => {
-	// 	if (modalElementRef.current) {
-	// 		const rect = modalElementRef.current.getBoundingClientRect();
-	// 		dispatch(channelAppActions.setPosition({ x: rect.left, y: rect.top }));
-	// 		dispatch(channelAppActions.setSize({ width: rect.width, height: rect.height }));
-	// 	}
-	// }, [dispatch]);
-
-	useEffect(() => {
-		if (isCollapsed) {
-			setModalSize(COLLAPSED_SIZE);
-		} else {
-			setModalSize(preSize);
-		}
-	}, [isCollapsed]);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
+			setResizeDirection(null);
 			if (e.target instanceof HTMLDivElement && e.target.dataset.resize) {
 				setResizeDirection(e.target.dataset.resize);
 			} else {
@@ -398,6 +362,36 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 		},
 		[modalPosition, overlay]
 	);
+
+	// Toggle full size
+	const onFullSizeToggle = useCallback(() => {
+		setIsFullSize((prev) => {
+			const nextFullSize = !prev;
+			setIsCollapsed(false);
+			setDragging(false);
+			setResizeDirection(null);
+			setModalSize(nextFullSize ? { width, height } : storedSize);
+			setModalPosition(nextFullSize ? MIN_POSITION : storedPosition);
+			return nextFullSize;
+		});
+	}, [width, height, storedPosition]);
+
+	// Toggle collapse
+
+	const onCollapseToggle = useCallback(() => {
+		setIsCollapsed((prev) => {
+			const nextCollapsed = !prev;
+			setDragging(false);
+			setResizeDirection(null);
+			setModalSize(nextCollapsed ? COLLAPSED_SIZE : storedSize);
+			if (isFullSize) {
+				setModalPosition(MIN_POSITION);
+				setModalSize(storedSize);
+			}
+			return nextCollapsed;
+		});
+	}, [storedSize]);
+
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
 			if (!dragging && !resizeDirection) return;
@@ -443,14 +437,18 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 	);
 
 	const handleMouseUp = useCallback(() => {
-		setOverlay(false);
 		if (modalElementRef.current) {
-			dispatch(channelAppActions.setPosition({ x: modalPosition.x, y: modalPosition.y }));
-			dispatch(channelAppActions.setSize({ width: modalSize.width, height: modalSize.height }));
+			const isSameAsWindowSize = modalSize.width === width && modalSize.height === height;
+			const isSameAsCollapsedSize = modalSize.width === COLLAPSED_SIZE.width && modalSize.height === COLLAPSED_SIZE.height;
+			if (!isSameAsCollapsedSize && !isSameAsWindowSize) {
+				dispatch(channelAppActions.setPosition({ x: modalPosition.x, y: modalPosition.y }));
+				dispatch(channelAppActions.setSize({ width: modalSize.width, height: modalSize.height }));
+			}
 		}
 		setDragging(false);
 		setResizeDirection(null);
-	}, [dispatch, modalPosition, modalSize, overlay]);
+		setOverlay(false);
+	}, [dispatch, modalPosition, modalSize, width, height]);
 
 	const handleResizeMouseDown = useCallback((dir: string) => {
 		return (e: React.MouseEvent<HTMLDivElement>) => {
@@ -467,20 +465,21 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 			window.removeEventListener('mouseup', handleMouseUp);
 		};
 	}, [handleMouseMove, handleMouseUp]);
-	console.log('modalSize', modalSize);
+
 	return (
 		isShowModal && (
-			<div className="relative z-50">
+			<div className="relative">
 				<div
 					ref={modalElementRef}
-					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict"
+					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict z-50"
 					style={{
 						left: `${modalPosition.x}px`,
 						top: `${modalPosition.y}px`,
 						width: `${modalSize.width}px`,
 						height: `${modalSize.height}px`,
 						display: 'flex',
-						flexDirection: 'column'
+						flexDirection: 'column',
+						minHeight: `${COLLAPSED_SIZE.height}px`
 					}}
 					onMouseDown={handleMouseDown}
 				>

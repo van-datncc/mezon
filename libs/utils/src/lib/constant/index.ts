@@ -132,7 +132,7 @@ export enum MiniAppEventType {
 export const CREATING_THREAD = 'CREATING_THREAD';
 export const CREATING_TOPIC = 'CREATING_TOPIC';
 
-export const COLLAPSED_SIZE = { width: 300, height: 48 };
+export const COLLAPSED_SIZE = { width: 430, height: 48 };
 
 export const INIT_SIZE = { width: 430, height: 630 };
 

@@ -311,7 +311,7 @@ const persistedChannelAppReducer = persistReducer(
 	{
 		key: CHANNEL_APP,
 		storage,
-		whitelist: ['position', 'size']
+		whitelist: ['position', 'size', 'prePosition', 'preSize']
 	},
 	channelAppReducer
 );
