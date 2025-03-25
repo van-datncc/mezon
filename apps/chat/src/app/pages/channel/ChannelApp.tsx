@@ -214,7 +214,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 		<div className="relative w-full h-full rounded-b-lg">
 			<div className="w-full h-full">
 				<iframe
-					allow="clipboard-read; clipboard-write"
+					allow="clipboard-read; clipboard-write; camera"
 					ref={miniAppRef}
 					title={appChannel?.url}
 					src={`${appChannel?.url}#${miniAppDataHash}`}

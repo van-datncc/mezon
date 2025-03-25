@@ -1,9 +1,10 @@
-import { createStackNavigator } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
-import { Platform } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
+import ChannelAppScreen from '../../../screens/home/homedrawer/ChannelApp';
 import { ChatBoxStreamComponent } from '../../../screens/home/homedrawer/components/StreamingRoom/ChatBoxStream';
 import TopicDiscussion from '../../../screens/home/homedrawer/components/TopicDiscussion/TopicDiscussion';
 import { NewGroupScreen } from '../../../screens/messages/NewGroup';
@@ -80,6 +81,19 @@ export const MessagesStacks = ({}: any) => {
 					},
 					headerShown: false,
 					headerShadowVisible: false
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MESSAGES.CHANNEL_APP}
+				component={ChannelAppScreen}
+				options={{
+					animationEnabled: true,
+					headerShown: false,
+					headerShadowVisible: false,
+					gestureEnabled: true,
+					gestureDirection: 'horizontal',
+					gestureResponseDistance: Dimensions.get('window').width,
+					cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
 				}}
 			/>
 		</Stack.Navigator>

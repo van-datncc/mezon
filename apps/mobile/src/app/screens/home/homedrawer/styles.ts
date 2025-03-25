@@ -842,5 +842,13 @@ export const style = (colors: Attributes) =>
 			height: '100%',
 			justifyContent: 'center',
 			bottom: size.s_6
+		},
+		channelAppButton: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: Colors.secondaryLight,
+			paddingVertical: size.s_4,
+			borderRadius: size.s_10
 		}
 	});

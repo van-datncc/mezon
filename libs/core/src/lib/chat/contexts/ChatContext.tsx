@@ -1083,13 +1083,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		} else if (channelCreated.creator_id === userId) {
 			dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
-			dispatch(
-				listChannelsByUserActions.addOneChannel({
-					id: channelCreated.channel_id,
-					type: channelCreated.channel_type,
-					...channelCreated
-				})
-			);
+			if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_DM && channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(
+					listChannelsByUserActions.addOneChannel({
+						id: channelCreated.channel_id,
+						type: channelCreated.channel_type,
+						...channelCreated
+					})
+				);
+			}
 		}
 	}, []);
 
@@ -1458,6 +1460,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+			const isActionUpdateUser = eventCreatedEvent.action === EEventAction.INTERESTED || eventCreatedEvent.action === EEventAction.UNINTERESTED;
 
 			// Check repeat
 			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
@@ -1510,6 +1513,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 					return;
+				}
+
+				if (isActionUpdateUser) {
+					dispatch(eventManagementActions.updateUserEvent(eventCreatedEvent));
 				}
 			} catch (error) {
 				console.error('Error handling eventCreatedEvent:', error);
