@@ -131,7 +131,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
-					`Balance notifications: ${formatMoney(tokenValue)}₫ | ${note}`,
+					`Funds Transferred: ${formatMoney(tokenValue)}₫ | ${note}`,
 					response.channel_id,
 					channelMode,
 					TypeMessage.SendToken
