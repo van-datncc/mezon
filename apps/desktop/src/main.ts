@@ -96,11 +96,12 @@ ipcMain.handle(DOWNLOAD_FILE, async (event, { url, defaultFileName }) => {
 });
 
 ipcMain.handle(REQUEST_PERMISSION_SCREEN, async (_event, source) => {
-	const sources = await desktopCapturer.getSources({ types: [source] });
+	const sources = await desktopCapturer.getSources({ types: [source], thumbnailSize: { width: 272, height: 136 }, fetchWindowIcons: true });
 	return sources.map((src) => ({
 		id: src.id,
 		name: src.name,
-		thumbnail: src.thumbnail.toDataURL()
+		thumbnail: src.thumbnail.toDataURL(),
+		icon: src.appIcon?.toDataURL()
 	}));
 });
 

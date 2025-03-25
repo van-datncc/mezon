@@ -34,6 +34,8 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
+	const audioScreenTrackRef = useRef<LocalTrackPublication | null>(null);
+
 	const screenTrackRef = useRef<LocalTrackPublication | null>(null);
 	const isDesktop = isElectron();
 	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
@@ -99,15 +101,27 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 				await localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
 				screenTrackRef.current = null;
 			}
+			if (audioScreenTrackRef.current?.track) {
+				audioScreenTrackRef.current.track.stop?.();
+				localParticipant.localParticipant.unpublishTrack(audioScreenTrackRef.current.track);
+				audioScreenTrackRef.current = null;
+			}
 			if (!stream) return;
 
 			const videoTrack = stream.getVideoTracks()[0];
-
 			try {
 				const trackPublication = await localParticipant.localParticipant.publishTrack(videoTrack, {
 					name: 'screen-share',
 					source: Track.Source.ScreenShare
 				});
+				const audioStream = await getAudioScreenStream();
+				if (audioStream) {
+					const audioTrack = audioStream.getAudioTracks()[0];
+					audioScreenTrackRef.current = await localParticipant.localParticipant.publishTrack(audioTrack, {
+						name: 'screen-share-audio',
+						source: Track.Source.ScreenShareAudio
+					});
+				}
 
 				screenTrackRef.current = trackPublication;
 			} catch (error) {
@@ -121,6 +135,11 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 				screenTrackRef.current.track.stop?.();
 				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
 				screenTrackRef.current = null;
+			}
+			if (audioScreenTrackRef.current?.track) {
+				audioScreenTrackRef.current.track.stop?.();
+				localParticipant.localParticipant.unpublishTrack(audioScreenTrackRef.current.track);
+				audioScreenTrackRef.current = null;
 			}
 		};
 	}, [stream]);
@@ -368,21 +387,23 @@ const supportsScreenSharing = () => {
 	return typeof navigator !== 'undefined' && navigator.mediaDevices && !!navigator.mediaDevices.getDisplayMedia;
 };
 
-async function getElectronScreenStream() {
+async function getAudioScreenStream() {
 	if (!isElectron() || !window.electron) return null;
-	const sources = await window.electron.getScreenSources('screen');
-	if (!sources.length) return null;
 	try {
-		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: false,
-			video: {
-				mandatory: {
-					chromeMediaSource: 'desktop',
-					chromeMediaSourceId: sources[0].id
-				}
-			}
-		} as MediaStreamConstraints);
-		return stream;
+		const devices = await navigator.mediaDevices.getUserMedia({
+			audio: {
+				// noiseSuppression: true,
+				echoCancellation: true,
+				sampleRate: 48000, // 44100, 48000, 96000
+				channelCount: 2,
+				autoGainControl: true,
+				sampleSize: 24 // 8, 16, 24, 32
+				// voiceIsolation: true
+			},
+			video: false
+		});
+
+		return devices;
 	} catch (error) {
 		console.error('Error getting screen stream:', error);
 		return null;
