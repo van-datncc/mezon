@@ -1,8 +1,9 @@
 import { useAuth } from '@mezon/core';
-import { authActions, useAppDispatch } from '@mezon/store';
+import { authActions, selectRegisteringStatus, useAppDispatch } from '@mezon/store';
 import { createImgproxyUrl } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import SetPassword from '../Setting Password';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -17,7 +18,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 	const { userProfile } = useAuth();
 	const urlImg = userProfile?.user?.avatar_url;
 	const checkUrl = urlImg === undefined || urlImg === '';
-
+	const isLoadingUpdatePassword = useSelector(selectRegisteringStatus);
 	const [color, setColor] = useState<string>('#323232');
 
 	const handleClick = () => {
@@ -35,13 +36,14 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 		getColor();
 	}, [checkUrl, urlImg]);
 
+	const email = `${userProfile?.user?.username}@ncc.asia`;
 	const [openSetPassWordModal, closeSetPasswordModal] = useModal(() => {
 		return (
 			<SetPassword
+				isLoading={isLoadingUpdatePassword}
+				initialEmail={email}
 				onSubmit={async (data) => {
-					console.log('data: ', data);
-					const email = `${userProfile?.user?.username}@ncc.asia`;
-					await dispatch(authActions.registrationPassword({ email, password: data.password as string }));
+					await dispatch(authActions.registrationPassword(data));
 				}}
 			/>
 		);

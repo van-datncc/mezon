@@ -10,9 +10,10 @@ interface PasswordInputProps {
 	value: string;
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	error?: string;
+	isLoading?: boolean;
 }
 
-export function PasswordInput({ id, label, value, onChange, error }: PasswordInputProps) {
+export function PasswordInput({ id, label, value, onChange, error, isLoading }: PasswordInputProps) {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const togglePasswordVisibility = () => {
@@ -33,6 +34,7 @@ export function PasswordInput({ id, label, value, onChange, error }: PasswordInp
 					className={`w-full px-3 py-2 border rounded-md pr-10 ${
 						error ? 'border-red-500' : 'border-gray-300'
 					} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+					readOnly={isLoading}
 				/>
 				<button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
 					{showPassword ? (

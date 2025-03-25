@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FormError } from './formError';
 import { Input } from './input';
 import { PasswordInput } from './passwordInput';
-import { PasswordRequirements } from './passwordRequirements';
 
 interface SetPasswordProps {
 	onSubmit?: (data: { email: string; password: string }) => void;
@@ -14,6 +13,7 @@ interface SetPasswordProps {
 	description?: string;
 	submitButtonText?: string;
 	initialEmail?: string;
+	isLoading?: boolean;
 }
 
 export default function SetPassword({
@@ -21,7 +21,8 @@ export default function SetPassword({
 	title = 'Set Password',
 	description = 'Please create a new password for your account',
 	submitButtonText = 'Confirm',
-	initialEmail = ''
+	initialEmail = '',
+	isLoading
 }: SetPasswordProps) {
 	const [email, setEmail] = useState(initialEmail);
 	const [password, setPassword] = useState('');
@@ -124,9 +125,11 @@ export default function SetPassword({
 		}
 	};
 
+	const disabled = !!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword || isLoading;
+
 	return (
 		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-			<Card className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+			<Card className="w-full max-w-md bg-white rounded-lg shadow-lg">
 				<CardHeader className="flex flex-row items-center justify-between">
 					<div>
 						<CardTitle>{title}</CardTitle>
@@ -142,18 +145,21 @@ export default function SetPassword({
 							<Input
 								id="email"
 								type="email"
-								value={'phong.nguyennam@ncc.asia'}
+								value={email}
 								onChange={handleEmailChange}
 								placeholder="your.email@example.com"
 								className={errors.email ? 'border-red-500 dark:border-red-400' : ''}
-								disabled={true}
+								readOnly={true}
 							/>
 							{errors.email && <FormError message={errors.email} />}
 						</div>
 
 						<div className="space-y-2">
 							<PasswordInput id="password" label="Password" value={password} onChange={handlePasswordChange} error={errors.password} />
-							<PasswordRequirements password={password} />
+							<p className="text-sm text-gray-500 mt-2">
+								Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one
+								number, and one special character (e.g., !@#$%^&*).
+							</p>
 						</div>
 
 						<PasswordInput
@@ -165,12 +171,8 @@ export default function SetPassword({
 						/>
 					</CardContent>
 					<CardFooter>
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={!!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword}
-						>
-							{submitButtonText}
+						<Button type="submit" className={`w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={disabled}>
+							{isLoading ? 'Submitting...' : submitButtonText}
 						</Button>
 					</CardFooter>
 				</form>
