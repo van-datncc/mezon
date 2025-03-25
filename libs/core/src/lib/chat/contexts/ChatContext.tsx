@@ -1458,6 +1458,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
 			const isActionDeleting = eventCreatedEvent.action === EEventAction.DELETE;
+			const isActionUpdateUser = eventCreatedEvent.action === EEventAction.INTERESTED || eventCreatedEvent.action === EEventAction.UNINTERESTED;
 
 			// Check repeat
 			const isEventNotRepeat = eventCreatedEvent.repeat_type === ERepeatType.DOES_NOT_REPEAT;
@@ -1510,6 +1511,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (shouldRemoveEvent || isActionDeleting) {
 					dispatch(eventManagementActions.removeOneEvent(eventCreatedEvent));
 					return;
+				}
+
+				if (isActionUpdateUser) {
+					dispatch(eventManagementActions.updateUserEvent(eventCreatedEvent));
 				}
 			} catch (error) {
 				console.error('Error handling eventCreatedEvent:', error);

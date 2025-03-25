@@ -5,14 +5,13 @@ import ItemEventManagement from '../ModalCreate/itemEventManagement';
 
 type ListEventManagementProps = {
 	allEventManagement: EventManagementEntity[];
-	onOpenDetailItem: (status: boolean) => void;
 	openModelUpdate: () => void;
 	onUpdateEventId: (id: string) => void;
 	onClose: () => void;
 };
 
 const ListEventManagement = (props: ListEventManagementProps) => {
-	const { allEventManagement, onOpenDetailItem, openModelUpdate, onUpdateEventId, onClose } = props;
+	const { allEventManagement, openModelUpdate, onUpdateEventId, onClose } = props;
 	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
 	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 
@@ -31,7 +30,6 @@ const ListEventManagement = (props: ListEventManagementProps) => {
 						start={event.start_time || ''}
 						end={event.end_time || ''}
 						event={event}
-						setOpenModalDetail={onOpenDetailItem}
 						createTime={event.create_time}
 						openModelUpdate={openModelUpdate}
 						onEventUpdateId={onUpdateEventId}
