@@ -1,10 +1,21 @@
-import { useAppNavigation, useEventManagement, useOnClickOutside, usePermissionChecker } from '@mezon/core';
-import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme, useAppSelector } from '@mezon/store';
+import { useAppNavigation, useAuth, useOnClickOutside, usePermissionChecker } from '@mezon/core';
+import {
+	EventManagementEntity,
+	addUserEvent,
+	deleteUserEvent,
+	eventManagementActions,
+	selectChannelById,
+	selectChannelFirst,
+	selectMemberClanByUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { ApiUserEventRequest } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
@@ -27,7 +38,6 @@ export type ItemEventManagementProps = {
 	event?: EventManagementEntity;
 	createTime?: string;
 	isReviewEvent?: boolean;
-	setOpenModalDetail?: (status: boolean) => void;
 	openModelUpdate?: () => void;
 	onEventUpdateId?: (id: string) => void;
 	textChannelId?: string;
@@ -39,29 +49,25 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		topic,
 		voiceChannel,
 		reviewDescription,
-		titleEvent,
 		option,
 		address,
 		logo,
 		logoRight,
 		start,
-		end,
 		event,
 		isReviewEvent,
-		setOpenModalDetail,
 		openModelUpdate,
 		onEventUpdateId,
 		textChannelId,
 		onClose
 	} = props;
 	const isPrivateEvent = textChannelId && textChannelId !== '0';
-	const { setChooseEvent, deleteEventManagement } = useEventManagement();
+	const dispatch = useAppDispatch();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
 	const textChannel = useAppSelector((state) => selectChannelById(state, textChannelId ?? '')) || {};
 	const isThread = textChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
-	const appearanceTheme = useSelector(selectTheme);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
@@ -108,22 +114,44 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		}
 	};
 
+	const setChooseEvent = useCallback(
+		(event: EventManagementEntity) => {
+			dispatch(eventManagementActions.setChooseEvent(event));
+			dispatch(eventManagementActions.showModelDetailEvent(true));
+		},
+		[dispatch]
+	);
+
+	const { userId } = useAuth();
+	const [isInterested, setIsInterested] = useState(false);
+
+	useEffect(() => {
+		if (userId && event?.user_ids) {
+			setIsInterested(event.user_ids.includes(userId));
+		}
+	}, [userId, event]);
+
+	const handleToggleUserEvent = () => {
+		if (!event?.id) return;
+
+		const request: ApiUserEventRequest = {
+			clan_id: event.clan_id,
+			event_id: event.id
+		};
+
+		if (isInterested) {
+			dispatch(deleteUserEvent(request));
+		} else {
+			dispatch(addUserEvent(request));
+		}
+
+		setIsInterested(!isInterested);
+	};
+
 	return (
-		<div
-			className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden"
-			onClick={
-				setOpenModalDetail && event
-					? () => {
-							setOpenModalDetail(true);
-							setChooseEvent(event);
-						}
-					: // eslint-disable-next-line @typescript-eslint/no-empty-function
-						() => {}
-			}
-			ref={panelRef}
-		>
+		<div className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden" ref={panelRef}>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
-			<div className="p-4 border-b dark:border-slate-600 border-white">
+			<div className="p-4 border-b dark:border-slate-600 border-white" onClick={() => event && setChooseEvent(event)}>
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
@@ -237,9 +265,12 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								End event
 							</button>
 						) : !eventIsOngoing ? (
-							<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
-								<Icons.MuteBell defaultSize="size-4 text-white" />
-								Interested
+							<button
+								onClick={handleToggleUserEvent}
+								className="flex items-center gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+							>
+								{isInterested ? <Icons.MuteBell defaultSize="size-4 text-white" /> : <Icons.Bell className="size-4 text-white" />}
+								{isInterested ? 'UnInterested' : 'Interested'}
 							</button>
 						) : (
 							<></>
@@ -272,22 +303,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
-			{openModalDelEvent && (
-				<ModalDelEvent
-					event={event}
-					onClose={() => setOpenPanel(false)}
-					setOpenModalDelEvent={setOpenModalDelEvent}
-					onHandle={handleStopPropagation}
-				/>
-			)}
-			{openModalShare && (
-				<ModalShareEvent
-					channel={channelVoice}
-					onClose={() => setOpenPanel(false)}
-					setOpenModalShareEvent={setOpenModalShare}
-					onHandle={handleStopPropagation}
-				/>
-			)}
+			{openModalDelEvent && <ModalDelEvent event={event} setOpenModalDelEvent={setOpenModalDelEvent} />}
+			{openModalShare && <ModalShareEvent channel={channelVoice} setOpenModalShareEvent={setOpenModalShare} />}
 		</div>
 	);
 };
