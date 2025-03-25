@@ -1,4 +1,5 @@
 import { useAuth } from '@mezon/core';
+import { authActions, useAppDispatch } from '@mezon/store';
 import { createImgproxyUrl } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -12,6 +13,7 @@ type SettingAccountProps = {
 };
 
 const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) => {
+	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const urlImg = userProfile?.user?.avatar_url;
 	const checkUrl = urlImg === undefined || urlImg === '';
@@ -36,9 +38,10 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 	const [openSetPassWordModal, closeSetPasswordModal] = useModal(() => {
 		return (
 			<SetPassword
-				onSubmit={(password) => {
-					console.log('Password submitted:', password);
-					// Handle password here
+				onSubmit={async (data) => {
+					console.log('data: ', data);
+					const email = `${userProfile?.user?.username}@ncc.asia`;
+					await dispatch(authActions.registrationPassword({ email, password: data.password as string }));
 				}}
 			/>
 		);

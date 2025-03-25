@@ -142,7 +142,7 @@ export default function SetPassword({
 							<Input
 								id="email"
 								type="email"
-								value={email}
+								value={'phong.nguyennam@ncc.asia'}
 								onChange={handleEmailChange}
 								placeholder="your.email@example.com"
 								className={errors.email ? 'border-red-500 dark:border-red-400' : ''}
