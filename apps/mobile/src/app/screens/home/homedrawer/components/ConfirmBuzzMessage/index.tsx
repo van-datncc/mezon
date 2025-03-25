@@ -32,6 +32,7 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 			coverScreen={true}
 			avoidKeyboard={false}
 			backdropColor={'rgba(0,0,0, 0.7)'}
+			onBackdropPress={onClose}
 		>
 			<View style={[styles.container, isTabletLandscape && { maxWidth: '40%' }]}>
 				<View>
@@ -43,9 +44,6 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 				<View style={styles.buttonsWrapper}>
 					<TouchableOpacity onPress={() => onConfirm()} style={styles.yesButton}>
 						<Text style={styles.buttonText}>{t('buzz.confirmText')}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => onClose()} style={styles.noButton}>
-						<Text style={styles.buttonText}>{t('buzz.cancel')}</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
