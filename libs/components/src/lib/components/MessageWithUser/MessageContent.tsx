@@ -10,7 +10,7 @@ import {
 	isValidEmojiData
 } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { MessageLine } from './MessageLine';
 
 type IMessageContentProps = {
@@ -25,7 +25,7 @@ type IMessageContentProps = {
 	isInTopic?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageContentProps) => {
+const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
@@ -112,7 +112,11 @@ export const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
 	);
 };
 
-export default MessageContent;
+export default memo(
+	MessageContent,
+	(prev, curr) =>
+		prev.message === curr.message && prev.mode === curr.mode && prev.isSearchMessage === curr.isSearchMessage && prev.isInTopic === curr.isInTopic
+);
 
 const MessageText = ({
 	message,

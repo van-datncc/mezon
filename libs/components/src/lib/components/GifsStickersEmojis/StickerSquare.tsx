@@ -97,7 +97,7 @@ function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 
 	const handleClickImage = (image: StickerPanel) => {
 		if (isReplyAction) {
-			handleSend({ t: '' }, [], [{ url: image.url, height: 40, width: 40, filetype: 'image/gif', filename: image.id }], [dataReferences]);
+			handleSend({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences]);
 
 			dispatch(
 				referencesActions.setDataReferences({
@@ -106,7 +106,7 @@ function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 				})
 			);
 		} else {
-			handleSend({ t: '' }, [], [{ url: image.url, height: 40, width: 40, filetype: 'image/gif', filename: image.id }], []);
+			handleSend({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], []);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};
