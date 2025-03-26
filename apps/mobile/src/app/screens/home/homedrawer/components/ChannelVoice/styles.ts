@@ -105,8 +105,7 @@ export const style = (colors: Attributes) =>
 			bottom: '3%',
 			backgroundColor: colors.selectedOverlay,
 			padding: size.s_6,
-			borderRadius: size.s_20,
-			left: 'auto'
+			borderRadius: size.s_20
 		},
 		focusIcon: {
 			position: 'absolute',
