@@ -118,7 +118,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 
 	const handleOpenTransferModal = () => {
 		const amount = 10000;
-		const note = 'Transfer action';
+		const note = 'Transfer funds';
 
 		dispatch(
 			giveCoffeeActions.setInfoSendToken({
