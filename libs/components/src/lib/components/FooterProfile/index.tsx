@@ -123,6 +123,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setError('');
 		setSendTokenInputsState({ isSendTokenInputDisabled: false, isUserSelectionDisabled: false });
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
+		dispatch(giveCoffeeActions.setInfoSendToken(null));
 	};
 
 	const sendNotificationMessage = useCallback(

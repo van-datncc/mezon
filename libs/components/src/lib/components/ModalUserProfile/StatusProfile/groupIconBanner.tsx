@@ -1,5 +1,15 @@
-import { useFriends } from '@mezon/core';
-import { ChannelMembersEntity, EStateFriend, selectCurrentUserId, selectTheme, useAppSelector } from '@mezon/store';
+import { useAuth, useFriends } from '@mezon/core';
+import {
+	ChannelMembersEntity,
+	EStateFriend,
+	giveCoffeeActions,
+	selectCurrentUserId,
+	selectInfoSendToken,
+	selectSendTokenEvent,
+	selectTheme,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IUser } from '@mezon/utils';
 import { useMemo } from 'react';
@@ -19,9 +29,13 @@ type GroupIconBannerProps = {
 const GroupIconBanner = (props: GroupIconBannerProps) => {
 	const { checkAddFriend, openModal, user, showPopupLeft, setOpenModal, kichUser } = props;
 	const appearanceTheme = useSelector(selectTheme);
+	const sendTokenEvent = useSelector(selectSendTokenEvent);
+	const transferDetail = useSelector(selectInfoSendToken);
 	const { addFriend, acceptFriend, deleteFriend } = useFriends();
 	const currentUserId = useAppSelector(selectCurrentUserId);
-	const isSelf = user?.user?.id === currentUserId;
+	const dispatch = useAppDispatch();
+	const isMe = user?.user?.id === currentUserId;
+	const { userProfile } = useAuth();
 
 	const handleDefault = (event: any) => {
 		event.stopPropagation();
@@ -101,10 +115,39 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 			}
 		}
 	};
+
+	const handleOpenTransferModal = () => {
+		const amount = 10000;
+		const note = 'Transfer action';
+
+		dispatch(
+			giveCoffeeActions.setInfoSendToken({
+				sender_id: userProfile?.user?.id,
+				sender_name: userProfile?.user?.username,
+				receiver_id: user?.id,
+				amount: amount,
+				note: note,
+				extra_attribute: transferDetail?.extra_attribute ?? ''
+			})
+		);
+		dispatch(giveCoffeeActions.setShowModalSendToken(true));
+	};
+
 	return (
 		<>
-			{!isSelf && (
+			{!isMe && (
 				<>
+					<div
+						className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
+						onClick={(e) => {
+							handleDefault(e);
+							handleOpenTransferModal();
+						}}
+					>
+						<span title="Transfer">
+							<Icons.Transaction className="size-4 iconWhiteImportant" />
+						</span>
+					</div>
 					{buttonFriendProps.map((button, index) => (
 						<div
 							className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
@@ -131,7 +174,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				<span title="More">
 					<Icons.ThreeDot defaultSize="size-4 iconWhiteImportant" />
 				</span>
-				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isSelf={isSelf} />}
+				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isMe={isMe} />}
 			</div>
 		</>
 	);
