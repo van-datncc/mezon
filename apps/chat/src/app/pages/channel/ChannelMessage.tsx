@@ -124,9 +124,12 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		message?.code === TypeMessage.AuditLog;
 
 	return message.code === TypeMessage.Indicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (
-		<OnBoardWelcome nextMessageId={nextMessageId} />
-	) : message.isFirst ? (
-		<ChatWelcome isPrivate={isPrivate} key={messageId} name={channelLabel} avatarDM={avatarDM} username={username} mode={mode} />
+		<>
+			<OnBoardWelcome nextMessageId={nextMessageId} />
+			{message.isFirst ? (
+				<ChatWelcome isPrivate={isPrivate} key={messageId} name={channelLabel} avatarDM={avatarDM} username={username} mode={mode} />
+			) : null}
+		</>
 	) : isMessageSystem ? (
 		<MessageWithSystem message={mess} mode={mode} popup={popup} onContextMenu={handleContextMenu} showDivider={isDifferentDay} />
 	) : (
