@@ -1244,7 +1244,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelupdated = useCallback(
-		(channelUpdated: ChannelUpdatedEvent) => {
+		async (channelUpdated: ChannelUpdatedEvent) => {
 			channelUpdated.channel_private = channelUpdated.channel_private ? 1 : 0;
 			if (channelUpdated.is_error) {
 				return dispatch(channelsActions.deleteChannel({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
@@ -1259,8 +1259,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			if (channelUpdated) {
 				//TODO: improve update once item
-				if (channelUpdated.channel_private !== undefined) {
-					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
+				const store = await getStoreAsync();
+				const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
+				const result = await dispatch(
+					channelsActions.updateChannelPrivateSocket({
+						action: channelUpdated,
+						isUserUpdate: channelUpdated.creator_id === userId
+					})
+				).unwrap();
+				if (result && currentChannelId === channelUpdated.channel_id) {
+					navigate(`/chat/clans/${channelUpdated.clan_id}`);
+				}
+				dispatch(
+					listChannelRenderAction.updateChannelInListRender({
+						channelId: channelUpdated.channel_id,
+						clanId: channelUpdated.clan_id as string,
+						dataUpdate: { ...channelUpdated }
+					})
+				);
+				if (channelUpdated.channel_private !== undefined && channelUpdated.channel_private !== 0) {
 					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string, clan_name: '' };
 
 					if (channelUpdated.creator_id === userId) {
@@ -1273,75 +1290,31 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								}
 							})
 						);
-						dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
-						dispatch(
-							listChannelRenderAction.updateChannelInListRender({
-								channelId: channelUpdated.channel_id,
-								clanId: channelUpdated.clan_id as string,
-								dataUpdate: { ...channelUpdated }
-							})
-						);
-						if (channelUpdated.parent_id !== '0') {
+					} else {
+						dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
+						if (channel.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 							dispatch(
-								listChannelRenderAction.setActiveThread({
-									clanId: channelUpdated.clan_id as string,
-									channelId: channelUpdated.channel_id as string
+								listChannelRenderAction.addThreadToListRender({
+									clanId: channel.clan_id,
+									channel: { id: channelUpdated.channel_id, ...channelUpdated }
 								})
 							);
 						}
-					} else {
-						if (channelUpdated.channel_private && channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL) {
-							dispatch(channelsActions.remove({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id as string }));
-							dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
-							dispatch(
-								listChannelRenderAction.deleteChannelInListRender({
-									channelId: channelUpdated.channel_id,
-									clanId: channelUpdated.clan_id as string
-								})
-							);
-						} else {
-							dispatch(
-								channelsActions.add({
-									clanId: channelUpdated.clan_id as string,
-									channel: { ...channel, active: 1, id: channel.channel_id }
-								})
-							);
-							dispatch(
-								channelsActions.createChannelSocket({
-									...channel
-								})
-							);
-							dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
-							if (channel.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
-								dispatch(
-									listChannelRenderAction.addThreadToListRender({
-										clanId: channel.clan_id,
-										channel: { id: channelUpdated.channel_id, ...channelUpdated }
-									})
-								);
-							} else {
-								dispatch(
-									listChannelRenderAction.addChannelToListRender({
-										type: channel.type,
-										...channelUpdated
-									})
-								);
-							}
 
-							if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
-								if (channel.parent_id) {
-									dispatch(
-										threadsActions.updateActiveCodeThread({
-											channelId: channel.channel_id || '',
-											activeCode: ThreadStatus.joined
-										})
-									);
-								}
+						if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+							if (channel.parent_id) {
+								dispatch(
+									threadsActions.updateActiveCodeThread({
+										channelId: channel.channel_id || '',
+										activeCode: ThreadStatus.joined
+									})
+								);
 							}
 						}
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
+					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 				}
 				if (channelUpdated.app_url) {
 					dispatch(
