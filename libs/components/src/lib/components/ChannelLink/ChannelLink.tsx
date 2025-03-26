@@ -380,6 +380,7 @@ export const ChannelLink = memo(
 		prev.isUnReadChannel === curr.isUnReadChannel &&
 		prev.channel?.channel_label === curr?.channel?.channel_label &&
 		prev.channel?.channel_private === curr?.channel?.channel_private &&
+		prev.channel?.age_restricted === curr?.channel?.age_restricted &&
 		(prev.channel as ChannelThreads)?.threads === (curr?.channel as ChannelThreads)?.threads
 );
 type ModalConfirmComponentProps = {

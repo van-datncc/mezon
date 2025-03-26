@@ -37,6 +37,7 @@ type MessageAttachmentProps = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode: ChannelStreamMode;
 	observeIntersectionForLoading?: ObserveFn;
+	isInSearchMessage?: boolean;
 };
 
 const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMessageWithUser) => {
@@ -93,7 +94,8 @@ const Attachments: React.FC<{
 	onContextMenu: any;
 	mode: ChannelStreamMode;
 	observeIntersectionForLoading?: ObserveFn;
-}> = ({ attachments, message, onContextMenu, mode, observeIntersectionForLoading }) => {
+	isInSearchMessage?: boolean;
+}> = ({ attachments, message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage }) => {
 	const { videos, images, documents, audio } = classifyAttachments(attachments, message);
 	return (
 		<>
@@ -114,6 +116,7 @@ const Attachments: React.FC<{
 					message={message}
 					mode={mode}
 					onContextMenu={onContextMenu}
+					isInSearchMessage={isInSearchMessage}
 				/>
 			)}
 
@@ -128,7 +131,7 @@ const Attachments: React.FC<{
 };
 
 // TODO: refactor component for message lines
-const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionForLoading }: MessageAttachmentProps) => {
+const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage }: MessageAttachmentProps) => {
 	const validateAttachment = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
 	if (!validateAttachment) return null;
 	return (
@@ -138,6 +141,7 @@ const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionFo
 			attachments={validateAttachment}
 			onContextMenu={onContextMenu}
 			observeIntersectionForLoading={observeIntersectionForLoading}
+			isInSearchMessage={isInSearchMessage}
 		/>
 	);
 };
@@ -147,13 +151,15 @@ const ImageAlbum = ({
 	message,
 	mode,
 	onContextMenu,
-	observeIntersectionForLoading
+	observeIntersectionForLoading,
+	isInSearchMessage
 }: {
 	images: (ApiMessageAttachment & { create_time?: string })[];
 	message: IMessageWithUser;
 	mode?: ChannelStreamMode;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	observeIntersectionForLoading?: ObserveFn;
+	isInSearchMessage?: boolean;
 }) => {
 	const dispatch = useAppDispatch();
 
@@ -292,6 +298,7 @@ const ImageAlbum = ({
 					albumLayout={albumLayout}
 					onClick={handleClick}
 					onContextMenu={onContextMenu}
+					isInSearchMessage={isInSearchMessage}
 				/>
 			</div>
 		);
@@ -322,6 +329,7 @@ const ImageAlbum = ({
 					onClick={handleClick}
 					isDownloading={false}
 					onContextMenu={onContextMenu}
+					isInSearchMessage={isInSearchMessage}
 				/>
 			</div>
 		);

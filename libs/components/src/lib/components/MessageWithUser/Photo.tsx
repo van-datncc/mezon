@@ -47,6 +47,7 @@ export type OwnProps<T> = {
 	onClick?: (url?: string) => void;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	onCancelUpload?: (arg: T) => void;
+	isInSearchMessage?: boolean;
 };
 const Photo = <T,>({
 	id,
@@ -71,7 +72,8 @@ const Photo = <T,>({
 	clickArg,
 	className,
 	onClick,
-	onContextMenu
+	onContextMenu,
+	isInSearchMessage
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 	const isPaidPreview = photo.mediaType === 'extendedMediaPreview';
@@ -153,7 +155,8 @@ const Photo = <T,>({
 		size === 'inline'
 			? {
 					height: height ? `${height}px` : 150,
-					width: width ? `${width}px` : 'auto',
+					// eslint-disable-next-line prettier/prettier
+					width: isInSearchMessage ? '' : (width ? `${width}px` : 'auto'),
 					...(dimensions && {
 						position: 'absolute' as const,
 						left: `${dimensions.x}px`,

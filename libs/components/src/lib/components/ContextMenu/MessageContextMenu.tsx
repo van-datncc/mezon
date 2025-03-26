@@ -569,15 +569,6 @@ function MessageContextMenu({
 			}
 		);
 
-		builder.when(enableViewReactionItem, (builder) => {
-			builder.addMenuItem(
-				'viewReaction',
-				'View Reaction',
-				() => console.log('view reaction'),
-				<Icons.ViewReactionRightClick defaultSize="w-4 h-4" />
-			);
-		});
-
 		builder.when(enableEditMessageItem, (builder) => {
 			builder.addMenuItem(
 				'editMessage',

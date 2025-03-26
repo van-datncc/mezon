@@ -936,8 +936,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				const checkMessageTargetToMoved = msgIdJumpHightlight.current === messageId && messageId !== lastMessageId;
 				const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
 				return (
-					// <div className="message-list-item" id={'msg-' + messageId}>
-					// </div>
 					<MemorizedChannelMessage
 						key={messageId}
 						index={index}
