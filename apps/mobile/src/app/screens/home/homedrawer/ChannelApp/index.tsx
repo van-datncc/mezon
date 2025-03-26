@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { useClans } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
