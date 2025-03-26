@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 export * from './attachmentThumb';
 export * from './iconInEmojiPanel';
+export * from './iconInformationStatus';
 export * from './iconRightClick';
 export * from './uploadThumbnail';
 
@@ -6523,6 +6524,7 @@ export function InfoIcon(props: React.HTMLAttributes<SVGElement>) {
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"
 			viewBox="0 0 20 20"
+			{...props}
 		>
 			<path
 				stroke="currentColor"
