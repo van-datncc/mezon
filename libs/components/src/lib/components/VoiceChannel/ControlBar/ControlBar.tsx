@@ -390,18 +390,36 @@ const supportsScreenSharing = () => {
 async function getAudioScreenStream() {
 	if (!isElectron() || !window.electron) return null;
 	try {
+		const devicess = await navigator.mediaDevices.enumerateDevices();
+		const outputDevice = devicess.find((device) => device.kind === 'audiooutput');
 		const devices = await navigator.mediaDevices.getUserMedia({
 			audio: {
+				// deviceId: {
+				// 	exact: window.electron.getAudioInputDeviceId()
+				// },
+				deviceId: { exact: outputDevice?.deviceId },
 				// noiseSuppression: true,
-				echoCancellation: true,
-				sampleRate: 48000, // 44100, 48000, 96000
+				// echoCancellation: true,
+				sampleRate: 96000, // 44100, 48000, 96000
 				channelCount: 2,
 				autoGainControl: true,
-				sampleSize: 24 // 8, 16, 24, 32
+				sampleSize: 32 // 8, 16, 24, 32
 				// voiceIsolation: true
 			},
 			video: false
 		});
+		// const devices = await navigator.mediaDevices.getUserMedia({
+		// 	audio: {
+		// 		noiseSuppression: true,
+		// 		echoCancellation: true,
+		// 		sampleRate: 48000, // 44100, 48000, 96000
+		// 		channelCount: 2,
+		// 		autoGainControl: true,
+		// 		sampleSize: 24 // 8, 16, 24, 32
+		// 		// voiceIsolation: true
+		// 	},
+		// 	video: false
+		// });
 
 		return devices;
 	} catch (error) {
