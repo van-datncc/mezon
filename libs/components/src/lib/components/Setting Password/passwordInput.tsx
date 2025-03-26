@@ -22,7 +22,7 @@ export function PasswordInput({ id, label, value, onChange, error, isLoading }: 
 
 	return (
 		<div className="space-y-2">
-			<label htmlFor={id} className="block text-sm font-medium">
+			<label htmlFor={id} className="block text-sm font-medium text-gray-900 dark:text-gray-200">
 				{label}
 			</label>
 			<div className="relative">
@@ -31,13 +31,19 @@ export function PasswordInput({ id, label, value, onChange, error, isLoading }: 
 					type={showPassword ? 'text' : 'password'}
 					value={value}
 					onChange={onChange}
-					className={`w-full px-3 py-2 border rounded-md pr-10 ${
-						error ? 'border-red-500' : 'border-gray-300'
-					} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+					className={`w-full px-3 py-2 rounded-md pr-10 border 
+						${error ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'} 
+						bg-white dark:bg-[#1e1e1e]
+						text-black dark:text-white 
+						focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
 					readOnly={isLoading}
 					autoComplete="off"
 				/>
-				<button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+				<button
+					type="button"
+					onClick={togglePasswordVisibility}
+					className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
+				>
 					{showPassword ? (
 						<svg
 							xmlns="http://www.w3.org/2000/svg"

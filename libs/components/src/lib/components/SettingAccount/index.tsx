@@ -40,6 +40,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 	const [openSetPassWordModal, closeSetPasswordModal] = useModal(() => {
 		return (
 			<SetPassword
+				onClose={closeSetPasswordModal}
 				isLoading={isLoadingUpdatePassword}
 				initialEmail={email}
 				onSubmit={async (data) => {
