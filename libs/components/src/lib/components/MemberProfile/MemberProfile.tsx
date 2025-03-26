@@ -22,7 +22,7 @@ import {
 	createImgproxyUrl
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage, ModalUserProfile } from '../../components';
@@ -73,7 +73,27 @@ export enum ModalType {
 export const profileElemHeight = 358;
 export const profileElemWidth = 320;
 
-export function MemberProfile({
+type BaseMemberProfileProps = MemberProfileProps & {
+	currentClan?: ReturnType<typeof selectCurrentClan>;
+};
+
+export const DMMemberProfile = (props: Omit<MemberProfileProps, 'isDM'>) => {
+	return <BaseMemberProfile {...props} isDM={true} currentClan={undefined} />;
+};
+
+export const ClanMemberProfile = (props: Omit<MemberProfileProps, 'isDM'>) => {
+	const currentClan = useSelector(selectCurrentClan);
+	return <BaseMemberProfile {...props} isDM={false} currentClan={currentClan} />;
+};
+
+export const MemberProfile = (props: MemberProfileProps) => {
+	if (props.isDM) {
+		return <DMMemberProfile {...props} />;
+	}
+	return <ClanMemberProfile {...props} />;
+};
+
+export const BaseMemberProfile = ({
 	avatar,
 	name,
 	status,
@@ -97,15 +117,15 @@ export function MemberProfile({
 	isDM,
 	isMute,
 	metaDataDM,
-	statusOnline
-}: MemberProfileProps) {
+	statusOnline,
+	currentClan
+}: BaseMemberProfileProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
 		distanceToBottom: 0
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
-	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const dispatch = useAppDispatch();
@@ -437,7 +457,7 @@ export function MemberProfile({
 			/>
 		</div>
 	);
-}
+};
 
 interface MemberProfileModalProps {
 	user?: ChannelMembersEntity;
@@ -463,8 +483,6 @@ function MemberProfileModal({ user, currentClanId, openModalRemoveMember, setOpe
 			setOpenModalRemoveMember(false);
 		}
 	};
-
-	// No need for the useEffect since we're controlling the state from the parent
 
 	if (!openModalRemoveMember) return null;
 
@@ -503,30 +521,44 @@ interface UserNameProps {
 	isDM?: boolean;
 	userId?: string;
 }
-function UserName({ name, isHiddenAvatarPanel, hideLongName, isOwnerClanOrGroup, isListFriend, isFooter, isDM, userId }: UserNameProps) {
-	if (isFooter || isDM) {
+const UserName = memo(
+	({ name, isHiddenAvatarPanel, hideLongName, isOwnerClanOrGroup, isListFriend, isFooter, isDM, userId }: UserNameProps) => {
+		if (isFooter || isDM) {
+			return (
+				<DMUserName
+					name={name}
+					isHiddenAvatarPanel={isHiddenAvatarPanel}
+					hideLongName={hideLongName}
+					isOwnerClanOrGroup={isOwnerClanOrGroup}
+					isListFriend={isListFriend}
+				/>
+			);
+		} else {
+			return (
+				<ClanUserName
+					name={name}
+					isHiddenAvatarPanel={isHiddenAvatarPanel}
+					hideLongName={hideLongName}
+					isOwnerClanOrGroup={isOwnerClanOrGroup}
+					isListFriend={isListFriend}
+					userId={userId}
+				/>
+			);
+		}
+	},
+	(prevProps, nextProps) => {
 		return (
-			<DMUserName
-				name={name}
-				isHiddenAvatarPanel={isHiddenAvatarPanel}
-				hideLongName={hideLongName}
-				isOwnerClanOrGroup={isOwnerClanOrGroup}
-				isListFriend={isListFriend}
-			/>
-		);
-	} else {
-		return (
-			<ClanUserName
-				name={name}
-				isHiddenAvatarPanel={isHiddenAvatarPanel}
-				hideLongName={hideLongName}
-				isOwnerClanOrGroup={isOwnerClanOrGroup}
-				isListFriend={isListFriend}
-				userId={userId}
-			/>
+			prevProps.name === nextProps.name &&
+			prevProps.isHiddenAvatarPanel === nextProps.isHiddenAvatarPanel &&
+			prevProps.hideLongName === nextProps.hideLongName &&
+			prevProps.isOwnerClanOrGroup === nextProps.isOwnerClanOrGroup &&
+			prevProps.isListFriend === nextProps.isListFriend &&
+			prevProps.isFooter === nextProps.isFooter &&
+			prevProps.isDM === nextProps.isDM &&
+			prevProps.userId === nextProps.userId
 		);
 	}
-}
+);
 
 const DMUserName = ({
 	name,

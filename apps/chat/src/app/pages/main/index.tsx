@@ -72,7 +72,6 @@ import DirectUnread from './directUnreads';
 
 function MyApp() {
 	const dispatch = useAppDispatch();
-	const elementHTML = document.documentElement;
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
@@ -233,10 +232,10 @@ function MyApp() {
 	useEffect(() => {
 		switch (appearanceTheme) {
 			case 'dark':
-				elementHTML.classList.add('dark');
+				document.documentElement.classList.add('dark');
 				break;
 			case 'light':
-				elementHTML.classList.remove('dark');
+				document.documentElement.classList.remove('dark');
 				break;
 			default:
 				break;
@@ -294,15 +293,17 @@ function MyApp() {
 					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
 					style={streamStyle}
 				>
-					<ChannelStream
-						key={currentStreamInfo?.streamId}
-						currentChannel={currentChannel}
-						currentStreamInfo={currentStreamInfo}
-						handleChannelClick={handleChannelClick}
-						streamVideoRef={streamVideoRef}
-						disconnect={disconnect}
-						isStream={isStream}
-					/>
+					{isStream || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+						<ChannelStream
+							key={currentStreamInfo?.streamId}
+							currentChannel={currentChannel}
+							currentStreamInfo={currentStreamInfo}
+							handleChannelClick={handleChannelClick}
+							streamVideoRef={streamVideoRef}
+							disconnect={disconnect}
+							isStream={isStream}
+						/>
+					) : null}
 				</div>
 
 				{isPlayRingTone &&
@@ -327,100 +328,70 @@ export default MyApp;
 
 type ShowModal = () => void;
 
+const DirectUnreadList = memo(() => {
+	const listUnreadDM = useSelector(selectDirectsUnreadlist);
+	const [listDmRender, setListDmRender] = useState(listUnreadDM);
+	const countUnreadRender = useRef(listDmRender.map((channel) => channel.id));
+
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	useEffect(() => {
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
+		if (listUnreadDM.length > countUnreadRender.current.length) {
+			setListDmRender(listUnreadDM);
+			countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
+		} else {
+			countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
+			timerRef.current = setTimeout(() => {
+				setListDmRender(listUnreadDM);
+			}, 1000);
+		}
+	}, [listUnreadDM]);
+
+	return (
+		!!listDmRender?.length &&
+		listDmRender.map((dmGroupChatUnread) => (
+			<DirectUnread key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} checkMoveOut={countUnreadRender.current} />
+		))
+	);
+});
+
 const SidebarMenu = memo(
 	({ openCreateClanModal }: { openCreateClanModal: ShowModal }) => {
-		const dispatch = useAppDispatch();
-		const clans = useSelector(selectAllClans);
-		clans.sort((a, b) => {
-			const nameA = a.clan_name ?? '';
-			const nameB = b.clan_name ?? '';
-
-			if (nameA < nameB) {
-				return -1;
-			}
-			if (nameA > nameB) {
-				return 1;
-			}
-			return 0;
-		});
-		const listUnreadDM = useSelector(selectDirectsUnreadlist);
-		const [listDmRender, setListDmRender] = useState(listUnreadDM);
-		const countUnreadRender = useRef(listDmRender.map((channel) => channel.id));
-		const isClanView = useSelector(selectClanView);
-		const currentClanId = useSelector(selectCurrentClanId);
 		const closeMenu = useSelector(selectCloseMenu);
 		const statusMenu = useSelector(selectStatusMenu);
-
 		const { setCloseMenu, setStatusMenu } = useMenu();
 
-		useEffect(() => {
-			const handleSizeWidth = () => {
-				if (window.innerWidth < 480) {
-					setCloseMenu(true);
-				} else {
-					setCloseMenu(false);
+		const handleMenu = useCallback(
+			(event: React.MouseEvent<HTMLDivElement>) => {
+				const elementClick = event.target as HTMLDivElement;
+				const wrapElement = document.querySelector('#menu');
+				if (!closeMenu) {
+					return;
 				}
-			};
-
-			handleSizeWidth();
-
-			if (closeMenu) {
-				setStatusMenu(false);
-			}
-
-			const handleResize = () => {
-				handleSizeWidth();
-			};
-
-			window.addEventListener('resize', handleResize);
-
-			return () => {
-				window.removeEventListener('resize', handleResize);
-			};
-		}, []);
-
-		const handleMenu = (event: MouseEvent) => {
-			const elementClick = event.target as HTMLDivElement;
-			const wrapElement = document.querySelector('#menu');
-			if (!closeMenu) {
-				return;
-			}
-			if (elementClick.classList.contains('clan')) {
-				if (elementClick.classList.contains('choose')) {
-					setStatusMenu(false);
-					elementClick.classList.remove('choose');
-				} else {
-					setStatusMenu(true);
-					const elementOld = wrapElement?.querySelector('.choose');
-					if (elementOld) {
-						elementOld.classList.remove('choose');
+				if (elementClick.classList.contains('clan')) {
+					if (elementClick.classList.contains('choose')) {
+						setStatusMenu(false);
+						elementClick.classList.remove('choose');
+					} else {
+						setStatusMenu(true);
+						const elementOld = wrapElement?.querySelector('.choose');
+						if (elementOld) {
+							elementOld.classList.remove('choose');
+						}
+						elementClick.classList.add('choose');
 					}
-					elementClick.classList.add('choose');
 				}
-			}
-		};
+			},
+			[closeMenu, setStatusMenu]
+		);
 
-		const timerRef = useRef<NodeJS.Timeout | null>(null);
-		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
-		useEffect(() => {
-			if (timerRef.current) {
-				clearTimeout(timerRef.current);
-				timerRef.current = null;
-			}
-			if (listUnreadDM.length > countUnreadRender.current.length) {
-				setListDmRender(listUnreadDM);
-				countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
-			} else {
-				countUnreadRender.current = listUnreadDM.map((channel) => channel.id);
-				timerRef.current = setTimeout(() => {
-					setListDmRender(listUnreadDM);
-				}, 1000);
-			}
-		}, [listUnreadDM]);
 		return (
 			<div
 				className={`contain-strict h-dvh fixed z-10 left-0 top-0 w-[72px] dark:bg-bgSecondary500 bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'max-sm:hidden') : ''}`}
-				onClick={() => handleMenu}
+				onClick={handleMenu}
 				id="menu"
 			>
 				<div
@@ -428,24 +399,12 @@ const SidebarMenu = memo(
 				>
 					<div className="flex flex-col ">
 						<SidebarLogoItem />
-						{!!listDmRender?.length &&
-							listDmRender.map((dmGroupChatUnread) => (
-								<DirectUnread key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} checkMoveOut={countUnreadRender.current} />
-							))}
+						<DirectUnreadList />
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
-					<div className="flex flex-col gap-3 ">
-						{clans.map((clan: IClan) => {
-							return (
-								<SidebarClanItem
-									key={clan.id}
-									linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
-									option={clan}
-									active={isClanView && currentClanId === clan.clan_id}
-								/>
-							);
-						})}
-					</div>
+
+					<ClansList />
+
 					<div className="mt-3">
 						<NavLinkComponent>
 							<div
@@ -464,6 +423,41 @@ const SidebarMenu = memo(
 	},
 	() => true
 );
+
+const ClansList = memo(() => {
+	const clans = useSelector(selectAllClans);
+	const isClanView = useSelector(selectClanView);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
+
+	const sortedClans = useMemo(() => {
+		return [...clans].sort((a, b) => {
+			const nameA = a.clan_name ?? '';
+			const nameB = b.clan_name ?? '';
+
+			if (nameA < nameB) {
+				return -1;
+			}
+			if (nameA > nameB) {
+				return 1;
+			}
+			return 0;
+		});
+	}, [clans]);
+
+	return (
+		<div className="flex flex-col gap-3">
+			{sortedClans.map((clan: IClan) => (
+				<SidebarClanItem
+					key={clan.id}
+					linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
+					option={clan}
+					active={isClanView && currentClanId === clan.clan_id}
+				/>
+			))}
+		</div>
+	);
+});
 
 const PreviewOnboardingMode = () => {
 	const dispatch = useDispatch();
