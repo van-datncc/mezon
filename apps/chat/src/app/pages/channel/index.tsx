@@ -80,7 +80,19 @@ function useChannelSeen(channelId: string) {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
-
+	const handleReadMessage = () => {
+		if (!lastMessage) {
+			return;
+		}
+		const mode =
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+				? ChannelStreamMode.STREAM_MODE_CHANNEL
+				: ChannelStreamMode.STREAM_MODE_THREAD;
+		const store = getStore();
+		const state = store.getState() as RootState;
+		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
+	};
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
 			const timestamp = Date.now() / 1000;
@@ -90,25 +102,7 @@ function useChannelSeen(channelId: string) {
 					channelId: previousChannels.at(1)?.channelId as string
 				})
 			);
-			if (!lastMessage) {
-				return;
-			}
-			const mode =
-				currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
-					? ChannelStreamMode.STREAM_MODE_CHANNEL
-					: ChannelStreamMode.STREAM_MODE_THREAD;
-
-			const store = getStore();
-			const state = store.getState() as RootState;
-			const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
-			markAsReadSeen(lastMessage, mode, badgeCountClan);
-			dispatch(
-				listChannelsByUserActions.updateChannelBadgeCount({
-					channelId: currentChannel.id,
-					count: 0,
-					isReset: true
-				})
-			);
+			handleReadMessage();
 
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
@@ -127,20 +121,6 @@ function useChannelSeen(channelId: string) {
 		const channel = listChannelRender?.find((channel) => channel.id === currentChannel.id);
 		return (channel as IChannel)?.count_mess_unread || 0;
 	}, [listChannelRender, currentChannel.id]);
-
-	const handleReadMessage = () => {
-		if (!lastMessage) {
-			return;
-		}
-		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
-				? ChannelStreamMode.STREAM_MODE_CHANNEL
-				: ChannelStreamMode.STREAM_MODE_THREAD;
-		const store = getStore();
-		const state = store.getState() as RootState;
-		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string].badge_count || 0;
-		markAsReadSeen(lastMessage, mode, badgeCountClan);
-	};
 
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
