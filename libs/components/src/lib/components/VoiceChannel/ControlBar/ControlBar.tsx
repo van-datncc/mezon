@@ -114,14 +114,16 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 					name: 'screen-share',
 					source: Track.Source.ScreenShare
 				});
-				const audioStream = await getAudioScreenStream();
-				if (audioStream) {
-					const audioTrack = audioStream.getAudioTracks()[0];
-					audioScreenTrackRef.current = await localParticipant.localParticipant.publishTrack(audioTrack, {
-						name: 'screen-share-audio',
-						source: Track.Source.ScreenShareAudio
-					});
-				}
+				// const audioStream = await getAudioScreenStream();
+				// if (audioStream !== null || audioStream !== undefined) {
+				// 	const audioTrack = audioStream?.getAudioTracks()[0];
+				// 	if (audioTrack) {
+				// 		audioScreenTrackRef.current = await localParticipant.localParticipant.publishTrack(audioTrack, {
+				// 			name: 'screen-share-audio',
+				// 			source: Track.Source.ScreenShareAudio
+				// 		});
+				// 	}
+				// }
 
 				screenTrackRef.current = trackPublication;
 			} catch (error) {
@@ -394,9 +396,6 @@ async function getAudioScreenStream() {
 		const outputDevice = devicess.find((device) => device.kind === 'audiooutput');
 		const devices = await navigator.mediaDevices.getUserMedia({
 			audio: {
-				// deviceId: {
-				// 	exact: window.electron.getAudioInputDeviceId()
-				// },
 				deviceId: { exact: outputDevice?.deviceId },
 				// noiseSuppression: true,
 				// echoCancellation: true,
@@ -408,19 +407,6 @@ async function getAudioScreenStream() {
 			},
 			video: false
 		});
-		// const devices = await navigator.mediaDevices.getUserMedia({
-		// 	audio: {
-		// 		noiseSuppression: true,
-		// 		echoCancellation: true,
-		// 		sampleRate: 48000, // 44100, 48000, 96000
-		// 		channelCount: 2,
-		// 		autoGainControl: true,
-		// 		sampleSize: 24 // 8, 16, 24, 32
-		// 		// voiceIsolation: true
-		// 	},
-		// 	video: false
-		// });
-
 		return devices;
 	} catch (error) {
 		console.error('Error getting screen stream:', error);
