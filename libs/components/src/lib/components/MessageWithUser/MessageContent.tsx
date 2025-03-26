@@ -5,7 +5,6 @@ import {
 	IExtendedMessage,
 	IMessageWithUser,
 	MEZON_MENTIONS_COPY_KEY,
-	TypeMessage,
 	addMention,
 	createImgproxyUrl,
 	isValidEmojiData
@@ -69,22 +68,19 @@ const MessageContent = ({ message, mode, isSearchMessage, isInTopic }: IMessageC
 	};
 
 	return (
-		<>
-			<MessageText
-				isOnlyContainEmoji={isOnlyContainEmoji}
-				isSearchMessage={isSearchMessage}
-				content={contentUpdatedMention}
-				message={message}
-				lines={lineValue as string}
-				mode={mode}
-				onCopy={handleCopyMessage}
-			/>
-			{!isInTopic && message?.code === TypeMessage.Topic && <TopicViewButton message={message} />}
-		</>
+		<MessageText
+			isOnlyContainEmoji={isOnlyContainEmoji}
+			isSearchMessage={isSearchMessage}
+			content={contentUpdatedMention}
+			message={message}
+			lines={lineValue as string}
+			mode={mode}
+			onCopy={handleCopyMessage}
+		/>
 	);
 };
 
-const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
+export const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
 	const dispatch = useAppDispatch();
 	const topicCreator = useAppSelector((state) => selectMemberClanByUserId2(state, message?.content?.cid as string));
 	const avatarToDisplay = topicCreator?.clan_avatar ? topicCreator?.clan_avatar : topicCreator?.user?.avatar_url;
