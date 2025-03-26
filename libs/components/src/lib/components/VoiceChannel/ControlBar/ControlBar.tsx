@@ -392,9 +392,9 @@ const supportsScreenSharing = () => {
 async function getAudioScreenStream() {
 	if (!isElectron() || !window.electron) return null;
 	try {
-		const devicess = await navigator.mediaDevices.enumerateDevices();
-		const outputDevice = devicess.find((device) => device.kind === 'audiooutput');
-		const devices = await navigator.mediaDevices.getUserMedia({
+		const devices = await navigator.mediaDevices.enumerateDevices();
+		const outputDevice = devices.find((device) => device.kind === 'audiooutput');
+		const device = await navigator.mediaDevices.getUserMedia({
 			audio: {
 				deviceId: { exact: outputDevice?.deviceId },
 				// noiseSuppression: true,
@@ -407,7 +407,7 @@ async function getAudioScreenStream() {
 			},
 			video: false
 		});
-		return devices;
+		return device;
 	} catch (error) {
 		console.error('Error getting screen stream:', error);
 		return null;
