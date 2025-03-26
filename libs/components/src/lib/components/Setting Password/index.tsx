@@ -1,7 +1,7 @@
 'use client';
 import { LoadingStatus } from '@mezon/utils';
 import type React from 'react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FormError } from './formError';
 import { Input } from './input';
 import { PasswordInput } from './passwordInput';
@@ -65,66 +65,66 @@ export default function SetPassword({
 		}
 		return '';
 	};
-
-	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setEmail(value);
 
-		const emailError = validateEmail(value);
 		setErrors((prev) => ({
 			...prev,
-			email: emailError
+			email: validateEmail(value)
 		}));
-	};
+	}, []);
 
-	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setPassword(value);
+	const handlePasswordChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setPassword(value);
 
-		const passwordError = validatePassword(value);
-		setErrors((prev) => ({
-			...prev,
-			password: passwordError
-		}));
-
-		if (confirmPassword) {
 			setErrors((prev) => ({
 				...prev,
-				confirmPassword: value !== confirmPassword ? "Confirmation password doesn't match" : ''
+				password: validatePassword(value),
+				confirmPassword: confirmPassword && value !== confirmPassword ? "Confirmation password doesn't match" : ''
 			}));
-		}
-	};
+		},
+		[confirmPassword]
+	);
 
-	const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setConfirmPassword(value);
+	const handleConfirmPasswordChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setConfirmPassword(value);
 
-		setErrors((prev) => ({
-			...prev,
-			confirmPassword: value !== password ? "Confirmation password doesn't match" : ''
-		}));
-	};
+			setErrors((prev) => ({
+				...prev,
+				confirmPassword: value !== password ? "Confirmation password doesn't match" : ''
+			}));
+		},
+		[password]
+	);
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = useCallback(
+		(e: React.FormEvent) => {
+			e.preventDefault();
 
-		const emailError = validateEmail(email);
-		const passwordError = validatePassword(password);
-		const confirmError = password !== confirmPassword ? "Confirmation password doesn't match" : '';
+			const emailError = validateEmail(email);
+			const passwordError = validatePassword(password);
+			const confirmError = password !== confirmPassword ? "Confirmation password doesn't match" : '';
 
-		if (emailError || passwordError || confirmError) {
-			setErrors({
-				email: emailError,
-				password: passwordError,
-				confirmPassword: confirmError
-			});
-			return;
-		}
+			if (emailError || passwordError || confirmError) {
+				setErrors({
+					email: emailError,
+					password: passwordError,
+					confirmPassword: confirmError
+				});
+				return;
+			}
 
-		if (onSubmit) {
-			onSubmit({ email, password });
-		}
-	};
+			if (onSubmit) {
+				onSubmit({ email, password });
+			}
+		},
+		[email, password, confirmPassword, onSubmit]
+	);
 
 	const disabled =
 		!!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword || isLoading === 'loading';

@@ -1,10 +1,11 @@
 import { Icons } from '@mezon/ui';
+import { memo } from 'react';
 
 interface FormErrorProps {
 	message: string;
 }
 
-export function FormError({ message }: FormErrorProps) {
+export const FormError = memo(({ message }: FormErrorProps) => {
 	if (!message) return null;
 
 	return (
@@ -13,4 +14,4 @@ export function FormError({ message }: FormErrorProps) {
 			<span>{message}</span>
 		</div>
 	);
-}
+});
