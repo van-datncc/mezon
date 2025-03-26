@@ -858,7 +858,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	return (
 		<div className="contain-layout relative">
 			<MentionsInput
-				onFocus={handleFocusInput}
 				onPaste={(event) => {
 					const pastedData = event.clipboardData.getData(MEZON_MENTIONS_COPY_KEY);
 					if (pastedData) {

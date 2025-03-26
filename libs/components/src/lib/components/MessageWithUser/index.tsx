@@ -236,6 +236,7 @@ function MessageWithUser({
 													handleOpenShortUser(e, message?.sender_id);
 												}
 									}
+									isDM={isDM}
 								/>
 							</>
 						)}
