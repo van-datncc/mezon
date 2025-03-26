@@ -25,7 +25,7 @@ import ModalUserProfile from '../ModalUserProfile';
 import TokenTransactionMessage from '../TokenTransactionMsg/TokenTransactionMsg';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
-import MessageContent from './MessageContent';
+import MessageContent, { TopicViewButton } from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageInput from './MessageInput';
 import MessageReaction from './MessageReaction/MessageReaction';
@@ -281,6 +281,7 @@ function MessageWithUser({
 								onContextMenu={onContextMenu}
 							/>
 						)}
+						{!isTopic && message?.code === TypeMessage.Topic && <TopicViewButton message={message} />}
 
 						{Array.isArray(message?.content?.embed) && (
 							<div className="w-full">
