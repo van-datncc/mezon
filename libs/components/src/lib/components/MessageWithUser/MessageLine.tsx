@@ -72,7 +72,7 @@ const getSelectionRange = (containerRef: HTMLDivElement | null) => {
 	return { startIndex: 0, endIndex: 0 };
 };
 
-const RenderContent = ({
+export const MessageLine = ({
 	content,
 	mode,
 	isSearchMessage,
@@ -424,5 +424,3 @@ export const RoleMentionContent = ({ element, contentInElement, isTokenClickAble
 
 	return <PlainText isSearchMessage={false} text={contentInElement ?? ''} />;
 };
-
-export const MessageLine = RenderContent;
