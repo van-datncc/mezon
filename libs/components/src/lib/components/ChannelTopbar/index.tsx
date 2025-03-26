@@ -50,6 +50,7 @@ export type ChannelTopbarProps = {
 	isChannelVoice?: boolean;
 	mode?: ChannelStreamMode;
 	isMemberPath?: boolean;
+	isChannelPath?: boolean;
 };
 
 const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
@@ -58,7 +59,8 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
-	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
+	const channelPath = `/chat/clans/${currentClanId}/channel-setting`;
+	const { isMemberPath, isChannelPath } = usePathMatch({ isMemberPath: memberPath, isChannelPath: channelPath });
 
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
@@ -76,7 +78,7 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 			{isChannelVoice ? (
 				<TopBarChannelVoice channel={channel} />
 			) : (
-				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
+				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} isChannelPath={isChannelPath} />
 			)}
 		</div>
 	);
@@ -108,7 +110,7 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	);
 });
 
-const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
+const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, isChannelPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();
 	const store = useStore();
 
@@ -133,9 +135,13 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
-				{isMemberPath ? <p className="text-base font-semibold">Members</p> : <ChannelLabel channel={channel} />}
+				{isMemberPath || isChannelPath ? (
+					<p className="text-base font-semibold">{isChannelPath ? 'Channels' : 'Members'}</p>
+				) : (
+					<ChannelLabel channel={channel} />
+				)}
 			</div>
-			{isMemberPath ? null : (
+			{isMemberPath || isChannelPath ? null : (
 				<div className="items-center h-full ml-auto flex">
 					{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
 						<div className="justify-end items-center gap-2 flex">
@@ -159,7 +165,6 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 								id="inBox"
 							>
 								<InboxButton isLightMode={appearanceTheme === 'light'} />
-								<HelpButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 							<div className="sbm:hidden mr-5">
 								<ChannelListButton />
