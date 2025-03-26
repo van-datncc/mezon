@@ -28,7 +28,6 @@ import {
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
-	selectIsUnreadChannelById,
 	selectLastMessageByChannelId,
 	selectListChannelRenderByClanId,
 	selectMissionDone,
@@ -82,7 +81,6 @@ function useChannelSeen(channelId: string) {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
-	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channelId));
 
 	useEffect(() => {
 		if (previousChannels.at(1) && lastMessage) {
@@ -145,17 +143,6 @@ function useChannelSeen(channelId: string) {
 		markAsReadSeen(lastMessage, mode, badgeCountClan);
 	};
 
-	const readMessage = useCallback(() => {
-		if (!statusFetchChannel) return;
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-		dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
-		handleReadMessage();
-	}, [numberNotification, lastMessage]);
-	useBackgroundMode(undefined, readMessage, isFocus);
-
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			const channelWithActive = { ...currentChannel, active: 1 };
@@ -173,16 +160,32 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [currentChannel?.id]);
 
+	const readMessage = useCallback(() => {
+		if (!statusFetchChannel) return;
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
+		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
+		handleReadMessage();
+	}, [numberNotification, lastMessage]);
+
 	useEffect(() => {
 		if (lastMessage && isFocus) {
 			handleReadMessage();
 		}
 	}, [lastMessage]);
+
+	return <WindowFocus readMessage={readMessage} isFocus={isFocus} />;
 }
 
-function ChannelSeenListener({ channelId }: { channelId: string }) {
-	useChannelSeen(channelId);
+const WindowFocus = ({ readMessage, isFocus }: { readMessage: () => void; isFocus: boolean }) => {
+	useBackgroundMode(undefined, readMessage, isFocus);
 	return null;
+};
+
+function ChannelSeenListener({ channelId }: { channelId: string }) {
+	return useChannelSeen(channelId);
 }
 
 type ChannelMainContentTextProps = {
