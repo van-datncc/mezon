@@ -1606,6 +1606,9 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 };
 
 const updateReferenceMessage = ({ state, channelId, listMessageIds }: { state: MessagesState; channelId: string; listMessageIds: string[] }) => {
+	if (!listMessageIds || listMessageIds.length === 0) {
+		return;
+	}
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(listMessageIds[0]);
 	if (index === -1) return;
