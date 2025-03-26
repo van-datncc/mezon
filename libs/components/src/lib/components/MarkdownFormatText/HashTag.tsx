@@ -58,8 +58,10 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const isTextChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 	const isStreamingChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isThreadChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
+	const isAppChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
+
 	const existHashtagAndChannelView = channelHastagId && !isClanView;
-	const isValidChannel = (isTextChannel || isStreamingChannel || isThreadChannel || existHashtagAndChannelView) && channel;
+	const isValidChannel = (isTextChannel || isStreamingChannel || isThreadChannel || existHashtagAndChannelView || isAppChannel) && channel;
 	const theme = useSelector(selectTheme);
 
 	return channel ? (
