@@ -102,11 +102,6 @@ const ChannelAppScreen = ({ channelId }) => {
 		webviewRef?.current?.postMessage(message);
 	}, [userProfile]);
 
-	const handleMessage = useCallback((event) => {
-		if (event?.nativeEvent?.title) {
-		}
-	}, []);
-
 	const closeChannelApp = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
@@ -159,7 +154,6 @@ const ChannelAppScreen = ({ channelId }) => {
 					await sleep(2000);
 					setLoading(false);
 				}}
-				onMessage={handleMessage}
 			/>
 		</View>
 	);
