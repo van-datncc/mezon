@@ -1568,7 +1568,6 @@ const handleSetManyMessages = ({
 };
 
 const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
-	console.log('messageId: ', messageId);
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
