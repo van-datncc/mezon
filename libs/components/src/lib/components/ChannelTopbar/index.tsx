@@ -154,11 +154,10 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 							</div>
 						)}
 						<div
-							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+							className={`gap-4 relative flex  w-8 h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
 							id="inBox"
 						>
 							<InboxButton isLightMode={appearanceTheme === 'light'} />
-							<HelpButton isLightMode={appearanceTheme === 'light'} />
 						</div>
 						<div className="sbm:hidden mr-5">
 							<ChannelListButton />
