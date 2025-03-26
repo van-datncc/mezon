@@ -1,20 +1,32 @@
-import { Attributes, size } from '@mezon/mobile-ui';
+import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		main: {
+			flex: 1,
+			width: '100%',
+			height: '100%',
+			alignItems: 'center',
+			justifyContent: 'center'
+		},
 		container: {
+			backgroundColor: colors.secondary,
+			padding: Metrics.size.xl,
+			margin: Metrics.size.l,
+			borderRadius: 10,
 			overflow: 'hidden',
-			backgroundColor: colors.charcoal,
-			alignSelf: 'center',
-			borderRadius: size.s_10,
-			padding: size.s_16,
-			maxHeight: '40%',
 			width: '90%',
-			display: 'flex',
-			flexDirection: 'column',
-			justifyContent: 'space-between',
-			gap: size.s_10
+			marginHorizontal: 0,
+			zIndex: 100
+		},
+		backdrop: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			width: '100%',
+			height: '100%',
+			backgroundColor: 'rgba(0,0,0,0.5)'
 		},
 		noButton: {
 			paddingVertical: size.s_10,

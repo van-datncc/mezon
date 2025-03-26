@@ -32,7 +32,8 @@ import {
 	ThreadStatus,
 	TypeMessage,
 	formatMoney,
-	isPublicChannel
+	isPublicChannel,
+	sleep
 } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -372,14 +373,19 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 	};
 
-	const handleActionBuzzMessage = () => {
-		setCurrentMessageActionType(EMessageActionType.Buzz);
-	};
-
-	const handleBuzzMessage = (text: string) => {
+	const handleBuzzMessage = useCallback((text: string) => {
 		onClose();
 		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-	};
+	}, []);
+
+	const handleActionBuzzMessage = useCallback(async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		await sleep(500);
+		const data = {
+			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	}, [handleBuzzMessage]);
 
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
@@ -679,13 +685,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					onClose={onClose}
 					message={message}
 					type={currentMessageActionType}
-				/>
-			)}
-			{currentMessageActionType === EMessageActionType.Buzz && (
-				<ConfirmBuzzMessageModal
-					isVisible={currentMessageActionType === EMessageActionType.Buzz}
-					onClose={onClose}
-					onSubmit={handleBuzzMessage}
 				/>
 			)}
 		</View>
