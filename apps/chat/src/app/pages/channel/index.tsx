@@ -73,7 +73,6 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const isFocus = !isBackgroundModeActive();
 
 	const previousChannels = useSelector(selectPreviousChannels);
@@ -160,32 +159,65 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [currentChannel?.id]);
 
-	const readMessage = useCallback(() => {
-		if (!statusFetchChannel) return;
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-		dispatch(listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel.id, count: numberNotification * -1 }));
-		handleReadMessage();
-	}, [numberNotification, lastMessage]);
-
 	useEffect(() => {
 		if (lastMessage && isFocus) {
 			handleReadMessage();
 		}
 	}, [lastMessage]);
-
-	return <WindowFocus readMessage={readMessage} isFocus={isFocus} />;
 }
 
-const WindowFocus = ({ readMessage, isFocus }: { readMessage: () => void; isFocus: boolean }) => {
+const WindowFocus = () => {
+	const dispatch = useAppDispatch();
+	const statusFetchChannel = useSelector(selectFetchChannelStatus);
+	const currentChannel = useAppSelector(selectCurrentChannel);
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, currentChannel?.channel_id as string));
+	const isFocus = !isBackgroundModeActive();
+	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentChannel?.clan_id as string));
+	const numberNotification = useMemo(() => {
+		const channel = listChannelRender?.find((channel) => channel.id === currentChannel?.id);
+		return (channel as IChannel)?.count_mess_unread || 0;
+	}, [listChannelRender, currentChannel?.id]);
+
+	const { markAsReadSeen } = useSeenMessagePool();
+
+	const handleReadMessage = () => {
+		if (!lastMessage) {
+			return;
+		}
+		const mode =
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+				? ChannelStreamMode.STREAM_MODE_CHANNEL
+				: ChannelStreamMode.STREAM_MODE_THREAD;
+		const store = getStore();
+		const state = store.getState() as RootState;
+		const badgeCountClan = state.clans.entities[currentChannel?.clan_id as string].badge_count || 0;
+		markAsReadSeen(lastMessage, mode, badgeCountClan);
+	};
+	const readMessage = useCallback(() => {
+		if (!statusFetchChannel) return;
+		const timestamp = Date.now() / 1000;
+		dispatch(
+			channelMetaActions.setChannelLastSeenTimestamp({ channelId: currentChannel?.channel_id as string, timestamp: timestamp + TIME_OFFSET })
+		);
+		dispatch(
+			listChannelRenderAction.removeBadgeFromChannel({
+				clanId: currentChannel?.clan_id as string,
+				channelId: currentChannel?.channel_id as string
+			})
+		);
+		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		dispatch(
+			listChannelsByUserActions.updateChannelBadgeCount({ channelId: currentChannel?.channel_id as string, count: numberNotification * -1 })
+		);
+		handleReadMessage();
+	}, [numberNotification, lastMessage]);
 	useBackgroundMode(undefined, readMessage, isFocus);
 	return null;
 };
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
-	return useChannelSeen(channelId);
+	useChannelSeen(channelId);
+	return <WindowFocus />;
 }
 
 type ChannelMainContentTextProps = {
