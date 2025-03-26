@@ -1,8 +1,8 @@
 import { computeMenuPosition } from '@livekit/components-core';
-import { MediaDeviceSelect } from '@livekit/components-react';
 import { Icons } from '@mezon/ui';
 import type { LocalAudioTrack, LocalVideoTrack } from 'livekit-client';
 import { ButtonHTMLAttributes, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { MediaDeviceSelect } from './MediaDeviceSelect';
 
 export interface MediaDeviceMenuProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	kind?: MediaDeviceKind;
