@@ -27,6 +27,8 @@ import {
 	EOverriddenPermission,
 	IMessageWithUser,
 	MenuBuilder,
+	SYSTEM_NAME,
+	SYSTEM_SENDER_ID,
 	SubPanelName,
 	TOKEN_TO_AMOUNT,
 	TypeMessage,
@@ -265,9 +267,15 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	}, [isFocusTopicBox, channel]);
 
 	return useMenuBuilderPlugin((builder) => {
-		builder.when(userId !== message?.sender_id && message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
-			builder.addMenuItem('giveacoffee', 'Give a coffee', handleItemClick, <Icons.DollarIcon defaultSize="w-5 h-5" />);
-		});
+		builder.when(
+			userId !== message?.sender_id &&
+				message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID &&
+				message?.sender_id !== SYSTEM_SENDER_ID &&
+				message.username !== SYSTEM_NAME,
+			(builder) => {
+				builder.addMenuItem('giveacoffee', 'Give a coffee', handleItemClick, <Icons.DollarIcon defaultSize="w-5 h-5" />);
+			}
+		);
 	});
 }
 

@@ -47,6 +47,8 @@ import {
 	MenuBuilder,
 	ModeResponsive,
 	SHOW_POSITION,
+	SYSTEM_NAME,
+	SYSTEM_SENDER_ID,
 	SubPanelName,
 	TOKEN_TO_AMOUNT,
 	TypeMessage,
@@ -520,46 +522,52 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos && message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID, (builder) => {
-			builder.addMenuItem(
-				'giveAcoffee', // id
-				'Give A Coffee', // label
+		builder.when(
+			checkPos &&
+				message?.sender_id !== NX_CHAT_APP_ANNONYMOUS_USER_ID &&
+				message?.sender_id !== SYSTEM_SENDER_ID &&
+				message.username !== SYSTEM_NAME,
+			(builder) => {
+				builder.addMenuItem(
+					'giveAcoffee', // id
+					'Give A Coffee', // label
 
-				async () => {
-					try {
-						if (userId !== message.sender_id) {
-							await dispatch(
-								giveCoffeeActions.updateGiveCoffee({
-									channel_id: message.channel_id,
-									clan_id: message.clan_id,
-									message_ref_id: message.id,
-									receiver_id: message.sender_id,
-									sender_id: userId,
-									token_count: AMOUNT_TOKEN.TEN_TOKENS
-								})
-							).unwrap();
-							await reactionMessageDispatch(
-								'',
-								message.id ?? '',
-								EMOJI_GIVE_COFFEE.emoji_id,
-								EMOJI_GIVE_COFFEE.emoji,
-								1,
-								message?.sender_id ?? '',
-								false,
-								isPublicChannel(currentChannel),
-								isFocusTopicBox,
-								message?.channel_id
-							);
+					async () => {
+						try {
+							if (userId !== message.sender_id) {
+								await dispatch(
+									giveCoffeeActions.updateGiveCoffee({
+										channel_id: message.channel_id,
+										clan_id: message.clan_id,
+										message_ref_id: message.id,
+										receiver_id: message.sender_id,
+										sender_id: userId,
+										token_count: AMOUNT_TOKEN.TEN_TOKENS
+									})
+								).unwrap();
+								await reactionMessageDispatch(
+									'',
+									message.id ?? '',
+									EMOJI_GIVE_COFFEE.emoji_id,
+									EMOJI_GIVE_COFFEE.emoji,
+									1,
+									message?.sender_id ?? '',
+									false,
+									isPublicChannel(currentChannel),
+									isFocusTopicBox,
+									message?.channel_id
+								);
 
-							await sendTransactionMessage(message.sender_id || '');
+								await sendTransactionMessage(message.sender_id || '');
+							}
+						} catch (error) {
+							console.error('Failed to give cofffee message', error);
 						}
-					} catch (error) {
-						console.error('Failed to give cofffee message', error);
-					}
-				},
-				<Icons.DollarIconRightClick defaultSize="w-4 h-4" />
-			);
-		});
+					},
+					<Icons.DollarIconRightClick defaultSize="w-4 h-4" />
+				);
+			}
+		);
 
 		builder.when(enableViewReactionItem, (builder) => {
 			builder.addMenuItem(
