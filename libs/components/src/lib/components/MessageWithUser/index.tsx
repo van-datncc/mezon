@@ -279,6 +279,7 @@ function MessageWithUser({
 								mode={mode}
 								message={message}
 								onContextMenu={onContextMenu}
+								isInSearchMessage={isSearchMessage}
 							/>
 						)}
 
