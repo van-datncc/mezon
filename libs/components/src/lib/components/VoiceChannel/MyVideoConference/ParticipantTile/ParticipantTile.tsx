@@ -2,14 +2,13 @@ import type { ParticipantClickEvent, TrackReferenceOrPlaceholder } from '@liveki
 import { isTrackReference, isTrackReferencePinned } from '@livekit/components-core';
 import {
 	AudioTrack,
-	ConnectionQualityIndicator,
-	FocusToggle,
 	LockLockedIcon,
 	ParticipantContext,
 	ScreenShareIcon,
 	TrackMutedIndicator,
 	TrackRefContext,
 	VideoTrack,
+	useConnectionQualityIndicator,
 	useEnsureTrackRef,
 	useFeatureContext,
 	useIsEncrypted,
@@ -19,11 +18,13 @@ import {
 	useParticipantTile
 } from '@livekit/components-react';
 import { selectMemberClanByUserName, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import type { Participant } from 'livekit-client';
-import { Track } from 'livekit-client';
-import { PropsWithChildren, forwardRef, useCallback, useMemo } from 'react';
+import { ConnectionQuality, Track } from 'livekit-client';
+import React, { PropsWithChildren, forwardRef, useCallback, useMemo, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
+import { FocusToggle } from './FocusToggle';
 
 export function ParticipantContextIfNeeded(
 	props: React.PropsWithChildren<{
@@ -128,11 +129,11 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 									/>
 								)}
 							</div>
-							<div className="lk-participant-metadata">
-								<div className="lk-participant-metadata-item">
+							<div className="lk-participant-metadata overflow-hidden">
+								<div className="lk-participant-metadata-item flex w-full justify-between gap-1 !bg-transparent">
 									{trackReference.source === Track.Source.Camera ? (
-										<>
-											{isEncrypted && <LockLockedIcon style={{ marginRight: '0.25rem' }} />}
+										<div className="flex min-w-0 items-center overflow-hidden gap-1 bg-[#00000080] p-[5px] rounded-md">
+											{isEncrypted && <LockLockedIcon />}
 											<TrackMutedIndicator
 												trackRef={{
 													participant: trackReference.participant,
@@ -140,22 +141,54 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 												}}
 												show={'muted'}
 											></TrackMutedIndicator>
-											<span>{voiceUsername}</span>
-										</>
+											<span className="truncate whitespace-nowrap">{voiceUsername}</span>
+										</div>
 									) : (
-										<>
-											<ScreenShareIcon style={{ marginRight: '0.25rem' }} />
-											<span>{voiceUsername} &apos;s screen</span>
-										</>
+										<div className="flex min-w-0 items-center overflow-hidden gap-1 bg-[#00000080] p-[5px] rounded-md">
+											<span>
+												<ScreenShareIcon />
+											</span>
+											<span className="truncate whitespace-nowrap">{voiceUsername}&apos;s screen</span>
+										</div>
 									)}
+									<ConnectionQualityIndicator />
 								</div>
-								<ConnectionQualityIndicator className="lk-participant-metadata-item" />
 							</div>
 						</>
 					)}
-					<FocusToggle trackRef={trackReference} />
+					<FocusToggle className="w-full h-full absolute top-0 right-0 bg-transparent" trackRef={trackReference} />
 				</ParticipantContextIfNeeded>
 			</TrackRefContextIfNeeded>
 		</div>
 	);
 });
+export interface ConnectionQualityIndicatorOptions {
+	participant?: Participant;
+}
+export interface ConnectionQualityIndicatorProps extends React.HTMLAttributes<HTMLDivElement>, ConnectionQualityIndicatorOptions {}
+
+export const ConnectionQualityIndicator = React.forwardRef<HTMLDivElement, ConnectionQualityIndicatorProps>(
+	function ConnectionQualityIndicator(props, ref) {
+		const { quality: rawQuality } = useConnectionQualityIndicator(props);
+		const [quality, setQuality] = useState(rawQuality);
+
+		React.useEffect(() => {
+			setQuality(rawQuality);
+		}, [rawQuality]);
+
+		return (
+			<div ref={ref} className="bg-[#00000080] p-[5px] rounded-md">
+				{props.children ??
+					(quality === ConnectionQuality.Excellent ? (
+						<Icons.SvgQualityExcellentIcon />
+					) : quality === ConnectionQuality.Good ? (
+						<Icons.SvgQualityGoodIcon />
+					) : quality === ConnectionQuality.Poor ? (
+						<Icons.SvgQualityPoorIcon />
+					) : (
+						<Icons.SvgQualityUnknownIcon />
+					))}
+			</div>
+		);
+	}
+);

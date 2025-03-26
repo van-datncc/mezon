@@ -131,6 +131,8 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 		};
 	}, []);
 
+	const userTracks = tracks.filter((track) => track.source !== 'screen_share' && track.source !== 'screen_share_audio');
+
 	return (
 		<div className="lk-video-conference">
 			<LayoutContextProvider value={layoutContext}>
@@ -170,9 +172,12 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 										onClick={handleShowMember}
 									>
 										{isShowMember ? <Icons.VoiceArowDownIcon /> : <Icons.VoiceArowUpIcon />}
-										<span>
-											<Icons.MemberList defaultFill="text-white" />
-										</span>
+										<p className="flex gap-1">
+											<span>
+												<Icons.MemberList defaultFill="text-white" />
+											</span>
+											<span className="pr-6">{userTracks.length}</span>
+										</p>
 									</div>
 								</Tooltip>
 							)}
