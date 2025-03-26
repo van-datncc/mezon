@@ -79,6 +79,8 @@ export const EMOJI_GIVE_COFFEE = {
 	emoji: ':coffee:',
 	emoji_id: '7280417126303261185'
 };
+export const SYSTEM_NAME = 'System';
+export const SYSTEM_SENDER_ID = '0';
 export const HEIGHT_PANEL_PROFILE = 480;
 export const WIDTH_PANEL_PROFILE = 300;
 export const HEIGHT_PANEL_PROFILE_DM = 314;
