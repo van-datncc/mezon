@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectAllChannels, useAppSelector } from '@mezon/store';
+import { getStore, selectGmeetVoice } from '@mezon/store';
 import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown, getMeetCode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
@@ -326,8 +326,12 @@ interface VoiceLinkContentProps {
 }
 
 export const VoiceLinkContent = ({ meetingCode, isTokenClickAble, isJumMessageEnabled, index, s, contentInElement }: VoiceLinkContentProps) => {
-	const allChannelVoice = useAppSelector(selectAllChannels);
-	const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+	const getVoiceChannelByMeetingCode = (meetingCode: string) => {
+		const store = getStore();
+		const allChannelVoice = selectGmeetVoice(store.getState());
+		return allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+	};
+	const voiceChannelFound = getVoiceChannelByMeetingCode(meetingCode as string) || null;
 
 	if (voiceChannelFound) {
 		return (
