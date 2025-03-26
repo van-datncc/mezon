@@ -1083,13 +1083,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		} else if (channelCreated.creator_id === userId) {
 			dispatch(listChannelRenderAction.addChannelToListRender({ type: channelCreated.channel_type, ...channelCreated }));
-			dispatch(
-				listChannelsByUserActions.addOneChannel({
-					id: channelCreated.channel_id,
-					type: channelCreated.channel_type,
-					...channelCreated
-				})
-			);
+			if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_DM && channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(
+					listChannelsByUserActions.addOneChannel({
+						id: channelCreated.channel_id,
+						type: channelCreated.channel_type,
+						...channelCreated
+					})
+				);
+			}
 		}
 	}, []);
 
@@ -1541,7 +1543,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const prioritizedName = member.clan_nick || member.user?.display_name || member.user?.username;
 			const prioritizedAvatar = member.clan_avatar || member.user?.avatar_url;
 
-			const title = 'Balance notifications:';
+			const title = 'Funds Transferred:';
 			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
 
 			electronBridge.pushNotification(title, {

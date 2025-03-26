@@ -231,7 +231,8 @@ export interface EventManagementState {
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
 	ongoingEvent: EventManagementOnGogoing | null;
-	showModelDetailEvent?: boolean;
+	showModalDetailEvent?: boolean;
+	showModalEvent?: boolean;
 }
 
 export const initialEventManagementState: EventManagementState = {
@@ -241,7 +242,8 @@ export const initialEventManagementState: EventManagementState = {
 	chooseEvent: null,
 	ongoingEvent: null,
 	creatingStatus: 'not loaded',
-	showModelDetailEvent: false
+	showModalDetailEvent: false,
+	showModalEvent: false
 };
 
 export const eventManagementSlice = createSlice({
@@ -259,8 +261,11 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		showModelDetailEvent: (state, action) => {
-			state.showModelDetailEvent = action.payload;
+		showModalDetailEvent: (state, action) => {
+			state.showModalDetailEvent = action.payload;
+		},
+		showModalEvent: (state, action) => {
+			state.showModalEvent = action.payload;
 		},
 		removeOneEvent: (state, action) => {
 			const { event_id } = action.payload;
@@ -337,6 +342,7 @@ export const eventManagementSlice = createSlice({
 				channel_id: normalizedChannelId,
 				channel_voice_id: normalizedVoiceChannelId,
 				event_status,
+				user_ids: [action.payload.creator_id],
 				...restPayload
 			});
 		},
@@ -425,7 +431,9 @@ export const selectNumberEvent = createSelector(selectEventsByClanId, (events) =
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
 
-export const selectShowModelDetailEvent = createSelector(getEventManagementState, (state) => state.showModelDetailEvent);
+export const selectShowModelEvent = createSelector(getEventManagementState, (state) => state.showModalEvent);
+
+export const selectShowModelDetailEvent = createSelector(getEventManagementState, (state) => state.showModalDetailEvent);
 
 export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);
 

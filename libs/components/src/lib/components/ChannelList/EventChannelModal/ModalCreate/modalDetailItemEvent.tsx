@@ -28,7 +28,7 @@ const ModalDetailItemEvent = () => {
 
 	const clearChooseEvent = useCallback(() => {
 		dispatch(eventManagementActions.setChooseEvent(null));
-		dispatch(eventManagementActions.showModelDetailEvent(false));
+		dispatch(eventManagementActions.showModalDetailEvent(false));
 	}, [dispatch]);
 
 	return (

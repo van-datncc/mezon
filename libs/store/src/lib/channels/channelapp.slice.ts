@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
-import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DEFAULT_POSITION, INIT_SIZE, LoadingStatus } from '@mezon/utils';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { JoinChannelAppData } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -30,6 +30,8 @@ export interface ChannelAppState {
 	enableVideo: boolean;
 	joinChannelAppData: JoinChannelAppData | undefined;
 	enableCall: boolean;
+	position: { x: number; y: number };
+	size: { width: number; height: number };
 }
 
 export const initialChannelAppState: ChannelAppState = {
@@ -42,7 +44,9 @@ export const initialChannelAppState: ChannelAppState = {
 	enableMic: false,
 	enableVideo: false,
 	enableCall: false,
-	channelId: null
+	channelId: null,
+	position: DEFAULT_POSITION,
+	size: INIT_SIZE
 };
 export const createChannelAppMeet = createAsyncThunk(
 	`${CHANNEL_APP}/CreateMeetingRoom`,
@@ -112,6 +116,12 @@ export const channelAppSlice = createSlice({
 		},
 		setEnableCall: (state, action: PayloadAction<boolean>) => {
 			state.enableCall = action.payload;
+		},
+		setPosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
+			state.position = action.payload;
+		},
+		setSize: (state, action: PayloadAction<{ width: number; height: number }>) => {
+			state.size = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -142,6 +152,9 @@ export const selectLiveToken = createSelector(getChannelAppState, (state) => sta
 export const selectChannelAppChannelId = createSelector(getChannelAppState, (state) => state.channelId);
 export const selectChannelAppClanId = createSelector(getChannelAppState, (state) => state.clanId);
 export const selectJoinChannelAppData = createSelector(getChannelAppState, (state) => state.joinChannelAppData);
+
+export const selectPostionPopupApps = createSelector(getChannelAppState, (state) => state.position);
+export const selectSizePopupApps = createSelector(getChannelAppState, (state) => state.size);
 
 export const channelAppReducer = channelAppSlice.reducer;
 

@@ -1,7 +1,7 @@
 import { selectMemberClanByGoogleId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannelMember, createImgproxyUrl, getAvatarForPrioritize, useWindowSize } from '@mezon/utils';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
 export type VoiceChannelUsersProps = {
@@ -12,6 +12,9 @@ export type VoiceChannelUsersProps = {
 
 export function VoiceChannelUsers({ memberJoin = [], memberMax, isShowChat }: VoiceChannelUsersProps) {
 	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin);
+	useEffect(() => {
+		setDisplayedMembers(memberJoin);
+	}, [memberJoin]);
 	const [remainingCount, setRemainingCount] = useState(0);
 
 	const handleSizeWidth = useCallback(() => {
