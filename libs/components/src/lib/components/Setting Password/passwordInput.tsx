@@ -35,6 +35,7 @@ export function PasswordInput({ id, label, value, onChange, error, isLoading }: 
 						error ? 'border-red-500' : 'border-gray-300'
 					} focus:outline-none focus:ring-2 focus:ring-blue-500`}
 					readOnly={isLoading}
+					autoComplete="off"
 				/>
 				<button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
 					{showPassword ? (

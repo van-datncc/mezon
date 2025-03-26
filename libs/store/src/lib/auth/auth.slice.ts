@@ -11,7 +11,7 @@ export interface AuthState {
 	error?: string | null;
 	session?: ISession | null;
 	isLogin?: boolean;
-	isRegistering?: boolean;
+	isRegistering?: LoadingStatus;
 }
 
 export interface ISession {
@@ -31,7 +31,7 @@ export const initialAuthState: AuthState = {
 	loadingStatus: 'not loaded',
 	session: null,
 	isLogin: false,
-	isRegistering: false
+	isRegistering: 'not loaded'
 };
 
 function normalizeSession(session: Session): ISession {
@@ -240,14 +240,13 @@ export const authSlice = createSlice({
 			});
 		builder
 			.addCase(registrationPassword.pending, (state) => {
-				state.isRegistering = true;
+				state.isRegistering = 'loading';
 			})
 			.addCase(registrationPassword.fulfilled, (state, action) => {
-				state.isRegistering = false;
-				state.isLogin = true;
+				state.isRegistering = 'loaded';
 			})
 			.addCase(registrationPassword.rejected, (state, action) => {
-				state.isRegistering = false;
+				state.isRegistering = 'error';
 				state.error = action.error.message;
 			});
 	}

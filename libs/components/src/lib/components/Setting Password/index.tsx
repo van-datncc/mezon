@@ -1,4 +1,5 @@
 'use client';
+import { LoadingStatus } from '@mezon/utils';
 import type React from 'react';
 import { useState } from 'react';
 import { Button } from './button';
@@ -13,7 +14,7 @@ interface SetPasswordProps {
 	description?: string;
 	submitButtonText?: string;
 	initialEmail?: string;
-	isLoading?: boolean;
+	isLoading?: LoadingStatus;
 }
 
 export default function SetPassword({
@@ -125,7 +126,8 @@ export default function SetPassword({
 		}
 	};
 
-	const disabled = !!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword || isLoading;
+	const disabled =
+		!!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword || isLoading === 'loading';
 
 	return (
 		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -150,6 +152,7 @@ export default function SetPassword({
 								placeholder="your.email@example.com"
 								className={errors.email ? 'border-red-500 dark:border-red-400' : ''}
 								readOnly={true}
+								autoComplete="off"
 							/>
 							{errors.email && <FormError message={errors.email} />}
 						</div>
@@ -172,7 +175,7 @@ export default function SetPassword({
 					</CardContent>
 					<CardFooter>
 						<Button type="submit" className={`w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={disabled}>
-							{isLoading ? 'Submitting...' : submitButtonText}
+							{isLoading === 'loading' ? 'Submitting...' : submitButtonText}
 						</Button>
 					</CardFooter>
 				</form>

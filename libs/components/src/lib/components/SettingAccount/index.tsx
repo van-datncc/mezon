@@ -47,11 +47,17 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 				}}
 			/>
 		);
-	}, []);
+	}, [isLoadingUpdatePassword]);
 
 	const handleOpenSetPassword = () => {
 		openSetPassWordModal();
 	};
+
+	useEffect(() => {
+		if (isLoadingUpdatePassword !== 'loading') {
+			closeSetPasswordModal();
+		}
+	}, [isLoadingUpdatePassword]);
 
 	return (
 		<div
