@@ -39,6 +39,7 @@ export const PasswordInput = memo(({ id, label, value, onChange, error, isLoadin
 						focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
 					readOnly={isLoading}
 					autoComplete="off"
+					placeholder={label === 'Password' ? 'Enter your password' : 'Confirm your password'}
 				/>
 				<button
 					type="button"
