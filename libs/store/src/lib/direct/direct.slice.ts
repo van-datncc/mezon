@@ -592,12 +592,14 @@ export const directSlice = createSlice({
 		addBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
 			const channelId = action.payload.channelId;
 			const currentBadge = state.entities[channelId]?.count_mess_unread || 0;
-			directAdapter.updateOne(state, {
-				id: channelId,
-				changes: {
-					count_mess_unread: currentBadge + 1
-				}
-			});
+			if (currentBadge !== currentBadge + 1) {
+				directAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: currentBadge + 1
+					}
+				});
+			}
 		},
 		removeBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
 			const currentBadge = state.entities[action.payload.channelId]?.count_mess_unread || 0;
