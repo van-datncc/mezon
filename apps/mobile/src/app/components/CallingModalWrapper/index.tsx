@@ -10,7 +10,7 @@ const CallingModalWrapper = () => {
 	}, []);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 
-	if (!signalingData?.length) {
+	if (!signalingData?.length || signalingData?.[signalingData?.length - 1]?.signalingData?.data_type !== WebrtcSignalingType.WEBRTC_SDP_OFFER) {
 		return <View />;
 	}
 

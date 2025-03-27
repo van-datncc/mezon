@@ -24,12 +24,12 @@ const Avatar = ({ id, index }: { id: string; index: number }) => {
 				key={index.toString()}
 				height={40}
 				width={40}
-				avatarUrl={user?.user?.avatar_url}
-				username={user?.user?.username}
+				avatarUrl={user?.clan_avatar || user?.user?.avatar_url}
+				username={user?.clan_nick || user?.user?.display_name || user?.user?.username}
 				userStatus={userStatus}
 				customStatus={customStatus}
 			/>
-			<Text style={styles.text}>{user?.user?.display_name}</Text>
+			<Text style={styles.text}>{user?.clan_nick || user?.user?.display_name || user?.user?.username}</Text>
 		</View>
 	);
 };

@@ -1,20 +1,21 @@
-import { TrackReference, useLocalParticipant, useParticipants, useRoomContext, useTracks, VideoTrack } from '@livekit/react-native';
+import { TrackReference, VideoTrack, useLocalParticipant, useParticipants, useRoomContext, useTracks } from '@livekit/react-native';
 import {
 	ActionEmitEvent,
-	getUpdateOrAddClanChannelCache,
 	Icons,
+	STORAGE_CLAN_ID,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
 	jumpToChannel,
 	load,
-	save,
-	STORAGE_CLAN_ID,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
+	save
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
+import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { Track } from 'livekit-client';
+import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Platform, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
+import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
@@ -28,13 +29,16 @@ const RoomView = ({
 	isAnimationComplete,
 	onPressMinimizeRoom,
 	channelId,
-	clanId
+	clanId,
+	onFocusedScreenChange
 }: {
 	isAnimationComplete: boolean;
 	onPressMinimizeRoom: () => void;
 	channelId: string;
 	clanId: string;
+	onFocusedScreenChange: (track: TrackReference | null) => void;
 }) => {
+	const marginWidth = Dimensions.get('screen').width;
 	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
@@ -54,12 +58,59 @@ const RoomView = ({
 
 	const sortedParticipants = [...participants].sort((a, b) => (b.isScreenShareEnabled ? 1 : 0) - (a.isScreenShareEnabled ? 1 : 0));
 
-	const handleToggleCamera = useCallback(() => {
-		localParticipant.setCameraEnabled(!isCameraEnabled);
+	const handleToggleCamera = useCallback(async () => {
+		try {
+			if (isCameraEnabled) {
+				await localParticipant.setCameraEnabled(false);
+			} else {
+				try {
+					await localParticipant.setCameraEnabled(true);
+				} catch (enablederror) {
+					try {
+						const newVideoTrack = await createLocalVideoTrack();
+						const oldPublication = Array.from(localParticipant.videoTrackPublications.values()).find(
+							(publication) => publication.source === Track.Source.Camera
+						);
+						if (oldPublication && oldPublication.track) {
+							await localParticipant.unpublishTrack(oldPublication.track, true);
+						}
+						await localParticipant.publishTrack(newVideoTrack);
+					} catch (newError) {
+						console.error('err:', newError);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error toggling camera:', error);
+		}
 	}, [isCameraEnabled, localParticipant]);
 
-	const handleToggleMicrophone = useCallback(() => {
-		localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+	const handleToggleMicrophone = useCallback(async () => {
+		try {
+			if (isMicrophoneEnabled) {
+				await localParticipant.setMicrophoneEnabled(false);
+			} else {
+				try {
+					await localParticipant.setMicrophoneEnabled(true);
+				} catch (enableError) {
+					try {
+						const newAudioTrack = await createLocalAudioTrack();
+
+						const oldAudioPublication = Array.from(localParticipant.audioTrackPublications.values()).find(
+							(publication) => publication.source === Track.Source.Microphone
+						);
+						if (oldAudioPublication && oldAudioPublication.track) {
+							await localParticipant.unpublishTrack(oldAudioPublication.track, true);
+						}
+						await localParticipant.publishTrack(newAudioTrack);
+					} catch (newError) {
+						console.error('err: ', newError);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error toggling microphone:', error);
+		}
 	}, [isMicrophoneEnabled, localParticipant]);
 
 	const handleToggleScreenShare = useCallback(() => {
@@ -112,11 +163,23 @@ const RoomView = ({
 		await jumpToChannel(channelId, clanId);
 	};
 
+	useEffect(() => {
+		onFocusedScreenChange(focusedScreenShare);
+	}, [focusedScreenShare, onFocusedScreenChange]);
+
 	if (focusedScreenShare) {
 		return (
 			<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-				<View style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center' }}>
-					<VideoTrack trackRef={focusedScreenShare} style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center' }} />
+				<View style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center', marginBottom: '30%' }}>
+					<ResumableZoom>
+						<View style={{ height: 3 * size.s_100, width: marginWidth, alignSelf: 'center' }}>
+							<VideoTrack
+								trackRef={focusedScreenShare}
+								objectFit="contain"
+								style={{ height: 3 * size.s_100, width: '100%', alignSelf: 'center' }}
+							/>
+						</View>
+					</ResumableZoom>
 				</View>
 				<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
 					<Icons.ArrowShrinkIcon height={size.s_16} />
@@ -138,7 +201,7 @@ const RoomView = ({
 				/>
 			)}
 			{isAnimationComplete && (
-				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_50 }]}>
+				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
 					<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 							{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
