@@ -61,7 +61,8 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 				timeValueStart,
 				description,
 				'',
-				eventChannelId
+				eventChannelId,
+				frequency
 			);
 		} else {
 			await createEventManagement(
@@ -73,7 +74,8 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 				timeValueEnd,
 				description,
 				'',
-				eventChannelId
+				eventChannelId,
+				frequency
 			);
 		}
 		onGoBack?.();
