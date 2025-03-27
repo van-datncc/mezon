@@ -47,6 +47,7 @@ export type OwnProps<T> = {
 	onClick?: (url?: string) => void;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	onCancelUpload?: (arg: T) => void;
+	isInSearchMessage?: boolean;
 };
 const Photo = <T,>({
 	id,
@@ -71,7 +72,8 @@ const Photo = <T,>({
 	clickArg,
 	className,
 	onClick,
-	onContextMenu
+	onContextMenu,
+	isInSearchMessage
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 	const isPaidPreview = photo.mediaType === 'extendedMediaPreview';
@@ -153,7 +155,8 @@ const Photo = <T,>({
 		size === 'inline'
 			? {
 					height: height ? `${height}px` : 150,
-					width: width ? `${width}px` : 'auto',
+					// eslint-disable-next-line prettier/prettier
+					width: isInSearchMessage ? '' : width ? `${width}px` : 'auto',
 					...(dimensions && {
 						position: 'absolute' as const,
 						left: `${dimensions.x}px`,
@@ -161,44 +164,6 @@ const Photo = <T,>({
 					})
 				}
 			: undefined;
-
-	let displayWidth, displayHeight;
-
-	const originalAspectRatio = realWidth && realHeight ? realWidth / realHeight : 1;
-
-	if (realWidth && realHeight) {
-		if (originalAspectRatio > 1) {
-			displayHeight = Math.min(height, realHeight);
-			displayWidth = Math.round(displayHeight * originalAspectRatio);
-			if (displayWidth > width) {
-				displayWidth = width;
-				displayHeight = Math.round(displayWidth / originalAspectRatio);
-			}
-		} else {
-			displayWidth = Math.min(width, realWidth);
-			displayHeight = Math.round(displayWidth / originalAspectRatio);
-			if (displayHeight > height) {
-				displayHeight = height;
-				displayWidth = Math.round(displayHeight * originalAspectRatio);
-			}
-		}
-	} else {
-		if (width && height) {
-			if (width / height > 1) {
-				displayHeight = height;
-				displayWidth = Math.min(width, Math.round(height * originalAspectRatio));
-			} else {
-				displayWidth = width;
-				displayHeight = Math.min(height, Math.round(width / originalAspectRatio));
-			}
-		} else {
-			displayWidth = width || 0;
-			displayHeight = height || 150;
-		}
-	}
-
-	displayWidth = Math.min(displayWidth, width || displayWidth);
-	displayHeight = Math.min(displayHeight, height || displayHeight);
 
 	const handleContextMenu = useCallback((e: React.MouseEvent<HTMLImageElement>) => {
 		setImageURL(photo?.url ?? '');
@@ -225,13 +190,13 @@ const Photo = <T,>({
 					src={fullMediaData}
 					className={`max-w-full max-h-full w-full h-full block object-cover absolute bottom-0 left-0 z-[1] rounded overflow-hidden cursor-pointer duration-700 ease-in-out ${withBlurredBackground && 'with-blurred-bg'}`}
 					alt=""
-					style={{ width: displayWidth || forcedWidth || 'auto', height: displayHeight || 'auto' }}
+					style={{ width: forcedWidth || width || 'auto' }}
 					draggable={!isProtected}
 				/>
 			)}
 			{withThumb && (
 				<canvas
-					style={{ width: displayWidth, height: displayHeight }}
+					style={{ width, height }}
 					ref={thumbRef}
 					className="max-w-full max-h-full block object-cover absolute bottom-0 left-0 rounded overflow-hidden "
 				/>
@@ -240,7 +205,7 @@ const Photo = <T,>({
 			{shouldRenderSpinner && !shouldRenderDownloadButton && (
 				<div
 					ref={spinnerRef as any}
-					style={{ width: displayWidth, height: displayHeight }}
+					style={{ width: width, height: height }}
 					className={`${!photo.thumbnail?.dataUri ? 'bg-[#0000001c]' : ''} max-w-full max-h-full absolute bottom-0 left-0 flex items-center justify-center bg-muted/30 backdrop-blur-[2px] rounded-md z-[3]`}
 					aria-hidden="true"
 				>

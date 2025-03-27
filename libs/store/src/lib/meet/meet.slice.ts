@@ -1,8 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
+import { HandleParticipantMeetStateEvent } from 'mezon-js';
 import { ApiHandleParticipantMeetStateRequest } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 
 type generateMeetTokenPayload = {
 	channelId: string;
@@ -46,17 +47,17 @@ export const generateMeetToken = createAsyncThunk('meet/generateMeetToken', asyn
 export const handleParticipantMeetState = createAsyncThunk(
 	'meet/handleParticipantMeetState',
 	async ({ clan_id, channel_id, user_id, display_name, state }: ApiHandleParticipantMeetStateRequest, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const body = {
-				clan_id: clan_id,
-				channel_id: channel_id,
-				user_id: user_id,
-				display_name: display_name,
-				state: state
-			};
-			const response = await mezon.client.handleParticipantMeetState(mezon.session, body);
+		//TODO remove this function after mobile team update their code
+		return;
+	}
+);
 
+export const handleParticipantVoiceState = createAsyncThunk(
+	'meet/handleParticipantVoiceState',
+	async ({ clan_id, channel_id, display_name, state }: HandleParticipantMeetStateEvent, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const response = await mezon.socketRef.current?.handleParticipantMeetState(clan_id, channel_id, display_name, state);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'meet/handleParticipantMeetState');

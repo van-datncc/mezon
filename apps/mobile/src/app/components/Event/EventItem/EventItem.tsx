@@ -31,7 +31,7 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 		if (start) {
 			const currentTime = Date.now();
 			const startTimeLocal = new Date(start);
-			const startTimeUTC = startTimeLocal.getTime() + startTimeLocal.getTimezoneOffset() * 60000;
+			const startTimeUTC = startTimeLocal.getTime() - startTimeLocal.getTimezoneOffset() * 60000;
 			const leftTime = startTimeUTC - currentTime;
 
 			if (leftTime > 0 && leftTime <= 1000 * 60 * 10) {
@@ -43,7 +43,7 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 			}
 		}
 
-		return EEventStatus.UNKNOWN;
+		return EEventStatus.CREATED;
 	}, [start, event?.event_status]);
 
 	function handlePress() {

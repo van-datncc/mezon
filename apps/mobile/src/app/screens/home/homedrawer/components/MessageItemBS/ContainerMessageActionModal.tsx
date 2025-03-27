@@ -32,7 +32,8 @@ import {
 	ThreadStatus,
 	TypeMessage,
 	formatMoney,
-	isPublicChannel
+	isPublicChannel,
+	sleep
 } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -49,6 +50,7 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType } from '../../enums';
 import { IConfirmActionPayload, IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
+import { ConfirmBuzzMessageModal } from '../ConfirmBuzzMessage';
 import { ConfirmPinMessageModal } from '../ConfirmPinMessageModal';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import ForwardMessageModal from '../ForwardMessage';
@@ -205,7 +207,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
 				if (directMessageId) {
 					sendInviteMessage(
-						`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+						`Funds Transferred: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 						directMessageId,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -214,7 +216,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					const response = await createDirectMessageWithUser(message?.user?.id, true);
 					if (response?.channel_id) {
 						sendInviteMessage(
-							`Balance notifications: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
+							`Funds Transferred: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
 							response?.channel_id,
 							ChannelStreamMode.STREAM_MODE_DM,
 							TypeMessage.SendToken
@@ -371,10 +373,19 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 	};
 
-	const handleBuzzMessage = () => {
+	const handleBuzzMessage = useCallback((text: string) => {
 		onClose();
-		sendMessage({ t: 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-	};
+		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
+	}, []);
+
+	const handleActionBuzzMessage = useCallback(async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		await sleep(500);
+		const data = {
+			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	}, [handleBuzzMessage]);
 
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
@@ -430,7 +441,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				handleActionTopicDiscussion();
 				break;
 			case EMessageActionType.Buzz:
-				handleBuzzMessage();
+				handleActionBuzzMessage();
 				break;
 			default:
 				break;

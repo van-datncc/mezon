@@ -30,7 +30,11 @@ const FocusedScreenPopup = ({ sortedParticipants, tracks, localParticipant }) =>
 			return (
 				<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 					<View style={{ height: size.s_150, width: '100%', alignSelf: 'center' }}>
-						<VideoTrack trackRef={screenTrackRef} style={{ height: size.s_150, width: '100%', alignSelf: 'center' }} />
+						<VideoTrack
+							objectFit="contain"
+							trackRef={screenTrackRef}
+							style={{ height: size.s_150, width: '100%', alignSelf: 'center' }}
+						/>
 					</View>
 				</View>
 			);

@@ -6,12 +6,13 @@ import { useAppParams, useAuth } from '@mezon/core';
 import {
 	generateMeetToken,
 	getStoreAsync,
-	handleParticipantMeetState,
+	handleParticipantVoiceState,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectIsShowSettingFooter,
 	selectShowCamera,
 	selectShowMicrophone,
+	selectShowModelEvent,
 	selectTokenJoinVoice,
 	selectVoiceFullScreen,
 	selectVoiceInfo,
@@ -45,11 +46,10 @@ const ChannelVoice = memo(
 			if (!clanId || !channelId || !userProfile?.user?.id) return;
 
 			await dispatch(
-				handleParticipantMeetState({
+				handleParticipantVoiceState({
 					clan_id: clanId,
 					channel_id: channelId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
+					display_name: userProfile?.user?.display_name ?? '',
 					state
 				})
 			);
@@ -119,11 +119,12 @@ const ChannelVoice = memo(
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 
 		const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
+		const showModalEvent = useSelector(selectShowModelEvent);
 		const { channelId } = useAppParams();
 
 		return (
 			<div
-				className={`${!isChannelMezonVoice || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
+				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0  z-30`}
 				style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
 			>
 				{token === '' || !serverUrl ? (

@@ -1,7 +1,7 @@
-import { AudioSession, LiveKitRoom } from '@livekit/react-native';
+import { AudioSession, LiveKitRoom, TrackReference } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById2 } from '@mezon/store';
-import React, { useEffect } from 'react';
+import { selectChannelById2 } from '@mezon/store-mobile';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
@@ -30,6 +30,7 @@ function ChannelVoice({
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const channel = useSelector((state) => selectChannelById2(state, channelId));
+	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 
 	useEffect(() => {
 		const start = async () => {
@@ -52,7 +53,7 @@ function ChannelVoice({
 					backgroundColor: themeValue?.primary
 				}}
 			>
-				{isAnimationComplete && (
+				{isAnimationComplete && !focusedScreenShare && (
 					<View style={[styles.menuHeader]}>
 						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
 							<TouchableOpacity
@@ -75,6 +76,7 @@ function ChannelVoice({
 						clanId={clanId}
 						onPressMinimizeRoom={onPressMinimizeRoom}
 						isAnimationComplete={isAnimationComplete}
+						onFocusedScreenChange={setFocusedScreenShare}
 					/>
 				</LiveKitRoom>
 			</View>

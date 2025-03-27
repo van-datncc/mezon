@@ -6517,13 +6517,7 @@ export function MetaMaskIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function InfoIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg
-			className="mx-auto  text-orange-400 w-20 h-20 dark:text-orange-400"
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 20 20"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" {...props}>
 			<path
 				stroke="currentColor"
 				strokeLinecap="round"
@@ -7105,6 +7099,47 @@ export function CornerTab(props: React.HTMLAttributes<SVGElement>) {
 			style={{ display: 'block' }} // Ensure proper rendering
 		>
 			<path fillRule="evenodd" clipRule="evenodd" d="M16 16V0C16 8.83656 8.83656 16 0 16H16Z" fill="black" />
+		</svg>
+	);
+}
+
+export function SvgQualityExcellentIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor">
+			<path d="M0 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm6-5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm6-6a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+		</svg>
+	);
+}
+
+export function SvgQualityGoodIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor">
+			<path d="M0 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm6-5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+			<g opacity={0.25}>
+				<path d="M12 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+			</g>
+		</svg>
+	);
+}
+
+export function SvgQualityPoorIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor">
+			<path d="M0 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+			<g opacity={0.25}>
+				<path d="M6 6.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+				<path d="M12 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5z" />
+			</g>
+		</svg>
+	);
+}
+
+export function SvgQualityUnknownIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor">
+			<g opacity={0.25}>
+				<path d="M0 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4Zm6-5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-9Zm6-6a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V.5Z" />
+			</g>
 		</svg>
 	);
 }

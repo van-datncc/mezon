@@ -39,11 +39,13 @@ export const Events = memo(() => {
 	const { numberEventManagement, numberEventUpcoming } = useEventManagementQuantity();
 	const closeModal = () => {
 		closeEventModal();
+		dispatch(eventManagementActions.showModalEvent(false));
 	};
 
 	const openModal = () => {
 		openEventModal();
 		setClanShowNumEvent(false);
+		dispatch(eventManagementActions.showModalEvent(true));
 	};
 
 	const handleOpenDetail = () => {

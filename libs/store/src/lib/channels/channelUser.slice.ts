@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelDescription } from 'mezon-js';
+import { ChannelDescription, ChannelType } from 'mezon-js';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -222,6 +222,10 @@ export const getChannelsByUserState = (rootState: { [LIST_CHANNELS_USER_FEATURE_
 
 export const selectAllChannelsByUser = createSelector(getChannelsByUserState, selectAll);
 export const selectEntitiesChannelsByUser = createSelector(getChannelsByUserState, selectEntities);
+
+export const selectGmeetVoice = createSelector(selectAllChannelsByUser, (hashtags) =>
+	hashtags.filter((hashtag) => hashtag.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE)
+);
 
 export const selectAllInfoChannels = createSelector(selectAllChannelsByUser, (channels = []) =>
 	channels?.map(({ channel_id, channel_label, channel_private, clan_name, clan_id, type, parent_id, meeting_code, id }) => ({

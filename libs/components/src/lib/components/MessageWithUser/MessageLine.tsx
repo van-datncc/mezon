@@ -1,5 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectAllChannels, useAppSelector } from '@mezon/store';
+import { getTagByIdOnStored } from '@mezon/core';
+import { ChannelsEntity, getStore, selectGmeetVoice } from '@mezon/store';
 import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown, getMeetCode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useRef } from 'react';
@@ -72,7 +73,7 @@ const getSelectionRange = (containerRef: HTMLDivElement | null) => {
 	return { startIndex: 0, endIndex: 0 };
 };
 
-const RenderContent = ({
+export const MessageLine = ({
 	content,
 	mode,
 	isSearchMessage,
@@ -172,18 +173,6 @@ const RenderContent = ({
 						emojiId={element.emojiid ?? ''}
 					/>
 				);
-			} else if ((element.kindOf === ETokenMessage.LINKS || element.kindOf === ETokenMessage.LINKYOUTUBE) && !isHideLinkOneImage) {
-				formattedContent.push(
-					<MarkdownContent
-						key={`link${s}-${messageId}`}
-						isLink={true}
-						isTokenClickAble={isTokenClickAble}
-						isJumMessageEnabled={isJumMessageEnabled}
-						content={contentInElement}
-						isReply={isReply}
-						isSearchMessage={isSearchMessage}
-					/>
-				);
 			} else if (element.kindOf === ETokenMessage.VOICE_LINKS) {
 				const meetingCode = getMeetCode(contentInElement as string) as string;
 				formattedContent.push(
@@ -199,16 +188,39 @@ const RenderContent = ({
 				);
 			} else if (element.kindOf === ETokenMessage.MARKDOWNS) {
 				if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
+					const basePath = '/chat/clans/';
+					const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
+
+					let componentToRender;
+					if (contentHasChannelLink) {
+						const pathSegments = contentInElement?.split('/') as string[];
+						const channelIdOnLink = pathSegments?.[pathSegments?.indexOf('channels') + 1];
+						const channelFound = getTagByIdOnStored(channelIdOnLink);
+						if (channelIdOnLink && channelFound?.id) {
+							componentToRender = (
+								<ChannelHashtag
+									channelOnLinkFound={channelFound}
+									key={`linkChannel${s}-${messageId}`}
+									isTokenClickAble={isTokenClickAble}
+									isJumMessageEnabled={isJumMessageEnabled}
+									channelHastagId={`<#${channelIdOnLink}>`}
+								/>
+							);
+						}
+					}
+
 					formattedContent.push(
-						<MarkdownContent
-							key={`link${s}-${messageId}`}
-							isLink={true}
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							content={contentInElement}
-							isReply={isReply}
-							isSearchMessage={isSearchMessage}
-						/>
+						componentToRender ?? (
+							<MarkdownContent
+								key={`link${s}-${messageId}`}
+								isLink={true}
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								content={contentInElement}
+								isReply={isReply}
+								isSearchMessage={isSearchMessage}
+							/>
+						)
 					);
 				} else if (element.type === EBacktickType.BOLD) {
 					formattedContent.push(<b key={`markdown-${s}-${messageId}`}> {contentInElement} </b>);
@@ -326,12 +338,17 @@ interface VoiceLinkContentProps {
 }
 
 export const VoiceLinkContent = ({ meetingCode, isTokenClickAble, isJumMessageEnabled, index, s, contentInElement }: VoiceLinkContentProps) => {
-	const allChannelVoice = useAppSelector(selectAllChannels);
-	const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+	const getVoiceChannelByMeetingCode = (meetingCode: string) => {
+		const store = getStore();
+		const allChannelVoice = selectGmeetVoice(store.getState());
+		return allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+	};
+	const voiceChannelFound = getVoiceChannelByMeetingCode(meetingCode as string) || null;
 
 	if (voiceChannelFound) {
 		return (
 			<ChannelHashtag
+				channelOnLinkFound={voiceChannelFound as ChannelsEntity}
 				isTokenClickAble={isTokenClickAble}
 				isJumMessageEnabled={isJumMessageEnabled}
 				channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
@@ -420,5 +437,3 @@ export const RoleMentionContent = ({ element, contentInElement, isTokenClickAble
 
 	return <PlainText isSearchMessage={false} text={contentInElement ?? ''} />;
 };
-
-export const MessageLine = RenderContent;

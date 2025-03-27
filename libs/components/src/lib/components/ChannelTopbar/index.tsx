@@ -50,6 +50,7 @@ export type ChannelTopbarProps = {
 	isChannelVoice?: boolean;
 	mode?: ChannelStreamMode;
 	isMemberPath?: boolean;
+	isChannelPath?: boolean;
 };
 
 const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
@@ -58,7 +59,8 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
-	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
+	const channelPath = `/chat/clans/${currentClanId}/channel-setting`;
+	const { isMemberPath, isChannelPath } = usePathMatch({ isMemberPath: memberPath, isChannelPath: channelPath });
 
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
@@ -76,7 +78,7 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 			{isChannelVoice ? (
 				<TopBarChannelVoice channel={channel} />
 			) : (
-				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
+				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} isChannelPath={isChannelPath} />
 			)}
 		</div>
 	);
@@ -108,7 +110,7 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	);
 });
 
-const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
+const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, isChannelPath }: ChannelTopbarProps) => {
 	const dispatch = useAppDispatch();
 	const store = useStore();
 
@@ -133,41 +135,46 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }:
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
-				{isMemberPath ? <p className="text-base font-semibold">Members</p> : <ChannelLabel channel={channel} />}
-			</div>
-			<div className="items-center h-full ml-auto flex">
-				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
-					<div className="justify-end items-center gap-2 flex">
-						{channel?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
-							<div className="hidden sbm:flex">
-								<div className="relative justify-start items-center gap-[15px] flex mr-4">
-									{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
-									{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
-									{channel?.type !== ChannelType.CHANNEL_TYPE_APP && <ThreadButton isLightMode={appearanceTheme === 'light'} />}
-									<MuteButton isLightMode={appearanceTheme === 'light'} />
-									<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
-									<div onClick={() => setTurnOffThreadMessage()}>
-										<ChannelListButton isLightMode={appearanceTheme === 'light'} />
-									</div>
-								</div>
-								<SearchMessageChannel mode={mode} />
-							</div>
-						)}
-						<div
-							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
-							id="inBox"
-						>
-							<InboxButton isLightMode={appearanceTheme === 'light'} />
-							<HelpButton isLightMode={appearanceTheme === 'light'} />
-						</div>
-						<div className="sbm:hidden mr-5">
-							<ChannelListButton />
-						</div>
-					</div>
+				{isMemberPath || isChannelPath ? (
+					<p className="text-base font-semibold">{isChannelPath ? 'Channels' : 'Members'}</p>
 				) : (
-					!isShowChatStream && !isMemberPath && <ChatButton isLightMode={appearanceTheme === 'light'} />
+					<ChannelLabel channel={channel} />
 				)}
 			</div>
+			{isMemberPath || isChannelPath ? null : (
+				<div className="items-center h-full ml-auto flex">
+					{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
+						<div className="justify-end items-center gap-2 flex">
+							{channel?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
+								<div className="hidden sbm:flex">
+									<div className="relative justify-start items-center gap-[15px] flex mr-4">
+										{!isMemberPath && <FileButton isLightMode={appearanceTheme === 'light'} />}
+										{!channelParent?.channel_label && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
+										{channel?.type !== ChannelType.CHANNEL_TYPE_APP && <ThreadButton isLightMode={appearanceTheme === 'light'} />}
+										<MuteButton isLightMode={appearanceTheme === 'light'} />
+										<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
+										<div onClick={() => setTurnOffThreadMessage()}>
+											<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+										</div>
+									</div>
+									<SearchMessageChannel mode={mode} />
+								</div>
+							)}
+							<div
+								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+								id="inBox"
+							>
+								<InboxButton isLightMode={appearanceTheme === 'light'} />
+							</div>
+							<div className="sbm:hidden mr-5">
+								<ChannelListButton />
+							</div>
+						</div>
+					) : (
+						!isShowChatStream && !isMemberPath && <ChatButton isLightMode={appearanceTheme === 'light'} />
+					)}
+				</div>
+			)}
 		</>
 	);
 });
@@ -370,7 +377,7 @@ export function RedDot() {
 	);
 }
 
-export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
+export const HelpButton = memo(({ isLightMode }: { isLightMode?: boolean }) => {
 	const { navigate } = useAppNavigation();
 	return (
 		<div className="relative leading-5 h-5">
@@ -379,7 +386,7 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 			</button>
 		</div>
 	);
-}
+});
 
 function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();

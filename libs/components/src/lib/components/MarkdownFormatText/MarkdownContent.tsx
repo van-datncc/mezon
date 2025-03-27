@@ -61,13 +61,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 				<a
 					onClick={() => onClickLink(content ?? '')}
 					rel="noopener noreferrer"
-					style={{
-						color: 'rgb(59,130,246)',
-						cursor: 'pointer',
-						wordBreak: 'break-word',
-						textDecoration: 'underline'
-					}}
-					className="tagLink"
+					className="text-blue-500 cursor-pointer break-words underline tagLink"
 				>
 					{content}
 				</a>

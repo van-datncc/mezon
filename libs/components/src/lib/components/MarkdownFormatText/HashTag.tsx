@@ -4,6 +4,7 @@ import {
 	categoriesActions,
 	selectClanView,
 	selectCurrentChannel,
+	selectTheme,
 	selectThreadById,
 	useAppDispatch,
 	useAppSelector
@@ -19,16 +20,20 @@ type ChannelHashtagProps = {
 	channelHastagId: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	channelOnLinkFound?: ChannelsEntity;
 };
 
-const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble, channelOnLinkFound }: ChannelHashtagProps) => {
 	const dispatch = useAppDispatch();
 	const tagId = channelHastagId?.slice(2, -1);
 	const isClanView = useSelector(selectClanView);
 	const { toChannelPage, navigate } = useAppNavigation();
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	let channel = useTagById(tagId);
+	const channelById = useTagById(tagId);
+
+	let channel = channelOnLinkFound?.id ? channelOnLinkFound : channelById;
+
 	const thread = useAppSelector((state) => selectThreadById(state, tagId));
 	if (thread) channel = thread as ChannelsEntity;
 
@@ -57,8 +62,11 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const isTextChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 	const isStreamingChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const isThreadChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
+	const isAppChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_APP;
+
 	const existHashtagAndChannelView = channelHastagId && !isClanView;
-	const isValidChannel = (isTextChannel || isStreamingChannel || isThreadChannel || existHashtagAndChannelView) && channel;
+	const isValidChannel = (isTextChannel || isStreamingChannel || isThreadChannel || existHashtagAndChannelView || isAppChannel) && channel;
+	const theme = useSelector(selectTheme);
 
 	return channel ? (
 		isValidChannel ? (
@@ -81,6 +89,11 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 					<Icons.Stream
 						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 						defaultFill="#3297FF"
+					/>
+				) : channel.type === ChannelType.CHANNEL_TYPE_APP ? (
+					<Icons.AppChannelIcon
+						fill={theme}
+						className={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 					/>
 				) : channel.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 					!channel.channel_private || channel.channel_private === 0 ? (

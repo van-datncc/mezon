@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { MessagesEntity, selectAllAccount, selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
+import { MessagesEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
@@ -7,6 +7,7 @@ import {
 	ID_MENTION_HERE,
 	ObserveFn,
 	TypeMessage,
+	UsersClanEntity,
 	WIDTH_CHANNEL_LIST_BOX,
 	WIDTH_CLAN_SIDE_BAR,
 	convertDateString,
@@ -17,7 +18,6 @@ import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { ReactNode, useCallback, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
 import CallLogMessage from '../CallLogMessage/CallLogMessage';
 import EmbedMessage from '../EmbedMessage/EmbedMessage';
 import { MessageActionsPanel } from '../MessageActionsPanel';
@@ -25,7 +25,7 @@ import ModalUserProfile from '../ModalUserProfile';
 import TokenTransactionMessage from '../TokenTransactionMsg/TokenTransactionMsg';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
-import MessageContent from './MessageContent';
+import MessageContent, { TopicViewButton } from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageInput from './MessageInput';
 import MessageReaction from './MessageReaction/MessageReaction';
@@ -58,6 +58,7 @@ export type MessageWithUserProps = {
 	messageReplyHighlight?: boolean;
 	isTopic?: boolean;
 	observeIntersectionForLoading?: ObserveFn;
+	user: UsersClanEntity;
 };
 
 function MessageWithUser({
@@ -76,10 +77,10 @@ function MessageWithUser({
 	checkMessageTargetToMoved,
 	messageReplyHighlight,
 	isTopic,
+	user,
 	observeIntersectionForLoading
 }: Readonly<MessageWithUserProps>) {
-	const userId = useSelector(selectAllAccount)?.user?.id as string;
-	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userId));
+	const userId = user?.user?.id as string;
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
 	const isClickReply = useRef(false);
@@ -87,9 +88,10 @@ function MessageWithUser({
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
 
-	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+	const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
 
 	const hasIncludeMention = (() => {
+		if (!userId) return false;
 		if (typeof message?.content?.t == 'string') {
 			if (message?.mentions?.some((mention) => mention?.user_id === ID_MENTION_HERE)) return true;
 		}
@@ -234,6 +236,7 @@ function MessageWithUser({
 													handleOpenShortUser(e, message?.sender_id);
 												}
 									}
+									isDM={isDM}
 								/>
 							</>
 						)}
@@ -277,8 +280,10 @@ function MessageWithUser({
 								mode={mode}
 								message={message}
 								onContextMenu={onContextMenu}
+								isInSearchMessage={isSearchMessage}
 							/>
 						)}
+						{!isTopic && message?.code === TypeMessage.Topic && <TopicViewButton message={message} />}
 
 						{Array.isArray(message?.content?.embed) && (
 							<div className="w-full">

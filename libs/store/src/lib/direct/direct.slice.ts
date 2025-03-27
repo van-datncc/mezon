@@ -422,10 +422,28 @@ export const directSlice = createSlice({
 	initialState: initialDirectState,
 	reducers: {
 		remove: directAdapter.removeOne,
-		upsertOne: directAdapter.upsertOne,
+		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
+			const { entities } = state;
+			const existLabel = entities[action.payload.id].channel_label?.split(',');
+			const dataUpdate = action.payload;
+			if (existLabel && existLabel?.length <= 1) {
+				dataUpdate.channel_label = entities[action.payload.id].channel_label;
+			}
+			directAdapter.upsertOne(state, dataUpdate);
+		},
 		update: directAdapter.updateOne,
 		setAll: directAdapter.setAll,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
+			if (!action.payload?.channel_id) return;
+			const { channel_id } = action.payload;
+			directAdapter.updateOne(state, {
+				id: channel_id,
+				changes: {
+					...action.payload
+				}
+			});
+		},
+		updateE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
 			const notCurrentUser = action.payload?.currentUserId !== creator_id;
@@ -439,7 +457,7 @@ export const directSlice = createSlice({
 			directAdapter.updateOne(state, {
 				id: channel_id,
 				changes: {
-					...action.payload
+					e2ee: e2ee
 				}
 			});
 		},

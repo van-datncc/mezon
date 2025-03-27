@@ -67,7 +67,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
-	const [note, setNote] = useState<string>('send token');
+	const [note, setNote] = useState<string>('Transfer funds');
 	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
@@ -123,6 +123,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setError('');
 		setSendTokenInputsState({ isSendTokenInputDisabled: false, isUserSelectionDisabled: false });
 		dispatch(giveCoffeeActions.setShowModalSendToken(false));
+		dispatch(giveCoffeeActions.setInfoSendToken(null));
 	};
 
 	const sendNotificationMessage = useCallback(
@@ -131,7 +132,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
-					`Balance notifications: ${formatMoney(tokenValue)}₫ | ${note}`,
+					`Funds Transferred: ${formatMoney(tokenValue)}₫ | ${note}`,
 					response.channel_id,
 					channelMode,
 					TypeMessage.SendToken
@@ -204,7 +205,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		if (showModalSendToken && infoSendToken) {
 			setToken(infoSendToken.amount ?? 0);
 			setSelectedUserId(infoSendToken.receiver_id ?? '');
-			setNote(infoSendToken.note ?? 'send token');
+			setNote(infoSendToken.note ?? 'Transfer funds');
 			setExtraAttribute(infoSendToken.extra_attribute ?? '');
 			setSendTokenInputsState({
 				isSendTokenInputDisabled: infoSendToken.amount !== 0,
@@ -296,4 +297,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	);
 }
 
-export default memo(FooterProfile);
+export default memo(FooterProfile, (prevProps, nextProps) => {
+	return (
+		prevProps.name === nextProps.name &&
+		prevProps.status === nextProps.status &&
+		prevProps.avatar === nextProps.avatar &&
+		prevProps.userId === nextProps.userId &&
+		prevProps.isDM === nextProps.isDM
+	);
+});

@@ -11,9 +11,20 @@ type OwnProps = {
 	albumLayout: IAlbumLayout;
 	onClick?: (url?: string) => void;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
+	isInSearchMessage?: boolean;
 };
 
-const Album: FC<OwnProps> = ({ album, observeIntersection, hasCustomAppendix, isOwn, isProtected, albumLayout, onClick, onContextMenu }) => {
+const Album: FC<OwnProps> = ({
+	album,
+	observeIntersection,
+	hasCustomAppendix,
+	isOwn,
+	isProtected,
+	albumLayout,
+	onClick,
+	onContextMenu,
+	isInSearchMessage
+}) => {
 	const mediaCount = (album as any)?.length;
 
 	function renderAlbumMessage(attachment: any, index: number) {
@@ -63,7 +74,7 @@ const Album: FC<OwnProps> = ({ album, observeIntersection, hasCustomAppendix, is
 	const { width: containerWidth, height: containerHeight } = albumLayout.containerStyle;
 
 	return (
-		<div className="relative overflow-hidden" style={{ width: containerWidth, height: containerHeight }}>
+		<div className="relative overflow-hidden" style={{ width: isInSearchMessage ? '' : containerWidth, height: containerHeight }}>
 			{(album as any).map(renderAlbumMessage)}
 		</div>
 	);

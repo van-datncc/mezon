@@ -6,7 +6,6 @@ import {
 	selectAllAccount,
 	selectCurrentChannelId,
 	selectCurrentClan,
-	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -23,7 +22,7 @@ import {
 	createImgproxyUrl
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage, ModalUserProfile } from '../../components';
@@ -74,7 +73,27 @@ export enum ModalType {
 export const profileElemHeight = 358;
 export const profileElemWidth = 320;
 
-export function MemberProfile({
+type BaseMemberProfileProps = MemberProfileProps & {
+	currentClan?: ReturnType<typeof selectCurrentClan>;
+};
+
+export const DMMemberProfile = (props: Omit<MemberProfileProps, 'isDM'>) => {
+	return <BaseMemberProfile {...props} isDM={true} currentClan={undefined} />;
+};
+
+export const ClanMemberProfile = (props: Omit<MemberProfileProps, 'isDM'>) => {
+	const currentClan = useSelector(selectCurrentClan);
+	return <BaseMemberProfile {...props} isDM={false} currentClan={currentClan} />;
+};
+
+export const MemberProfile = (props: MemberProfileProps) => {
+	if (props.isDM) {
+		return <DMMemberProfile {...props} />;
+	}
+	return <ClanMemberProfile {...props} />;
+};
+
+export const BaseMemberProfile = ({
 	avatar,
 	name,
 	status,
@@ -98,24 +117,20 @@ export function MemberProfile({
 	isDM,
 	isMute,
 	metaDataDM,
-	statusOnline
-}: MemberProfileProps) {
+	statusOnline,
+	currentClan
+}: BaseMemberProfileProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
 		distanceToBottom: 0
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
-	const { removeMemberClan } = useChannelMembersActions();
-	const currentClanId = useSelector(selectCurrentClanId);
-	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userRolesClan = useColorsRoleById(user?.user?.id as string);
 	const activityNames: { [key: number]: string } = {
 		[ActivitiesType.VISUAL_STUDIO_CODE]: 'Coding',
 		[ActivitiesType.SPOTIFY]: 'Music',
@@ -182,15 +197,6 @@ export function MemberProfile({
 		setOpenModalRemoveMember(true);
 		closeModal(ModalType.ProfileItem);
 		closeModal(ModalType.PannelMember);
-	};
-
-	const handleRemoveMember = async () => {
-		if (user) {
-			const userIds = [user.user?.id ?? ''];
-			await removeMemberClan({ clanId: currentClanId as string, channelId: currentChannelId as string, userIds });
-
-			setOpenModalRemoveMember(false);
-		}
 	};
 
 	const isFooter = positionType === MemberProfileType.FOOTER_PROFILE;
@@ -352,6 +358,7 @@ export function MemberProfile({
 					{!isFooter && !isHideIconStatus && (
 						<StatusUser
 							isListDm={isListDm}
+							isDM={isDM}
 							isMemberChannel={isMemberChannel}
 							isMemberDMGroup={isMemberDMGroup}
 							status={status}
@@ -401,12 +408,16 @@ export function MemberProfile({
 									`}
 									title={name}
 								>
-									<span
-										className={`one-line text-start ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
-										style={isFooter || isDM ? undefined : { color: userRolesClan.highestPermissionRoleColor }}
-									>
-										{!isHiddenAvatarPanel && name}
-									</span>
+									<UserName
+										name={name}
+										isHiddenAvatarPanel={isHiddenAvatarPanel}
+										hideLongName={hideLongName}
+										isOwnerClanOrGroup={!!isOwnerClanOrGroup}
+										isListFriend={isListFriend}
+										isFooter={isFooter}
+										isDM={isDM}
+										userId={user?.user?.id}
+									/>
 									{isListFriend && <span className="hidden group-hover/list_friends:inline">&nbsp;{usernameAva}</span>}
 								</p>
 								{isOwnerClanOrGroup && (
@@ -437,16 +448,51 @@ export function MemberProfile({
 					)}
 				</div>
 			</div>
-
-			{openModalRemoveMember && (
-				<ModalRemoveMemberClan
-					openModal={openModalRemoveMember}
-					username={user?.user?.username}
-					onClose={() => setOpenModalRemoveMember(false)}
-					onRemoveMember={handleRemoveMember}
-				/>
-			)}
+			<MemberProfileModal
+				user={user}
+				currentClanId={currentClan?.id}
+				openModalRemoveMember={openModalRemoveMember}
+				setOpenModalRemoveMember={setOpenModalRemoveMember}
+				onCloseModals={handleClickRemoveMember}
+			/>
 		</div>
+	);
+};
+
+interface MemberProfileModalProps {
+	user?: ChannelMembersEntity;
+	currentClanId?: string;
+	openModalRemoveMember: boolean;
+	setOpenModalRemoveMember: (open: boolean) => void;
+	onCloseModals: () => void;
+}
+
+function MemberProfileModal({ user, currentClanId, openModalRemoveMember, setOpenModalRemoveMember, onCloseModals }: MemberProfileModalProps) {
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const { removeMemberClan } = useChannelMembersActions();
+
+	const handleRemoveMember = async () => {
+		if (user) {
+			const userIds = [user.user?.id ?? ''];
+			await removeMemberClan({
+				clanId: currentClanId as string,
+				channelId: currentChannelId as string,
+				userIds
+			});
+
+			setOpenModalRemoveMember(false);
+		}
+	};
+
+	if (!openModalRemoveMember) return null;
+
+	return (
+		<ModalRemoveMemberClan
+			openModal={openModalRemoveMember}
+			username={user?.user?.username}
+			onClose={() => setOpenModalRemoveMember(false)}
+			onRemoveMember={handleRemoveMember}
+		/>
 	);
 }
 
@@ -464,3 +510,92 @@ export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
 			return <Icons.OnlineStatus />;
 	}
 };
+
+interface UserNameProps {
+	name: string;
+	isHiddenAvatarPanel?: boolean;
+	hideLongName?: boolean;
+	isOwnerClanOrGroup?: boolean;
+	isListFriend?: boolean;
+	isFooter?: boolean;
+	isDM?: boolean;
+	userId?: string;
+}
+const UserName = memo(
+	({ name, isHiddenAvatarPanel, hideLongName, isOwnerClanOrGroup, isListFriend, isFooter, isDM, userId }: UserNameProps) => {
+		if (isFooter || isDM) {
+			return (
+				<DMUserName
+					name={name}
+					isHiddenAvatarPanel={isHiddenAvatarPanel}
+					hideLongName={hideLongName}
+					isOwnerClanOrGroup={isOwnerClanOrGroup}
+					isListFriend={isListFriend}
+				/>
+			);
+		} else {
+			return (
+				<ClanUserName
+					name={name}
+					isHiddenAvatarPanel={isHiddenAvatarPanel}
+					hideLongName={hideLongName}
+					isOwnerClanOrGroup={isOwnerClanOrGroup}
+					isListFriend={isListFriend}
+					userId={userId}
+				/>
+			);
+		}
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.name === nextProps.name &&
+			prevProps.isHiddenAvatarPanel === nextProps.isHiddenAvatarPanel &&
+			prevProps.hideLongName === nextProps.hideLongName &&
+			prevProps.isOwnerClanOrGroup === nextProps.isOwnerClanOrGroup &&
+			prevProps.isListFriend === nextProps.isListFriend &&
+			prevProps.isFooter === nextProps.isFooter &&
+			prevProps.isDM === nextProps.isDM &&
+			prevProps.userId === nextProps.userId
+		);
+	}
+);
+
+const DMUserName = ({
+	name,
+	isHiddenAvatarPanel,
+	hideLongName,
+	isOwnerClanOrGroup,
+	isListFriend
+}: Omit<UserNameProps, 'isDM' | 'isFooter' | 'userId'>) => {
+	return (
+		<span
+			className={`one-line text-start ${hideLongName && 'truncate !block'} ${
+				isOwnerClanOrGroup && 'max-w-[140px]'
+			} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+		>
+			{!isHiddenAvatarPanel && name}
+		</span>
+	);
+};
+
+function ClanUserName({
+	name,
+	isHiddenAvatarPanel,
+	hideLongName,
+	isOwnerClanOrGroup,
+	isListFriend,
+	userId
+}: Omit<UserNameProps, 'isDM' | 'isFooter'>) {
+	const userRolesClan = useColorsRoleById(userId || '');
+
+	return (
+		<span
+			className={`one-line text-start ${hideLongName && 'truncate !block'} ${
+				isOwnerClanOrGroup && 'max-w-[140px]'
+			} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+			style={{ color: userRolesClan.highestPermissionRoleColor }}
+		>
+			{!isHiddenAvatarPanel && name}
+		</span>
+	);
+}
