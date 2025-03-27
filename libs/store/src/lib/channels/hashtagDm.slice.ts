@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, HashtagDm } from 'mezon-js';
+import { HashtagDm } from 'mezon-js';
 import { MezonValueContext, ensureClient, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -96,7 +96,3 @@ export const selectHashtagDmById = createSelector([gethashtagDmState, (state, id
 	const hashtag = selectById(state, id);
 	return { ...hashtag, id: hashtag?.channel_id || '' };
 });
-
-export const selectGmeetVoice = createSelector(selectAllHashtagDm, (hashtags) =>
-	hashtags.filter((hashtag) => hashtag.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE)
-);

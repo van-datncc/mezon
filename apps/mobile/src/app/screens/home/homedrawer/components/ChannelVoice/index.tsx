@@ -1,6 +1,6 @@
 import { AudioSession, LiveKitRoom } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById2 } from '@mezon/store';
+import { selectChannelById2 } from '@mezon/store-mobile';
 import React, { useEffect } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';

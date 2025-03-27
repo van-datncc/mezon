@@ -10,9 +10,9 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
+import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { Track } from 'livekit-client';
+import { createLocalAudioTrack, createLocalVideoTrack, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Platform, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -54,12 +54,59 @@ const RoomView = ({
 
 	const sortedParticipants = [...participants].sort((a, b) => (b.isScreenShareEnabled ? 1 : 0) - (a.isScreenShareEnabled ? 1 : 0));
 
-	const handleToggleCamera = useCallback(() => {
-		localParticipant.setCameraEnabled(!isCameraEnabled);
+	const handleToggleCamera = useCallback(async () => {
+		try {
+			if (isCameraEnabled) {
+				await localParticipant.setCameraEnabled(false);
+			} else {
+				try {
+					await localParticipant.setCameraEnabled(true);
+				} catch (enablederror) {
+					try {
+						const newVideoTrack = await createLocalVideoTrack();
+						const oldPublication = Array.from(localParticipant.videoTrackPublications.values()).find(
+							(publication) => publication.source === Track.Source.Camera
+						);
+						if (oldPublication && oldPublication.track) {
+							await localParticipant.unpublishTrack(oldPublication.track, true);
+						}
+						await localParticipant.publishTrack(newVideoTrack);
+					} catch (newError) {
+						console.error('err:', newError);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error toggling camera:', error);
+		}
 	}, [isCameraEnabled, localParticipant]);
 
-	const handleToggleMicrophone = useCallback(() => {
-		localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+	const handleToggleMicrophone = useCallback(async () => {
+		try {
+			if (isMicrophoneEnabled) {
+				await localParticipant.setMicrophoneEnabled(false);
+			} else {
+				try {
+					await localParticipant.setMicrophoneEnabled(true);
+				} catch (enableError) {
+					try {
+						const newAudioTrack = await createLocalAudioTrack();
+
+						const oldAudioPublication = Array.from(localParticipant.audioTrackPublications.values()).find(
+							(publication) => publication.source === Track.Source.Microphone
+						);
+						if (oldAudioPublication && oldAudioPublication.track) {
+							await localParticipant.unpublishTrack(oldAudioPublication.track, true);
+						}
+						await localParticipant.publishTrack(newAudioTrack);
+					} catch (newError) {
+						console.error('err: ', newError);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error toggling microphone:', error);
+		}
 	}, [isMicrophoneEnabled, localParticipant]);
 
 	const handleToggleScreenShare = useCallback(() => {
@@ -138,7 +185,7 @@ const RoomView = ({
 				/>
 			)}
 			{isAnimationComplete && (
-				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_50 }]}>
+				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
 					<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 							{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}

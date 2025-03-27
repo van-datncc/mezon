@@ -1,7 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { generateMeetToken, selectChannelById2, voiceActions } from '@mezon/store';
-import { handleParticipantVoiceState, selectClanById, useAppDispatch } from '@mezon/store-mobile';
+import { generateMeetToken, handleParticipantMeetState, selectChannelById2, selectClanById, useAppDispatch, voiceActions } from '@mezon/store-mobile';
 import { ParticipantMeetState } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder } from 'react-native';
@@ -64,9 +63,10 @@ const ChannelVoicePopup = () => {
 
 	const participantMeetState = async (state: ParticipantMeetState, clanId: string, channelId: string): Promise<void> => {
 		await dispatch(
-			handleParticipantVoiceState({
+			handleParticipantMeetState({
 				clan_id: clanId,
 				channel_id: channelId,
+				user_id: userProfile?.user?.id,
 				display_name: userProfile?.user?.display_name,
 				state
 			})
