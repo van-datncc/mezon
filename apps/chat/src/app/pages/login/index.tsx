@@ -1,12 +1,9 @@
-/* eslint-disable @nx/enforce-module-boundaries */
 import { QRSection } from '@mezon/components';
 import { useAppNavigation, useAuth } from '@mezon/core';
 import { authActions, selectErrLoginEmail, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
 import { validateEmail, validatePassword } from '@mezon/utils';
-import { FormError } from 'libs/components/src/lib/components/Setting Password/formError';
-import { Input } from 'libs/components/src/lib/components/Setting Password/input';
-import { PasswordInput } from 'libs/components/src/lib/components/Setting Password/passwordInput';
-import SubmitButton from 'libs/components/src/lib/components/Setting Password/submitButton';
+
+import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
@@ -86,7 +83,6 @@ function Login() {
 		password?: string;
 	}>({});
 
-	console.log('isErrLogin :', isErrLogin);
 	useEffect(() => {
 		if (isErrLogin) {
 			setErrors({
@@ -95,6 +91,7 @@ function Login() {
 			});
 			const timeout = setTimeout(() => {
 				setErrors({});
+				dispatch(authActions.refreshStatusErrLogin());
 			}, 3000);
 
 			return () => clearTimeout(timeout);
@@ -173,7 +170,7 @@ function Login() {
 						<div className="min-h-[20px]">{errors.email && <FormError message={errors.email} />}</div>
 						<PasswordInput id="password" label="Password" value={password} onChange={handlePasswordChange} />
 						<div className="min-h-[20px]">{errors.password && <FormError message={errors.password} />}</div>
-						<SubmitButton disabled={disabled} submitButtonText={'Log In'} />
+						<SubmitButton disabled={disabled} submitButtonText={'Log In'} isLoading={isLoadingLoginEmail} />
 					</form>
 					<div className="mt-4 flex items-center text-gray-400">
 						<input

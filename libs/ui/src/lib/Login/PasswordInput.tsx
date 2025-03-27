@@ -3,7 +3,7 @@
 import { Icons } from '@mezon/ui';
 import type React from 'react';
 import { memo, useState } from 'react';
-import { FormError } from './formError';
+import FormError from './FormError';
 
 interface PasswordInputProps {
 	id: string;
@@ -14,7 +14,7 @@ interface PasswordInputProps {
 	isLoading?: boolean;
 }
 
-export const PasswordInput = memo(({ id, label, value, onChange, error, isLoading }: PasswordInputProps) => {
+const PasswordInput = memo(({ id, label, value, onChange, error, isLoading }: PasswordInputProps) => {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const togglePasswordVisibility = () => {
@@ -54,3 +54,5 @@ export const PasswordInput = memo(({ id, label, value, onChange, error, isLoadin
 		</div>
 	);
 });
+
+export default PasswordInput;

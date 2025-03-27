@@ -1,11 +1,8 @@
 'use client';
+import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
 import { LoadingStatus, validateEmail, validatePassword } from '@mezon/utils';
 import type React from 'react';
 import { useCallback, useState } from 'react';
-import { FormError } from './formError';
-import { Input } from './input';
-import { PasswordInput } from './passwordInput';
-import SubmitButton from './submitButton';
 
 interface SetPasswordProps {
 	onSubmit?: (data: { email: string; password: string }) => void;

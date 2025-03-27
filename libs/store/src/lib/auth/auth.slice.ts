@@ -13,7 +13,7 @@ export interface AuthState {
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
-	isErrLogin?: boolean | null;
+	isErrLogin?: boolean;
 }
 
 export interface ISession {
@@ -35,7 +35,7 @@ export const initialAuthState: AuthState = {
 	isLogin: false,
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
-	isErrLogin: null
+	isErrLogin: false
 };
 
 function normalizeSession(session: Session): ISession {
@@ -184,6 +184,9 @@ export const authSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
+		},
+		refreshStatusErrLogin(state) {
+			state.isErrLogin = false;
 		}
 	},
 	extraReducers: (builder) => {
