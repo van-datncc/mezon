@@ -78,6 +78,7 @@ function useChannelSeen(channelId: string) {
 					isReset: true
 				})
 			);
+			dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);
