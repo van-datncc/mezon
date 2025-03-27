@@ -37,7 +37,6 @@ import { categoriesActions, FetchCategoriesPayload } from '../categories/categor
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { clansActions } from '../clans/clans.slice';
-import { directActions } from '../direct/direct.slice';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { messagesActions } from '../messages/messages.slice';
@@ -349,15 +348,9 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const state = thunkAPI.getState() as RootState;
 		const clanId = state.clans.currentClanId;
-
-		if (body.e2ee) {
-			await thunkAPI.dispatch(directActions.changeE2EE({ channel_id: body.channel_id, e2ee: body.e2ee }));
-		}
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
 		if (response) {
-			if (body.category_id === '0') {
-				thunkAPI.dispatch(directActions.update({ id: body.channel_id, changes: { ...body } }));
-			} else {
+			if (body.category_id !== '0') {
 				thunkAPI.dispatch(
 					channelsActions.update({
 						clanId: clanId as string,
