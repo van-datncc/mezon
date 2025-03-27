@@ -47,22 +47,8 @@ export const generateMeetToken = createAsyncThunk('meet/generateMeetToken', asyn
 export const handleParticipantMeetState = createAsyncThunk(
 	'meet/handleParticipantMeetState',
 	async ({ clan_id, channel_id, user_id, display_name, state }: ApiHandleParticipantMeetStateRequest, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const body = {
-				clan_id: clan_id,
-				channel_id: channel_id,
-				user_id: user_id,
-				display_name: display_name,
-				state: state
-			};
-			const response = await mezon.client.handleParticipantMeetState(mezon.session, body);
-
-			return response;
-		} catch (error) {
-			captureSentryError(error, 'meet/handleParticipantMeetState');
-			return thunkAPI.rejectWithValue(error);
-		}
+		//TODO remove this function
+		return;
 	}
 );
 
