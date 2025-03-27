@@ -75,14 +75,11 @@ export function CarouselLayout({ tracks, ...props }: CarouselLayoutProps) {
           	height: 6px;
         }
         .lk-carousel::-webkit-scrollbar-thumb {
-          	background-color: transparent;
+          	background-color: #6d6f77;
           	border-radius: 4px;
         }
         .lk-carousel::-webkit-scrollbar-track {
           	background: transparent;
-        }
-        .lk-carousel::-webkit-scrollbar-thumb:hover {
-          	background-color: #6d6f77;
         }
       `}
 			</style>
