@@ -25,6 +25,7 @@ export const PasswordInput = memo(({ id, label, value, onChange, error, isLoadin
 		<div className="space-y-2">
 			<label htmlFor={id} className="block text-sm font-medium text-gray-900 dark:text-gray-200">
 				{label}
+				<span className="text-red-500">*</span>
 			</label>
 			<div className="relative">
 				<input

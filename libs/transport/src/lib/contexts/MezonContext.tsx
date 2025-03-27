@@ -35,6 +35,8 @@ export type MezonContextValue = {
 	checkLoginRequest: (LoginRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	confirmLoginRequest: (ConfirmRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	authenticateApple: (token: string) => Promise<Session>;
+	authenticateEmail: (email: string, password: string) => Promise<Session>;
+
 	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
@@ -123,6 +125,29 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef.current = session;
 
 			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
+
+			if (!socketRef.current) {
+				return session;
+			}
+
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
+			sessionRef.current = session2;
+
+			return session;
+		},
+		[createSocket, isFromMobile]
+	);
+
+	const authenticateEmail = useCallback(
+		async (email: string, password: string) => {
+			if (!clientRef.current) {
+				throw new Error('Mezon client not initialized');
+			}
+			const session = await clientRef.current.authenticateEmail(email, password);
+			sessionRef.current = session;
+
+			const socket = await createSocket();
 			socketRef.current = socket;
 
 			if (!socketRef.current) {
@@ -307,7 +332,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			logOutMezon,
 			reconnectWithTimeout,
-			authenticateMezon
+			authenticateMezon,
+			authenticateEmail
 		}),
 		[
 			clientRef,
@@ -323,7 +349,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			logOutMezon,
 			reconnectWithTimeout,
-			authenticateMezon
+			authenticateMezon,
+			authenticateEmail
 		]
 	);
 
