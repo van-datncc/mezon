@@ -6,7 +6,7 @@ import { useAppParams, useAuth } from '@mezon/core';
 import {
 	generateMeetToken,
 	getStoreAsync,
-	handleParticipantMeetState,
+	handleParticipantVoiceState,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectIsShowSettingFooter,
@@ -46,11 +46,10 @@ const ChannelVoice = memo(
 			if (!clanId || !channelId || !userProfile?.user?.id) return;
 
 			await dispatch(
-				handleParticipantMeetState({
+				handleParticipantVoiceState({
 					clan_id: clanId,
 					channel_id: channelId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
+					display_name: userProfile?.user?.display_name ?? '',
 					state
 				})
 			);

@@ -1,7 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { generateMeetToken, handleParticipantMeetState, selectChannelById2, voiceActions } from '@mezon/store';
-import { selectClanById, useAppDispatch } from '@mezon/store-mobile';
+import { generateMeetToken, handleParticipantMeetState, selectChannelById2, selectClanById, useAppDispatch, voiceActions } from '@mezon/store-mobile';
 import { ParticipantMeetState } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder } from 'react-native';

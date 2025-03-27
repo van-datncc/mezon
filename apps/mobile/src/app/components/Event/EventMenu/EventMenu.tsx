@@ -1,6 +1,7 @@
 import { useEventManagement } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { EventManagementEntity } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -37,7 +38,9 @@ export function EventMenu({ event }: IEventMenuProps) {
 				// },
 				{
 					title: t('menu.cancelEvent'),
-					onPress: () => {
+					onPress: async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+						await sleep(300);
 						const data = {
 							children: (
 								<MezonConfirm

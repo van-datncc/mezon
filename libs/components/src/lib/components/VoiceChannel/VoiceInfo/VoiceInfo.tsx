@@ -1,6 +1,6 @@
 import { useAppNavigation, useAuth } from '@mezon/core';
 import {
-	handleParticipantMeetState,
+	handleParticipantVoiceState,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
@@ -34,11 +34,10 @@ const VoiceInfo = React.memo(() => {
 
 	const participantMeetState = async (state: ParticipantMeetState, clanId: string, channelId: string): Promise<void> => {
 		await dispatch(
-			handleParticipantMeetState({
+			handleParticipantVoiceState({
 				clan_id: clanId,
 				channel_id: channelId,
-				user_id: userProfile?.user?.id,
-				display_name: userProfile?.user?.display_name,
+				display_name: userProfile?.user?.display_name ?? '',
 				state
 			})
 		);

@@ -4,7 +4,7 @@ import {
 	generateMeetToken,
 	getStore,
 	giveCoffeeActions,
-	handleParticipantMeetState,
+	handleParticipantVoiceState,
 	selectAllAccount,
 	selectAllChannelMembers,
 	selectAllRolesClan,
@@ -92,11 +92,10 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 		if (currentChannelAppId && currentChannelAppClanId) {
 			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
 			dispatch(
-				handleParticipantMeetState({
+				handleParticipantVoiceState({
 					clan_id: currentChannelAppClanId,
 					channel_id: currentChannelAppId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
+					display_name: userProfile?.user?.display_name ?? '',
 					state: ParticipantMeetState.LEAVE
 				})
 			);
@@ -178,11 +177,10 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 		async (state: ParticipantMeetState, channelId: string) => {
 			try {
 				await dispatch(
-					handleParticipantMeetState({
-						clan_id: appChannel.clan_id,
+					handleParticipantVoiceState({
+						clan_id: appChannel.clan_id ?? '',
 						channel_id: channelId,
-						user_id: userProfile?.user?.id,
-						display_name: userProfile?.user?.display_name,
+						display_name: userProfile?.user?.display_name ?? '',
 						state
 					})
 				);
