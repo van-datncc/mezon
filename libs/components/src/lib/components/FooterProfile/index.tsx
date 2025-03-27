@@ -67,7 +67,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
-	const [note, setNote] = useState<string>('send token');
+	const [note, setNote] = useState<string>('Transfer funds');
 	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
@@ -204,7 +204,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		if (showModalSendToken && infoSendToken) {
 			setToken(infoSendToken.amount ?? 0);
 			setSelectedUserId(infoSendToken.receiver_id ?? '');
-			setNote(infoSendToken.note ?? 'send token');
+			setNote(infoSendToken.note ?? 'Transfer funds');
 			setExtraAttribute(infoSendToken.extra_attribute ?? '');
 			setSendTokenInputsState({
 				isSendTokenInputDisabled: infoSendToken.amount !== 0,
