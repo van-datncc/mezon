@@ -13,7 +13,7 @@ export interface AuthState {
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
-	isErrLogin?: boolean;
+	isErrLogin?: boolean | null;
 }
 
 export interface ISession {
@@ -35,7 +35,7 @@ export const initialAuthState: AuthState = {
 	isLogin: false,
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
-	isErrLogin: false
+	isErrLogin: null
 };
 
 function normalizeSession(session: Session): ISession {
