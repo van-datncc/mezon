@@ -424,10 +424,10 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
-			const existLabel = entities[action.payload.id].channel_label?.split(',');
+			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
 			const dataUpdate = action.payload;
 			if (existLabel && existLabel?.length <= 1) {
-				dataUpdate.channel_label = entities[action.payload.id].channel_label;
+				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
 			}
 			directAdapter.upsertOne(state, dataUpdate);
 		},
