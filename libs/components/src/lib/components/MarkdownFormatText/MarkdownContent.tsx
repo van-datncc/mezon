@@ -1,3 +1,4 @@
+import { useTagById } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
@@ -33,7 +34,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const basePath = '/chat/clans/';
 	const contentHasChannelLink = content?.includes(basePath) && content?.includes('/channels/');
 	const channelIdOnLink = contentHasChannelLink ? content?.split('/')?.[content?.split('/')?.indexOf('channels') + 1] : undefined;
-	const isLinkChannel = !!channelIdOnLink;
+	const channel = useTagById(channelIdOnLink);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const navigate = useNavigate();
@@ -62,7 +63,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 
 	return (
 		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-			{isLinkChannel ? (
+			{channel?.id ? (
 				<ChannelHashtag
 					isTokenClickAble={isTokenClickAble}
 					isJumMessageEnabled={isJumMessageEnabled}
