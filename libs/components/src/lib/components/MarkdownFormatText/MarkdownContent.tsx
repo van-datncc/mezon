@@ -1,4 +1,4 @@
-import { useTagById } from '@mezon/core';
+import { useTagByIdOnStored } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
@@ -34,7 +34,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const basePath = '/chat/clans/';
 	const contentHasChannelLink = content?.includes(basePath) && content?.includes('/channels/');
 	const channelIdOnLink = contentHasChannelLink ? content?.split('/')?.[content?.split('/')?.indexOf('channels') + 1] : undefined;
-	const channel = useTagById(channelIdOnLink);
+	const channel = useTagByIdOnStored(channelIdOnLink);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const navigate = useNavigate();

@@ -1,5 +1,6 @@
 import {
 	ChannelsEntity,
+	getStore,
 	selectChannelById2,
 	selectClanMemberMetaUserId,
 	selectClanView,
@@ -54,6 +55,13 @@ export const useTagById = (tagId: string | undefined): ChannelsEntity | undefine
 			? (selectChannelById2(state, tagId) as unknown as ChannelsEntity)
 			: (selectHashtagDmById(state, tagId) as unknown as ChannelsEntity);
 	});
+};
+
+export const useTagByIdOnStored = (tagId: string | undefined): ChannelsEntity | undefined => {
+	const store = getStore();
+	if (!tagId) return undefined;
+	const isClanView = selectClanView(store.getState());
+	return isClanView ? selectChannelById2(store.getState(), tagId) : selectHashtagDmById(store.getState(), tagId);
 };
 
 export const useCurrentInbox = (): ChannelsEntity | null => {
