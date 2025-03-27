@@ -834,12 +834,21 @@ export const updateChannelPrivateSocket = createAsyncThunk(
 					channel: { ...action, active: 1, id: action.channel_id, type: action.channel_type }
 				})
 			);
-			thunkAPI.dispatch(
-				listChannelRenderAction.addChannelToListRender({
-					type: action.channel_type,
-					...action
-				})
-			);
+			if (action.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+				thunkAPI.dispatch(
+					listChannelRenderAction.addChannelToListRender({
+						type: action.channel_type,
+						...action
+					})
+				);
+			}
+			if (action.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+				const thread: ChannelsEntity = {
+					...action,
+					id: action.channel_id
+				};
+				thunkAPI.dispatch(listChannelRenderAction.addThreadToListRender({ clanId: action.clan_id, channel: thread }));
+			}
 			return false;
 		}
 		return false;
