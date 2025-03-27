@@ -600,12 +600,15 @@ export const directSlice = createSlice({
 			});
 		},
 		removeBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
-			directAdapter.updateOne(state, {
-				id: action.payload.channelId,
-				changes: {
-					count_mess_unread: 0
-				}
-			});
+			const currentBadge = state.entities[action.payload.channelId]?.count_mess_unread || 0;
+			if (currentBadge) {
+				directAdapter.updateOne(state, {
+					id: action.payload.channelId,
+					changes: {
+						count_mess_unread: 0
+					}
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
