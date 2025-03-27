@@ -598,6 +598,29 @@ export const directSlice = createSlice({
 			const dmGroup = state.entities?.[dmId];
 			if (!dmGroup) return;
 			state.entities[dmId].active = isActive ? 1 : 0;
+		},
+		addBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
+			const channelId = action.payload.channelId;
+			const currentBadge = state.entities[channelId]?.count_mess_unread || 0;
+			if (currentBadge !== currentBadge + 1) {
+				directAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: currentBadge + 1
+					}
+				});
+			}
+		},
+		removeBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
+			const currentBadge = state.entities[action.payload.channelId]?.count_mess_unread || 0;
+			if (currentBadge) {
+				directAdapter.updateOne(state, {
+					id: action.payload.channelId,
+					changes: {
+						count_mess_unread: 0
+					}
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
