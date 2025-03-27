@@ -6,7 +6,8 @@ import {
 	selectCurrentClan,
 	selectCurrentRoleIcon,
 	selectTheme,
-	setAddMemberRoles
+	setAddMemberRoles,
+	usersClanActions
 } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ThemeApp, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
@@ -91,6 +92,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 				currentRoleIcon
 			);
 		}
+		dispatch(usersClanActions.updateManyRoleIds(userIds.map((id) => ({ userId: id, roleId: selectedRoleId }))));
 	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 
 	useEffect(() => {
