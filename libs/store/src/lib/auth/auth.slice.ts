@@ -13,6 +13,7 @@ export interface AuthState {
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
+	isErrLogin?: boolean;
 }
 
 export interface ISession {
@@ -33,7 +34,8 @@ export const initialAuthState: AuthState = {
 	session: null,
 	isLogin: false,
 	isRegistering: 'not loaded',
-	loadingStatusEmail: 'not loaded'
+	loadingStatusEmail: 'not loaded',
+	isErrLogin: false
 };
 
 function normalizeSession(session: Session): ISession {
@@ -55,11 +57,7 @@ export type AuthenticateEmailPayload = {
 
 export const authenticateEmail = createAsyncThunk('auth/authenticateEmail', async ({ email, password }: AuthenticateEmailPayload, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon?.authenticateEmail(email, password).catch(function (err: any) {
-		err.json().then((data: any) => {
-			console.error(data.message);
-		});
-	});
+	const session = await mezon?.authenticateEmail(email, password);
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
@@ -255,15 +253,18 @@ export const authSlice = createSlice({
 		builder
 			.addCase(authenticateEmail.pending, (state: AuthState) => {
 				state.loadingStatusEmail = 'loading';
+				state.isErrLogin = false;
 			})
 			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'loaded';
 				state.session = action.payload;
 				state.isLogin = true;
+				state.isErrLogin = false;
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'error';
 				state.error = action.error.message;
+				state.isErrLogin = true;
 			});
 		builder
 			.addCase(registrationPassword.pending, (state) => {
@@ -310,3 +311,5 @@ export const selectSession = createSelector(getAuthState, (state: AuthState) => 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
+
+export const selectErrLoginEmail = createSelector(getAuthState, (state: AuthState) => state.isErrLogin);

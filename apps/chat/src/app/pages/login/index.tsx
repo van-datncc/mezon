@@ -1,7 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { QRSection } from '@mezon/components';
 import { useAppNavigation, useAuth } from '@mezon/core';
-import { authActions, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
+import { authActions, selectErrLoginEmail, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
 import { validateEmail, validatePassword } from '@mezon/utils';
 import { FormError } from 'libs/components/src/lib/components/Setting Password/formError';
 import { Input } from 'libs/components/src/lib/components/Setting Password/input';
@@ -22,6 +22,8 @@ function Login() {
 	const [hidden, setHidden] = useState<boolean>(false);
 	const [isRemember, setIsRemember] = useState<boolean>(false);
 	const isLoadingLoginEmail = useSelector(selectLoadingEmail);
+	const isErrLogin = useSelector(selectErrLoginEmail);
+
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		const fetchQRCode = async () => {
@@ -84,6 +86,20 @@ function Login() {
 		password?: string;
 	}>({});
 
+	useEffect(() => {
+		if (isErrLogin) {
+			setErrors({
+				email: 'Email or password is invalid',
+				password: 'Email or password is invalid'
+			});
+			const timeout = setTimeout(() => {
+				setErrors({});
+			}, 3000);
+
+			return () => clearTimeout(timeout);
+		}
+	}, [isErrLogin]);
+
 	const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setEmail(value);
@@ -115,22 +131,22 @@ function Login() {
 
 	const handleSubmit = useCallback(
 		(e: React.FormEvent) => {
-			// e.preventDefault();
+			e.preventDefault();
 
-			// const emailError = validateEmail(email);
-			// const passwordError = validatePassword(password);
+			const emailError = validateEmail(email);
+			const passwordError = validatePassword(password);
 
-			// if (emailError || passwordError) {
-			// 	setErrors({ email: emailError, password: passwordError });
-			// 	return;
-			// }
+			if (emailError || passwordError) {
+				setErrors({ email: emailError, password: passwordError });
+				return;
+			}
 
-			handleLogin({ email: 'nguyentran@ncc.asia', password: '12345678' });
+			handleLogin({ email, password });
 		},
 		[email, password]
 	);
 
-	const disabled = !!errors.email || !!errors.password || !email || !password;
+	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail === 'loading';
 
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-300 px-4">
@@ -156,7 +172,7 @@ function Login() {
 						<div className="min-h-[20px]">{errors.email && <FormError message={errors.email} />}</div>
 						<PasswordInput id="password" label="Password" value={password} onChange={handlePasswordChange} />
 						<div className="min-h-[20px]">{errors.password && <FormError message={errors.password} />}</div>
-						<SubmitButton disabled={false} submitButtonText={'Log In'} />
+						<SubmitButton disabled={disabled} submitButtonText={'Log In'} />
 					</form>
 					<div className="mt-4 flex items-center text-gray-400">
 						<input
