@@ -361,6 +361,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							message.references?.at(0)?.message_sender_id !== userId
 						) {
 							dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id, isMention: false }));
+							dispatch(directActions.addBadgeDirect({ channelId: message.channel_id as string }));
 						}
 					}
 
@@ -587,6 +588,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				isReset: true
 			})
 		);
+		dispatch(directActions.addBadgeDirect({ channelId: lastSeenMess.channel_id as string }));
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
 	}, []);
 

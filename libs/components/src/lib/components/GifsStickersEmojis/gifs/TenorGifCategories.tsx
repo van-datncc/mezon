@@ -75,7 +75,7 @@ function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBo
 				})
 			);
 		} else {
-			handleSend({ t: '' }, [], [{ url: giftUrl }], []);
+			handleSend({ t: '' }, [], [{ url: giftUrl, filetype: 'gif' }], []);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};
