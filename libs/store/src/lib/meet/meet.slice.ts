@@ -47,7 +47,7 @@ export const generateMeetToken = createAsyncThunk('meet/generateMeetToken', asyn
 export const handleParticipantMeetState = createAsyncThunk(
 	'meet/handleParticipantMeetState',
 	async ({ clan_id, channel_id, user_id, display_name, state }: ApiHandleParticipantMeetStateRequest, thunkAPI) => {
-		//TODO remove this function
+		//TODO remove this function after mobile team update their code
 		return;
 	}
 );
