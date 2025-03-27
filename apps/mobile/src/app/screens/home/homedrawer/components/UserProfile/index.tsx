@@ -216,6 +216,25 @@ const UserProfile = React.memo(
 			return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction || (isDMGroup && isChannelOwner && !isCheckOwner);
 		}, [userById?.user?.about_me, showAction, showRole, userRolesClan, isDMGroup, isCheckOwner, isChannelOwner]);
 
+		const handleTransferFunds = () => {
+			const payload = JSON.stringify({
+				receiver_id: userId,
+				receiver_name: user?.user?.username,
+				amount: 10000,
+				note: t('userAction.transferFunds')
+			});
+			navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+				screen: APP_SCREEN.SETTINGS.SEND_TOKEN,
+				params: {
+					formValue: payload
+				}
+			});
+			if (onClose && typeof onClose === 'function') {
+				onClose();
+			}
+			dismiss();
+		};
+
 		if (isShowPendingContent) {
 			return (
 				<View style={[styles.wrapper]}>
@@ -227,6 +246,21 @@ const UserProfile = React.memo(
 		return (
 			<View style={[styles.wrapper]}>
 				<View style={[styles.backdrop, { backgroundColor: userById || user?.avatar_url ? color : Colors.titleReset }]}>
+					{!isCheckOwner && (
+						<TouchableOpacity
+							onPress={() => handleTransferFunds()}
+							style={{
+								position: 'absolute',
+								right: size.s_10,
+								top: size.s_10,
+								padding: size.s_4,
+								borderRadius: size.s_20,
+								backgroundColor: Colors.bgGrayDark
+							}}
+						>
+							<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} />
+						</TouchableOpacity>
+					)}
 					<View style={[styles.userAvatar]}>
 						<MezonAvatar
 							width={size.s_80}

@@ -131,7 +131,8 @@ export const style = (colors: Attributes) =>
 		},
 		action: {
 			display: 'flex',
-			gap: size.s_20
+			gap: size.s_20,
+			height: '20%'
 		},
 		actionMore: {
 			display: 'flex',

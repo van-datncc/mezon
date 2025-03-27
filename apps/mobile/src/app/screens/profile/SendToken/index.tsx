@@ -329,7 +329,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 						<TextInput
 							editable={!jsonObject?.amount}
 							style={styles.textInput}
-							value={jsonObject?.amount?.toString() || tokenCount}
+							value={tokenCount}
 							keyboardType="numeric"
 							placeholderTextColor="#535353"
 							onChangeText={handleInputChange}
@@ -379,15 +379,17 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 									<Icons.TickIcon width={100} height={100} />
 								</View>
 								<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
-								<Text style={styles.amountText}>
-									{tokenCount} {plainTokenCount === 1 ? `token` : `tokens`}
-								</Text>
+								<Text style={styles.amountText}>{tokenCount} ₫</Text>
 							</View>
 
 							<View style={styles.modalBody}>
 								<View style={styles.infoRow}>
 									<Text style={styles.label}>{t('receiver')}</Text>
-									<Text style={[styles.value, { fontSize: size.s_20 }]}>{selectedUser?.username || 'Unknown'}</Text>
+									<Text style={[styles.value, { fontSize: size.s_20 }]}>
+										{/*eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+										{/*@ts-expect-error*/}
+										{selectedUser?.username || jsonObject?.receiver_name || 'Unknown'}
+									</Text>
 								</View>
 
 								<View style={styles.infoRow}>
