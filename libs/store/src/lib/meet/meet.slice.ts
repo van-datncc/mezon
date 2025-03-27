@@ -1,8 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
+import { HandleParticipantMeetStateEvent } from 'mezon-js';
 import { ApiHandleParticipantMeetStateRequest } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 
 type generateMeetTokenPayload = {
 	channelId: string;
@@ -57,6 +58,20 @@ export const handleParticipantMeetState = createAsyncThunk(
 			};
 			const response = await mezon.client.handleParticipantMeetState(mezon.session, body);
 
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'meet/handleParticipantMeetState');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const handleParticipantVoiceState = createAsyncThunk(
+	'meet/handleParticipantVoiceState',
+	async ({ clan_id, channel_id, display_name, state }: HandleParticipantMeetStateEvent, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const response = await mezon.socketRef.current?.handleParticipantMeetState(clan_id, channel_id, display_name, state);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'meet/handleParticipantMeetState');
