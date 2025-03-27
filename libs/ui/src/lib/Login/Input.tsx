@@ -5,7 +5,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 	error?: string;
 }
 
-export const Input = memo(({ label, error, id, className = '', ...props }: InputProps) => {
+const Input = memo(({ label, error, id, className = '', ...props }: InputProps) => {
 	return (
 		<div className="space-y-2">
 			{label && (
@@ -24,3 +24,5 @@ export const Input = memo(({ label, error, id, className = '', ...props }: Input
 		</div>
 	);
 });
+
+export default Input;
