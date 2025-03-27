@@ -1256,6 +1256,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (channelUpdated?.e2ee && channelUpdated.creator_id !== userId) {
 					dispatch(e2eeActions.setOpenModalE2ee(true));
 				}
+				if (channelUpdated.channel_label === '') {
+					return dispatch(directActions.updateE2EE({ ...channelUpdated, currentUserId: userId }));
+				}
 				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
 

@@ -435,6 +435,16 @@ export const directSlice = createSlice({
 		setAll: directAdapter.setAll,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
+			const { channel_id } = action.payload;
+			directAdapter.updateOne(state, {
+				id: channel_id,
+				changes: {
+					...action.payload
+				}
+			});
+		},
+		updateE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
+			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
 			const notCurrentUser = action.payload?.currentUserId !== creator_id;
 			const existingDirect = state.entities[channel_id];
@@ -447,7 +457,7 @@ export const directSlice = createSlice({
 			directAdapter.updateOne(state, {
 				id: channel_id,
 				changes: {
-					...action.payload
+					e2ee: e2ee
 				}
 			});
 		},
