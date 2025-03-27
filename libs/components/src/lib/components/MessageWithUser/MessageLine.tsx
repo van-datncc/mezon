@@ -1,4 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { getTagByIdOnStored } from '@mezon/core';
 import { getStore, selectGmeetVoice } from '@mezon/store';
 import { ChannelMembersEntity, EBacktickType, ETokenMessage, IExtendedMessage, TypeMessage, convertMarkdown, getMeetCode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -172,18 +173,6 @@ export const MessageLine = ({
 						emojiId={element.emojiid ?? ''}
 					/>
 				);
-			} else if ((element.kindOf === ETokenMessage.LINKS || element.kindOf === ETokenMessage.LINKYOUTUBE) && !isHideLinkOneImage) {
-				formattedContent.push(
-					<MarkdownContent
-						key={`link${s}-${messageId}`}
-						isLink={true}
-						isTokenClickAble={isTokenClickAble}
-						isJumMessageEnabled={isJumMessageEnabled}
-						content={contentInElement}
-						isReply={isReply}
-						isSearchMessage={isSearchMessage}
-					/>
-				);
 			} else if (element.kindOf === ETokenMessage.VOICE_LINKS) {
 				const meetingCode = getMeetCode(contentInElement as string) as string;
 				formattedContent.push(
@@ -199,17 +188,35 @@ export const MessageLine = ({
 				);
 			} else if (element.kindOf === ETokenMessage.MARKDOWNS) {
 				if (element.type === EBacktickType.LINK || element.type === EBacktickType.LINKYOUTUBE) {
-					formattedContent.push(
-						<MarkdownContent
-							key={`link${s}-${messageId}`}
-							isLink={true}
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							content={contentInElement}
-							isReply={isReply}
-							isSearchMessage={isSearchMessage}
-						/>
-					);
+					const basePath = '/chat/clans/';
+					const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
+					const channelIdOnLink = contentHasChannelLink
+						? contentInElement?.split('/')?.[contentInElement?.split('/')?.indexOf('channels') + 1]
+						: undefined;
+					const channel = getTagByIdOnStored(channelIdOnLink);
+
+					if (channel?.id) {
+						formattedContent.push(
+							<ChannelHashtag
+								key={`linkChannel${s}-${messageId}`}
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								channelHastagId={`<#${channelIdOnLink}>`}
+							/>
+						);
+					} else {
+						formattedContent.push(
+							<MarkdownContent
+								key={`link${s}-${messageId}`}
+								isLink={true}
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								content={contentInElement}
+								isReply={isReply}
+								isSearchMessage={isSearchMessage}
+							/>
+						);
+					}
 				} else if (element.type === EBacktickType.BOLD) {
 					formattedContent.push(<b key={`markdown-${s}-${messageId}`}> {contentInElement} </b>);
 				} else if (element.type === EBacktickType.VOICE_LINK) {

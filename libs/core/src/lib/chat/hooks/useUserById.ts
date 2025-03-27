@@ -57,7 +57,7 @@ export const useTagById = (tagId: string | undefined): ChannelsEntity | undefine
 	});
 };
 
-export const useTagByIdOnStored = (tagId: string | undefined): ChannelsEntity | undefined => {
+export const getTagByIdOnStored = (tagId: string | undefined): ChannelsEntity | undefined => {
 	const store = getStore();
 	if (!tagId) return undefined;
 	const isClanView = selectClanView(store.getState());

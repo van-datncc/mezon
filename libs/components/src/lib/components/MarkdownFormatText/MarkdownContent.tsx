@@ -1,4 +1,3 @@
-import { useTagByIdOnStored } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
@@ -6,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ChannelHashtag } from '../../components';
 
 type MarkdownContentOpt = {
 	content?: string;
@@ -31,11 +29,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	isReply,
 	isSearchMessage
 }) => {
-	const basePath = '/chat/clans/';
-	const contentHasChannelLink = content?.includes(basePath) && content?.includes('/channels/');
-	const channelIdOnLink = contentHasChannelLink ? content?.split('/')?.[content?.split('/')?.indexOf('channels') + 1] : undefined;
-	const channel = useTagByIdOnStored(channelIdOnLink);
-
 	const appearanceTheme = useSelector(selectTheme);
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
@@ -63,23 +56,15 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 
 	return (
 		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-			{channel?.id ? (
-				<ChannelHashtag
-					isTokenClickAble={isTokenClickAble}
-					isJumMessageEnabled={isJumMessageEnabled}
-					channelHastagId={`<#${channelIdOnLink}>`}
-				/>
-			) : (
-				isLink && (
-					// eslint-disable-next-line jsx-a11y/anchor-is-valid
-					<a
-						onClick={() => onClickLink(content ?? '')}
-						rel="noopener noreferrer"
-						className="text-blue-500 cursor-pointer break-words underline tagLink"
-					>
-						{content}
-					</a>
-				)
+			{isLink && (
+				// eslint-disable-next-line jsx-a11y/anchor-is-valid
+				<a
+					onClick={() => onClickLink(content ?? '')}
+					rel="noopener noreferrer"
+					className="text-blue-500 cursor-pointer break-words underline tagLink"
+				>
+					{content}
+				</a>
 			)}
 			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} isSearchMessage={isSearchMessage} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
