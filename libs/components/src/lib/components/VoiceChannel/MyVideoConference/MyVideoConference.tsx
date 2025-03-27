@@ -1,6 +1,5 @@
 import {
 	ConnectionStateToast,
-	GridLayout,
 	isTrackReference,
 	LayoutContextProvider,
 	RoomAudioRenderer,
@@ -19,6 +18,7 @@ import NotificationList from '../../NotificationList';
 import { ControlBar } from '../ControlBar/ControlBar';
 import { CarouselLayout } from './FocusLayout/CarouselLayout/CarouselLayout';
 import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
+import { GridLayout } from './GridLayout/GridLayout';
 import { ParticipantTile } from './ParticipantTile/ParticipantTile';
 
 interface MyVideoConferenceProps {
@@ -176,7 +176,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 											<span>
 												<Icons.MemberList defaultFill="text-white" />
 											</span>
-											<span className="pr-6">{userTracks.length}</span>
+											<span className="pr-[6px]">{userTracks.length}</span>
 										</p>
 									</div>
 								</Tooltip>
