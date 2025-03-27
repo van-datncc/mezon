@@ -132,9 +132,6 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					</div>
 					<p className="dark:text-textThreadPrimary text-gray-500 text-sm mt-2">
 						Members use the colour of the highest role they have on this list. Drag roles to reorder them.&nbsp;
-						<a href="" className="hover:underline text-[#00A8FC]">
-							Need help with permissions?
-						</a>
 					</p>
 					<br />
 					<div className={`overflow-hidden w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>

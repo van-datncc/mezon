@@ -20,9 +20,6 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 		<div className="flex flex-col">
 			<div className="flex flex-col xl:flex-row gap-x-1 text-sm font-normal">
 				<p className="dark:text-bgLightPrimary text-bgPrimary">Show who you are with different profiles for each of your clans</p>
-				<a href=" " className="text-[#155EEF] text-sm font-normal">
-					Learn more about Clan Profiles
-				</a>
 			</div>
 			<p className="mt-[20px] font-bold text-sm dark:text-[#CCCCCC] text-black tracking-wide">CHOOSE A CLAN</p>
 			<select

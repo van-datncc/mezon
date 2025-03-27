@@ -23,6 +23,8 @@ function MessageVideo({ attachmentData }: MessageImage) {
 		}
 	};
 	const handleTogglePlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+		e.preventDefault();
+		e.stopPropagation();
 		if (e.currentTarget.paused) {
 			e.currentTarget.play();
 		} else {
