@@ -7,14 +7,9 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ICategoryChannel } from '@mezon/utils';
+import { EDragBorderPosition, ICategoryChannel } from '@mezon/utils';
 import { ApiCategoryOrderUpdate } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
-
-enum EDragBorderPositon {
-	TOP = 'top',
-	BOTTOM = 'bottom'
-}
 
 const CategoryOrderSetting = () => {
 	const categoryList: CategoriesEntity[] = useAppSelector(selectAllCategories);
@@ -24,7 +19,7 @@ const CategoryOrderSetting = () => {
 	const dragOverItemIndex = useRef<number | null>(null);
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 	const [hasChanged, setHasChanged] = useState<boolean>(false);
-	const [dragBorderPosition, setDragBorderPosition] = useState<EDragBorderPositon | null>(null);
+	const [dragBorderPosition, setDragBorderPosition] = useState<EDragBorderPosition | null>(null);
 	const dispatch = useAppDispatch();
 
 	const handleDragStart = (index: number) => {
@@ -37,9 +32,9 @@ const CategoryOrderSetting = () => {
 
 		if (dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
 			if (dragItemIndex.current > dragOverItemIndex.current) {
-				setDragBorderPosition(EDragBorderPositon.TOP);
+				setDragBorderPosition(EDragBorderPosition.TOP);
 			} else if (dragItemIndex.current < dragOverItemIndex.current) {
-				setDragBorderPosition(EDragBorderPositon.BOTTOM);
+				setDragBorderPosition(EDragBorderPosition.BOTTOM);
 			}
 		}
 	};
@@ -103,7 +98,7 @@ const CategoryOrderSetting = () => {
 					} cursor-grab hover:bg-bgLightTertiary hover:dark:bg-bgModifierHover border-borderDividerLight dark:border-borderDivider
 					${
 						hoveredIndex === index
-							? dragBorderPosition === EDragBorderPositon.BOTTOM
+							? dragBorderPosition === EDragBorderPosition.BOTTOM
 								? 'border-b-4 border-b-green-500 dark:border-b-green-500'
 								: 'border-t-4 border-t-green-500 dark:border-t-green-500'
 							: ''

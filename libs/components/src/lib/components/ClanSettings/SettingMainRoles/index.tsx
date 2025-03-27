@@ -125,20 +125,17 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 							className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium inline-flex items-center justify-center h-[32.5px]"
 							onClick={handleCreateNewRole}
 						>
-							<span className="relative inline-flex items-center justify-center min-w-[100px]">
+							<span className="relative inline-flex items-center justify-center min-w-[100px] text-white">
 								{isLoading ? <Icons.IconLoadingTyping bgFill="mx-auto" /> : 'Create Role'}
 							</span>
 						</button>
 					</div>
 					<p className="dark:text-textThreadPrimary text-gray-500 text-sm mt-2">
 						Members use the colour of the highest role they have on this list. Drag roles to reorder them.&nbsp;
-						<a href="" className="hover:underline text-[#00A8FC]">
-							Need help with permissions?
-						</a>
 					</p>
 					<br />
 					<div className={`overflow-hidden w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
-						<table className="w-full divide-y divide-gray-200 dark:divide-gray-500">
+						<table className="w-full divide-y divide-gray-200 dark:divide-gray-500 mb-10">
 							<thead>
 								<tr className="h-11">
 									<th
