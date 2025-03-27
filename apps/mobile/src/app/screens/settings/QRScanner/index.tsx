@@ -120,7 +120,7 @@ export const QRScanner = () => {
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			const valueObj = safeJSONParse(value || '{}');
-			// case send token
+			// case Transfer funds
 			if (valueObj?.receiver_id) {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
 					screen: APP_SCREEN.SETTINGS.SEND_TOKEN,

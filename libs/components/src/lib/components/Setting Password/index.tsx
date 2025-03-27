@@ -1,10 +1,8 @@
 'use client';
-import { LoadingStatus } from '@mezon/utils';
+import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
+import { LoadingStatus, validateEmail, validatePassword } from '@mezon/utils';
 import type React from 'react';
 import { useCallback, useState } from 'react';
-import { FormError } from './formError';
-import { Input } from './input';
-import { PasswordInput } from './passwordInput';
 
 interface SetPasswordProps {
 	onSubmit?: (data: { email: string; password: string }) => void;
@@ -34,37 +32,6 @@ export default function SetPassword({
 		confirmPassword?: string;
 	}>({});
 
-	const validateEmail = (value: string) => {
-		if (!value) {
-			return 'Email is required';
-		}
-
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(value)) {
-			return 'Please enter a valid email address';
-		}
-
-		return '';
-	};
-
-	const validatePassword = (value: string) => {
-		if (value.length < 8) {
-			return 'Password must be at least 8 characters';
-		}
-		if (!/[A-Z]/.test(value)) {
-			return 'Password must contain at least 1 uppercase letter';
-		}
-		if (!/[a-z]/.test(value)) {
-			return 'Password must contain at least 1 lowercase letter';
-		}
-		if (!/[0-9]/.test(value)) {
-			return 'Password must contain at least 1 number';
-		}
-		if (!/[^A-Za-z0-9]/.test(value)) {
-			return 'Password must contain at least 1 special character';
-		}
-		return '';
-	};
 	const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setEmail(value);
@@ -180,20 +147,8 @@ export default function SetPassword({
 							error={errors.confirmPassword}
 						/>
 					</div>
-
 					<div className="p-6">
-						<button
-							type="submit"
-							className={`w-full px-4 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 
-            ${
-				disabled
-					? 'bg-gray-400 text-white cursor-not-allowed dark:bg-gray-600 dark:text-gray-300'
-					: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 cursor-pointer dark:bg-indigo-500 dark:hover:bg-indigo-600'
-			}`}
-							disabled={disabled}
-						>
-							{isLoading === 'loading' ? 'Submitting...' : submitButtonText}
-						</button>
+						<SubmitButton disabled={disabled} submitButtonText={submitButtonText} isLoading={isLoading} />
 					</div>
 				</form>
 			</div>

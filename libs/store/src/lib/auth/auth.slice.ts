@@ -12,6 +12,7 @@ export interface AuthState {
 	session?: ISession | null;
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
+	loadingStatusEmail?: LoadingStatus;
 }
 
 export interface ISession {
@@ -31,7 +32,8 @@ export const initialAuthState: AuthState = {
 	loadingStatus: 'not loaded',
 	session: null,
 	isLogin: false,
-	isRegistering: 'not loaded'
+	isRegistering: 'not loaded',
+	loadingStatusEmail: 'not loaded'
 };
 
 function normalizeSession(session: Session): ISession {
@@ -46,11 +48,19 @@ export const authenticateApple = createAsyncThunk('auth/authenticateApple', asyn
 	}
 	return normalizeSession(session);
 });
-
 export type AuthenticateEmailPayload = {
-	username: string;
+	email: string;
 	password: string;
 };
+
+export const authenticateEmail = createAsyncThunk('auth/authenticateEmail', async ({ email, password }: AuthenticateEmailPayload, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+	const session = await mezon?.authenticateEmail(email, password);
+	if (!session) {
+		return thunkAPI.rejectWithValue('Invalid session');
+	}
+	return normalizeSession(session);
+});
 
 export const authenticateMezon = createAsyncThunk('auth/authenticateMezon', async (code: string, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
@@ -172,6 +182,7 @@ export const authSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
+			state.loadingStatusEmail = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
@@ -239,6 +250,19 @@ export const authSlice = createSlice({
 				state.error = action.error.message;
 			});
 		builder
+			.addCase(authenticateEmail.pending, (state: AuthState) => {
+				state.loadingStatusEmail = 'loading';
+			})
+			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
+				state.loadingStatusEmail = 'loaded';
+				state.session = action.payload;
+				state.isLogin = true;
+			})
+			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
+				state.loadingStatusEmail = 'error';
+				state.error = action.error.message;
+			});
+		builder
 			.addCase(registrationPassword.pending, (state) => {
 				state.isRegistering = 'loading';
 			})
@@ -266,7 +290,8 @@ export const authActions = {
 	checkLoginRequest,
 	confirmLoginRequest,
 	logOut,
-	registrationPassword
+	registrationPassword,
+	authenticateEmail
 };
 
 export const getAuthState = (rootState: { [AUTH_FEATURE_KEY]: AuthState }): AuthState => rootState[AUTH_FEATURE_KEY];
@@ -280,3 +305,5 @@ export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => 
 export const selectSession = createSelector(getAuthState, (state: AuthState) => state.session);
 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
+
+export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);

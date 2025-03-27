@@ -55,13 +55,34 @@ export function CarouselLayout({ tracks, ...props }: CarouselLayoutProps) {
 		}
 	}, [maxVisibleTiles]);
 
+	const handleWheelScroll = (event: React.WheelEvent<HTMLElement>) => {
+		if (asideEl.current) {
+			event.stopPropagation();
+			asideEl.current.scrollLeft += event.deltaY;
+		}
+	};
+
 	return (
 		<aside
-			className={`lk-carousel ${sortedTiles.length <= maxVisibleTiles ? '!justify-center' : '!justify-start'} !overflow-x-auto`}
-			style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0, 0, 0, 0.3) transparent' }}
+			className={`lk-carousel pb-1 cursor-pointer ${sortedTiles.length <= maxVisibleTiles ? '!justify-center' : '!justify-start'} !overflow-x-auto`}
 			ref={asideEl}
+			onWheel={handleWheelScroll}
 			{...props}
 		>
+			<style>
+				{`
+        .lk-carousel::-webkit-scrollbar {
+          	height: 6px;
+        }
+        .lk-carousel::-webkit-scrollbar-thumb {
+          	background-color: #6d6f77;
+          	border-radius: 4px;
+        }
+        .lk-carousel::-webkit-scrollbar-track {
+          	background: transparent;
+        }
+      `}
+			</style>
 			<TrackLoop tracks={sortedTiles}>{props.children}</TrackLoop>
 		</aside>
 	);

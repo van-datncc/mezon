@@ -32,10 +32,13 @@ const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 			return;
 		}
 		if (isElectron()) {
+			const fileName = !attachmentData.filename?.includes('.')
+				? attachmentData.filename + '.' + attachmentData.filetype
+				: attachmentData.filename;
 			try {
 				await electronBridge.invoke(DOWNLOAD_FILE, {
 					url: attachmentData.url as string,
-					defaultFileName: attachmentData.filename as string
+					defaultFileName: fileName
 				});
 			} catch (error) {
 				console.error('Error during download:', error);

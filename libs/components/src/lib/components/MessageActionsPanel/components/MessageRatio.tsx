@@ -31,7 +31,7 @@ export const MessageRatioButton: React.FC<MessageRatioButtonProps> = ({ name, on
 
 	return (
 		<div
-			className={`!border-2 border-channelTextLabel  ${checked ? buttonColor : null} flex flex-row  w-5 h-5 justify-center  items-center dark:text-textPrimary text-textPrimaryLight rounded-full text-sm text-left !bg-transparent`}
+			className={`!border-2 border-channelTextLabel ${checked ? buttonColor : null} flex flex-row  w-5 h-5 justify-center  items-center dark:text-textPrimary text-textPrimaryLight rounded-full text-sm text-left !bg-transparent flex-shrink-0`}
 		>
 			<input
 				name={name}
