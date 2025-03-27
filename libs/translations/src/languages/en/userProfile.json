@@ -1,5 +1,6 @@
 {
   "userAction": {
+    "transferFunds": "Transfer Funds",
     "sendMessage": "Message",
     "voiceCall": "VoiceCall",
     "videoCall": "VideoCall",

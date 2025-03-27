@@ -1,5 +1,6 @@
 {
   "userAction": {
+    "transferFunds": "Chuyển tiền",
     "sendMessage": "Gửi Tin Nhắn",
     "voiceCall": "Gọi Thoại",
     "videoCall": "Gọi Video",
