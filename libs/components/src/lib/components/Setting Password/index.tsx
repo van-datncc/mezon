@@ -148,7 +148,7 @@ export default function SetPassword({
 						/>
 					</div>
 					<div className="p-6">
-						<SubmitButton disabled={disabled} submitButtonText={submitButtonText} />
+						<SubmitButton disabled={disabled} submitButtonText={submitButtonText} isLoading={isLoading} />
 					</div>
 				</form>
 			</div>

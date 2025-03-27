@@ -1,6 +1,6 @@
 import { QRSection } from '@mezon/components';
 import { useAppNavigation, useAuth } from '@mezon/core';
-import { authActions, selectErrLoginEmail, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
+import { authActions, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
 import { validateEmail, validatePassword } from '@mezon/utils';
 
 import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
@@ -19,7 +19,6 @@ function Login() {
 	const [hidden, setHidden] = useState<boolean>(false);
 	const [isRemember, setIsRemember] = useState<boolean>(false);
 	const isLoadingLoginEmail = useSelector(selectLoadingEmail);
-	const isErrLogin = useSelector(selectErrLoginEmail);
 
 	const dispatch = useAppDispatch();
 	useEffect(() => {
@@ -83,21 +82,19 @@ function Login() {
 		password?: string;
 	}>({});
 
+	const showErrLoginFail = isLoadingLoginEmail === 'error';
 	useEffect(() => {
-		if (isErrLogin) {
+		if (showErrLoginFail) {
 			setErrors({
 				email: 'Email or password is invalid',
 				password: 'Email or password is invalid'
 			});
-			const timeout = setTimeout(() => {
-				setErrors({});
-				dispatch(authActions.refreshStatusErrLogin());
-			}, 3000);
-
-			return () => clearTimeout(timeout);
 		}
-	}, [isErrLogin]);
-
+	}, [showErrLoginFail]);
+	const handleFocus = () => {
+		setErrors({});
+		dispatch(authActions.refreshStatus());
+	};
 	const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setEmail(value);
@@ -144,7 +141,7 @@ function Login() {
 		[email, password]
 	);
 
-	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail === 'loading';
+	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail !== 'not loaded';
 
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-300 px-4">
@@ -159,6 +156,7 @@ function Login() {
 							Email<span className="text-red-500">*</span>
 						</label>
 						<Input
+							onFocus={handleFocus}
 							id="email"
 							type="email"
 							value={email}
@@ -168,7 +166,7 @@ function Login() {
 							readOnly={false}
 						/>
 						<div className="min-h-[20px]">{errors.email && <FormError message={errors.email} />}</div>
-						<PasswordInput id="password" label="Password" value={password} onChange={handlePasswordChange} />
+						<PasswordInput onFocus={handleFocus} id="password" label="Password" value={password} onChange={handlePasswordChange} />
 						<div className="min-h-[20px]">{errors.password && <FormError message={errors.password} />}</div>
 						<SubmitButton disabled={disabled} submitButtonText={'Log In'} isLoading={isLoadingLoginEmail} />
 					</form>

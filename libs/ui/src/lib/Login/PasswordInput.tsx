@@ -12,9 +12,10 @@ interface PasswordInputProps {
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	error?: string;
 	isLoading?: boolean;
+	onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const PasswordInput = memo(({ id, label, value, onChange, error, isLoading }: PasswordInputProps) => {
+const PasswordInput = memo(({ id, label, value, onChange, error, isLoading, onFocus }: PasswordInputProps) => {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const togglePasswordVisibility = () => {
@@ -41,6 +42,7 @@ const PasswordInput = memo(({ id, label, value, onChange, error, isLoading }: Pa
 					readOnly={isLoading}
 					autoComplete="off"
 					placeholder={label === 'Password' ? 'Enter your password' : 'Confirm your password'}
+					onFocus={onFocus}
 				/>
 				<button
 					type="button"

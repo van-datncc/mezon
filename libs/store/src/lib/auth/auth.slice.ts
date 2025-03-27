@@ -13,7 +13,6 @@ export interface AuthState {
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
-	isErrLogin?: boolean;
 }
 
 export interface ISession {
@@ -34,8 +33,7 @@ export const initialAuthState: AuthState = {
 	session: null,
 	isLogin: false,
 	isRegistering: 'not loaded',
-	loadingStatusEmail: 'not loaded',
-	isErrLogin: false
+	loadingStatusEmail: 'not loaded'
 };
 
 function normalizeSession(session: Session): ISession {
@@ -184,9 +182,7 @@ export const authSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
-		},
-		refreshStatusErrLogin(state) {
-			state.isErrLogin = false;
+			state.loadingStatusEmail = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
@@ -256,18 +252,15 @@ export const authSlice = createSlice({
 		builder
 			.addCase(authenticateEmail.pending, (state: AuthState) => {
 				state.loadingStatusEmail = 'loading';
-				state.isErrLogin = false;
 			})
 			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'loaded';
 				state.session = action.payload;
 				state.isLogin = true;
-				state.isErrLogin = false;
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'error';
 				state.error = action.error.message;
-				state.isErrLogin = true;
 			});
 		builder
 			.addCase(registrationPassword.pending, (state) => {
@@ -314,5 +307,3 @@ export const selectSession = createSelector(getAuthState, (state: AuthState) => 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
-
-export const selectErrLoginEmail = createSelector(getAuthState, (state: AuthState) => state.isErrLogin);
