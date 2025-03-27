@@ -10,7 +10,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store';
+import { clansActions, selectVoiceInfo, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { createLocalAudioTrack, createLocalVideoTrack, Track } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -185,7 +185,7 @@ const RoomView = ({
 				/>
 			)}
 			{isAnimationComplete && (
-				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_50 }]}>
+				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
 					<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 							{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
