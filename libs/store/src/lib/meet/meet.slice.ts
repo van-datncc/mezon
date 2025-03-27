@@ -2,7 +2,6 @@ import { captureSentryError } from '@mezon/logger';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { HandleParticipantMeetStateEvent } from 'mezon-js';
-import { ApiHandleParticipantMeetStateRequest } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 
 type generateMeetTokenPayload = {
@@ -46,7 +45,7 @@ export const generateMeetToken = createAsyncThunk('meet/generateMeetToken', asyn
 
 export const handleParticipantMeetState = createAsyncThunk(
 	'meet/handleParticipantMeetState',
-	async ({ clan_id, channel_id, user_id, display_name, state }: ApiHandleParticipantMeetStateRequest, thunkAPI) => {
+	async ({ clan_id, channel_id, user_id, display_name, state }: any, thunkAPI) => {
 		//TODO remove this function after mobile team update their code
 		return;
 	}
