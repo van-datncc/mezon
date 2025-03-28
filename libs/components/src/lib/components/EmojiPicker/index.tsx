@@ -15,6 +15,7 @@ import {
 	EPermission,
 	EmojiPlaces,
 	IEmoji,
+	MAX_LENGTH_MESSAGE_BUZZ,
 	ModeResponsive,
 	RequestInput,
 	SubPanelName,
@@ -141,9 +142,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				}
 			}
 			if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ) {
+				const lastIndexOfInputPlainText = (buzzInputRequest?.content ?? '')?.length;
+				if (lastIndexOfInputPlainText > MAX_LENGTH_MESSAGE_BUZZ) return;
 				const buzzInputRequestMentionArr = buzzInputRequest?.mentionRaw ?? [];
 				const lastIndexOfInputValue = (buzzInputRequest?.valueTextInput ?? '')?.length;
-				const lastIndexOfInputPlainText = (buzzInputRequest?.content ?? '')?.length;
 				const newEmoji: MentionItem = {
 					childIndex: 0,
 					display: emojiPicked,
