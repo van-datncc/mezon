@@ -270,7 +270,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								className="flex items-center gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
 							>
 								{isInterested ? <Icons.MuteBell defaultSize="size-4 text-white" /> : <Icons.Bell className="size-4 text-white" />}
-								{isInterested ? 'UnInterested' : 'Interested'}
+								{event.user_ids?.length} {isInterested ? 'UnInterested' : 'Interested'}
 							</button>
 						) : (
 							<></>
