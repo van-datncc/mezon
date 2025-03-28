@@ -1,9 +1,8 @@
 import { ModalInputMessageBuzz } from '@mezon/components';
-import { useChatSending } from '@mezon/core';
 import { ChannelsEntity } from '@mezon/store-mobile';
-import { TypeMessage } from '@mezon/utils';
+import { RequestInput } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChannelMessages from './ChannelMessages';
 
 type ChannelMediaProps = {
@@ -42,10 +41,9 @@ type KeyPressListenerProps = {
 };
 
 const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
-	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
 	const isListenerAttached = useRef(false);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [messageText, setMessageText] = useState('');
+	const [modalIsOpen, setModalIsOpen] = useState(false);
+	const [inputRequest, setInputRequest] = useState<RequestInput>({ content: '', mentionRaw: [], valueTextInput: '' });
 
 	useEffect(() => {
 		if (isListenerAttached.current) return;
@@ -54,7 +52,7 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		const handleKeyPress = (event: KeyboardEvent) => {
 			if (event.ctrlKey && (event.key === 'g' || event.key === 'G')) {
 				event.preventDefault();
-				setIsModalOpen(true);
+				setModalIsOpen(true);
 			}
 		};
 
@@ -64,29 +62,19 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 			window.removeEventListener('keydown', handleKeyPress);
 			isListenerAttached.current = false;
 		};
-	}, [isModalOpen]);
-
-	const handleSend = useCallback(() => {
-		if (messageText.trim()) {
-			sendMessage({ t: messageText }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-		}
-		setIsModalOpen(false);
-		setMessageText('');
-	}, [messageText, sendMessage, setIsModalOpen, setMessageText]);
+	}, [modalIsOpen]);
 
 	return (
-		<>
-			{isModalOpen && (
+		<div>
+			{modalIsOpen && (
 				<ModalInputMessageBuzz
-					messageText={messageText}
-					setMessageText={setMessageText}
-					onClose={() => {
-						setIsModalOpen(false);
-						setMessageText('');
-					}}
-					onSend={handleSend}
+					inputRequest={inputRequest}
+					setInputRequest={setInputRequest}
+					currentChannel={currentChannel}
+					mode={mode}
+					setModalIsOpen={setModalIsOpen}
 				/>
 			)}
-		</>
+		</div>
 	);
 };

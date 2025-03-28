@@ -10,8 +10,20 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EEmojiCategory, EPermission, IEmoji, ModeResponsive, SubPanelName, getSrcEmoji, isPublicChannel } from '@mezon/utils';
+import {
+	EEmojiCategory,
+	EPermission,
+	EmojiPlaces,
+	IEmoji,
+	MAX_LENGTH_MESSAGE_BUZZ,
+	ModeResponsive,
+	RequestInput,
+	SubPanelName,
+	getSrcEmoji,
+	isPublicChannel
+} from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MentionItem } from 'react-mentions';
 import { useDispatch, useSelector } from 'react-redux';
 
 export type EmojiCustomPanelOptions = {
@@ -22,10 +34,12 @@ export type EmojiCustomPanelOptions = {
 	onClose: () => void;
 	isFocusTopicBox?: boolean;
 	isFocusThreadBox?: boolean;
-
+	emojiAction?: EmojiPlaces;
 	currenTopicId?: string;
 	directId?: string;
 	isClanView: boolean;
+	buzzInputRequest?: RequestInput;
+	setBuzzInputRequest?: (value: RequestInput) => void;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -34,6 +48,7 @@ const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
+	const { buzzInputRequest, setBuzzInputRequest } = props;
 	const dispatch = useDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentThread = useSelector(selectCurrentThread);
@@ -126,12 +141,33 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					setSubPanelActive(SubPanelName.NONE);
 				}
 			}
+			if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ) {
+				const lastIndexOfInputPlainText = (buzzInputRequest?.content ?? '')?.length;
+				if (lastIndexOfInputPlainText > MAX_LENGTH_MESSAGE_BUZZ) return;
+				const buzzInputRequestMentionArr = buzzInputRequest?.mentionRaw ?? [];
+				const lastIndexOfInputValue = (buzzInputRequest?.valueTextInput ?? '')?.length;
+				const newEmoji: MentionItem = {
+					childIndex: 0,
+					display: emojiPicked,
+					index: lastIndexOfInputValue > 0 ? lastIndexOfInputValue : 0,
+					id: emojiId,
+					plainTextIndex: lastIndexOfInputPlainText > 0 ? lastIndexOfInputPlainText : 0
+				};
+				if (setBuzzInputRequest) {
+					setBuzzInputRequest({
+						content: (buzzInputRequest?.content ?? '') + emojiPicked,
+						mentionRaw: [...buzzInputRequestMentionArr, newEmoji],
+						valueTextInput: (buzzInputRequest?.valueTextInput ?? '') + `::[${emojiPicked}](${emojiId})`
+					});
+				}
+			}
 		},
 		[
 			subPanelActive,
-			reactionMessageDispatch,
+			props.emojiAction,
 			props.messageEmojiId,
 			props.isFocusTopicBox,
+			reactionMessageDispatch,
 			messageEmoji?.sender_id,
 			messageEmoji?.channel_id,
 			currentChannel,
@@ -140,7 +176,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setAddEmojiActionChatbox,
 			addEmojiState,
 			setSuggestionEmojiObjPicked,
-			shiftPressedState
+			shiftPressedState,
+			buzzInputRequest,
+			setBuzzInputRequest
 		]
 	);
 
