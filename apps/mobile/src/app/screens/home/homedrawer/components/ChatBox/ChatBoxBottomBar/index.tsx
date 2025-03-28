@@ -269,24 +269,25 @@ export const ChatBoxBottomBar = memo(
 					return offset;
 				}
 
-				if (word?.startsWith?.('<#') && word?.endsWith?.('>')) {
+				if (word?.trim()?.startsWith('<#') && word?.trim()?.endsWith('>')) {
+					const channelName = word?.trim();
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-expect-error
 					const listChannel = selectAllChannels(store.getState() as RootState);
 					const listHashtagDm = selectAllHashtagDm(store.getState() as RootState);
-					const channelLabel = word?.slice?.(2, -1);
+					const channelLabel = channelName?.slice?.(2, -1);
 					const channelInfo = getChannelHashtag(listHashtagDm, listChannel, mode, channelLabel);
 
 					mentionBeforeHashtagCount++;
 
 					if (channelInfo) {
-						const startindex = convertedHashtag?.indexOf?.(word, indexOfLastHashtag);
+						const startindex = convertedHashtag?.indexOf?.(channelName, indexOfLastHashtag);
 						indexOfLastHashtag = startindex + 1;
 
 						hashtagList?.push?.({
 							channelid: channelInfo?.channel_id?.toString() ?? '',
 							s: startindex - (mentionBeforeCount * 2 + (mentionBeforeHashtagCount - 1) * 2),
-							e: startindex + word.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
+							e: startindex + channelName.length - (mentionBeforeHashtagCount * 2 + mentionBeforeCount * 2)
 						});
 					}
 				}
