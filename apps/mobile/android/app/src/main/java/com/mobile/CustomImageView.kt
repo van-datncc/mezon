@@ -87,12 +87,7 @@ class CustomImageView(context: Context) : RelativeLayout(context) {
                     isFirstResource: Boolean
                 ): Boolean {
                     loadingIcon.visibility = View.GONE
-
-                    imageView.animate()
-                        .alpha(1f)
-                        .setDuration(300)
-                        .start()
-
+                    imageView.alpha = 1f
                     return false
                 }
             })

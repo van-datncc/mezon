@@ -40,7 +40,8 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 	return (
 		<>
 			{screenTrackRef && (
-				<View
+				<TouchableOpacity
+					onPress={handleFocusScreen}
 					style={[
 						styles.userView,
 						!isGridLayout ? { width: '100%', height: size.s_150 + size.s_100 } : { width: '48%', height: size.s_150 },
@@ -58,14 +59,14 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 							{voiceUsername} {isParticipantFocused && `(Share Screen)`}
 						</Text>
 					</View>
-					<TouchableOpacity style={styles.focusIcon} onPress={handleFocusScreen}>
+					<View style={styles.focusIcon}>
 						{isParticipantFocused ? (
 							<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_14} />
 						) : (
 							<Icons.ArrowSaltIcon height={size.s_14} />
 						)}
-					</TouchableOpacity>
-				</View>
+					</View>
+				</TouchableOpacity>
 			)}
 
 			{videoTrackRef && (

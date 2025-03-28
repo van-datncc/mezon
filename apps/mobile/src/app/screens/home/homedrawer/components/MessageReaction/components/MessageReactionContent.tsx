@@ -146,6 +146,7 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 									onSelectUserId={() => {
 										const data = {
 											snapPoints: ['60%', '90%'],
+											hiddenHeaderIndicator: true,
 											children: <UserProfile userId={item.sender_id} showAction={true} showRole={true} currentChannel={null} />
 										};
 										DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
