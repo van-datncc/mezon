@@ -22,13 +22,15 @@ function NavLinkComponent({ active, children }: NavLinkProps) {
 				></div>
 			</div>
 
-			<div className="group-active:translate-y-px transition-transform" onClick={() => setTurnOffThreadMessage()}>
+			<div className="group-active:translate-y-px transition-transform" onClick={setTurnOffThreadMessage}>
 				<div
 					className={`
              transform
             ${
-				active ? 'rounded-xl text-white' : 'text-gray-100  group-hover:text-white group-hover:rounded-xl rounded-3xl'
-			} flex items-center justify-center w-12 h-12 duration-200 ease-out overflow-hidden`}
+				active
+					? 'rounded-xl text-white'
+					: 'text-gray-100  group-hover:text-white [clip-path:inset(0_round_40px)] hover:[clip-path:inset(0_round_12px)] '
+			} flex items-center justify-center w-12 h-12 duration-200 ease-in-out overflow-hidden`}
 				>
 					{children}
 				</div>
