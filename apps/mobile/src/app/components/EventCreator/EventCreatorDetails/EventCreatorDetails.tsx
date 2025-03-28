@@ -1,6 +1,6 @@
 import { getDayName, getDayWeekName, getDayYearName, getNearTime } from '@mezon/mobile-components';
 import { Fonts, useTheme } from '@mezon/mobile-ui';
-import { OptionEvent } from '@mezon/utils';
+import { ERepeatType, OptionEvent } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -62,27 +62,27 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 		() => [
 			{
 				title: t('fields.eventFrequency.noRepeat'),
-				value: 0
+				value: ERepeatType.DOES_NOT_REPEAT
 			},
 			{
 				title: t('fields.eventFrequency.weeklyOn', { name: getDayName(combinedStartDateTime, language) }),
-				value: 1
+				value: ERepeatType.WEEKLY_ON_DAY
 			},
 			{
 				title: t('fields.eventFrequency.everyOther', { name: getDayName(combinedStartDateTime, language) }),
-				value: 2
+				value: ERepeatType.EVERY_OTHER_DAY
 			},
 			{
 				title: t('fields.eventFrequency.monthlyOn', { name: getDayWeekName(combinedStartDateTime, language) }),
-				value: 3
+				value: ERepeatType.MONTHLY
 			},
 			{
 				title: t('fields.eventFrequency.annuallyOn', { name: getDayYearName(combinedStartDateTime, language) }),
-				value: 4
+				value: ERepeatType.ANNUALLY
 			},
 			{
 				title: t('fields.eventFrequency.everyWeekday'),
-				value: 5
+				value: ERepeatType.WEEKLY_ON_DAY
 			}
 		],
 		[combinedStartDateTime]

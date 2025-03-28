@@ -20,16 +20,20 @@ type ChannelHashtagProps = {
 	channelHastagId: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	channelOnLinkFound?: ChannelsEntity;
 };
 
-const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble, channelOnLinkFound }: ChannelHashtagProps) => {
 	const dispatch = useAppDispatch();
 	const tagId = channelHastagId?.slice(2, -1);
 	const isClanView = useSelector(selectClanView);
 	const { toChannelPage, navigate } = useAppNavigation();
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	let channel = useTagById(tagId);
+	const channelById = useTagById(tagId);
+
+	let channel = channelOnLinkFound?.id ? channelOnLinkFound : channelById;
+
 	const thread = useAppSelector((state) => selectThreadById(state, tagId));
 	if (thread) channel = thread as ChannelsEntity;
 

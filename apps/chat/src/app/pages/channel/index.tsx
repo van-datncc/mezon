@@ -12,7 +12,7 @@ import {
 	directMetaActions,
 	getStore,
 	gifsStickerEmojiActions,
-	handleParticipantMeetState,
+	handleParticipantVoiceState,
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	onboardingActions,
@@ -374,11 +374,10 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		if (currentChannelAppId && currentChannelAppClanId) {
 			dispatch(channelAppActions.setJoinChannelAppData({ dataUpdate: undefined }));
 			dispatch(
-				handleParticipantMeetState({
+				handleParticipantVoiceState({
 					clan_id: currentChannelAppClanId,
 					channel_id: currentChannelAppId,
-					user_id: userProfile?.user?.id,
-					display_name: userProfile?.user?.display_name,
+					display_name: userProfile?.user?.display_name ?? '',
 					state: ParticipantMeetState.LEAVE
 				})
 			);

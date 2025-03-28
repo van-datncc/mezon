@@ -284,7 +284,7 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 					>
 						<div
 							onClick={onLeaveRoom}
-							className="w-14 h-14 bg-[#da373c] hover:bg-[#a12829] rounded-full flex justify-center items-center"
+							className="w-14 h-14 bg-[#da373c] hover:bg-[#a12829] cursor-pointer rounded-full flex justify-center items-center"
 						>
 							<Icons.EndCall className="w-6 h-6" />
 						</div>

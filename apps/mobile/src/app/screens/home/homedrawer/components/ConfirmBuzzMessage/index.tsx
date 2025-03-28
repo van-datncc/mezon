@@ -15,7 +15,7 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { onSubmit } = props;
-	const [messageBuzz, setMessageBuzz] = useState<string>('');
+	const [messageBuzz, setMessageBuzz] = useState<string>('Buzz!!');
 	const { t } = useTranslation('message');
 
 	const onConfirm = async () => {
@@ -34,7 +34,7 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 					<Text style={styles.title}>{t('buzz.description')}</Text>
 				</View>
 				<View style={styles.textBox}>
-					<TextInput style={styles.input} onChangeText={setMessageBuzz} />
+					<TextInput style={styles.input} value={messageBuzz} onChangeText={setMessageBuzz} />
 				</View>
 				<View style={styles.buttonsWrapper}>
 					<TouchableOpacity onPress={onConfirm} style={styles.yesButton}>

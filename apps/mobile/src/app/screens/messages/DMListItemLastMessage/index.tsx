@@ -75,7 +75,7 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 
 			if (endIndex !== -1) {
 				const emojiUrl = formatEmojiInText.slice(startIndex, endIndex);
-				parts.push(<ImageNative style={styles.emoji} url={emojiUrl} resizeMode="contain" />);
+				parts.push(<ImageNative key={`${emojiUrl}_dm_item_last_${endIndex}`} style={styles.emoji} url={emojiUrl} resizeMode="contain" />);
 				startIndex = endIndex + EMOJI_KEY.length;
 				endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
 			}

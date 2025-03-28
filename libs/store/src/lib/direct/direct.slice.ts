@@ -424,16 +424,26 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
-			const existLabel = entities[action.payload.id].channel_label?.split(',');
+			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
 			const dataUpdate = action.payload;
 			if (existLabel && existLabel?.length <= 1) {
-				dataUpdate.channel_label = entities[action.payload.id].channel_label;
+				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
 			}
 			directAdapter.upsertOne(state, dataUpdate);
 		},
 		update: directAdapter.updateOne,
 		setAll: directAdapter.setAll,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
+			if (!action.payload?.channel_id) return;
+			const { channel_id } = action.payload;
+			directAdapter.updateOne(state, {
+				id: channel_id,
+				changes: {
+					...action.payload
+				}
+			});
+		},
+		updateE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
 			const { creator_id, channel_id, e2ee } = action.payload;
 			const notCurrentUser = action.payload?.currentUserId !== creator_id;
@@ -447,7 +457,7 @@ export const directSlice = createSlice({
 			directAdapter.updateOne(state, {
 				id: channel_id,
 				changes: {
-					...action.payload
+					e2ee: e2ee
 				}
 			});
 		},
@@ -588,6 +598,29 @@ export const directSlice = createSlice({
 			const dmGroup = state.entities?.[dmId];
 			if (!dmGroup) return;
 			state.entities[dmId].active = isActive ? 1 : 0;
+		},
+		addBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
+			const channelId = action.payload.channelId;
+			const currentBadge = state.entities[channelId]?.count_mess_unread || 0;
+			if (currentBadge !== currentBadge + 1) {
+				directAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: currentBadge + 1
+					}
+				});
+			}
+		},
+		removeBadgeDirect: (state, action: PayloadAction<{ channelId: string }>) => {
+			const currentBadge = state.entities[action.payload.channelId]?.count_mess_unread || 0;
+			if (currentBadge) {
+				directAdapter.updateOne(state, {
+					id: action.payload.channelId,
+					changes: {
+						count_mess_unread: 0
+					}
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
