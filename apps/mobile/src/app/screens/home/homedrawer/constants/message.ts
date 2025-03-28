@@ -69,11 +69,6 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
 			title: t('message:actions.unPinMessage'),
 			type: EMessageActionType.UnPinMessage
 		},
-		{
-			id: 10,
-			title: t('message:actions.markUnRead'),
-			type: EMessageActionType.MarkUnRead
-		},
 		// {
 		// 	id: 11,
 		// 	title: t('message:actions.mention'),

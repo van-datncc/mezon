@@ -1,6 +1,7 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { selectComputedReactionsByMessageId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlatList } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../../src/app/constants/icon_cdn';
 import UserProfile from '../../UserProfile';
@@ -20,12 +22,14 @@ interface IMessageReactionContentProps {
 	userId: string | null;
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 	channelId?: string;
+	messageId?: string;
 }
 
 const { width } = Dimensions.get('window');
 
 export const MessageReactionContent = memo((props: IMessageReactionContentProps) => {
-	const { allReactionDataOnOneMessage, emojiSelectedId, channelId, userId, removeEmoji } = props;
+	const { emojiSelectedId, channelId, userId, removeEmoji, messageId } = props;
+	const allReactionDataOnOneMessage = useSelector(selectComputedReactionsByMessageId(channelId, messageId));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation('message');
@@ -146,6 +150,7 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 									onSelectUserId={() => {
 										const data = {
 											snapPoints: ['60%', '90%'],
+											hiddenHeaderIndicator: true,
 											children: <UserProfile userId={item.sender_id} showAction={true} showRole={true} currentChannel={null} />
 										};
 										DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
