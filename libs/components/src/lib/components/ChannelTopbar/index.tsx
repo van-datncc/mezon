@@ -1,4 +1,4 @@
-import { useAppNavigation, useGifsStickersEmoji, usePathMatch } from '@mezon/core';
+import { useGifsStickersEmoji, usePathMatch } from '@mezon/core';
 import {
 	RootState,
 	appActions,
@@ -161,7 +161,7 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, i
 								</div>
 							)}
 							<div
-								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+								className={`gap-4 relative flex  w-8 h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
 								id="inBox"
 							>
 								<InboxButton isLightMode={appearanceTheme === 'light'} />
@@ -376,17 +376,6 @@ export function RedDot() {
 		></div>
 	);
 }
-
-export const HelpButton = memo(({ isLightMode }: { isLightMode?: boolean }) => {
-	const { navigate } = useAppNavigation();
-	return (
-		<div className="relative leading-5 h-5">
-			<button title="Help" onClick={() => navigate('help')}>
-				<Icons.Help />
-			</button>
-		</div>
-	);
-});
 
 function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();
