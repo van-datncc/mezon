@@ -167,6 +167,7 @@ const MessageItem = React.memo(
 				}
 				const data = {
 					snapPoints: ['50%', '80%'],
+					hiddenHeaderIndicator: true,
 					children: (
 						<UserProfile
 							userId={message?.user?.id}

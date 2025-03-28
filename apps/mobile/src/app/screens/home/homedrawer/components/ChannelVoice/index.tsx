@@ -1,8 +1,10 @@
 import { AudioSession, LiveKitRoom, TrackReference } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2 } from '@mezon/store-mobile';
+import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import InCallManager from 'react-native-incall-manager';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
@@ -31,6 +33,8 @@ function ChannelVoice({
 	const styles = style(themeValue);
 	const channel = useSelector((state) => selectChannelById2(state, channelId));
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
+	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(true);
+	useKeepAwake();
 
 	useEffect(() => {
 		const start = async () => {
@@ -42,6 +46,11 @@ function ChannelVoice({
 			AudioSession.stopAudioSession();
 		};
 	}, []);
+
+	const onToggleSpeaker = async () => {
+		InCallManager.setSpeakerphoneOn(!isSpeakerOn);
+		setIsSpeakerOn(!isSpeakerOn);
+	};
 
 	return (
 		<View>
@@ -56,17 +65,25 @@ function ChannelVoice({
 				{isAnimationComplete && !focusedScreenShare && (
 					<View style={[styles.menuHeader]}>
 						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
-							<TouchableOpacity
-								onPress={() => {
-									onPressMinimizeRoom();
-								}}
-								style={styles.buttonCircle}
-							>
+							<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
 								<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
 							</TouchableOpacity>
 							<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
 								{channel?.channel_label}
 							</Text>
+						</View>
+						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
+							<TouchableOpacity
+								onPress={() => onToggleSpeaker()}
+								style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
+							>
+								<MezonIconCDN
+									icon={IconCDN.channelVoice}
+									height={size.s_17}
+									width={size.s_17}
+									color={isSpeakerOn ? themeValue.border : themeValue.white}
+								/>
+							</TouchableOpacity>
 						</View>
 					</View>
 				)}

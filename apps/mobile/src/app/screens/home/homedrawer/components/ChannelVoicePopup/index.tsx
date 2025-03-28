@@ -1,6 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import {
+	appActions,
 	generateMeetToken,
 	handleParticipantVoiceState,
 	selectChannelById2,
@@ -106,6 +107,7 @@ const ChannelVoicePopup = () => {
 	const handleJoinChannelVoice = useCallback(
 		async (roomName: string, channelId: string, clanId: string) => {
 			if (!roomName) return;
+			dispatch(appActions.setLoadingMainMobile(true));
 			try {
 				const result = await dispatch(
 					generateMeetToken({
@@ -113,7 +115,6 @@ const ChannelVoicePopup = () => {
 						roomName
 					})
 				).unwrap();
-
 				if (result) {
 					dispatch(
 						voiceActions.setVoiceInfo({
@@ -126,13 +127,16 @@ const ChannelVoicePopup = () => {
 					await participantMeetState(ParticipantMeetState.JOIN, clanId as string, channelId as string);
 					setToken(result);
 					dispatch(voiceActions.setJoined(true));
+					dispatch(appActions.setLoadingMainMobile(false));
 					setVoicePlay(true);
 				} else {
 					setToken(null);
+					dispatch(appActions.setLoadingMainMobile(false));
 				}
 			} catch (err) {
 				console.error('Failed to join room:', err);
 				setToken(null);
+				dispatch(appActions.setLoadingMainMobile(false));
 			}
 		},
 		[channel?.channel_label, clan?.clan_name, dispatch]

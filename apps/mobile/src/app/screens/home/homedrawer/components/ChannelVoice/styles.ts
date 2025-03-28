@@ -38,7 +38,14 @@ export const style = (colors: Attributes) =>
 		buttonCircle: {
 			backgroundColor: colors.border,
 			padding: size.s_8,
-			borderRadius: size.s_22
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderRadius: size.s_40,
+			width: size.s_40,
+			height: size.s_40
+		},
+		buttonCircleActive: {
+			backgroundColor: colors.text
 		},
 		btnVoice: {
 			backgroundColor: colors.secondary,
@@ -113,6 +120,6 @@ export const style = (colors: Attributes) =>
 			right: '3%',
 			backgroundColor: colors.selectedOverlay,
 			borderRadius: size.s_30,
-			padding: size.s_4
+			padding: size.s_10
 		}
 	});

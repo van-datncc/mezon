@@ -167,6 +167,30 @@ const RoomView = ({
 		onFocusedScreenChange(focusedScreenShare);
 	}, [focusedScreenShare, onFocusedScreenChange]);
 
+	const RenderControlBar = () => {
+		return (
+			<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
+				<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
+					<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
+						{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
+					</TouchableOpacity>
+					<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
+						{isMicrophoneEnabled ? <MezonIconCDN icon={IconCDN.microphoneIcon} /> : <MezonIconCDN icon={IconCDN.microphoneSlashIcon} />}
+					</TouchableOpacity>
+					<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
+						<MezonIconCDN icon={IconCDN.chatIcon} />
+					</TouchableOpacity>
+					<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
+						{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
+					</TouchableOpacity>
+					<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
+						<MezonIconCDN icon={IconCDN.phoneCallIcon} />
+					</TouchableOpacity>
+				</View>
+			</View>
+		);
+	};
+
 	if (focusedScreenShare) {
 		return (
 			<View style={{ width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -184,6 +208,7 @@ const RoomView = ({
 				<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
 					<Icons.ArrowShrinkIcon height={size.s_16} />
 				</TouchableOpacity>
+				<RenderControlBar />
 			</View>
 		);
 	}
@@ -200,31 +225,7 @@ const RoomView = ({
 					setFocusedScreenShare={setFocusedScreenShare}
 				/>
 			)}
-			{isAnimationComplete && (
-				<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
-					<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
-						<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
-							{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
-						</TouchableOpacity>
-						<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
-							{isMicrophoneEnabled ? (
-								<MezonIconCDN icon={IconCDN.microphoneIcon} />
-							) : (
-								<MezonIconCDN icon={IconCDN.microphoneSlashIcon} />
-							)}
-						</TouchableOpacity>
-						<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-							<MezonIconCDN icon={IconCDN.chatIcon} />
-						</TouchableOpacity>
-						<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
-							{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
-						</TouchableOpacity>
-						<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
-							<MezonIconCDN icon={IconCDN.phoneCallIcon} />
-						</TouchableOpacity>
-					</View>
-				</View>
-			)}
+			{isAnimationComplete && <RenderControlBar />}
 		</View>
 	);
 };
