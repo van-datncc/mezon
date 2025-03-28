@@ -23,7 +23,7 @@ import {
 import { ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const ChannelVoice = memo(
@@ -114,6 +114,17 @@ const ChannelVoice = memo(
 			} else {
 				document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
 			}
+		}, [dispatch]);
+
+		useEffect(() => {
+			const handleFullscreenChange = () => {
+				if (!document.fullscreenElement) {
+					dispatch(voiceActions.setFullScreen(false));
+				}
+			};
+
+			document.addEventListener('fullscreenchange', handleFullscreenChange);
+			return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
 		}, [dispatch]);
 
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
