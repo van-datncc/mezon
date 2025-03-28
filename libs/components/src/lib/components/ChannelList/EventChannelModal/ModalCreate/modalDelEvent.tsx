@@ -1,6 +1,6 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
 import { EventManagementEntity } from '@mezon/store';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 type ModalDelEventProps = {
 	event: EventManagementEntity | undefined;
@@ -21,10 +21,30 @@ const ModalDelEvent = (props: ModalDelEventProps) => {
 	};
 
 	const panelRef = useRef(null);
+	const modalRef = useRef<HTMLDivElement>(null);
 	useOnClickOutside(panelRef, closeModal);
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
+			closeModal();
+		}
+	};
+
+	useEffect(() => {
+		if (modalRef.current) {
+			modalRef.current.focus();
+		}
+	}, []);
+
 	return (
-		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			onKeyDown={handleKeyDown}
+			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+		>
 			<div
 				ref={panelRef}
 				className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden"

@@ -151,7 +151,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	return (
 		<div className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden" ref={panelRef}>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
-			<div className="p-4 border-b dark:border-slate-600 border-white" onClick={() => event && setChooseEvent(event)}>
+			<div className="p-4 border-b dark:border-slate-600 border-white cursor-pointer" onClick={() => event && setChooseEvent(event)}>
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />

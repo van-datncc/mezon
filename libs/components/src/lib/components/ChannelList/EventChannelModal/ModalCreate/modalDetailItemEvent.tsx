@@ -1,3 +1,4 @@
+import { useOnClickOutside } from '@mezon/core';
 import {
 	eventManagementActions,
 	EventManagementEntity,
@@ -12,7 +13,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { timeFomat } from '../timeFomatEvent';
 
@@ -31,9 +32,35 @@ const ModalDetailItemEvent = () => {
 		dispatch(eventManagementActions.showModalDetailEvent(false));
 	}, [dispatch]);
 
+	const panelRef = useRef(null);
+	const modalRef = useRef<HTMLDivElement>(null);
+	useOnClickOutside(panelRef, clearChooseEvent);
+
+	useEffect(() => {
+		if (modalRef.current) {
+			modalRef.current.focus();
+		}
+	}, []);
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
+			clearChooseEvent();
+		}
+	};
+
 	return (
-		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-			<div className="w-[600px] min-h-[400px] max-h-[600px] rounded-lg overflow-hidden text-base dark:bg-[#313339] bg-white dark:text-white text-black">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			onKeyDown={handleKeyDown}
+			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+		>
+			<div
+				ref={panelRef}
+				className="w-[600px] min-h-[400px] max-h-[600px] rounded-lg overflow-hidden text-base dark:bg-[#313339] bg-white dark:text-white text-black"
+			>
 				{event?.logo && <img src={event?.logo} alt={event?.title} className="w-full h-44 object-cover" />}
 				<div className="flex justify-between items-center pt-4 border-b font-bold border-zinc-600">
 					<div className="flex items-center gap-x-4 ml-4">
@@ -89,7 +116,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 				<p className="hover:underline">{currentClan?.clan_name}</p>
 			</div>
 			<div className="flex items-center gap-x-3 ">
-				{event?.channel_id === '0' ? (
+				{event?.address ? (
 					<>
 						<Icons.Location />
 						<p>{event?.address}</p>
