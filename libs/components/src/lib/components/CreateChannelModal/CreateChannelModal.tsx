@@ -208,12 +208,6 @@ export const CreateNewChannelModal = () => {
 										onChange={onChangeChannelType}
 										error={isErrorType}
 									/>
-									{/* <ChannelTypeComponent
-										disable={true}
-										type={ChannelType.CHANNEL_TYPE_FORUM}
-										onChange={onChangeChannelType}
-										error={isErrorType}
-									/> */}
 									<ChannelTypeComponent
 										disable={false}
 										type={ChannelType.CHANNEL_TYPE_STREAMING}
@@ -263,11 +257,9 @@ export const CreateNewChannelModal = () => {
 									/>
 								</div>
 							)}
-							{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
-								channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
-								channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
-									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-								)}
+							{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
+								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+							)}
 						</div>
 					</div>
 				</div>

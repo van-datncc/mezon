@@ -57,22 +57,26 @@ export const MessageReactionWrapper = React.memo((props: IMessageReactionProps) 
 		[message?.channel_id, message.topic_id, message?.id, mode, userId]
 	);
 
-	const onReactItemLongPress = (emojiId: string) => {
-		const data = {
-			snapPoints: ['60%', '90%'],
-			children: (
-				<MessageReactionContent
-					allReactionDataOnOneMessage={messageReactions}
-					emojiSelectedId={emojiId}
-					userId={userId}
-					removeEmoji={removeEmoji}
-					channelId={message?.channel_id}
-				/>
-			)
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-		Keyboard.dismiss();
-	};
+	const onReactItemLongPress = useCallback(
+		(emojiId: string) => {
+			const data = {
+				snapPoints: ['60%', '90%'],
+				children: (
+					<MessageReactionContent
+						allReactionDataOnOneMessage={messageReactions}
+						emojiSelectedId={emojiId}
+						userId={userId}
+						removeEmoji={removeEmoji}
+						channelId={message?.channel_id}
+						messageId={message?.id}
+					/>
+				)
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+			Keyboard.dismiss();
+		},
+		[message?.channel_id, message?.id, messageReactions, removeEmoji, userId]
+	);
 
 	return (
 		<View style={[styles.reactionWrapper, styles.reactionSpace, isMessageSystem && { paddingTop: 0, marginLeft: size.s_40 }]}>
