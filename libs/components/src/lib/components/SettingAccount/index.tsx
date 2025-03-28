@@ -36,7 +36,8 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 		getColor();
 	}, [checkUrl, urlImg]);
 
-	const email = `${userProfile?.user?.username}@ncc.asia`;
+	const email = userProfile?.email;
+
 	const [openSetPassWordModal, closeSetPasswordModal] = useModal(() => {
 		return (
 			<SetPassword
