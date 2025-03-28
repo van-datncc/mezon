@@ -7,7 +7,7 @@ import styles from './styles';
 interface ISticker {
 	stickerList: any[];
 	categoryName: string;
-	onClickSticker: (url: string) => void;
+	onClickSticker: (sticker: any) => void;
 }
 
 export default memo(function Sticker({ stickerList, categoryName, onClickSticker }: ISticker) {
@@ -20,7 +20,7 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 			<View style={styles.sessionContent}>
 				{stickersListByCategoryName.length > 0 &&
 					stickersListByCategoryName.map((sticker, index) => (
-						<TouchableOpacity onPress={() => onClickSticker(sticker.url)} style={styles.content} key={index.toString() + 'stickers'}>
+						<TouchableOpacity onPress={() => onClickSticker(sticker)} style={styles.content} key={index.toString() + 'stickers'}>
 							<FastImage
 								source={{
 									uri: sticker.url,
