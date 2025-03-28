@@ -65,6 +65,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && isMobile) ||
 			(emojiAction === EmojiPlaces.EMOJI_REACTION && !isMobile) ||
 			(emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && !isMobile) ||
+			(emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ && !isMobile) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && isStreaming) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && isStreaming)
 		);
@@ -92,7 +93,9 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 	return (
 		<div onClick={(e) => e.stopPropagation()} className={containerClassName}>
 			<div className="w-full">
-				{!idMessageRefReaction && <TabBar subPanelActive={subPanelActive} onTabClick={handleTabClick} />}
+				{!idMessageRefReaction && emojiAction !== EmojiPlaces.EMOJI_EDITOR_BUZZ && (
+					<TabBar subPanelActive={subPanelActive} onTabClick={handleTabClick} />
+				)}
 				<InputSearch />
 			</div>
 
