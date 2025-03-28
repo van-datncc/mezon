@@ -23,6 +23,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 			const data = {
 				snapPoints: ['60%'],
 				heightFitContent: true,
+				hiddenHeaderIndicator: true,
 				children: (
 					<View
 						style={{

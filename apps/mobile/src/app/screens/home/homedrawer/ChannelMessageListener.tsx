@@ -50,6 +50,7 @@ const ChannelMessageListener = React.memo(() => {
 				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
 				const data = {
 					snapPoints: ['50%', '80%'],
+					hiddenHeaderIndicator: true,
 					children: <UserProfile userId={clanUser?.user?.id} user={clanUser?.user} />
 				};
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });

@@ -298,10 +298,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		setCurrentMessageActionType(EMessageActionType.UnPinMessage);
 	};
 
-	const handleActionMarkUnRead = () => {
-		Toast.show({ type: 'info', text1: 'Updating...' });
-	};
-
 	const handleResendMessage = async () => {
 		dispatch(
 			messagesActions.remove({
@@ -413,9 +409,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.UnPinMessage:
 				handleActionUnPinMessage();
 				break;
-			case EMessageActionType.MarkUnRead:
-				handleActionMarkUnRead();
-				break;
 			// case EMessageActionType.CopyMessageLink:
 			// 	handleActionCopyMessageLink();
 			// 	break;
@@ -468,8 +461,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.pinIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.UnPinMessage:
 				return <MezonIconCDN icon={IconCDN.pinIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
-			case EMessageActionType.MarkUnRead:
-				return <MezonIconCDN icon={IconCDN.markUnreadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			// case EMessageActionType.Mention:
 			// 	return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
