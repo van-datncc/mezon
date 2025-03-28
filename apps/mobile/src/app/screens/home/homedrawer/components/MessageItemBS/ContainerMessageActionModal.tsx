@@ -374,14 +374,14 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 	}, []);
 
-	const handleActionBuzzMessage = useCallback(async () => {
+	const handleActionBuzzMessage = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		await sleep(500);
 		const data = {
 			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, [handleBuzzMessage]);
+	};
 
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {

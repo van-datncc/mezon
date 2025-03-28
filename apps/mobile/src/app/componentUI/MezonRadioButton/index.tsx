@@ -19,12 +19,16 @@ export default function MezonRadioButton({ onChange, checked, noSwitchFalse, dis
 	}, [checked]);
 
 	function handleToggle() {
-		if (noSwitchFalse) {
-			setChecked(true);
-			onChange && onChange(true);
-		} else {
-			onChange && onChange(!isChecked);
-			setChecked(!isChecked);
+		try {
+			if (noSwitchFalse) {
+				setChecked(true);
+				onChange && onChange(true);
+			} else {
+				onChange && onChange(!isChecked);
+				setChecked(!isChecked);
+			}
+		} catch (error) {
+			console.error('Error in handleToggle:', error);
 		}
 	}
 

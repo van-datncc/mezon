@@ -495,7 +495,7 @@ export const selectAllChannelMembers = createSelector(
 		selectGrouplMembers,
 		(state: RootState, channelId: string) => {
 			const currentClanId = state.clans?.currentClanId;
-			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
+			const channel = state?.channels?.byClans?.[currentClanId as string]?.entities?.entities?.[channelId];
 			const isPrivate = channel?.channel_private;
 			const parentId = channel?.parent_id;
 			const isDm = state.direct?.currentDirectMessageId === channelId || '';
