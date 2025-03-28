@@ -5,7 +5,7 @@ interface FormErrorProps {
 	message: string;
 }
 
-export const FormError = memo(({ message }: FormErrorProps) => {
+const FormError = memo(({ message }: FormErrorProps) => {
 	if (!message) return null;
 
 	return (
@@ -15,3 +15,5 @@ export const FormError = memo(({ message }: FormErrorProps) => {
 		</div>
 	);
 });
+
+export default FormError;
