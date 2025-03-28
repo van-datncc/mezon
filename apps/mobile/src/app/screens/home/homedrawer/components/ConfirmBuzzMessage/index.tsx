@@ -20,6 +20,9 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 
 	const onConfirm = async () => {
 		onClose();
+		if (!messageBuzz) {
+			return;
+		}
 		onSubmit(messageBuzz);
 	};
 
