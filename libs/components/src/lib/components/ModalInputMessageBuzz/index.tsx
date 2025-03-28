@@ -22,6 +22,7 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ inputRequ
 	const { sendMessage } = useChatSending({ channelOrDirect: currentChannel || undefined, mode });
 	const panelRef = useRef(null);
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+	const emojiRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const [isShowEmojiPanel, setIsShowEmojiPanel] = useState(false);
 
@@ -82,7 +83,9 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ inputRequ
 			handleClosePopup();
 		}
 	}, [handleClosePopup, inputRequest.content, inputRequest.mentionRaw, sendMessage]);
+
 	useOnClickOutside(panelRef, handleClosePopup);
+	useOnClickOutside(emojiRef, toggleEmojiPanel);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
@@ -116,6 +119,8 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ inputRequ
 						channelOrDirect={currentChannel as ApiChannelDescription}
 						emojiAction={EmojiPlaces.EMOJI_EDITOR_BUZZ}
 						mode={mode}
+						buzzInputRequest={inputRequest}
+						setBuzzInputRequest={setInputRequest}
 					/>
 				</div>
 			)}
