@@ -5,6 +5,7 @@ import {
 	getNewColorRole,
 	getNewNameRole,
 	getSelectedRoleId,
+	getStoreAsync,
 	roleSlice,
 	rolesClanActions,
 	selectCurrentClanId,
@@ -19,7 +20,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EDragBorderPosition } from '@mezon/utils';
 import { ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../../ClanSettingOverview/ModalSaveChanges';
@@ -39,7 +40,6 @@ const SettingListRole = (props: closeEditRole) => {
 	const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
 	const nameRoleNew = useSelector(getNewNameRole);
 	const colorRoleNew = useSelector(getNewColorRole);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const {
 		rolesList,
 		hoveredIndex,
@@ -56,7 +56,11 @@ const SettingListRole = (props: closeEditRole) => {
 		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} />;
 	});
 
-	const handleUpdateRolesOrder = useCallback(() => {
+	const handleUpdateRolesOrder = async () => {
+		const store = await getStoreAsync();
+		const state = store.getState();
+		const currentClanId = selectCurrentClanId(state);
+
 		setRolesList((currentRoles) => {
 			const requestBody: ApiUpdateRoleOrderRequest = {
 				clan_id: currentClanId || '',
@@ -74,7 +78,7 @@ const SettingListRole = (props: closeEditRole) => {
 
 			return currentRoles;
 		});
-	}, [dispatch]);
+	};
 
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {

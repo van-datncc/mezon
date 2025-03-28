@@ -1,9 +1,9 @@
 import { useClanOwner, useDragAndDropRole } from '@mezon/core';
-import { RolesClanEntity, rolesClanActions, selectCurrentClanId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store';
+import { RolesClanEntity, getStoreAsync, rolesClanActions, selectCurrentClanId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EDragBorderPosition, SlugPermission } from '@mezon/utils';
 import { ApiPermission, ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
@@ -19,7 +19,6 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 	const { activeRoles, handleRoleClick, setShowModal, setOpenEdit } = props;
 	const isClanOwner = useClanOwner();
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const {
 		rolesList,
 		hoveredIndex,
@@ -48,7 +47,11 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 		setOpenEdit(true);
 	};
 
-	const handleUpdateRolesOrder = useCallback(() => {
+	const handleUpdateRolesOrder = async () => {
+		const store = await getStoreAsync();
+		const state = store.getState();
+		const currentClanId = selectCurrentClanId(state);
+
 		setRolesList((currentRoles) => {
 			const requestBody: ApiUpdateRoleOrderRequest = {
 				clan_id: currentClanId || '',
@@ -66,7 +69,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 
 			return currentRoles;
 		});
-	}, [dispatch]);
+	};
 
 	const handleResetChanges = () => {
 		resetRolesList();
