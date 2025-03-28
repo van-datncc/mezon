@@ -219,9 +219,10 @@ const UserProfile = React.memo(
 		const handleTransferFunds = () => {
 			const payload = JSON.stringify({
 				receiver_id: userId,
-				receiver_name: user?.user?.username,
+				receiver_name: user?.user?.username || userById?.user?.username || user?.username,
 				amount: 10000,
-				note: t('userAction.transferFunds')
+				note: t('userAction.transferFunds'),
+				canEdit: true
 			});
 			navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
 				screen: APP_SCREEN.SETTINGS.SEND_TOKEN,
@@ -253,12 +254,12 @@ const UserProfile = React.memo(
 								position: 'absolute',
 								right: size.s_10,
 								top: size.s_10,
-								padding: size.s_4,
+								padding: size.s_6,
 								borderRadius: size.s_20,
-								backgroundColor: Colors.bgGrayDark
+								backgroundColor: Colors.darkGray
 							}}
 						>
-							<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} />
+							<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} width={size.s_20} height={size.s_20} />
 						</TouchableOpacity>
 					)}
 					<View style={[styles.userAvatar]}>
