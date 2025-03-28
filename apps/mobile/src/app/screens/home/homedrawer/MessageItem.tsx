@@ -141,7 +141,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				snapPoints: ['60%', '90%'],
+				heightFitContent: true,
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -167,6 +167,7 @@ const MessageItem = React.memo(
 				}
 				const data = {
 					snapPoints: ['50%', '80%'],
+					hiddenHeaderIndicator: true,
 					children: (
 						<UserProfile
 							userId={message?.user?.id}
@@ -195,7 +196,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				snapPoints: ['60%', '90%'],
+				heightFitContent: true,
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -378,7 +379,7 @@ const MessageItem = React.memo(
 									preventAction={preventAction}
 									openEmojiPicker={() => {
 										const data = {
-											snapPoints: ['70%', '90%'],
+											heightFitContent: true,
 											children: (
 												<ContainerMessageActionModal
 													message={message}

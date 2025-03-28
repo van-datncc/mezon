@@ -140,6 +140,7 @@ export const BaseMemberProfile = ({
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_type as number];
 	const activityTitle = activityByUserId?.activity_description;
 	const activityName = activityByUserId?.activity_name;
+	const isFooter = positionType === MemberProfileType.FOOTER_PROFILE;
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
@@ -174,7 +175,7 @@ export const BaseMemberProfile = ({
 			openProfileItem();
 		}
 
-		if (event.button === MouseButton.RIGHT) {
+		if (event.button === MouseButton.RIGHT && !isFooter) {
 			const distanceToBottom = windowHeight - mouseY;
 			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
 			if (modalState.current.pannelMember) {
@@ -198,8 +199,6 @@ export const BaseMemberProfile = ({
 		closeModal(ModalType.ProfileItem);
 		closeModal(ModalType.PannelMember);
 	};
-
-	const isFooter = positionType === MemberProfileType.FOOTER_PROFILE;
 
 	const isListFriend = positionType === MemberProfileType.LIST_FRIENDS;
 

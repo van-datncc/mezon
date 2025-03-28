@@ -35,6 +35,7 @@ const useBottomSheetState = () => {
 	const [headerLeft, setHeaderLeft] = useState<any>(null);
 	const [headerRight, setHeaderRight] = useState<any>(null);
 	const [titleSize, setTitleSize] = useState<string>(null);
+	const [hiddenHeaderIndicator, setHiddenHeaderIndicator] = useState<boolean>(false);
 
 	const clearDataBottomSheet = () => {
 		setSnapPoints(['90%']);
@@ -44,6 +45,7 @@ const useBottomSheetState = () => {
 		setHeaderLeft(null);
 		setHeaderRight(null);
 		setTitleSize(null);
+		setHiddenHeaderIndicator(false);
 	};
 
 	return {
@@ -54,6 +56,7 @@ const useBottomSheetState = () => {
 		headerLeft,
 		headerRight,
 		titleSize,
+		hiddenHeaderIndicator,
 		setSnapPoints,
 		setHeightFitContent,
 		setChildren,
@@ -61,7 +64,8 @@ const useBottomSheetState = () => {
 		setHeaderLeft,
 		setHeaderRight,
 		setTitleSize,
-		clearDataBottomSheet
+		clearDataBottomSheet,
+		setHiddenHeaderIndicator
 	};
 };
 
@@ -74,6 +78,7 @@ const BottomSheetRootListener = () => {
 		headerLeft,
 		headerRight,
 		titleSize,
+		hiddenHeaderIndicator,
 		setSnapPoints,
 		setHeightFitContent,
 		setChildren,
@@ -81,7 +86,8 @@ const BottomSheetRootListener = () => {
 		setHeaderLeft,
 		setHeaderRight,
 		setTitleSize,
-		clearDataBottomSheet
+		clearDataBottomSheet,
+		setHiddenHeaderIndicator
 	} = useBottomSheetState();
 
 	const ref = useRef<OriginalBottomSheet>();
@@ -99,6 +105,7 @@ const BottomSheetRootListener = () => {
 		if (data?.headerLeft) setHeaderLeft(data.headerLeft);
 		if (data?.headerRight) setHeaderRight(data.headerRight);
 		if (data?.setTitleSize) setTitleSize(data.setTitleSize);
+		if (data?.hiddenHeaderIndicator) setHiddenHeaderIndicator(data.hiddenHeaderIndicator);
 		ref?.current?.present();
 	};
 
@@ -146,6 +153,13 @@ const BottomSheetRootListener = () => {
 			handleIndicatorStyle={styles.handleIndicator}
 			style={styles.container}
 			onChange={handleSheetPositionChange}
+			handleComponent={
+				hiddenHeaderIndicator
+					? null
+					: () => {
+							return <View style={styles.handleIndicator} />;
+						}
+			}
 		>
 			{renderHeader()}
 			{children && <BottomSheetScrollView>{children}</BottomSheetScrollView>}

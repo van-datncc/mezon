@@ -134,7 +134,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		if (type === 'gif') {
 			handleSend({ t: '' }, [], [{ url: data }], [messageRef]);
 		} else if (type === 'sticker') {
-			handleSend({ t: '' }, [], [{ url: data, height: 40, width: 40, filetype: 'image/gif' }], [messageRef]);
+			handleSend({ t: '' }, [], [{ url: data?.url, filetype: 'image/gif', filename: data?.id }], [messageRef]);
 		} else {
 			/* empty */
 		}
@@ -220,7 +220,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 				) : mode === 'gif' ? (
 					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
 				) : (
-					<StickerSelector onScroll={onScroll} onSelected={(url) => handleSelected('sticker', url)} />
+					<StickerSelector onScroll={onScroll} onSelected={(sticker) => handleSelected('sticker', sticker)} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>

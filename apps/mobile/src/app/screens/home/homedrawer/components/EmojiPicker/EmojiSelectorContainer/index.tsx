@@ -234,7 +234,7 @@ export default function EmojiSelectorContainer({
 				categoriesWithIcons.map((item, index) => {
 					return (
 						<View
-							ref={categoryRefs.current[item.name]} // Pass the ref here
+							key={`${index}-${item.name}-emoji-pannel`}
 							onLayout={(event) => {
 								if (categoryRefs?.current?.[item?.name]?.position !== undefined) {
 									categoryRefs.current[item.name].position = event.nativeEvent.layout.y;

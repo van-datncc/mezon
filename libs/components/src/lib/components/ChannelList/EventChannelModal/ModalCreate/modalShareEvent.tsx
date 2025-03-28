@@ -3,7 +3,7 @@ import { ChannelsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type ModalShareEventProps = {
 	channel: ChannelsEntity;
@@ -38,10 +38,30 @@ const ModalShareEvent = (props: ModalShareEventProps) => {
 	};
 
 	const panelRef = useRef(null);
+	const modalRef = useRef<HTMLDivElement>(null);
 	useOnClickOutside(panelRef, closeModal);
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
+			closeModal();
+		}
+	};
+
+	useEffect(() => {
+		if (modalRef.current) {
+			modalRef.current.focus();
+		}
+	}, []);
+
 	return (
-		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			onKeyDown={handleKeyDown}
+			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+		>
 			<div
 				ref={panelRef}
 				className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden"

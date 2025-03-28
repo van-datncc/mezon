@@ -73,6 +73,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return friends?.filter((user) => user.state === 0) || [];
 	}, [friends]);
+	const canEdit = jsonObject?.canEdit;
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
@@ -327,7 +328,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					<Text style={styles.title}>{t('token')}</Text>
 					<View style={styles.textField}>
 						<TextInput
-							editable={!jsonObject?.amount}
+							editable={!jsonObject?.amount || canEdit}
 							style={styles.textInput}
 							value={tokenCount}
 							keyboardType="numeric"
@@ -340,10 +341,11 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					<Text style={styles.title}>{t('note')}</Text>
 					<View style={styles.textField}>
 						<TextInput
+							editable={!jsonObject?.note || canEdit}
 							style={[styles.textInput, { height: size.s_100, paddingVertical: size.s_10, paddingTop: size.s_10 }]}
 							placeholderTextColor="#535353"
 							autoCapitalize="none"
-							value={jsonObject?.note?.toString() || note}
+							value={note}
 							numberOfLines={5}
 							multiline={true}
 							textAlignVertical="top"

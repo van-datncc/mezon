@@ -82,6 +82,15 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 					keyExtractor={(item, index) => `${item?.id}_${index}}`}
 					showsHorizontalScrollIndicator={false}
 					decelerationRate="fast"
+					onScrollToIndexFailed={(info) => {
+						const wait = new Promise((resolve) => setTimeout(resolve, 200));
+						if (info.highestMeasuredFrameIndex < info.index) {
+							flatListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: true });
+							wait.then(() => {
+								flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+							});
+						}
+					}}
 				/>
 			</View>
 		</View>

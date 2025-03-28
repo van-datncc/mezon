@@ -298,10 +298,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		setCurrentMessageActionType(EMessageActionType.UnPinMessage);
 	};
 
-	const handleActionMarkUnRead = () => {
-		Toast.show({ type: 'info', text1: 'Updating...' });
-	};
-
 	const handleResendMessage = async () => {
 		dispatch(
 			messagesActions.remove({
@@ -378,14 +374,14 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 	}, []);
 
-	const handleActionBuzzMessage = useCallback(async () => {
+	const handleActionBuzzMessage = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		await sleep(500);
 		const data = {
 			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, [handleBuzzMessage]);
+	};
 
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
@@ -412,9 +408,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				break;
 			case EMessageActionType.UnPinMessage:
 				handleActionUnPinMessage();
-				break;
-			case EMessageActionType.MarkUnRead:
-				handleActionMarkUnRead();
 				break;
 			// case EMessageActionType.CopyMessageLink:
 			// 	handleActionCopyMessageLink();
@@ -468,8 +461,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.pinIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.UnPinMessage:
 				return <MezonIconCDN icon={IconCDN.pinIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
-			case EMessageActionType.MarkUnRead:
-				return <MezonIconCDN icon={IconCDN.markUnreadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			// case EMessageActionType.Mention:
 			// 	return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
