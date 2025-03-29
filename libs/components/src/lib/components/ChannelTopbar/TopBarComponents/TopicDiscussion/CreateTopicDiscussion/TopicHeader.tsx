@@ -1,5 +1,5 @@
 import { useMessageValue } from '@mezon/core';
-import { selectCurrentChannelId, topicsActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentChannelId, selectRequestByChannelId, topicsActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
@@ -25,7 +25,9 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 		dispatch(topicsActions.setCurrentTopicInitMessage(null));
 	}, [dispatch]);
 
-	const { setRequestInput, request } = useMessageValue();
+	const { setRequestInput } = useMessageValue();
+
+	const request = useAppSelector((state) => selectRequestByChannelId(state, currentChannelId as string));
 
 	const handleCloseModal = useCallback(
 		(event?: React.MouseEvent) => {
