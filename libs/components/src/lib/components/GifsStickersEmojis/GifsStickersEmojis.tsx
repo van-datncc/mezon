@@ -7,7 +7,7 @@ import {
 	selectCurrentTopicId,
 	selectIdMessageRefReaction
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, RequestInput, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useRef } from 'react';
@@ -22,9 +22,11 @@ export type GifStickerEmojiPopupOptions = {
 	emojiAction?: EmojiPlaces;
 	mode?: number;
 	channelOrDirect?: ApiChannelDescription;
+	buzzInputRequest?: RequestInput;
+	setBuzzInputRequest?: (value: RequestInput) => void;
 };
 
-export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: GifStickerEmojiPopupOptions) => {
+export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect, buzzInputRequest, setBuzzInputRequest }: GifStickerEmojiPopupOptions) => {
 	const { subPanelActive, setSubPanelActive, setValueInputSearch } = useGifsStickersEmoji();
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -65,6 +67,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && isMobile) ||
 			(emojiAction === EmojiPlaces.EMOJI_REACTION && !isMobile) ||
 			(emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && !isMobile) ||
+			(emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ && !isMobile) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && isStreaming) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && isStreaming)
 		);
@@ -92,7 +95,9 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 	return (
 		<div onClick={(e) => e.stopPropagation()} className={containerClassName}>
 			<div className="w-full">
-				{!idMessageRefReaction && <TabBar subPanelActive={subPanelActive} onTabClick={handleTabClick} />}
+				{!idMessageRefReaction && emojiAction !== EmojiPlaces.EMOJI_EDITOR_BUZZ && (
+					<TabBar subPanelActive={subPanelActive} onTabClick={handleTabClick} />
+				)}
 				<InputSearch />
 			</div>
 
@@ -106,6 +111,9 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 					onClose={closePannel}
 					isShowEmojiPicker={isShowEmojiPicker}
 					idMessageRefReaction={idMessageRefReaction}
+					emojiAction={emojiAction}
+					buzzInputRequest={buzzInputRequest}
+					setBuzzInputRequest={setBuzzInputRequest}
 				/>
 			</div>
 		</div>
@@ -148,7 +156,10 @@ const ContentPanel = React.memo(
 		contentWidthClass,
 		onClose,
 		isShowEmojiPicker,
-		idMessageRefReaction
+		idMessageRefReaction,
+		emojiAction,
+		buzzInputRequest,
+		setBuzzInputRequest
 	}: {
 		subPanelActive: SubPanelName;
 		channelOrDirect?: ApiChannelDescription;
@@ -158,6 +169,9 @@ const ContentPanel = React.memo(
 		onClose: () => void;
 		isShowEmojiPicker: boolean;
 		idMessageRefReaction?: string;
+		emojiAction?: EmojiPlaces;
+		buzzInputRequest?: RequestInput;
+		setBuzzInputRequest?: (value: RequestInput) => void;
 	}) => {
 		const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 		const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
@@ -198,6 +212,9 @@ const ContentPanel = React.memo(
 						messageEmojiId={idMessageRefReaction}
 						onClose={onClose}
 						isFocusThreadBox={isFocusThreadBox}
+						emojiAction={emojiAction}
+						buzzInputRequest={buzzInputRequest}
+						setBuzzInputRequest={setBuzzInputRequest}
 					/>
 				</div>
 			);

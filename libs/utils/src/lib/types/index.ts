@@ -522,7 +522,8 @@ export enum EmojiPlaces {
 	EMOJI_REACTION = 'EMOJI_REACTION',
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REACTION_BOTTOM',
 	EMOJI_EDITOR = 'EMOJI_EDITOR',
-	EMOJI_REACTION_NONE = 'EMOJI_REACTION_NONE'
+	EMOJI_REACTION_NONE = 'EMOJI_REACTION_NONE',
+	EMOJI_EDITOR_BUZZ = 'EMOJI_EDITOR_BUZZ'
 }
 
 export interface UnreadChannel {
@@ -1479,4 +1480,9 @@ export enum SymbolsAndIdsLengthOfMentionValue {
 
 export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
 	isBlank?: boolean;
+}
+
+export enum EDragBorderPosition {
+	TOP = 'top',
+	BOTTOM = 'bottom'
 }

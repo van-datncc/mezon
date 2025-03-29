@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
+import { ApiRole, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
@@ -71,7 +71,25 @@ export const fetchRolesClan = createAsyncThunk(
 			if (repace) {
 				thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 			}
-			const roles = response?.roles.roles.map(mapRolesClanToEntity);
+			const roles = response?.roles.roles
+				.filter((role) => role?.active)
+				.map((role, index) => ({ ...role, originalIndex: index }))
+				.sort((role_1, role_2) => {
+					// If both roles have 'order_role', sort by its value
+					if (role_1.order_role !== undefined && role_2.order_role !== undefined) {
+						return role_1.order_role - role_2.order_role;
+					}
+
+					// If neither role has 'order_role', maintain their original order
+					if (role_1.order_role === undefined && role_2.order_role === undefined) {
+						return role_1.originalIndex - role_2.originalIndex;
+					}
+
+					// If only one role has 'order_role', prioritize it
+					return role_1.order_role !== undefined ? -1 : 1;
+				})
+				.map(mapRolesClanToEntity);
+
 			return roles;
 		} catch (error) {
 			captureSentryError(error, 'RolesClan/fetchRolesClan');
@@ -221,6 +239,15 @@ export const updateRole = createAsyncThunk(
 	}
 );
 
+export const updateRoleOrder = createAsyncThunk('UpdateRole/updateRolesOrder', async ({ clan_id, roles }: ApiUpdateRoleOrderRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.updateRoleOrder(mezon.session, { clan_id, roles });
+	} catch (e) {
+		console.error('Error', e);
+	}
+});
+
 type updatePermission = {
 	roleId: string;
 	userId: string;
@@ -278,6 +305,9 @@ export const RolesClanSlice = createSlice({
 				id: action.payload.id || '',
 				changes: changes
 			});
+		},
+		setAll: (state, action: PayloadAction<RolesClanEntity[]>) => {
+			RolesClanAdapter.setAll(state, action.payload);
 		},
 		updateRemoveUserRole: (state, action: PayloadAction<{ userId: string }>) => {
 			const { userId } = action.payload;
@@ -455,7 +485,8 @@ export const rolesClanActions = {
 	fetchDeleteRole,
 	fetchCreateRole,
 	updateRole,
-	updatePermissionUserByRoleId
+	updatePermissionUserByRoleId,
+	updateRoleOrder
 };
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
