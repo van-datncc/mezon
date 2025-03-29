@@ -731,6 +731,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		useLayoutEffectWithPrevDeps(
 			([prevMessageIds, prevIsViewportNewest]) => {
 				if (skipCalculateScroll.current) return;
+				const container = chatRef.current!;
+				if (!container) return;
 				const containerHeight = getContainerHeight();
 				const prevContainerHeight = prevContainerHeightRef.current;
 				prevContainerHeightRef.current = containerHeight;
@@ -745,7 +747,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					return;
 				}
 
-				const container = chatRef.current!;
 				listItemElementsRef.current = Array.from(container.querySelectorAll<HTMLDivElement>('.message-list-item'));
 
 				const lastItemElement = listItemElementsRef.current[listItemElementsRef.current.length - 1];
@@ -806,6 +807,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
+
 							animateScroll({
 								container,
 								element: shouldScrollToBottom ? lastItemElement : null!,
