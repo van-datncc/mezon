@@ -1,12 +1,21 @@
 import { useClanOwner, useDragAndDropRole } from '@mezon/core';
-import { RolesClanEntity, getStoreAsync, rolesClanActions, selectCurrentClanId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store';
+import {
+	RolesClanEntity,
+	getStoreAsync,
+	rolesClanActions,
+	selectCurrentClanId,
+	selectUserMaxPermissionLevel,
+	useAppDispatch,
+	getStore
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EDragBorderPosition, SlugPermission } from '@mezon/utils';
 import { ApiPermission, ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
+import { toast } from "react-toastify";
 
 type ListActiveRoleProps = {
 	activeRoles: RolesClanEntity[];
@@ -31,10 +40,11 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 		setRolesList,
 		hasChanged
 	} = useDragAndDropRole<RolesClanEntity>(activeRoles);
+	const [isLoading, setIsLoading] = useState<boolean> (false);
 
 	const [openSaveChangesModal, closeSaveChangesModal] = useModal(() => {
-		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={handleResetChanges} />;
-	});
+		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} isLoading={isLoading}/>;
+	}, [isLoading]);
 	const dispatch = useAppDispatch();
 
 	const handleOpenDeleteRoleModal = (e: React.MouseEvent, roleId: string) => {
@@ -47,11 +57,12 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 		setOpenEdit(true);
 	};
 
-	const handleUpdateRolesOrder = async () => {
-		const store = await getStoreAsync();
+	const handleUpdateRolesOrder = () => {
+		const store = getStore();
 		const state = store.getState();
 		const currentClanId = selectCurrentClanId(state);
-
+		
+		setIsLoading(true);
 		setRolesList((currentRoles) => {
 			const requestBody: ApiUpdateRoleOrderRequest = {
 				clan_id: currentClanId || '',
@@ -60,19 +71,22 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 					order: index
 				}))
 			};
-
-			dispatch(rolesClanActions.updateRoleOrder(requestBody));
-
-			setTimeout(() => {
+			
+			dispatch(rolesClanActions.updateRoleOrder(requestBody))
+				.then(() => {
 				dispatch(rolesClanActions.setAll(currentRoles));
-			}, 0);
-
+				
+			})
+				.catch(() => {
+				toast('Failed to update role order.');
+				setRolesList(activeRoles);
+			})
+				.finally(() => {
+				setIsLoading(false);
+			});
+			
 			return currentRoles;
 		});
-	};
-
-	const handleResetChanges = () => {
-		resetRolesList();
 	};
 
 	useEffect(() => {

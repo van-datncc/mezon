@@ -1,5 +1,6 @@
 import { EDragBorderPosition } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import isEqual  from "lodash.isequal";
 
 export function useDragAndDropRole<T>(initialList: T[]) {
 	const [rolesList, setRolesList] = useState([...initialList]);
@@ -8,17 +9,17 @@ export function useDragAndDropRole<T>(initialList: T[]) {
 	const [dragBorderPosition, setDragBorderPosition] = useState<EDragBorderPosition | null>(null);
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 	const hasChanged = useMemo(() => {
-		return JSON.stringify(rolesList) !== JSON.stringify(initialList);
+		return !isEqual(rolesList, initialList);
 	}, [rolesList, initialList]);
 
 	const SCROLL_SPEED = 10;
 	const SCROLL_THRESHOLD = 10;
 
-	const handleDragStart = (index: number) => {
+	const handleDragStart = useCallback((index: number) => {
 		dragItemIndexRef.current = index;
-	};
+	}, []);
 
-	const handleDragEnd = () => {
+	const handleDragEnd = useCallback(() => {
 		setDragBorderPosition(null);
 		setHoveredIndex(null);
 
@@ -32,9 +33,9 @@ export function useDragAndDropRole<T>(initialList: T[]) {
 
 		dragOverItemIndexRef.current = null;
 		dragItemIndexRef.current = null;
-	};
+	}, []);
 
-	const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+	const handleDragOver = useCallback((e: React.DragEvent<HTMLTableRowElement>) => {
 		e.preventDefault();
 		const { clientY } = e;
 		const windowHeight = window.innerHeight;
@@ -44,15 +45,15 @@ export function useDragAndDropRole<T>(initialList: T[]) {
 		} else if (clientY > windowHeight - SCROLL_THRESHOLD) {
 			window.scrollBy({ top: SCROLL_SPEED, behavior: 'smooth' });
 		}
-	};
+	}, []);
 
-	const handleDragEnter = (index: number) => {
+	const handleDragEnter = useCallback((index: number) => {
 		setHoveredIndex(index);
 		dragOverItemIndexRef.current = index;
 		if (dragItemIndexRef.current !== null) {
 			setDragBorderPosition(dragItemIndexRef.current > index ? EDragBorderPosition.TOP : EDragBorderPosition.BOTTOM);
 		}
-	};
+	}, []);
 
 	const resetRolesList = useCallback(() => {
 		setRolesList([...initialList]);

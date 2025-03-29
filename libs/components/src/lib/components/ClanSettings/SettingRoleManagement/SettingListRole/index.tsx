@@ -5,7 +5,7 @@ import {
 	getNewColorRole,
 	getNewNameRole,
 	getSelectedRoleId,
-	getStoreAsync,
+	getStore,
 	roleSlice,
 	rolesClanActions,
 	selectCurrentClanId,
@@ -23,6 +23,7 @@ import { ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import ModalSaveChanges from '../../ClanSettingOverview/ModalSaveChanges';
 
 type closeEditRole = {
@@ -52,15 +53,17 @@ const SettingListRole = (props: closeEditRole) => {
 		setRolesList,
 		hasChanged
 	} = useDragAndDropRole<RolesClanEntity>(RolesClan);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [openSaveChangesModal, closeSaveChangesModal] = useModal(() => {
-		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} />;
-	});
+		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} isLoading={isLoading} />;
+	}, [isLoading]);
 
-	const handleUpdateRolesOrder = async () => {
-		const store = await getStoreAsync();
+	const handleUpdateRolesOrder = () => {
+		const store = getStore();
 		const state = store.getState();
 		const currentClanId = selectCurrentClanId(state);
 
+		setIsLoading(true);
 		setRolesList((currentRoles) => {
 			const requestBody: ApiUpdateRoleOrderRequest = {
 				clan_id: currentClanId || '',
@@ -70,11 +73,17 @@ const SettingListRole = (props: closeEditRole) => {
 				}))
 			};
 
-			dispatch(rolesClanActions.updateRoleOrder(requestBody));
-
-			setTimeout(() => {
-				dispatch(rolesClanActions.setAll(currentRoles));
-			}, 0);
+			dispatch(rolesClanActions.updateRoleOrder(requestBody))
+				.then(() => {
+					dispatch(rolesClanActions.setAll(currentRoles));
+				})
+				.catch(() => {
+					toast('Failed to update role order.');
+					setRolesList(RolesClan);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				});
 
 			return currentRoles;
 		});
