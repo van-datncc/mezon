@@ -1481,3 +1481,8 @@ export enum SymbolsAndIdsLengthOfMentionValue {
 export interface ApiChannelAppResponseExtend extends ApiChannelAppResponse {
 	isBlank?: boolean;
 }
+
+export enum EDragBorderPosition {
+	TOP = 'top',
+	BOTTOM = 'bottom'
+}

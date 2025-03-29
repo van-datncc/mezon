@@ -1,21 +1,30 @@
+import { useDragAndDropRole } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getIsShow,
 	getNewColorRole,
 	getNewNameRole,
 	getSelectedRoleId,
+	getStore,
 	roleSlice,
+	rolesClanActions,
+	selectCurrentClanId,
 	selectTheme,
 	setAddMemberRoles,
 	setColorRoleNew,
 	setNameRoleNew,
 	setSelectedPermissions,
-	setSelectedRoleId
+	setSelectedRoleId,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { DEFAULT_ROLE_COLOR } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR, EDragBorderPosition } from '@mezon/utils';
+import { ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import ModalSaveChanges from '../../ClanSettingOverview/ModalSaveChanges';
 
 type closeEditRole = {
 	RolesClan: RolesClanEntity[];
@@ -24,7 +33,7 @@ type closeEditRole = {
 };
 const SettingListRole = (props: closeEditRole) => {
 	const { RolesClan, handleClose, handleUpdateUser } = props;
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const appearanceTheme = useSelector(selectTheme);
 	const isChange = useSelector(getIsShow);
 
@@ -32,6 +41,53 @@ const SettingListRole = (props: closeEditRole) => {
 	const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
 	const nameRoleNew = useSelector(getNewNameRole);
 	const colorRoleNew = useSelector(getNewColorRole);
+	const {
+		rolesList,
+		hoveredIndex,
+		dragBorderPosition,
+		handleDragStart,
+		handleDragEnd,
+		handleDragOver,
+		handleDragEnter,
+		resetRolesList,
+		setRolesList,
+		hasChanged
+	} = useDragAndDropRole<RolesClanEntity>(RolesClan);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [openSaveChangesModal, closeSaveChangesModal] = useModal(() => {
+		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} isLoading={isLoading} />;
+	}, [isLoading]);
+
+	const handleUpdateRolesOrder = () => {
+		const store = getStore();
+		const state = store.getState();
+		const currentClanId = selectCurrentClanId(state);
+
+		setIsLoading(true);
+		setRolesList((currentRoles) => {
+			const requestBody: ApiUpdateRoleOrderRequest = {
+				clan_id: currentClanId || '',
+				roles: currentRoles.map((role, index) => ({
+					role_id: role.id,
+					order: index
+				}))
+			};
+
+			dispatch(rolesClanActions.updateRoleOrder(requestBody))
+				.then(() => {
+					dispatch(rolesClanActions.setAll(currentRoles));
+				})
+				.catch(() => {
+					toast('Failed to update role order.');
+					setRolesList(RolesClan);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				});
+
+			return currentRoles;
+		});
+	};
 
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
@@ -53,7 +109,6 @@ const SettingListRole = (props: closeEditRole) => {
 			dispatch(roleSlice.actions.setCurrentRoleIcon(activeRole?.role_icon || ''));
 		}
 	};
-	const activeRoles = RolesClan.filter((role) => role.active === 1);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const newRoleRef = useRef<HTMLDivElement>(null);
@@ -69,6 +124,10 @@ const SettingListRole = (props: closeEditRole) => {
 		}
 	}, [clickedRole, dispatch, isNewRole]);
 
+	useEffect(() => {
+		hasChanged ? openSaveChangesModal() : closeSaveChangesModal();
+	}, [hasChanged]);
+
 	return (
 		<div className="w-1/3 pr-3 flex flex-col mb-20">
 			<div className="font-semibold mb-4 flex cursor-pointer" onClick={() => handleClose()}>
@@ -83,8 +142,23 @@ const SettingListRole = (props: closeEditRole) => {
 				ref={containerRef}
 				className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			>
-				{activeRoles.map((role) => (
-					<div key={role.id}>
+				{rolesList.map((role, index) => (
+					<div
+						key={role.id}
+						className={`cursor-grab
+						${
+							hoveredIndex === index
+								? dragBorderPosition === EDragBorderPosition.BOTTOM
+									? '!border-b-2 !border-b-green-500'
+									: '!border-t-2 !border-t-green-500'
+								: ''
+						}`}
+						draggable
+						onDragStart={() => handleDragStart(index)}
+						onDragOver={handleDragOver}
+						onDragEnd={handleDragEnd}
+						onDragEnter={() => handleDragEnter(index)}
+					>
 						<ItemRole
 							title={role.title || ''}
 							color={role.color || ''}

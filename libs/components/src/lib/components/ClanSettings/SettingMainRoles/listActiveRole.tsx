@@ -1,9 +1,21 @@
-import { useClanOwner } from '@mezon/core';
-import { RolesClanEntity, selectTheme, selectUserMaxPermissionLevel } from '@mezon/store';
+import { useClanOwner, useDragAndDropRole } from '@mezon/core';
+import {
+	RolesClanEntity,
+	getStoreAsync,
+	rolesClanActions,
+	selectCurrentClanId,
+	selectUserMaxPermissionLevel,
+	useAppDispatch,
+	getStore
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { DEFAULT_ROLE_COLOR, RoleEveryOne, SlugPermission } from '@mezon/utils';
-import { ApiPermission } from 'mezon-js/api.gen';
+import { DEFAULT_ROLE_COLOR, EDragBorderPosition, SlugPermission } from '@mezon/utils';
+import { ApiPermission, ApiUpdateRoleOrderRequest } from 'mezon-js/api.gen';
+import { useEffect, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
+import { toast } from "react-toastify";
 
 type ListActiveRoleProps = {
 	activeRoles: RolesClanEntity[];
@@ -15,8 +27,25 @@ type ListActiveRoleProps = {
 const ListActiveRole = (props: ListActiveRoleProps) => {
 	const { activeRoles, handleRoleClick, setShowModal, setOpenEdit } = props;
 	const isClanOwner = useClanOwner();
-	const appearanceTheme = useSelector(selectTheme);
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const {
+		rolesList,
+		hoveredIndex,
+		dragBorderPosition,
+		handleDragStart,
+		handleDragEnd,
+		handleDragOver,
+		handleDragEnter,
+		resetRolesList,
+		setRolesList,
+		hasChanged
+	} = useDragAndDropRole<RolesClanEntity>(activeRoles);
+	const [isLoading, setIsLoading] = useState<boolean> (false);
+
+	const [openSaveChangesModal, closeSaveChangesModal] = useModal(() => {
+		return <ModalSaveChanges onSave={handleUpdateRolesOrder} onReset={resetRolesList} isLoading={isLoading}/>;
+	}, [isLoading]);
+	const dispatch = useAppDispatch();
 
 	const handleOpenDeleteRoleModal = (e: React.MouseEvent, roleId: string) => {
 		e.stopPropagation();
@@ -28,64 +57,112 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 		setOpenEdit(true);
 	};
 
-	return activeRoles
-		.filter((role) => role.creator_id !== RoleEveryOne.TRUE)
-		.map((role) => {
-			const hasPermissionEdit = isClanOwner || Number(userMaxPermissionLevel) > Number(role.max_level_permission);
-			return (
-				<tr
-					key={role.id}
-					className="h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton cursor-pointer"
-					onClick={() => {
-						handleOpenEditRole(role.id);
-					}}
-				>
-					<td>
-						<p className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5">
-							{role.role_icon ? (
-								<img src={role.role_icon} alt="" className={'size-5'} />
-							) : (
-								<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" defaultFill={`${role.color || DEFAULT_ROLE_COLOR}`} />
-							)}
+	const handleUpdateRolesOrder = () => {
+		const store = getStore();
+		const state = store.getState();
+		const currentClanId = selectCurrentClanId(state);
+		
+		setIsLoading(true);
+		setRolesList((currentRoles) => {
+			const requestBody: ApiUpdateRoleOrderRequest = {
+				clan_id: currentClanId || '',
+				roles: currentRoles.map((role, index) => ({
+					role_id: role.id,
+					order: index
+				}))
+			};
+			
+			dispatch(rolesClanActions.updateRoleOrder(requestBody))
+				.then(() => {
+				dispatch(rolesClanActions.setAll(currentRoles));
+				
+			})
+				.catch(() => {
+				toast('Failed to update role order.');
+				setRolesList(activeRoles);
+			})
+				.finally(() => {
+				setIsLoading(false);
+			});
+			
+			return currentRoles;
+		});
+	};
 
-							{!hasPermissionEdit && <Icons.IconLock defaultSize="size-3 text-contentTertiary" />}
-							<span className="one-line">{role.title}</span>
-						</p>
-					</td>
-					<td className="text-[15px] text-center">
-						<p className="inline-flex gap-x-2 items-center dark:text-textThreadPrimary text-gray-500">
-							{role.role_user_list?.role_users?.length ?? 0}
-							<Icons.MemberIcon defaultSize="w-5 h-[30px] min-w-5" />
-						</p>
-					</td>
-					<td className="  flex h-14 justify-center items-center">
-						<div className="flex gap-x-2">
-							<div className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full opacity-0 group-hover:opacity-100">
-								{hasPermissionEdit ? (
-									<span title="Edit">
-										<Icons.PenEdit className="size-5" />
-									</span>
+	useEffect(() => {
+		hasChanged ? openSaveChangesModal() : closeSaveChangesModal();
+	}, [hasChanged]);
+
+	return (
+		<>
+			{rolesList.map((role, index) => {
+				const hasPermissionEdit = isClanOwner || Number(userMaxPermissionLevel) > Number(role.max_level_permission);
+				return (
+					<tr
+						key={role.id}
+						className={`h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton cursor-grab
+						${
+							hoveredIndex === index
+								? dragBorderPosition === EDragBorderPosition.BOTTOM
+									? '!border-b-2 !border-b-green-500'
+									: '!border-t-2 !border-t-green-500'
+								: ''
+						}`}
+						onClick={() => handleOpenEditRole(role.id)}
+						draggable
+						onDragStart={() => handleDragStart(index)}
+						onDragOver={handleDragOver}
+						onDragEnd={handleDragEnd}
+						onDragEnter={() => handleDragEnter(index)}
+					>
+						<td>
+							<p className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5">
+								{role.role_icon ? (
+									<img src={role.role_icon} alt="" className={'size-5'} />
 								) : (
-									<span title="View">
-										<Icons.ViewRole defaultSize="size-5" />
-									</span>
+									<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" defaultFill={`${role.color || DEFAULT_ROLE_COLOR}`} />
+								)}
+
+								{!hasPermissionEdit && <Icons.IconLock defaultSize="size-3 text-contentTertiary" />}
+								<span className="one-line">{role.title}</span>
+							</p>
+						</td>
+						<td className="text-[15px] text-center">
+							<p className="inline-flex gap-x-2 items-center dark:text-textThreadPrimary text-gray-500">
+								{role.role_user_list?.role_users?.length ?? 0}
+								<Icons.MemberIcon defaultSize="w-5 h-[30px] min-w-5" />
+							</p>
+						</td>
+						<td className="  flex h-14 justify-center items-center">
+							<div className="flex gap-x-2">
+								<div className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full opacity-0 group-hover:opacity-100">
+									{hasPermissionEdit ? (
+										<span title="Edit">
+											<Icons.PenEdit className="size-5" />
+										</span>
+									) : (
+										<span title="View">
+											<Icons.ViewRole defaultSize="size-5" />
+										</span>
+									)}
+								</div>
+								{hasPermissionEdit && (
+									<div
+										className={`text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
+										onClick={(e) => handleOpenDeleteRoleModal(e, role.id)}
+									>
+										<span title="Delete">
+											<Icons.DeleteMessageRightClick defaultSize="size-5" />
+										</span>
+									</div>
 								)}
 							</div>
-							{hasPermissionEdit && (
-								<div
-									className={`text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
-									onClick={(e) => handleOpenDeleteRoleModal(e, role.id)}
-								>
-									<span title="Delete">
-										<Icons.DeleteMessageRightClick defaultSize="size-5" />
-									</span>
-								</div>
-							)}
-						</div>
-					</td>
-				</tr>
-			);
-		});
+						</td>
+					</tr>
+				);
+			})}
+		</>
+	);
 };
 
 export default ListActiveRole;
