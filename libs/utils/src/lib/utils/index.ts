@@ -47,6 +47,7 @@ import {
 	SenderInfoOptionals,
 	UsersClanEntity
 } from '../types';
+import { Foreman } from './foreman';
 import { getPlatform } from './windowEnvironment';
 export * from './animateScroll';
 export * from './audio';
@@ -690,6 +691,9 @@ export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | nul
 	return createdFiles;
 }
 
+const MAX_WORKERS = 4;
+const fileUploadForeman = new Foreman(MAX_WORKERS);
+
 export async function getWebUploadedAttachments(payload: {
 	attachments: ApiMessageAttachment[];
 	client: Client;
@@ -703,16 +707,54 @@ export async function getWebUploadedAttachments(payload: {
 	}
 	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
 	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
 	if (nonDirectAttachments.length > 0) {
-		const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
-		const uploadPromises = createdFiles.map((file, index) => {
-			return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
+		const uploadPromises = nonDirectAttachments.map(async (attachment, index) => {
+			await fileUploadForeman.requestWorker();
+
+			try {
+				if (!attachment.url) {
+					throw new Error(`File URL is missing for file: ${attachment.filename}`);
+				}
+
+				const response = await fetch(attachment.url);
+				const arrayBuffer = await response.arrayBuffer();
+				const blob = new Blob([arrayBuffer], { type: attachment.filetype || 'application/octet-stream' });
+				const createdFile = new CustomFile([blob], attachment.filename ?? 'untitled', {
+					type: attachment.filetype || 'application/octet-stream'
+				});
+				createdFile.url = attachment.url;
+				createdFile.width = attachment.width || 0;
+				createdFile.height = attachment.height || 0;
+				createdFile.thumbnail = attachment.thumbnail;
+
+				const result = await handleUploadFile(client, session, clanId, channelId, createdFile.name, createdFile, index);
+
+				fileUploadForeman.releaseWorker();
+
+				return result;
+			} catch (error) {
+				fileUploadForeman.releaseWorker();
+				console.error('Error processing file:', error);
+				throw error;
+			}
 		});
 
-		return await Promise.all(uploadPromises);
+		try {
+			const uploadedAttachments = await Promise.all(uploadPromises);
+			return uploadedAttachments;
+		} catch (error) {
+			console.error('Failed to upload attachments:', error);
+			throw error;
+		}
 	}
 
-	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype, filename: link.filename, thumbnail: link.thumbnail }));
+	return directLinks.map((link) => ({
+		url: link.url,
+		filetype: link.filetype,
+		filename: link.filename,
+		thumbnail: link.thumbnail
+	}));
 }
 
 export async function getMobileUploadedAttachments(payload: {

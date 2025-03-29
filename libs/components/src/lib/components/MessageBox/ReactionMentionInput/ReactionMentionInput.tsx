@@ -1,28 +1,25 @@
 import {
+	getCurrentChatData,
 	useChannelMembers,
 	useClickUpToEdit,
-	useCurrentChat,
 	useEmojiSuggestionContext,
 	useGifsStickersEmoji,
 	useHandlePopupQuickMess,
 	useMessageValue,
 	useReference,
-	useThreads,
-	useTopics
+	useThreads
 } from '@mezon/core';
 import {
 	ChannelsEntity,
-	RootState,
 	appActions,
-	e2eeActions,
 	emojiSuggestionActions,
+	getStore,
 	messagesActions,
 	referencesActions,
 	selectAllAccount,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
-	selectAllUserClans,
 	selectAnonymousMode,
 	selectAttachmentByChannelId,
 	selectCloseMenu,
@@ -30,7 +27,6 @@ import {
 	selectCurrentChannelId,
 	selectCurrentTopicId,
 	selectDataReferences,
-	selectDirectById,
 	selectDmGroupCurrentId,
 	selectHasKeyE2ee,
 	selectIdMessageRefEdit,
@@ -38,14 +34,12 @@ import {
 	selectIsFocused,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
-	selectIsShowMemberListDM,
 	selectIsShowPopupQuickMess,
-	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
-	selectOpenTopicMessageState,
 	selectReactionRightState,
+	selectRequestByChannelId,
 	selectRolesClanEntities,
 	selectStatusMenu,
 	selectTheme,
@@ -98,30 +92,41 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { KeyboardEvent, ReactElement, RefObject, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import { useSelector, useStore } from 'react-redux';
+import { Mention, MentionItem, MentionsInput } from 'react-mentions';
+import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import CustomModalMentions from './CustomModalMentions';
-import {
-	defaultMaxWidth,
-	maxWidthWithChatThread,
-	maxWidthWithDmGroupMemberList,
-	maxWidthWithDmUserProfile,
-	maxWidthWithMemberList,
-	maxWidthWithSearchMessage,
-	widthDmGroupMemberList,
-	widthDmUserProfile,
-	widthMessageViewChat,
-	widthMessageViewChatThread,
-	widthSearchMessage,
-	widthThumbnailAttachment
-} from './CustomWidth';
+import { widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 import processMention from './processMention';
+
+// update type later
+export interface MentionReactBaseProps extends MentionReactInputProps {
+	mentionWidth: string;
+	handleSearchHashtag?: (search: string, callback: any) => void;
+	addMemberToThread?: any;
+	joinningToThread?: any;
+	threadCurrentChannel?: any;
+	currentChannel?: any;
+	setOpenThreadMessageState?: any;
+	checkAttachment?: any;
+	request?: any;
+	setRequestInput?: any;
+	openThreadMessageState?: any;
+	isShowCreateThread?: any;
+	nameValueThread?: any;
+	valueThread?: any;
+	isPrivate?: any;
+	membersOfChild?: any;
+	membersOfParent?: any;
+	dataReferences?: any;
+	dataReferencesTopic?: any;
+	currentDmGroupId?: string;
+}
 
 type ChannelsMentionProps = {
 	id: string;
@@ -129,191 +134,94 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
-export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
+export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElement => {
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const appStore = useStore();
-	const channels = useSelector(selectAllChannels);
-	const rolesClan = useSelector(selectAllRolesClan);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
+	const {
+		currentChannel,
+		addMemberToThread,
+		joinningToThread,
+		request,
+		threadCurrentChannel,
+		isPrivate,
+		nameValueThread,
+		valueThread,
+		setRequestInput
+	} = props;
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const openTopicMessageState = useSelector(selectOpenTopicMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelDms = useSelector(selectAllHashtagDm);
-	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
-	const { currentTopicInitMessage } = useTopics();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const usersClan = useSelector(selectAllUserClans);
 	const { emojis, emojiPicked, addEmojiState } = useEmojiSuggestionContext();
-	const currentTopicId = useSelector(selectCurrentTopicId);
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
-	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
-	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
-	const { currentChatUsersEntities } = useCurrentChat();
 	const isNotChannel = props.isThread || props.isTopic;
 	const inputElementId = isNotChannel ? GENERAL_INPUT_ID : CHANNEL_INPUT_ID;
 	const isShowEmojiPicker = !props.isThread;
-
-	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
-	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
 
 	const currTopicId = useSelector(selectCurrentTopicId);
 	const dataReferences = useSelector(selectDataReferences(props.currentChannelId ?? ''));
 	const dataReferencesTopic = useSelector(selectDataReferences(currTopicId ?? ''));
 
-	const { request, setRequestInput } = useMessageValue(isNotChannel ? currentChannelId + String(isNotChannel) : (currentChannelId as string));
-
-	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
-
-	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useMemo(() => {
-		return processMention(
-			request?.mentionRaw,
-			rolesClan,
-			membersOfChild as ChannelMembersEntity[],
-			membersOfParent as ChannelMembersEntity[],
-			dataReferences?.message_sender_id || ''
-		);
-	}, [request?.mentionRaw, rolesClan, membersOfChild, membersOfParent, dataReferences?.message_sender_id]);
-
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
-	const isGr = props.mode === ChannelStreamMode.STREAM_MODE_GROUP;
 
+	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, props.currentChannelId));
-	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, props.currentChannelId, userProfile?.user?.id));
 	const { setOpenThreadMessageState, checkAttachment } = useReference(props.currentChannelId || '');
+
+	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
 	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
 	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
 	const [isPasteMulti, setIsPasteMulti] = useState<boolean>(false);
-	const directMessage = useAppSelector((state) => selectDirectById(state, props.currentChannelId));
-	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 
-	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const seenIds = new Set();
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.toLowerCase().indexOf(query.toLowerCase()) > -1)
-			.filter((emoji) => {
-				if (emoji.id && !seenIds.has(emoji.id)) {
-					seenIds.add(emoji.id);
-					return true;
-				}
-				return false;
-			})
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+	const [undoHistory, setUndoHistory] = useState<HistoryItem[]>([]);
+	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
 
-		callback(matches);
-	};
+	const queryEmojis = useCallback(
+		(query: string, callback: (data: any[]) => void) => {
+			if (query.length === 0) return;
+			const seenIds = new Set();
+			const matches = emojis
+				.filter((emoji) => emoji.shortname && emoji.shortname.toLowerCase().indexOf(query.toLowerCase()) > -1)
+				.filter((emoji) => {
+					if (emoji.id && !seenIds.has(emoji.id)) {
+						seenIds.add(emoji.id);
+						return true;
+					}
+					return false;
+				})
+				.slice(0, 20)
+				.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+
+			callback(matches);
+		},
+		[emojis]
+	);
 
 	const { trackEnterPress } = useEnterPressTracker();
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
-	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { key, ctrlKey, shiftKey, metaKey } = event;
-		const isComposing = event.nativeEvent.isComposing;
-
-		if ((ctrlKey || metaKey) && (key === 'z' || key === 'Z')) {
-			event.preventDefault();
-			if (undoHistory.length > 0) {
-				const { valueTextInput, content, mentionRaw } = undoHistory[undoHistory.length - 1];
-
-				setRedoHistory((prevRedoHistory) => [
-					{ valueTextInput: request.valueTextInput, content: request.content, mentionRaw: request.mentionRaw },
-					...prevRedoHistory
-				]);
-
-				setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(0, prevUndoHistory.length - 1));
-
-				setRequestInput(
-					{
-						...request,
-						valueTextInput: valueTextInput,
-						content: content,
-						mentionRaw: mentionRaw
-					},
-					isNotChannel
-				);
-			}
-		} else if ((ctrlKey || metaKey) && (key === 'y' || key === 'Y')) {
-			event.preventDefault();
-			if (redoHistory.length > 0) {
-				const { valueTextInput, content, mentionRaw } = redoHistory[0];
-
-				setUndoHistory((prevUndoHistory) => [
-					...prevUndoHistory,
-					{ valueTextInput: request.valueTextInput, content: request.content, mentionRaw: request.mentionRaw }
-				]);
-
-				setRedoHistory((prevRedoHistory) => prevRedoHistory.slice(1));
-
-				setRequestInput(
-					{
-						...request,
-						valueTextInput: valueTextInput,
-						content: content,
-						mentionRaw: mentionRaw
-					},
-					isNotChannel
-				);
-			}
-		}
-
-		if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
-			handleBoldShortCut({ editorRef: editorRef, request: request, setRequestInput });
-		}
-
-		switch (key) {
-			case 'Enter': {
-				if (shiftKey || isComposing) {
-					return;
-				} else {
-					event.preventDefault();
-					trackEnterPress();
-					handleSend(anonymousMode);
-					return;
-				}
-			}
-			default: {
-				return;
-			}
-		}
-	};
-
-	const openEditMessageState = useSelector(selectOpenEditMessageState);
-
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
-
-	const attachmentData = useMemo(() => {
-		if (attachmentFilteredByChannelId === null) {
-			return [];
-		} else {
-			return attachmentFilteredByChannelId.files;
-		}
-	}, [attachmentFilteredByChannelId?.files]);
-
-	const isReplyOnChannel = dataReferences.message_ref_id && !props.isTopic ? true : false;
-	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
-	const isSendMessageOnThreadBox = openThreadMessageState && !props.isTopic ? true : false;
-
-	const hasToken = mentionList.length > 0 || hashtagList.length > 0 || emojiList.length > 0; // no remove trim() if message has token
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
+			const store = getStore();
+			const rolesClan = selectAllRolesClan(store.getState());
+			const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = processMention(
+				request?.mentionRaw,
+				rolesClan,
+				props.membersOfChild as ChannelMembersEntity[],
+				props.membersOfParent as ChannelMembersEntity[],
+				dataReferences?.message_sender_id || ''
+			);
+
+			const hasToken = mentionList.length > 0 || hashtagList.length > 0 || emojiList.length > 0; // no remove trim() if message has token
+
 			const emptyRequest: RequestInput = {
 				content: '',
 				valueTextInput: '',
@@ -325,7 +233,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 			const boldMarkdownArr: IMarkdownOnMessage[] = [];
 
-			checkedRequest?.mentionRaw?.forEach((mention) => {
+			checkedRequest?.mentionRaw?.forEach((mention: any) => {
 				if (mention.childIndex === ETypeMEntion.BOLD) {
 					boldMarkdownArr.push({
 						type: EBacktickType.BOLD,
@@ -416,7 +324,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						dataReferences: blankReferenceObj
 					})
 				);
-				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
+				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			} else if (isSendMessageOnThreadBox) {
@@ -470,7 +378,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				);
 
 				setMentionEveryone(false);
-				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
+				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			}
@@ -497,8 +405,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
-			hashtagList,
-			emojiList,
 			mentionData,
 			nameValueThread,
 			props,
@@ -511,8 +417,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			mentionEveryone,
 			addMemberToThread,
 			currentChannel,
-			usersClan,
-			currentChannelId,
+			props.currentChannelId,
 			valueThread?.content.t,
 			valueThread?.mentions,
 			valueThread?.attachments,
@@ -522,31 +427,96 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		]
 	);
 
-	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-		if (!isGr && !isDm) {
-			return channels
-				.map((item) => ({
-					id: item?.channel_id ?? '',
-					display: item?.channel_label ?? '',
-					subText: item?.category_name ?? ''
-				}))
-				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
-		}
-		return [];
-	}, [props.mode, channels]);
+	const onKeyDown = useCallback(
+		async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
+			const { key, ctrlKey, shiftKey, metaKey } = event;
+			const isComposing = event.nativeEvent.isComposing;
 
-	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-		if (isDm) {
-			return commonChannelDms
-				.map((item) => ({
-					id: item?.channel_id ?? '',
-					display: item?.channel_label ?? '',
-					subText: item?.clan_name ?? ''
-				}))
-				.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
+			if ((ctrlKey || metaKey) && (key === 'z' || key === 'Z')) {
+				event.preventDefault();
+				if (undoHistory.length > 0) {
+					const { valueTextInput, content, mentionRaw } = undoHistory[undoHistory.length - 1];
+
+					setRedoHistory((prevRedoHistory) => [
+						{ valueTextInput: request.valueTextInput, content: request.content, mentionRaw: request.mentionRaw },
+						...prevRedoHistory
+					]);
+
+					setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(0, prevUndoHistory.length - 1));
+
+					setRequestInput(
+						{
+							...request,
+							valueTextInput: valueTextInput,
+							content: content,
+							mentionRaw: mentionRaw
+						},
+						isNotChannel
+					);
+				}
+			} else if ((ctrlKey || metaKey) && (key === 'y' || key === 'Y')) {
+				event.preventDefault();
+				if (redoHistory.length > 0) {
+					const { valueTextInput, content, mentionRaw } = redoHistory[0];
+
+					setUndoHistory((prevUndoHistory) => [
+						...prevUndoHistory,
+						{ valueTextInput: request.valueTextInput, content: request.content, mentionRaw: request.mentionRaw }
+					]);
+
+					setRedoHistory((prevRedoHistory) => prevRedoHistory.slice(1));
+
+					setRequestInput(
+						{
+							...request,
+							valueTextInput: valueTextInput,
+							content: content,
+							mentionRaw: mentionRaw
+						},
+						isNotChannel
+					);
+				}
+			}
+
+			if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
+				handleBoldShortCut({ editorRef: editorRef, request: request, setRequestInput: setRequestInput });
+			}
+
+			switch (key) {
+				case 'Enter': {
+					if (shiftKey || isComposing) {
+						return;
+					} else {
+						event.preventDefault();
+						trackEnterPress();
+						handleSend(anonymousMode);
+						return;
+					}
+				}
+				default: {
+					return;
+				}
+			}
+		},
+		[undoHistory, redoHistory, request, isNotChannel, trackEnterPress, handleSend, anonymousMode]
+	);
+
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
+
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+
+	const attachmentData = useMemo(() => {
+		if (attachmentFilteredByChannelId === null) {
+			return [];
+		} else {
+			return attachmentFilteredByChannelId.files;
 		}
-		return [];
-	}, [props.mode, commonChannelDms]);
+	}, [attachmentFilteredByChannelId?.files]);
+
+	const isReplyOnChannel = dataReferences.message_ref_id && !props.isTopic ? true : false;
+	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
+	const isSendMessageOnThreadBox = openThreadMessageState && !props.isTopic ? true : false;
 
 	const [pastedContent, setPastedContent] = useState<string>('');
 	const prevValueRef = useRef('');
@@ -560,7 +530,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		prevPlainTextRef.current = request?.content;
 	}, [request?.content]);
 
-	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+	const onChangeMentionInput = (event: { target: { value: string } }, newValue: string, newPlainTextValue: string, mentions: MentionItem[]) => {
+		const store = getStore();
 		const previousValue = prevValueRef.current;
 		const previousPlainText = prevPlainTextRef.current;
 		const newMentions = updateMentionPositions(mentions, newValue, newPlainTextValue);
@@ -595,6 +566,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		const onlyMention = filterMentionsWithAtSign(newMentions);
 		const convertToMarkUpString = formatMentionsToString(onlyMention);
 		const convertToPlainTextString = getDisplayMention(onlyMention);
+		const rolesClan = selectAllRolesClan(store.getState());
+
 		const mentionUpdated = convertMentionOnfile(rolesClan, convertToPlainTextString, onlyMention as MentionItem[]);
 		setDisplayPlaintext(convertToPlainTextString);
 		setDisplayMarkup(convertToMarkUpString);
@@ -606,6 +579,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		} else {
 			setDisplayPlaintext(newPlainTextValue);
 			setDisplayMarkup(newValue);
+			const { mentionList } = processMention(
+				[...(request?.mentionRaw || [])],
+				rolesClan,
+				props.membersOfChild as ChannelMembersEntity[],
+				props.membersOfParent as ChannelMembersEntity[]
+			);
+
 			setMentionUpdated(mentionList);
 			setRequestInput(
 				{
@@ -644,7 +624,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	};
 
-	function handleEventAfterEmojiPicked() {
+	const handleEventAfterEmojiPicked = useCallback(() => {
 		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
 
 		if (isEmptyEmojiPicked || !editorRef?.current) {
@@ -666,9 +646,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				}
 			}
 		}
-	}
+	}, [emojiPicked, isFocusOnChannelInput]);
 
 	const clickUpToEditMessage = useCallback(() => {
+		const store = getStore();
+		const lastMessageByUserId = selectLassSendMessageEntityBySenderId(store.getState(), props.currentChannelId, userProfile?.user?.id);
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !request?.valueTextInput) {
 			dispatch(referencesActions.setOpenEditMessageState(true));
@@ -687,39 +669,62 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				})
 			);
 		}
-	}, [lastMessageByUserId, props.currentChannelId, request]);
+	}, [props.currentChannelId, request]);
 
-	const appearanceTheme = useSelector(selectTheme);
+	const handleSearchUserMention = useCallback(
+		(search: string, callback: any) => {
+			setValueHightlight(search);
+			callback(searchMentionsHashtag(search, props.listMentions ?? []));
+		},
+		[props.listMentions]
+	);
 
-	const handleSearchUserMention = (search: string, callback: any) => {
-		setValueHightlight(search);
-		callback(searchMentionsHashtag(search, props.listMentions ?? []));
-	};
+	const handleSearchHashtag = useCallback(
+		(search: string, callback: any) => {
+			setValueHightlight(search);
+			const store = getStore();
+			if (isDm) {
+				const commonChannelDms = selectAllHashtagDm(store.getState());
+				const mentions = commonChannelDms
+					.map((item) => ({
+						id: item?.channel_id ?? '',
+						display: item?.channel_label ?? '',
+						subText: item?.clan_name ?? ''
+					}))
+					.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
 
-	const handleSearchHashtag = (search: string, callback: any) => {
-		setValueHightlight(search);
-		if (isDm) {
-			callback(searchMentionsHashtag(search, commonChannelsMention ?? []));
-		} else {
-			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
-		}
-	};
+				callback(searchMentionsHashtag(search, mentions ?? []));
+			} else {
+				const channels = selectAllChannels(store.getState());
+
+				const listChannelsMention = channels
+					.map((item) => ({
+						id: item?.channel_id ?? '',
+						display: item?.channel_label ?? '',
+						subText: item?.category_name ?? ''
+					}))
+					.filter((mention) => mention.id || mention.display || mention.subText) as ChannelsMentionProps[];
+				callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+			}
+		},
+		[isDm]
+	);
 
 	const handleFocusInput = useCallback(() => {
 		dispatch(appActions.setIsFocusOnChannelInput(!isNotChannel));
-	}, [isNotChannel]);
+	}, [dispatch, isNotChannel]);
 
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 
-	const handleFocusOnEditorElement = (
-		isFocusOnChannelInput: boolean,
-		editorRef: RefObject<HTMLInputElement | HTMLDivElement | HTMLUListElement>
-	) => {
-		const targetEditorId = isFocusOnChannelInput ? CHANNEL_INPUT_ID : GENERAL_INPUT_ID;
-		if (editorRef.current?.id === targetEditorId) {
-			focusToElement(editorRef);
-		}
-	};
+	const handleFocusOnEditorElement = useCallback(
+		(isFocusOnChannelInput: boolean, editorRef: RefObject<HTMLInputElement | HTMLDivElement | HTMLUListElement>) => {
+			const targetEditorId = isFocusOnChannelInput ? CHANNEL_INPUT_ID : GENERAL_INPUT_ID;
+			if (editorRef.current?.id === targetEditorId) {
+				focusToElement(editorRef);
+			}
+		},
+		[]
+	);
 
 	useEffect(() => {
 		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
@@ -734,12 +739,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked, addEmojiState]);
 
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu) {
+		if ((props.currentChannelId !== undefined || props.currentDmGroupId !== undefined) && !closeMenu) {
 			handleFocusOnEditorElement(isFocusOnChannelInput, editorRef);
 		}
-	}, [currentChannelId, currentDmGroupId]);
+	}, [props.currentChannelId, props.currentDmGroupId]);
 
 	useEffect(() => {
 		if (isFocused || attachmentFilteredByChannelId?.files.length > 0) {
@@ -747,38 +751,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			dispatch(messagesActions.setIsFocused(false));
 		}
 	}, [dispatch, isFocused, attachmentFilteredByChannelId?.files]);
-
-	const [mentionWidth, setMentionWidth] = useState('');
-	const [chatBoxMaxWidth, setChatBoxMaxWidth] = useState('');
-
-	useEffect(() => {
-		if (isDm) {
-			setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
-			setChatBoxMaxWidth(isShowDMUserProfile ? maxWidthWithDmUserProfile : defaultMaxWidth);
-		} else if (isGr) {
-			setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
-			setChatBoxMaxWidth(isShowMemberListDM ? maxWidthWithDmGroupMemberList : defaultMaxWidth);
-		} else {
-			setMentionWidth(
-				isShowMemberList
-					? widthMessageViewChat
-					: isShowCreateThread
-						? widthMessageViewChatThread
-						: isSearchMessage
-							? widthSearchMessage
-							: widthThumbnailAttachment
-			);
-			setChatBoxMaxWidth(
-				isShowMemberList
-					? maxWidthWithMemberList
-					: isShowCreateThread
-						? maxWidthWithChatThread
-						: isSearchMessage
-							? maxWidthWithSearchMessage
-							: defaultMaxWidth
-			);
-		}
-	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
 
 	useEffect(() => {
 		if (editorRef.current) {
@@ -795,12 +767,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			const parsedData = parsePastedMentionData(pastedData);
 
 			if (!parsedData) return;
+			const { currentChatUsersEntities } = getCurrentChatData();
 
 			const { message: pastedContent, startIndex, endIndex } = parsedData;
 			const currentInputValueLength = (request?.valueTextInput ?? '').length;
 			const currentFocusIndex = editorRef.current?.selectionStart as number;
-			const appState = appStore.getState() as RootState;
-			const clanRolesEntities = selectRolesClanEntities(appState);
+			const store = getStore();
+			const clanRolesEntities = selectRolesClanEntities(store.getState());
 
 			const transformedText =
 				pastedContent?.content?.t && pastedContent?.mentions
@@ -819,11 +792,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				currentInputValueLength
 			);
 
+			const rolesClan = selectAllRolesClan(store.getState());
+
 			const { mentionList } = processMention(
 				[...(request?.mentionRaw || []), ...mentionRaw],
 				rolesClan,
-				membersOfChild as ChannelMembersEntity[],
-				membersOfParent as ChannelMembersEntity[]
+				props.membersOfChild as ChannelMembersEntity[],
+				props.membersOfParent as ChannelMembersEntity[]
 			);
 
 			const transformedTextInsertIndex = getMarkupInsertIndex(currentFocusIndex, mentionList, currentChatUsersEntities, clanRolesEntities);
@@ -846,14 +821,13 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 			event.preventDefault();
 		},
-		[request, editorRef, currentChatUsersEntities, setRequestInput, props.isThread]
+		[request, editorRef, setRequestInput, props.isThread, props.membersOfChild, props.membersOfParent, isNotChannel]
 	);
 
-	const handleShowModalE2ee = () => {
-		if (directMessage && directMessage?.e2ee && !hasKeyE2ee) {
-			dispatch(e2eeActions.setOpenModalE2ee(true));
-		}
-	};
+	const handleShowModalE2ee = useCallback(() => {
+		const store = getStore();
+		const hasKeyE2ee = selectHasKeyE2ee(store.getState());
+	}, []);
 
 	return (
 		<div className="contain-layout relative">
@@ -887,7 +861,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
-						width: `${!closeMenu ? mentionWidth : '90vw'}`,
+						width: `${!closeMenu ? props.mentionWidth : '90vw'}`,
 						left: `${!closeMenu ? '-40px' : '-30px'}`
 					},
 
@@ -1014,6 +988,130 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			)}
 		</div>
 	);
+});
+
+MentionReactBase.displayName = 'MentionReactBase';
+
+const ClanMentionReactInput = memo((props: MentionReactInputProps) => {
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const isSearchMessage = useSelector((state) => selectIsSearchMessage(state, props.currentChannelId));
+	const [mentionWidth, setMentionWidth] = useState('');
+
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
+	const { isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const currTopicId = useSelector(selectCurrentTopicId);
+	const dataReferences = useSelector(selectDataReferences(currentChannelId ?? ''));
+	const dataReferencesTopic = useSelector(selectDataReferences(currTopicId ?? ''));
+	const { setRequestInput } = useMessageValue(
+		props.isThread || props.isTopic ? currentChannelId + String(props.isThread || props.isTopic) : (currentChannelId as string)
+	);
+	const request = useAppSelector((state) =>
+		selectRequestByChannelId(
+			state,
+			props.isThread || props.isTopic ? currentChannelId + String(props.isThread || props.isTopic) : (currentChannelId as string)
+		)
+	);
+	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
+	const { setOpenThreadMessageState, checkAttachment } = useReference(currentChannelId || '');
+
+	useEffect(() => {
+		setMentionWidth(
+			isShowMemberList
+				? widthMessageViewChat
+				: isShowCreateThread
+					? widthMessageViewChatThread
+					: isSearchMessage
+						? widthSearchMessage
+						: widthThumbnailAttachment
+		);
+	}, [isSearchMessage, isShowCreateThread, isShowMemberList]);
+
+	return (
+		<MentionReactBase
+			{...props}
+			currentChannelId={currentChannelId || ''}
+			mentionWidth={mentionWidth}
+			addMemberToThread={addMemberToThread}
+			joinningToThread={joinningToThread}
+			threadCurrentChannel={threadCurrentChannel}
+			currentChannel={currentChannel}
+			setOpenThreadMessageState={setOpenThreadMessageState}
+			checkAttachment={checkAttachment}
+			request={request}
+			setRequestInput={setRequestInput}
+			openThreadMessageState={openThreadMessageState}
+			isShowCreateThread={isShowCreateThread}
+			nameValueThread={nameValueThread}
+			valueThread={valueThread}
+			isPrivate={isPrivate}
+			membersOfChild={membersOfChild}
+			membersOfParent={membersOfParent}
+			dataReferences={dataReferences}
+			dataReferencesTopic={dataReferencesTopic}
+		/>
+	);
+});
+
+interface DMReactionInputProps extends MentionReactInputProps {
+	isDm: boolean;
+	isGr: boolean;
+}
+
+const DMReactionInput = memo((props: DMReactionInputProps) => {
+	// const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
+	// const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const [mentionWidth, setMentionWidth] = useState('');
+
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+
+	// DM specific state and functionality
+	const { setRequestInput } = useMessageValue(props.currentChannelId || '');
+	const request = useAppSelector((state) => selectRequestByChannelId(state, props.currentChannelId as string));
+
+	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
+	const isGr = props.mode === ChannelStreamMode.STREAM_MODE_GROUP;
+
+	// useEffect(() => {
+	// 	if (isDm) {
+	// 		setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
+	// 	} else if (isGr) {
+	// 		setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
+	// 	}
+	// }, [isDm, isGr, isShowDMUserProfile, isShowMemberListDM]);
+
+	// You could add custom DM-specific search handlers here if needed
+	const handleSearchHashtag = useCallback((search: string, callback: any) => {
+		// DM-specific hashtag search implementation
+		// ...
+	}, []);
+
+	return (
+		<MentionReactBase
+			{...props}
+			mentionWidth={mentionWidth}
+			handleSearchHashtag={handleSearchHashtag}
+			request={request}
+			setRequestInput={setRequestInput}
+			currentDmGroupId={currentDmGroupId as string}
+		/>
+	);
+});
+
+DMReactionInput.displayName = 'DMReactionInput';
+
+export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
+	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
+	const isGr = props.mode === ChannelStreamMode.STREAM_MODE_GROUP;
+
+	if (isDm || isGr) {
+		return <DMReactionInput {...props} isDm={isDm} isGr={isGr} />;
+	}
+
+	return <ClanMentionReactInput {...props} />;
 });
 
 MentionReactInput.displayName = 'MentionReactInput';

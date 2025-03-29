@@ -28,7 +28,9 @@ import {
 	selectFriendStatus,
 	selectHasKeyE2ee,
 	selectNotifiSettingsEntitiesById,
-	useAppDispatch
+	selectRequestByChannelId,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { ChannelMembersEntity, EPermission, EUserSettings, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
@@ -133,7 +135,9 @@ const PanelMember = ({
 	const { toDmGroupPageFromMainApp } = useAppNavigation();
 	const navigate = useNavigate();
 	const { createDirectMessageWithUser } = useDirect();
-	const { setRequestInput, request } = useMessageValue(currentChannel?.channel_id);
+	const { setRequestInput } = useMessageValue(currentChannel?.channel_id);
+	const request = useAppSelector((state) => selectRequestByChannelId(state, currentChannel?.channel_id as string));
+
 	const displayMentionName = useMemo(() => {
 		if (member?.clan_nick) return member.clan_nick;
 		return member?.user?.display_name ?? member?.user?.username;

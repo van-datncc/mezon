@@ -48,6 +48,7 @@ export type OwnProps<T> = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	onCancelUpload?: (arg: T) => void;
 	isInSearchMessage?: boolean;
+	isSending?: boolean;
 };
 const Photo = <T,>({
 	id,
@@ -73,7 +74,8 @@ const Photo = <T,>({
 	className,
 	onClick,
 	onContextMenu,
-	isInSearchMessage
+	isInSearchMessage,
+	isSending
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 	const isPaidPreview = photo.mediaType === 'extendedMediaPreview';
@@ -134,7 +136,8 @@ const Photo = <T,>({
 		isOpen: isTransferring,
 		noMountTransition: wasLoadDisabled,
 		className: 'slow',
-		withShouldRender: true
+		withShouldRender: true,
+		isSending
 	});
 
 	const { ref: downloadButtonRef, shouldRender: shouldRenderDownloadButton } = useShowTransition({
@@ -194,7 +197,7 @@ const Photo = <T,>({
 					draggable={!isProtected}
 				/>
 			)}
-			{withThumb && (
+			{!isSending && withThumb && (
 				<canvas
 					style={{ width, height }}
 					ref={thumbRef}
@@ -202,7 +205,7 @@ const Photo = <T,>({
 				/>
 			)}
 			{isProtected && <span className="protector" />}
-			{shouldRenderSpinner && !shouldRenderDownloadButton && (
+			{((shouldRenderSpinner && !shouldRenderDownloadButton) || isSending) && (
 				<div
 					ref={spinnerRef as any}
 					style={{ width: width, height: height }}
