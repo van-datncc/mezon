@@ -345,12 +345,6 @@ export const fetchMessages = createAsyncThunk(
 				lastSentMessage = response.last_sent_message as ApiChannelMessageHeader;
 			}
 
-			// no message id and direction is before timestamp means load latest messages
-			// then the last sent message will be the last message of response
-			if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
-				lastSentMessage = response.last_sent_message as ApiChannelMessageHeader;
-			}
-
 			const lastSentState = selectLatestMessageId(state, chlId);
 			if (!lastSentState || (lastSentMessage && lastSentMessage.id && noCache)) {
 				thunkAPI.dispatch(
@@ -767,6 +761,7 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 	// ignore the message if in view older messages mode
 	const state = getMessagesState(getMessagesRootState(thunkAPI));
 	const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[message.channel_id];
+
 	if (isViewingOlderMessages) {
 		thunkAPI.dispatch(messagesActions.setLastMessage(message));
 		return;
