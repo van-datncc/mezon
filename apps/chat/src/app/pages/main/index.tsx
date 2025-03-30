@@ -278,12 +278,15 @@ function MyApp() {
 	};
 
 	const allChannelApp = useSelector(selectAllAppChannelsListShowOnPopUp);
-	const groupedByClan = allChannelApp.reduce<Record<string, typeof allChannelApp>>((acc, item) => {
-		if (item.clan_id) {
-			(acc[item.clan_id] ||= []).push(item);
-		}
-		return acc;
-	}, {});
+
+	const groupedByClan = useMemo(() => {
+		return allChannelApp.reduce<Record<string, typeof allChannelApp>>((acc, item) => {
+			if (item.clan_id) {
+				(acc[item.clan_id] ||= []).push(item);
+			}
+			return acc;
+		}, {});
+	}, [allChannelApp]);
 
 	return (
 		<div className="relative overflow-hidden w-full h-full">
