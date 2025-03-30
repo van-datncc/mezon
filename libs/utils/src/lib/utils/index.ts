@@ -27,7 +27,6 @@ import {
 	EBacktickType,
 	EMimeTypes,
 	ETokenMessage,
-	EmojiDataOptionals,
 	IAttachmentEntity,
 	IChannel,
 	IEmojiOnMessage,
@@ -251,36 +250,6 @@ export const convertMarkdown = (markdown: string, type: EBacktickType): string =
 
 export const getSrcEmoji = (id: string) => {
 	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
-};
-
-export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
-	const emojiDataItems: Record<string, EmojiDataOptionals> = {};
-	message.reactions?.forEach((reaction) => {
-		const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-
-		if (!emojiDataItems[key]) {
-			emojiDataItems[key] = {
-				id: reaction.id,
-				emoji: reaction.emoji,
-				emojiId: reaction.emoji_id,
-				senders: [
-					{
-						sender_id: reaction.sender_id,
-						count: reaction.count
-					}
-				],
-				channel_id: message.channel_id,
-				message_id: message.id
-			};
-		} else {
-			const existingItem = emojiDataItems[key];
-
-			if (existingItem.senders.length > 0) {
-				existingItem.senders[0].count = reaction.count;
-			}
-		}
-	});
-	return Object.values(emojiDataItems);
 };
 
 export const checkLastChar = (text: string) => {

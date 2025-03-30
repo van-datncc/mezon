@@ -104,6 +104,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 								height: `${virtualRow.size}px`,
 								transform: `translateY(${virtualRow.start}px)`
 							}}
+							className="dm-wrap"
 						>
 							<DMListItem
 								currentDmGroupId={currentDmGroupId as string}

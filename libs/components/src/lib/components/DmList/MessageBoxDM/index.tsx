@@ -2,7 +2,7 @@ import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core'
 import { referencesActions, selectDataReferences, selectSession, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
@@ -111,4 +111,4 @@ DirectMessageBox.Skeleton = () => {
 	);
 };
 
-export default DirectMessageBox;
+export default memo(DirectMessageBox);
